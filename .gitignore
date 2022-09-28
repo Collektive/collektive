@@ -1,0 +1,8 @@
+.gradle/
+build/
+.idea/
+.vscode
+bin
+kotlin-js-store
+*.hprof
+local.properties
