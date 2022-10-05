@@ -1,7 +1,8 @@
 fun main() {
-    val field = FieldImpl<Int>()
+    val field = FieldImpl<Double>()
     println("Running on ${Platform.name}")
-    field.print()
+
+    // DSL functions
     aggregate {
         neighbouring()
     }
