@@ -1,10 +1,9 @@
-import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.shouldNotBe
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
-class Test : StringSpec(
-    {
-        "a simple test" {
-            true shouldNotBe false
-        }
+class FieldTest {
+    @Test
+    fun emptyField(){
+        assertEquals(FieldImpl<String>().field, emptyMap())
     }
-)
+}
