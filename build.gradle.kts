@@ -68,6 +68,7 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(libs.bundles.kotlin.testing.common)
+                implementation(kotlin("test"))
             }
         }
         val jvmTest by getting {
