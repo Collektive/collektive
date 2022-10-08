@@ -29,7 +29,6 @@ class FieldsTest {
         fields.addField(String)
         val field = fields.retrieveField(String)
         field.addElement(0, "test")
-        println(fields.retrieveAllFields())
         assertContains(fields.retrieveField(String).field, 0)
     }
 }
