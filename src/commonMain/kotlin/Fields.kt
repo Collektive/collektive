@@ -1,10 +1,7 @@
-import kotlin.native.concurrent.ThreadLocal
+class Fields<X : Any> {
+    private val fields: MutableMap<X, FieldImpl<X>> = mutableMapOf()
 
-@ThreadLocal
-object Fields {
-    private val fields: MutableList<Field<Any>> = mutableListOf()
+    fun retrieveAllFields(): List<FieldImpl<X>> = fields.values.toList()
 
-    fun retrieveAllFields(): MutableList<Field<Any>> = fields
-
-    fun <X : Any> addField(event: Field<X>): Boolean = fields.add(event)
+    fun addField(event: X): FieldImpl<X>? = fields.put(event, FieldImpl())
 }
