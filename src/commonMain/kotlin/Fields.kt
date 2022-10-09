@@ -1,10 +1,7 @@
 class Fields<X : Any> {
     private val fields: MutableMap<Int, FieldImpl<X>> = mutableMapOf()
 
-    fun retrieveAllFields(): List<FieldImpl<X>> {
-        println(fields.toString())
-        return fields.values.toList()
-    }
+    fun retrieveAllFields(): List<FieldImpl<X>> = fields.values.toList()
 
     fun addField(event: X): FieldImpl<X>? = fields.put(event::class.hashCode(), FieldImpl())
 
