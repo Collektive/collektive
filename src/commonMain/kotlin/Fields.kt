@@ -5,5 +5,5 @@ class Fields<X : Any> {
 
     fun addField(event: X): FieldImpl<X>? = fields.put(event, FieldImpl())
 
-    fun retrieveField(event: X): FieldImpl<X> = fields.getValue(event)
+    fun retrieveField(event: X): FieldImpl<X>? = fields[event]
 }
