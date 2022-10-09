@@ -6,4 +6,7 @@ class Fields<X : Any> {
     fun addField(event: X): FieldImpl<X>? = fields.put(event, FieldImpl())
 
     fun retrieveField(event: X): FieldImpl<X>? = fields[event]
+
+    fun isFieldPresent(event: X): Boolean = fields.containsKey(event)
+
 }
