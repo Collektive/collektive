@@ -1,18 +1,10 @@
 fun main() {
-    println("Running on ${Platform.name}")
-    val fields = Fields<Any>()
 
+    val fields = Environment.fields
     val f: (Int) -> Int = { it * 2 }
-    fields.addField(f)
-    fields.addField(String)
-
-    val field = fields.retrieveField(String)
-    field.addElement(0, "test")
-
-    println(fields.retrieveField(String))
-
+    fields.addField(f) //this will not be necessary in the future
     // DSL functions
     aggregate {
-
+        neighbouring(f)
     }
 }
