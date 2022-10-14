@@ -1,5 +1,4 @@
 import kotlin.test.Test
-import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
@@ -27,8 +26,7 @@ class FieldsTest {
     @Test
     fun modifyField() {
         fields.addField(String)
-        val field = fields.retrieveField(String)
-        field.addElement(0, "test")
-        assertContains(fields.retrieveField(String).field, 0)
+        fields.retrieveField(String).addElement(0, "test")
+        assertNotNull(fields.retrieveField(String).getById(0))
     }
 }
