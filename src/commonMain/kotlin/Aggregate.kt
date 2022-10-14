@@ -1,13 +1,11 @@
 class Aggregate {
     // nbr
-    fun <X : Any> neighbouring(event: X): Field<Any> =
-        Environment.fields.retrieveField(event) ?:
-        throw IllegalArgumentException("No field found of the selected event")
+    fun <X : Any> neighbouring(event: X): Field<Any> = Environment.fields.retrieveField(event)
 
     // rep
     inline fun <reified X : Any> repeating(initial: X, repeat: (X) -> X): X {
         return if (Environment.fields.isFieldPresent(initial)) {
-            val value = Environment.fields.retrieveField(initial)?.getById(Environment.deviceId)
+            val value = Environment.fields.retrieveField(initial).getById(Environment.deviceId)
             if (value is X){
                 repeat(value)
             } else {
