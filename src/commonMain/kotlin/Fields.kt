@@ -1,5 +1,5 @@
-class Fields<X : Any> {
-    private val fields: MutableMap<Int, Field<X>> = mutableMapOf()
+sealed class Fields<X : Any> {
+    abstract val fields: MutableMap<Int, Field<X>>
 
     fun retrieveAllFields(): List<Field<X>> = fields.values.toList()
 
@@ -10,3 +10,4 @@ class Fields<X : Any> {
 
     fun isFieldPresent(event: X): Boolean = fields.containsKey(event::class.hashCode())
 }
+
