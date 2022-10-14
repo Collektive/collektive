@@ -11,3 +11,4 @@ sealed class Fields<X : Any> {
     fun isFieldPresent(event: X): Boolean = fields.containsKey(event::class.hashCode())
 }
 
+data class LocalFields<X : Any>(override val fields: MutableMap<Int, Field<X>> ) : Fields<X>()
