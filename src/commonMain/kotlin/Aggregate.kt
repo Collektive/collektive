@@ -1,11 +1,11 @@
 class Aggregate {
     // nbr
-    fun <X : Any> neighbouring(event: X): Field<Any> = Environment.fields.retrieveField(event)
+    fun <X : Any> neighbouring(event: X): Field<Any> = Environment.localFields.retrieveField(event)
 
     // rep
     inline fun <reified X : Any> repeating(initial: X, repeat: (X) -> X): X {
-        return if (Environment.fields.isFieldPresent(initial)) {
-            val value = Environment.fields.retrieveField(initial).getById(Environment.deviceId)
+        return if (Environment.localFields.isFieldPresent(initial)) {
+            val value = Environment.localFields.retrieveField(initial).getById(Environment.deviceId)
             if (value is X){
                 repeat(value)
             } else {

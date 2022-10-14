@@ -3,7 +3,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 class FieldsTest {
-    private val fields = Fields<Any>()
+    private val fields = LocalFields<Any>()
     @Test
     fun addField(){
         fields.addField(Int)

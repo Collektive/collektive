@@ -5,7 +5,7 @@ import kotlin.test.assertNotNull
 class AggregateTest {
     private val notAddedEvent: (String) -> String = { it.uppercase()}
     private val event: (Int) -> Int = { it * 2}
-    private val field = Environment.fields.addField(event)
+    private val field = Environment.localFields.addField(event)
 
     @Test
     fun neighbouringSuccessful(){
