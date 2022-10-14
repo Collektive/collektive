@@ -1,6 +1,6 @@
 class Aggregate {
     // nbr
-    fun <X : Any> neighbouring(event: X): FieldImpl<Any> =
+    fun <X : Any> neighbouring(event: X): Field<Any> =
         Environment.fields.retrieveField(event) ?:
         throw IllegalArgumentException("No field found of the selected event")
 
