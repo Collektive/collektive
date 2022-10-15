@@ -1,8 +1,12 @@
+package aggregateTest
+
+import Environment
+import aggregate
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 
-class AggregateTest {
+class NeighbouringTest {
     private val notAddedEvent: (String) -> String = { it.uppercase()}
     private val event: (Int) -> Int = { it * 2}
     private val field = Environment.localFields.addField(event)
