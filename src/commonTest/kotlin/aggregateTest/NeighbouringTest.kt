@@ -1,15 +1,18 @@
 package aggregateTest
 
-import Environment
+import Environment.localFields
 import aggregate
+import event.EventImpl
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 
 class NeighbouringTest {
-    private val notAddedEvent: (String) -> String = { it.uppercase()}
-    private val event: (Int) -> Int = { it * 2}
-    private val field = Environment.localFields.addField(event)
+    private val notAddedType: (String) -> String = { it.uppercase()}
+    private val notAddedEvent = EventImpl(notAddedType)
+    private val type: (Int) -> Int = { it * 2}
+    private val event = EventImpl(type)
+    private val field = localFields.addField(event)
 
     @Test
     fun neighbouringSuccessful(){
