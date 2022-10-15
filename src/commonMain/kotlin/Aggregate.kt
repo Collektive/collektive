@@ -7,7 +7,7 @@ class Aggregate {
     fun <X : Any> neighbouring(event: X): Field<Any> = localFields.retrieveField(EventImpl(event))
 
     // rep
-    inline fun <reified X : Any> repeating(initial: X, noinline repeat: (X) -> X): X {
+    inline fun <reified X : Any, Y : Any> repeating(initial: X, noinline repeat: (X) -> Y): Y {
         val event = EventImpl(repeat)
         return if (localFields.isFieldPresent(event)) {
             val value = localFields.retrieveField(event).getById(deviceId)
