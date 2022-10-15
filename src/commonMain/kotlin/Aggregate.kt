@@ -1,25 +1,28 @@
 import Environment.deviceId
 import Environment.localFields
+import event.EventImpl
 
 class Aggregate {
     // nbr
-    fun <X : Any> neighbouring(event: X): Field<Any> = localFields.retrieveField(event)
+    fun <X : Any> neighbouring(event: X): Field<Any> = localFields.retrieveField(EventImpl(event))
 
     // rep
     inline fun <reified X : Any> repeating(initial: X, noinline repeat: (X) -> X): X {
-        return if (localFields.isFieldPresent(repeat)) {
-            val value = localFields.retrieveField(repeat).getById(deviceId)
+        val event = EventImpl(repeat)
+        return if (localFields.isFieldPresent(event)) {
+            val value = localFields.retrieveField(event).getById(deviceId)
             if (value is X){
                 val result = repeat(value)
-                localFields.retrieveField(repeat).addElement(deviceId, result)
+                localFields.retrieveField(event).addElement(deviceId, result)
                 result
             } else {
                 throw IllegalArgumentException("Wrong field found")
             }
         } else {
             val result = repeat(initial)
-            localFields.addField(repeat)
-            localFields.retrieveField(repeat).addElement(deviceId, result)
+            localFields.addField(event)
+            println(localFields)
+            localFields.retrieveField(event).addElement(deviceId, result)
             result
         }
     }
