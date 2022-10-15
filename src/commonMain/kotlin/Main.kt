@@ -2,9 +2,10 @@ fun main() {
 
     val fields = Environment.localFields
     val f: (Int) -> Int = { it * 2 }
-    fields.addField(f) //this will not be necessary in the future
+    println(fields)
     // DSL functions
     aggregate {
-        neighbouring(f)
+        repeating(1, f)
     }
+    println(fields)
 }
