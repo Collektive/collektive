@@ -4,4 +4,5 @@ import kotlin.native.concurrent.ThreadLocal
 object Environment {
     const val deviceId: Int = 0 // For test purposes
     val localFields: Fields<Any> = LocalFields()
+    val globalFields: Fields<Any> = GlobalFields()
 }
