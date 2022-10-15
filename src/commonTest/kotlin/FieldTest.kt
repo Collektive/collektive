@@ -1,6 +1,6 @@
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class FieldTest {
@@ -27,6 +27,10 @@ class FieldTest {
     @Test
     fun getValueByWrongId(){
         field.addElement(testId, testValue)
-        assertNull(field.getById(wrongId))
+        assertFailsWith<IllegalArgumentException>(
+            block = {
+                field.getById(wrongId)
+            }
+        )
     }
 }
