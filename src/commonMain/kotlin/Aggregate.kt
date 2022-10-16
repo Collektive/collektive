@@ -4,7 +4,7 @@ import event.EventImpl
 
 class Aggregate {
     // nbr
-    fun <X : Any> neighbouring(event: X): Field<Any> = localFields.retrieveField(EventImpl(event))
+    inline fun <reified X : Any> neighbouring(type: X): Field<Any> = localFields.retrieveField(EventImpl(EventImpl(type)))
 
     // rep
     inline fun <reified X : Any, Y : Any> repeating(initial: X, noinline repeat: (X) -> Y): Y {
@@ -21,7 +21,6 @@ class Aggregate {
         } else {
             val result = repeat(initial)
             localFields.addField(event)
-            println(localFields)
             localFields.retrieveField(event).addElement(deviceId, result)
             result
         }
