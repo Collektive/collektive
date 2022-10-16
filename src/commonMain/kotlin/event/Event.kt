@@ -2,11 +2,11 @@ package event
 
 interface Event<out X : Any> {
     val type: X
-    fun identifier(): Int
+    val identifier: String
 }
 
 class EventImpl<X : Any>(override val type: X): Event<X> {
-    override fun identifier(): Int = HashCodeEventIdentifierStrategy<X>().generateIdentifier(this)
+    override val identifier: String = StackTraceEventIdentifierStrategy<X>().generateIdentifier(this)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
