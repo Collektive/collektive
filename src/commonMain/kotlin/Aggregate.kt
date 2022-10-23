@@ -4,7 +4,7 @@ import event.EventImpl
 
 class Aggregate {
     // nbr
-    inline fun <reified X : Any> neighbouring(type: X): Field<Any> = localFields.retrieveField(EventImpl(EventImpl(type)))
+    fun <X : Any> neighbouring(type: X): Field<Any> = localFields.retrieveField(EventImpl(type))
 
     // rep
     inline fun <reified X : Any, Y : Any> repeating(initial: X, noinline repeat: (X) -> Y): Y {
