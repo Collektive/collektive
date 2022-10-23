@@ -9,7 +9,7 @@ actual class StackTraceEventIdentifierStrategy<X : Any> {
         } catch (e: Exception) {
             val stackTrace = e.stackTraceToString()
             println(stackTrace)
-            return subject.type.toString()
+            return stackTrace
         }
     }
 }
