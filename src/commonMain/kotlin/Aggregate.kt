@@ -1,10 +1,18 @@
 import Environment.deviceId
+import Environment.globalFields
 import Environment.localFields
 import event.EventImpl
 
 class Aggregate {
     // nbr
-    fun <X : Any> neighbouring(type: X): Field<Any> = localFields.retrieveField(EventImpl(type))
+    fun <X : Any> neighbouring(type: X): Field<Any> {
+        val event = EventImpl(type)
+        if (!globalFields.isFieldPresent(event)){
+            globalFields.addField(event)
+        }
+        globalFields.retrieveField(event).addElement(deviceId, type)
+        return globalFields.retrieveField(event)
+    }
 
     // rep
     inline fun <reified X : Any, Y : Any> repeating(initial: X, noinline repeat: (X) -> Y): Y {

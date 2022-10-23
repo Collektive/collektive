@@ -1,14 +1,13 @@
 fun main() {
 
-    val fields = Environment.localFields
+    val fields = Environment.globalFields
     val f: (Int) -> Int = { it * 2 }
     val k: (String) -> Int = { it.length }
-    println(fields)
     // DSL functions
     aggregate {
-        repeating(1, f)
-        repeating(1, f)
-        repeating("casa", k)
+        //repeating(1, f)
+        neighbouring(f(1))
+        neighbouring(k("test"))
     }
     println(fields)
 }
