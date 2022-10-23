@@ -9,7 +9,6 @@ import kotlin.test.assertNotNull
 
 class NeighbouringTest {
     private val notAddedType: (String) -> String = { it.uppercase()}
-    private val notAddedEvent = EventImpl(notAddedType)
     private val type: (Int) -> Int = { it * 2}
     private val event = EventImpl(type)
     private val field = localFields.addField(event)
@@ -17,7 +16,7 @@ class NeighbouringTest {
     @Test
     fun neighbouringSuccessful(){
         aggregate {
-            assertNotNull(neighbouring(event))
+            assertNotNull(neighbouring(type))
         }
     }
 
@@ -26,7 +25,7 @@ class NeighbouringTest {
         aggregate {
             assertFailsWith<IllegalArgumentException>(
                 block = {
-                    neighbouring(notAddedEvent)
+                    neighbouring(notAddedType)
                 }
             )
         }
