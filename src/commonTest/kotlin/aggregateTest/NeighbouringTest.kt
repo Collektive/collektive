@@ -1,33 +1,34 @@
 package aggregateTest
 
-import Environment.localFields
+import Environment.deviceId
+import Environment.globalFields
 import aggregate
-import event.EventImpl
-import kotlin.test.Test
-import kotlin.test.assertFailsWith
-import kotlin.test.assertNotNull
+import kotlin.test.*
 
 class NeighbouringTest {
-    private val notAddedType: (String) -> String = { it.uppercase()}
-    private val type: (Int) -> Int = { it * 2}
-    private val event = EventImpl(type)
-    private val field = localFields.addField(event)
+    private val typeDouble: (Int) -> Int = { it * 2 }
+    private val typeUppercase: (String) -> String = { it.uppercase() }
+
+    @BeforeTest
+    fun resetGlobalFields(){
+        globalFields.fields.clear()
+    }
 
     @Test
     fun neighbouringSuccessful(){
         aggregate {
-            assertNotNull(neighbouring(type))
+            val field = neighbouring(typeDouble(1))
+            assertNotNull(field)
+            assertEquals(2, field.getById(deviceId))
         }
     }
 
     @Test
-    fun neighbouringFailing(){
+    fun neighbouringWithDifferentEvent(){
         aggregate {
-            assertFailsWith<IllegalArgumentException>(
-                block = {
-                    neighbouring(notAddedType)
-                }
-            )
+            neighbouring(typeDouble(1))
+            neighbouring(typeUppercase("hello"))
+            assertEquals(2, globalFields.fields.size)
         }
     }
 }
