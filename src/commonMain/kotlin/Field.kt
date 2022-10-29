@@ -1,14 +1,15 @@
-interface Field<T : Any> {
-    fun addElement(id: Int, value: T): T?
-    fun getById(id: Int): T
+interface Field<ID, out T : Any> {
+    val local: T
+    fun toMap(): Map<ID, T>
+    operator fun get(id: ID): T
     fun fieldSize(): Int
 }
 
-class FieldImpl<T : Any> : Field<T> {
-    val field: MutableMap<Int, T> = mutableMapOf()
-    override fun addElement(id: Int, value: T): T? = field.put(id, value)
-    override fun getById(id: Int): T = field[id]
+class FieldImpl<ID, out T : Any>(override val local: T) : Field<ID, T> {
+    private val field: Map<ID, T> = emptyMap()
+    override fun get(id: ID): T = field[id]
         ?: throw IllegalArgumentException("No value found of the selected event")
+    override fun toMap(): Map<ID, T> = field.toMap()
     override fun fieldSize(): Int = field.size
     override fun toString(): String {
         return "FieldImpl(field=$field)"

@@ -15,6 +15,21 @@ class NeighbouringTest {
     }
 
     @Test
+    fun pluto(){
+        aggregate {
+            fun a() = neighbouring(1)
+            fun b() = neighbouring(2)
+            a()
+            b()
+        }
+        aggregate {
+            val field = neighbouring(typeDouble(1))
+            assertNotNull(field)
+            assertEquals(2, field.getById(deviceId))
+        }
+    }
+
+    @Test
     fun neighbouringSuccessful(){
         aggregate {
             val field = neighbouring(typeDouble(1))
@@ -27,7 +42,9 @@ class NeighbouringTest {
     fun neighbouringWithDifferentEvent(){
         aggregate {
             neighbouring(typeDouble(1))
+            println(globalFields)
             neighbouring(typeUppercase("hello"))
+            println(globalFields)
             assertEquals(2, globalFields.fields.size)
         }
     }
