@@ -1,25 +1,21 @@
-import Environment.deviceId
-import Environment.localFields
-
 typealias ID = Int
 
-class AggregateContext(val messages: Map<Path, Map<ID, *>>, private val previousState: Map<Path, *>) {
-
-    val messagesToSend: Map<Path, *> = TODO()
-    val newState: Map<Path, *> = TODO()
-
+class AggregateContext(private val messages: Map<Path, Map<ID, *>>, private val previousState: Map<Path, *>) {
     private val state: MutableMap<Path, Any> = mutableMapOf()
-    private val toBeSent: MutableMap<Path, Any> = mutableMapOf()
+    private val toBeSent: MutableMap<Path, Any?> = mutableMapOf()
     private val stack: Stack = StackImpl()
-    private val localID: ID = TODO()
+    private val localID: ID = 1
 
-    private fun <T> messagesAt(path: Path): Map<ID, T> = TODO()
+    val messagesToSend: Map<Path, *> = toBeSent.toMap()
+    val newState: Map<Path, *> = state.toMap()
+
+    private fun messagesAt(path: Path): Map<ID, *> = messages[path] ?: emptyMap<ID, Any>()
 
     // nbr
-    fun <X : Any> neighbouring(type: X): Field<ID, X> {
+    fun neighbouring(type: Any?): Field<ID, Any?> {
         return alignedOn(Token.NEIGHBOURING) { here ->
             toBeSent[here] = type
-            val messages = messagesAt<X>(here)
+            val messages = messagesAt(here)
             FieldImpl(Pair(localID, type), messages)
         }
     }
@@ -35,7 +31,7 @@ class AggregateContext(val messages: Map<Path, Map<ID, *>>, private val previous
 
     // share
     fun <X, Y: Any> sharing(initial: X, body: (Field<ID, Any?>) -> Y): Y = alignedOn(Token.SHARING) { here ->
-        val messages = messagesAt<X>(here)
+        val messages = messagesAt(here)
         val previous = if (previousState.containsKey(here)) previousState[here] else initial
         val subject = FieldImpl(Pair(localID, previous), messages)
         body(subject).also {
@@ -57,8 +53,7 @@ fun <X> singleCycle(
     AggregateContext.AggregateResult(compute(), messagesToSend, newState)
 }
 
-interface Table // 2-indexed map
-
+/*
 interface Network {
     fun send(message: Map<Path, *>): Unit = TODO()
     fun receive(): Map<ID, Map<Path, *>> = TODO()
@@ -80,6 +75,6 @@ fun <X> runUntil(init: X, network: Network, condition: () -> Boolean, compute: A
         network.send(computed.toSend)
     }
     return result
-}
+}*/
 
 fun <X> aggregate(init: AggregateContext.() -> X) = singleCycle(compute = init).result
