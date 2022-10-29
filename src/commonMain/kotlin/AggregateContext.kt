@@ -34,14 +34,10 @@ class AggregateContext(val messages: Map<Path, Map<ID, *>>, private val previous
     }
 
     // share
-    fun <X: Any, Y: Any> sharing(init: X, body: (Field<ID, X>) -> Y): Y = alignedOn("share") { here ->
+    fun <X, Y: Any> sharing(initial: X, body: (Field<ID, Any?>) -> Y): Y = alignedOn(Token.SHARING) { here ->
         val messages = messagesAt<X>(here)
-        val subject = object : Field<ID, X> {
-            override val local: X = init
-            override fun toMap(): Map<ID, X> = messages + (localID to init)
-            override fun fieldSize() = messages.size + 1
-            override fun get(id: ID): X  = messages[id]!!
-        }
+        val previous = if (previousState.containsKey(here)) previousState[here] else initial
+        val subject = FieldImpl(Pair(localID, previous), messages)
         body(subject).also {
             toBeSent[here] = it
         }
