@@ -17,16 +17,10 @@ class AggregateContext(val messages: Map<Path, Map<ID, *>>, val previousState: M
 
     // nbr
     fun <X : Any> neighbouring(type: X): Field<ID, X> {
-        return alignedOn("neigh") { here ->
+        return alignedOn(Token.NEIGHBOURING) { here ->
             toBeSent[here] = type
             val messages = messagesAt<X>(here)
-            FieldImpl<ID, X>(type)
-            object : Field<ID, X> {
-                override val local: X = type
-                override fun toMap(): Map<ID, X> = messages + (localID to type)
-                override fun fieldSize() = messages.size + 1
-                override fun get(id: ID): X  = messages[id]!!
-            }
+            FieldImpl(Pair(localID, type), messages)
         }
     }
 
