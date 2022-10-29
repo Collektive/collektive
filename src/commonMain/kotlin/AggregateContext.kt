@@ -3,12 +3,12 @@ import Environment.localFields
 
 typealias ID = Int
 
-class AggregateContext(val messages: Map<Path, Map<ID, *>>, val previousState: Map<String, *>) {
+class AggregateContext(val messages: Map<Path, Map<ID, *>>, private val previousState: Map<Path, *>) {
 
     val messagesToSend: Map<Path, *> = TODO()
     val newState: Map<Path, *> = TODO()
 
-    private val state: MutableMap<String, Field<ID, *>> = mutableMapOf()
+    private val state: MutableMap<Path, Any> = mutableMapOf()
     private val toBeSent: MutableMap<Path, Any> = mutableMapOf()
     private val stack: Stack = StackImpl()
     private val localID: ID = TODO()
@@ -25,23 +25,14 @@ class AggregateContext(val messages: Map<Path, Map<ID, *>>, val previousState: M
     }
 
     // rep
-    inline fun <reified X : Any, Y : Any> repeating(initial: X, noinline repeat: (X) -> Y): Y {
-        return if (localFields.isFieldPresent(event)) {
-            val value = localFields.retrieveField(event).getById(deviceId)
-            if (value is X){
-                val result = repeat(value)
-                localFields.retrieveField(event).addElement(deviceId, result)
-                result
-            } else {
-                throw IllegalArgumentException("Wrong field found")
-            }
-        } else {
-            val result = repeat(initial)
-            localFields.addField(event)
-            localFields.retrieveField(event).addElement(deviceId, result)
-            result
+    fun repeating(initial: Any?, repeat: (Any?) -> Any): Any {
+        return alignedOn(Token.REPEATING) { here ->
+            val res = if (previousState.containsKey(here)) repeat(previousState[here]) else repeat(initial)
+            state[here] = res
+            res
         }
     }
+
     // share
     fun <X: Any, Y: Any> sharing(init: X, body: (Field<ID, X>) -> Y): Y = alignedOn("share") { here ->
         val messages = messagesAt<X>(here)
