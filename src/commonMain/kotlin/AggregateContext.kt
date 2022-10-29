@@ -2,7 +2,7 @@ import Environment.deviceId
 import Environment.localFields
 
 typealias ID = Int
-typealias Path = String
+
 class AggregateContext(val messages: Map<Path, Map<ID, *>>, val previousState: Map<String, *>) {
 
     val messagesToSend: Map<Path, *> = TODO()
@@ -10,7 +10,7 @@ class AggregateContext(val messages: Map<Path, Map<ID, *>>, val previousState: M
 
     private val state: MutableMap<String, Field<ID, *>> = mutableMapOf()
     private val toBeSent: MutableMap<Path, Any> = mutableMapOf()
-    private val stack: Stack = TODO()
+    private val stack: Stack = StackImpl()
     private val localID: ID = TODO()
 
     private fun <T> messagesAt(path: Path): Map<ID, T> = TODO()
