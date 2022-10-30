@@ -1,3 +1,5 @@
+package stack
+
 interface Path {
     fun addToken(token: Any?)
     fun currentList(): List<String>
@@ -14,7 +16,7 @@ class PathImpl : Path {
 
     override fun current(): String = currentPath.toList().toString()
     override fun toString(): String {
-        return "PathImpl(currentPath=$currentPath)"
+        return "stack.PathImpl(currentPath=$currentPath)"
     }
 
     override fun equals(other: Any?): Boolean {
