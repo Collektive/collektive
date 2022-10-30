@@ -6,8 +6,8 @@ class AggregateContext(private val messages: Map<Path, Map<ID, *>>, private val 
     private val stack: Stack = StackImpl()
     private val localID: ID = 1
 
-    val messagesToSend: Map<Path, *> = toBeSent.toMap()
-    val newState: Map<Path, *> = state.toMap()
+    fun messagesToSend(): Map<Path, *> = toBeSent.toMap()
+    fun newState(): Map<Path, *> = state.toMap()
 
     private fun messagesAt(path: Path): Map<ID, *> = messages[path] ?: emptyMap<ID, Any>()
 
@@ -21,9 +21,10 @@ class AggregateContext(private val messages: Map<Path, Map<ID, *>>, private val 
     }
 
     // rep
-    fun repeating(initial: Any?, repeat: (Any?) -> Any): Any {
+    @Suppress("UNCHECKED_CAST")
+    fun <X,Y : Any> repeating(initial: X, repeat: (X) -> Y): Y {
         return alignedOn(Token.REPEATING) { here ->
-            val res = if (previousState.containsKey(here)) repeat(previousState[here]) else repeat(initial)
+            val res = if (previousState.containsKey(here)) repeat(previousState[here] as X) else repeat(initial)
             state[here] = res
             res
         }
@@ -50,7 +51,10 @@ fun <X> singleCycle(
     state: Map<Path, *> = emptyMap<Path, Any>(),
     compute: AggregateContext.() -> X
 ): AggregateContext.AggregateResult<X> = with(AggregateContext(messages, state)) {
-    AggregateContext.AggregateResult(compute(), messagesToSend, newState)
+    AggregateContext.AggregateResult(compute(), messagesToSend(), newState()). also {
+        println(messagesToSend())
+        println(newState())
+    }
 }
 
 /*
@@ -58,23 +62,30 @@ interface Network {
     fun send(message: Map<Path, *>): Unit = TODO()
     fun receive(): Map<ID, Map<Path, *>> = TODO()
 }
-
-fun <X> runUntil(init: X, network: Network, condition: () -> Boolean, compute: AggregateContext.() -> X): X {
+*/
+fun <X> runUntil(init: X, /*network: Network,*/ condition: () -> Boolean, compute: AggregateContext.() -> X): X {
     var state = emptyMap<Path, Any?>()
     var result: X = init
     while (condition()) {
-        val messages: Map<Path, Map<ID, *>> = network.receive()
+        /*val messages: Map<Path, Map<ID, *>> = network.receive()
             .flatMap { (id, messages) ->
                 messages.toList().map { (path, value) -> Triple(path, id, value) }
             } // List of triples
             .groupBy { it.first } // Map<Path, List<Triple>
-            .mapValues { (_, triples) -> triples.map { it.second to it.third }.toMap() }
-        val computed = singleCycle(messages, state, compute)
+            .mapValues { (_, triples) -> triples.map { it.second to it.third }.toMap() }*/
+        val computed = singleCycle(emptyMap(), state, compute)
         result = computed.result
         state = computed.newState
-        network.send(computed.toSend)
+        println(state)
+        println(result)
+        //network.send(computed.toSend)
     }
     return result
-}*/
+}
 
-fun <X> aggregate(init: AggregateContext.() -> X) = singleCycle(compute = init).result
+//fun <X> aggregate(init: AggregateContext.() -> X) = singleCycle(compute = init).result
+
+var i = 0
+fun <X> aggregate(init: AggregateContext.() -> X) = runUntil(0,  { condition() },compute = init)
+
+fun condition(): Boolean = i++ != 3
