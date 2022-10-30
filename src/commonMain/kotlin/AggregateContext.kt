@@ -1,3 +1,8 @@
+import stack.Path
+import stack.Stack
+import stack.StackImpl
+import stack.Token
+
 typealias ID = Int
 
 class AggregateContext(private val messages: Map<Path, Map<ID, *>>, private val previousState: Map<Path, *>) {
@@ -59,19 +64,19 @@ fun <X> singleCycle(
 
 /*
 interface Network {
-    fun send(message: Map<Path, *>): Unit = TODO()
-    fun receive(): Map<ID, Map<Path, *>> = TODO()
+    fun send(message: Map<stack.Path, *>): Unit = TODO()
+    fun receive(): Map<ID, Map<stack.Path, *>> = TODO()
 }
 */
 fun <X> runUntil(init: X, /*network: Network,*/ condition: () -> Boolean, compute: AggregateContext.() -> X): X {
     var state = emptyMap<Path, Any?>()
     var result: X = init
     while (condition()) {
-        /*val messages: Map<Path, Map<ID, *>> = network.receive()
+        /*val messages: Map<stack.Path, Map<ID, *>> = network.receive()
             .flatMap { (id, messages) ->
                 messages.toList().map { (path, value) -> Triple(path, id, value) }
             } // List of triples
-            .groupBy { it.first } // Map<Path, List<Triple>
+            .groupBy { it.first } // Map<stack.Path, List<Triple>
             .mapValues { (_, triples) -> triples.map { it.second to it.third }.toMap() }*/
         val computed = singleCycle(emptyMap(), state, compute)
         result = computed.result
