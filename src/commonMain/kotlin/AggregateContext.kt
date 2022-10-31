@@ -90,4 +90,4 @@ fun <X> runUntil(init: X, /*network: Network,*/ condition: () -> Boolean, comput
 
 fun <X> aggregate(init: AggregateContext.() -> X) = singleCycle(compute = init).result
 
-fun <X> aggregate(init: AggregateContext.() -> X, condition: () -> Boolean) = runUntil(0, condition, compute = init)
+fun <X> aggregate(condition: () -> Boolean, init: AggregateContext.() -> X,) = runUntil(0, condition, compute = init)
