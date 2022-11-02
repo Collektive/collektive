@@ -1,11 +1,20 @@
 fun main() {
+    val network: Network = NetworkImpl()
 
     val f: (Int) -> Int = { it * 2 }
-    //val k: (String) -> Int = { it.length }
-    // DSL functions
-    aggregate {
+    var i = 0
+    val condition: () -> Boolean = { i++ < 2 }
+
+    // Device 1
+    aggregate(condition, network) {
         repeating(1, f)
-        //neighbouring(f(1))
-        //neighbouring(k("test"))
+        neighbouring("hello1")
+    }
+
+    i = 0
+    // Device 2
+    aggregate(condition, network) {
+        repeating(1, f)
+        println(neighbouring("hello2"))
     }
 }
