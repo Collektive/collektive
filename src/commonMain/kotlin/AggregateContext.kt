@@ -52,4 +52,5 @@ class AggregateContext(
 
 fun <X> aggregate(init: AggregateContext.() -> X) = singleCycle(IntId(), compute = init).result
 
-fun <X> aggregate(condition: () -> Boolean, init: AggregateContext.() -> X) = runUntil(condition, compute = init)
+fun <X> aggregate(condition: () -> Boolean, network: Network = NetworkImpl(), init: AggregateContext.() -> X) =
+    runUntil(condition, network, compute = init)
