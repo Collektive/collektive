@@ -16,7 +16,7 @@ class PathImpl : Path {
 
     override fun current(): String = currentPath.toList().toString()
     override fun toString(): String {
-        return "stack.PathImpl(currentPath=$currentPath)"
+        return "PathImpl(currentPath=$currentPath)"
     }
 
     override fun equals(other: Any?): Boolean {
