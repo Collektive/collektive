@@ -1,29 +1,4 @@
-@file:Suppress("UnstableApiUsage")
+rootProject.name = "dsl-aggregate-computing"
 
-pluginManagement {
-    repositories {
-        gradlePluginPortal()
-        google()
-        mavenCentral()
-    }
-}
-
-plugins {
-    id("com.gradle.enterprise") version "3.11.1"
-    id("org.danilopianini.gradle-pre-commit-git-hooks") version "1.0.20"
-}
-
-gradleEnterprise {
-    buildScan {
-        termsOfServiceUrl = "https://gradle.com/terms-of-service"
-        termsOfServiceAgree = "yes"
-        publishOnFailure()
-    }
-}
-
-gitHooks {
-    commitMsg { conventionalCommits() }
-    createHooks()
-}
-
-rootProject.name = "dsl-aggregate-computing".toLowerCase()
+include(":gradle-plugin")
+include(":compiler-plugin")
