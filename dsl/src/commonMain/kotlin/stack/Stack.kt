@@ -1,13 +1,15 @@
 package stack
 
-interface Stack {
-    fun <X> inNewFrame(frameId: Any, compute: (Path) -> X): X
-}
+import kotlin.native.concurrent.ThreadLocal
 
-class StackImpl : Stack {
-    private val path: Path = PathImpl()
-    override fun <X> inNewFrame(frameId: Any, compute: (Path) -> X): X {
-        path.addToken(frameId)
-        return compute(path)
+@ThreadLocal
+object Stack {
+    private var currentStack: MutableList<String> = mutableListOf()
+    fun clearStack() = currentStack.clear()
+    fun currentPath(): Path = Path(currentStack.toList())
+    fun addToken(token: String) {
+        currentStack.add(token)
     }
 }
+
+data class Path(val path: List<String>)
