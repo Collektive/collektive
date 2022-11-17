@@ -3,7 +3,7 @@ import stack.Stack
 import util.switchIndexes
 
 fun <X> singleCycle(
-    localId: ID,
+    localId: ID = IntId(),
     messages: Map<Path, Map<ID, *>> = emptyMap<Path, Map<ID, Any>>(),
     state: Map<Path, *> = emptyMap<Path, Any>(),
     compute: AggregateContext.() -> X
