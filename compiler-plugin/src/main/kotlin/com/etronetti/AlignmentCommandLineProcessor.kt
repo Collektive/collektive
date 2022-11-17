@@ -7,8 +7,12 @@ import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 
+/**
+ * The command line processor is used to define the expected command line
+ * option, which enable or disable the plugin.
+ */
 @AutoService(CommandLineProcessor::class)
-class CommandLineProcessorImpl : CommandLineProcessor {
+class AlignmentCommandLineProcessor : CommandLineProcessor {
     companion object {
         private const val OPTION_ENABLED = "enabled"
         val ARG_ENABLED = CompilerConfigurationKey<Boolean>(OPTION_ENABLED)
@@ -20,7 +24,7 @@ class CommandLineProcessorImpl : CommandLineProcessor {
         CliOption(
             optionName = OPTION_ENABLED,
             valueDescription = "bool <true | false>",
-            description = "If the DebugLog annotation should be applied",
+            description = "If the align plugin should be applied",
             required = false,
         ),
     )

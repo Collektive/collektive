@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
 
 @AutoService(ComponentRegistrar::class)
-class ComponentRegistrarImpl(
+class AlignmentComponentRegistrar(
     private val defaultEnabled: Boolean,
 ) : ComponentRegistrar {
 
@@ -20,7 +20,7 @@ class ComponentRegistrarImpl(
     project: MockProject,
     configuration: CompilerConfiguration
   ) {
-      val enabled = configuration.get(CommandLineProcessorImpl.ARG_ENABLED, defaultEnabled)
+      val enabled = configuration.get(AlignmentCommandLineProcessor.ARG_ENABLED, defaultEnabled)
       if (enabled) {
           IrGenerationExtension.registerExtension(project, IrGenerationExtensionImpl())
       }
