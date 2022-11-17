@@ -18,12 +18,13 @@ buildConfig {
     buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${project.version}\"")
 }
 
+// Defines a gradle plugin that can be used from other projects
 gradlePlugin {
     plugins {
-        create("kotlinIrPlugin") {
-            id = "com.etronetti.kotlinIrPlugin"
-            displayName = "Kotlin Ir Plugin"
-            description = "Kotlin Ir Plugin"
+        create("kotlinAlignmentPlugin") {
+            id = "com.etronetti.kotlinAlignmentPlugin"
+            displayName = "Kotlin Alignment Plugin"
+            description = "Kotlin Alignment Plugin"
             implementationClass = "com.etronetti.GradlePlugin"
         }
     }
