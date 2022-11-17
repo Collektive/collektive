@@ -6,6 +6,10 @@ import org.jetbrains.kotlin.com.intellij.mock.MockProject
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
 
+/**
+ * The component registrar register the alignment generation extension if
+ * the compiler plugin is enabled.
+ */
 @AutoService(ComponentRegistrar::class)
 class AlignmentComponentRegistrar(
     private val defaultEnabled: Boolean,
@@ -22,7 +26,7 @@ class AlignmentComponentRegistrar(
   ) {
       val enabled = configuration.get(AlignmentCommandLineProcessor.ARG_ENABLED, defaultEnabled)
       if (enabled) {
-          IrGenerationExtension.registerExtension(project, IrGenerationExtensionImpl())
+          IrGenerationExtension.registerExtension(project, AlignmentIrGenerationExtension())
       }
   }
 }
