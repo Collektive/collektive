@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.config.CompilerConfigurationKey
 
 /**
  * The command line processor is used to define the expected command line
- * option, which enable or disable the plugin.
+ * option, which enable or disable the plugin that is responsible for the alignment.
  */
 @AutoService(CommandLineProcessor::class)
 class AlignmentCommandLineProcessor : CommandLineProcessor {
@@ -24,7 +24,7 @@ class AlignmentCommandLineProcessor : CommandLineProcessor {
         CliOption(
             optionName = OPTION_ENABLED,
             valueDescription = "bool <true | false>",
-            description = "If the align plugin should be applied",
+            description = "If the alignment plugin should be applied",
             required = false,
         ),
     )
