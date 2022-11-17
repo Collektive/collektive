@@ -3,9 +3,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class FieldTest {
-    private val myId: ID = 1
+    private val myId: ID = IntId()
     private val myValue: String = "myValue"
-    private val connectedId: ID = 2
+    private val connectedId: ID = IntId()
     private val connectedValue: String = "connectedValue"
 
     @Test
