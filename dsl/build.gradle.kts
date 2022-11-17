@@ -21,9 +21,6 @@ kotlin {
         compilations.all {
             kotlinOptions.jvmTarget = "1.8"
         }
-        testRuns["test"].executionTask.configure {
-            useJUnitPlatform()
-        }
     }
     js(IR) {
         browser()
@@ -69,15 +66,17 @@ kotlin {
                 implementation(kotlin("test"))
             }
         }
+        val jsTest by getting {
+            dependsOn(commonMain)
+        }
         val jvmTest by getting {
-            dependencies {
-                implementation(libs.bundles.kotlin.testing.jvm)
-            }
+            dependsOn(commonMain)
         }
         val nativeMain by getting {
             dependsOn(commonMain)
         }
         val nativeTest by getting {
+            dependsOn(commonMain)
             dependsOn(commonTest)
         }
     }
