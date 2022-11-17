@@ -7,9 +7,13 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinCompilerPluginSupportPlugin
 import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 
+/**
+ * Gradle plugin that register the gradle extension and defines where the compiler
+ * plugin is located.
+ */
 class GradlePlugin : KotlinCompilerPluginSupportPlugin {
     override fun apply(target: Project): Unit = with(target) {
-        extensions.create("kotlinIrPlugin", GradleExtension::class.java)
+        extensions.create("kotlinAlignmentPlugin", GradleExtension::class.java)
     }
 
     override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean = true
