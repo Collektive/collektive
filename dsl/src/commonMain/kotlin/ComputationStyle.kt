@@ -1,4 +1,5 @@
 import stack.Path
+import stack.Stack
 import util.switchIndexes
 
 fun <X> singleCycle(
@@ -7,6 +8,7 @@ fun <X> singleCycle(
     state: Map<Path, *> = emptyMap<Path, Any>(),
     compute: AggregateContext.() -> X
 ): AggregateContext.AggregateResult<X> = with(AggregateContext(localId, messages, state)) {
+    Stack.clearStack()
     AggregateContext.AggregateResult(compute(), messagesToSend(), newState())
 }
 
