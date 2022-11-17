@@ -42,7 +42,7 @@ class AggregateContext(
     data class AggregateResult<X>(val result: X, val toSend: Map<Path, *>, val newState: Map<Path, *>)
 }
 
-fun <X> aggregate(init: AggregateContext.() -> X) = singleCycle(IntId(), compute = init).result
+fun <X> aggregate(init: AggregateContext.() -> X) = singleCycle(compute = init).result
 
 fun <X> aggregate(condition: () -> Boolean, network: Network = NetworkImpl(), init: AggregateContext.() -> X) =
     runUntil(condition, network, compute = init)
