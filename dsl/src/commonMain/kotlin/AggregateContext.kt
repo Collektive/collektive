@@ -28,10 +28,10 @@ class AggregateContext(
     }
 
     // share
-    fun <X, Y: Any> sharing(initial: X, body: (Field<ID, Any?>) -> Y): Y {
+    fun <X, Y: Any?> sharing(initial: X, body: (Field<ID, X>) -> Y): Y {
         val messages = messagesAt(currentPath())
-        val previous = if (previousState.containsKey(currentPath())) previousState[currentPath()] else initial
-        val subject = FieldImpl(Pair(localId, previous), messages)
+        val previous = if (previousState.containsKey(currentPath())) (previousState[currentPath()]) else initial
+        val subject = FieldImpl<ID, X>(Pair(localId, previous), messages)
         return body(subject).also {
             toBeSent[currentPath()] = it
         }
