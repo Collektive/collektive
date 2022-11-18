@@ -7,9 +7,13 @@ fun <X> singleCycle(
     messages: Map<Path, Map<ID, *>> = emptyMap<Path, Map<ID, Any>>(),
     state: Map<Path, *> = emptyMap<Path, Any>(),
     compute: AggregateContext.() -> X
-): AggregateContext.AggregateResult<X> = with(AggregateContext(localId, messages, state)) {
+): AggregateContext.AggregateResult<X> {
     Stack.clearStack()
-    AggregateContext.AggregateResult(compute(), messagesToSend(), newState())
+    return with(AggregateContext(localId, messages, state)) {
+        AggregateContext.AggregateResult(compute(), messagesToSend(), newState()).also {
+            Stack.clearStack()
+        }
+    }
 }
 
 fun <X> runUntil(
