@@ -61,22 +61,32 @@ kotlin {
             }
         }
         val commonTest by getting {
+            dependsOn(commonMain)
             dependencies {
                 implementation(libs.bundles.kotlin.testing.common)
                 implementation(kotlin("test"))
             }
         }
-        val jsTest by getting {
-            dependsOn(commonMain)
-        }
-        val jvmTest by getting {
-            dependsOn(commonMain)
-        }
         val nativeMain by getting {
             dependsOn(commonMain)
         }
         val nativeTest by getting {
+            dependsOn(commonTest)
+        }
+        val jvmMain by getting {
             dependsOn(commonMain)
+        }
+        val jvmTest by getting {
+            dependsOn(jvmMain)
+            dependencies {
+                implementation(libs.bundles.kotlin.testing.jvm)
+            }
+        }
+        val jsMain by getting {
+            dependsOn(commonMain)
+        }
+        val jsTest by getting {
+            dependsOn(jsMain)
             dependsOn(commonTest)
         }
     }
