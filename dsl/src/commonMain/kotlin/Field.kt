@@ -1,11 +1,12 @@
 interface Field<ID, out T> {
-    val local: Pair<ID, T>
+    val local: Pair<ID, *>
     fun toMap(): Map<ID, T>
     operator fun get(id: ID): T
 }
 
-class FieldImpl<ID, out T>(override val local: Pair<ID, T>, messages: Map<ID, T> = emptyMap()) : Field<ID, T> {
-    private val field: Map<ID, T> =  mapOf(local) + messages
+@Suppress("UNCHECKED_CAST")
+class FieldImpl<ID, out T>(override val local: Pair<ID, *>, messages: Map<ID, *> = emptyMap<ID, T>()) : Field<ID, T> {
+    private val field: Map<ID, T> =  (mapOf(local) + messages) as Map<ID, T>
     override fun get(id: ID): T = field[id]
         ?: throw IllegalArgumentException("No value found for the specified id")
     override fun toMap(): Map<ID, T> = field.toMap()
