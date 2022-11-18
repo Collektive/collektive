@@ -63,6 +63,7 @@ class AlignmentIrElementTransformer(
                 declaration.name.toString() != "currentPath" &&
                 declaration.name.toString() != "clearStack" &&
                 declaration.name.toString() != "toString" &&
-                declaration.name.toString() != "hashCode")
+                declaration.name.toString() != "hashCode" &&
+                declaration.name.toString() != "equals")
     }
 }
