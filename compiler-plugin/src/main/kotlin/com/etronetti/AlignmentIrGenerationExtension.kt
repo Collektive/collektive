@@ -11,7 +11,9 @@ import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 class AlignmentIrGenerationExtension: IrGenerationExtension {
     override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
         // Function that is responsible to handle the alignment
-        val alignOnFunction = collect(moduleFragment).first()
-        moduleFragment.transform(AlignmentIrElementTransformer(pluginContext, alignOnFunction), null)
+        val alignOnFunctions = collect(moduleFragment)
+        if (alignOnFunctions.isNotEmpty()) {
+            moduleFragment.transform(AlignmentIrElementTransformer(pluginContext, alignOnFunctions.first()), null)
+        }
     }
 }
