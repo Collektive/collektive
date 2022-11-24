@@ -16,4 +16,7 @@ jobs:
     steps:
       - name: Checkout current branch (full)
         uses: actions/checkout@v2
-      - run: ./gradlew runAllTests
+      - name: Grant execution permissions
+        run: chmod +x gradlew
+      - name: Run tests
+        run: ./gradlew runAllTests
