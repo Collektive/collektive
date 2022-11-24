@@ -9,7 +9,13 @@ on:
 
 jobs:
   testing:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ windows, macos, ubuntu ]
+    runs-on: ${{ matrix.os }}-latest
+    concurrency:
+      group: build-${{ github.workflow }}-${{ matrix.os }}-${{ github.event.number || github.ref }}
+      cancel-in-progress: true
     defaults:
       run:
         working-directory: ./dsl
