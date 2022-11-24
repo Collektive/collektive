@@ -1,6 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 
 @Suppress("DSL_SCOPE_VIOLATION")
@@ -29,7 +30,7 @@ kotlin {
     }
     val hostOs = System.getProperty("os.name").trim().toLowerCaseAsciiOnly()
     val hostArch = System.getProperty("os.arch").trim().toLowerCaseAsciiOnly()
-    val nativeTarget: (String, org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget.() -> Unit) -> KotlinTarget =
+    val nativeTarget: (String, KotlinNativeTarget.() -> Unit) -> KotlinTarget =
         when (hostOs to hostArch) {
             "linux" to "aarch64" -> ::linuxArm64
             "linux" to "amd64" -> ::linuxX64
@@ -82,13 +83,6 @@ kotlin {
                 implementation(libs.bundles.kotlin.testing.jvm)
             }
         }
-        val jsMain by getting {
-            dependsOn(commonMain)
-        }
-        val jsTest by getting {
-            dependsOn(jsMain)
-            dependsOn(commonTest)
-        }
     }
     targets.all {
         compilations.all {
@@ -97,6 +91,12 @@ kotlin {
             }
         }
     }
+
+    tasks.register<Test>("runAllTests") {
+        dependsOn(tasks["clean"])
+        dependsOn(tasks["allTests"])
+    }
+
 }
 
 kotlinAlignmentPlugin {
