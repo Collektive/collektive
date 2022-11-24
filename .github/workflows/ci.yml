@@ -1,0 +1,19 @@
+name: CI
+on:
+  push:
+    branches: [ '**' ]
+    paths-ignore:
+      - '.gitignore'
+      - 'CHANGELOG.md'
+      - 'README.md'
+
+jobs:
+  testing:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./dsl
+    steps:
+      - name: Checkout current branch (full)
+        uses: actions/checkout@v2
+      - run: ./gradlew runAllTests
