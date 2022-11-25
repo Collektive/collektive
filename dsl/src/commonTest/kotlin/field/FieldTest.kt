@@ -1,5 +1,7 @@
-import field.Field
-import field.FieldImpl
+package field
+
+import ID
+import IntId
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
