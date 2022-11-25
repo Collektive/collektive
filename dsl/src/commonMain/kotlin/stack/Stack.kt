@@ -17,6 +17,4 @@ data class Path(val path: List<String>)
 @Suppress("unused") // Used from the compiler plugin
 fun alignedOn(token: String) {
     Stack.addToken(token)
-    println(Stack.currentPath())
-    println("-----")
 }
