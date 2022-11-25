@@ -1,3 +1,5 @@
+import field.Field
+import field.FieldImpl
 import stack.Path
 import stack.Stack.currentPath
 
@@ -13,7 +15,7 @@ class AggregateContext(
     fun newState(): Map<Path, *> = state.toMap()
 
     // nbr
-    fun neighbouring(type: Any?): Field<ID, Any?> {
+    fun neighbouring(type: Any?): Field<Any?> {
         toBeSent[currentPath()] = type
         val messages = messagesAt(currentPath())
         return FieldImpl(Pair(localId, type), messages)
@@ -28,10 +30,10 @@ class AggregateContext(
     }
 
     // share
-    fun <X, Y: Any?> sharing(initial: X, body: (Field<ID, X>) -> Y): Y {
+    fun <X, Y: Any?> sharing(initial: X, body: (Field<X>) -> Y): Y {
         val messages = messagesAt(currentPath())
         val previous = if (previousState.containsKey(currentPath())) (previousState[currentPath()]) else initial
-        val subject = FieldImpl<ID, X>(Pair(localId, previous), messages)
+        val subject = FieldImpl<X>(Pair(localId, previous), messages)
         return body(subject).also {
             toBeSent[currentPath()] = it
         }
