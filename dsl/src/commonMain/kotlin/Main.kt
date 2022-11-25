@@ -1,3 +1,5 @@
+import field.min
+
 fun main() {
     val network: Network = NetworkImpl()
 
@@ -7,14 +9,12 @@ fun main() {
 
     // Device 1
     aggregate(condition, network) {
-        repeating(1, f)
-        neighbouring("hello1")
+        neighbouring(f(3))
     }
 
     i = 0
     // Device 2
     aggregate(condition, network) {
-        repeating(1, f)
-        println(neighbouring("hello2"))
+        println(neighbouring(f(2)).min())
     }
 }
