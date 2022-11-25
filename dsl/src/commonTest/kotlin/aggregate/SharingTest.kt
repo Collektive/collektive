@@ -1,18 +1,16 @@
 package aggregate
 
-import Field
-import ID
+import field.Field
 import Network
 import NetworkImpl
 import aggregate
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class SharingTest {
     private val initialValue: Int = 1
     private val initialValue2: Int = 2
-    private val findMax: (Field<ID, Int>) -> Int = { e -> e.toMap().maxBy { it.value }.value }
+    private val findMax: (Field<Int>) -> Int = { e -> e.toMap().maxBy { it.value }.value }
 
     @Test
     fun firstTimeSharing(){
