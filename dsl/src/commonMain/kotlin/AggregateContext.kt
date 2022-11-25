@@ -15,7 +15,7 @@ class AggregateContext(
     fun newState(): Map<Path, *> = state.toMap()
 
     // nbr
-    fun neighbouring(type: Any?): Field<Any?> {
+    fun <X> neighbouring(type: X): Field<X> {
         toBeSent[currentPath()] = type
         val messages = messagesAt(currentPath())
         return FieldImpl(Pair(localId, type), messages)
