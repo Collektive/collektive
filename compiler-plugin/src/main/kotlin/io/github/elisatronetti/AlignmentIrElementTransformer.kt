@@ -1,4 +1,4 @@
-package com.etronetti
+package io.github.elisatronetti
 
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder

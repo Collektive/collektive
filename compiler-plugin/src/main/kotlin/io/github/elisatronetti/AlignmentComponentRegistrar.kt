@@ -1,4 +1,4 @@
-package com.etronetti
+package io.github.elisatronetti
 
 import com.google.auto.service.AutoService
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
