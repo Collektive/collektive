@@ -1,5 +1,5 @@
 buildscript {
-    extra["kotlin_plugin_id"] = "com.etronetti.dsl-aggregate-computing"
+    extra["kotlin_plugin_id"] = "io.github.elisatronetti.collektive"
 }
 
 @Suppress("DSL_SCOPE_VIOLATION")
@@ -10,7 +10,7 @@ plugins {
 }
 
 allprojects {
-    group = "com.etronetti"
+    group = "io.github.elisatronetti"
     version = "0.1.0"
 }
 

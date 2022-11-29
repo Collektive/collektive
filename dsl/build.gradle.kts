@@ -9,7 +9,7 @@ plugins {
     alias(libs.plugins.gitSemVer)
     alias(libs.plugins.multiJvmTesting)
     alias(libs.plugins.kotlin.multiplatform)
-    id("com.etronetti.kotlinAlignmentPlugin") version "0.1.0"
+    id("io.github.elisatronetti.kotlinAlignmentPlugin") version "0.1.0"
 }
 
 repositories {

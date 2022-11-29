@@ -1,4 +1,4 @@
-package com.etronetti
+package io.github.elisatronetti
 
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrFunction
