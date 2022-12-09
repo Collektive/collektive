@@ -12,8 +12,10 @@ class AlignmentIrGenerationExtension: IrGenerationExtension {
     override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
         // Function that is responsible to handle the alignment
         val alignOnFunctions = collect(moduleFragment)
-        if (alignOnFunctions.isNotEmpty()) {
-            moduleFragment.transform(AlignmentIrElementTransformer(pluginContext, alignOnFunctions.first()), null)
+        // Aggregate Context class
+        val aggregateContext = collectClass(moduleFragment)
+        if (alignOnFunctions.isNotEmpty() && aggregateContext.isNotEmpty()) {
+            moduleFragment.transform(AggregateIrElementTransformer(pluginContext, alignOnFunctions.first(), aggregateContext.first()), null)
         }
     }
 }
