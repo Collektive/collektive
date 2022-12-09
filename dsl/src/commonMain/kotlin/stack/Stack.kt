@@ -1,20 +1,15 @@
 package stack
 
-import kotlin.native.concurrent.ThreadLocal
-
-@ThreadLocal
-object Stack {
-    private var currentStack: MutableList<String> = mutableListOf()
+class Stack<X> {
+    private var currentStack: MutableList<X> = mutableListOf()
     fun clearStack() = currentStack.clear()
     fun currentPath(): Path = Path(currentStack.toList())
-    fun addToken(token: String) {
+    fun alignRaw(token: X){
         currentStack.add(token)
+    }
+    fun dealing(){
+        currentStack.removeLast()
     }
 }
 
-data class Path(val path: List<String>)
-
-@Suppress("unused") // Used from the compiler plugin
-fun alignedOn(token: String) {
-    Stack.addToken(token)
-}
+data class Path(val path: List<Any?>)
