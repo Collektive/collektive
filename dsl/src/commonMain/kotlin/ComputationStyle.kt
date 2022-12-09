@@ -1,5 +1,4 @@
 import stack.Path
-import stack.Stack
 import util.switchIndexes
 
 fun <X> singleCycle(
