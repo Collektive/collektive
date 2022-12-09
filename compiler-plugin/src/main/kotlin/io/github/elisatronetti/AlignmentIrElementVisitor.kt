@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 class AlignmentIrElementVisitor(
     private val elements: MutableList<IrFunction>
 ) : IrElementVisitor<Unit, Nothing?> {
-    private val alignmentFunctionName: String = "alignedOn"
+    private val alignRawFunctionName: String = "alignRaw"
 
     // Visit all the children of the root element
     override fun visitElement(element: IrElement, data: Nothing?) {
@@ -20,7 +20,7 @@ class AlignmentIrElementVisitor(
 
     // Looking for the function declaration with the target names
     override fun visitFunction(declaration: IrFunction, data: Nothing?) {
-        if (declaration.name.toString() == alignmentFunctionName){
+        if (declaration.name.toString() == alignRawFunctionName){
             elements.add(declaration)
         }
         super.visitFunction(declaration, data)
@@ -28,7 +28,7 @@ class AlignmentIrElementVisitor(
 }
 
 /**
- * Retrieve the function that matches the target function name
+ * Retrieve the function that matches the target function name.
  */
 fun collect(element: IrElement) = buildList {
     element.accept(AlignmentIrElementVisitor(this), null)
