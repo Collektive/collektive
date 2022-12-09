@@ -8,11 +8,8 @@ fun <X> singleCycle(
     state: Map<Path, *> = emptyMap<Path, Any>(),
     compute: AggregateContext.() -> X
 ): AggregateContext.AggregateResult<X> {
-    Stack.clearStack()
     return with(AggregateContext(localId, messages, state)) {
-        AggregateContext.AggregateResult(compute(), messagesToSend(), newState()).also {
-            Stack.clearStack()
-        }
+        AggregateContext.AggregateResult(compute(), messagesToSend(), newState())
     }
 }
 
