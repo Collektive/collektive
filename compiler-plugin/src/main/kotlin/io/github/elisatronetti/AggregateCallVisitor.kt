@@ -18,7 +18,10 @@ class AggregateCallVisitor(
     }
 
     override fun visitCall(expression: IrCall, data: Nothing?) {
-        if (expression !in elements) elements.add(expression)
+        if (elements.find { it.symbol.owner.name != expression.symbol.owner.name } == null) {
+            elements.add(expression)
+        }
+        //if (expression !in elements) elements.add(expression)
         super.visitCall(expression, data)
     }
 }

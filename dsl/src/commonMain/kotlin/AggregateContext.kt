@@ -17,9 +17,7 @@ class AggregateContext(
 
     // nbr
     fun <X> neighbouring(type: X): Field<X> {
-        val currentPath = stack.currentPath()
-        toBeSent[currentPath] = type
-        println(currentPath)
+        toBeSent[stack.currentPath()] = type
         val messages = messagesAt(stack.currentPath())
         return FieldImpl(Pair(localId, type), messages)
     }
@@ -28,9 +26,7 @@ class AggregateContext(
     @Suppress("UNCHECKED_CAST")
     fun <X,Y : Any> repeating(initial: X, repeat: (X) -> Y): Y {
         val res = if (previousState.containsKey(stack.currentPath())) repeat(previousState[stack.currentPath()] as X) else repeat(initial)
-        val currentPath = stack.currentPath()
-        println(currentPath)
-        state[currentPath] = res
+        state[stack.currentPath()] = res
         return res
     }
 
@@ -40,10 +36,14 @@ class AggregateContext(
         val previous = if (previousState.containsKey(stack.currentPath())) (previousState[stack.currentPath()]) else initial
         val subject = FieldImpl<X>(Pair(localId, previous), messages)
         return body(subject).also {
-            val currentPath = stack.currentPath()
-            println(currentPath)
-            toBeSent[currentPath] = it
+            toBeSent[stack.currentPath()] = it
         }
+    }
+
+    fun <R> alignedOn(pivot: Any?, body: () -> R): R {
+        stack.alignRaw(pivot)
+        println(stack)
+        return body()
     }
 
     private fun messagesAt(path: Path): Map<ID, *> = messages[path] ?: emptyMap<ID, Any>()
