@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 class AlignmentIrElementVisitor(
     private val elements: MutableList<IrFunction>
 ) : IrElementVisitor<Unit, Nothing?> {
-    private val alignRawFunctionName: String = "alignRaw"
+    private val alignRawFunctionName: String = "alignedOn"
 
     // Visit all the children of the root element
     override fun visitElement(element: IrElement, data: Nothing?) {

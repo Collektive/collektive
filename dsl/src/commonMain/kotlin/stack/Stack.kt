@@ -1,14 +1,17 @@
 package stack
 
 class Stack<X> {
-    private var currentStack: MutableList<X> = mutableListOf()
-    fun clearStack() = currentStack.clear()
+    private val currentStack: MutableList<X?> = mutableListOf()
     fun currentPath(): Path = Path(currentStack.toList())
-    fun alignRaw(token: X){
+    fun alignRaw(token: X?){
         currentStack.add(token)
     }
-    fun dealing(){
+    fun dealign(){
         currentStack.removeLast()
+    }
+
+    override fun toString(): String {
+        return currentStack.toString()
     }
 }
 

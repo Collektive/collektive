@@ -1,9 +1,11 @@
 package io.github.elisatronetti
 
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.backend.jvm.ir.receiverAndArgs
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 
 /**
@@ -22,7 +24,7 @@ class AggregateIrElementTransformer(
             collectCalls(expression).forEach {
                 // Modify all irCall that are children of aggregate
                 it.transform(
-                    AlignmentIrElementTransformer(pluginContext, alignOnFunction, aggregateContext),
+                    AlignmentIrElementTransformer(pluginContext, alignOnFunction, expression, aggregateContext),
                     null
                 )
             }
