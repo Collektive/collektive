@@ -21,10 +21,11 @@ class AggregateIrElementTransformer(
 
     override fun visitCall(expression: IrCall): IrExpression {
         if (expression.symbol.owner.name.asString() == aggregateFunctionCallName) {
+            val aggregateLambdaBody = (expression.getValueArgument(0) as IrFunctionExpression).function
             collectCalls(expression).forEach {
                 // Modify all irCall that are children of aggregate
                 it.transform(
-                    AlignmentIrElementTransformer(pluginContext, alignOnFunction, expression, aggregateContext),
+                    AlignmentIrElementTransformer(pluginContext, alignOnFunction, aggregateLambdaBody, aggregateContext),
                     null
                 )
             }
