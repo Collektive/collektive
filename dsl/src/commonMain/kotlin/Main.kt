@@ -1,6 +1,13 @@
 fun main() {
 
     aggregate {
-        neighbouring(4)
+        fun test() {
+            neighbouring(2)
+        }
+        fun test2() {
+            test()
+        }
+
+        test2()
     }
 }
