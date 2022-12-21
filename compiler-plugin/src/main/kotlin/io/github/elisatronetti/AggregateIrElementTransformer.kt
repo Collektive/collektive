@@ -21,7 +21,7 @@ class AggregateIrElementTransformer(
 
     override fun visitCall(expression: IrCall): IrExpression {
         if (expression.symbol.owner.name.asString() == aggregateFunctionCallName) {
-            val aggregateLambdaBody = (expression.getValueArgument(0) as IrFunctionExpression).function
+            val aggregateLambdaBody = (expression.getValueArgument(expression.valueArgumentsCount - 1) as IrFunctionExpression).function
             collectCalls(expression).forEach {
                 // Modify all irCall that are children of aggregate
                 it.transform(
