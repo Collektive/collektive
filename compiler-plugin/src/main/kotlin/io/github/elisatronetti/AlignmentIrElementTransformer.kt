@@ -24,6 +24,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrReturnImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrSyntheticBodyImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrSimpleFunctionSymbolImpl
 import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.types.isUnit
 import org.jetbrains.kotlin.ir.types.typeWith
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
@@ -60,7 +61,6 @@ class AlignmentIrElementTransformer(
             val a = irStatement {
                 irCall(alignOnFunction).apply {
                     val x = pluginContext.irBuiltIns.createIrBuilder(aggregateLambda.symbol).buildLambda(expression)
-
                     type = expression.type
                     putTypeArgument(0, expression.type)
                     putArgument(alignOnFunction.dispatchReceiverParameter!!, aggregateContextRef)
@@ -89,38 +89,30 @@ class AlignmentIrElementTransformer(
                 val aggregateContextForse = collectAggregateReference(aggregateContext, expression.symbol.owner)
                 if (aggregateContextForse.isNotEmpty()) {
                     val a = irStatement {
-                        //val x = buildLambda(expression)
-                        val call = irCall(alignOnFunction).apply {
+                        irCall(alignOnFunction).apply {
+                            val x = pluginContext.irBuiltIns.createIrBuilder(aggregateLambda.symbol).buildLambda(expression)
+                            type = expression.type
+                            putTypeArgument(0, expression.type)
                             putArgument(alignOnFunction.dispatchReceiverParameter!!, aggregateContextForse.first())
                             putValueArgument(
                                 0,
                                 irString(callee.symbol.owner.kotlinFqName.asString())
                             )
-                            /*val base = pluginContext.referenceClass(
-                                        StandardNames.getFunctionClassId(x.allParameters.size).asSingleFqName()
-                                    )
-                                        ?: error("function type not found")
+                            val base = pluginContext.referenceClass(
+                                StandardNames.getFunctionClassId(x.allParameters.size).asSingleFqName()
+                            )
+                                ?: error("function type not found")
 
-                            val type: IrType = base.typeWith(x.allParameters.map { it.type } + x.returnType)*/
-                            /*val y = IrFunctionExpressionImpl(
+                            val type: IrType = base.typeWith(x.allParameters.map { it.type } + x.returnType)
+                            val y = IrFunctionExpressionImpl(
                                 startOffset,
                                 endOffset,
                                 type,
                                 x,
                                 IrStatementOrigin.LAMBDA
                             )
-                            putValueArgument(1, y)*/
+                            putValueArgument(1, y)
                         }
-                        val lambda = pluginContext.irBuiltIns.createIrBuilder(expression.symbol).buildLambda(expression)
-                        val y = IrFunctionExpressionImpl(
-                            startOffset,
-                            endOffset,
-                            call.type,
-                            lambda,
-                            IrStatementOrigin.LAMBDA
-                        )
-                        call.putValueArgument(1, y)
-                        call
                     }
                     return a
                 }
@@ -128,54 +120,19 @@ class AlignmentIrElementTransformer(
         return super.visitCall(expression)
     }
 
-    val factory: IrFactory get() = pluginContext.irFactory
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
-    fun IrBuilderWithScope.buildLambda(
+    private fun IrBuilderWithScope.buildLambda(
         expression: IrCall
-    ): IrSimpleFunction = factory.buildFun {
+    ): IrSimpleFunction = pluginContext.irFactory.buildFun {
         name = Name.special("<anonymous>")
         this.returnType = expression.type
         this.origin = IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA
         this.visibility = DescriptorVisibilities.LOCAL
     }.apply {
-
-        /*if (expression.symbol.owner.body!! is IrBlockBody && expression.symbol.owner.body!!.statements[2] is IrReturn) {
-            this.returnType = expression.symbol.owner.body!!.statements[2].cast<IrReturn>().value.type
-        }*/
-        //this.returnType = expression.symbol.owner.body!!.statements[2].cast<IrReturn>().value.type
         this.patchDeclarationParents(this@buildLambda.parent)
-        //val ret = context.irBuiltIns.createIrBuilder(symbol).irReturn(expression)
-        this.body = context.irBuiltIns.createIrBuilder(symbol).irBlockBody { +irReturn(expression) }
-        println("ciao")
-    }
-
-    private fun irAlign(
-        function: IrFunction,
-        body: IrBody
-    ): IrBlockBody {
-        return DeclarationIrBuilder(pluginContext, function.symbol).irBlockBody {
-            // Add alignment call at the beginning of the function
-            +irEnter(function)
-            // Put back all the function statements
-            for (statement in body.statements) +statement
+        if (expression.symbol.owner.returnType.isUnit()) {
+            this.body = context.irBuiltIns.createIrBuilder(symbol).irBlockBody { +expression }
+        } else {
+            this.body = context.irBuiltIns.createIrBuilder(symbol).irBlockBody { +irReturn(expression) }
         }
-    }
-
-    private fun IrBuilderWithScope.irEnter(
-        function: IrFunction
-    ): IrFunctionAccessExpression {
-        val concat = irConcat()
-        concat.addArgument(irString("${function.name}"))
-        // Create function call with the name of the function as argument
-        return irCall(alignOnFunction).also { call ->
-            //call.extensionReceiver = TODO()
-            call.putValueArgument(0, concat)
-        }
-    }
-
-    private fun hasToBeStacked(declaration: IrFunction): Boolean {
-        // Function that has not to be modified
-        return (declaration.body !is IrSyntheticBodyImpl &&
-                !declaration.name.isSpecial)
     }
 }
