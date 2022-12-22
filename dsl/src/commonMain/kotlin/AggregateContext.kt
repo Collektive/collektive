@@ -5,7 +5,7 @@ import stack.Stack
 
 class AggregateContext(
     private val localId: ID,
-    private val messages: Map<Path, Map<ID, *>>,
+    private val messages: Map<ID, Map<Path, *>>,
     private val previousState: Map<Path, *>) {
 
     private val stack: Stack<Any> = Stack()
@@ -43,10 +43,12 @@ class AggregateContext(
     fun <R> alignedOn(pivot: Any?, body: () -> R): R {
         stack.alignRaw(pivot)
         println(stack)
-        return body()
+        return body().also { stack.dealign() }
     }
 
-    private fun messagesAt(path: Path): Map<ID, *> = messages[path] ?: emptyMap<ID, Any>()
+    private fun messagesAt(path: Path): Map<ID, *> = messages.mapNotNull { (id, message) ->
+        if (message.containsKey(path)) id to message[path] else null
+    }.toMap()
 
     data class AggregateResult<X>(val result: X, val toSend: Map<Path, *>, val newState: Map<Path, *>)
 }
