@@ -22,6 +22,7 @@ class AlignmentIrElementTransformer(
 ) : IrElementTransformerVoid() {
 
     override fun visitCall(expression: IrCall): IrExpression {
+        if (expression.symbol.owner.name.asString() == "alignedOn") return super.visitCall(expression)
         val aggregateContextRef: IrExpression? = expression.receiverAndArgs().find {
             it.type == aggregateClass.defaultType
         }
@@ -42,6 +43,33 @@ class AlignmentIrElementTransformer(
             buildAlignOnCall(pluginContext, aggregateLambdaBody, alignOnFunction, expression, aggregateContext)
         }
     }
+
+    override fun visitBranch(branch: IrBranch): IrBranch {
+        val aggregateRefs: MutableList<IrExpression> = mutableListOf()
+        if (branch.result is IrBlock) {
+            val statements = (branch.result as IrBlock).statements
+            for (statement in statements) {
+                if (statement is IrCall || statement is IrTypeOperatorCall){
+                     aggregateRefs.addAll(collectAggregateReference(aggregateClass, statement))
+                }
+            }
+            if (aggregateRefs.isNotEmpty()) {
+               branch.result = irStatement(branch.result as IrBlock){
+                    buildAlignOnCall(pluginContext, aggregateLambdaBody, alignOnFunction, branch.condition, true, branch.result as IrBlock, aggregateRefs.first() )
+                }
+            }
+        }
+        return super.visitBranch(branch)
+    }
+
+
+    private fun <T : IrElement> irStatement(expression: IrBlock, body: IrSingleStatementBuilder.() -> T): T =
+        IrSingleStatementBuilder(
+            pluginContext,
+            Scope(aggregateLambdaBody.symbol),
+            expression.startOffset,
+            expression.endOffset
+        ).build(body)
 
     private fun <T : IrElement> irStatement(expression: IrCall, body: IrSingleStatementBuilder.() -> T): T =
         IrSingleStatementBuilder(
