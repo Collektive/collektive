@@ -3,6 +3,7 @@ package io.github.elisatronetti.utils
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.ir.allParameters
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
+import org.jetbrains.kotlin.backend.common.pop
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.ir.builders.IrBuilderWithScope
@@ -12,8 +13,7 @@ import org.jetbrains.kotlin.ir.builders.irReturn
 import org.jetbrains.kotlin.ir.builders.parent
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
-import org.jetbrains.kotlin.ir.expressions.IrCall
-import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
+import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrFunctionExpressionImpl
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.isUnit
@@ -43,6 +43,49 @@ fun IrBuilderWithScope.buildLambdaArgument(
         lambda,
         IrStatementOrigin.LAMBDA
     )
+}
+
+fun IrBuilderWithScope.buildLambdaArgument(
+    pluginContext: IrPluginContext,
+    aggregateLambdaBody: IrSimpleFunction,
+    block: IrBlock
+): IrFunctionExpressionImpl {
+    val lambda = buildLambda(pluginContext, block)
+    val base = if (lambda.isSuspend)
+        pluginContext.referenceClass(
+            StandardNames.getSuspendFunctionClassId(lambda.allParameters.size).asSingleFqName()
+        )
+            ?: error("suspend function type not found")
+    else
+        pluginContext.referenceClass(StandardNames.getFunctionClassId(lambda.allParameters.size).asSingleFqName())
+            ?: error("function type not found")
+    val type: IrType = base.typeWith(lambda.allParameters.map { it.type } + lambda.returnType)
+    return IrFunctionExpressionImpl(
+        startOffset,
+        endOffset,
+        type,
+        lambda,
+        IrStatementOrigin.LAMBDA
+    )
+}
+
+fun IrBuilderWithScope.buildLambda(
+    pluginContext: IrPluginContext,
+    expression: IrBlock
+): IrSimpleFunction = pluginContext.irFactory.buildFun {
+    name = Name.special("<anonymous>")
+    this.origin = IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA
+    this.visibility = DescriptorVisibilities.LOCAL
+}.apply {
+    this.patchDeclarationParents(this@buildLambda.parent)
+    val lastExpression = expression.statements.removeLast() as IrExpression
+    if (lastExpression is IrTypeOperatorCall){
+        this.returnType = lastExpression.argument.type
+    }
+    this.body = context.irBuiltIns.createIrBuilder(symbol).irBlockBody {
+        for (bodyStatement in expression.statements) { +bodyStatement }
+        +irReturn(lastExpression)
+    }
 }
 
 /**
