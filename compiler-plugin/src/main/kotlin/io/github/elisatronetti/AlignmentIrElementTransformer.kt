@@ -1,5 +1,6 @@
 package io.github.elisatronetti
 
+import io.github.elisatronetti.utils.buildAlignOnBlock
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.jvm.ir.receiverAndArgs
 import org.jetbrains.kotlin.ir.IrElement
@@ -53,9 +54,15 @@ class AlignmentIrElementTransformer(
                      aggregateRefs.addAll(collectAggregateReference(aggregateClass, statement))
                 }
             }
-            if (aggregateRefs.isNotEmpty()) {
-               branch.result = irStatement(branch.result as IrBlock){
-                    buildAlignOnCall(pluginContext, aggregateLambdaBody, alignOnFunction, branch.condition, true, branch.result as IrBlock, aggregateRefs.first() )
+        } else {
+            aggregateRefs.addAll(collectAggregateReference(aggregateClass, branch.result))
+        }
+        if (aggregateRefs.isNotEmpty()) {
+            branch.result = irStatement(branch) {
+                if (branch.result is IrBlock){
+                    buildAlignOnBlock(pluginContext, alignOnFunction, branch, true, aggregateRefs.first())
+                } else {
+                    buildAlignOnCall(pluginContext, alignOnFunction, branch, true, aggregateRefs.first())
                 }
             }
         }
@@ -63,7 +70,7 @@ class AlignmentIrElementTransformer(
     }
 
 
-    private fun <T : IrElement> irStatement(expression: IrBlock, body: IrSingleStatementBuilder.() -> T): T =
+    private fun <T : IrElement> irStatement(expression: IrBranch, body: IrSingleStatementBuilder.() -> T): T =
         IrSingleStatementBuilder(
             pluginContext,
             Scope(aggregateLambdaBody.symbol),
