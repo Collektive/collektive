@@ -40,6 +40,11 @@ class AggregateContext(
         }
     }
 
+    /**
+     * Alignment function that pushes in the stack the pivot, executes the body and pop the last
+     * element of the stack after it is called.
+     * Returns the body's return element.
+     */
     fun <R> alignedOn(pivot: Any?, body: () -> R): R {
         stack.alignRaw(pivot)
         println(stack)
