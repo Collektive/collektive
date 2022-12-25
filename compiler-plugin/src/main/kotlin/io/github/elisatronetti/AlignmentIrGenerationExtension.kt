@@ -15,7 +15,14 @@ class AlignmentIrGenerationExtension: IrGenerationExtension {
         // Aggregate Context class
         val aggregateContext = collectClass(moduleFragment)
         if (alignOnFunctions.isNotEmpty() && aggregateContext.isNotEmpty()) {
-            moduleFragment.transform(AggregateIrElementTransformer(pluginContext, alignOnFunctions.first(), aggregateContext.first()), null)
+            moduleFragment.transform(
+                AggregateIrElementTransformer(
+                    pluginContext,
+                    alignOnFunctions.first(),
+                    aggregateContext.first()
+                ),
+                null
+            )
         }
     }
 }
