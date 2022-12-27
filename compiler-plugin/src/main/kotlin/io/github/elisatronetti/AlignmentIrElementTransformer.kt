@@ -41,7 +41,13 @@ class AlignmentIrElementTransformer(
         }
 
         return irStatement(expression) {
-            buildAlignOnCall(pluginContext, aggregateLambdaBody, alignOnFunction, expression, aggregateContext)
+            buildAlignOnCall(
+                pluginContext,
+                aggregateLambdaBody,
+                alignOnFunction,
+                aggregateContext,
+                expression
+            )
         }
     }
 
