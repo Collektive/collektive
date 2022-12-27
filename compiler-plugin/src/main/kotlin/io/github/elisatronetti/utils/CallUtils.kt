@@ -23,8 +23,8 @@ fun IrSingleStatementBuilder.buildAlignOnCall(
     pluginContext: IrPluginContext,
     aggregateLambdaBody: IrSimpleFunction,
     alignOnFunction: IrFunction,
-    expression: IrCall,
-    aggregateContext: IrExpression
+    aggregateContext: IrExpression,
+    expression: IrCall
 ): IrFunctionAccessExpression {
     return irCall(alignOnFunction).apply {
         // Set generics type
