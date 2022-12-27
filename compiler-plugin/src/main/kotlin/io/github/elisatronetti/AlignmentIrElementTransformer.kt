@@ -93,19 +93,13 @@ class AlignmentIrElementTransformer(
         return super.visitElseBranch(branch)
     }
 
-
-    private fun <T : IrElement> irStatement(expression: IrBranch, body: IrSingleStatementBuilder.() -> T): T =
+    private fun <T : IrElement> irStatement(
+        expression: IrElement,
+        body: IrSingleStatementBuilder.() -> T
+    ): T =
         IrSingleStatementBuilder(
             pluginContext,
             Scope(aggregateLambdaBody.symbol),
-            expression.startOffset,
-            expression.endOffset
-        ).build(body)
-
-    private fun <T : IrElement> irStatement(expression: IrCall, body: IrSingleStatementBuilder.() -> T): T =
-        IrSingleStatementBuilder(
-            pluginContext,
-            Scope(expression.symbol),
             expression.startOffset,
             expression.endOffset
         ).build(body)
