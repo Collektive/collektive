@@ -69,6 +69,30 @@ class AlignmentIrElementTransformer(
         return super.visitBranch(branch)
     }
 
+    override fun visitElseBranch(branch: IrElseBranch): IrElseBranch {
+        val aggregateRefs: MutableList<IrExpression> = mutableListOf()
+        if (branch.result is IrBlock) {
+            val statements = (branch.result as IrBlock).statements
+            for (statement in statements) {
+                if (statement is IrCall || statement is IrTypeOperatorCall){
+                    aggregateRefs.addAll(collectAggregateReference(aggregateClass, statement))
+                }
+            }
+        } else {
+            aggregateRefs.addAll(collectAggregateReference(aggregateClass, branch.result))
+        }
+        if (aggregateRefs.isNotEmpty()) {
+            branch.result = irStatement(branch) {
+                if (branch.result is IrBlock) {
+                    buildAlignOnBlock(pluginContext, alignOnFunction, branch, false, aggregateRefs.first())
+                } else {
+                    buildAlignOnCall(pluginContext, alignOnFunction, branch, false, aggregateRefs.first())
+                }
+            }
+        }
+        return super.visitElseBranch(branch)
+    }
+
 
     private fun <T : IrElement> irStatement(expression: IrBranch, body: IrSingleStatementBuilder.() -> T): T =
         IrSingleStatementBuilder(
