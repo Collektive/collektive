@@ -1,9 +1,10 @@
 package io.github.elisatronetti.utils.branch
 
+import io.github.elisatronetti.utils.common.getLambdaType
+import io.github.elisatronetti.utils.common.putTypeArgument
+import io.github.elisatronetti.utils.common.putValueArgument
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.backend.common.ir.allParameters
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
-import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.ir.builders.*
 import org.jetbrains.kotlin.ir.builders.declarations.buildFun
@@ -13,11 +14,10 @@ import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrFunctionExpressionImpl
 import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.types.typeWith
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.name.Name
 
-fun IrSingleStatementBuilder.buildAlignOnBlock(
+internal fun IrSingleStatementBuilder.buildAlignOnBlock(
     pluginContext: IrPluginContext,
     alignOnFunction: IrFunction,
     branch: IrBranch,
@@ -29,15 +29,11 @@ fun IrSingleStatementBuilder.buildAlignOnBlock(
         +irCall(alignOnFunction).apply {
             // Set generics type
             val lastExpression = block.statements.last() as IrExpression
-            val returnType = getReturnType(lastExpression)
-            this.type = returnType
-            putTypeArgument(0, returnType)
-
+            putTypeArgument(getReturnType(lastExpression))
             // Set aggregate context
             putArgument(alignOnFunction.dispatchReceiverParameter!!, aggregateContext)
             // Set the argument that is going to be push in the stack
             putValueArgument(
-                0,
                 irString(createConditionArgument(branch.condition, conditionValue))
             )
             // Create the lambda that is going to call expression
@@ -47,7 +43,7 @@ fun IrSingleStatementBuilder.buildAlignOnBlock(
     }
 }
 
-fun IrSingleStatementBuilder.buildAlignOnCall(
+internal fun IrSingleStatementBuilder.buildAlignOnCall(
     pluginContext: IrPluginContext,
     alignOnFunction: IrFunction,
     branch: IrBranch,
@@ -57,15 +53,11 @@ fun IrSingleStatementBuilder.buildAlignOnCall(
     return irCall(alignOnFunction).apply {
         val statement = branch.result
         // Set generics type
-        val returnType = getReturnType(statement)
-        this.type = returnType
-        putTypeArgument(0, returnType)
-
+        putTypeArgument(getReturnType(statement))
         // Set aggregate context
         putArgument(alignOnFunction.dispatchReceiverParameter!!, aggregateContext)
         // Set the argument that is going to be push in the stack
         putValueArgument(
-            0,
             irString(createConditionArgument(branch.condition, conditionValue))
         )
         // Create the lambda that is going to call expression
@@ -74,45 +66,26 @@ fun IrSingleStatementBuilder.buildAlignOnCall(
     }
 }
 
-fun IrBuilderWithScope.buildLambdaArgument(
+private fun IrBuilderWithScope.buildLambdaArgument(
     pluginContext: IrPluginContext,
-    statement: IrExpression
+    element: IrExpression
 ): IrFunctionExpressionImpl {
-    val lambda = buildLambda(pluginContext, statement)
-    val base = pluginContext.referenceClass(
-        StandardNames.getFunctionClassId(lambda.allParameters.size).asSingleFqName()
-    )
-        ?: error("function type not found")
-    val type: IrType = base.typeWith(lambda.allParameters.map { it.type } + lambda.returnType)
+    val lambda = if (element is IrBlock) {
+        // The element is a IrBlock
+        buildLambda(pluginContext, element)
+    } else {
+        buildLambda(pluginContext, element)
+    }
     return IrFunctionExpressionImpl(
         startOffset,
         endOffset,
-        type,
+        getLambdaType(pluginContext, lambda),
         lambda,
         IrStatementOrigin.LAMBDA
     )
 }
 
-fun IrBuilderWithScope.buildLambdaArgument(
-    pluginContext: IrPluginContext,
-    block: IrBlock
-): IrFunctionExpressionImpl {
-    val lambda = buildLambda(pluginContext, block)
-    val base = pluginContext.referenceClass(
-        StandardNames.getFunctionClassId(lambda.allParameters.size).asSingleFqName()
-    )
-        ?: error("function type not found")
-    val type: IrType = base.typeWith(lambda.allParameters.map { it.type } + lambda.returnType)
-    return IrFunctionExpressionImpl(
-        startOffset,
-        endOffset,
-        type,
-        lambda,
-        IrStatementOrigin.LAMBDA
-    )
-}
-
-fun IrBuilderWithScope.buildLambda(
+private fun IrBuilderWithScope.buildLambda(
     pluginContext: IrPluginContext,
     expression: IrExpression
 ): IrSimpleFunction = pluginContext.irFactory.buildFun {
@@ -127,7 +100,7 @@ fun IrBuilderWithScope.buildLambda(
     }
 }
 
-fun IrBuilderWithScope.buildLambda(
+private fun IrBuilderWithScope.buildLambda(
     pluginContext: IrPluginContext,
     expression: IrBlock
 ): IrSimpleFunction = pluginContext.irFactory.buildFun {
