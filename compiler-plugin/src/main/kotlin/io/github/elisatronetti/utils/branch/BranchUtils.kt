@@ -33,6 +33,7 @@ fun IrBranch.addAlignmentToBranchBlock(
     }
 }
 
+
 fun IrBranch.addAlignmentToBranchExpression(
     pluginContext: IrPluginContext,
     aggregateClass: IrClass,

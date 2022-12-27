@@ -1,6 +1,6 @@
 package io.github.elisatronetti
 
-import io.github.elisatronetti.utils.Name
+import io.github.elisatronetti.utils.common.Name
 import io.github.elisatronetti.utils.branch.*
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.jvm.ir.receiverAndArgs
