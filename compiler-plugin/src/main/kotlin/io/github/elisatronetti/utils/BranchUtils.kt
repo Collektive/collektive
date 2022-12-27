@@ -160,6 +160,11 @@ private fun getReturnType(expression: IrExpression): IrType {
     when (expression) {
         is IrTypeOperatorCall -> return expression.argument.type
         is IrCall -> return expression.type
+        is IrConst<*> -> return expression.type
+        is IrGetObjectValue -> return expression.type
+        is IrConstructorCall -> return expression.type
+        is IrGetValue -> return expression.type
+        is IrFunctionExpression -> return expression.type
     }
     throw IllegalStateException(
         "The current if condition body ${expression::class} has not been handled for the alignment yet. " +
