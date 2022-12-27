@@ -1,5 +1,5 @@
 package io.github.elisatronetti.utils
 
-enum class Name(val elementName: String) {
-    ALIGNED_ON_FUNCTION("alignedOn"),
+object Name {
+    const val ALIGNED_ON_FUNCTION = "alignedOn"
 }

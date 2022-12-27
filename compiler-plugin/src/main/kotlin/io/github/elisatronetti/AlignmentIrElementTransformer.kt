@@ -1,5 +1,6 @@
 package io.github.elisatronetti
 
+import io.github.elisatronetti.utils.Name
 import io.github.elisatronetti.utils.buildAlignOnBlock
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.jvm.ir.receiverAndArgs
@@ -23,7 +24,8 @@ class AlignmentIrElementTransformer(
 ) : IrElementTransformerVoid() {
 
     override fun visitCall(expression: IrCall): IrExpression {
-        if (expression.symbol.owner.name.asString() == "alignedOn") return super.visitCall(expression)
+        if (expression.symbol.owner.name.asString() == Name.ALIGNED_ON_FUNCTION) return super.visitCall(expression)
+
         val aggregateContextRef: IrExpression? = expression.receiverAndArgs().find {
             it.type == aggregateClass.defaultType
         }
