@@ -21,15 +21,15 @@ import org.jetbrains.kotlin.name.Name
 fun IrSingleStatementBuilder.buildAlignOnCall(
     pluginContext: IrPluginContext,
     aggregateLambdaBody: IrSimpleFunction,
-    alignOnFunction: IrFunction,
-    aggregateContext: IrExpression,
+    aggregateContextReference: IrExpression,
+    alignedOnFunction: IrFunction,
     expression: IrCall
 ): IrFunctionAccessExpression {
-    return irCall(alignOnFunction).apply {
+    return irCall(alignedOnFunction).apply {
         // Set generics type
         putTypeArgument(expression.type)
         // Set aggregate context
-        putArgument(alignOnFunction.dispatchReceiverParameter!!, aggregateContext)
+        putArgument(alignedOnFunction.dispatchReceiverParameter!!, aggregateContextReference)
         // Set the argument that is going to be push in the stack
         putValueArgument(
             irString(expression.symbol.owner.kotlinFqName.asString())

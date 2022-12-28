@@ -24,7 +24,7 @@ class AggregateCallTransformer(
             val aggregateLambdaBody =
                 (expression.getLastValueArgument() as IrFunctionExpression).function
             expression.transform(
-                AlignmentIrElementTransformer(
+                AlignmentTransformer(
                     pluginContext,
                     aggregateContextClass,
                     aggregateLambdaBody,

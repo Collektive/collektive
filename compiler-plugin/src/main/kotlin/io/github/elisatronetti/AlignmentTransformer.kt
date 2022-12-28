@@ -15,7 +15,7 @@ import io.github.elisatronetti.utils.statement.irStatement
  * for each function call and branch found, they are going to be wrapped in the alignedOn
  * function.
  */
-class AlignmentIrElementTransformer(
+class AlignmentTransformer(
     private val pluginContext: IrPluginContext,
     private val aggregateContextClass: IrClass,
     private val aggregateLambdaBody: IrSimpleFunction,
@@ -25,7 +25,7 @@ class AlignmentIrElementTransformer(
     override fun visitCall(expression: IrCall): IrExpression {
         if (expression.symbol.owner.name.asString() == Name.ALIGNED_ON_FUNCTION) return super.visitCall(expression)
 
-        val aggregateContext: IrExpression =
+        val aggregateContextReference: IrExpression =
             expression.receiverAndArgs(aggregateContextClass)
                 ?: (collectAggregateContextReference(aggregateContextClass, expression.symbol.owner)
                     ?: return super.visitCall(expression))
@@ -38,8 +38,8 @@ class AlignmentIrElementTransformer(
             buildAlignOnCall(
                 pluginContext,
                 aggregateLambdaBody,
+                aggregateContextReference,
                 alignedOnFunction,
-                aggregateContext,
                 expression
             )
         }
