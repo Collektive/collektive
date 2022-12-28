@@ -1,6 +1,6 @@
 package io.github.elisatronetti.utils.branch
 
-import io.github.elisatronetti.collectAggregateReference
+import io.github.elisatronetti.collectAggregateContextReference
 import io.github.elisatronetti.utils.statement.irStatement
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.declarations.IrClass
@@ -15,8 +15,8 @@ fun IrBranch.addAlignmentToBranchBlock(
     alignOnFunction: IrFunction,
     conditionValue: Boolean = true
 ) {
-    val aggregateRefs = (this.result as IrBlock).findAggregateReferences(aggregateClass)
-    if (aggregateRefs.isNotEmpty()) {
+    val aggregateRef: IrExpression? = (this.result as IrBlock).findAggregateReference(aggregateClass)
+    if (aggregateRef != null) {
         this.result = irStatement(
             pluginContext,
             aggregateLambdaBody,
@@ -27,7 +27,7 @@ fun IrBranch.addAlignmentToBranchBlock(
                 alignOnFunction,
                 this@addAlignmentToBranchBlock,
                 conditionValue,
-                aggregateRefs.first()
+                aggregateRef
             )
         }
     }
@@ -41,8 +41,8 @@ fun IrBranch.addAlignmentToBranchExpression(
     alignOnFunction: IrFunction,
     conditionValue: Boolean = true
 ) {
-    val aggregateRefs = this.result.findAggregateReferences(aggregateClass)
-    if (aggregateRefs.isNotEmpty()) {
+    val aggregateRefs: IrExpression? = this.result.findAggregateReference(aggregateClass)
+    if (aggregateRefs != null) {
         this.result = irStatement(
             pluginContext,
             aggregateLambdaBody,
@@ -53,27 +53,27 @@ fun IrBranch.addAlignmentToBranchExpression(
                 alignOnFunction,
                 this@addAlignmentToBranchExpression,
                 conditionValue,
-                aggregateRefs.first()
+                aggregateRefs
             )
         }
     }
 }
 
-private fun IrBlock.findAggregateReferences(
+private fun IrBlock.findAggregateReference(
     aggregateClass: IrClass
-): List<IrExpression> {
-    val aggregateRefs: MutableList<IrExpression> = mutableListOf()
+): IrExpression? {
+    val aggregateRefs: MutableList<IrExpression?> = mutableListOf()
     val statements = this.statements
     for (statement in statements) {
         if (statement is IrCall) {
-            aggregateRefs.addAll(collectAggregateReference(aggregateClass, statement.symbol.owner))
+            aggregateRefs.add(collectAggregateContextReference(aggregateClass, statement.symbol.owner))
         } else if (statement is IrTypeOperatorCall) {
-            aggregateRefs.addAll(collectAggregateReference(aggregateClass, statement))
+            aggregateRefs.add(collectAggregateContextReference(aggregateClass, statement))
         }
     }
-    return aggregateRefs.toList()
+    return aggregateRefs.filterNotNull().firstOrNull()
 }
 
-private fun IrExpression.findAggregateReferences(
+private fun IrExpression.findAggregateReference(
     aggregateClass: IrClass
-): List<IrExpression> =  collectAggregateReference(aggregateClass, this)
+): IrExpression? = collectAggregateContextReference(aggregateClass, this)

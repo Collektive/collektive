@@ -6,13 +6,14 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
+import org.jetbrains.kotlin.utils.addIfNotNull
 
 /**
  * Class that visit all the children of the IR, looking for the
  * AggregateContext class.
  */
 class AggregateRefChildrenVisitor(
-    private val aggregateContext: IrClass,
+    private val aggregateContextClass: IrClass,
     private val elements: MutableList<IrExpression>
 ) : IrElementVisitor<Unit, Nothing?> {
 
@@ -22,10 +23,7 @@ class AggregateRefChildrenVisitor(
     }
 
     override fun visitCall(expression: IrCall, data: Nothing?) {
-        val aggregateContextRef: IrExpression? = expression.receiverAndArgs(aggregateContext)
-        if (aggregateContextRef != null) {
-            elements.add(aggregateContextRef)
-        }
+        elements.addIfNotNull(expression.receiverAndArgs(aggregateContextClass))
         super.visitCall(expression, data)
     }
 
@@ -34,6 +32,7 @@ class AggregateRefChildrenVisitor(
 /**
  * Retrieve the classes that match the target class name.
  */
-fun collectAggregateReference(aggregateContext: IrClass, element: IrElement) = buildList {
-    element.accept(AggregateRefChildrenVisitor(aggregateContext, this), null)
-}
+fun collectAggregateContextReference(aggregateContextClass: IrClass, element: IrElement): IrExpression? =
+    buildList {
+        element.accept(AggregateRefChildrenVisitor(aggregateContextClass, this), null)
+    }.firstOrNull()
