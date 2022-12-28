@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
 
 /**
- * The component registrar register the alignment generation extension if
+ * The component registrar registers the alignment generation extension if
  * the compiler plugin is enabled.
  */
 @AutoService(ComponentRegistrar::class)
