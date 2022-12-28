@@ -1,11 +1,10 @@
 package io.github.elisatronetti
 
-import org.jetbrains.kotlin.backend.jvm.ir.receiverAndArgs
+import io.github.elisatronetti.utils.common.receiverAndArgs
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 
 /**
@@ -23,9 +22,7 @@ class AggregateRefChildrenVisitor(
     }
 
     override fun visitCall(expression: IrCall, data: Nothing?) {
-        val aggregateContextRef: IrExpression? = expression.receiverAndArgs().find {
-            it.type == aggregateContext.defaultType
-        }
+        val aggregateContextRef: IrExpression? = expression.receiverAndArgs(aggregateContext)
         if (aggregateContextRef != null) {
             elements.add(aggregateContextRef)
         }

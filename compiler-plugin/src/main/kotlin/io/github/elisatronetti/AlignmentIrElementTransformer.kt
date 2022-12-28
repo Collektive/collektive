@@ -3,12 +3,11 @@ package io.github.elisatronetti
 import io.github.elisatronetti.utils.common.Name
 import io.github.elisatronetti.utils.branch.*
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.backend.jvm.ir.receiverAndArgs
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
-import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import io.github.elisatronetti.utils.call.buildAlignOnCall
+import io.github.elisatronetti.utils.common.receiverAndArgs
 import io.github.elisatronetti.utils.statement.irStatement
 
 /**
@@ -26,21 +25,20 @@ class AlignmentIrElementTransformer(
     override fun visitCall(expression: IrCall): IrExpression {
         if (expression.symbol.owner.name.asString() == Name.ALIGNED_ON_FUNCTION) return super.visitCall(expression)
 
-        val aggregateContextRef: IrExpression? = expression.receiverAndArgs().find {
-            it.type == aggregateContextClass.defaultType
-        }
+        val aggregateContextRef: IrExpression? = expression.receiverAndArgs(aggregateContextClass)
 
-        val aggregateContext: IrExpression = if (aggregateContextRef != null) {
-            aggregateContextRef
-        } else {
-            // Find the aggregate context looking in all the children of expression
-            val childrenAggregateRefs = collectAggregateReference(aggregateContextClass, expression.symbol.owner)
-            if (childrenAggregateRefs.isNotEmpty()) {
-                childrenAggregateRefs.first()
+        val aggregateContext: IrExpression =
+            if (aggregateContextRef != null) {
+                aggregateContextRef
             } else {
-                return super.visitCall(expression)
+                // Find the aggregate context looking in all the children of expression
+                val childrenAggregateRefs = collectAggregateReference(aggregateContextClass, expression.symbol.owner)
+                if (childrenAggregateRefs.isNotEmpty()) {
+                    childrenAggregateRefs.first()
+                } else {
+                    return super.visitCall(expression)
+                }
             }
-        }
 
         return irStatement(
             pluginContext,
