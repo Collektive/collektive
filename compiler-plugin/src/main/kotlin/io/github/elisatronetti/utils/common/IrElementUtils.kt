@@ -2,13 +2,16 @@ package io.github.elisatronetti.utils.common
 
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.ir.allParameters
+import org.jetbrains.kotlin.backend.jvm.ir.receiverAndArgs
 import org.jetbrains.kotlin.builtins.StandardNames
+import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.typeWith
+import org.jetbrains.kotlin.ir.util.defaultType
 import java.beans.Expression
 
 /**
@@ -38,6 +41,15 @@ internal fun IrFunctionAccessExpression.putTypeArgument(
  */
 internal fun IrCall.getLastValueArgument(): IrExpression? =
     this.getValueArgument(this.valueArgumentsCount - 1)
+
+/**
+ * Looking in the receiver and args of a IrCall if there is one that matches the
+ * type of class passed as argument.
+ */
+internal fun IrCall.receiverAndArgs(
+    classToMatch : IrClass
+): IrExpression? =
+    this.receiverAndArgs().find { it.type == classToMatch.defaultType }
 
 internal fun getLambdaType(
     pluginContext: IrPluginContext,
