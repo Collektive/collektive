@@ -9,9 +9,10 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 
 /**
  * Looking for the aggregate function call, which is the one that contains the function calls
- * and the branches that have to be aligned.
+ * and the branches that have to be aligned. The body of this function call will be
+ * transformed by adding the alignedOn function when necessary.
  */
-class AggregateIrElementTransformer(
+class AggregateCallTransformer(
     private val pluginContext: IrPluginContext,
     private val aggregateContextClass: IrClass,
     private val alignedOnFunction: IrFunction

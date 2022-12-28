@@ -17,20 +17,20 @@ class AlignmentIrGenerationExtension: IrGenerationExtension {
         // Function that is responsible to handle the alignment
         val alignedOnFunction: IrFunction? = collectAlignedOnFunction(moduleFragment)
         // Aggregate Context class that has the reference to the stack
-        val aggregateContext: IrClass? = collectAggregateContextClass(moduleFragment)
-        if (alignedOnFunction != null && aggregateContext != null) {
+        val aggregateContextClass: IrClass? = collectAggregateContextClass(moduleFragment)
+        if (alignedOnFunction != null && aggregateContextClass != null) {
             moduleFragment.transform(
-                AggregateIrElementTransformer(
+                AggregateCallTransformer(
                     pluginContext,
-                    alignedOnFunction,
-                    aggregateContext
+                    aggregateContextClass,
+                    alignedOnFunction
                 ),
                 null
             )
         } else {
             if (alignedOnFunction == null)
                 println("[COMPILER-PLUGIN]: the function that is used to handle the alignment has not been found.")
-            if (aggregateContext == null)
+            if (aggregateContextClass == null)
                 println("[COMPILER-PLUGIN]: the aggregate context used to update the stack for " +
                         "alignment has not been found.")
         }
