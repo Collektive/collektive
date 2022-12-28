@@ -8,8 +8,8 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
-import io.github.elisatronetti.utils.buildAlignOnCall
-import io.github.elisatronetti.utils.irStatement
+import io.github.elisatronetti.utils.call.buildAlignOnCall
+import io.github.elisatronetti.utils.statement.irStatement
 
 /**
  * This transform the generated IR, creating in the function declaration a new function call,
