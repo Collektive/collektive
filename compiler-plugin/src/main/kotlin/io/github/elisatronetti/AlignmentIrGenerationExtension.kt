@@ -1,5 +1,6 @@
 package io.github.elisatronetti
 
+import io.github.elisatronetti.visitors.collectAlignedOnFunction
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.declarations.IrFunction
