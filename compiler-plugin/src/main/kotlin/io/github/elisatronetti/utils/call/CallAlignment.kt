@@ -1,4 +1,4 @@
-package io.github.elisatronetti.utils
+package io.github.elisatronetti.utils.call
 
 import io.github.elisatronetti.utils.common.getLambdaType
 import io.github.elisatronetti.utils.common.putTypeArgument

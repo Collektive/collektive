@@ -1,4 +1,4 @@
-package io.github.elisatronetti.utils
+package io.github.elisatronetti.utils.statement
 
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrElement
