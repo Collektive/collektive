@@ -10,24 +10,24 @@ import org.jetbrains.kotlin.ir.expressions.*
 
 fun IrBranch.addAlignmentToBranchBlock(
     pluginContext: IrPluginContext,
-    aggregateClass: IrClass,
+    aggregateContextClass: IrClass,
     aggregateLambdaBody: IrSimpleFunction,
-    alignOnFunction: IrFunction,
+    alignedOnFunction: IrFunction,
     conditionValue: Boolean = true
 ) {
-    val aggregateRef: IrExpression? = (this.result as IrBlock).findAggregateReference(aggregateClass)
-    if (aggregateRef != null) {
+    val aggregateContextReference: IrExpression? = (this.result as IrBlock).findAggregateReference(aggregateContextClass)
+    if (aggregateContextReference != null) {
         this.result = irStatement(
             pluginContext,
             aggregateLambdaBody,
             this
         ) {
-            buildAlignOnBlock(
+            buildAlignedOnBlock(
                 pluginContext,
-                alignOnFunction,
+                aggregateContextReference,
+                alignedOnFunction,
                 this@addAlignmentToBranchBlock,
-                conditionValue,
-                aggregateRef
+                conditionValue
             )
         }
     }
@@ -36,44 +36,46 @@ fun IrBranch.addAlignmentToBranchBlock(
 
 fun IrBranch.addAlignmentToBranchExpression(
     pluginContext: IrPluginContext,
-    aggregateClass: IrClass,
+    aggregateContextClass: IrClass,
     aggregateLambdaBody: IrSimpleFunction,
-    alignOnFunction: IrFunction,
+    alignedOnFunction: IrFunction,
     conditionValue: Boolean = true
 ) {
-    val aggregateRefs: IrExpression? = this.result.findAggregateReference(aggregateClass)
-    if (aggregateRefs != null) {
+    val aggregateContextReference: IrExpression? = this.result.findAggregateReference(aggregateContextClass)
+    if (aggregateContextReference != null) {
         this.result = irStatement(
             pluginContext,
             aggregateLambdaBody,
             this
         ) {
-            buildAlignOnCall(
+            buildAlignedOnCall(
                 pluginContext,
-                alignOnFunction,
+                aggregateContextReference,
+                alignedOnFunction,
                 this@addAlignmentToBranchExpression,
-                conditionValue,
-                aggregateRefs
+                conditionValue
             )
         }
     }
 }
 
 private fun IrBlock.findAggregateReference(
-    aggregateClass: IrClass
+    aggregateContextClass: IrClass
 ): IrExpression? {
-    val aggregateRefs: MutableList<IrExpression?> = mutableListOf()
+    val aggregateContextReferences: MutableList<IrExpression?> = mutableListOf()
     val statements = this.statements
     for (statement in statements) {
         if (statement is IrCall) {
-            aggregateRefs.add(collectAggregateContextReference(aggregateClass, statement.symbol.owner))
+            aggregateContextReferences.add(
+                collectAggregateContextReference(aggregateContextClass, statement.symbol.owner)
+            )
         } else if (statement is IrTypeOperatorCall) {
-            aggregateRefs.add(collectAggregateContextReference(aggregateClass, statement))
+            aggregateContextReferences.add(collectAggregateContextReference(aggregateContextClass, statement))
         }
     }
-    return aggregateRefs.filterNotNull().firstOrNull()
+    return aggregateContextReferences.filterNotNull().firstOrNull()
 }
 
 private fun IrExpression.findAggregateReference(
-    aggregateClass: IrClass
-): IrExpression? = collectAggregateContextReference(aggregateClass, this)
+    aggregateContextClass: IrClass
+): IrExpression? = collectAggregateContextReference(aggregateContextClass, this)

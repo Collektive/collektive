@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
-import io.github.elisatronetti.utils.call.buildAlignOnCall
+import io.github.elisatronetti.utils.call.buildAlignedOnCall
 import io.github.elisatronetti.utils.common.receiverAndArgs
 import io.github.elisatronetti.utils.statement.irStatement
 
@@ -35,7 +35,7 @@ class AlignmentTransformer(
             aggregateLambdaBody,
             expression
         ) {
-            buildAlignOnCall(
+            buildAlignedOnCall(
                 pluginContext,
                 aggregateLambdaBody,
                 aggregateContextReference,
