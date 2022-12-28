@@ -11,7 +11,7 @@ import io.github.elisatronetti.utils.common.receiverAndArgs
 import io.github.elisatronetti.utils.statement.irStatement
 
 /**
- * This transform the generated IR only when an aggregate computing's function is involved:
+ * This transforms the generated IR only when an aggregate computing's function is involved:
  * for each function call and branch found, they are going to be wrapped in the alignedOn
  * function.
  */

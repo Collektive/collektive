@@ -22,6 +22,8 @@ class AggregateRefChildrenVisitor(
         element.acceptChildren(this, data)
     }
 
+    // Search in each call if in its receiver or arguments there is the reference to
+    // the aggregate context
     override fun visitCall(expression: IrCall, data: Nothing?) {
         elements.addIfNotNull(expression.receiverAndArgs(aggregateContextClass))
         super.visitCall(expression, data)
@@ -30,7 +32,7 @@ class AggregateRefChildrenVisitor(
 }
 
 /**
- * Retrieve the classes that match the target class name.
+ * Retrieve the aggregate context reference by looking in all the function call in the element found.
  */
 fun collectAggregateContextReference(aggregateContextClass: IrClass, element: IrElement): IrExpression? =
     buildList {
