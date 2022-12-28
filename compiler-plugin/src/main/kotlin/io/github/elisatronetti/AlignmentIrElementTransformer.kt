@@ -25,20 +25,10 @@ class AlignmentIrElementTransformer(
     override fun visitCall(expression: IrCall): IrExpression {
         if (expression.symbol.owner.name.asString() == Name.ALIGNED_ON_FUNCTION) return super.visitCall(expression)
 
-        val aggregateContextRef: IrExpression? = expression.receiverAndArgs(aggregateContextClass)
-
         val aggregateContext: IrExpression =
-            if (aggregateContextRef != null) {
-                aggregateContextRef
-            } else {
-                // Find the aggregate context looking in all the children of expression
-                val childrenAggregateRefs = collectAggregateReference(aggregateContextClass, expression.symbol.owner)
-                if (childrenAggregateRefs.isNotEmpty()) {
-                    childrenAggregateRefs.first()
-                } else {
-                    return super.visitCall(expression)
-                }
-            }
+            expression.receiverAndArgs(aggregateContextClass)
+                ?: (collectAggregateContextReference(aggregateContextClass, expression.symbol.owner)
+                    ?: return super.visitCall(expression))
 
         return irStatement(
             pluginContext,
