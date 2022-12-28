@@ -65,7 +65,9 @@ private fun IrBlock.findAggregateReferences(
     val aggregateRefs: MutableList<IrExpression> = mutableListOf()
     val statements = this.statements
     for (statement in statements) {
-        if (statement is IrCall || statement is IrTypeOperatorCall){
+        if (statement is IrCall) {
+            aggregateRefs.addAll(collectAggregateReference(aggregateClass, statement.symbol.owner))
+        } else if (statement is IrTypeOperatorCall) {
             aggregateRefs.addAll(collectAggregateReference(aggregateClass, statement))
         }
     }
