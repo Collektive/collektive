@@ -17,21 +17,21 @@ import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.name.Name
 
-internal fun IrSingleStatementBuilder.buildAlignOnBlock(
+internal fun IrSingleStatementBuilder.buildAlignedOnBlock(
     pluginContext: IrPluginContext,
-    alignOnFunction: IrFunction,
+    aggregateContextReference: IrExpression,
+    alignedOnFunction: IrFunction,
     branch: IrBranch,
-    conditionValue: Boolean,
-    aggregateContext: IrExpression
+    conditionValue: Boolean
 ): IrContainerExpression {
     return irBlock {
         val block = branch.result as IrBlock
-        +irCall(alignOnFunction).apply {
+        +irCall(alignedOnFunction).apply {
             // Set generics type
             val lastExpression = block.statements.last() as IrExpression
             putTypeArgument(getReturnType(lastExpression))
             // Set aggregate context
-            putArgument(alignOnFunction.dispatchReceiverParameter!!, aggregateContext)
+            putArgument(alignedOnFunction.dispatchReceiverParameter!!, aggregateContextReference)
             // Set the argument that is going to be push in the stack
             putValueArgument(
                 irString(createConditionArgument(branch.condition, conditionValue))
@@ -43,19 +43,19 @@ internal fun IrSingleStatementBuilder.buildAlignOnBlock(
     }
 }
 
-internal fun IrSingleStatementBuilder.buildAlignOnCall(
+internal fun IrSingleStatementBuilder.buildAlignedOnCall(
     pluginContext: IrPluginContext,
-    alignOnFunction: IrFunction,
+    aggregateContextReference: IrExpression,
+    alignedOnFunction: IrFunction,
     branch: IrBranch,
-    conditionValue: Boolean,
-    aggregateContext: IrExpression
+    conditionValue: Boolean
 ): IrFunctionAccessExpression {
-    return irCall(alignOnFunction).apply {
+    return irCall(alignedOnFunction).apply {
         val statement = branch.result
         // Set generics type
         putTypeArgument(getReturnType(statement))
         // Set aggregate context
-        putArgument(alignOnFunction.dispatchReceiverParameter!!, aggregateContext)
+        putArgument(alignedOnFunction.dispatchReceiverParameter!!, aggregateContextReference)
         // Set the argument that is going to be push in the stack
         putValueArgument(
             irString(createConditionArgument(branch.condition, conditionValue))

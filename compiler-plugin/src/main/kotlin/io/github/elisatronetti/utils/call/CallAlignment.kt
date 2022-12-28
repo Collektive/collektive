@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.name.Name
 
-fun IrSingleStatementBuilder.buildAlignOnCall(
+fun IrSingleStatementBuilder.buildAlignedOnCall(
     pluginContext: IrPluginContext,
     aggregateLambdaBody: IrSimpleFunction,
     aggregateContextReference: IrExpression,
