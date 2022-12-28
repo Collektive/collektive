@@ -1,5 +1,6 @@
 package io.github.elisatronetti
 
+import io.github.elisatronetti.utils.common.Name
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
@@ -11,7 +12,6 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 class StackClassVisitor(
     private val elements: MutableList<IrClass>
 ) : IrElementVisitor<Unit, Nothing?> {
-    private val aggregateContextClassName: String = "AggregateContext"
 
     // Visit all the children of the root element
     override fun visitElement(element: IrElement, data: Nothing?) {
@@ -20,7 +20,7 @@ class StackClassVisitor(
 
     // Visit all the classes looking for the AggregateContext class
     override fun visitClass(declaration: IrClass, data: Nothing?) {
-        if (declaration.name.asString() == aggregateContextClassName) {
+        if (declaration.name.asString() == Name.AGGREGATE_CONTEXT_CLASS) {
             elements.add(declaration)
         }
         super.visitClass(declaration, data)
@@ -29,8 +29,8 @@ class StackClassVisitor(
 }
 
 /**
- * Retrieve the classes that match the target class name.
+ * Retrieve the first class that matches the target's class name or null.
  */
-fun collectClass(element: IrElement) = buildList {
+fun collectAggregateContextClass(element: IrElement): IrClass? = buildList {
     element.accept(StackClassVisitor(this), null)
-}
+}.firstOrNull()
