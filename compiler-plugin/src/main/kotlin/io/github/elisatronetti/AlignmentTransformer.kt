@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import io.github.elisatronetti.utils.call.buildAlignedOnCall
 import io.github.elisatronetti.utils.common.receiverAndArgs
 import io.github.elisatronetti.utils.statement.irStatement
+import io.github.elisatronetti.visitors.collectAggregateContextReference
 
 /**
  * This transforms the generated IR only when an aggregate computing's function is involved:

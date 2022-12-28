@@ -1,7 +1,7 @@
 package io.github.elisatronetti.utils.branch
 
-import io.github.elisatronetti.collectAggregateContextReference
 import io.github.elisatronetti.utils.statement.irStatement
+import io.github.elisatronetti.visitors.collectAggregateContextReference
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
