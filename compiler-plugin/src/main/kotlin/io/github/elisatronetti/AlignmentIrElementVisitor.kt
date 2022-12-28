@@ -1,5 +1,6 @@
 package io.github.elisatronetti
 
+import io.github.elisatronetti.utils.common.Name
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
@@ -11,16 +12,15 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 class AlignmentIrElementVisitor(
     private val elements: MutableList<IrFunction>
 ) : IrElementVisitor<Unit, Nothing?> {
-    private val alignRawFunctionName: String = "alignedOn"
 
     // Visit all the children of the root element
     override fun visitElement(element: IrElement, data: Nothing?) {
         element.acceptChildren(this, data)
     }
 
-    // Looking for the function declaration with the target names
+    // Looking for the function declaration that matches the target's name
     override fun visitFunction(declaration: IrFunction, data: Nothing?) {
-        if (declaration.name.toString() == alignRawFunctionName){
+        if (declaration.name.toString() == Name.ALIGNED_ON_FUNCTION){
             elements.add(declaration)
         }
         super.visitFunction(declaration, data)
@@ -28,8 +28,9 @@ class AlignmentIrElementVisitor(
 }
 
 /**
- * Retrieve the function that matches the target function name.
+ * Retrieve the first function that matches the target's function name or null.
  */
-fun collect(element: IrElement) = buildList {
-    element.accept(AlignmentIrElementVisitor(this), null)
-}
+fun collectAlignedOnFunction(element: IrElement): IrFunction? =
+    buildList {
+        element.accept(AlignmentIrElementVisitor(this), null)
+    }.firstOrNull()

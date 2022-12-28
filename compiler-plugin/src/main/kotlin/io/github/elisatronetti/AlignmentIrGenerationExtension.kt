@@ -2,6 +2,7 @@ package io.github.elisatronetti
 
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 
 /**
@@ -11,18 +12,24 @@ import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 class AlignmentIrGenerationExtension: IrGenerationExtension {
     override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
         // Function that is responsible to handle the alignment
-        val alignOnFunctions = collect(moduleFragment)
+        val alignedOnFunction: IrFunction? = collectAlignedOnFunction(moduleFragment)
         // Aggregate Context class
         val aggregateContext = collectClass(moduleFragment)
-        if (alignOnFunctions.isNotEmpty() && aggregateContext.isNotEmpty()) {
+        if (alignedOnFunction != null && aggregateContext.isNotEmpty()) {
             moduleFragment.transform(
                 AggregateIrElementTransformer(
                     pluginContext,
-                    alignOnFunctions.first(),
+                    alignedOnFunction,
                     aggregateContext.first()
                 ),
                 null
             )
+        } else {
+            if (alignedOnFunction == null)
+                println("[COMPILER-PLUGIN]: the function that is used to handle the alignment has not been found.")
+            if (aggregateContext.isEmpty())
+                println("[COMPILER-PLUGIN]: the aggregate context used to update the stack for " +
+                        "alignment has not been found.")
         }
     }
 }
