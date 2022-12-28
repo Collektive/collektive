@@ -1,4 +1,4 @@
-package io.github.elisatronetti
+package io.github.elisatronetti.visitors
 
 import io.github.elisatronetti.utils.common.Name
 import org.jetbrains.kotlin.ir.IrElement

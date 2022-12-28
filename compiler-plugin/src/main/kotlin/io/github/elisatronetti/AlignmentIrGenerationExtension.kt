@@ -1,8 +1,10 @@
 package io.github.elisatronetti
 
+import io.github.elisatronetti.visitors.collectAggregateContextClass
 import io.github.elisatronetti.visitors.collectAlignedOnFunction
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 
@@ -14,21 +16,21 @@ class AlignmentIrGenerationExtension: IrGenerationExtension {
     override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
         // Function that is responsible to handle the alignment
         val alignedOnFunction: IrFunction? = collectAlignedOnFunction(moduleFragment)
-        // Aggregate Context class
-        val aggregateContext = collectClass(moduleFragment)
-        if (alignedOnFunction != null && aggregateContext.isNotEmpty()) {
+        // Aggregate Context class that has the reference to the stack
+        val aggregateContext: IrClass? = collectAggregateContextClass(moduleFragment)
+        if (alignedOnFunction != null && aggregateContext != null) {
             moduleFragment.transform(
                 AggregateIrElementTransformer(
                     pluginContext,
                     alignedOnFunction,
-                    aggregateContext.first()
+                    aggregateContext
                 ),
                 null
             )
         } else {
             if (alignedOnFunction == null)
                 println("[COMPILER-PLUGIN]: the function that is used to handle the alignment has not been found.")
-            if (aggregateContext.isEmpty())
+            if (aggregateContext == null)
                 println("[COMPILER-PLUGIN]: the aggregate context used to update the stack for " +
                         "alignment has not been found.")
         }
