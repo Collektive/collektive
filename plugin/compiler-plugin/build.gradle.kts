@@ -4,6 +4,10 @@ plugins {
     id("com.github.gmazzo.buildconfig")
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable")
 

@@ -1,7 +1,11 @@
 plugins {
     id("java-gradle-plugin")
-    kotlin("jvm")
+    id("org.jetbrains.kotlin.jvm")
     id("com.github.gmazzo.buildconfig")
+}
+
+repositories {
+    mavenCentral()
 }
 
 dependencies {
