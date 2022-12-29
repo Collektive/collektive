@@ -16,9 +16,6 @@ jobs:
     concurrency:
       group: build-${{ github.workflow }}-${{ matrix.os }}-${{ github.event.number || github.ref }}
       cancel-in-progress: true
-    defaults:
-      run:
-        working-directory: ./dsl
     steps:
       - name: Checkout current branch (full)
         uses: actions/checkout@v2
