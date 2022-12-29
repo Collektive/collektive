@@ -8,6 +8,8 @@ fun main() {
             test()
         }
 
-        test2()
+        if(true) {
+            test2()
+        }
     }
 }
