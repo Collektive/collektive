@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrFunctionExpressionImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrIfThenElseImpl
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.name.Name
@@ -118,15 +119,30 @@ private fun IrBuilderWithScope.buildLambda(
 }
 
 private fun createConditionArgument(condition: IrExpression, conditionValue: Boolean): String {
-    when (condition) {
-        is IrGetValue -> return Pair(condition.symbol.owner.name.asString(), conditionValue.toString()).toString()
-        is IrConst<*> -> return Pair("constant", conditionValue.toString()).toString()
-        is IrCall -> return Pair(condition.symbol.owner.name.asString(), conditionValue.toString()).toString()
+    return Pair(conditionName(condition), conditionValue.toString()).toString()
+}
+
+private fun conditionName(condition: IrExpression): String {
+    return when (condition) {
+        is IrGetValue -> condition.symbol.owner.name.asString()
+        is IrConst<*> -> "constant"
+        is IrCall -> condition.symbol.owner.name.asString() + " " +
+                if(condition.origin == IrStatementOrigin.EXCL && condition.dispatchReceiver != null)
+                    conditionName(condition.dispatchReceiver!!)
+                else ""
+        is IrIfThenElseImpl -> conditionName(condition.branches[0].condition) +
+                if (condition.origin == IrStatementOrigin.ANDAND) {
+                    " AND " + conditionName(condition.branches[0].result)
+                } else {
+                    " OR " + conditionName(condition.branches[1].result)
+                }
+        else ->
+            throw IllegalStateException(
+            "The current if condition type ${condition::class} has not been handled for the alignment yet. " +
+                    "Update the compiler plugin."
+            )
     }
-    throw IllegalStateException(
-        "The current if condition type ${condition::class} has not been handled for the alignment yet. " +
-                "Update the compiler plugin."
-    )
+
 }
 
 private fun getReturnType(expression: IrExpression): IrType {
