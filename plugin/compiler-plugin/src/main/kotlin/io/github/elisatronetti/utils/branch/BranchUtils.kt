@@ -78,4 +78,9 @@ private fun IrBlock.findAggregateReference(
 
 private fun IrExpression.findAggregateReference(
     aggregateContextClass: IrClass
-): IrExpression? = collectAggregateContextReference(aggregateContextClass, this)
+): IrExpression? =
+    when (this) {
+        is IrCall -> collectAggregateContextReference(aggregateContextClass, this.symbol.owner)
+        else -> collectAggregateContextReference(aggregateContextClass, this)
+    }
+
