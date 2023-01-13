@@ -6,6 +6,7 @@ import io.github.elisatronetti.utils.common.putValueArgument
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
+import org.jetbrains.kotlin.ir.backend.js.utils.asString
 import org.jetbrains.kotlin.ir.builders.*
 import org.jetbrains.kotlin.ir.builders.declarations.buildFun
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
@@ -126,8 +127,9 @@ private fun conditionName(condition: IrExpression): String {
     return when (condition) {
         is IrGetValue -> condition.symbol.owner.name.asString()
         is IrConst<*> -> "constant"
+        is IrTypeOperatorCall -> condition.operator.name + " " + condition.typeOperand.asString()
         is IrCall -> condition.symbol.owner.name.asString() + " " +
-                if(condition.origin == IrStatementOrigin.EXCL && condition.dispatchReceiver != null)
+                if (condition.origin == IrStatementOrigin.EXCL && condition.dispatchReceiver != null)
                     conditionName(condition.dispatchReceiver!!)
                 else ""
         is IrIfThenElseImpl -> conditionName(condition.branches[0].condition) +
