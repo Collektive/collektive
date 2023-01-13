@@ -24,7 +24,7 @@ class IfElseBlockTest {
 
     @Test
     fun falseConditionIfElseBlock() {
-        val customCondition = true
+        val customCondition = false
         val result = aggregate {
             if (customCondition) {
                 neighbouring("test")
@@ -33,14 +33,14 @@ class IfElseBlockTest {
             }
         }
         assertTrue(result.toSend.keys.any {
-            it.path.toString().contains("customCondition") &&
+            it.path.toString().contains("constant") &&
                     it.path.toString().contains("false")
         })
     }
 
     @Test
     fun ifElseBlock() {
-        val customCondition1 = true
+        val customCondition1 = false
         val customCondition2 = true
         val result = aggregate {
             if (customCondition1) {
