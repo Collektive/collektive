@@ -66,9 +66,14 @@ private fun IrBlock.findAggregateReference(
     val statements = this.statements
     for (statement in statements) {
         if (statement is IrCall) {
-            aggregateContextReferences.add(
-                collectAggregateContextReference(aggregateContextClass, statement.symbol.owner)
-            )
+            val callAggregateReference = collectAggregateContextReference(aggregateContextClass, statement)
+            if (callAggregateReference == null) {
+                aggregateContextReferences.add(
+                    collectAggregateContextReference(aggregateContextClass, statement.symbol.owner)
+                )
+            } else {
+                aggregateContextReferences.add(callAggregateReference)
+            }
         } else if (statement is IrTypeOperatorCall) {
             aggregateContextReferences.add(collectAggregateContextReference(aggregateContextClass, statement))
         }
@@ -80,7 +85,11 @@ private fun IrExpression.findAggregateReference(
     aggregateContextClass: IrClass
 ): IrExpression? =
     when (this) {
-        is IrCall -> collectAggregateContextReference(aggregateContextClass, this.symbol.owner)
+        is IrCall -> {
+            collectAggregateContextReference(aggregateContextClass, this) ?: collectAggregateContextReference(
+                aggregateContextClass,
+                this.symbol.owner
+            )
+        }
         else -> collectAggregateContextReference(aggregateContextClass, this)
     }
-
