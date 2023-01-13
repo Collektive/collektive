@@ -24,6 +24,8 @@ class IfElseNestedFunction {
         }
         assertTrue(result.toSend.keys.any {
             it.path.toString().contains("condition") &&
+                    it.path.toString().contains("test") &&
+                    it.path.toString().contains("test2") &&
                     it.path.toString().contains("true")
         })
     }
