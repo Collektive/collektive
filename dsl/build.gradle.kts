@@ -92,11 +92,6 @@ kotlin {
         }
     }
 
-    tasks.register<Test>("runAllTests") {
-        dependsOn(tasks["clean"])
-        dependsOn(tasks["allTests"])
-    }
-
 }
 
 kotlinAlignmentPlugin {
