@@ -19,9 +19,7 @@ repositories {
 
 kotlin {
     jvm {
-        /*compilations.all {
-            kotlinOptions.jvmTarget = "11"
-        }*/
+        withJava()
     }
     js(IR) {
         browser()
