@@ -1,7 +1,5 @@
 import kotlin.random.Random
 
-interface ID {
-    val id: Any?
-}
+interface ID
 
-data class IntId(override val id: Any? = Random.nextInt(Int.MIN_VALUE, Int.MAX_VALUE)) : ID
+data class IntId(val id: Any? = Random.nextInt(Int.MIN_VALUE, Int.MAX_VALUE)) : ID
