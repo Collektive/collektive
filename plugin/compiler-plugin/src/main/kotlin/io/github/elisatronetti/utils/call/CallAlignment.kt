@@ -20,7 +20,7 @@ import org.jetbrains.kotlin.name.Name
 
 fun IrSingleStatementBuilder.buildAlignedOnCall(
     pluginContext: IrPluginContext,
-    aggregateLambdaBody: IrSimpleFunction,
+    aggregateLambdaBody: IrFunction,
     aggregateContextReference: IrExpression,
     alignedOnFunction: IrFunction,
     expression: IrCall
@@ -46,7 +46,7 @@ fun IrSingleStatementBuilder.buildAlignedOnCall(
  */
 private fun IrBuilderWithScope.buildLambdaArgument(
     pluginContext: IrPluginContext,
-    aggregateLambdaBody: IrSimpleFunction,
+    aggregateLambdaBody: IrFunction,
     expression: IrCall
 ): IrFunctionExpressionImpl {
     val lambda = pluginContext
