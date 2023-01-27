@@ -2,7 +2,6 @@ package io.github.elisatronetti
 
 import io.github.elisatronetti.utils.common.Name
 import io.github.elisatronetti.utils.common.getLastValueArgument
-import io.github.elisatronetti.utils.common.receiverAndArgs
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrClass
