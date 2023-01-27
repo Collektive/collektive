@@ -2,7 +2,9 @@ package io.github.elisatronetti
 
 import io.github.elisatronetti.utils.common.Name
 import io.github.elisatronetti.utils.common.getLastValueArgument
+import io.github.elisatronetti.utils.common.receiverAndArgs
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.expressions.*
@@ -18,6 +20,21 @@ class AggregateCallTransformer(
     private val aggregateContextClass: IrClass,
     private val alignedOnFunction: IrFunction
 ) : IrElementTransformerVoid() {
+
+    override fun visitFunction(declaration: IrFunction): IrStatement {
+        if (!declaration.name.isSpecial && declaration.extensionReceiverParameter?.type == aggregateContextClass.thisReceiver?.type) {
+            declaration.transform(
+                AlignmentTransformer(
+                    pluginContext,
+                    aggregateContextClass,
+                    declaration,
+                    alignedOnFunction
+                ),
+                null
+            )
+        }
+        return super.visitFunction(declaration)
+    }
 
     override fun visitCall(expression: IrCall): IrExpression {
         if (expression.symbol.owner.name.asString() == Name.AGGREGATE_FUNCTION) {
