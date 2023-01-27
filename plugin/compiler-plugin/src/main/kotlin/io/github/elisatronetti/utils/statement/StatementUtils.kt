@@ -4,11 +4,11 @@ import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.builders.IrSingleStatementBuilder
 import org.jetbrains.kotlin.ir.builders.Scope
-import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
+import org.jetbrains.kotlin.ir.declarations.IrFunction
 
 fun <T : IrElement> irStatement(
     pluginContext: IrPluginContext,
-    aggregateLambdaBody: IrSimpleFunction,
+    aggregateLambdaBody: IrFunction,
     expression: IrElement,
     body: IrSingleStatementBuilder.() -> T
 ): T =

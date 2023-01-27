@@ -19,7 +19,7 @@ import io.github.elisatronetti.visitors.collectAggregateContextReference
 class AlignmentTransformer(
     private val pluginContext: IrPluginContext,
     private val aggregateContextClass: IrClass,
-    private val aggregateLambdaBody: IrSimpleFunction,
+    private val aggregateLambdaBody: IrFunction,
     private val alignedOnFunction: IrFunction
 ) : IrElementTransformerVoid() {
 

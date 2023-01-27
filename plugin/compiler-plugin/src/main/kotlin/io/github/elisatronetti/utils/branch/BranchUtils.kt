@@ -5,13 +5,12 @@ import io.github.elisatronetti.visitors.collectAggregateContextReference
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
-import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.*
 
 fun IrBranch.addAlignmentToBranchBlock(
     pluginContext: IrPluginContext,
     aggregateContextClass: IrClass,
-    aggregateLambdaBody: IrSimpleFunction,
+    aggregateLambdaBody: IrFunction,
     alignedOnFunction: IrFunction,
     conditionValue: Boolean = true
 ) {
@@ -37,7 +36,7 @@ fun IrBranch.addAlignmentToBranchBlock(
 fun IrBranch.addAlignmentToBranchExpression(
     pluginContext: IrPluginContext,
     aggregateContextClass: IrClass,
-    aggregateLambdaBody: IrSimpleFunction,
+    aggregateLambdaBody: IrFunction,
     alignedOnFunction: IrFunction,
     conditionValue: Boolean = true
 ) {
