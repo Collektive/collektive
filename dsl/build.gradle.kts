@@ -46,11 +46,11 @@ kotlin {
             sharedLib()
             staticLib()
             // Remove if it is not executable
-            /*"main".let { executable ->
+            "main".let { executable ->
                 executable {
                     entryPoint = executable
                 }
-            }*/
+            }
         }
     }
     sourceSets {
