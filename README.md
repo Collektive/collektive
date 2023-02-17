@@ -12,12 +12,11 @@ JVM environments.
 ## Project structure
 
 Currently, the project is composed by three submodules:
-- **compiler-plugin**: the compiler plugin is used modify a data
+- **plugin**: it is divided in:
+  - **compiler-plugin**: the compiler plugin is used modify a data
 structure used to keep track of the stack at runtime. For each function,
 when its called, its name is registered in the data structure;
-- **gradle-plugin**: necessary plugin that a gradle project uses in 
+  - **gradle-plugin**: necessary plugin that a gradle project uses in 
 order to include the compiler plugin;
 - **dsl**: the actual DSL, where the logic is implemented and that 
 exposes the operator of the aggregate computing.
-
-
