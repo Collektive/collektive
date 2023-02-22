@@ -20,6 +20,7 @@ dependencies {
     implementation("it.unibo.alchemist:alchemist-euclidean-geometry:25.7.2")
     implementation("it.unibo.alchemist:alchemist-implementationbase:25.7.2")
     implementation("it.unibo.alchemist:alchemist-swingui:25.7.2")
+    implementation("it.unibo.alchemist:alchemist-loading:25.7.2")
     implementation("it.unibo.alchemist:alchemist-engine:25.7.2") //engine
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
@@ -34,5 +35,5 @@ tasks.getByName<Test>("test") {
 }
 
 application {
-    mainClass.set("it.unibo.alchemist.model.TestKt")
+    mainClass.set("MainKt")
 }
