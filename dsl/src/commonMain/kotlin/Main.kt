@@ -1,5 +1,5 @@
 fun main() {
-    fun AggregateContext.compute() = neighbouring("kbjhgfs")
+    fun AggregateContext.compute() = neighbouring("test")
 
     aggregate {
         compute()
