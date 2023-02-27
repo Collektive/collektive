@@ -43,15 +43,21 @@ class CollektiveIncarnation<P> : Incarnation<Any, P> where P : Position<P> {
         val aggregateEntrypoint: Method
         val programIdentifier = SimpleMolecule(additionalParameters)
         val localDevice: CollektiveDevice<P> by lazy { this.node.asProperty() }
+        val run: () -> AggregateContext.AggregateResult<*>
 
         init {
             declareDependencyTo(programIdentifier)
             val lastDotIndex = additionalParameters.lastIndexOf('.')
-            aggregateEntrypoint = Class.forName(additionalParameters.substring(0 until lastDotIndex))
+            val clazz = Class.forName(additionalParameters.substring(0 until lastDotIndex))
+            val instance = clazz.constructors.first().newInstance(
+                requireNotNull(node).asProperty<Any, CollektiveDevice<P>>()
+            )
+            aggregateEntrypoint = clazz
                 .methods
                 .asSequence()
                 .filter { it.returnType == AggregateContext.AggregateResult::class.java }
                 .first { it.name == additionalParameters.substring(lastDotIndex + 1) && it.parameters.isEmpty() }
+            run = { aggregateEntrypoint.invoke(instance) as AggregateContext.AggregateResult<*> }
         }
 
         override fun cloneAction(node: Node<Any>, reaction: Reaction<Any>): Action<Any> {
@@ -60,7 +66,7 @@ class CollektiveIncarnation<P> : Incarnation<Any, P> where P : Position<P> {
 
         override fun execute() {
             localDevice.currentTime = time.nextOccurence
-            val result = aggregateEntrypoint.invoke(null) as AggregateContext.AggregateResult<*>
+            val result = run()
             node?.setConcentration(programIdentifier, result.result!!)
             environment.getNeighborhood(node)
                 .mapNotNull { it.asPropertyOrNull<Any, CollektiveDevice<P>>() }
