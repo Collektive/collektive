@@ -12,3 +12,8 @@ fun <T : Comparable<T>> Field<T>.max(includingSelf: Boolean = true): T =
 
 private fun <T : Comparable<T>> Field<T>.handleIncludingSelf(includingSelf: Boolean): Map<ID, Comparable<T>> =
     this.toMap().filterKeys { id -> (!includingSelf && id != local.first) || includingSelf}
+
+operator fun Field<Double>.plus(field: Field<Double>): Field<Double> {
+    this.toMap().map { (k,v) -> v + (field.toMap()[k] ?: 0.0) }
+    return this
+}
