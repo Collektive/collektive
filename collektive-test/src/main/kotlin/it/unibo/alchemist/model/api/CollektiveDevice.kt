@@ -2,6 +2,8 @@ package it.unibo.alchemist.model.api
 
 import ID
 import Network
+import field.Field
+import it.unibo.alchemist.model.DistanceSensor
 import it.unibo.alchemist.model.interfaces.*
 import it.unibo.alchemist.model.interfaces.Node.Companion.asPropertyOrNull
 import stack.Path
@@ -10,7 +12,7 @@ class CollektiveDevice<P> @JvmOverloads constructor(
     private val environment: Environment<Any, P>,
     override val node: Node<Any>,
     private val retainMessagesFor: Time,
-) : NodeProperty<Any>, ID, Network where P : Position<P> {
+) : NodeProperty<Any>, ID, Network, DistanceSensor where P : Position<P> {
 
     private var validMessages = mapOf<ID, Pair<Time, Map<Path, *>>>()
     var currentTime: Time = Time.ZERO
@@ -31,4 +33,8 @@ class CollektiveDevice<P> @JvmOverloads constructor(
         .filter { (_, value) -> value.first + retainMessagesFor >= currentTime }
         .also { validMessages = it }
         .mapValues { (_, value) -> value.second }
+
+    override fun distances(): Field<Double> {
+        TODO("Not yet implemented")
+    }
 }
