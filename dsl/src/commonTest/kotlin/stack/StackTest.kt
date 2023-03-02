@@ -1,24 +1,33 @@
 package stack
 
 import kotlin.test.Test
-import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
-// TODO implement test for new stack class
-/*
+
 class StackTest {
     private val token: String = "token"
 
     @Test
-    fun addTokenToStack() {
-        Stack.addToken(token)
-        assertEquals(token, Stack.currentPath().path.last())
+    fun emptyStack() {
+        val stack: Stack<Any> = Stack()
+        assertTrue(stack.currentPath().path.isEmpty())
     }
 
     @Test
-    fun clearStack() {
-        Stack.clearStack()
-        assertEquals(emptyList(), Stack.currentPath().path)
+    fun addTokenToStack() {
+        val stack: Stack<Any> = Stack()
+        stack.alignRaw(token)
+        assertTrue(stack.currentPath().path.contains(token))
+    }
+
+    @Test
+    fun removeTokenFromStack() {
+        val stack: Stack<Any> = Stack()
+        stack.alignRaw(token)
+        assertTrue(stack.currentPath().path.contains(token))
+        stack.dealign()
+        assertFalse(stack.currentPath().path.contains(token))
     }
 
 }
-*/
