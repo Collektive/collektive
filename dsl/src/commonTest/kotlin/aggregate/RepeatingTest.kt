@@ -3,6 +3,7 @@ package aggregate
 import aggregate
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class RepeatingTest {
     private val double: (Int) -> Int = { it * 2 }
@@ -25,5 +26,18 @@ class RepeatingTest {
             res = repeating(initValue, double)
         }
         assertEquals(4, res)
+    }
+
+    @Test
+    fun repeatingWithLambdaBody() {
+        val result = aggregate {
+            repeating(initValue){
+                neighbouring(it*2)
+            }
+        }
+        assertTrue(result.toSend.keys.any {
+            it.path.toString().contains("repeating") &&
+                    it.path.toString().contains("neighbouring")
+        })
     }
 }
