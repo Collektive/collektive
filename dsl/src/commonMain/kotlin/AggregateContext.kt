@@ -58,7 +58,17 @@ class AggregateContext(
     data class AggregateResult<X>(val result: X, val toSend: Map<Path, *>, val newState: Map<Path, *>)
 }
 
+/**
+ * Aggregate program entry point which computes a single iteration.
+ * @param init: lambda with AggregateContext object receiver that provides the aggregate constructs.
+ */
 fun <X> aggregate(init: AggregateContext.() -> X) = singleCycle(compute = init)
 
+/**
+ * Aggregate program entry point which computes multiple iterations.
+ * @param condition: lambda that establish the number of iterations.
+ * @param network: data structure used to allow the local communication between devices.
+ * @param init: lambda with AggregateContext object receiver that provides the aggregate constructs.
+ */
 fun <X> aggregate(condition: () -> Boolean, network: Network = NetworkImpl(), init: AggregateContext.() -> X) =
     runUntil(condition, network, compute = init)
