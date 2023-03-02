@@ -22,7 +22,7 @@ class AggregateCallTransformer(
 
     override fun visitFunction(declaration: IrFunction): IrStatement {
         if (!declaration.name.isSpecial && declaration.extensionReceiverParameter?.type == aggregateContextClass.thisReceiver?.type) {
-            declaration.transform(
+            declaration.transformChildren(
                 AlignmentTransformer(
                     pluginContext,
                     aggregateContextClass,
@@ -39,7 +39,7 @@ class AggregateCallTransformer(
         if (expression.symbol.owner.name.asString() == Name.AGGREGATE_FUNCTION) {
             val aggregateLambdaBody =
                 (expression.getLastValueArgument() as IrFunctionExpression).function
-            expression.transform(
+            expression.transformChildren(
                 AlignmentTransformer(
                     pluginContext,
                     aggregateContextClass,

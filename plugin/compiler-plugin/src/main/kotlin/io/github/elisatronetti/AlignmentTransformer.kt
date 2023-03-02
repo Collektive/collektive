@@ -23,27 +23,37 @@ class AlignmentTransformer(
     private val alignedOnFunction: IrFunction
 ) : IrElementTransformerVoid() {
 
-    override fun visitCall(expression: IrCall): IrExpression {
-        if (expression.symbol.owner.name.asString() == Name.ALIGNED_ON_FUNCTION) return super.visitCall(expression)
+   override fun visitCall(expression: IrCall): IrExpression {
+       if (expression.symbol.owner.name.asString() == Name.ALIGNED_ON_FUNCTION) return super.visitCall(expression)
 
-        val aggregateContextReference: IrExpression =
-            expression.receiverAndArgs(aggregateContextClass)
-                ?: (collectAggregateContextReference(aggregateContextClass, expression.symbol.owner)
-                    ?: return super.visitCall(expression))
+       val aggregateContextReference: IrExpression =
+           expression.receiverAndArgs(aggregateContextClass)
+               ?: (collectAggregateContextReference(aggregateContextClass, expression.symbol.owner)
+                   ?: return super.visitCall(expression))
 
-        return irStatement(
-            pluginContext,
-            aggregateLambdaBody,
-            expression
-        ) {
-            buildAlignedOnCall(
-                pluginContext,
-                aggregateLambdaBody,
-                aggregateContextReference,
-                alignedOnFunction,
-                expression
-            )
-        }
+       // If the expression contains a lambda, this recursion is necessary to visit the children
+       expression.transformChildren(
+           AlignmentTransformer(
+               pluginContext,
+               aggregateContextClass,
+               aggregateLambdaBody,
+               alignedOnFunction
+           ),
+           null
+       )
+       return irStatement(
+           pluginContext,
+           aggregateLambdaBody,
+           expression
+       ) {
+           buildAlignedOnCall(
+               pluginContext,
+               aggregateLambdaBody,
+               aggregateContextReference,
+               alignedOnFunction,
+               expression
+           )
+       }
     }
 
     override fun visitBranch(branch: IrBranch): IrBranch {
