@@ -17,3 +17,10 @@ operator fun Field<Double>.plus(field: Field<Double>): Field<Double> {
     this.toMap().map { (k,v) -> v + (field.toMap()[k] ?: 0.0) }
     return this
 }
+
+@Suppress("UNCHECKED_CAST")
+fun <T> Field<Pair<Double, T>>.map(function: (Pair<Double, T>) -> Double): Field<Double> {
+    this.localId
+    val result = this.messages.map { (k,v) -> k to function(v as Pair<Double, T>) }.toMap()
+    return FieldImpl(this.localId, result)
+}
