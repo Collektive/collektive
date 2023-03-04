@@ -1,6 +1,7 @@
 package it.unibo.alchemist.model
 
 import AggregateContext
+import IntId
 import it.unibo.alchemist.model.api.CollektiveDevice
 import it.unibo.alchemist.model.implementations.actions.AbstractAction
 import it.unibo.alchemist.model.implementations.conditions.AbstractCondition
@@ -11,7 +12,6 @@ import it.unibo.alchemist.model.implementations.timedistributions.DiracComb
 import it.unibo.alchemist.model.implementations.times.DoubleTime
 import it.unibo.alchemist.model.interfaces.*
 import it.unibo.alchemist.model.interfaces.Node.Companion.asProperty
-import it.unibo.alchemist.model.interfaces.Node.Companion.asPropertyOrNull
 import it.unibo.alchemist.model.util.RandomGeneratorExtension.nextDouble
 import org.apache.commons.math3.random.RandomGenerator
 import org.danilopianini.util.ListSet
@@ -68,9 +68,7 @@ class CollektiveIncarnation<P> : Incarnation<Any, P> where P : Position<P> {
             localDevice.currentTime = time.nextOccurence
             val result = run()
             node?.setConcentration(programIdentifier, result.result!!)
-            environment.getNeighborhood(node)
-                .mapNotNull { it.asPropertyOrNull<Any, CollektiveDevice<P>>() }
-                .forEach { it.receiveMessage(time.nextOccurence, localDevice, result.toSend) }
+            localDevice.send(IntId(localDevice.node.id), result.toSend)
         }
 
         override fun getContext(): Context = Context.NEIGHBORHOOD
