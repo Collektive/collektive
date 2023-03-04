@@ -2,25 +2,19 @@ package field
 
 import ID
 
-@Suppress("UNCHECKED_CAST")
-fun <T : Comparable<T>> Field<T>.min(includingSelf: Boolean = true): T =
-    handleIncludingSelf(includingSelf).values.reduce { x,y -> if (x <= y as T) x else y } as T
+fun <T : Comparable<T>> Field<T>.min(includingSelf: Boolean = true): Map.Entry<ID, T>? =
+    handleIncludingSelf(includingSelf).minByOrNull { it.value }
 
-@Suppress("UNCHECKED_CAST")
-fun <T : Comparable<T>> Field<T>.max(includingSelf: Boolean = true): T =
-    handleIncludingSelf(includingSelf).values.reduce { x,y -> if (x >= y as T) x else y } as T
+fun <T : Comparable<T>> Field<T>.max(includingSelf: Boolean = true): Map.Entry<ID, T>? =
+    handleIncludingSelf(includingSelf).maxByOrNull { it.value }
 
-private fun <T : Comparable<T>> Field<T>.handleIncludingSelf(includingSelf: Boolean): Map<ID, Comparable<T>> =
+private fun <T : Comparable<T>> Field<T>.handleIncludingSelf(includingSelf: Boolean): Map<ID, T> =
     if (includingSelf) this.toMap() else this.excludeSelf()
 
 operator fun Field<Double>.plus(field: Field<Double>): Field<Double> {
-    this.toMap().map { (k,v) -> v + (field.toMap()[k] ?: 0.0) }
-    return this
-}
-
-@Suppress("UNCHECKED_CAST")
-fun <T> Field<Pair<Double, T>>.map(function: (Pair<Double, T>) -> Double): Field<Double> {
-    this.localId
-    val result = this.messages.map { (k,v) -> k to function(v as Pair<Double, T>) }.toMap()
-    return FieldImpl(this.localId, result)
+    val res = (this.toMap().toList() + field.toMap().toList())
+        .groupBy({ it.first }, { it.second })
+        .map { (key, values) -> key to values.sum() }
+        .toMap()
+    return FieldImpl(this.localId, res)
 }
