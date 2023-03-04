@@ -16,7 +16,7 @@ fun main() {
         ConnectWithinDistance(2.0)
     environment.linkingRule = linkingRule
     // Creates nodes
-    for (i in 0..200) {
+    for (i in 0..20) {
         val randomGenerator = RandomGeneratorFactory.createRandomGenerator(Random(1))
         val node = incarnation.createNode(
             randomGenerator,
@@ -40,7 +40,7 @@ fun main() {
             )
         )
     }
-    val engine = Engine(environment,10)
+    val engine = Engine(environment,200)
     environment.simulation = engine
     // Start GUI
     SingleRunGUI.make(engine, JFrame.EXIT_ON_CLOSE)
