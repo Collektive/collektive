@@ -1,8 +1,10 @@
 package it.unibo.alchemist.model.api
 
 import ID
+import IntId
 import Network
 import field.Field
+import field.FieldImpl
 import it.unibo.alchemist.model.DistanceSensor
 import it.unibo.alchemist.model.interfaces.*
 import it.unibo.alchemist.model.interfaces.Node.Companion.asPropertyOrNull
@@ -12,12 +14,13 @@ class CollektiveDevice<P> @JvmOverloads constructor(
     private val environment: Environment<Any, P>,
     override val node: Node<Any>,
     private val retainMessagesFor: Time,
-) : NodeProperty<Any>, ID, Network, DistanceSensor where P : Position<P> {
+) : NodeProperty<Any>, Network, DistanceSensor where P : Position<P> {
 
     private var validMessages = mapOf<ID, Pair<Time, Map<Path, *>>>()
     var currentTime: Time = Time.ZERO
 
-    fun receiveMessage(time: Time, from: ID, message: Map<Path, *>) {
+    private fun receiveMessage(time: Time, from: ID, message: Map<Path, *>) {
+        println(node.id.toString() + " $from $message")
         validMessages += from to (time to message)
     }
 
@@ -27,6 +30,7 @@ class CollektiveDevice<P> @JvmOverloads constructor(
         environment.getNeighborhood(node)
             .mapNotNull { it.asPropertyOrNull<Any, CollektiveDevice<P>>() }
             .forEach { it.receiveMessage(currentTime, localId, message) }
+        receiveMessage(currentTime, localId, message) // send to myself
     }
 
     override fun receive(): Map<ID, Map<Path, *>> = validMessages
@@ -35,6 +39,12 @@ class CollektiveDevice<P> @JvmOverloads constructor(
         .mapValues { (_, value) -> value.second }
 
     override fun distances(): Field<Double> {
-        TODO("Not yet implemented")
+        val res: Map<ID, Double> = mapOf(IntId(node.id) to 0.0) +
+                environment.getNeighborhood(node)
+                    .associate { IntId(it.id) to environment.getDistanceBetweenNodes(node, it) }
+        return FieldImpl(
+            IntId(node.id),
+            res
+        )
     }
 }
