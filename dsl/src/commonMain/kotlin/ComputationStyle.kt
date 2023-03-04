@@ -1,9 +1,9 @@
 import stack.Path
 
 fun <X> singleCycle(
-    localId: ID = IntId(),
-    messages: Map<ID, Map<Path, *>> = emptyMap<ID, Map<Path, Any>>(),
-    state: Map<Path, *> = emptyMap<Path, Any>(),
+    localId: ID,
+    messages: Map<ID, Map<Path, *>>,
+    state: Map<Path, *>,
     compute: AggregateContext.() -> X
 ): AggregateContext.AggregateResult<X> {
     return with(AggregateContext(localId, messages, state)) {
