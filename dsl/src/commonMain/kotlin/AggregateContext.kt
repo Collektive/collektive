@@ -19,7 +19,7 @@ class AggregateContext(
     fun <X> neighbouring(type: X): Field<X> {
         toBeSent[stack.currentPath()] = type
         val messages = messagesAt(stack.currentPath())
-        return FieldImpl(Pair(localId, type), messages)
+        return FieldImpl(localId, mapOf(localId to type) + messages)
     }
 
     // rep
@@ -34,7 +34,7 @@ class AggregateContext(
     fun <X, Y: Any?> sharing(initial: X, body: (Field<X>) -> Y): Y {
         val messages = messagesAt(stack.currentPath())
         val previous = if (previousState.containsKey(stack.currentPath())) (previousState[stack.currentPath()]) else initial
-        val subject = FieldImpl<X>(Pair(localId, previous), messages)
+        val subject = FieldImpl<X>(localId, mapOf(localId to previous) + messages)
         return body(subject).also {
             toBeSent[stack.currentPath()] = it
         }
@@ -59,10 +59,16 @@ class AggregateContext(
 }
 
 /**
- * Aggregate program entry point which computes a single iteration.
+ * Aggregate program entry point which computes a single iteration, taking as parameters the previous state.
+ * @param localId: id of the device.
+ * @param messages: map with all the messages sent by the neighbors.
+ * @param state: last device state.
  * @param init: lambda with AggregateContext object receiver that provides the aggregate constructs.
  */
-fun <X> aggregate(init: AggregateContext.() -> X) = singleCycle(compute = init)
+fun <X> aggregate(localId: ID = IntId(),
+                  messages: Map<ID, Map<Path, *>> = emptyMap<ID, Map<Path, Any>>(),
+                  state: Map<Path, *> = emptyMap<Path, Any>(),
+                  init: AggregateContext.() -> X) = singleCycle(localId, messages, state, compute = init)
 
 /**
  * Aggregate program entry point which computes multiple iterations.
