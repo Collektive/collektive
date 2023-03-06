@@ -19,4 +19,7 @@ when its called, its name is registered in the data structure;
   - **gradle-plugin**: necessary plugin that a gradle project uses in 
 order to include the compiler plugin;
 - **dsl**: the actual DSL, where the logic is implemented and that 
-exposes the operator of the aggregate computing.
+exposes the operator of the aggregate computing;
+- **collektive-test**: this folder contains a test that allows to calculate
+the gradient between nodes using the simulation environment offered by
+[Alchemist Simulator](https://alchemistsimulator.github.io/).
