@@ -1,6 +1,6 @@
 import it.unibo.alchemist.boundary.swingui.impl.SingleRunGUI
 import it.unibo.alchemist.core.implementations.Engine
-import it.unibo.alchemist.model.CollektiveIncarnation
+import it.unibo.alchemist.model.incarnation.CollektiveIncarnation
 import it.unibo.alchemist.model.implementations.environments.Continuous2DEnvironment
 import it.unibo.alchemist.model.implementations.linkingrules.ConnectWithinDistance
 import it.unibo.alchemist.model.implementations.positions.Euclidean2DPosition
@@ -14,10 +14,11 @@ fun main() {
     val environment = Continuous2DEnvironment(incarnation)
     val linkingRule: LinkingRule<Any, Euclidean2DPosition> =
         ConnectWithinDistance(1.0)
+    environment.linkingRule = linkingRule
+    // Creation range
     val minDouble = 0.0
     val maxDouble = 5.0
     val range = maxDouble - minDouble
-    environment.linkingRule = linkingRule
     // Creates nodes
     for (i in 0..200) {
         val randomGenerator = RandomGeneratorFactory.createRandomGenerator(Random(1))
@@ -43,7 +44,7 @@ fun main() {
             )
         )
     }
-    val engine = Engine(environment,)
+    val engine = Engine(environment)
     environment.simulation = engine
     // Start GUI
     SingleRunGUI.make(engine, "collektive-test/src/main/resources/effects/gradient.json", JFrame.EXIT_ON_CLOSE)

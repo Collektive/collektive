@@ -1,11 +1,10 @@
-package it.unibo.alchemist.model.api
+package it.unibo.alchemist.model.device
 
 import ID
 import IntId
 import Network
 import field.Field
 import field.FieldImpl
-import it.unibo.alchemist.model.DistanceSensor
 import it.unibo.alchemist.model.interfaces.*
 import it.unibo.alchemist.model.interfaces.Node.Companion.asPropertyOrNull
 import stack.Path
