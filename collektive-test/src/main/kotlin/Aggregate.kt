@@ -5,22 +5,19 @@ import stack.Path
 
 class Aggregate(private val node: CollektiveDevice<*>) {
     private val nodeId = node.node.id
-    fun entrypoint() = aggregate(
-        IntId(nodeId),
-        node.receive(),
-        emptyMap<Path, Any>()
-    ) {
+    private var state = emptyMap<Path, Any?>()
+    fun entrypoint() = aggregate(IntId(nodeId), node.receive(), state) {
         gradient(nodeId == 0, node)
-    }
+    }.also { state = it.newState }
 }
 
 fun AggregateContext.gradient(source: Boolean, sensor: DistanceSensor) =
-    sharing(Double.POSITIVE_INFINITY) { data ->
-        val paths: Field<Double> = sensor.distances() + data
-        val others: Map.Entry<ID, Double>? = paths.min(includingSelf = false) // field to map, excluding local
+    sharing(Double.POSITIVE_INFINITY) { distances ->
+        val paths: Field<Double> = sensor.distances() + distances
+        val minByPath = paths.min(includingSelf = false)?.value // field to map, excluding local
         when {
             source -> 0.0
-            others == null -> Double.POSITIVE_INFINITY
-            else -> others.value
+            minByPath == null -> Double.POSITIVE_INFINITY
+            else -> minByPath
         }
     }
