@@ -47,7 +47,6 @@ class AggregateContext(
      */
     fun <R> alignedOn(pivot: Any?, body: () -> R): R {
         stack.alignRaw(pivot)
-        println(stack)
         return body().also { stack.dealign() }
     }
 
@@ -65,10 +64,12 @@ class AggregateContext(
  * @param state: last device state.
  * @param init: lambda with AggregateContext object receiver that provides the aggregate constructs.
  */
-fun <X> aggregate(localId: ID = IntId(),
-                  messages: Map<ID, Map<Path, *>> = emptyMap<ID, Map<Path, Any>>(),
-                  state: Map<Path, *> = emptyMap<Path, Any>(),
-                  init: AggregateContext.() -> X) = singleCycle(localId, messages, state, compute = init)
+fun <X> aggregate(
+    localId: ID = IntId(),
+    messages: Map<ID, Map<Path, *>> = emptyMap<ID, Map<Path, Any>>(),
+    state: Map<Path, *> = emptyMap<Path, Any>(),
+    init: AggregateContext.() -> X
+) = singleCycle(localId, messages, state, compute = init)
 
 /**
  * Aggregate program entry point which computes multiple iterations.
@@ -76,5 +77,8 @@ fun <X> aggregate(localId: ID = IntId(),
  * @param network: data structure used to allow the local communication between devices.
  * @param init: lambda with AggregateContext object receiver that provides the aggregate constructs.
  */
-fun <X> aggregate(condition: () -> Boolean, network: Network = NetworkImpl(), init: AggregateContext.() -> X) =
-    runUntil(condition, network, compute = init)
+fun <X> aggregate(
+    condition: () -> Boolean,
+    network: Network = NetworkImpl(),
+    init: AggregateContext.() -> X)
+= runUntil(condition, network, compute = init)
