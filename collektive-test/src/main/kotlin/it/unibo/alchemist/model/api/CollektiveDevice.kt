@@ -20,7 +20,6 @@ class CollektiveDevice<P> @JvmOverloads constructor(
     var currentTime: Time = Time.ZERO
 
     private fun receiveMessage(time: Time, from: ID, message: Map<Path, *>) {
-        println(node.id.toString() + " $from $message")
         validMessages += from to (time to message)
     }
 

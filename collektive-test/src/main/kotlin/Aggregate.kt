@@ -16,7 +16,6 @@ class Aggregate(private val node: CollektiveDevice<*>) {
 
 fun AggregateContext.gradient(source: Boolean, sensor: DistanceSensor) =
     sharing(Double.POSITIVE_INFINITY) { data ->
-        println(data)
         val paths: Field<Double> = sensor.distances() + data
         val others: Map.Entry<ID, Double>? = paths.min(includingSelf = false) // field to map, excluding local
         when {
