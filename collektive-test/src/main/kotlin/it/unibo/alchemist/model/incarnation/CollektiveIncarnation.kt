@@ -1,8 +1,8 @@
-package it.unibo.alchemist.model
+package it.unibo.alchemist.model.incarnation
 
 import AggregateContext
 import IntId
-import it.unibo.alchemist.model.api.CollektiveDevice
+import it.unibo.alchemist.model.device.CollektiveDevice
 import it.unibo.alchemist.model.implementations.actions.AbstractAction
 import it.unibo.alchemist.model.implementations.conditions.AbstractCondition
 import it.unibo.alchemist.model.implementations.molecules.SimpleMolecule
