@@ -13,7 +13,7 @@ fun main() {
     val incarnation = CollektiveIncarnation<Euclidean2DPosition>()
     val environment = Continuous2DEnvironment(incarnation)
     val linkingRule: LinkingRule<Any, Euclidean2DPosition> =
-        ConnectWithinDistance(2.0)
+        ConnectWithinDistance(1.0)
     val minDouble = 0.0
     val maxDouble = 5.0
     val range = maxDouble - minDouble
@@ -43,7 +43,7 @@ fun main() {
             )
         )
     }
-    val engine = Engine(environment, 400000)
+    val engine = Engine(environment,)
     environment.simulation = engine
     // Start GUI
     SingleRunGUI.make(engine, "collektive-test/src/main/resources/effects/gradient.json", JFrame.EXIT_ON_CLOSE)
