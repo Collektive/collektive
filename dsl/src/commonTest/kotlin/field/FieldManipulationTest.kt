@@ -6,6 +6,7 @@ import aggregate
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 
 class FieldManipulationTest {
     private var network: Network = NetworkImpl()
@@ -31,7 +32,11 @@ class FieldManipulationTest {
         // Device 2
         aggregate(condition, network) {
             val res = neighbouring(double(2)).min()
-            assertEquals(4, res)
+            assertNotEquals(null, res)
+            if (res != null) {
+                assertEquals(4, res.value)
+            }
+
         }
     }
 
@@ -46,7 +51,10 @@ class FieldManipulationTest {
         // Device 2
         aggregate(condition, network) {
             val res = neighbouring(double(2)).min(includingSelf = false)
-            assertEquals(6, res)
+            assertNotEquals(null, res)
+            if (res != null) {
+                assertEquals(6, res.value)
+            }
         }
     }
 
@@ -61,7 +69,10 @@ class FieldManipulationTest {
         // Device 2
         aggregate(condition, network) {
             val res = neighbouring(double(2)).max()
-            assertEquals(6, res)
+            assertNotEquals(null, res)
+            if (res != null) {
+                assertEquals(6, res.value)
+            }
         }
     }
 
@@ -76,7 +87,10 @@ class FieldManipulationTest {
         // Device 2
         aggregate(condition, network) {
             val res = neighbouring(double(2)).max(includingSelf = false)
-            assertEquals(6, res)
+            assertNotEquals(null, res)
+            if (res != null) {
+                assertEquals(6, res.value)
+            }
         }
     }
 }
