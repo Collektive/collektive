@@ -1,7 +1,8 @@
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.build.config)
     id("java-gradle-plugin")
-    id("org.jetbrains.kotlin.jvm")
-    id("com.github.gmazzo.buildconfig")
 }
 
 repositories {

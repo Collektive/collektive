@@ -1,6 +1,7 @@
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.7.10"
-    id("com.github.gmazzo.buildconfig") version "3.1.0"
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.build.config)
 }
 
 group = "io.github.elisatronetti"

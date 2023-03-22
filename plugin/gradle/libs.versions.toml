@@ -1,0 +1,9 @@
+[versions]
+kotlin = "1.7.10"
+build-config = "3.1.0"
+kapt = "1.8.10"
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+build-config = { id = "com.github.gmazzo.buildconfig", version.ref = "build-config"}
+kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kapt" }
