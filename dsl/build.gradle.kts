@@ -1,5 +1,3 @@
-@file:Suppress("UnstableApiUsage")
-
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
@@ -45,12 +43,6 @@ kotlin {
         binaries {
             sharedLib()
             staticLib()
-            // Remove if it is not executable
-            "main".let { executable ->
-                executable {
-                    entryPoint = executable
-                }
-            }
         }
     }
     sourceSets {
@@ -60,36 +52,20 @@ kotlin {
             }
         }
         val commonTest by getting {
-            dependsOn(commonMain)
             dependencies {
                 implementation(libs.bundles.kotlin.testing.common)
                 implementation(kotlin("test"))
             }
         }
-        val nativeMain by getting {
-            dependsOn(commonMain)
-        }
-        val nativeTest by getting {
-            dependsOn(commonTest)
-        }
-        val jvmMain by getting {
-            dependsOn(commonMain)
-        }
-        val jvmTest by getting {
-            dependsOn(jvmMain)
-            dependencies {
-                implementation(libs.bundles.kotlin.testing.jvm)
-            }
-        }
     }
     targets.all {
         compilations.all {
+            // enable all warnings as errors
             kotlinOptions {
                 allWarningsAsErrors = true
             }
         }
     }
-
 }
 
 kotlinAlignmentPlugin {
