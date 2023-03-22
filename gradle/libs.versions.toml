@@ -3,6 +3,7 @@ android-plugins = "7.0.0"
 kotest = "5.4.2"
 kotlin = "1.7.10"
 alchemist = "25.15.0"
+jupiter = "5.9.2"
 
 [libraries]
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
@@ -23,7 +24,8 @@ alchemist-loading = { module = "it.unibo.alchemist:alchemist-loading", version.r
 alchemist-engine = { module = "it.unibo.alchemist:alchemist-engine", version.ref = "alchemist"}
 alchemist-physics = { module = "it.unibo.alchemist:alchemist-physics", version.ref = "alchemist"}
 alchemist-test = { module = "it.unibo.alchemist:alchemist-test", version.ref = "alchemist"}
-
+jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "jupiter"}
+jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "jupiter"}
 
 [bundles]
 kotlin-testing-common = [
@@ -45,6 +47,8 @@ alchemist = [
     "alchemist-loading",
     "alchemist-test"
 ]
+jupiter-api = [ "jupiter-api" ]
+jupiter-engine = [ "jupiter-engine" ]
 
 [plugins]
 dokka = "org.jetbrains.dokka:1.7.10"

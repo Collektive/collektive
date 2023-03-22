@@ -16,8 +16,8 @@ repositories {
 dependencies {
     implementation(project(path=":dsl"))
     implementation(libs.bundles.alchemist)
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
+    testImplementation(libs.bundles.jupiter.api)
+    testRuntimeOnly(libs.bundles.jupiter.engine)
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class).all {
