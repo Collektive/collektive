@@ -9,10 +9,10 @@ import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
+import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.typeWith
 import org.jetbrains.kotlin.ir.util.defaultType
-import java.beans.Expression
 
 /**
  * Put a value argument at the head of the function's arguments.
@@ -55,7 +55,7 @@ internal fun getLambdaType(
     pluginContext: IrPluginContext,
     lambda: IrSimpleFunction
 ): IrType {
-    val base = pluginContext.referenceClass(
+    val base: IrClassSymbol = pluginContext.referenceClass(
         StandardNames.getFunctionClassId(lambda.allParameters.size).asSingleFqName()
     )
         ?: error("function type not found")
