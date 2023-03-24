@@ -28,7 +28,6 @@ class CollektiveDevice<P> @JvmOverloads constructor(
         environment.getNeighborhood(node)
             .mapNotNull { it.asPropertyOrNull<Any, CollektiveDevice<P>>() }
             .forEach { it.receiveMessage(currentTime, localId, message) }
-        receiveMessage(currentTime, localId, message) // send to myself
     }
 
     override fun receive(): Map<ID, Map<Path, *>> = validMessages
