@@ -39,7 +39,11 @@ class CollektiveIncarnation<P> : Incarnation<Any, P> where P : Position<P> {
         time: TimeDistribution<Any>,
         actionable: Actionable<Any>,
         additionalParameters: String,
-    ): Action<Any> = object : AbstractAction<Any>(requireNotNull(node) { "Global Collektive programs not supported yet" }) {
+    ): Action<Any> = object : AbstractAction<Any>(
+        requireNotNull(node) {
+            "Global Collektive programs not supported yet"
+        }
+    ){
         val aggregateEntrypoint: Method
         val programIdentifier = SimpleMolecule(additionalParameters)
         val localDevice: CollektiveDevice<P> by lazy { this.node.asProperty() }
@@ -56,7 +60,10 @@ class CollektiveIncarnation<P> : Incarnation<Any, P> where P : Position<P> {
                 .methods
                 .asSequence()
                 .filter { it.returnType == AggregateContext.AggregateResult::class.java }
-                .first { it.name == additionalParameters.substring(lastDotIndex + 1) && it.parameters.isEmpty() }
+                .first {
+                    it.name == additionalParameters.substring(lastDotIndex + 1)
+                            && it.parameters.isEmpty()
+                }
             run = { aggregateEntrypoint.invoke(instance) as AggregateContext.AggregateResult<*> }
         }
 
