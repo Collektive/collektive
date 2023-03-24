@@ -9,7 +9,7 @@ class AggregateContext(
     private val previousState: Map<Path, *>) {
 
     private val stack: Stack<Any> = Stack()
-    private val state: MutableMap<Path, Any> = mutableMapOf()
+    private val state: MutableMap<Path, Any?> = mutableMapOf()
     private val toBeSent: MutableMap<Path, Any?> = mutableMapOf()
 
     fun messagesToSend(): Map<Path, *> = toBeSent.toMap()
@@ -42,6 +42,7 @@ class AggregateContext(
         val subject = FieldImpl<X>(localId, mapOf(localId to previous) + messages)
         return body(subject).also {
             toBeSent[stack.currentPath()] = it
+            state[stack.currentPath()] = it
         }
     }
 
