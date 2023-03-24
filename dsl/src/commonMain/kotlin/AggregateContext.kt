@@ -15,25 +15,30 @@ class AggregateContext(
     fun messagesToSend(): Map<Path, *> = toBeSent.toMap()
     fun newState(): Map<Path, *> = state.toMap()
 
-    // nbr
     fun <X> neighbouring(type: X): Field<X> {
         toBeSent[stack.currentPath()] = type
         val messages = messagesAt(stack.currentPath())
         return FieldImpl(localId, mapOf(localId to type) + messages)
     }
 
-    // rep
     @Suppress("UNCHECKED_CAST")
     fun <X,Y : Any> repeating(initial: X, repeat: (X) -> Y): Y {
-        val res = if (previousState.containsKey(stack.currentPath())) repeat(previousState[stack.currentPath()] as X) else repeat(initial)
+        val res = if (previousState.containsKey(stack.currentPath())) {
+            repeat(previousState[stack.currentPath()] as X)
+        } else {
+            repeat(initial)
+        }
         state[stack.currentPath()] = res
         return res
     }
 
-    // share
     fun <X, Y: Any?> sharing(initial: X, body: (Field<X>) -> Y): Y {
         val messages = messagesAt(stack.currentPath())
-        val previous = if (previousState.containsKey(stack.currentPath())) (previousState[stack.currentPath()]) else initial
+        val previous = if (previousState.containsKey(stack.currentPath())) {
+            (previousState[stack.currentPath()])
+        } else {
+            initial
+        }
         val subject = FieldImpl<X>(localId, mapOf(localId to previous) + messages)
         return body(subject).also {
             toBeSent[stack.currentPath()] = it
