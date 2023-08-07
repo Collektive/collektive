@@ -27,10 +27,10 @@ buildConfig {
 gradlePlugin {
     plugins {
         create("kotlinAlignmentPlugin") {
-            id = "io.github.elisatronetti.kotlinAlignmentPlugin"
+            id = "it.unibo.collektive.kotlinAlignmentPlugin"
             displayName = "Kotlin Alignment Plugin"
             description = "Kotlin Alignment Plugin"
-            implementationClass = "io.github.elisatronetti.GradlePlugin"
+            implementationClass = "it.unibo.collektive.GradlePlugin"
         }
     }
 }
