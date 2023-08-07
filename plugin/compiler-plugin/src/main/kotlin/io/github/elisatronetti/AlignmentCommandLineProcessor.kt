@@ -1,6 +1,5 @@
 package io.github.elisatronetti
 
-import com.google.auto.service.AutoService
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CliOption
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
@@ -14,7 +13,7 @@ import plugin.BuildConfig
  * option, which enable or disable the plugin that is responsible for the alignment.
  */
 @OptIn(ExperimentalCompilerApi::class)
-@AutoService(CommandLineProcessor::class)
+// @AutoService(CommandLineProcessor::class)
 class AlignmentCommandLineProcessor : CommandLineProcessor {
     companion object {
         private const val OPTION_ENABLED = "enabled"
