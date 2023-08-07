@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.collektive.compiler.plugin)
 }
 
-group = "io.github.elisatronetti"
+group = "it.unibo.collektive"
 version = "0.1.0"
 
 repositories {

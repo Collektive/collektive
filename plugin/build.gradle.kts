@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.build.config)
 }
 
-group = "io.github.elisatronetti"
+group = "it.unibo.collektive"
 version = "0.1.0"
 
 repositories {
