@@ -1,8 +1,10 @@
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.gradle.internal.os.OperatingSystem
+import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
+import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 
 plugins {
-    alias(libs.plugins.gitSemVer)
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.collektive.compiler.plugin)
 }
@@ -20,10 +22,10 @@ kotlin {
             testLogging {
                 showExceptions = true
                 events = setOf(
-                    org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED,
-                    org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED,
+                    FAILED,
+                    PASSED,
                 )
-                exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+                exceptionFormat = FULL
             }
         }
     }
@@ -31,7 +33,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                // implementation(libs.kotlin.stdlib)
+                implementation(libs.kotlinx.coroutines)
             }
         }
         val commonTest by getting {
@@ -68,7 +70,7 @@ kotlin {
     }
 
     linuxX64(nativeSetup)
-    // linuxArm64(nativeSetup)
+    linuxArm64(nativeSetup)
 
     mingwX64(nativeSetup)
 
