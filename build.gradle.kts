@@ -7,10 +7,10 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.publishOnCentral)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.gitSemVer)
 }
 
 val Provider<PluginDependency>.id: String get() = get().pluginId
-
 
 allprojects {
     group = "it.unibo.${rootProject.name}"
@@ -22,6 +22,7 @@ allprojects {
     with(rootProject.libs.plugins) {
         apply(plugin = publishOnCentral.id)
         apply(plugin = detekt.id)
+        apply(plugin = gitSemVer.id)
     }
 
     signing {
@@ -77,6 +78,9 @@ allprojects {
         resolutionStrategy.eachDependency {
             if (requested.group == "org.jetbrains.kotlin") {
                 useVersion(rootProject.libs.versions.kotlin.get())
+            }
+            if (requested.group == "org.jetbrains.kotlinx" && requested.name == "kotlinx-coroutines-core") {
+                useVersion(rootProject.libs.versions.coroutines.get())
             }
         }
     }
