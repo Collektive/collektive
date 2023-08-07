@@ -24,5 +24,5 @@ fun <X> runUntil(
         state = computed.newState
         network.send(localId, computed.toSend)
     }
-    return computed ?: throw IllegalStateException("The computation did not produce a result")
+    return computed ?: error("The computation did not produce a result")
 }
