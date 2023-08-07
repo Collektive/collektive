@@ -1,7 +1,6 @@
 package io.github.elisatronetti.utils.common
 
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.backend.common.ir.allParameters
 import org.jetbrains.kotlin.backend.jvm.ir.receiverAndArgs
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.ir.declarations.IrClass
@@ -13,13 +12,12 @@ import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.typeWith
 import org.jetbrains.kotlin.ir.util.defaultType
+import org.jetbrains.kotlin.name.ClassId
 
 /**
  * Put a value argument at the head of the function's arguments.
  */
-internal fun IrFunctionAccessExpression.putValueArgument(
-    argument: IrExpression
-){
+internal fun IrFunctionAccessExpression.putValueArgument(argument: IrExpression) {
     putValueArgument(
         0,
         argument
@@ -53,11 +51,10 @@ internal fun IrCall.receiverAndArgs(
 
 internal fun getLambdaType(
     pluginContext: IrPluginContext,
-    lambda: IrSimpleFunction
+    lambda: IrSimpleFunction,
 ): IrType {
-    val base: IrClassSymbol = pluginContext.referenceClass(
-        StandardNames.getFunctionClassId(lambda.allParameters.size).asSingleFqName()
-    )
+    val classFqn = StandardNames.getFunctionClassId(lambda.valueParameters.size).asSingleFqName()
+    val base: IrClassSymbol = pluginContext.referenceClass(ClassId(classFqn.parent(), classFqn.shortName()))
         ?: error("function type not found")
-    return base.typeWith(lambda.allParameters.map { it.type } + lambda.returnType)
+    return base.typeWith(lambda.valueParameters.map { it.type } + lambda.returnType)
 }

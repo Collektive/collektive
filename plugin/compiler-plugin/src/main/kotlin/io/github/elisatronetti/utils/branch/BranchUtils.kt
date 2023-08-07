@@ -14,7 +14,7 @@ fun IrBranch.addAlignmentToBranchBlock(
     alignedOnFunction: IrFunction,
     conditionValue: Boolean = true
 ) {
-    val aggregateContextReference: IrExpression? = (this.result as IrBlock).findAggregateReference(aggregateContextClass)
+    val aggregateContextReference = (this.result as IrBlock).findAggregateReference(aggregateContextClass)
     if (aggregateContextReference != null) {
         this.result = irStatement(
             pluginContext,

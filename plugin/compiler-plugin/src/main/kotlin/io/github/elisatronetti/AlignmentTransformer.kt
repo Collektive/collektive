@@ -1,6 +1,6 @@
 package io.github.elisatronetti
 
-import io.github.elisatronetti.utils.common.Name
+import io.github.elisatronetti.utils.common.AggregateFunctionNames
 import io.github.elisatronetti.utils.branch.*
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.declarations.*
@@ -24,7 +24,7 @@ class AlignmentTransformer(
 ) : IrElementTransformerVoid() {
 
    override fun visitCall(expression: IrCall): IrExpression {
-       if (expression.symbol.owner.name.asString() == Name.ALIGNED_ON_FUNCTION) return super.visitCall(expression)
+       if (expression.symbol.owner.name.asString() == AggregateFunctionNames.ALIGNED_ON_FUNCTION) return super.visitCall(expression)
 
        val aggregateContextReference: IrExpression =
            expression.receiverAndArgs(aggregateContextClass)
@@ -57,15 +57,9 @@ class AlignmentTransformer(
     }
 
     override fun visitBranch(branch: IrBranch): IrBranch {
-        if (branch.result is IrBlock) {
-            branch.addAlignmentToBranchBlock(
-                pluginContext,
-                aggregateContextClass,
-                aggregateLambdaBody,
-                alignedOnFunction
-            )
-        } else {
-            branch.addAlignmentToBranchExpression(
+        when (branch.result) {
+            is IrBlock -> branch.addAlignmentToBranchBlock(pluginContext, aggregateContextClass, aggregateLambdaBody, alignedOnFunction)
+            else -> branch.addAlignmentToBranchExpression(
                 pluginContext,
                 aggregateContextClass,
                 aggregateLambdaBody,
