@@ -1,10 +1,14 @@
 package io.github.elisatronetti
 
-import io.github.elisatronetti.utils.common.Name
+import io.github.elisatronetti.utils.common.AggregateFunctionNames
+import org.jetbrains.kotlin.backend.common.extensions.FirIncompatiblePluginAPI
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.name.CallableId
+import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.Name
 
 /**
  * The generation extension is used to register the transformer plugin, which is going to modify
@@ -13,9 +17,16 @@ import org.jetbrains.kotlin.name.FqName
 class AlignmentIrGenerationExtension: IrGenerationExtension {
     override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
         // Function that is responsible to handle the alignment
-        val alignedOnFunction = pluginContext.referenceFunctions(FqName(Name.ALIGNED_ON_FUNCTION_FQ_NAME)).firstOrNull()
+        val alignedOnFunction = pluginContext.referenceFunctions(
+            CallableId(
+                FqName(AggregateFunctionNames.AGGREGATE_CONTEXT_CLASS),
+                Name.identifier(AggregateFunctionNames.ALIGNED_ON_FUNCTION)
+            )
+        ).firstOrNull()
         // Aggregate Context class that has the reference to the stack
-        val aggregateContextClass = pluginContext.referenceClass(FqName(Name.AGGREGATE_CONTEXT_CLASS))
+        val aggregateContextClass = pluginContext.referenceClass(
+            ClassId.topLevel(FqName(AggregateFunctionNames.AGGREGATE_CONTEXT_CLASS))
+        )
         if (alignedOnFunction!= null && aggregateContextClass != null) {
             moduleFragment.transform(
                 AggregateCallTransformer(

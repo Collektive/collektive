@@ -1,6 +1,6 @@
 package io.github.elisatronetti
 
-import io.github.elisatronetti.utils.common.Name
+import io.github.elisatronetti.utils.common.AggregateFunctionNames
 import io.github.elisatronetti.utils.common.getLastValueArgument
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement
@@ -36,7 +36,7 @@ class AggregateCallTransformer(
     }
 
     override fun visitCall(expression: IrCall): IrExpression {
-        if (expression.symbol.owner.name.asString() == Name.AGGREGATE_FUNCTION) {
+        if (expression.symbol.owner.name.asString() == AggregateFunctionNames.AGGREGATE_FUNCTION) {
             val aggregateLambdaBody =
                 (expression.getLastValueArgument() as IrFunctionExpression).function
             expression.transformChildren(
