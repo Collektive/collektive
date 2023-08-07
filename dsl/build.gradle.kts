@@ -1,71 +1,113 @@
-@file:Suppress("UnstableApiUsage")
-
-import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
+import org.gradle.internal.os.OperatingSystem
 
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.gitSemVer)
-    alias(libs.plugins.multiJvmTesting)
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.collektive.compiler.plugin)
 }
 
-repositories {
-    google()
-    mavenCentral()
-}
+val os: OperatingSystem = OperatingSystem.current()
 
 kotlin {
     jvm {
         withJava()
-    }
-    js(IR) {
-        browser()
-        nodejs()
-        binaries.library()
-    }
-    val hostOs = System.getProperty("os.name").trim().toLowerCaseAsciiOnly()
-    val hostArch = System.getProperty("os.arch").trim().toLowerCaseAsciiOnly()
-    val nativeTarget: (String, KotlinNativeTarget.() -> Unit) -> KotlinTarget =
-        when (hostOs to hostArch) {
-            "linux" to "aarch64" -> ::linuxArm64
-            "linux" to "amd64" -> ::linuxX64
-            "linux" to "arm", "linux" to "arm32" -> ::linuxArm32Hfp
-            "linux" to "mips", "linux" to "mips32" -> ::linuxMips32
-            "linux" to "mipsel", "linux" to "mips32el" -> ::linuxMipsel32
-            "mac os x" to "aarch64" -> ::macosArm64
-            "mac os x" to "amd64", "mac os x" to "x86_64" -> ::macosX64
-            "windows 10" to "amd64", "windows server 2022" to "amd64" -> ::mingwX64
-            "windows" to "x86" -> ::mingwX86
-            else -> throw GradleException("Host OS '$hostOs' with arch '$hostArch' is not supported in Kotlin/Native.")
-        }
-    nativeTarget("native") {
-        binaries {
-            sharedLib()
-            staticLib()
+        testRuns["test"].executionTask.configure {
+            useJUnitPlatform()
+            filter {
+                isFailOnNoMatchingTests = false
+            }
+            testLogging {
+                showExceptions = true
+                events = setOf(
+                    org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED,
+                    org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED,
+                )
+                exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+            }
         }
     }
+
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(libs.kotlin.stdlib)
+                // implementation(libs.kotlin.stdlib)
             }
         }
         val commonTest by getting {
             dependencies {
                 implementation(libs.bundles.kotlin.testing.common)
-                implementation(kotlin("test"))
             }
         }
+        val jvmTest by getting {
+            dependencies {
+                implementation(libs.kotest.runner.junit5.jvm)
+            }
+        }
+        val nativeMain by creating {
+            dependsOn(commonMain)
+        }
+        val nativeTest by creating {
+            dependsOn(commonTest)
+        }
     }
+
+    js(IR) {
+        browser()
+        nodejs()
+        binaries.library()
+    }
+
+    val nativeSetup: KotlinNativeTarget.() -> Unit = {
+        compilations["main"].defaultSourceSet.dependsOn(kotlin.sourceSets["nativeMain"])
+        compilations["test"].defaultSourceSet.dependsOn(kotlin.sourceSets["nativeTest"])
+        binaries {
+            sharedLib()
+            staticLib()
+        }
+    }
+
+    linuxX64(nativeSetup)
+    // linuxArm64(nativeSetup)
+
+    mingwX64(nativeSetup)
+
+    macosX64(nativeSetup)
+    macosArm64(nativeSetup)
+    ios(nativeSetup)
+    watchos(nativeSetup)
+    tvos(nativeSetup)
+
     targets.all {
         compilations.all {
             // enable all warnings as errors
             kotlinOptions {
                 allWarningsAsErrors = true
             }
+        }
+    }
+
+    // Disable cross compilation
+    val excludeTargets = when {
+        os.isLinux -> kotlin.targets.filterNot { "linux" in it.name }
+        os.isWindows -> kotlin.targets.filterNot { "mingw" in it.name }
+        os.isMacOsX -> kotlin.targets.filter { "linux" in it.name || "mingw" in it.name }
+        else -> emptyList()
+    }.mapNotNull { it as? KotlinNativeTarget }
+
+    configure(excludeTargets) {
+        compilations.configureEach {
+            cinterops.configureEach { tasks[interopProcessingTaskName].enabled = false }
+            compileTaskProvider.get().enabled = false
+            tasks[processResourcesTaskName].enabled = false
+        }
+        binaries.configureEach { linkTask.enabled = false }
+
+        mavenPublication {
+            tasks.withType<AbstractPublishToMaven>()
+                .configureEach { onlyIf { publication != this@mavenPublication } }
+            tasks.withType<GenerateModuleMetadata>()
+                .configureEach { onlyIf { publication.get() != this@mavenPublication } }
         }
     }
 }
