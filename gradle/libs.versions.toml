@@ -31,7 +31,7 @@ kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref 
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 publishOnCentral = "org.danilopianini.publish-on-central:5.0.11"
 #kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.25.0"
-multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:0.4.23"
+multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:0.5.4"
 taskTree = "com.dorongold.task-tree:2.1.1"
 collektive-compiler-plugin = "it.unibo.collektive.kotlinAlignmentPlugin:0.1.0"
 detekt = "io.gitlab.arturbosch.detekt:1.23.1"
