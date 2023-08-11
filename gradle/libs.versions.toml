@@ -32,6 +32,6 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 publishOnCentral = "org.danilopianini.publish-on-central:5.0.10"
 #kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.25.0"
 multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:0.4.23"
-taskTree = "com.dorongold.task-tree:2.1.0"
+taskTree = "com.dorongold.task-tree:2.1.1"
 collektive-compiler-plugin = "it.unibo.collektive.kotlinAlignmentPlugin:0.1.0"
 detekt = "io.gitlab.arturbosch.detekt:1.23.1"
