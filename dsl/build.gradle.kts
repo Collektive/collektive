@@ -13,7 +13,6 @@ val os: OperatingSystem = OperatingSystem.current()
 
 kotlin {
     jvm {
-        withJava()
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
             filter {
