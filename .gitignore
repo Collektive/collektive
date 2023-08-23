@@ -6,3 +6,4 @@ bin
 kotlin-js-store
 *.hprof
 local.properties
+node_modules/
