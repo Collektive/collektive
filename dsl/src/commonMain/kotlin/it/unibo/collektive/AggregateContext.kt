@@ -1,14 +1,14 @@
 package it.unibo.collektive
 
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.FieldImpl
 import it.unibo.collektive.stack.Path
 import it.unibo.collektive.stack.Stack
 
 class AggregateContext(
     private val localId: ID,
     private val messages: Map<ID, Map<Path, *>>,
-    private val previousState: Map<Path, *>) {
+    private val previousState: Map<Path, *>,
+) {
 
     private val stack: Stack<Any> = Stack()
     private val state: MutableMap<Path, Any?> = mutableMapOf()
@@ -19,29 +19,20 @@ class AggregateContext(
 
     fun <X> neighbouring(type: X): Field<X> {
         toBeSent[stack.currentPath()] = type
-        val messages = messagesAt(stack.currentPath())
-        return FieldImpl(localId, mapOf(localId to type) + messages)
+        val messages = messagesAt<X>(stack.currentPath())
+        return Field(localId, type, messages)
     }
 
-    @Suppress("UNCHECKED_CAST")
-    fun <X,Y : Any> repeating(initial: X, repeat: (X) -> Y): Y {
-        val res = if (previousState.containsKey(stack.currentPath())) {
-            repeat(previousState[stack.currentPath()] as X)
-        } else {
-            repeat(initial)
-        }
+    fun <X, Y> repeating(initial: X, repeat: (X) -> Y): Y {
+        val res = stateAt<X>(stack.currentPath())?.let { repeat(it) } ?: repeat(initial)
         state[stack.currentPath()] = res
         return res
     }
 
-    fun <X, Y: Any?> sharing(initial: X, body: (Field<X>) -> Y): Y {
-        val messages = messagesAt(stack.currentPath())
-        val previous = if (previousState.containsKey(stack.currentPath())) {
-            (previousState[stack.currentPath()])
-        } else {
-            initial
-        }
-        val subject = FieldImpl<X>(localId, mapOf(localId to previous) + messages)
+    fun <X, Y> sharing(initial: X, body: (Field<X>) -> Y): Y {
+        val messages = messagesAt<X>(stack.currentPath())
+        val previous = stateAt<X>(stack.currentPath()) ?: initial
+        val subject = Field(localId, previous, messages)
         return body(subject).also {
             toBeSent[stack.currentPath()] = it
             state[stack.currentPath()] = it
@@ -58,9 +49,13 @@ class AggregateContext(
         return body().also { stack.dealign() }
     }
 
-    private fun messagesAt(path: Path): Map<ID, *> = messages.mapNotNull { (id, message) ->
-        if (message.containsKey(path)) id to message[path] else null
-    }.toMap()
+    @Suppress("UNCHECKED_CAST")
+    private fun <T> messagesAt(path: Path): Map<ID, T> = messages
+        .mapNotNull { (id, message) -> if (message.containsKey(path)) id to (message[path] as T) else null }
+        .toMap()
+
+    @Suppress("UNCHECKED_CAST")
+    private fun <T> stateAt(path: Path): T? = previousState[path] as? T
 
     data class AggregateResult<X>(val result: X, val toSend: Map<Path, *>, val newState: Map<Path, *>)
 }
@@ -76,7 +71,7 @@ fun <X> aggregate(
     localId: ID = IntId(),
     messages: Map<ID, Map<Path, *>> = emptyMap<ID, Map<Path, Any>>(),
     state: Map<Path, *> = emptyMap<Path, Any>(),
-    init: AggregateContext.() -> X
+    init: AggregateContext.() -> X,
 ) = singleCycle(localId, messages, state, compute = init)
 
 /**
@@ -88,5 +83,5 @@ fun <X> aggregate(
 fun <X> aggregate(
     condition: () -> Boolean,
     network: Network = NetworkImpl(),
-    init: AggregateContext.() -> X)
-= runUntil(condition, network, compute = init)
+    init: AggregateContext.() -> X,
+) = runUntil(condition, network, compute = init)
