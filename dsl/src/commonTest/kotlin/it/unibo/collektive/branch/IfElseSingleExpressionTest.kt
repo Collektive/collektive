@@ -12,10 +12,12 @@ class IfElseSingleExpressionTest {
         val result = aggregate {
             if (customCondition) neighbouring("test") else neighbouring("test")
         }
-        assertTrue(result.toSend.keys.any {
-            it.path.toString().contains("customCondition") &&
+        assertTrue(
+            result.toSend.keys.any {
+                it.path.toString().contains("customCondition") &&
                     it.path.toString().contains("true")
-        })
+            },
+        )
     }
 
     @Test
@@ -24,9 +26,11 @@ class IfElseSingleExpressionTest {
         val result = aggregate {
             if (customCondition) neighbouring("test") else neighbouring("test")
         }
-        assertTrue(result.toSend.keys.any {
-            it.path.toString().contains("constant") &&
+        assertTrue(
+            result.toSend.keys.any {
+                it.path.toString().contains("constant") &&
                     it.path.toString().contains("false")
-        })
+            },
+        )
     }
 }

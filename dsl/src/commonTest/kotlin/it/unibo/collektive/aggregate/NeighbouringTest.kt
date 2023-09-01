@@ -67,5 +67,4 @@ class NeighbouringTest {
             assertEquals(1, field.toMap().size)
         }
     }
-
 }

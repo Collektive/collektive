@@ -31,13 +31,15 @@ class RepeatingTest {
     @Test
     fun repeatingWithLambdaBody() {
         val result = aggregate {
-            repeating(initValue){
-                neighbouring(it*2)
+            repeating(initValue) {
+                neighbouring(it * 2)
             }
         }
-        assertTrue(result.toSend.keys.any {
-            it.path.toString().contains("repeating") &&
+        assertTrue(
+            result.toSend.keys.any {
+                it.path.toString().contains("repeating") &&
                     it.path.toString().contains("neighbouring")
-        })
+            },
+        )
     }
 }

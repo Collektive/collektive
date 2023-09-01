@@ -1,9 +1,9 @@
 package it.unibo.collektive.aggregate
 
-import it.unibo.collektive.field.Field
 import it.unibo.collektive.Network
 import it.unibo.collektive.NetworkImpl
 import it.unibo.collektive.aggregate
+import it.unibo.collektive.field.Field
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -13,7 +13,7 @@ class SharingTest {
     private val findMax: (Field<Int>) -> Int = { e -> e.toMap().maxBy { it.value }.value }
 
     @Test
-    fun firstTimeSharing(){
+    fun firstTimeSharing() {
         aggregate {
             val res = sharing(initialValue, findMax)
             assertEquals(1, res)
@@ -21,7 +21,7 @@ class SharingTest {
     }
 
     @Test
-    fun sharingWithTwoAlignedDevices(){
+    fun sharingWithTwoAlignedDevices() {
         val network: Network = NetworkImpl()
 
         var i = 0

@@ -16,10 +16,12 @@ class IfElseBlockTest {
                 neighbouring("test")
             }
         }
-        assertTrue(result.toSend.keys.any {
-            it.path.toString().contains("customCondition") &&
+        assertTrue(
+            result.toSend.keys.any {
+                it.path.toString().contains("customCondition") &&
                     it.path.toString().contains("true")
-        })
+            },
+        )
     }
 
     @Test
@@ -32,10 +34,12 @@ class IfElseBlockTest {
                 neighbouring("test")
             }
         }
-        assertTrue(result.toSend.keys.any {
-            it.path.toString().contains("constant") &&
+        assertTrue(
+            result.toSend.keys.any {
+                it.path.toString().contains("constant") &&
                     it.path.toString().contains("false")
-        })
+            },
+        )
     }
 
     @Test
@@ -51,9 +55,11 @@ class IfElseBlockTest {
                 neighbouring("test")
             }
         }
-        assertTrue(result.toSend.keys.any {
-            it.path.toString().contains("customCondition2") &&
+        assertTrue(
+            result.toSend.keys.any {
+                it.path.toString().contains("customCondition2") &&
                     it.path.toString().contains("true")
-        })
+            },
+        )
     }
 }

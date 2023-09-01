@@ -1,10 +1,8 @@
 package it.unibo.collektive.stack
 
-import it.unibo.collektive.stack.Stack
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-
 
 class StackTest {
     private val token: String = "token"
@@ -30,5 +28,4 @@ class StackTest {
         stack.dealign()
         assertFalse(stack.currentPath().path.contains(token))
     }
-
 }

@@ -8,12 +8,13 @@ import kotlin.test.assertTrue
 class IfElseNestedFunction {
 
     @Test
-    fun alignWithNestedFunction(){
+    fun alignWithNestedFunction() {
         val result = aggregate {
             val condition = true
             fun test() {
                 neighbouring("test")
             }
+
             fun test2() {
                 test()
             }
@@ -22,21 +23,24 @@ class IfElseNestedFunction {
                 test2()
             }
         }
-        assertTrue(result.toSend.keys.any {
-            it.path.toString().contains("condition") &&
+        assertTrue(
+            result.toSend.keys.any {
+                it.path.toString().contains("condition") &&
                     it.path.toString().contains("test") &&
                     it.path.toString().contains("test2") &&
                     it.path.toString().contains("true")
-        })
+            },
+        )
     }
 
     @Test
-    fun notAlignWithNestedFunction(){
+    fun notAlignWithNestedFunction() {
         val result = aggregate {
             val condition = true
             fun test(): String {
                 return "hello"
             }
+
             fun test2() {
                 test()
             }
@@ -45,9 +49,11 @@ class IfElseNestedFunction {
                 test2()
             }
         }
-        assertFalse(result.toSend.keys.any {
-            it.path.toString().contains("condition") &&
+        assertFalse(
+            result.toSend.keys.any {
+                it.path.toString().contains("condition") &&
                     it.path.toString().contains("true")
-        })
+            },
+        )
     }
 }

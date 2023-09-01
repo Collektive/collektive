@@ -9,12 +9,14 @@ class IfConditionTest {
     @Test
     fun constantConditionIf() {
         val result = aggregate {
-             if (true) neighbouring("test")
+            if (true) neighbouring("test")
         }
-        assertTrue(result.toSend.keys.any {
-            it.path.toString().contains("constant") &&
+        assertTrue(
+            result.toSend.keys.any {
+                it.path.toString().contains("constant") &&
                     it.path.toString().contains("true")
-        })
+            },
+        )
     }
 
     @Test
@@ -23,10 +25,12 @@ class IfConditionTest {
         val result = aggregate {
             if (customCondition) neighbouring("test")
         }
-        assertTrue(result.toSend.keys.any {
-            it.path.toString().contains("customCondition") &&
+        assertTrue(
+            result.toSend.keys.any {
+                it.path.toString().contains("customCondition") &&
                     it.path.toString().contains("true")
-        })
+            },
+        )
     }
 
     @Test
@@ -35,10 +39,12 @@ class IfConditionTest {
         val result = aggregate {
             if (customCondition()) neighbouring("test")
         }
-        assertTrue(result.toSend.keys.any {
-            it.path.toString().contains("customCondition") &&
+        assertTrue(
+            result.toSend.keys.any {
+                it.path.toString().contains("customCondition") &&
                     it.path.toString().contains("true")
-        })
+            },
+        )
     }
 
     @Test
@@ -48,12 +54,14 @@ class IfConditionTest {
         val result = aggregate {
             if (customCondition1 && customCondition2) neighbouring("test")
         }
-        assertTrue(result.toSend.keys.any {
-            it.path.toString().contains("customCondition1") &&
+        assertTrue(
+            result.toSend.keys.any {
+                it.path.toString().contains("customCondition1") &&
                     it.path.toString().contains("customCondition2") &&
                     it.path.toString().contains("AND") &&
                     it.path.toString().contains("true")
-        })
+            },
+        )
     }
 
     @Test
@@ -63,12 +71,14 @@ class IfConditionTest {
         val result = aggregate {
             if (customCondition1 || customCondition2) neighbouring("test")
         }
-        assertTrue(result.toSend.keys.any {
-            it.path.toString().contains("customCondition1") &&
+        assertTrue(
+            result.toSend.keys.any {
+                it.path.toString().contains("customCondition1") &&
                     it.path.toString().contains("customCondition2") &&
                     it.path.toString().contains("OR") &&
                     it.path.toString().contains("true")
-        })
+            },
+        )
     }
 
     @Test
@@ -78,12 +88,14 @@ class IfConditionTest {
         val result = aggregate {
             if (customCondition1 && !customCondition2) neighbouring("test")
         }
-        assertTrue(result.toSend.keys.any {
-            it.path.toString().contains("customCondition1") &&
+        assertTrue(
+            result.toSend.keys.any {
+                it.path.toString().contains("customCondition1") &&
                     it.path.toString().contains("customCondition2") &&
                     it.path.toString().contains("AND") &&
                     it.path.toString().contains("not") &&
                     it.path.toString().contains("true")
-        })
+            },
+        )
     }
 }
