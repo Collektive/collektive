@@ -3,8 +3,6 @@ package it.unibo.collektive.field
 import it.unibo.collektive.Network
 import it.unibo.collektive.NetworkImpl
 import it.unibo.collektive.aggregate
-import it.unibo.collektive.field.max
-import it.unibo.collektive.field.min
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -24,7 +22,7 @@ class FieldManipulationTest {
     }
 
     @Test
-    fun getMinIncludingSelf(){
+    fun getMinIncludingSelf() {
         // Device 1
         aggregate(condition, network) {
             neighbouring(double(3))
@@ -38,12 +36,11 @@ class FieldManipulationTest {
             if (res != null) {
                 assertEquals(4, res.value)
             }
-
         }
     }
 
     @Test
-    fun getMinNonIncludingSelf(){
+    fun getMinNonIncludingSelf() {
         // Device 1
         aggregate(condition, network) {
             neighbouring(double(3))
@@ -61,7 +58,7 @@ class FieldManipulationTest {
     }
 
     @Test
-    fun getMaxIncludingSelf(){
+    fun getMaxIncludingSelf() {
         // Device 1
         aggregate(condition, network) {
             neighbouring(double(3))
@@ -79,7 +76,7 @@ class FieldManipulationTest {
     }
 
     @Test
-    fun getMaxNonIncludingSelf(){
+    fun getMaxNonIncludingSelf() {
         // Device 1
         aggregate(condition, network) {
             neighbouring(double(3))

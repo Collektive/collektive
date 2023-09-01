@@ -3,18 +3,17 @@ package it.unibo.collektive.field
 import it.unibo.collektive.ID
 
 fun <T : Comparable<T>> Field<T>.min(includingSelf: Boolean = true): Map.Entry<ID, T>? =
-    handleIncludingSelf(includingSelf).minByOrNull { it.value }
+    handle(includingSelf).minByOrNull { it.value }
 
 fun <T : Comparable<T>> Field<T>.max(includingSelf: Boolean = true): Map.Entry<ID, T>? =
-    handleIncludingSelf(includingSelf).maxByOrNull { it.value }
+    handle(includingSelf).maxByOrNull { it.value }
 
-private fun <T : Comparable<T>> Field<T>.handleIncludingSelf(includingSelf: Boolean): Map<ID, T> =
+private fun <T : Comparable<T>> Field<T>.handle(includingSelf: Boolean): Map<ID, T> =
     if (includingSelf) this.toMap() else this.excludeSelf()
 
 operator fun Field<Double>.plus(field: Field<Double>): Field<Double> {
-    val res = (this.toMap().toList() + field.toMap().toList())
-        .groupBy({ it.first }, { it.second })
-        .map { (key, values) -> key to values.sum() }
-        .toMap()
-    return FieldImpl(this.localId, res)
+    val complete = (this.keys + field.keys).associateWith { setOf(this[it], field[it]).filterNotNull().sum() }
+    val local = complete.filter { it.key == localId }.values.first()
+    val other = complete.filterNot { it.key == localId }
+    return Field(localId, local, other)
 }

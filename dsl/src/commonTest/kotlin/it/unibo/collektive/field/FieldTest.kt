@@ -2,8 +2,6 @@ package it.unibo.collektive.field
 
 import it.unibo.collektive.ID
 import it.unibo.collektive.IntId
-import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.FieldImpl
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -16,14 +14,14 @@ class FieldTest {
 
     @Test
     fun createFieldWithoutMessages() {
-        val field: Field<String> = FieldImpl(myId, mapOf(myId to myValue))
+        val field: Field<String> = Field(myId, mapOf(myId to myValue))
         assertTrue(field.toMap().containsKey(myId))
         assertEquals(1, field.toMap().size)
     }
 
     @Test
     fun createFieldWithMessages() {
-        val field: Field<String> = FieldImpl(myId, mapOf(myId to myValue, connectedId to connectedValue))
+        val field: Field<String> = Field(myId, myValue, mapOf(connectedId to connectedValue))
         assertTrue(field.toMap().containsKey(myId))
         assertTrue(field.toMap().containsKey(connectedId))
         assertEquals(2, field.toMap().size)
@@ -31,7 +29,7 @@ class FieldTest {
 
     @Test
     fun getFieldValueById() {
-        val field: Field<String> = FieldImpl(myId, mapOf(myId to myValue, connectedId to connectedValue))
+        val field: Field<String> = Field(myId, myValue, mapOf(connectedId to connectedValue))
         assertEquals(myValue, field[myId])
         assertEquals(connectedValue, field[connectedId])
     }
