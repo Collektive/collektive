@@ -6,7 +6,7 @@ fun <X> singleCycle(
     localId: ID,
     messages: Map<ID, Map<Path, *>>,
     state: Map<Path, *>,
-    compute: AggregateContext.() -> X
+    compute: AggregateContext.() -> X,
 ): AggregateContext.AggregateResult<X> {
     return with(AggregateContext(localId, messages, state)) {
         AggregateContext.AggregateResult(compute(), messagesToSend(), newState())
@@ -16,7 +16,7 @@ fun <X> singleCycle(
 fun <X> runUntil(
     condition: () -> Boolean,
     network: Network,
-    compute: AggregateContext.() -> X
+    compute: AggregateContext.() -> X,
 ): AggregateContext.AggregateResult<X> {
     val localId: ID = IntId()
     var state = emptyMap<Path, Any?>()

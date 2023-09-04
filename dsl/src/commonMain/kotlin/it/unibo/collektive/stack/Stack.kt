@@ -15,9 +15,7 @@ internal class StackImplDequeue<X> : Stack<X> {
 
     override fun currentPath(): Path = Path(currentStack.toList())
 
-    override fun alignRaw(token: X?) {
-        currentStack.addLast(token)
-    }
+    override fun alignRaw(token: X?) = currentStack.addLast(token)
 
     override fun dealign() {
         currentStack.removeLast()

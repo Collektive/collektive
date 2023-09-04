@@ -17,7 +17,7 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 class AggregateCallTransformer(
     private val pluginContext: IrPluginContext,
     private val aggregateContextClass: IrClass,
-    private val alignedOnFunction: IrFunction
+    private val alignedOnFunction: IrFunction,
 ) : IrElementTransformerVoid() {
 
     override fun visitFunction(declaration: IrFunction): IrStatement {
@@ -27,9 +27,9 @@ class AggregateCallTransformer(
                     pluginContext,
                     aggregateContextClass,
                     declaration,
-                    alignedOnFunction
+                    alignedOnFunction,
                 ),
-                null
+                null,
             )
         }
         return super.visitFunction(declaration)
@@ -44,9 +44,9 @@ class AggregateCallTransformer(
                     pluginContext,
                     aggregateContextClass,
                     aggregateLambdaBody,
-                    alignedOnFunction
+                    alignedOnFunction,
                 ),
-                null
+                null,
             )
         }
         return super.visitCall(expression)

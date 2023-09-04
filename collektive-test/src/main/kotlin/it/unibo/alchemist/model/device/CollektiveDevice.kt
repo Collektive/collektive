@@ -37,11 +37,11 @@ class CollektiveDevice<P> @JvmOverloads constructor(
 
     override fun distances(): Field<Double> {
         val res: Map<ID, Double> = mapOf(IntId(node.id) to 0.0) +
-                environment.getNeighborhood(node)
-                    .associate { IntId(it.id) to environment.getDistanceBetweenNodes(node, it) }
+            environment.getNeighborhood(node)
+                .associate { IntId(it.id) to environment.getDistanceBetweenNodes(node, it) }
         return FieldImpl(
             IntId(node.id),
-            res
+            res,
         )
     }
 }

@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.utils.addIfNotNull
  */
 class AggregateRefChildrenVisitor(
     private val aggregateContextClass: IrClass,
-    private val elements: MutableList<IrExpression>
+    private val elements: MutableList<IrExpression>,
 ) : IrElementVisitor<Unit, Nothing?> {
 
     // Visit all the children of the root element
@@ -28,7 +28,6 @@ class AggregateRefChildrenVisitor(
         elements.addIfNotNull(expression.receiverAndArgs(aggregateContextClass))
         super.visitCall(expression, data)
     }
-
 }
 
 /**

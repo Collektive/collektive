@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    implementation(project(path=":dsl"))
+    implementation(project(path = ":dsl"))
     implementation(libs.bundles.alchemist)
     testImplementation(libs.bundles.jupiter.api)
     testRuntimeOnly(libs.bundles.jupiter.engine)

@@ -43,7 +43,9 @@ allprojects {
         publishing {
             publications {
                 withType<MavenPublication>().configureEach {
-                    if ("OSSRH" !in name) { artifact(tasks.javadocJar) }
+                    if ("OSSRH" !in name) {
+                        artifact(tasks.javadocJar)
+                    }
                     scmConnection.set("git:git@github.com:Collektive/${rootProject.name}")
                     projectUrl.set("https://github.com/Collektive/${rootProject.name}")
                     pom {

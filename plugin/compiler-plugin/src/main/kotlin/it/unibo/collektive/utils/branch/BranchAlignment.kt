@@ -19,19 +19,19 @@ import org.jetbrains.kotlin.ir.builders.parent
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
-import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrBranch
-import org.jetbrains.kotlin.ir.expressions.IrContainerExpression
 import org.jetbrains.kotlin.ir.expressions.IrBlock
+import org.jetbrains.kotlin.ir.expressions.IrBranch
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
+import org.jetbrains.kotlin.ir.expressions.IrContainerExpression
+import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.expressions.IrTypeOperatorCall
-import org.jetbrains.kotlin.ir.expressions.putArgument
 import org.jetbrains.kotlin.ir.expressions.impl.IrFunctionExpressionImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrIfThenElseImpl
+import org.jetbrains.kotlin.ir.expressions.putArgument
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.name.Name
@@ -41,7 +41,7 @@ internal fun IrSingleStatementBuilder.buildAlignedOnBlock(
     aggregateContextReference: IrExpression,
     alignedOnFunction: IrFunction,
     branch: IrBranch,
-    conditionValue: Boolean
+    conditionValue: Boolean,
 ): IrContainerExpression {
     return irBlock {
         val block = branch.result as IrBlock
@@ -53,7 +53,7 @@ internal fun IrSingleStatementBuilder.buildAlignedOnBlock(
             putArgument(alignedOnFunction.dispatchReceiverParameter!!, aggregateContextReference)
             // Set the argument that is going to be push in the stack
             putValueArgument(
-                irString(createConditionArgument(branch.condition, conditionValue))
+                irString(createConditionArgument(branch.condition, conditionValue)),
             )
             // Create the lambda that is going to call expression
             val lambda = buildLambdaArgument(pluginContext, block)
@@ -67,7 +67,7 @@ internal fun IrSingleStatementBuilder.buildAlignedOnCall(
     aggregateContextReference: IrExpression,
     alignedOnFunction: IrFunction,
     branch: IrBranch,
-    conditionValue: Boolean
+    conditionValue: Boolean,
 ): IrFunctionAccessExpression {
     return irCall(alignedOnFunction).apply {
         val statement = branch.result
@@ -77,7 +77,7 @@ internal fun IrSingleStatementBuilder.buildAlignedOnCall(
         putArgument(alignedOnFunction.dispatchReceiverParameter!!, aggregateContextReference)
         // Set the argument that is going to be push in the stack
         putValueArgument(
-            irString(createConditionArgument(branch.condition, conditionValue))
+            irString(createConditionArgument(branch.condition, conditionValue)),
         )
         // Create the lambda that is going to call expression
         val lambda = buildLambdaArgument(pluginContext, statement)
@@ -87,7 +87,7 @@ internal fun IrSingleStatementBuilder.buildAlignedOnCall(
 
 private fun IrBuilderWithScope.buildLambdaArgument(
     pluginContext: IrPluginContext,
-    element: IrExpression
+    element: IrExpression,
 ): IrFunctionExpressionImpl {
     val lambda = if (element is IrBlock) {
         // The element is a IrBlock
@@ -100,13 +100,13 @@ private fun IrBuilderWithScope.buildLambdaArgument(
         endOffset,
         getLambdaType(pluginContext, lambda),
         lambda,
-        IrStatementOrigin.LAMBDA
+        IrStatementOrigin.LAMBDA,
     )
 }
 
 private fun IrBuilderWithScope.buildLambda(
     pluginContext: IrPluginContext,
-    expression: IrExpression
+    expression: IrExpression,
 ): IrSimpleFunction = pluginContext.irFactory.buildFun {
     name = Name.special("<anonymous>")
     this.origin = IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA
@@ -121,7 +121,7 @@ private fun IrBuilderWithScope.buildLambda(
 
 private fun IrBuilderWithScope.buildLambda(
     pluginContext: IrPluginContext,
-    expression: IrBlock
+    expression: IrBlock,
 ): IrSimpleFunction = pluginContext.irFactory.buildFun {
     name = Name.special("<anonymous>")
     this.origin = IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA
@@ -131,7 +131,9 @@ private fun IrBuilderWithScope.buildLambda(
     val lastExpression = expression.statements.removeLast() as IrExpression
     this.returnType = getReturnType(lastExpression)
     this.body = context.irBuiltIns.createIrBuilder(symbol).irBlockBody {
-        for (bodyStatement in expression.statements) { +bodyStatement }
+        for (bodyStatement in expression.statements) {
+            +bodyStatement
+        }
         +irReturn(lastExpression)
     }
 }
@@ -146,22 +148,25 @@ private fun conditionName(condition: IrExpression): String {
         is IrConst<*> -> "constant"
         is IrTypeOperatorCall -> condition.operator.name + " " + condition.typeOperand.asString()
         is IrCall -> condition.symbol.owner.name.asString() + " " +
-                if (condition.origin == IrStatementOrigin.EXCL && condition.dispatchReceiver != null)
-                    conditionName(condition.dispatchReceiver!!)
-                else ""
+            if (condition.origin == IrStatementOrigin.EXCL && condition.dispatchReceiver != null) {
+                conditionName(condition.dispatchReceiver!!)
+            } else {
+                ""
+            }
+
         is IrIfThenElseImpl -> conditionName(condition.branches[0].condition) +
-                if (condition.origin == IrStatementOrigin.ANDAND) {
-                    " AND " + conditionName(condition.branches[0].result)
-                } else {
-                    " OR " + conditionName(condition.branches[1].result)
-                }
+            if (condition.origin == IrStatementOrigin.ANDAND) {
+                " AND " + conditionName(condition.branches[0].result)
+            } else {
+                " OR " + conditionName(condition.branches[1].result)
+            }
+
         else ->
             throw IllegalStateException(
-            "The current if condition type ${condition::class} has not been handled for the alignment yet. " +
-                    "Update the compiler plugin."
+                "The current if condition type ${condition::class} has not been handled for the alignment yet. " +
+                    "Update the compiler plugin.",
             )
     }
-
 }
 
 private fun getReturnType(expression: IrExpression): IrType {

@@ -9,4 +9,3 @@ group = "it.unibo.collektive"
 repositories {
     mavenCentral()
 }
-

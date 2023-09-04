@@ -42,8 +42,8 @@ class CollektiveIncarnation<P> : Incarnation<Any, P> where P : Position<P> {
     ): Action<Any> = object : AbstractAction<Any>(
         requireNotNull(node) {
             "Global Collektive programs not supported yet"
-        }
-    ){
+        },
+    ) {
         val aggregateEntrypoint: Method
         val programIdentifier = SimpleMolecule(additionalParameters)
         val localDevice: CollektiveDevice<P> by lazy { this.node.asProperty() }
@@ -54,15 +54,15 @@ class CollektiveIncarnation<P> : Incarnation<Any, P> where P : Position<P> {
             val lastDotIndex = additionalParameters.lastIndexOf('.')
             val clazz = Class.forName(additionalParameters.substring(0 until lastDotIndex))
             val instance = clazz.constructors.first().newInstance(
-                requireNotNull(node).asProperty<Any, CollektiveDevice<P>>()
+                requireNotNull(node).asProperty<Any, CollektiveDevice<P>>(),
             )
             aggregateEntrypoint = clazz
                 .methods
                 .asSequence()
                 .filter { it.returnType == AggregateContext.AggregateResult::class.java }
                 .first {
-                    it.name == additionalParameters.substring(lastDotIndex + 1)
-                            && it.parameters.isEmpty()
+                    it.name == additionalParameters.substring(lastDotIndex + 1) &&
+                        it.parameters.isEmpty()
                 }
             run = { aggregateEntrypoint.invoke(instance) as AggregateContext.AggregateResult<*> }
         }
@@ -79,7 +79,6 @@ class CollektiveIncarnation<P> : Incarnation<Any, P> where P : Position<P> {
         }
 
         override fun getContext(): Context = Context.NEIGHBORHOOD
-
     }
 
     override fun createCondition(
@@ -88,7 +87,7 @@ class CollektiveIncarnation<P> : Incarnation<Any, P> where P : Position<P> {
         node: Node<Any>?,
         time: TimeDistribution<Any>?,
         actionable: Actionable<Any>?,
-        additionalParameters: String?
+        additionalParameters: String?,
     ): Condition<Any> = object : AbstractCondition<Any>(requireNotNull(node)) {
         override fun getContext() = Context.LOCAL
         override fun getPropensityContribution(): Double = 1.0
@@ -100,10 +99,10 @@ class CollektiveIncarnation<P> : Incarnation<Any, P> where P : Position<P> {
         environment: Environment<Any, P>,
         node: Node<Any>?,
         timeDistribution: TimeDistribution<Any>,
-        parameter: String
+        parameter: String,
     ): Reaction<Any> = Event(node, timeDistribution).also {
         it.actions = ListSet.of(
-            createAction(randomGenerator, environment, node, timeDistribution, it, parameter)
+            createAction(randomGenerator, environment, node, timeDistribution, it, parameter),
         )
     }
 
@@ -111,7 +110,7 @@ class CollektiveIncarnation<P> : Incarnation<Any, P> where P : Position<P> {
         randomGenerator: RandomGenerator,
         environment: Environment<Any, P>,
         node: Node<Any>?,
-        parameter: String?
+        parameter: String?,
     ): TimeDistribution<Any> = parameter.toDefaultDouble().let { frequency ->
         DiracComb(DoubleTime(randomGenerator.nextDouble(0.0, 1.0 / frequency)), frequency)
     }
@@ -119,7 +118,7 @@ class CollektiveIncarnation<P> : Incarnation<Any, P> where P : Position<P> {
     override fun createNode(
         randomGenerator: RandomGenerator,
         environment: Environment<Any, P>,
-        parameter: String?
+        parameter: String?,
     ): Node<Any> = GenericNode(environment).also {
         it.addProperty(CollektiveDevice(environment, it, DoubleTime(parameter.toDefaultDouble())))
     }

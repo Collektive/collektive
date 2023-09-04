@@ -1,9 +1,9 @@
 import it.unibo.alchemist.boundary.swingui.impl.SingleRunGUI
 import it.unibo.alchemist.core.implementations.Engine
-import it.unibo.alchemist.model.incarnation.CollektiveIncarnation
 import it.unibo.alchemist.model.implementations.environments.Continuous2DEnvironment
 import it.unibo.alchemist.model.implementations.linkingrules.ConnectWithinDistance
 import it.unibo.alchemist.model.implementations.positions.Euclidean2DPosition
+import it.unibo.alchemist.model.incarnation.CollektiveIncarnation
 import it.unibo.alchemist.model.interfaces.*
 import org.apache.commons.math3.random.RandomGeneratorFactory
 import java.util.*
@@ -25,7 +25,7 @@ fun main() {
         val node = incarnation.createNode(
             randomGenerator,
             environment,
-            null
+            null,
         )
         node.addReaction(
             incarnation.createReaction(
@@ -33,15 +33,15 @@ fun main() {
                 environment,
                 node,
                 incarnation.createTimeDistribution(randomGenerator, environment, node, null),
-                "Aggregate.entrypoint"
-            )
+                "Aggregate.entrypoint",
+            ),
         )
         environment.addNode(
             node,
             Euclidean2DPosition(
                 Random().nextDouble() * range + minDouble,
-                Random().nextDouble() * range + minDouble
-            )
+                Random().nextDouble() * range + minDouble,
+            ),
         )
     }
     val engine = Engine(environment)

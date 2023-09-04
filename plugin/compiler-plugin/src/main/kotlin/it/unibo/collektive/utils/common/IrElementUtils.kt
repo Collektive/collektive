@@ -20,7 +20,7 @@ import org.jetbrains.kotlin.name.ClassId
 internal fun IrFunctionAccessExpression.putValueArgument(argument: IrExpression) {
     putValueArgument(
         0,
-        argument
+        argument,
     )
 }
 
@@ -28,8 +28,8 @@ internal fun IrFunctionAccessExpression.putValueArgument(argument: IrExpression)
  * Set the type argument and the type.
  */
 internal fun IrFunctionAccessExpression.putTypeArgument(
-    type: IrType
-){
+    type: IrType,
+) {
     this.type = type
     putTypeArgument(0, type)
 }
@@ -45,7 +45,7 @@ internal fun IrCall.getLastValueArgument(): IrExpression? =
  * type of class passed as argument.
  */
 internal fun IrCall.receiverAndArgs(
-    classToMatch : IrClass
+    classToMatch: IrClass,
 ): IrExpression? =
     this.receiverAndArgs().find { it.type == classToMatch.defaultType }
 

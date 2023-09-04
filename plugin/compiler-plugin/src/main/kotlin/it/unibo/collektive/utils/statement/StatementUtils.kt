@@ -10,11 +10,11 @@ fun <T : IrElement> irStatement(
     pluginContext: IrPluginContext,
     aggregateLambdaBody: IrFunction,
     expression: IrElement,
-    body: IrSingleStatementBuilder.() -> T
+    body: IrSingleStatementBuilder.() -> T,
 ): T =
     IrSingleStatementBuilder(
         pluginContext,
         Scope(aggregateLambdaBody.symbol),
         expression.startOffset,
-        expression.endOffset
+        expression.endOffset,
     ).build(body)

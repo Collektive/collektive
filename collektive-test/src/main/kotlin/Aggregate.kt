@@ -1,6 +1,6 @@
 import field.*
-import it.unibo.alchemist.model.device.DistanceSensor
 import it.unibo.alchemist.model.device.CollektiveDevice
+import it.unibo.alchemist.model.device.DistanceSensor
 import stack.Path
 
 class Aggregate(private val node: CollektiveDevice<*>) {
