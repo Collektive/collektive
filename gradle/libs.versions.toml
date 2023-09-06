@@ -1,8 +1,9 @@
 [versions]
-kotest = "5.7.2"
-dokka = "1.9.0"
-kotlin = "1.9.0"
+build-config = "4.1.2"
 coroutines = "1.7.3"
+dokka = "1.9.0"
+kotest = "5.7.2"
+kotlin = "1.9.0"
 
 [libraries]
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
@@ -35,3 +36,4 @@ multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:0.5.5"
 taskTree = "com.dorongold.task-tree:2.1.1"
 collektive-compiler-plugin = "it.unibo.collektive.kotlinAlignmentPlugin:0.1.0"
 detekt = "io.gitlab.arturbosch.detekt:1.23.1"
+build-config = { id = "com.github.gmazzo.buildconfig", version.ref = "build-config" }
