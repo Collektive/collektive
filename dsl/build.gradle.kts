@@ -116,3 +116,13 @@ kotlin {
 kotlinAlignmentPlugin {
     enabled = true
 }
+
+afterEvaluate {
+    listOf(
+        "uploadKotlinOSSRHToMavenCentralNexus",
+    ).forEach {
+        tasks.named(it).configure {
+            enabled = false
+        }
+    }
+}
