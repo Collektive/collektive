@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.collektive.compiler.plugin)
+    id("it.unibo.collektive.kotlinAlignmentPlugin")
 }
 
 val os: OperatingSystem = OperatingSystem.current()

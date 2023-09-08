@@ -8,9 +8,18 @@ plugins {
     alias(libs.plugins.publishOnCentral)
     alias(libs.plugins.detekt)
     alias(libs.plugins.gitSemVer)
+    alias(libs.plugins.taskTree)
 }
 
 val Provider<PluginDependency>.id: String get() = get().pluginId
+
+buildscript {
+    dependencies {
+        // Add to the classpath the plugin project to import the local compiler plugin.
+        // Rationale: we want to build the `dsl` submodule with the local compiler plugin, instead with the remote one.
+        classpath("it.unibo.collektive:plugin")
+    }
+}
 
 allprojects {
     group = "it.unibo.${rootProject.name}"
@@ -23,6 +32,7 @@ allprojects {
         apply(plugin = publishOnCentral.id)
         apply(plugin = detekt.id)
         apply(plugin = gitSemVer.id)
+        apply(plugin = taskTree.id)
     }
 
     signing {

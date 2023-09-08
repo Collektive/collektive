@@ -6,5 +6,7 @@ dependencyResolutionManagement {
     }
 }
 
+rootProject.name = "plugin"
+
 include(":compiler-plugin")
 include(":gradle-plugin")

@@ -34,6 +34,5 @@ publishOnCentral = "org.danilopianini.publish-on-central:5.0.13"
 #kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.25.0"
 multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:0.5.5"
 taskTree = "com.dorongold.task-tree:2.1.1"
-collektive-compiler-plugin = "it.unibo.collektive.kotlinAlignmentPlugin:0.1.0"
 detekt = "io.gitlab.arturbosch.detekt:1.23.1"
 build-config = { id = "com.github.gmazzo.buildconfig", version.ref = "build-config" }
