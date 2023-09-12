@@ -36,3 +36,4 @@ multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:0.5.5"
 taskTree = "com.dorongold.task-tree:2.1.1"
 detekt = "io.gitlab.arturbosch.detekt:1.23.1"
 build-config = { id = "com.github.gmazzo.buildconfig", version.ref = "build-config" }
+gradlePluginPublish = { id = "com.gradle.plugin-publish", version = "1.2.1" }

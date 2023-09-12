@@ -107,3 +107,11 @@ tasks {
         enabled = false
     }
 }
+
+afterEvaluate {
+    val myUpload by tasks.creating {
+        dependsOn(gradle.includedBuild("plugin").task(":compiler-plugin:uploadKotlinOSSRHToMavenCentralNexus"))
+        dependsOn(gradle.includedBuild("plugin").task(":gradle-plugin:uploadKotlinOSSRHToMavenCentralNexus"))
+        dependsOn(tasks.named("uploadAllPublicationsToMavenCentralNexus"))
+    }
+}

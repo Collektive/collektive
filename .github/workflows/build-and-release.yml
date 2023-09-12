@@ -89,7 +89,7 @@ jobs:
           deploy-command: |
             NEXT_VERSION="${{ needs.staging-repo.outputs.next-version }}"
             OVERRIDE_VERSION=$([[ "$NEXT_VERSION" != "" ]] && echo "-PforceVersion=$(echo $NEXT_VERSION)" || echo "")
-            ./gradlew $OVERRIDE_VERSION -PstagingRepositoryId=${{ needs.staging-repo.outputs.maven-central-repo-id }} uploadAll --parallel
+            ./gradlew $OVERRIDE_VERSION -PstagingRepositoryId=${{ needs.staging-repo.outputs.maven-central-repo-id }} uploadAll :plugin:compiler-plugin:uploadKotlinOSSRHToMavenCentralNexus :plugin:gradle-plugin:uploadKotlinOSSRHToMavenCentralNexus --parallel
           should-run-codecov: ${{ runner.os == 'Linux' }}
           should-deploy: ${{ needs.check-secrets.outputs.run-with-secrets == 'true' }}
           maven-central-username: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
