@@ -1,11 +1,6 @@
 plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.build.config)
     id("java-gradle-plugin")
-}
-
-repositories {
-    mavenCentral()
+    alias(libs.plugins.gradlePluginPublish)
 }
 
 dependencies {
@@ -25,11 +20,14 @@ buildConfig {
 // Defines a gradle plugin that can be used from other projects
 gradlePlugin {
     plugins {
+        website = "https://github.com/Collektive/collektive"
+        vcsUrl = "https://github.com/Collektive/collektive.git"
         create("kotlinAlignmentPlugin") {
             id = "it.unibo.collektive.kotlinAlignmentPlugin"
             displayName = "Kotlin Alignment Plugin"
             description = "Kotlin Alignment Plugin"
             implementationClass = "it.unibo.collektive.GradlePlugin"
+            tags = listOf("compiler-plugin", "aggregate-computing", "collektive")
         }
     }
 }
