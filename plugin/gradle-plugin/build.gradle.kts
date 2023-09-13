@@ -23,7 +23,7 @@ gradlePlugin {
         website = "https://github.com/Collektive/collektive"
         vcsUrl = "https://github.com/Collektive/collektive.git"
         create("kotlinAlignmentPlugin") {
-            id = "it.unibo.collektive.kotlinAlignmentPlugin"
+            id = "it.unibo.collektive.collektive-plugin"
             displayName = "Kotlin Alignment Plugin"
             description = "Kotlin Alignment Plugin"
             implementationClass = "it.unibo.collektive.GradlePlugin"
