@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.build.config)
@@ -7,6 +9,8 @@ plugins {
 }
 
 val Provider<PluginDependency>.id: String get() = get().pluginId
+
+val os: OperatingSystem = OperatingSystem.current()
 
 allprojects {
     group = "it.unibo.collektive"
@@ -40,6 +44,10 @@ allprojects {
         licenseUrl.set("https://opensource.org/license/mit/")
         publishing {
             publications {
+                // Upload these artifacts only from Linux to prevent overlapping with other OS in CI.
+                tasks.withType<AbstractPublishToMaven>().configureEach {
+                    onlyIf { os.isLinux }
+                }
                 withType<MavenPublication>().configureEach {
                     if ("OSSRH" !in name) {
                         artifact(tasks.javadocJar)
