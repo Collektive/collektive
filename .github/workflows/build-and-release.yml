@@ -33,7 +33,7 @@ jobs:
       will-release: ${{ steps.compute-next-version.outputs.will-release }}
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v3.5.3
+        uses: actions/checkout@v4.0.0
         with:
           fetch-depth: 0
       - name: Compute next release version
@@ -80,7 +80,7 @@ jobs:
       cancel-in-progress: true
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v3.5.3
+        uses: actions/checkout@v4.0.0
         with:
           fetch-depth: 0
       - uses: DanySK/build-check-deploy-gradle-action@2.2.8
@@ -135,7 +135,7 @@ jobs:
     if: ${{ needs.check-secrets.outputs.run-with-secrets == 'true' }}
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v3.5.3
+        uses: actions/checkout@v4.0.0
       - uses: DanySK/build-check-deploy-gradle-action@2.2.8
         with:
           maven-central-username: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
@@ -164,7 +164,7 @@ jobs:
     if: ${{ needs.check-secrets.outputs.run-with-secrets == 'true' }}
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v3.5.3
+        uses: actions/checkout@v4.0.0
         with:
           fetch-depth: 0
           token: ${{ secrets.PERSONAL_TOKEN }}
