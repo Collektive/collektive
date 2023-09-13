@@ -10,9 +10,9 @@ class AggregateContext(
     private val previousState: Map<Path, *>,
 ) {
 
-    private val stack: Stack<Any> = Stack()
-    private val state: MutableMap<Path, Any?> = mutableMapOf()
-    private val toBeSent: MutableMap<Path, Any?> = mutableMapOf()
+    private val stack = Stack<Any>()
+    private val state = mutableMapOf<Path, Any?>()
+    private val toBeSent = mutableMapOf<Path, Any?>()
 
     fun messagesToSend(): Map<Path, *> = toBeSent.toMap()
     fun newState(): Map<Path, *> = state.toMap()
@@ -20,7 +20,7 @@ class AggregateContext(
     fun <X> neighbouring(type: X): Field<X> {
         toBeSent[stack.currentPath()] = type
         val messages = messagesAt<X>(stack.currentPath())
-        return Field(localId, type, messages)
+        return Field(localId, messages + (localId to type))
     }
 
     fun <X, Y> repeating(initial: X, repeat: (X) -> Y): Y {
@@ -32,7 +32,7 @@ class AggregateContext(
     fun <X, Y> sharing(initial: X, body: (Field<X>) -> Y): Y {
         val messages = messagesAt<X>(stack.currentPath())
         val previous = stateAt<X>(stack.currentPath()) ?: initial
-        val subject = Field(localId, previous, messages)
+        val subject = Field(localId, messages + (localId to previous))
         return body(subject).also {
             toBeSent[stack.currentPath()] = it
             state[stack.currentPath()] = it

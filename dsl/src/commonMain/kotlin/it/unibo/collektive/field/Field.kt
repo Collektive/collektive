@@ -5,29 +5,15 @@ import it.unibo.collektive.ID
 interface Field<out T> : Map<ID, T> {
     val localId: ID
     val local: T?
-    fun excludeSelf(): Field<T>
+    fun excludeSelf(): Field<T> = Field(localId, filter { it.key != localId })
+    fun <B> map(transform: (T) -> B): Field<B> = Field(localId, this.mapValues { (_, value) -> transform(value) })
 
     companion object {
-        operator fun <T> invoke(localId: ID, local: T, messages: Map<ID, T>): Field<T> =
-            FieldWithSelf(localId, local, messages)
-
-        operator fun <T> invoke(localId: ID, messages: Map<ID, T>): Field<T> =
-            FieldWithoutSelf(localId, messages)
+        operator fun <T> invoke(localId: ID, messages: Map<ID, T> = emptyMap()): Field<T> = FieldImpl(localId, messages)
     }
 }
 
-internal data class FieldWithoutSelf<T>(
+internal data class FieldImpl<T>(
     override val localId: ID,
-    private val messages: Map<ID, T> = emptyMap(),
-) : Field<T>, Map<ID, T> by messages {
-    override val local: T? = null
-    override fun excludeSelf(): Field<T> = this
-}
-
-internal data class FieldWithSelf<T>(
-    override val localId: ID,
-    override val local: T,
-    private val messages: Map<ID, T> = emptyMap(),
-) : Field<T>, Map<ID, T> by messages + (localId to local) {
-    override fun excludeSelf(): Field<T> = FieldWithoutSelf(localId, this.filterKeys { it != localId }.toMap())
-}
+    private val messages: Map<ID, T>,
+) : Field<T>, Map<ID, T> by messages { override val local: T? = this[localId] }
