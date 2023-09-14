@@ -10,6 +10,24 @@ devices by the means of computational fields.
 Using Kotlin Multiplatform allows the DSL to be used in Native, JS and
 JVM environments.
 
+## Usage
+
+First of all, add the following plugin to your `build.gradle.kts` file:
+
+```kotlin
+plugins {
+    id("it.unibo.collektive.collektive-plugin") version "<latest version>"
+}
+```
+This plugin is used to apply the Kotlin compiler plugin used for the alignment of aggregate operator.
+Then, add the dependency to the project:
+    
+```kotlin
+dependencies {
+    implementation("it.unibo.collektive:dsl:<latest version>")
+}
+```
+
 ## Project structure
 
 Currently, the project is composed by three submodules:

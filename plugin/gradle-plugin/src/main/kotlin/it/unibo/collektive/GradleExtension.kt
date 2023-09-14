@@ -8,5 +8,8 @@ import org.gradle.api.provider.Property
  * used to enable or disable the plugin.
  */
 open class GradleExtension(objects: ObjectFactory) {
+    /**
+     * Determines if the compiler plugin should be enabled or disabled.
+     */
     val enabled: Property<Boolean> = objects.property(Boolean::class.java).apply { convention(true) }
 }
