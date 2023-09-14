@@ -10,12 +10,12 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
  * the compiler plugin is enabled.
  */
 @OptIn(ExperimentalCompilerApi::class)
-class AlignmentComponentRegistrar(private val defaultEnabled: Boolean = true) : CompilerPluginRegistrar() {
+class AlignmentComponentRegistrar : CompilerPluginRegistrar() {
 
     override val supportsK2: Boolean = true
 
     override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
-        val enabled = configuration.get(AlignmentCommandLineProcessor.ARG_ENABLED, defaultEnabled)
+        val enabled = configuration.get(AlignmentCommandLineProcessor.ARG_ENABLED) ?: error("No enabled arg")
         if (enabled) {
             IrGenerationExtension.registerExtension(AlignmentIrGenerationExtension())
         }

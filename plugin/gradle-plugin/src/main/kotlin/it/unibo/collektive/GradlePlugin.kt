@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
  */
 class GradlePlugin : KotlinCompilerPluginSupportPlugin {
     override fun apply(target: Project): Unit = with(target) {
-        extensions.create("kotlinAlignmentPlugin", GradleExtension::class.java)
+        extensions.create("collektive", GradleExtension::class.java)
     }
 
     override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean = true
@@ -33,7 +33,7 @@ class GradlePlugin : KotlinCompilerPluginSupportPlugin {
         val extension = project.extensions.getByType(GradleExtension::class.java)
         return project.provider {
             listOf(
-                SubpluginOption(key = "enabled", value = extension.enabled.toString()),
+                SubpluginOption(key = "enabled", value = extension.enabled.get().toString()),
             )
         }
     }
