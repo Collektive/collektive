@@ -4,5 +4,5 @@ dependencies {
 
 buildConfig {
     packageName(group.toString())
-    buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"$group.$name\"")
+    buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"$group.compiler-plugin\"")
 }

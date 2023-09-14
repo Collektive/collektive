@@ -11,7 +11,6 @@ import org.jetbrains.kotlin.config.CompilerConfigurationKey
  * The command line processor is used to define the expected command line
  * option, which enable or disable the plugin that is responsible for the alignment.
  */
-// @AutoService(CommandLineProcessor::class)
 @OptIn(ExperimentalCompilerApi::class)
 class AlignmentCommandLineProcessor : CommandLineProcessor {
     companion object {
