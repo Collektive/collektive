@@ -25,7 +25,7 @@ gradlePlugin {
         create("collektive-plugin") {
             id = "it.unibo.collektive.collektive-plugin"
             displayName = "Collektive Plugin"
-            description = "This plugin enables the Collektive compiler plugin for Kotlin." +
+            description = "This plugin enables the Collektive Kotlin compiler plugin." +
                 "It enables the automatic alignment of aggregate operators in the Collektive DSL."
             implementationClass = "it.unibo.collektive.GradlePlugin"
             tags = listOf("kotlin compiler plugin", "aggregate computing", "collektive", "kotlin", "auto-alignment")
