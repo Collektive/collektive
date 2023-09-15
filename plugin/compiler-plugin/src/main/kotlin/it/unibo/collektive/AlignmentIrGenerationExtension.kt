@@ -1,8 +1,10 @@
 package it.unibo.collektive
 
 import it.unibo.collektive.utils.common.AggregateFunctionNames
+import it.unibo.collektive.utils.logging.warn
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
@@ -13,7 +15,7 @@ import org.jetbrains.kotlin.name.Name
  * The generation extension is used to register the transformer plugin, which is going to modify
  * the IR using the function responsible for the alignment.
  */
-class AlignmentIrGenerationExtension : IrGenerationExtension {
+class AlignmentIrGenerationExtension(private val logger: MessageCollector) : IrGenerationExtension {
     override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
         // Function that is responsible to handle the alignment
         val alignedOnFunction = pluginContext.referenceFunctions(
@@ -22,29 +24,18 @@ class AlignmentIrGenerationExtension : IrGenerationExtension {
                 Name.identifier(AggregateFunctionNames.ALIGNED_ON_FUNCTION),
             ),
         ).firstOrNull()
+
         // Aggregate Context class that has the reference to the stack
         val aggregateContextClass = pluginContext.referenceClass(
             ClassId.topLevel(FqName(AggregateFunctionNames.AGGREGATE_CONTEXT_CLASS)),
         )
-        if (alignedOnFunction != null && aggregateContextClass != null) {
-            moduleFragment.transform(
-                AggregateCallTransformer(
-                    pluginContext,
-                    aggregateContextClass.owner,
-                    alignedOnFunction.owner,
-                ),
-                null,
-            )
-        } else {
-            if (alignedOnFunction == null) {
-                println("[COMPILER-PLUGIN]: the function that is used to handle the alignment has not been found.")
-            }
-            if (aggregateContextClass == null) {
-                println(
-                    "[COMPILER-PLUGIN]: the aggregate context used to update the stack for " +
-                        "alignment has not been found.",
-                )
-            }
-        }
+
+        val (alignFunc, aggCtxClass) = getBothOrNull(alignedOnFunction, aggregateContextClass)
+            ?: return logger.warn("The function and the class used to handle the alignment have not been found.")
+
+        moduleFragment.transform(AggregateCallTransformer(pluginContext, aggCtxClass.owner, alignFunc.owner), null)
     }
+
+    private fun <F, S> getBothOrNull(first: F?, second: S?): Pair<F, S>? =
+        if (first != null && second != null) first to second else null
 }
