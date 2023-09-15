@@ -1,3 +1,38 @@
+## [0.3.0](https://github.com/Collektive/collektive/compare/0.2.0...0.3.0) (2023-09-15)
+
+
+### Features
+
+* add generic field ops and change the way a field is built ([b14968e](https://github.com/Collektive/collektive/commit/b14968e30dbce323c1488d1549f868261df381f4))
+
+
+### Dependency updates
+
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.54 ([a73f1fa](https://github.com/Collektive/collektive/commit/a73f1fa3f2d1ebef6bd21f2019725485b2c80ddc))
+* **deps:** update plugin com.gradle.enterprise to v3.15 ([a44dbff](https://github.com/Collektive/collektive/commit/a44dbffc5050f303f52521e4cd8ce3838595f174))
+
+
+### Bug Fixes
+
+* **plugin:** use consistent plugin ID and rename of the gradle dsl entrypoint of the plugin ([21986af](https://github.com/Collektive/collektive/commit/21986af4bd7e529afbd52ea62f7d5067cce59ad9))
+
+
+### Documentation
+
+* add readme for using the library ([6d5001d](https://github.com/Collektive/collektive/commit/6d5001d8e59d93024bbb5061479dabbf5ca40bb5))
+* improve plugin description ([17b148a](https://github.com/Collektive/collektive/commit/17b148ad034bb2afa101eee9ba38f19e0bf4b8d1))
+
+
+### Build and continuous integration
+
+* **deps:** update actions/checkout action to v4 ([56f69ae](https://github.com/Collektive/collektive/commit/56f69ae50e85660e4e5f5890a42c27330b68fd32))
+
+
+### General maintenance
+
+* **build:** rename gradle plugin id ([028e5cb](https://github.com/Collektive/collektive/commit/028e5cb815fe45d53f893a203dfa83c885af87a5))
+* use new dsl entrypoint name ([1b7f442](https://github.com/Collektive/collektive/commit/1b7f442d7c8a521f9f3e7d580c8733316a1cc5c7))
+
 ## [0.2.0](https://github.com/Collektive/collektive/compare/0.1.0...0.2.0) (2023-09-13)
 
 
