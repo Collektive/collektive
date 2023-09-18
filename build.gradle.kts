@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.gitSemVer)
     alias(libs.plugins.taskTree)
+    alias(libs.plugins.kover)
 }
 
 val Provider<PluginDependency>.id: String get() = get().pluginId
@@ -30,6 +31,7 @@ allprojects {
         apply(plugin = detekt.id)
         apply(plugin = gitSemVer.id)
         apply(plugin = taskTree.id)
+        apply(plugin = kover.id)
     }
 
     signing {
@@ -106,6 +108,17 @@ allprojects {
     tasks.withType<Detekt>().configureEach { finalizedBy(reportMerge) }
     reportMerge {
         input.from(tasks.withType<Detekt>().map { it.sarifReportFile })
+    }
+}
+
+dependencies {
+    kover(project(":dsl"))
+}
+
+koverReport {
+    defaults {
+        html { onCheck = true }
+        xml { onCheck = true }
     }
 }
 
