@@ -4,6 +4,12 @@ import it.unibo.collektive.field.Field
 import it.unibo.collektive.stack.Path
 import it.unibo.collektive.stack.Stack
 
+/**
+ * Context for managing aggregate computation.
+ * @param localId: id of the device.
+ * @param messages: map with all the messages sent by the neighbors.
+ * @param previousState: last device state.
+ */
 class AggregateContext(
     private val localId: ID,
     private val messages: Map<ID, Map<Path, *>>,
@@ -14,21 +20,37 @@ class AggregateContext(
     private val state = mutableMapOf<Path, Any?>()
     private val toBeSent = mutableMapOf<Path, Any?>()
 
+    /**
+     * Messages to send to the other nodes.
+     */
     fun messagesToSend(): Map<Path, *> = toBeSent.toMap()
+
+    /**
+     * Return the current state of the device as a new state.
+     */
     fun newState(): Map<Path, *> = state.toMap()
 
+    /**
+     * TODO.
+     */
     fun <X> neighbouring(type: X): Field<X> {
         toBeSent[stack.currentPath()] = type
         val messages = messagesAt<X>(stack.currentPath())
         return Field(localId, messages + (localId to type))
     }
 
+    /**
+     * TODO.
+     */
     fun <X, Y> repeating(initial: X, repeat: (X) -> Y): Y {
         val res = stateAt<X>(stack.currentPath())?.let { repeat(it) } ?: repeat(initial)
         state[stack.currentPath()] = res
         return res
     }
 
+    /**
+     * TODO.
+     */
     fun <X, Y> sharing(initial: X, body: (Field<X>) -> Y): Y {
         val messages = messagesAt<X>(stack.currentPath())
         val previous = stateAt<X>(stack.currentPath()) ?: initial
@@ -57,6 +79,12 @@ class AggregateContext(
     @Suppress("UNCHECKED_CAST")
     private fun <T> stateAt(path: Path): T? = previousState[path] as? T
 
+    /**
+     * Result of the aggregate computation.
+     * @param result: result of the computation.
+     * @param toSend: map with all the messages to send to the neighbors.
+     * @param newState: new state of the device.
+     */
     data class AggregateResult<X>(val result: X, val toSend: Map<Path, *>, val newState: Map<Path, *>)
 }
 
