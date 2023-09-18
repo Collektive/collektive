@@ -9,4 +9,3 @@ fun MessageCollector.info(message: String) = report(CompilerMessageSeverity.INFO
 fun MessageCollector.debug(message: String) = report(CompilerMessageSeverity.LOGGING, message)
 fun MessageCollector.trace(message: String) = report(CompilerMessageSeverity.STRONG_WARNING, message)
 fun MessageCollector.fatal(message: String) = report(CompilerMessageSeverity.EXCEPTION, message)
-fun MessageCollector.internalError(message: String) = report(CompilerMessageSeverity.EXCEPTION, message)
