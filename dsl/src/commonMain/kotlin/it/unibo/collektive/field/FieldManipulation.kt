@@ -2,16 +2,34 @@ package it.unibo.collektive.field
 
 import it.unibo.collektive.ID
 
+/**
+ * Get the minimum value of a field.
+ * @param includingSelf if true the local node is included in the computation.
+ */
 fun <T : Comparable<T>> Field<T>.min(includingSelf: Boolean = true): Map.Entry<ID, T>? =
     handle(includingSelf).minByOrNull { it.value }
 
+/**
+ * Get the maximum value of a field.
+ * @param includingSelf if true the local node is included in the computation.
+ */
 fun <T : Comparable<T>> Field<T>.max(includingSelf: Boolean = true): Map.Entry<ID, T>? =
     handle(includingSelf).maxByOrNull { it.value }
 
+/**
+ * Manages the field to exclude the local node if [includingSelf] is false.
+ */
 private fun <T : Comparable<T>> Field<T>.handle(includingSelf: Boolean): Map<ID, T> =
     if (includingSelf) this.toMap() else this.excludeSelf()
 
+/**
+ * Operator to sum a [value] to all the values of the field.
+ */
 operator fun <T : Number> Field<T>.plus(value: T): Field<T> = map { add(it, value) }
+
+/**
+ * Operator to subtract a [value] to all the values of the field.
+ */
 operator fun <T : Number> Field<T>.minus(value: T): Field<T> = map { sub(it, value) }
 
 @Suppress("UNCHECKED_CAST")

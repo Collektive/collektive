@@ -1,5 +1,6 @@
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektPlugin
+import io.gitlab.arturbosch.detekt.report.ReportMergeTask
 import org.danilopianini.gradle.mavencentral.DocStyle
 
 plugins {
@@ -13,12 +14,8 @@ plugins {
 
 val Provider<PluginDependency>.id: String get() = get().pluginId
 
-buildscript {
-    dependencies {
-        // Add to the classpath the plugin project to import the local compiler plugin.
-        // Rationale: we want to build the `dsl` submodule with the local compiler plugin, instead with the remote one.
-        classpath("it.unibo.collektive:plugin")
-    }
+val reportMerge by tasks.registering(ReportMergeTask::class) {
+    output.set(project.layout.buildDirectory.file("reports/detekt/merge.sarif"))
 }
 
 allprojects {
@@ -96,6 +93,20 @@ allprojects {
             }
         }
     }
+
+    detekt {
+        config.setFrom("${rootDir.absolutePath}/detekt.yml")
+        parallel = true
+        buildUponDefaultConfig = true
+        ignoreFailures = false
+    }
+    dependencies {
+        detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.1")
+    }
+    tasks.withType<Detekt>().configureEach { finalizedBy(reportMerge) }
+    reportMerge {
+        input.from(tasks.withType<Detekt>().map { it.sarifReportFile })
+    }
 }
 
 tasks {
@@ -105,13 +116,5 @@ tasks {
     }
     withType<GenerateModuleMetadata>().configureEach {
         enabled = false
-    }
-}
-
-afterEvaluate {
-    val myUpload by tasks.creating {
-        dependsOn(gradle.includedBuild("plugin").task(":compiler-plugin:uploadKotlinOSSRHToMavenCentralNexus"))
-        dependsOn(gradle.includedBuild("plugin").task(":gradle-plugin:uploadKotlinOSSRHToMavenCentralNexus"))
-        dependsOn(tasks.named("uploadAllPublicationsToMavenCentralNexus"))
     }
 }
