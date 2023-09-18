@@ -1,3 +1,9 @@
+[![CI/CD](https://github.com/Collektive/collektive/actions/workflows/dispatcher.yml/badge.svg)](https://github.com/Collektive/collektive/actions/workflows/dispatcher.yml)
+[![Maven Central](https://img.shields.io/maven-central/v/it.unibo.collektive/dsl)]()
+[![codecov](https://codecov.io/gh/Collektive/collektive/graph/badge.svg?token=U94AUOB5OK)](https://codecov.io/gh/Collektive/collektive)
+[![semantic-release: conventional-commits](https://img.shields.io/badge/semantic--release-conventional_commits-e10098?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
+![GitHub](https://img.shields.io/github/license/Collektive/collektive)
+
 # Collektive
 
 ## Goal
@@ -19,6 +25,7 @@ plugins {
     id("it.unibo.collektive.collektive-plugin") version "<latest version>"
 }
 ```
+
 This plugin is used to apply the Kotlin compiler plugin used for the alignment of aggregate operator.
 Then, add the dependency to the project:
     
