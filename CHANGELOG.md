@@ -1,3 +1,29 @@
+## [0.3.1](https://github.com/Collektive/collektive/compare/0.3.0...0.3.1) (2023-09-18)
+
+
+### Dependency updates
+
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.55 ([14a5abd](https://github.com/Collektive/collektive/commit/14a5abd1e27a828a906f7455b07087ae1c7a751e))
+* **deps:** update plugin publishoncentral to v5.0.14 ([f89c4a6](https://github.com/Collektive/collektive/commit/f89c4a6abae8cdf259353450bcf844468f402026))
+
+
+### Documentation
+
+* add missing KDoc ([a4dc9b7](https://github.com/Collektive/collektive/commit/a4dc9b76ad64cb6de43b76499bfd9eedd90333f9))
+
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.2.9 ([e905b63](https://github.com/Collektive/collektive/commit/e905b6376db880409e0e0eb21b4824b232a9dd7e))
+
+
+### General maintenance
+
+* add deteket config file ([c7de07e](https://github.com/Collektive/collektive/commit/c7de07e95ba55767b6ab7eebd5a83cd0e5f11b65))
+* **kover:** setup kover for code coverage ([673bc84](https://github.com/Collektive/collektive/commit/673bc842b7c6d35a47481909edc29866f0de225f))
+* update README with badges ([84749d9](https://github.com/Collektive/collektive/commit/84749d9a54f3f22afafa7d9178a69ab983ca5dac))
+* use collektive renovate config ([5fe1bd4](https://github.com/Collektive/collektive/commit/5fe1bd4317bc8bd98388b5e4547c59c45c6dc1da))
+
 ## [0.3.0](https://github.com/Collektive/collektive/compare/0.2.0...0.3.0) (2023-09-15)
 
 
