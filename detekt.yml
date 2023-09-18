@@ -1,0 +1,46 @@
+comments:
+  EndOfSentenceFormat:
+    active: true
+  UndocumentedPublicClass:
+    active: true
+  UndocumentedPublicFunction:
+    active: true
+  UndocumentedPublicProperty:
+    active: true
+complexity:
+  LongMethod:
+    active: false
+  LongParameterList:
+    active: false
+  NestedBlockDepth:
+    threshold: 5
+  TooManyFunctions:
+    ignoreDeprecated: true
+    ignorePrivate: true
+    ignoreOverridden: true
+    thresholdInInterfaces: 20
+    thresholdInObjects: 20
+naming:
+  MemberNameEqualsClassName:
+    active: false
+performance:
+  SpreadOperator:
+    active: false
+style:
+  DestructuringDeclarationWithTooManyEntries:
+    maxDestructuringEntries: 10
+  ForbiddenComment:
+    allowedPatterns: 'TODO:'
+  MagicNumber:
+    ignoreNumbers: [ '-2', '-1', '0', '0.5', '1', '2', '3', '4', '5', '10', '100', '360.0', '1000' ]
+  ThrowsCount:
+    max: 10
+  MaxLineLength:
+    maxLineLength: 150
+formatting:
+  MaximumLineLength:
+    maxLineLength: 150
+  ArgumentListWrapping:
+    maxLineLength: 150
+  ParameterListWrapping:
+    maxLineLength: 150
