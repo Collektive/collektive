@@ -1,3 +1,25 @@
+## [0.3.2](https://github.com/Collektive/collektive/compare/0.3.1...0.3.2) (2023-09-19)
+
+
+### Dependency updates
+
+* **deps:** update node.js to 18.18 ([9dfa73e](https://github.com/Collektive/collektive/commit/9dfa73e65b0e71a1d645c4f09a5a894d4d522f13))
+
+
+### Bug Fixes
+
+* add logger to compiler plugin ([f92aeab](https://github.com/Collektive/collektive/commit/f92aeabbaf0e4b436bf055c4f7fbb42a15df85b8))
+
+
+### General maintenance
+
+* remove alchemist incarnation as moved on a separate repo ([9fa122e](https://github.com/Collektive/collektive/commit/9fa122e115d4757e5d4d803bd124bd3fce9bbd99))
+
+
+### Refactoring
+
+* remove uneeded function ([006e426](https://github.com/Collektive/collektive/commit/006e42633ad804a146f10a1bf60921423a5a0a14))
+
 ## [0.3.1](https://github.com/Collektive/collektive/compare/0.3.0...0.3.1) (2023-09-18)
 
 
