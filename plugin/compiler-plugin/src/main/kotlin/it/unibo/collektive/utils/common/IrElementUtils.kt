@@ -37,17 +37,13 @@ internal fun IrFunctionAccessExpression.putTypeArgument(
 /**
  * Get the value argument in the last index available of the function call.
  */
-internal fun IrCall.getLastValueArgument(): IrExpression? =
-    this.getValueArgument(this.valueArgumentsCount - 1)
+internal fun IrCall.getLastValueArgument(): IrExpression? = this.getValueArgument(this.valueArgumentsCount - 1)
 
 /**
  * Looking in the receiver and args of a IrCall if there is one that matches the
  * type of class passed as argument.
  */
-internal fun IrCall.receiverAndArgs(
-    classToMatch: IrClass,
-): IrExpression? =
-    this.receiverAndArgs().find { it.type == classToMatch.defaultType }
+internal fun IrCall.receiverAndArgs(classToMatch: IrClass): IrExpression? = this.receiverAndArgs().find { it.type == classToMatch.defaultType }
 
 internal fun getLambdaType(
     pluginContext: IrPluginContext,

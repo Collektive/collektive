@@ -20,11 +20,7 @@ fun IrBranch.addAlignmentToBranchBlock(
 ) {
     val aggregateContextReference = (this.result as IrBlock).findAggregateReference(aggregateContextClass)
     if (aggregateContextReference != null) {
-        this.result = irStatement(
-            pluginContext,
-            aggregateLambdaBody,
-            this,
-        ) {
+        this.result = irStatement(pluginContext, aggregateLambdaBody, this) {
             buildAlignedOnBlock(
                 pluginContext,
                 aggregateContextReference,
@@ -45,11 +41,7 @@ fun IrBranch.addAlignmentToBranchExpression(
 ) {
     val aggregateContextReference: IrExpression? = this.result.findAggregateReference(aggregateContextClass)
     if (aggregateContextReference != null) {
-        this.result = irStatement(
-            pluginContext,
-            aggregateLambdaBody,
-            this,
-        ) {
+        this.result = irStatement(pluginContext, aggregateLambdaBody, this) {
             buildAlignedOnCall(
                 pluginContext,
                 aggregateContextReference,
@@ -61,9 +53,7 @@ fun IrBranch.addAlignmentToBranchExpression(
     }
 }
 
-private fun IrBlock.findAggregateReference(
-    aggregateContextClass: IrClass,
-): IrExpression? {
+private fun IrBlock.findAggregateReference(aggregateContextClass: IrClass): IrExpression? {
     val aggregateContextReferences: MutableList<IrExpression?> = mutableListOf()
     val statements = this.statements
     for (statement in statements) {
@@ -83,16 +73,12 @@ private fun IrBlock.findAggregateReference(
     return aggregateContextReferences.filterNotNull().firstOrNull()
 }
 
-private fun IrExpression.findAggregateReference(
-    aggregateContextClass: IrClass,
-): IrExpression? =
-    when (this) {
-        is IrCall -> {
-            collectAggregateContextReference(aggregateContextClass, this) ?: collectAggregateContextReference(
-                aggregateContextClass,
-                this.symbol.owner,
-            )
-        }
-
-        else -> collectAggregateContextReference(aggregateContextClass, this)
+private fun IrExpression.findAggregateReference(aggregateContextClass: IrClass): IrExpression? = when (this) {
+    is IrCall -> {
+        collectAggregateContextReference(aggregateContextClass, this) ?: collectAggregateContextReference(
+            aggregateContextClass,
+            this.symbol.owner,
+        )
     }
+    else -> collectAggregateContextReference(aggregateContextClass, this)
+}

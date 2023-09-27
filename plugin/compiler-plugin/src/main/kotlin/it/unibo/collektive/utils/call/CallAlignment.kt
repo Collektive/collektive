@@ -1,5 +1,6 @@
 package it.unibo.collektive.utils.call
 
+import it.unibo.collektive.AlignedData
 import it.unibo.collektive.utils.common.getLambdaType
 import it.unibo.collektive.utils.common.putTypeArgument
 import it.unibo.collektive.utils.common.putValueArgument
@@ -24,7 +25,6 @@ import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.expressions.impl.IrFunctionExpressionImpl
 import org.jetbrains.kotlin.ir.expressions.putArgument
 import org.jetbrains.kotlin.ir.types.isUnit
-import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.name.Name
 
@@ -34,6 +34,7 @@ fun IrSingleStatementBuilder.buildAlignedOnCall(
     aggregateContextReference: IrExpression,
     alignedOnFunction: IrFunction,
     expression: IrCall,
+    data: AlignedData,
 ): IrFunctionAccessExpression {
     return irCall(alignedOnFunction).apply {
         // Set generics type
@@ -41,8 +42,10 @@ fun IrSingleStatementBuilder.buildAlignedOnCall(
         // Set aggregate context
         putArgument(alignedOnFunction.dispatchReceiverParameter!!, aggregateContextReference)
         // Set the argument that is going to be push in the stack
+        val functionName = expression.symbol.owner.name.asString()
+        val count = data[functionName]!! // Here the key should be present!
         putValueArgument(
-            irString(expression.symbol.owner.kotlinFqName.asString()),
+            irString("$functionName.$count"),
         )
         // Create the lambda that is going to call expression
         val lambda = buildLambdaArgument(pluginContext, aggregateLambdaBody, expression)
