@@ -3,13 +3,18 @@ package it.unibo.collektive
 import it.unibo.collektive.utils.branch.addAlignmentToBranchBlock
 import it.unibo.collektive.utils.branch.addAlignmentToBranchExpression
 import it.unibo.collektive.utils.call.buildAlignedOnCall
-import it.unibo.collektive.utils.common.AggregateFunctionNames
-import it.unibo.collektive.utils.common.receiverAndArgs
 import it.unibo.collektive.utils.statement.irStatement
-import it.unibo.collektive.visitors.collectAggregateContextReference
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.backend.jvm.ir.receiverAndArgs
+import org.jetbrains.kotlin.cli.common.messages.MessageCollector
+import org.jetbrains.kotlin.ir.declarations.IrClass
+import org.jetbrains.kotlin.ir.declarations.IrFunction
+import org.jetbrains.kotlin.ir.expressions.IrBlock
+import org.jetbrains.kotlin.ir.expressions.IrBranch
+import org.jetbrains.kotlin.ir.expressions.IrCall
+import org.jetbrains.kotlin.ir.expressions.IrElseBranch
+import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 
 /**
@@ -19,46 +24,31 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
  */
 class AlignmentTransformer(
     private val pluginContext: IrPluginContext,
+    private val logger: MessageCollector,
     private val aggregateContextClass: IrClass,
     private val aggregateLambdaBody: IrFunction,
     private val alignedOnFunction: IrFunction,
 ) : IrElementTransformerVoid() {
 
+    private var aligned: AlignedData = emptyMap()
+
     override fun visitCall(expression: IrCall): IrExpression {
-        if (expression.symbol.owner.name.asString() == AggregateFunctionNames.ALIGNED_ON_FUNCTION) {
-            return super.visitCall(expression)
-        }
+        val contextReference = expression.receiverAndArgs().find { it.type == aggregateContextClass.defaultType }
 
-        val aggregateContextReference: IrExpression =
-            expression.receiverAndArgs(aggregateContextClass)
-                ?: (
-                    collectAggregateContextReference(aggregateContextClass, expression.symbol.owner)
-                        ?: return super.visitCall(expression)
-                    )
+        return contextReference?.let { context ->
+            val functionName = expression.symbol.owner.name.asString()
 
-        // If the expression contains a lambda, this recursion is necessary to visit the children
-        expression.transformChildren(
-            AlignmentTransformer(
-                pluginContext,
-                aggregateContextClass,
-                aggregateLambdaBody,
-                alignedOnFunction,
-            ),
-            null,
-        )
-        return irStatement(
-            pluginContext,
-            aggregateLambdaBody,
-            expression,
-        ) {
-            buildAlignedOnCall(
-                pluginContext,
-                aggregateLambdaBody,
-                aggregateContextReference,
-                alignedOnFunction,
-                expression,
-            )
-        }
+            // If no function, the first time the counter is 0
+            val actualCounter = aligned[functionName]?.let { it + 1 } ?: 1
+            aligned += functionName to actualCounter
+
+            // If the expression contains a lambda, this recursion is necessary to visit the children
+            expression.transformChildren(this, null)
+
+            irStatement(pluginContext, aggregateLambdaBody, expression) {
+                buildAlignedOnCall(pluginContext, aggregateLambdaBody, context, alignedOnFunction, expression, aligned)
+            }
+        } ?: super.visitCall(expression)
     }
 
     override fun visitBranch(branch: IrBranch): IrBranch {
