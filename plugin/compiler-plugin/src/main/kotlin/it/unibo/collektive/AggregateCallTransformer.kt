@@ -3,7 +3,6 @@ package it.unibo.collektive
 import it.unibo.collektive.utils.common.AggregateFunctionNames
 import it.unibo.collektive.utils.common.getLastValueArgument
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
@@ -21,7 +20,6 @@ typealias AlignedData = Map<String, Int>
  */
 class AggregateCallTransformer(
     private val pluginContext: IrPluginContext,
-    private val logger: MessageCollector,
     private val aggregateContextClass: IrClass,
     private val alignedOnFunction: IrFunction,
 ) : IrElementTransformerVoid() {
@@ -31,7 +29,6 @@ class AggregateCallTransformer(
             declaration.transformChildren(
                 AlignmentTransformer(
                     pluginContext,
-                    logger,
                     aggregateContextClass,
                     declaration,
                     alignedOnFunction,
@@ -49,7 +46,6 @@ class AggregateCallTransformer(
             expression.transformChildren(
                 AlignmentTransformer(
                     pluginContext,
-                    logger,
                     aggregateContextClass,
                     aggregateLambdaBody,
                     alignedOnFunction,

@@ -4,9 +4,9 @@ import it.unibo.collektive.utils.branch.addAlignmentToBranchBlock
 import it.unibo.collektive.utils.branch.addAlignmentToBranchExpression
 import it.unibo.collektive.utils.call.buildAlignedOnCall
 import it.unibo.collektive.utils.statement.irStatement
+import it.unibo.collektive.visitors.collectAggregateContextReference
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.jvm.ir.receiverAndArgs
-import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.expressions.IrBlock
@@ -24,7 +24,6 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
  */
 class AlignmentTransformer(
     private val pluginContext: IrPluginContext,
-    private val logger: MessageCollector,
     private val aggregateContextClass: IrClass,
     private val aggregateLambdaBody: IrFunction,
     private val alignedOnFunction: IrFunction,
@@ -34,6 +33,7 @@ class AlignmentTransformer(
 
     override fun visitCall(expression: IrCall): IrExpression {
         val contextReference = expression.receiverAndArgs().find { it.type == aggregateContextClass.defaultType }
+            ?: collectAggregateContextReference(aggregateContextClass, expression.symbol.owner)
 
         return contextReference?.let { context ->
             val functionName = expression.symbol.owner.name.asString()

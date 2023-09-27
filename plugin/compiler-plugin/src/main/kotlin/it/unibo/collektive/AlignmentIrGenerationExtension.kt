@@ -33,7 +33,7 @@ class AlignmentIrGenerationExtension(private val logger: MessageCollector) : IrG
         val (alignFunc, aggCtxClass) = getBothOrNull(alignedOnFunction, aggregateContextClass)
             ?: return logger.warn("The function and the class used to handle the alignment have not been found.")
 
-        moduleFragment.transform(AggregateCallTransformer(pluginContext, logger, aggCtxClass.owner, alignFunc.owner), null)
+        moduleFragment.transform(AggregateCallTransformer(pluginContext, aggCtxClass.owner, alignFunc.owner), null)
     }
 
     private fun <F, S> getBothOrNull(first: F?, second: S?): Pair<F, S>? =
