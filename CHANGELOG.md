@@ -1,3 +1,41 @@
+## [0.3.3](https://github.com/Collektive/collektive/compare/0.3.2...0.3.3) (2023-09-28)
+
+
+### Dependency updates
+
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.56 ([a8de136](https://github.com/Collektive/collektive/commit/a8de1362dc004491e5cf90c8247dd75bceeeb916))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.58 ([62b4059](https://github.com/Collektive/collektive/commit/62b405971ff11ee03316042bfcfd0d30cf0bb6df))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.59 ([10e32e1](https://github.com/Collektive/collektive/commit/10e32e1d6424bbd59443865a17a1065c28122f41))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.60 ([93aa6ac](https://github.com/Collektive/collektive/commit/93aa6ac00bae63e3d58f1d198c922cb39c5bc161))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.61 ([64230fc](https://github.com/Collektive/collektive/commit/64230fc0009235b446368659b84b938b1e3f1eaa))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.62 ([ce2436d](https://github.com/Collektive/collektive/commit/ce2436d804fa988b0efb74583d037055edca734a))
+
+
+### Bug Fixes
+
+* branch alignment ([ec9c440](https://github.com/Collektive/collektive/commit/ec9c440b8285b8d815ced36801062a65faffb343))
+* use a counter to distingush the same operator used in different position. Issue [#51](https://github.com/Collektive/collektive/issues/51) ([78d9634](https://github.com/Collektive/collektive/commit/78d96345c2cb99d897a4cbab7c7edd0289493a6e))
+
+
+### Tests
+
+* add regression test for issue [#51](https://github.com/Collektive/collektive/issues/51) ([4bc2005](https://github.com/Collektive/collektive/commit/4bc2005336141e07bc33445add0c7e39ad7cbc47))
+
+
+### Build and continuous integration
+
+* **deps:** update actions/checkout action to v4.1.0 ([a526160](https://github.com/Collektive/collektive/commit/a526160a2794bb273ffcaef18479d7590aef40ba))
+
+
+### General maintenance
+
+* add logging dependency ([b75cdce](https://github.com/Collektive/collektive/commit/b75cdce7eed93cfdc0b11dd7adab247bd10f5eb6))
+
+
+### Style improvements
+
+* minor style improvements ([83b15dd](https://github.com/Collektive/collektive/commit/83b15ddfe656852bff690d0883346f3a4ed0bed0))
+
 ## [0.3.2](https://github.com/Collektive/collektive/compare/0.3.1...0.3.2) (2023-09-19)
 
 
