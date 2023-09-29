@@ -1,3 +1,25 @@
+## [0.3.4](https://github.com/Collektive/collektive/compare/0.3.3...0.3.4) (2023-09-29)
+
+
+### Dependency updates
+
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.63 ([318b76c](https://github.com/Collektive/collektive/commit/318b76c2d4fc079f38ea2dc5956c7221aebf662d))
+
+
+### Bug Fixes
+
+* use a different branch representation on alignment ([9b57ed0](https://github.com/Collektive/collektive/commit/9b57ed0f51239bd652655c15267058cd217d23e8))
+
+
+### Tests
+
+* adjust tests according to new branch representation ([68d9e19](https://github.com/Collektive/collektive/commit/68d9e196782ac56d4d6b5509b61ec369ea4a2a9a))
+
+
+### General maintenance
+
+* set line lenght to 150 ([70c6c1c](https://github.com/Collektive/collektive/commit/70c6c1cd1e69aec9b8edd40df7c5e12107742b27))
+
 ## [0.3.3](https://github.com/Collektive/collektive/compare/0.3.2...0.3.3) (2023-09-28)
 
 
