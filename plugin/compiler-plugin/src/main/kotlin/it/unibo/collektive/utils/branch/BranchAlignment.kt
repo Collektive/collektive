@@ -29,12 +29,35 @@ import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.expressions.IrTypeOperatorCall
+import org.jetbrains.kotlin.ir.expressions.IrWhen
 import org.jetbrains.kotlin.ir.expressions.impl.IrFunctionExpressionImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrIfThenElseImpl
 import org.jetbrains.kotlin.ir.expressions.putArgument
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.name.Name
+
+internal fun IrSingleStatementBuilder.buildAlignedOn(
+    pluginContext: IrPluginContext,
+    aggregateContextReference: IrExpression,
+    alignedOnFunction: IrFunction,
+    branch: IrBranch,
+    conditionValue: Boolean,
+): IrExpression = when (branch.result) {
+    is IrBlock -> buildAlignedOnBlock(
+        pluginContext,
+        aggregateContextReference,
+        alignedOnFunction,
+        branch,
+        conditionValue,
+    )
+    else -> buildAlignedOnCall(
+        pluginContext,
+        aggregateContextReference,
+        alignedOnFunction,
+        branch,
+        conditionValue,
+    )
+}
 
 internal fun IrSingleStatementBuilder.buildAlignedOnBlock(
     pluginContext: IrPluginContext,
@@ -138,15 +161,14 @@ private fun IrBuilderWithScope.buildLambda(
     }
 }
 
-private fun createConditionArgument(condition: IrExpression, conditionValue: Boolean): String {
-    return Pair(conditionName(condition), conditionValue.toString()).toString()
-}
+private fun createConditionArgument(condition: IrExpression, conditionValue: Boolean): String =
+    "branch[${conditionName(condition)}, $conditionValue]"
 
 private fun conditionName(condition: IrExpression): String {
     return when (condition) {
         is IrGetValue -> condition.symbol.owner.name.asString()
         is IrConst<*> -> "constant"
-        is IrTypeOperatorCall -> condition.operator.name + " " + condition.typeOperand.asString()
+        is IrTypeOperatorCall -> condition.operator.name + " " + condition.typeOperand.asString() // 'is' in the 'when'
         is IrCall -> condition.symbol.owner.name.asString() + " " +
             if (condition.origin == IrStatementOrigin.EXCL && condition.dispatchReceiver != null) {
                 conditionName(condition.dispatchReceiver!!)
@@ -154,11 +176,11 @@ private fun conditionName(condition: IrExpression): String {
                 ""
             }
 
-        is IrIfThenElseImpl -> conditionName(condition.branches[0].condition) +
+        is IrWhen -> conditionName(condition.branches[0].condition) +
             if (condition.origin == IrStatementOrigin.ANDAND) {
-                " AND " + conditionName(condition.branches[0].result)
+                " & " + conditionName(condition.branches[0].result)
             } else {
-                " OR " + conditionName(condition.branches[1].result)
+                " | " + conditionName(condition.branches[1].result)
             }
 
         else ->
