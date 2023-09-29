@@ -1,7 +1,6 @@
 package it.unibo.collektive.alignment
 
 import io.kotest.core.spec.style.FreeSpec
-import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.aggregate
 import it.unibo.collektive.stack.Path
@@ -20,7 +19,7 @@ class TestAlignment : FreeSpec({
 
             result.result shouldBe 5
             result.toSend.keys.size shouldBe 4 // 4 paths of alignment
-            result.toSend.keys shouldContainAll setOf(
+            result.toSend.keys shouldBe setOf(
                 Path(listOf("neighbouring.1")),
                 Path(listOf("sharing.1", "neighbouring.2")),
                 Path(listOf("sharing.1")),
