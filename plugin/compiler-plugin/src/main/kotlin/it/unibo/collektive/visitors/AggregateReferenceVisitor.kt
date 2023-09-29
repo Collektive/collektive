@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.utils.addIfNotNull
  */
 class AggregateRefChildrenVisitor(
     private val aggregateContextClass: IrClass,
-    private val elements: MutableList<IrExpression>,
+    private val elements: MutableList<IrExpression>
 ) : IrElementVisitor<Unit, Nothing?> {
 
     // Visit all the children of the root element
@@ -34,6 +34,4 @@ class AggregateRefChildrenVisitor(
  * Retrieve the aggregate context reference by looking in all the function call in the element found.
  */
 fun collectAggregateContextReference(aggregateContextClass: IrClass, element: IrElement): IrExpression? =
-    buildList {
-        element.accept(AggregateRefChildrenVisitor(aggregateContextClass, this), null)
-    }.firstOrNull()
+    buildList { element.accept(AggregateRefChildrenVisitor(aggregateContextClass, this), null) }.firstOrNull()
