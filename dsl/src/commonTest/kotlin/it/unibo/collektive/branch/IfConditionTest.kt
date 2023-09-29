@@ -58,7 +58,7 @@ class IfConditionTest {
             result.toSend.keys.any {
                 it.path.toString().contains("customCondition1") &&
                     it.path.toString().contains("customCondition2") &&
-                    it.path.toString().contains("AND") &&
+                    it.path.toString().contains("&") &&
                     it.path.toString().contains("true")
             },
         )
@@ -75,7 +75,7 @@ class IfConditionTest {
             result.toSend.keys.any {
                 it.path.toString().contains("customCondition1") &&
                     it.path.toString().contains("customCondition2") &&
-                    it.path.toString().contains("OR") &&
+                    it.path.toString().contains("|") &&
                     it.path.toString().contains("true")
             },
         )
@@ -92,7 +92,7 @@ class IfConditionTest {
             result.toSend.keys.any {
                 it.path.toString().contains("customCondition1") &&
                     it.path.toString().contains("customCondition2") &&
-                    it.path.toString().contains("AND") &&
+                    it.path.toString().contains("&") &&
                     it.path.toString().contains("not") &&
                     it.path.toString().contains("true")
             },
