@@ -25,7 +25,7 @@ interface Field<out T> : Map<ID, T> {
     /**
      * Function for generic manipulation of the field.
      */
-    fun <B> map(transform: (T) -> B): Field<B> = Field(localId, this.mapValues { (_, value) -> transform(value) })
+    fun <B> map(transform: (T) -> B): Field<B> = Field(localId, mapValues { (_, value) -> transform(value) })
 
     companion object {
         /**
@@ -34,6 +34,11 @@ interface Field<out T> : Map<ID, T> {
         operator fun <T> invoke(localId: ID, messages: Map<ID, T> = emptyMap()): Field<T> = FieldImpl(localId, messages)
     }
 }
+
+/**
+ * Transform a map into a field with a [localId].
+ */
+fun <T> Map<ID, T>.toField(localId: ID): Field<T> = Field(localId, this)
 
 internal data class FieldImpl<T>(
     override val localId: ID,
