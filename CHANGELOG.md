@@ -1,3 +1,28 @@
+## [0.4.0](https://github.com/Collektive/collektive/compare/0.3.4...0.4.0) (2023-10-08)
+
+
+### Features
+
+* add operations between fields ([8b26692](https://github.com/Collektive/collektive/commit/8b266923340af739d81b3a62fa1c93ed13a0c360))
+* implement conversion from map to field ([a6fb9b7](https://github.com/Collektive/collektive/commit/a6fb9b780b3b2ddcc18e2d5a0d12f1b48ef1baba))
+
+
+### Dependency updates
+
+* **deps:** update dependency gradle to v8.4 ([d851cd8](https://github.com/Collektive/collektive/commit/d851cd82a29a6abb26f14de874f56b92f87971dd))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.64 ([407bf2b](https://github.com/Collektive/collektive/commit/407bf2b69405afe15efef84107f8b1be3f284bed))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.65 ([dcc5f3e](https://github.com/Collektive/collektive/commit/dcc5f3ec81ddd5e41115939b4b3e56f3c71db20e))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.66 ([0f6d5d3](https://github.com/Collektive/collektive/commit/0f6d5d3f57aea31cbdabf3af8de81412e063eff3))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.67 ([b062a76](https://github.com/Collektive/collektive/commit/b062a76c2269802875144d8fe6625b896f78409e))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.68 ([3177127](https://github.com/Collektive/collektive/commit/3177127910287357edfeb30572b7b8cd15fbcbac))
+* **deps:** update plugin com.gradle.enterprise to v3.15.1 ([8f3e002](https://github.com/Collektive/collektive/commit/8f3e0021dd642079572eea70c4d7bea83c229055))
+* **deps:** update plugin publishoncentral to v5.0.15 ([182ff0e](https://github.com/Collektive/collektive/commit/182ff0ebe119ec4009c379f4921a1a144a4c4a1d))
+
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.2.10 ([1c0c597](https://github.com/Collektive/collektive/commit/1c0c597bc2637384210e01202324d1963daec3be))
+
 ## [0.3.4](https://github.com/Collektive/collektive/compare/0.3.3...0.3.4) (2023-09-29)
 
 
