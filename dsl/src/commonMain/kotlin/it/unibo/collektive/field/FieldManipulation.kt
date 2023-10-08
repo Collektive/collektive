@@ -32,6 +32,27 @@ operator fun <T : Number> Field<T>.plus(value: T): Field<T> = map { add(it, valu
  */
 operator fun <T : Number> Field<T>.minus(value: T): Field<T> = map { sub(it, value) }
 
+/**
+ * Sum a field with [other] field.
+ * The two fields must be aligned, otherwise an error is thrown.
+ */
+operator fun <T : Number> Field<T>.plus(other: Field<T>): Field<T> = combine(this, other) { a, b -> add(a, b) }
+
+/**
+ * Subtract a field with [other] field.
+ * The two fields must be aligned, otherwise an error is thrown.
+ */
+operator fun <T : Number> Field<T>.minus(other: Field<T>): Field<T> = combine(this, other) { a, b -> sub(a, b) }
+
+/**
+ * Combine two fields with a [transform] function.
+ * The two fields must be aligned, otherwise an error is thrown.
+ */
+fun <T, V, R> combine(field1: Field<T>, field: Field<V>, transform: (T, V) -> R): Field<R> {
+    val res = field1.mapValues { (id, value) -> transform(value, field[id] ?: error("Field not aligned")) }
+    return Field(field1.localId, res)
+}
+
 @Suppress("UNCHECKED_CAST")
 private fun <T : Number> add(value: T, other: T): T {
     return when (value) {
