@@ -1,3 +1,10 @@
+## [0.4.1](https://github.com/Collektive/collektive/compare/0.4.0...0.4.1) (2023-10-11)
+
+
+### Dependency updates
+
+* **core-deps:** update plugin kover to v0.7.4 ([bc7ad96](https://github.com/Collektive/collektive/commit/bc7ad9612a923ced3c4f906a97579c557f62c4c1))
+
 ## [0.4.0](https://github.com/Collektive/collektive/compare/0.3.4...0.4.0) (2023-10-08)
 
 
