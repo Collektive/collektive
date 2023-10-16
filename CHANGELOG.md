@@ -1,3 +1,10 @@
+## [0.4.2](https://github.com/Collektive/collektive/compare/0.4.1...0.4.2) (2023-10-16)
+
+
+### Documentation
+
+* **deps:** update dependency org.jetbrains.dokka to v1.9.10 ([2c5cc71](https://github.com/Collektive/collektive/commit/2c5cc715a26befee27162248c28f49d95c97d4e8))
+
 ## [0.4.1](https://github.com/Collektive/collektive/compare/0.4.0...0.4.1) (2023-10-11)
 
 
