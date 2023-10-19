@@ -27,7 +27,7 @@ kotlin-testing-common = [
 
 [plugins]
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-gitSemVer = "org.danilopianini.git-sensitive-semantic-versioning:1.1.14"
+gitSemVer = "org.danilopianini.git-sensitive-semantic-versioning:1.1.15"
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 publishOnCentral = "org.danilopianini.publish-on-central:5.0.16"
