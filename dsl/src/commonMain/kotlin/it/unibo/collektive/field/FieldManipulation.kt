@@ -25,12 +25,12 @@ private fun <T : Comparable<T>> Field<T>.handle(includingSelf: Boolean): Map<ID,
 /**
  * Operator to sum a [value] to all the values of the field.
  */
-operator fun <T : Number> Field<T>.plus(value: T): Field<T> = map { add(it, value) }
+operator fun <T : Number> Field<T>.plus(value: T): Field<T> = mapField { _, oldValue -> add(oldValue, value) }
 
 /**
  * Operator to subtract a [value] to all the values of the field.
  */
-operator fun <T : Number> Field<T>.minus(value: T): Field<T> = map { sub(it, value) }
+operator fun <T : Number> Field<T>.minus(value: T): Field<T> = mapField { _, oldValue -> sub(oldValue, value) }
 
 /**
  * Sum a field with [other] field.
