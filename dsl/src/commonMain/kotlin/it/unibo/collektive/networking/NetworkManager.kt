@@ -1,36 +1,47 @@
 package it.unibo.collektive.networking
 
 import it.unibo.collektive.ID
-import it.unibo.collektive.stack.Path
+import it.unibo.collektive.messages.AnisotropicMessage
+import it.unibo.collektive.messages.IsotropicMessage
+import it.unibo.collektive.messages.ReceivedMessage
+import it.unibo.collektive.messages.SentMessage
 
 /**
  * Implementation of the Network interface.
  */
-class NetworkManager : Network {
-    private var messageBuffer = mutableListOf<Message>()
-    private var devices = mutableListOf<ID>()
+class NetworkManager {
+    private var messageBuffer = mutableSetOf<SentMessage>()
 
-    override fun send(messages: List<Message>) {
+    /**
+     * Adds the messages to the message buffer.
+     * @param messages: the messages to be sent.
+     */
+    fun send(messages: Set<SentMessage>) {
         messages.forEach { messageBuffer.add(it) }
     }
 
-    override fun receive(recipientID: ID): Map<ID, Map<Path, *>> {
-        return messageBuffer
-            .filter { it.recipientID == recipientID }
-            .groupBy { it.senderID }
-            .mapValues { entry -> entry.value.flatMap { it.message.entries } }
-            .mapValues { entry -> entry.value.associate { it.toPair() } }.also {
-                messageBuffer = messageBuffer.filterNot { it.recipientID == recipientID }.toMutableList()
+    /**
+     * Returns the messages directed to a specific receiver.
+     * @param receiverID: the ID of the receiver.
+     * @return the messages received.
+     */
+    fun receive(receiverID: ID): Set<ReceivedMessage> {
+        val filtered = messageBuffer
+            .filter {
+                (it is AnisotropicMessage && it.receiverID == receiverID) ||
+                    (it is IsotropicMessage && it.senderID != receiverID)
             }
+            .map { entry -> convertToReceivedMessage(entry) }
+            .toSet()
+        return filtered
     }
 
-    override fun connectDevice(id: ID) {
-        devices.add(id)
+    /**
+     * Converts a SentMessage to a ReceivedMessage.
+     * @param entry: the SentMessage to be converted.
+     */
+    private fun convertToReceivedMessage(entry: SentMessage): ReceivedMessage = when (entry) {
+        is AnisotropicMessage -> ReceivedMessage(entry.senderID, entry.message)
+        is IsotropicMessage -> ReceivedMessage(entry.senderID, entry.message)
     }
-
-    override fun disconnectDevice(id: ID) {
-        devices.remove(id)
-    }
-
-    override fun getDevices(): List<ID> = devices.toList()
 }
