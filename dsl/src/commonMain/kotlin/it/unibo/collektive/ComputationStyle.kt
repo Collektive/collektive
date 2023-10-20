@@ -1,5 +1,7 @@
 package it.unibo.collektive
 
+import it.unibo.collektive.messages.ReceivedMessage
+import it.unibo.collektive.networking.Network
 import it.unibo.collektive.stack.Path
 
 /**
@@ -11,12 +13,12 @@ import it.unibo.collektive.stack.Path
  */
 fun <X> singleCycle(
     localId: ID,
-    messages: Map<ID, Map<Path, *>>,
+    messages: Set<ReceivedMessage>,
     state: Map<Path, *>,
     compute: AggregateContext.() -> X,
-): AggregateContext.AggregateResult<X> {
+): AggregateResult<X> {
     return with(AggregateContext(localId, messages, state)) {
-        AggregateContext.AggregateResult(compute(), messagesToSend(), newState())
+        AggregateResult(localId, compute(), messagesToSend(), newState())
     }
 }
 
@@ -27,17 +29,17 @@ fun <X> singleCycle(
  * @param compute the function that compute the new state of the local node.
  */
 fun <X> runUntil(
+    localId: ID,
     condition: () -> Boolean,
     network: Network,
     compute: AggregateContext.() -> X,
-): AggregateContext.AggregateResult<X> {
-    val localId: ID = IntId()
+): AggregateResult<X> {
     var state = emptyMap<Path, Any?>()
-    var computed: AggregateContext.AggregateResult<X>? = null
+    var computed: AggregateResult<X>? = null
     while (condition()) {
-        computed = singleCycle(localId, network.receive(), state, compute)
+        computed = singleCycle(localId, network.read(), state, compute)
         state = computed.newState
-        network.send(localId, computed.toSend)
+        network.write(computed.toSend)
     }
     return computed ?: error("The computation did not produce a result")
 }
