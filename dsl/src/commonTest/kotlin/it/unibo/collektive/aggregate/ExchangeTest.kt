@@ -1,0 +1,100 @@
+package it.unibo.collektive.aggregate
+
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
+import it.unibo.collektive.IntId
+import it.unibo.collektive.aggregate
+import it.unibo.collektive.field.Field
+import it.unibo.collektive.messages.AnisotropicMessage
+import it.unibo.collektive.messages.IsotropicMessage
+import it.unibo.collektive.network.NetworkImplTest
+import it.unibo.collektive.networking.NetworkManager
+import it.unibo.collektive.stack.Path
+
+@OptIn(ExperimentalStdlibApi::class)
+class ExchangeTest : StringSpec({
+    coroutineTestScope = true
+
+    // device ids
+    val id0 = IntId()
+    val id1 = IntId()
+    val id2 = IntId()
+    val id3 = IntId()
+
+    // initial values
+    val initV1 = 1
+    val initV2 = 2
+    val initV3 = 3
+    val initV4 = 4
+    val initV5 = 5
+    val initV6 = 6
+
+    // paths
+    val path1 = Path(listOf("exchange.1"))
+    val path2 = Path(listOf("exchange.2"))
+
+    val increaseOrDouble: (Field<Int>) -> Field<Int> = { f ->
+        f.mapField { _, v -> if (v % 2 == 0) v + 1 else v * 2 }
+    }
+
+    "First time exchange should return the initial value" {
+        aggregate(id0) {
+            val res = exchange(initV1, increaseOrDouble)
+            res shouldBe Field(id0, mapOf(id0 to 2))
+            messagesToSend() shouldBe setOf(IsotropicMessage(id0, mapOf(path1 to res.local)))
+        }
+    }
+
+    "Exchange should work between two aligned devices" {
+        val nm = NetworkManager()
+        var i = 0
+        val condition: () -> Boolean = { i++ < 1 }
+
+        // Device 1
+        val testNetwork1 = NetworkImplTest(nm, id1)
+        aggregate(id1, condition, testNetwork1) {
+            val res1 = exchange(initV1, increaseOrDouble)
+            val res2 = exchange(initV2, increaseOrDouble)
+            testNetwork1.read().size shouldBe 0
+            res1 shouldBe Field(id1, mapOf(id1 to 2))
+            res2 shouldBe Field(id1, mapOf(id1 to 3))
+            messagesToSend() shouldBe setOf(
+                IsotropicMessage(id1, mapOf(path1 to res1.local)),
+                IsotropicMessage(id1, mapOf(path2 to res2.local)),
+            )
+        }
+
+        i = 0
+        // Device 2
+        val testNetwork2 = NetworkImplTest(nm, id2)
+        aggregate(id2, condition, testNetwork2) {
+            val res1 = exchange(initV3, increaseOrDouble)
+            val res2 = exchange(initV4, increaseOrDouble)
+            testNetwork2.read().size shouldBe 2
+            res1 shouldBe Field(id2, mapOf(id1 to 3, id2 to 6))
+            res2 shouldBe Field(id2, mapOf(id1 to 6, id2 to 5))
+            messagesToSend() shouldBe setOf(
+                IsotropicMessage(id2, mapOf(path1 to initV3 * 2)),
+                IsotropicMessage(id2, mapOf(path2 to initV4 + 1)),
+                AnisotropicMessage(id2, id1, mapOf(path1 to res1[id1], path2 to res2[id1])),
+            )
+        }
+
+        i = 0
+        // Device 3
+        val testNetwork3 = NetworkImplTest(nm, id3)
+        aggregate(id3, condition, testNetwork3) {
+            val res1 = exchange(initV5, increaseOrDouble)
+            val res2 = exchange(initV6, increaseOrDouble)
+            testNetwork3.read().size shouldBe 4
+            res1 shouldBe Field(id3, mapOf(id1 to 3, id2 to 7, id3 to 10))
+            res2 shouldBe Field(id3, mapOf(id1 to 6, id2 to 10, id3 to 7))
+            messagesToSend() shouldBe setOf(
+                IsotropicMessage(id3, mapOf(path1 to initV5 * 2)),
+                IsotropicMessage(id3, mapOf(path2 to initV6 + 1)),
+                AnisotropicMessage(id3, id1, mapOf(path1 to res1[id1], path2 to res2[id1])),
+                AnisotropicMessage(id3, id2, mapOf(path1 to res1[id2], path2 to res2[id2])),
+            )
+        }
+    }
+})
