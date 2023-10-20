@@ -1,6 +1,11 @@
 package it.unibo.collektive
 
 import it.unibo.collektive.field.Field
+import it.unibo.collektive.messages.AnisotropicMessage
+import it.unibo.collektive.messages.IsotropicMessage
+import it.unibo.collektive.messages.ReceivedMessage
+import it.unibo.collektive.messages.SentMessage
+import it.unibo.collektive.networking.Network
 import it.unibo.collektive.stack.Path
 import it.unibo.collektive.stack.Stack
 
@@ -12,18 +17,18 @@ import it.unibo.collektive.stack.Stack
  */
 class AggregateContext(
     private val localId: ID,
-    private val messages: Map<ID, Map<Path, *>>,
+    private val messages: Set<ReceivedMessage>,
     private val previousState: Map<Path, *>,
 ) {
 
     private val stack = Stack<Any>()
     private val state = mutableMapOf<Path, Any?>()
-    private val toBeSent = mutableMapOf<Path, Any?>()
+    private var toBeSent = setOf<SentMessage>()
 
     /**
      * Messages to send to the other nodes.
      */
-    fun messagesToSend(): Map<Path, *> = toBeSent.toMap()
+    fun messagesToSend(): Set<SentMessage> = toBeSent
 
     /**
      * Return the current state of the device as a new state.
@@ -31,33 +36,38 @@ class AggregateContext(
     fun newState(): Map<Path, *> = state.toMap()
 
     /**
-     * TODO.
+     * This function computes the local value of e_i, substituting variable n with the nvalue w of
+     * messages received from neighbors, using the local value of e_i as a default.
+     * The exchange returns the neighboring or local value v_r from the evaluation of e_r.
+     * e_s evaluates to a nvalue w_s consisting of local values to be sent to neighbor devices δ′,
+     * which will use their corresponding w_s(δ') as soon as they wake up and perform their next execution round.
+     *
+     * Often, expressions e_r and e_s coincide, so this function provides a shorthand for exchange(e_i, (n) => (e, e)).
+     *
+     * @param initial The initial value of e_i.
+     * @param body A lambda that defines the computation for exchange, with access to the `Field` subject.
+     * @return The result of the exchange, typically the neighboring or local value v_r.
      */
-    fun <X> neighbouring(type: X): Field<X> {
-        toBeSent[stack.currentPath()] = type
-        val messages = messagesAt<X>(stack.currentPath())
-        return Field(localId, messages + (localId to type))
-    }
-
-    /**
-     * TODO.
-     */
-    fun <X, Y> repeating(initial: X, repeat: (X) -> Y): Y {
-        val res = stateAt<X>(stack.currentPath())?.let { repeat(it) } ?: repeat(initial)
-        state[stack.currentPath()] = res
-        return res
-    }
-
-    /**
-     * TODO.
-     */
-    fun <X, Y> sharing(initial: X, body: (Field<X>) -> Y): Y {
+    fun <X, Y> exchange(initial: X, body: (Field<X>) -> Field<Y>): Field<Y> {
         val messages = messagesAt<X>(stack.currentPath())
         val previous = stateAt<X>(stack.currentPath()) ?: initial
         val subject = Field(localId, messages + (localId to previous))
-        return body(subject).also {
-            toBeSent[stack.currentPath()] = it
-            state[stack.currentPath()] = it
+        return body(subject).also { field ->
+            toBeSent = toBeSent + IsotropicMessage(localId, mapOf(stack.currentPath() to field.local))
+            if (messages.isNotEmpty()) {
+                field.toMap().filterNot { it.key == localId }.map { (id, value) ->
+                    val old = toBeSent
+                        .filterIsInstance<AnisotropicMessage>()
+                        .firstOrNull { it.senderID == localId && it.receiverID == id }
+                        ?: AnisotropicMessage(localId, id, mapOf(stack.currentPath() to value))
+                    toBeSent = (
+                        toBeSent.filterNot { m ->
+                            m is AnisotropicMessage && m.senderID == localId && m.receiverID == id
+                        } + AnisotropicMessage(localId, id, old.message + (stack.currentPath() to value))
+                        ).toSet()
+                }
+            }
+            state[stack.currentPath()] = field.local
         }
     }
 
@@ -73,19 +83,11 @@ class AggregateContext(
 
     @Suppress("UNCHECKED_CAST")
     private fun <T> messagesAt(path: Path): Map<ID, T> = messages
-        .mapNotNull { (id, message) -> if (message.containsKey(path)) id to (message[path] as T) else null }
-        .toMap()
+        .filter { it.messages.containsKey(path) }
+        .associate { it.senderId to it.messages[path] as T }
 
     @Suppress("UNCHECKED_CAST")
     private fun <T> stateAt(path: Path): T? = previousState[path] as? T
-
-    /**
-     * Result of the aggregate computation.
-     * @param result: result of the computation.
-     * @param toSend: map with all the messages to send to the neighbors.
-     * @param newState: new state of the device.
-     */
-    data class AggregateResult<X>(val result: X, val toSend: Map<Path, *>, val newState: Map<Path, *>)
 }
 
 /**
@@ -96,8 +98,8 @@ class AggregateContext(
  * @param init: lambda with AggregateContext object receiver that provides the aggregate constructs.
  */
 fun <X> aggregate(
-    localId: ID = IntId(),
-    messages: Map<ID, Map<Path, *>> = emptyMap<ID, Map<Path, Any>>(),
+    localId: ID,
+    messages: Set<ReceivedMessage> = emptySet(),
     state: Map<Path, *> = emptyMap<Path, Any>(),
     init: AggregateContext.() -> X,
 ) = singleCycle(localId, messages, state, compute = init)
@@ -109,7 +111,8 @@ fun <X> aggregate(
  * @param init: lambda with AggregateContext object receiver that provides the aggregate constructs.
  */
 fun <X> aggregate(
+    localId: ID,
     condition: () -> Boolean,
-    network: Network = NetworkImpl(),
+    network: Network,
     init: AggregateContext.() -> X,
-) = runUntil(condition, network, compute = init)
+) = runUntil(localId, condition, network, compute = init)
