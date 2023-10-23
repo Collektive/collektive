@@ -16,10 +16,10 @@ class ExchangeTest : StringSpec({
     coroutineTestScope = true
 
     // device ids
-    val id0 = IntId()
-    val id1 = IntId()
-    val id2 = IntId()
-    val id3 = IntId()
+    val id0 = IntId(0)
+    val id1 = IntId(1)
+    val id2 = IntId(2)
+    val id3 = IntId(3)
 
     // initial values
     val initV1 = 1
