@@ -11,9 +11,7 @@ import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.networking.NetworkManager
 import it.unibo.collektive.stack.Path
 
-@OptIn(ExperimentalStdlibApi::class)
 class ExchangeTest : StringSpec({
-    coroutineTestScope = true
 
     // device ids
     val id0 = IntId(0)
