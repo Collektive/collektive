@@ -22,14 +22,14 @@ class NetworkManager {
 
     /**
      * Returns the messages directed to a specific receiver.
-     * @param receiverID: the ID of the receiver.
+     * @param receiverId: the ID of the receiver.
      * @return the messages received.
      */
-    fun receive(receiverID: ID): Set<ReceivedMessage> {
+    fun receive(receiverId: ID): Set<ReceivedMessage> {
         val filtered = messageBuffer
             .filter {
-                (it is AnisotropicMessage && it.receiverID == receiverID) ||
-                    (it is IsotropicMessage && it.senderID != receiverID)
+                (it is AnisotropicMessage && it.receiverId == receiverId) ||
+                    (it is IsotropicMessage && it.senderId != receiverId)
             }
             .map { entry -> convertToReceivedMessage(entry) }
             .toSet()
@@ -41,7 +41,7 @@ class NetworkManager {
      * @param entry: the SentMessage to be converted.
      */
     private fun convertToReceivedMessage(entry: SentMessage): ReceivedMessage = when (entry) {
-        is AnisotropicMessage -> ReceivedMessage(entry.senderID, entry.message)
-        is IsotropicMessage -> ReceivedMessage(entry.senderID, entry.message)
+        is AnisotropicMessage -> ReceivedMessage(entry.senderId, entry.message)
+        is IsotropicMessage -> ReceivedMessage(entry.senderId, entry.message)
     }
 }

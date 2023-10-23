@@ -58,11 +58,11 @@ class AggregateContext(
                 field.toMap().filterNot { it.key == localId }.map { (id, value) ->
                     val old = toBeSent
                         .filterIsInstance<AnisotropicMessage>()
-                        .firstOrNull { it.senderID == localId && it.receiverID == id }
+                        .firstOrNull { it.senderId == localId && it.receiverId == id }
                         ?: AnisotropicMessage(localId, id, mapOf(stack.currentPath() to value))
                     toBeSent = (
                         toBeSent.filterNot { m ->
-                            m is AnisotropicMessage && m.senderID == localId && m.receiverID == id
+                            m is AnisotropicMessage && m.senderId == localId && m.receiverId == id
                         } + AnisotropicMessage(localId, id, old.message + (stack.currentPath() to value))
                         ).toSet()
                 }
