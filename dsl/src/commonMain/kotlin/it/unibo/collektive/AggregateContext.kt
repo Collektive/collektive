@@ -12,9 +12,8 @@ import it.unibo.collektive.state.State
 
 /**
  * Context for managing aggregate computation.
- * @param localId: id of the device.
- * @param messages: map with all the messages sent by the neighbors.
- * @param previousState: last device state.
+ * It represents the [localId] of the device, the [messages] received from the neighbours,
+ * the [previousState] of the device.
  */
 class AggregateContext(
     private val localId: ID,
@@ -38,16 +37,14 @@ class AggregateContext(
 
     /**
      * This function computes the local value of e_i, substituting variable n with the nvalue w of
-     * messages received from neighbors, using the local value of e_i as a default.
-     * The exchange returns the neighboring or local value v_r from the evaluation of e_r.
-     * e_s evaluates to a nvalue w_s consisting of local values to be sent to neighbor devices δ′,
+     * messages received from neighbours, using the local value of e_i ([initial]) as a default.
+     * The exchange returns the neighbouring or local value v_r from the evaluation of e_r applied to the [body].
+     * e_s evaluates to a nvalue w_s consisting of local values to be sent to neighbour devices δ′,
      * which will use their corresponding w_s(δ') as soon as they wake up and perform their next execution round.
      *
      * Often, expressions e_r and e_s coincide, so this function provides a shorthand for exchange(e_i, (n) => (e, e)).
      *
-     * @param initial The initial value of e_i.
-     * @param body A lambda that defines the computation for exchange, with access to the `Field` subject.
-     * @return The result of the exchange, typically the neighboring or local value v_r.
+     * @return The result of the exchange, typically the neighbouring or local value v_r.
      */
     fun <X, Y> exchange(initial: X, body: (Field<X>) -> Field<Y>): Field<Y> {
         val messages = messagesAt<X>(stack.currentPath())
@@ -92,11 +89,9 @@ class AggregateContext(
 }
 
 /**
- * Aggregate program entry point which computes a single iteration, taking as parameters the previous state.
- * @param localId: id of the device.
- * @param messages: map with all the messages sent by the neighbors.
- * @param state: last device state.
- * @param init: lambda with AggregateContext object receiver that provides the aggregate constructs.
+ * Aggregate program entry point which computes a single iteration of a device [localId], taking as parameters the previous [state],
+ * the [messages] received from the neighbours and the [init] with AggregateContext
+ *  * object receiver that provides the aggregate constructs.
  */
 fun <X> aggregate(
     localId: ID,
@@ -106,10 +101,9 @@ fun <X> aggregate(
 ) = singleCycle(localId, messages, state, compute = init)
 
 /**
- * Aggregate program entry point which computes multiple iterations.
- * @param condition: lambda that establish the number of iterations.
- * @param network: data structure used to allow the local communication between devices.
- * @param init: lambda with AggregateContext object receiver that provides the aggregate constructs.
+ * Aggregate program entry point which computes multiple iterations of a device [localId],
+ * over a [condition] and a [network] of devices, with the lambda [init] with AggregateContext
+ * object receiver that provides the aggregate constructs.
  */
 fun <X> aggregate(
     localId: ID,

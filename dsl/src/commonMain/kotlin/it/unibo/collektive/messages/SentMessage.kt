@@ -9,8 +9,7 @@ import it.unibo.collektive.stack.Path
 sealed interface SentMessage {
     companion object {
         /**
-         * Converts a SentMessage to a ReceivedMessage.
-         * @param entry: the SentMessage to be converted.
+         * Converts a [SentMessage] given as input to a [ReceivedMessage].
          */
         fun convertToReceivedMessage(entry: SentMessage): ReceivedMessage = when (entry) {
             is AnisotropicMessage -> ReceivedMessage(entry.senderId, entry.message)
@@ -20,16 +19,11 @@ sealed interface SentMessage {
 }
 
 /**
- * Message sent from a device to other devices in the network.
- * @param senderId: id of the device that sends the message.
- * @param message: map <Path, value> of the message sent.
+ * [message] sent from a [senderId] device to all the other devices in the network.
  */
 data class IsotropicMessage(val senderId: ID, val message: Map<Path, *>) : SentMessage
 
 /**
- * Message sent from a device to a specific device in the network.
- * @param senderId: id of the device that sends the message.
- * @param receiverId: id of the device that receives the message.
- * @param message: map <Path, value> of the message sent.
+ * [message] sent from a [senderId] device to a specific [receiverId] device in the network.
  */
 data class AnisotropicMessage(val senderId: ID, val receiverId: ID, val message: Map<Path, *>) : SentMessage

@@ -3,9 +3,7 @@ package it.unibo.collektive.state
 import it.unibo.collektive.stack.Path
 
 /**
- * State of the local node.
- * @param path: path of the state.
- * @param value: value of the state.
+ * State composed of [path] and [value] of a node.
  */
 data class State<X>(
     val path: Path,

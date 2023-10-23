@@ -14,17 +14,14 @@ class NetworkManager {
     private var messageBuffer = setOf<SentMessage>()
 
     /**
-     * Adds the messages to the message buffer.
-     * @param messages: the messages to be sent.
+     * Adds the [messages] to the message buffer.
      */
     fun send(messages: Set<SentMessage>) {
         messages.forEach { messageBuffer = messageBuffer + it }
     }
 
     /**
-     * Returns the messages directed to a specific receiver.
-     * @param receiverId: the ID of the receiver.
-     * @return the messages received.
+     * Return the messages directed to a specific [receiverId].
      */
     fun receive(receiverId: ID): Set<ReceivedMessage> {
         val filtered = messageBuffer

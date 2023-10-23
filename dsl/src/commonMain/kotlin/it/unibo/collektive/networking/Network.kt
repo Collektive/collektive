@@ -8,8 +8,7 @@ import it.unibo.collektive.messages.SentMessage
  */
 interface Network {
     /**
-     * Sends a message to the other nodes.
-     * @param messages: the set of messages to be sent.
+     * Sends a set of [messages] of type [SentMessage] to other nodes.
      */
     fun write(messages: Set<SentMessage>)
 
