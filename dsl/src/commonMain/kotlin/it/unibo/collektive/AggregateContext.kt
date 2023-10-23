@@ -8,6 +8,7 @@ import it.unibo.collektive.messages.SentMessage
 import it.unibo.collektive.networking.Network
 import it.unibo.collektive.stack.Path
 import it.unibo.collektive.stack.Stack
+import it.unibo.collektive.state.State
 
 /**
  * Context for managing aggregate computation.
@@ -18,11 +19,11 @@ import it.unibo.collektive.stack.Stack
 class AggregateContext(
     private val localId: ID,
     private val messages: Set<ReceivedMessage>,
-    private val previousState: Map<Path, *>,
+    private val previousState: Set<State<*>>,
 ) {
 
     private val stack = Stack<Any>()
-    private val state = mutableMapOf<Path, Any?>()
+    private var state = setOf<State<Any?>>()
     private var toBeSent = setOf<SentMessage>()
 
     /**
@@ -33,7 +34,7 @@ class AggregateContext(
     /**
      * Return the current state of the device as a new state.
      */
-    fun newState(): Map<Path, *> = state.toMap()
+    fun newState(): Set<State<Any?>> = state
 
     /**
      * This function computes the local value of e_i, substituting variable n with the nvalue w of
@@ -67,7 +68,7 @@ class AggregateContext(
                         ).toSet()
                 }
             }
-            state[stack.currentPath()] = field.local
+            state = state.filterNot { stack.currentPath() == it.path }.toSet() + State(stack.currentPath(), field.local)
         }
     }
 
@@ -87,7 +88,7 @@ class AggregateContext(
         .associate { it.senderId to it.messages[path] as T }
 
     @Suppress("UNCHECKED_CAST")
-    private fun <T> stateAt(path: Path): T? = previousState[path] as? T
+    private fun <T> stateAt(path: Path): T? = previousState.firstOrNull { it.path == path }?.value as? T
 }
 
 /**
@@ -100,7 +101,7 @@ class AggregateContext(
 fun <X> aggregate(
     localId: ID,
     messages: Set<ReceivedMessage> = emptySet(),
-    state: Map<Path, *> = emptyMap<Path, Any>(),
+    state: Set<State<*>> = emptySet(),
     init: AggregateContext.() -> X,
 ) = singleCycle(localId, messages, state, compute = init)
 

@@ -2,7 +2,7 @@ package it.unibo.collektive
 
 import it.unibo.collektive.messages.ReceivedMessage
 import it.unibo.collektive.networking.Network
-import it.unibo.collektive.stack.Path
+import it.unibo.collektive.state.State
 
 /**
  * Execute a single cycle of the aggregate computation.
@@ -14,7 +14,7 @@ import it.unibo.collektive.stack.Path
 fun <X> singleCycle(
     localId: ID,
     messages: Set<ReceivedMessage>,
-    state: Map<Path, *>,
+    state: Set<State<*>>,
     compute: AggregateContext.() -> X,
 ): AggregateResult<X> {
     return with(AggregateContext(localId, messages, state)) {
@@ -34,7 +34,7 @@ fun <X> runUntil(
     network: Network,
     compute: AggregateContext.() -> X,
 ): AggregateResult<X> {
-    var state = emptyMap<Path, Any?>()
+    var state = emptySet<State<*>>()
     var computed: AggregateResult<X>? = null
     while (condition()) {
         computed = singleCycle(localId, network.read(), state, compute)

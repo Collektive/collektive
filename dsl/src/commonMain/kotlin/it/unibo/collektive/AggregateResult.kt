@@ -1,7 +1,7 @@
 package it.unibo.collektive
 
 import it.unibo.collektive.messages.SentMessage
-import it.unibo.collektive.stack.Path
+import it.unibo.collektive.state.State
 
 /**
  * Result of the aggregate computation.
@@ -14,5 +14,5 @@ data class AggregateResult<X>(
     val localId: ID,
     val result: X,
     val toSend: Set<SentMessage>,
-    val newState: Map<Path, *>, // todo create state data class
+    val newState: Set<State<*>>, // todo create state data class
 )
