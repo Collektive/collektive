@@ -1,12 +1,14 @@
 package it.unibo.collektive.aggregate
 
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.messages.AnisotropicMessage
 import it.unibo.collektive.messages.IsotropicMessage
+import it.unibo.collektive.messages.SentMessage
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.networking.NetworkManager
 import it.unibo.collektive.stack.Path
@@ -39,7 +41,7 @@ class ExchangeTest : StringSpec({
         aggregate(id0) {
             val res = exchange(initV1, increaseOrDouble)
             res shouldBe Field(id0, mapOf(id0 to 2))
-            messagesToSend() shouldBe setOf(IsotropicMessage(id0, mapOf(path1 to res.local)))
+            messagesToSend() shouldBe setOf(IsotropicMessage(id0, mapOf(path1 to res.local)) as SentMessage)
         }
     }
 
@@ -53,7 +55,7 @@ class ExchangeTest : StringSpec({
         aggregate(id1, condition, testNetwork1) {
             val res1 = exchange(initV1, increaseOrDouble)
             val res2 = exchange(initV2, increaseOrDouble)
-            testNetwork1.read().size shouldBe 0
+            testNetwork1.read() shouldHaveSize 0
             res1 shouldBe Field(id1, mapOf(id1 to 2))
             res2 shouldBe Field(id1, mapOf(id1 to 3))
             messagesToSend() shouldBe setOf(
@@ -68,7 +70,7 @@ class ExchangeTest : StringSpec({
         aggregate(id2, condition, testNetwork2) {
             val res1 = exchange(initV3, increaseOrDouble)
             val res2 = exchange(initV4, increaseOrDouble)
-            testNetwork2.read().size shouldBe 2
+            testNetwork2.read() shouldHaveSize 2
             res1 shouldBe Field(id2, mapOf(id1 to 3, id2 to 6))
             res2 shouldBe Field(id2, mapOf(id1 to 6, id2 to 5))
             messagesToSend() shouldBe setOf(
@@ -84,7 +86,7 @@ class ExchangeTest : StringSpec({
         aggregate(id3, condition, testNetwork3) {
             val res1 = exchange(initV5, increaseOrDouble)
             val res2 = exchange(initV6, increaseOrDouble)
-            testNetwork3.read().size shouldBe 4
+            testNetwork3.read() shouldHaveSize 4
             res1 shouldBe Field(id3, mapOf(id1 to 3, id2 to 7, id3 to 10))
             res2 shouldBe Field(id3, mapOf(id1 to 6, id2 to 10, id3 to 7))
             messagesToSend() shouldBe setOf(
