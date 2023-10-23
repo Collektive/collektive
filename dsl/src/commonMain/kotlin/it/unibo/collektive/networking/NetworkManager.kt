@@ -5,6 +5,7 @@ import it.unibo.collektive.messages.AnisotropicMessage
 import it.unibo.collektive.messages.IsotropicMessage
 import it.unibo.collektive.messages.ReceivedMessage
 import it.unibo.collektive.messages.SentMessage
+import it.unibo.collektive.messages.SentMessage.Companion.convertToReceivedMessage
 
 /**
  * Implementation of the Network interface.
@@ -34,14 +35,5 @@ class NetworkManager {
             .map { entry -> convertToReceivedMessage(entry) }
             .toSet()
         return filtered
-    }
-
-    /**
-     * Converts a SentMessage to a ReceivedMessage.
-     * @param entry: the SentMessage to be converted.
-     */
-    private fun convertToReceivedMessage(entry: SentMessage): ReceivedMessage = when (entry) {
-        is AnisotropicMessage -> ReceivedMessage(entry.senderId, entry.message)
-        is IsotropicMessage -> ReceivedMessage(entry.senderId, entry.message)
     }
 }

@@ -6,7 +6,18 @@ import it.unibo.collektive.stack.Path
 /**
  * Types of messages sent by a device.
  */
-sealed interface SentMessage
+sealed interface SentMessage {
+    companion object {
+        /**
+         * Converts a SentMessage to a ReceivedMessage.
+         * @param entry: the SentMessage to be converted.
+         */
+        fun convertToReceivedMessage(entry: SentMessage): ReceivedMessage = when (entry) {
+            is AnisotropicMessage -> ReceivedMessage(entry.senderId, entry.message)
+            is IsotropicMessage -> ReceivedMessage(entry.senderId, entry.message)
+        }
+    }
+}
 
 /**
  * Message sent from a device to other devices in the network.
