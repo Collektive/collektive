@@ -10,14 +10,14 @@ import it.unibo.collektive.messages.SentMessage
  * Implementation of the Network interface.
  */
 class NetworkManager {
-    private var messageBuffer = mutableSetOf<SentMessage>()
+    private var messageBuffer = setOf<SentMessage>()
 
     /**
      * Adds the messages to the message buffer.
      * @param messages: the messages to be sent.
      */
     fun send(messages: Set<SentMessage>) {
-        messages.forEach { messageBuffer.add(it) }
+        messages.forEach { messageBuffer = messageBuffer + it }
     }
 
     /**
