@@ -14,5 +14,5 @@ data class AggregateResult<X>(
     val localId: ID,
     val result: X,
     val toSend: Set<SentMessage>,
-    val newState: Set<State<*>>, // todo create state data class
+    val newState: Set<State<*>>,
 )
