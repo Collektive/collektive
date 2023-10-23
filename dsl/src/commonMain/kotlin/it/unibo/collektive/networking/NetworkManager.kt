@@ -5,7 +5,7 @@ import it.unibo.collektive.messages.AnisotropicMessage
 import it.unibo.collektive.messages.IsotropicMessage
 import it.unibo.collektive.messages.ReceivedMessage
 import it.unibo.collektive.messages.SentMessage
-import it.unibo.collektive.messages.SentMessage.Companion.convertToReceivedMessage
+import it.unibo.collektive.messages.convertToReceivedMessage
 
 /**
  * Implementation of the Network interface.
@@ -29,7 +29,7 @@ class NetworkManager {
                 (it is AnisotropicMessage && it.receiverId == receiverId) ||
                     (it is IsotropicMessage && it.senderId != receiverId)
             }
-            .map { entry -> convertToReceivedMessage(entry) }
+            .map { entry -> entry.convertToReceivedMessage(entry) }
             .toSet()
         return filtered
     }
