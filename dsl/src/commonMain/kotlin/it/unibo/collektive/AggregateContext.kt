@@ -70,6 +70,16 @@ class AggregateContext(
     }
 
     /**
+     * Iteratively updates the value of the input expression [repeat] at each device using the last computed value or the [initial].
+     */
+    fun <X, Y> repeating(initial: X, repeat: (X) -> Y): Y {
+        val res = stateAt<X>(stack.currentPath())?.let { repeat(it) } ?: repeat(initial)
+        state = state.filterNot { stack.currentPath() == it.path }.toSet() + State(stack.currentPath(), res)
+//        state[stack.currentPath()] = res
+        return res
+    }
+
+    /**
      * Alignment function that pushes in the stack the pivot, executes the body and pop the last
      * element of the stack after it is called.
      * Returns the body's return element.
