@@ -2,9 +2,9 @@ package it.unibo.collektive
 
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.messages.AnisotropicMessage
+import it.unibo.collektive.messages.InboundMessage
 import it.unibo.collektive.messages.IsotropicMessage
-import it.unibo.collektive.messages.ReceivedMessage
-import it.unibo.collektive.messages.SentMessage
+import it.unibo.collektive.messages.OutboundMessage
 import it.unibo.collektive.networking.Network
 import it.unibo.collektive.stack.Path
 import it.unibo.collektive.stack.Stack
@@ -17,23 +17,23 @@ import it.unibo.collektive.state.State
  */
 class AggregateContext(
     private val localId: ID,
-    private val messages: Set<ReceivedMessage>,
+    private val messages: Set<InboundMessage>,
     private val previousState: Set<State<*>>,
 ) {
 
     private val stack = Stack<Any>()
-    private var state = setOf<State<Any?>>()
-    private var toBeSent = setOf<SentMessage>()
+    private var state = setOf<State<*>>()
+    private var toBeSent = setOf<OutboundMessage>()
 
     /**
      * Messages to send to the other nodes.
      */
-    fun messagesToSend(): Set<SentMessage> = toBeSent
+    fun messagesToSend(): Set<OutboundMessage> = toBeSent
 
     /**
      * Return the current state of the device as a new state.
      */
-    fun newState(): Set<State<Any?>> = state
+    fun newState(): Set<State<*>> = state
 
     /**
      * This function computes the local value of e_i, substituting variable n with the nvalue w of
@@ -95,7 +95,7 @@ class AggregateContext(
  */
 fun <X> aggregate(
     localId: ID,
-    messages: Set<ReceivedMessage> = emptySet(),
+    messages: Set<InboundMessage> = emptySet(),
     state: Set<State<*>> = emptySet(),
     init: AggregateContext.() -> X,
 ) = singleCycle(localId, messages, state, compute = init)

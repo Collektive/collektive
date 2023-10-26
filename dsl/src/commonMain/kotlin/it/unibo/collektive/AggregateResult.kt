@@ -1,6 +1,6 @@
 package it.unibo.collektive
 
-import it.unibo.collektive.messages.SentMessage
+import it.unibo.collektive.messages.OutboundMessage
 import it.unibo.collektive.state.State
 
 /**
@@ -11,6 +11,6 @@ import it.unibo.collektive.state.State
 data class AggregateResult<X>(
     val localId: ID,
     val result: X,
-    val toSend: Set<SentMessage>,
+    val toSend: Set<OutboundMessage>,
     val newState: Set<State<*>>,
 )

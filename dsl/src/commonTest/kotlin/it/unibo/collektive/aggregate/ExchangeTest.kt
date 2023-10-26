@@ -8,7 +8,7 @@ import it.unibo.collektive.aggregate
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.messages.AnisotropicMessage
 import it.unibo.collektive.messages.IsotropicMessage
-import it.unibo.collektive.messages.SentMessage
+import it.unibo.collektive.messages.OutboundMessage
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.networking.NetworkManager
 import it.unibo.collektive.stack.Path
@@ -41,7 +41,7 @@ class ExchangeTest : StringSpec({
         aggregate(id0) {
             val res = exchange(initV1, increaseOrDouble)
             res shouldBe Field(id0, mapOf(id0 to 2))
-            messagesToSend() shouldBe setOf(IsotropicMessage(id0, mapOf(path1 to res.local)) as SentMessage)
+            messagesToSend() shouldBe setOf(IsotropicMessage(id0, mapOf(path1 to res.local)) as OutboundMessage)
         }
     }
 

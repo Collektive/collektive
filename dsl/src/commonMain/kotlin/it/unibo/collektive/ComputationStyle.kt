@@ -1,6 +1,6 @@
 package it.unibo.collektive
 
-import it.unibo.collektive.messages.ReceivedMessage
+import it.unibo.collektive.messages.InboundMessage
 import it.unibo.collektive.networking.Network
 import it.unibo.collektive.state.State
 
@@ -13,7 +13,7 @@ import it.unibo.collektive.state.State
  */
 fun <X> singleCycle(
     localId: ID,
-    messages: Set<ReceivedMessage>,
+    messages: Set<InboundMessage>,
     state: Set<State<*>>,
     compute: AggregateContext.() -> X,
 ): AggregateResult<X> {
