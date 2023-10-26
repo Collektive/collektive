@@ -1,70 +1,96 @@
 package it.unibo.collektive.aggregate
 
-import it.unibo.collektive.Network
-import it.unibo.collektive.NetworkImpl
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.maps.shouldContainValue
+import io.kotest.matchers.maps.shouldHaveSize
+import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
+import it.unibo.collektive.neighbouring
+import it.unibo.collektive.network.NetworkImplTest
+import it.unibo.collektive.networking.NetworkManager
 
-class NeighbouringTest {
-    private val double: (Int) -> Int = { it * 2 }
-    private val testValue: Int = 1
-    private val testValue2: Int = 2
+class NeighbouringTest : StringSpec({
+    // device ids
+    val id0 = IntId(0)
+    val id1 = IntId(1)
+    val id2 = IntId(2)
+    val id3 = IntId(3)
 
-    @Test
-    fun neighbouringWithoutMessages() {
-        aggregate {
-            val field = neighbouring(double(testValue))
-            assertTrue(field.toMap().containsValue(2))
+    // values
+    val initV1 = 1
+    val initV2 = 2
+    val initV3 = 3
+    val double: (Int) -> Int = { it * 2 }
+    val add: (Int) -> Int = { it + 1 }
+
+    "Neighbouring without messages" {
+        aggregate(id0) {
+            val field = neighbouring(initV1)
+            field.toMap() shouldContainValue initV1
         }
     }
 
-    @Test
-    fun neighbouringWithTwoAlignedDevices() {
-        val network: Network = NetworkImpl()
-
+    "Neighbouring with three aligned devices" {
+        val nm = NetworkManager()
         var i = 0
         val condition: () -> Boolean = { i++ < 1 }
 
         // Device 1
-        aggregate(condition, network) {
-            val field = neighbouring(double(testValue))
-            assertTrue(field.toMap().containsValue(2))
+        val testNetwork1 = NetworkImplTest(nm, id1)
+        aggregate(id1, condition, testNetwork1) {
+            val field = neighbouring(double(initV1))
+            println("field 1 $field")
+            field.toMap() shouldContainValue 2
         }
 
         i = 0
         // Device 2
-        aggregate(condition, network) {
-            val field = neighbouring(double(testValue2))
-            assertTrue(field.toMap().containsValue(2))
-            assertTrue(field.toMap().containsValue(4))
+        val testNetwork2 = NetworkImplTest(nm, id2)
+        aggregate(id2, condition, testNetwork2) {
+            val field = neighbouring(double(initV2))
+            println("field 2 $field")
+            field.toMap() shouldContainValue 2
+            field.toMap() shouldContainValue 4
+        }
+
+        i = 0
+        // Device 3
+        val testNetwork3 = NetworkImplTest(nm, id3)
+        aggregate(id3, condition, testNetwork3) {
+            val field = neighbouring(double(initV3))
+            println("field 3 $field")
+            field.toMap() shouldContainValue 2
+            field.toMap() shouldContainValue 4
+            field.toMap() shouldContainValue 6
         }
     }
 
-    @Test
-    fun neighbouringWithTwoNonAlignedDevices() {
-        val network: Network = NetworkImpl()
-
+    "Neighbouring with two not aligned devices" {
+        val nm = NetworkManager()
         var i = 0
         val condition: () -> Boolean = { i++ < 1 }
 
         // Device 1
         val isDeviceOneKing = true
-        aggregate(condition, network) {
-            fun kingBehaviour() = neighbouring(double(testValue))
-            fun queenBehaviour() = neighbouring(double(testValue))
-            if (isDeviceOneKing) kingBehaviour() else queenBehaviour()
+        val testNetwork1 = NetworkImplTest(nm, id1)
+        aggregate(id1, condition, testNetwork1) {
+            fun kingBehaviour() = neighbouring(double(initV2))
+            fun queenBehaviour() = neighbouring(add(initV1))
+            val f = if (isDeviceOneKing) kingBehaviour() else queenBehaviour()
+            println("f $f")
+            f.toMap() shouldHaveSize 1
         }
 
         i = 0
         // Device 2
         val isDeviceTwoKing = false
-        aggregate(condition, network) {
-            fun kingBehaviour() = neighbouring(double(testValue))
-            fun queenBehaviour() = neighbouring(double(testValue))
+        val testNetwork2 = NetworkImplTest(nm, id2)
+        aggregate(id2, condition, testNetwork2) {
+            fun kingBehaviour() = neighbouring(double(initV1))
+            fun queenBehaviour() = neighbouring(add(initV2))
             val field = if (isDeviceTwoKing) kingBehaviour() else queenBehaviour()
-            assertEquals(1, field.toMap().size)
+            println("field $field")
+            field.toMap() shouldHaveSize 1
         }
     }
-}
+})
