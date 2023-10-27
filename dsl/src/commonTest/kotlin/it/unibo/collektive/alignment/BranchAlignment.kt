@@ -1,41 +1,48 @@
 package it.unibo.collektive.alignment
 
-import io.kotest.core.spec.style.FreeSpec
-import io.kotest.matchers.collections.shouldContainAll
-import io.kotest.matchers.shouldBe
-import it.unibo.collektive.aggregate
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.collections.shouldHaveSize
+import it.unibo.collektive.IntId
+import it.unibo.collektive.aggregate.aggregate
+import it.unibo.collektive.aggregate.ops.neighbouring
 import it.unibo.collektive.stack.Path
+import it.unibo.collektive.utils.getPaths
 
-class BranchAlignment : FreeSpec({
-    "The branch alignment" - {
-        "should occur also for nested functions" {
-            val result = aggregate {
-                val condition = true
-                fun test() { neighbouring("test") }
-                fun test2() { test() }
+class BranchAlignment : StringSpec({
+    val id0 = IntId(0)
 
-                if (condition) { test2() }
+    "The branch alignment should occur also for nested functions" {
+        val result = aggregate(id0) {
+            val condition = true
+            fun test() {
+                neighbouring("test")
             }
 
-            result.toSend.keys.size shouldBe 1 // 1 path of alignment
-            result.toSend.keys shouldBe setOf(
-                Path(listOf("branch[condition, true]", "test2.1", "test.1", "neighbouring.1")),
-            )
-        }
-        "should not occur in non aggregate context" {
-            val result = aggregate {
-                val condition = true
-                fun test(): String = "hello"
-
-                fun test2() {
-                    test()
-                }
-
-                if (condition) {
-                    test2()
-                }
+            fun test2() {
+                test()
             }
-            result.toSend.keys.size shouldBe 0 // 0 paths of alignment
+            if (condition) {
+                test2()
+            }
         }
+
+        result.toSend.firstOrNull()?.getPaths()?.shouldHaveSize(1) // 1 path of alignment
+        result.toSend.firstOrNull()?.getPaths()?.shouldContain(
+            Path(listOf("branch[condition, true]", "test2.1", "test.1", "neighbouring.1", "exchange.1")),
+        )
+    }
+    "The branch alignment should not occur in non aggregate context" {
+        val result = aggregate(id0) {
+            val condition = true
+            fun test(): String = "hello"
+            fun test2() {
+                test()
+            }
+            if (condition) {
+                test2()
+            }
+        }
+        result.toSend.firstOrNull()?.getPaths()?.shouldHaveSize(0) // 0 path of alignment
     }
 })

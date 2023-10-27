@@ -1,95 +1,71 @@
 package it.unibo.collektive.field
 
-import it.unibo.collektive.Network
-import it.unibo.collektive.NetworkImpl
-import it.unibo.collektive.aggregate
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import it.unibo.collektive.IntId
+import it.unibo.collektive.aggregate.aggregate
+import it.unibo.collektive.aggregate.ops.neighbouring
+import it.unibo.collektive.network.NetworkImplTest
+import it.unibo.collektive.network.NetworkManager
 
-class FieldManipulationTest {
-    private var network: Network = NetworkImpl()
-    private val double: (Int) -> Int = { it * 2 }
-    private var i = 0
-    private val condition: () -> Boolean = { i++ < 1 }
+class FieldManipulationTest : StringSpec({
+    var nm = NetworkManager()
+    val double: (Int) -> Int = { it * 2 }
+    var i = 0
+    val condition: () -> Boolean = { i++ < 1 }
 
-    @BeforeTest
-    fun setup() {
-        // reset network and counter
-        i = 0
-        network = NetworkImpl()
-    }
+    // ids
+    val id0 = IntId(0)
+    val id1 = IntId(1)
 
-    @Test
-    fun getMinIncludingSelf() {
-        // Device 1
-        aggregate(condition, network) {
+    "Get the min value including self" {
+        val network0 = NetworkImplTest(nm, id0)
+        val network1 = NetworkImplTest(nm, id1)
+
+        aggregate(id0, condition, network0) {
             neighbouring(double(3))
         }
 
         i = 0
-        // Device 2
-        aggregate(condition, network) {
+        aggregate(id1, condition, network1) {
             val res = neighbouring(double(2)).min()
-            assertNotEquals(null, res)
-            if (res != null) {
-                assertEquals(4, res.value)
-            }
+            res shouldNotBe null
+            if (res != null) res.value shouldBe 4
         }
     }
 
-    @Test
-    fun getMinNonIncludingSelf() {
-        // Device 1
-        aggregate(condition, network) {
+    "Get min value non including self" {
+        val network0 = NetworkImplTest(nm, id0)
+        val network1 = NetworkImplTest(nm, id1)
+
+        i = 0
+        aggregate(id0, condition, network0) {
             neighbouring(double(3))
         }
 
         i = 0
-        // Device 2
-        aggregate(condition, network) {
+        aggregate(id1, condition, network1) {
             val res = neighbouring(double(2)).min(includingSelf = false)
-            assertNotEquals(null, res)
-            if (res != null) {
-                assertEquals(6, res.value)
-            }
+            res shouldNotBe null
+            if (res != null) res.value shouldBe 6
         }
     }
 
-    @Test
-    fun getMaxIncludingSelf() {
-        // Device 1
-        aggregate(condition, network) {
+    "Get max value non including self" {
+        val network0 = NetworkImplTest(nm, id0)
+        val network1 = NetworkImplTest(nm, id1)
+
+        i = 0
+        aggregate(id0, condition, network0) {
             neighbouring(double(3))
         }
 
         i = 0
-        // Device 2
-        aggregate(condition, network) {
-            val res = neighbouring(double(2)).max()
-            assertNotEquals(null, res)
-            if (res != null) {
-                assertEquals(6, res.value)
-            }
-        }
-    }
-
-    @Test
-    fun getMaxNonIncludingSelf() {
-        // Device 1
-        aggregate(condition, network) {
-            neighbouring(double(3))
-        }
-
-        i = 0
-        // Device 2
-        aggregate(condition, network) {
+        aggregate(id1, condition, network1) {
             val res = neighbouring(double(2)).max(includingSelf = false)
-            assertNotEquals(null, res)
-            if (res != null) {
-                assertEquals(6, res.value)
-            }
+            res shouldNotBe null
+            if (res != null) res.value shouldBe 6
         }
     }
-}
+})

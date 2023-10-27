@@ -7,9 +7,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class FieldTest {
-    private val myId: ID = IntId()
+    private val myId: ID = IntId(0)
     private val myValue: String = "myValue"
-    private val connectedId: ID = IntId()
+    private val connectedId: ID = IntId(1)
     private val connectedValue: String = "connectedValue"
 
     @Test

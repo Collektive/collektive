@@ -6,6 +6,7 @@ import org.danilopianini.gradle.mavencentral.DocStyle
 plugins {
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.multiplatform) apply false
+    alias(libs.plugins.dokka)
     alias(libs.plugins.publishOnCentral)
     alias(libs.plugins.detekt)
     alias(libs.plugins.gitSemVer)
@@ -27,6 +28,7 @@ allprojects {
     }
 
     with(rootProject.libs.plugins) {
+        apply(plugin = dokka.id)
         apply(plugin = publishOnCentral.id)
         apply(plugin = detekt.id)
         apply(plugin = gitSemVer.id)
