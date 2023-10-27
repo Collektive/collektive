@@ -12,8 +12,7 @@ import it.unibo.collektive.field.Field
  * ```
  * The field returned has as local value the value passed as input (0 in this example).
  * ```
- * val double: (Int) -> Int = { it * 2 }
- * val field = neighbouring(double(1))
+ * val field = neighbouring({ 2 * 2 })
  * ```
  * In this case, the field returned has the result of the computation as local value.
  */
@@ -26,23 +25,24 @@ fun <Return> AggregateContext.neighbouring(type: Return): Field<Return> {
  * [share] captures the space-time nature of field computation through observation of neighbours’ values, starting from an [initial] value,
  * it reduces to a single local value given a [transform] function and updating and sharing to neighbours of a local variable.
  * ```
- * val a = share(0) {
- *   it.min()?.value!!
+ * val a = share(0) { f ->
+ *   f.toMap().maxBy { it.value }.value
  * }
  * ```
+ * In the example above, the function [share] wil return a value that is the max found in the field.
  * ```
- * val b = share(0) {
- *   val minValue = it.min()?.value!!
+ * val b = share(0) { f ->
+ *   val minValue = f.toMap().minBy { it.value }.value
  *   minValue butReturn "Something different"
  * }
  * ```
- *
+ * In the example above, the function [share] wil return the string initialised.
  * ## N.B.:
  * Do not write code after calling the sending or returning values, they must be written at last inside the lambda.
  * ```
- * val dont = share(0){
- *  val minValue = it.min()?.value!!
- *  minValue butReturn "Dont do this"
+ * val dont = share(0){f ->
+ *  val minValue = f.toMap().minBy { it.value }.value
+ *  minValue butReturn "Don't do this"
  *  minValue
  * }
  * ```
