@@ -17,8 +17,8 @@ import it.unibo.collektive.field.Field
  * ```
  * In this case, the field returned has the result of the computation as local value.
  */
-fun <X> AggregateContext.neighbouring(type: X): Field<X> {
-    val body: (Field<X>) -> Field<X> = { f -> f.mapField { _, x -> x } } // imho non va bene
+fun <Return> AggregateContext.neighbouring(type: Return): Field<Return> {
+    val body: (Field<Return>) -> Field<Return> = { f -> f.mapField { _, x -> x } } // imho non va bene
     return exchange(type, body)
 }
 
