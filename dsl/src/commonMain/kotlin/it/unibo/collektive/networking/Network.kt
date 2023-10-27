@@ -13,8 +13,7 @@ interface Network {
     fun write(messages: Set<OutboundMessage>)
 
     /**
-     * Receive the messages sent by the other nodes.
-     * @return the set of messages received.
+     * Returns a set of [InboundMessage]s representing the received messages from the neighbours.
      */
     fun read(): Set<InboundMessage>
 }
