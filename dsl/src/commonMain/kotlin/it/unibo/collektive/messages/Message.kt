@@ -19,12 +19,15 @@ data class InboundMessage(val senderId: ID, val messages: Map<Path, *>) : Messag
 sealed interface OutboundMessage : Message
 
 /**
- * [message] sent from a [senderId] device to all the other devices in the network.
+ * An [IsotropicMessage] is a [message] that a device [senderId] wants to send to all other neighbours.
+ * It is usually sent when devices don't know yet their neighbours, this will also allow them to find new neighbours
+ * when they will connect to the network.
  */
 data class IsotropicMessage(val senderId: ID, val message: Map<Path, *>) : OutboundMessage
 
 /**
- * [message] sent from a [senderId] device to a specific [receiverId] device in the network.
+ * An [AnisotropicMessage] is a [message] that a device [senderId] wants to send only to a specific neighbour [receiverId],
+ * without being received also from other neighbours.
  */
 data class AnisotropicMessage(val senderId: ID, val receiverId: ID, val message: Map<Path, *>) : OutboundMessage
 
