@@ -1,3 +1,37 @@
+## [1.0.0](https://github.com/Collektive/collektive/compare/0.4.2...1.0.0) (2023-10-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* **dsl:** introduce `exchange` as per https://doi.org/10.4230/LIPIcs.ECOOP.2022.20 (#82)
+
+### Features
+
+* **dsl:** introduce `exchange` as per https://doi.org/10.4230/LIPIcs.ECOOP.2022.20 ([#82](https://github.com/Collektive/collektive/issues/82)) ([619c8de](https://github.com/Collektive/collektive/commit/619c8de8464f9add182193fe42ac83026f35edec))
+
+
+### Dependency updates
+
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.69 ([0c911af](https://github.com/Collektive/collektive/commit/0c911af1a8ab836f09565b4eb0ae9ec617309f77))
+* **deps:** update node.js to 20.9 ([4750c74](https://github.com/Collektive/collektive/commit/4750c74a228c467b95563b6d2198e11ed5a0b837))
+* **deps:** update node.js to v20 ([c9e7b35](https://github.com/Collektive/collektive/commit/c9e7b354ef126882f717be0c233698ae5b895bf0))
+* **deps:** update plugin gitsemver to v1.1.11 ([1008d9c](https://github.com/Collektive/collektive/commit/1008d9cb3119604638bf08a1cf973c252e7f24a9))
+* **deps:** update plugin gitsemver to v1.1.13 ([ac8e475](https://github.com/Collektive/collektive/commit/ac8e475346fd03ed7ba51a25cfaf70d74f190b18))
+* **deps:** update plugin gitsemver to v1.1.14 ([70d8942](https://github.com/Collektive/collektive/commit/70d894205cb487f8d7a08025e22e2316a305b065))
+* **deps:** update plugin gitsemver to v1.1.15 ([09d0c9a](https://github.com/Collektive/collektive/commit/09d0c9a187617adf92300099aa14c5ceb357f1a3))
+* **deps:** update plugin gitsemver to v2 ([5919aae](https://github.com/Collektive/collektive/commit/5919aaee6f347ed0386143baa6cbcf813960df09))
+* **deps:** update plugin multijvmtesting to v0.5.6 ([b1850ae](https://github.com/Collektive/collektive/commit/b1850aea8dbbf14ba3812880f07a59e2474111c3))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v1.1.11 ([f071214](https://github.com/Collektive/collektive/commit/f07121421a4e18b2181695d69487fde75083f6fa))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v1.1.13 ([6b78501](https://github.com/Collektive/collektive/commit/6b7850134122828b94d7aec6a1ec63aeaa4f3f83))
+* **deps:** update plugin publishoncentral to v5.0.16 ([61578e5](https://github.com/Collektive/collektive/commit/61578e5dd4959544c9d44bf7d72527d388ccdda1))
+
+
+### Build and continuous integration
+
+* **deps:** update actions/checkout action to v4.1.1 ([d7efed8](https://github.com/Collektive/collektive/commit/d7efed8a6a52eba05dc03e4ad727bc8bfe103645))
+* **deps:** update actions/setup-node action to v3.8.2 ([7dac9fb](https://github.com/Collektive/collektive/commit/7dac9fb0fcf22deb2b200060c5f8e031ce2cb2a5))
+* **deps:** update actions/setup-node action to v4 ([6fa0abd](https://github.com/Collektive/collektive/commit/6fa0abd78a2f3950baca57a6aaf981c0884ae0ff))
+
 ## [0.4.2](https://github.com/Collektive/collektive/compare/0.4.1...0.4.2) (2023-10-16)
 
 
