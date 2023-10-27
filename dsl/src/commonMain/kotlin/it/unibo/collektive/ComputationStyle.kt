@@ -1,5 +1,7 @@
 package it.unibo.collektive
 
+import it.unibo.collektive.aggregate.AggregateContext
+import it.unibo.collektive.aggregate.AggregateResult
 import it.unibo.collektive.messages.InboundMessage
 import it.unibo.collektive.networking.Network
 import it.unibo.collektive.state.State

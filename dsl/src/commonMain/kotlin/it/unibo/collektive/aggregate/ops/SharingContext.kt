@@ -1,4 +1,4 @@
-package it.unibo.collektive
+package it.unibo.collektive.aggregate
 
 /**
  * The lambda context passed to the [share] function.

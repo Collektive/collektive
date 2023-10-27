@@ -1,4 +1,4 @@
-package it.unibo.collektive
+package it.unibo.collektive.aggregate
 
 import it.unibo.collektive.field.Field
 
