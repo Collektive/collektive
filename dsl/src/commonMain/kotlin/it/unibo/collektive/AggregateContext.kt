@@ -67,9 +67,8 @@ class AggregateContext(
                         ?: AnisotropicMessage(localId, id, mapOf(stack.currentPath() to value))
                     toBeSent = (
                         toBeSent
-                            .filterIsInstance<AnisotropicMessage>()
                             .filterNot {
-                                it.senderId == localId && it.receiverId == id
+                                it is AnisotropicMessage && it.senderId == localId && it.receiverId == id
                             } + AnisotropicMessage(localId, id, old.message + (stack.currentPath() to value))
                         ).toSet()
                 }
