@@ -44,7 +44,6 @@ class BranchAlignment : FreeSpec({
                 }
             }
             result.toSend.firstOrNull()?.getPaths()?.shouldHaveSize(0) // 0 path of alignment
-//            result.toSend.keys.size shouldBe 0 // 0 paths of alignment
         }
     }
 })
