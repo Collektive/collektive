@@ -5,11 +5,11 @@ import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate
-import it.unibo.collektive.messages.getPaths
 import it.unibo.collektive.neighbouring
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.networking.NetworkManager
 import it.unibo.collektive.stack.Path
+import it.unibo.collektive.utils.getPaths
 
 class RepeatingTest : StringSpec({
     val id0 = IntId(0)

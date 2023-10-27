@@ -5,9 +5,9 @@ import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldHaveSize
 import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate
-import it.unibo.collektive.messages.getPaths
 import it.unibo.collektive.neighbouring
 import it.unibo.collektive.stack.Path
+import it.unibo.collektive.utils.getPaths
 
 class BranchAlignment : FreeSpec({
     val id0 = IntId(0)
