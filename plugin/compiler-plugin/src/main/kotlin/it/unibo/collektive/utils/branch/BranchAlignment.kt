@@ -50,6 +50,7 @@ internal fun IrSingleStatementBuilder.buildAlignedOn(
         branch,
         conditionValue,
     )
+
     else -> buildAlignedOnCall(
         pluginContext,
         aggregateContextReference,
@@ -169,9 +170,9 @@ private fun conditionName(condition: IrExpression): String {
         is IrGetValue -> condition.symbol.owner.name.asString()
         is IrConst<*> -> "constant"
         is IrTypeOperatorCall -> condition.operator.name + " " + condition.typeOperand.asString() // 'is' in the 'when'
-        is IrCall -> condition.symbol.owner.name.asString() + " " +
+        is IrCall -> condition.symbol.owner.name.asString() +
             if (condition.origin == IrStatementOrigin.EXCL && condition.dispatchReceiver != null) {
-                conditionName(condition.dispatchReceiver!!)
+                " " + conditionName(condition.dispatchReceiver!!)
             } else {
                 ""
             }
