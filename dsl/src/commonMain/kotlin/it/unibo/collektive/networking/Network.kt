@@ -8,7 +8,7 @@ import it.unibo.collektive.messages.OutboundMessage
  */
 interface Network {
     /**
-     * Sends a set of [messages] of type [OutboundMessage] to other nodes.
+     * Sends a set of [messages] of type [OutboundMessage] to the neighbours.
      */
     fun write(messages: Set<OutboundMessage>)
 
