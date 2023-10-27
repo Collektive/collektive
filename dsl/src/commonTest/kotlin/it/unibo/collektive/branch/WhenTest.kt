@@ -1,73 +1,68 @@
 package it.unibo.collektive.branch
 
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.string.shouldContain
+import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate
-import kotlin.test.Test
-import kotlin.test.assertTrue
+import it.unibo.collektive.messages.getPaths
+import it.unibo.collektive.neighbouring
+import it.unibo.collektive.stack.Path
 
-class WhenTest {
-    @Test
-    fun whenSingleExpression() {
+class WhenTest : StringSpec({
+    val id0 = IntId(0)
+
+    "When in single expression" {
         val condition = true
         val x = if (condition) "hello" else 123
-        val result = aggregate {
+        val result = aggregate(id0) {
             when (x) {
-                is String -> neighbouring("test")
+                is String -> neighbouring("string")
                 else -> neighbouring("test")
             }
         }
-        assertTrue(
-            result.toSend.keys.any {
-                it.path.toString().contains("INSTANCEOF") &&
-                    it.path.toString().contains("String") &&
-                    it.path.toString().contains("true")
-            },
-        )
+        var paths = emptySet<Path>()
+        result.toSend.forEach { paths = paths + it.getPaths() }
+        paths.toString() shouldContain "INSTANCEOF"
+        paths.toString() shouldContain "String"
+        paths.toString() shouldContain "true"
     }
 
-    @Test
-    fun whenSingleExpressionElseCase() {
+    "When in single expression in else case" {
         val condition = false
         val x = if (condition) "hello" else 123
-        val result = aggregate {
+        val result = aggregate(id0) {
             when (x) {
-                is String -> neighbouring("test")
+                is String -> neighbouring("string")
                 else -> neighbouring("test")
             }
         }
-        assertTrue(
-            result.toSend.keys.any {
-                it.path.toString().contains("false")
-            },
-        )
+        var paths = emptySet<Path>()
+        result.toSend.forEach { paths = paths + it.getPaths() }
+        paths.toString() shouldContain "false"
     }
 
-    @Test
-    fun whenWithNestedFunction() {
+    "When with nested function" {
         val condition = true
         val x = if (condition) "hello" else 123
-
-        val result = aggregate {
+        val result = aggregate(id0) {
             fun test() {
                 neighbouring("test")
             }
 
             fun test2() {
-                test()
+                neighbouring("test2")
             }
-
             when (x) {
                 is String -> test2()
-                else -> test2()
+                else -> test()
             }
         }
-        assertTrue(
-            result.toSend.keys.any {
-                it.path.toString().contains("INSTANCEOF") &&
-                    it.path.toString().contains("String") &&
-                    it.path.toString().contains("test") &&
-                    it.path.toString().contains("test2") &&
-                    it.path.toString().contains("true")
-            },
-        )
+        var paths = emptySet<Path>()
+        result.toSend.forEach { paths = paths + it.getPaths() }
+        paths.toString() shouldContain "INSTANCEOF"
+        paths.toString() shouldContain "String"
+        paths.toString() shouldContain "test"
+        paths.toString() shouldContain "test2"
+        paths.toString() shouldContain "true"
     }
-}
+})
