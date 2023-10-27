@@ -43,8 +43,16 @@ class AggregateContext(
      * which will use their corresponding w_s(δ') as soon as they wake up and perform their next execution round.
      *
      * Often, expressions e_r and e_s coincide, so this function provides a shorthand for exchange(e_i, (n) => (e, e)).
-     *
-     * @return The result of the exchange, typically the neighbouring or local value v_r.
+     **
+     * ## Example
+     * ```
+     * val increaseOrDouble: (Field<Int>) -> Field<Int> = { f ->
+     *   f.mapField { _, v -> if (v % 2 == 0) v + 1 else v * 2 }
+     * }
+     * exchange(0, increaseOrDouble)
+     * ```
+     * The result of the exchange function is a field with as messages a map with key the id of devices across the network
+     * and the result of the computation passed as relative local values.
      */
     fun <X, Y> exchange(initial: X, body: (Field<X>) -> Field<Y>): Field<Y> {
         val messages = messagesAt<X>(stack.currentPath())
