@@ -14,7 +14,7 @@ class SharingContext<Initial, Return> {
      *
      * ## Example
      * ```
-     * val res3 = share(initV1) {
+     * val res3 = share(0) {
      *   val min = it.min()?.value!!
      *   min butReturn if (min > 1) "Hello" else null
      * }
