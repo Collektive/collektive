@@ -25,22 +25,3 @@ fun <Initial, Return> AggregateContext.share(initial: Initial, transform: Sharin
 
     return if (context.areSameType) local as Return else context.toBeReturned as Return
 }
-
-/**
- * TODO.
- */
-class SharingContext<Initial, Return> {
-    internal var toBeSent: Initial? = null
-    internal var toBeReturned: Return? = null
-    internal var areSameType = true
-
-    /**
-     * TODO .
-     */
-    infix fun Initial.butReturn(toReturn: Return): Return {
-        toBeSent = this
-        toBeReturned = toReturn
-        areSameType = false
-        return toReturn
-    }
-}
