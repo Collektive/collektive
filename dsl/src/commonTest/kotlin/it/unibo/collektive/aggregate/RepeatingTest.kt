@@ -7,7 +7,7 @@ import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate
 import it.unibo.collektive.neighbouring
 import it.unibo.collektive.network.NetworkImplTest
-import it.unibo.collektive.networking.NetworkManager
+import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.stack.Path
 import it.unibo.collektive.utils.getPaths
 

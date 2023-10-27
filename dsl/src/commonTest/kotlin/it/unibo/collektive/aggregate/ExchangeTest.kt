@@ -10,7 +10,7 @@ import it.unibo.collektive.messages.AnisotropicMessage
 import it.unibo.collektive.messages.IsotropicMessage
 import it.unibo.collektive.messages.OutboundMessage
 import it.unibo.collektive.network.NetworkImplTest
-import it.unibo.collektive.networking.NetworkManager
+import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.stack.Path
 
 class ExchangeTest : StringSpec({

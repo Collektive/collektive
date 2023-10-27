@@ -1,11 +1,7 @@
-package it.unibo.collektive.networking
+package it.unibo.collektive.network
 
 import it.unibo.collektive.ID
-import it.unibo.collektive.messages.AnisotropicMessage
-import it.unibo.collektive.messages.InboundMessage
-import it.unibo.collektive.messages.IsotropicMessage
-import it.unibo.collektive.messages.OutboundMessage
-import it.unibo.collektive.messages.convertToReceivedMessage
+import it.unibo.collektive.messages.*
 
 /**
  * Implementation of the Network interface.

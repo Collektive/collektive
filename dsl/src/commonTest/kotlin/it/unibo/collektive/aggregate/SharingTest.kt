@@ -9,7 +9,7 @@ import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.max
 import it.unibo.collektive.field.min
 import it.unibo.collektive.network.NetworkImplTest
-import it.unibo.collektive.networking.NetworkManager
+import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.share
 
 class SharingTest : StringSpec({

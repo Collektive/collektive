@@ -4,7 +4,6 @@ import it.unibo.collektive.ID
 import it.unibo.collektive.messages.InboundMessage
 import it.unibo.collektive.messages.OutboundMessage
 import it.unibo.collektive.networking.Network
-import it.unibo.collektive.networking.NetworkManager
 
 class NetworkImplTest(private val networkManager: NetworkManager, private val localId: ID) : Network {
 
