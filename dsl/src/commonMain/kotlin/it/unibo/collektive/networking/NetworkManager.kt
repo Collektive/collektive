@@ -29,7 +29,7 @@ class NetworkManager {
                 (it is AnisotropicMessage && it.receiverId == receiverId) ||
                     (it is IsotropicMessage && it.senderId != receiverId)
             }
-            .map { entry -> entry.convertToReceivedMessage(entry) }
+            .map { entry -> entry.convertToReceivedMessage() }
             .toSet()
         return filtered
     }
