@@ -6,8 +6,6 @@ import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.ops.SharingContext
 import it.unibo.collektive.aggregate.ops.share
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.max
-import it.unibo.collektive.field.min
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 
@@ -85,18 +83,18 @@ class SharingTest : StringSpec({
         // Device 1
         val testNetwork1 = NetworkImplTest(nm, id1)
         aggregate(id1, condition, testNetwork1) {
-            val res1 = share(initV1) {
-                it.max()?.value!!
+            val res1 = share(initV1) { f ->
+                f.toMap().maxBy { it.value }.value
             }
             res1 shouldBe initV1
 
-            val res2 = share(initV1) {
-                it.max()?.value!! butReturn "A string"
+            val res2 = share(initV1) { f ->
+                f.toMap().maxBy { it.value }.value butReturn "A string"
             }
             res2 shouldBe "A string"
 
-            val res3 = share(initV1) {
-                val min = it.min()?.value!!
+            val res3 = share(initV1) { f ->
+                val min = f.toMap().minBy { it.value }.value
                 min butReturn if (min > 1) "Hello" else null
             }
             res3 shouldBe null
