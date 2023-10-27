@@ -31,7 +31,15 @@ data class AnisotropicMessage(val senderId: ID, val receiverId: ID, val message:
 /**
  * Converts a [OutboundMessage] given as input to a [InboundMessage].
  */
-fun OutboundMessage.convertToReceivedMessage(entry: OutboundMessage): InboundMessage = when (entry) {
-    is AnisotropicMessage -> InboundMessage(entry.senderId, entry.message)
-    is IsotropicMessage -> InboundMessage(entry.senderId, entry.message)
+fun OutboundMessage.convertToReceivedMessage(): InboundMessage = when (this) {
+    is AnisotropicMessage -> InboundMessage(this.senderId, this.message)
+    is IsotropicMessage -> InboundMessage(this.senderId, this.message)
+}
+
+/**
+ * Returns the paths of a given [OutboundMessage].
+ */
+fun OutboundMessage.getPaths(): Set<Path> = when (this) {
+    is AnisotropicMessage -> this.message.keys
+    is IsotropicMessage -> this.message.keys
 }
