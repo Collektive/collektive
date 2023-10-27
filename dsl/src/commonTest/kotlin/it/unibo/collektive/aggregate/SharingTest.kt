@@ -3,7 +3,8 @@ package it.unibo.collektive.aggregate
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.IntId
-import it.unibo.collektive.SharingContext
+import it.unibo.collektive.aggregate.ops.SharingContext
+import it.unibo.collektive.aggregate.ops.share
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.max
 import it.unibo.collektive.field.min

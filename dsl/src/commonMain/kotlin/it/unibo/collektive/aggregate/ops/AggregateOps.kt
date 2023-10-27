@@ -1,5 +1,6 @@
-package it.unibo.collektive.aggregate
+package it.unibo.collektive.aggregate.ops
 
+import it.unibo.collektive.aggregate.AggregateContext
 import it.unibo.collektive.field.Field
 
 /**

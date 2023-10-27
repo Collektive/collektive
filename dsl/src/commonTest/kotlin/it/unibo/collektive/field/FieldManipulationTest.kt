@@ -5,7 +5,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.aggregate
-import it.unibo.collektive.aggregate.neighbouring
+import it.unibo.collektive.aggregate.ops.neighbouring
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 

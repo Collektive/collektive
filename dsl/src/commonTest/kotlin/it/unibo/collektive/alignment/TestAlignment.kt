@@ -5,8 +5,8 @@ import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.aggregate
-import it.unibo.collektive.aggregate.neighbouring
-import it.unibo.collektive.aggregate.share
+import it.unibo.collektive.aggregate.ops.neighbouring
+import it.unibo.collektive.aggregate.ops.share
 import it.unibo.collektive.stack.Path
 import it.unibo.collektive.utils.getPaths
 

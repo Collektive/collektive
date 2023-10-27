@@ -4,6 +4,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.IntId
+import it.unibo.collektive.aggregate.ops.neighbouring
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.stack.Path

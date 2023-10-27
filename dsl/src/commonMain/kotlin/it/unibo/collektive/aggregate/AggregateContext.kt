@@ -46,7 +46,7 @@ class AggregateContext(
      * which will use their corresponding w_s(δ') as soon as they wake up and perform their next execution round.
      *
      * Often, expressions e_r and e_s coincide, so this function provides a shorthand for exchange(e_i, (n) => (e, e)).
-     **
+     *
      * ## Example
      * ```
      * exchange(0){ f ->
