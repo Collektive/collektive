@@ -13,7 +13,7 @@ import it.unibo.collektive.state.State
 /**
  * Context for managing aggregate computation.
  * It represents the [localId] of the device, the [messages] received from the neighbours,
- * the [previousState] of the device.
+ * and the [previousState] of the device.
  */
 class AggregateContext(
     private val localId: ID,
@@ -46,10 +46,9 @@ class AggregateContext(
      **
      * ## Example
      * ```
-     * val increaseOrDouble: (Field<Int>) -> Field<Int> = { f ->
-     *   f.mapField { _, v -> if (v % 2 == 0) v + 1 else v * 2 }
+     * exchange(0){ f ->
+     *  f.mapField { _, v -> if (v % 2 == 0) v + 1 else v * 2 }
      * }
-     * exchange(0, increaseOrDouble)
      * ```
      * The result of the exchange function is a field with as messages a map with key the id of devices across the network
      * and the result of the computation passed as relative local values.
@@ -67,9 +66,11 @@ class AggregateContext(
                         .firstOrNull { it.senderId == localId && it.receiverId == id }
                         ?: AnisotropicMessage(localId, id, mapOf(stack.currentPath() to value))
                     toBeSent = (
-                        toBeSent.filterNot { m ->
-                            m is AnisotropicMessage && m.senderId == localId && m.receiverId == id
-                        } + AnisotropicMessage(localId, id, old.message + (stack.currentPath() to value))
+                        toBeSent
+                            .filterIsInstance<AnisotropicMessage>()
+                            .filterNot {
+                                it.senderId == localId && it.receiverId == id
+                            } + AnisotropicMessage(localId, id, old.message + (stack.currentPath() to value))
                         ).toSet()
                 }
             }
@@ -83,7 +84,6 @@ class AggregateContext(
     fun <X, Y> repeating(initial: X, repeat: (X) -> Y): Y {
         val res = stateAt<X>(stack.currentPath())?.let { repeat(it) } ?: repeat(initial)
         state = state.filterNot { stack.currentPath() == it.path }.toSet() + State(stack.currentPath(), res)
-//        state[stack.currentPath()] = res
         return res
     }
 
@@ -109,7 +109,7 @@ class AggregateContext(
 /**
  * Aggregate program entry point which computes a single iteration of a device [localId], taking as parameters the previous [state],
  * the [messages] received from the neighbours and the [init] with AggregateContext
- *  * object receiver that provides the aggregate constructs.
+ * object receiver that provides the aggregate constructs.
  */
 fun <X> aggregate(
     localId: ID,
