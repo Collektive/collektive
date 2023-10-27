@@ -4,6 +4,17 @@ import it.unibo.collektive.field.Field
 
 /**
  * Observes the value of an expression [type] across neighbours.
+ *
+ * ## Example
+ * ```
+ * val field = neighbouring(0)
+ * ```
+ * The field returned has as local value the value passed as input (0 in this example).
+ * ```
+ * val double: (Int) -> Int = { it * 2 }
+ * val field = neighbouring(double(1))
+ * ```
+ * In this case, the field returned has the result of the computation as local value.
  */
 fun <X> AggregateContext.neighbouring(type: X): Field<X> {
     val body: (Field<X>) -> Field<X> = { f -> f.mapField { _, x -> x } } // imho non va bene
@@ -11,7 +22,29 @@ fun <X> AggregateContext.neighbouring(type: X): Field<X> {
 }
 
 /**
- * TODO.
+ * [share] captures the space-time nature of field computation through observation of neighbours’ values, starting from an [initial] value,
+ * it reduces to a single local value given a [transform] function and updating and sharing to neighbours of a local variable.
+ * ```
+ * val a = share(0) {
+ *   it.min()?.value!!
+ * }
+ * ```
+ * ```
+ * val b = share(0) {
+ *   val minValue = it.min()?.value!!
+ *   minValue butReturn "Something different"
+ * }
+ * ```
+ *
+ * ## N.B.:
+ * Do not write code after calling the sending or returning values, they must be written at last inside the lambda.
+ * ```
+ * val dont = share(0){
+ *  val minValue = it.min()?.value!!
+ *  minValue butReturn "Dont do this"
+ *  minValue
+ * }
+ * ```
  */
 @Suppress("UNCHECKED_CAST")
 fun <Initial, Return> AggregateContext.share(initial: Initial, transform: SharingContext<Initial, Return>.(Field<Initial>) -> Return): Return {
