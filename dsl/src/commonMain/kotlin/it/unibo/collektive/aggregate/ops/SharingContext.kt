@@ -16,32 +16,33 @@ class SharingContext<Initial, Return> {
      * ## Example
      * ```
      * val result = share(0) {
-     *   sendButReturn(it.toMap().maxBy { v -> v.value }.value, "A string")
+     *   val maxValue = it.maxBy { v -> v.value }.value
+     *   maxValue yielding "A string"
      * }
      * result // result: Kotlin.String
      * ```
-     * The invoke of [sendButReturn] as the last statement of the body of the [share],
+     * The invoke of [yielding] as the last statement of the body of the [share],
      * sent to the neighbours the [toSend] value, but returns from the [share] the [toReturn] value.
      */
-    fun sendButReturn(toSend: Initial, toReturn: Return): Return {
-        toBeSent = toSend
+    infix fun Initial.yielding(toReturn: Return): Return {
+        toBeSent = this
         toBeReturned = toReturn
         areSameType = false
         return toReturn
     }
+
+//    fun Initial.returning(toReturn: () -> Return) = toReturn().also { toBeSent = this }
 
     /**
      * When the [share] computation is done, it evaluates the lambda [toReturn] over [toSend] value and returns its result.
      * ## Example
      * ```
      * val res: String? = share(0) {
-     *   val min = it.toMap().minBy { v -> v.value }.value
-     *   sendButReturn(min) {
-     *      if (min > 1) "Hello" else null
-     *   }
+     *   val max = it.minBy { v -> v.value }.value
+     *   max yielding { if (max > 1) "Hello" else null }
      * }
      * ```
      */
-    fun sendButReturn(toSend: Initial, toReturn: () -> Return): Return =
-        sendButReturn(toSend, toReturn())
+    infix fun Initial.yielding(toReturn: () -> Return): Return =
+        yielding(toReturn())
 }

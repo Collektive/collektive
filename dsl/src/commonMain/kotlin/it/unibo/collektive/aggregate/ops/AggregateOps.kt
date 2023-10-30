@@ -27,14 +27,15 @@ fun <Return> AggregateContext.neighbouring(type: Return): Field<Return> {
  * neighbours of a local variable.
  * ```
  * val result = share(0) {
- *   it.toMap().maxBy { v -> v.value }.value
+ *   it.maxBy { v -> v.value }.value
  * }
  * result // result: kotlin.Int
  * ```
  * In the example above, the function [share] wil return a value that is the max found in the field.
  * ```
  * val result = share(0) {
- *   sendButReturn(it.toMap().maxBy { v -> v.value }.value, "Something different")
+ *   val maxValue = it.maxBy { v -> v.value }.value
+ *   maxValue yielding "Something different"
  * }
  * result // result: kotlin.String
  * ```
@@ -45,9 +46,9 @@ fun <Return> AggregateContext.neighbouring(type: Return): Field<Return> {
  * Do not write code after calling the sending or returning values, they must be written at last inside the lambda.
  * ```
  * share(0) {
- *  val minValue = it.toMap().minBy { v -> v.value }.value
- *  sendButReturn(minValue, "Don't do this")
- *  minValue
+ *  val maxValue = it.maxBy { v -> v.value }.value
+ *  maxValue yielding "Don't do this"
+ *  maxValue
  * }
  * ```
  */
