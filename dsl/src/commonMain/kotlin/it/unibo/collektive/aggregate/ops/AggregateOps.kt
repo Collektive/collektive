@@ -26,18 +26,22 @@ fun <Return> AggregateContext.neighbouring(type: Return): Field<Return> {
  * an [initial] value, it reduces to a single local value given a [transform] function and updating and sharing to
  * neighbours of a local variable.
  * ```
- * share(0) {
+ * val result = share(0) {
  *   it.toMap().maxBy { v -> v.value }.value
  * }
+ * result // result: kotlin.Int
  * ```
  * In the example above, the function [share] wil return a value that is the max found in the field.
  * ```
- * share(0) {
+ * val result = share(0) {
  *   sendButReturn(it.toMap().maxBy { v -> v.value }.value, "Something different")
  * }
+ * result // result: kotlin.String
  * ```
  * In the example above, the function [share] wil return the string initialised as in [sendButReturn].
- * ## Note:
+ *
+ * ### Invalid use:
+ *
  * Do not write code after calling the sending or returning values, they must be written at last inside the lambda.
  * ```
  * share(0) {
