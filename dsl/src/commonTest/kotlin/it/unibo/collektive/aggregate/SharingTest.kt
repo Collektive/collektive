@@ -90,11 +90,11 @@ class SharingTest : StringSpec({
 
             val res2 = share(initV1) {
                 val min = it.maxBy { v -> v.value }.value
-                min.yielding("A string")
+                min.yielding { "A string" }
             }
             res2 shouldBe "A string"
 
-            val res3: String? = share(initV1) {
+            val res3 = share(initV1) {
                 val min = it.minBy { v -> v.value }.value
                 min.yielding { if (min > 1) "Hello" else null }
             }
