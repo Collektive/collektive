@@ -93,9 +93,10 @@ class SharingTest : StringSpec({
             }
             res2 shouldBe "A string"
 
-            val res3 = share(initV1) {
-                sendButReturn(it.toMap().minBy { v -> v.value }.value) { s ->
-                    if (s > 1) "Hello" else null
+            val res3: String? = share(initV1) {
+                val min = it.toMap().minBy { v -> v.value }.value
+                sendButReturn(min) {
+                    if (min > 1) "Hello" else null
                 }
             }
             res3 shouldBe null
