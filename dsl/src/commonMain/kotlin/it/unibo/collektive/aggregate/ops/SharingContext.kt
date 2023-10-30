@@ -31,8 +31,6 @@ class SharingContext<Initial, Return> {
         return toReturn
     }
 
-//    fun Initial.returning(toReturn: () -> Return) = toReturn().also { toBeSent = this }
-
     /**
      * When the [share] computation is done, it evaluates the lambda [toReturn] over [toSend] value and returns its result.
      * ## Example
