@@ -17,14 +17,14 @@ class SharingContext<Initial, Return> {
      * ```
      * val result = share(0) {
      *   val maxValue = it.maxBy { v -> v.value }.value
-     *   maxValue yielding "A string"
+     *   maxValue.yielding { "A string" }
      * }
      * result // result: Kotlin.String
      * ```
      * ```
      * val result = share(0) {
-     *   val max = it.minBy { v -> v.value }.value
-     *   max yielding { if (max > 1) "Hello" else null }
+     *   val max = it.maxBy { v -> v.value }.value
+     *   max.yielding { if (max > 1) "Hello" else null }
      * }
      * result // result: Kotlin.String?
      * ```
