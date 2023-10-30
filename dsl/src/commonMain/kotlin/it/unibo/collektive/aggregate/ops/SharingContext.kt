@@ -24,7 +24,7 @@ class SharingContext<Initial, Return> {
      * The invoke of [yielding] as the last statement of the body of the [share],
      * sent to the neighbours the [toSend] value, but returns from the [share] the [toReturn] value.
      */
-    infix fun Initial.yielding(toReturn: Return): Return {
+    fun Initial.yielding(toReturn: Return): Return {
         toBeSent = this
         toBeReturned = toReturn
         areSameType = false
@@ -41,6 +41,6 @@ class SharingContext<Initial, Return> {
      * }
      * ```
      */
-    infix fun Initial.yielding(toReturn: () -> Return): Return =
+    fun Initial.yielding(toReturn: () -> Return): Return =
         yielding(toReturn())
 }
