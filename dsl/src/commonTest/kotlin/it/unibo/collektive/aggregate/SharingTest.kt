@@ -3,8 +3,8 @@ package it.unibo.collektive.aggregate
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.IntId
-import it.unibo.collektive.aggregate.ops.SharingContext
 import it.unibo.collektive.aggregate.ops.share
+import it.unibo.collektive.aggregate.ops.shareYielding
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
@@ -25,7 +25,7 @@ class SharingTest : StringSpec({
     val initV7 = 7
     val initV10 = 10
 
-    val findMax: SharingContext<Int, Int>.(Field<Int>) -> Int = { e -> e.toMap().maxBy { it.value }.value }
+    val findMax: (Field<Int>) -> Int = { e -> e.maxBy { it.value }.value }
 
     "first time sharing" {
         aggregate(id0) {
@@ -75,30 +75,47 @@ class SharingTest : StringSpec({
         }
     }
 
-    "Sharing should work fine even with null as value" {
+    "Share with lambda body should work fine" {
         val nm = NetworkManager()
         var i = 0
         val condition: () -> Boolean = { i++ < 1 }
-
-        // Device 1
         val testNetwork1 = NetworkImplTest(nm, id1)
+
         aggregate(id1, condition, testNetwork1) {
-            val res1 = share(initV1) {
+            val res = share(initV1) {
                 it.maxBy { v -> v.value }.value
             }
-            res1 shouldBe initV1
+            res shouldBe initV1
+        }
+    }
 
-            val res2 = share(initV1) {
+    "ShareYielding should return the value passed in the yielding function" {
+        val nm = NetworkManager()
+        var i = 0
+        val condition: () -> Boolean = { i++ < 1 }
+        val testNetwork1 = NetworkImplTest(nm, id1)
+
+        aggregate(id1, condition, testNetwork1) {
+            val res = shareYielding(initV1) {
                 val min = it.maxBy { v -> v.value }.value
                 min.yielding { "A string" }
             }
-            res2 shouldBe "A string"
+            res shouldBe "A string"
+        }
+    }
 
-            val res3 = share(initV1) {
+    "ShareYielding should work fine even with null as value" {
+        val nm = NetworkManager()
+        var i = 0
+        val condition: () -> Boolean = { i++ < 1 }
+        val testNetwork1 = NetworkImplTest(nm, id1)
+
+        aggregate(id1, condition, testNetwork1) {
+            val res = shareYielding(initV1) {
                 val min = it.minBy { v -> v.value }.value
-                min.yielding { if (min > 1) "Hello" else null }
+                min.yielding { "Hello".takeIf { min > 1 } }
             }
-            res3 shouldBe null
+            res shouldBe null
         }
     }
 })
