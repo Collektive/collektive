@@ -9,7 +9,7 @@ class SharingContext<Initial, Return> {
     internal var areSameType = true
 
     /**
-     * Express the lambda [toReturn] when the [shareYielding] computation is done.
+     * Express the lambda [toReturn] when the [sharing] computation is done.
      * Usually the [toReturn] value is different from the [toSend],
      * otherwise use [share] without calling this function to return the value [toSend].
      * It can be used with checks after the invocation.
