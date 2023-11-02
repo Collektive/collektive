@@ -25,7 +25,10 @@ interface Field<out T> : Map<ID, T> {
     /**
      * Function for generic manipulation of the field.
      */
-    fun <B> mapField(transform: (ID, T) -> B): Field<B> = Field(localId, mapValues { (id, value) -> transform(id, value) })
+    fun <B> mapField(transform: (ID, T) -> B): Field<B> = Field(
+        localId,
+        mapValues { (id, value) -> transform(id, value) },
+    )
 
     /**
      * Transform the field into a map.

@@ -26,8 +26,8 @@ sealed interface OutboundMessage : Message
 data class IsotropicMessage(val senderId: ID, val message: Map<Path, *>) : OutboundMessage
 
 /**
- * An [AnisotropicMessage] is a [message] that a device [senderId] wants to send only to a specific neighbour [receiverId],
- * without being received also from other neighbours.
+ * An [AnisotropicMessage] is a [message] that a device [senderId] wants to send only to a specific neighbour
+ * [receiverId], without being received also from other neighbours.
  */
 data class AnisotropicMessage(val senderId: ID, val receiverId: ID, val message: Map<Path, *>) : OutboundMessage
 
