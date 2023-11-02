@@ -47,7 +47,9 @@ class IfConditionTest : StringSpec({
         }
         var paths = emptySet<Path>()
         result.toSend.forEach { paths = paths + it.getPaths() }
-        paths shouldContain Path(listOf("branch[customCondition1 & customCondition2, true]", "neighbouring.1", "exchange.1"))
+        paths shouldContain Path(
+            listOf("branch[customCondition1 & customCondition2, true]", "neighbouring.1", "exchange.1"),
+        )
     }
 
     "Function or condition if" {
@@ -58,7 +60,13 @@ class IfConditionTest : StringSpec({
         }
         var paths = emptySet<Path>()
         result.toSend.forEach { paths = paths + it.getPaths() }
-        paths shouldContain Path(listOf("branch[customCondition1 | customCondition2, true]", "neighbouring.1", "exchange.1"))
+        paths shouldContain Path(
+            listOf(
+                "branch[customCondition1 | customCondition2, true]",
+                "neighbouring.1",
+                "exchange.1",
+            ),
+        )
     }
 
     "Function not condition if" {
@@ -69,6 +77,12 @@ class IfConditionTest : StringSpec({
         }
         var paths = emptySet<Path>()
         result.toSend.forEach { paths = paths + it.getPaths() }
-        paths shouldContain Path(listOf("branch[customCondition1 & not customCondition2, true]", "neighbouring.1", "exchange.1"))
+        paths shouldContain Path(
+            listOf(
+                "branch[customCondition1 & not customCondition2, true]",
+                "neighbouring.1",
+                "exchange.1",
+            ),
+        )
     }
 })
