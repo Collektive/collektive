@@ -26,20 +26,12 @@ fun <Return> AggregateContext.neighbouring(type: Return): Field<Return> {
 }
 
 /**
- * [share] captures the space-time nature of field computation through observation of neighbours' values, starting from
- * an [initial] value, it reduces to a single local value given a [transform] function and updating and sharing to
- * neighbours of a local variable.
+ * [sharing] captures the space-time nature of field computation through observation of neighbours' values, starting from an [initial] value,
+ * it reduces to a single local value given a [transform] function and updating and sharing to neighbours of a local variable.
  * ```
- * val result = share(0) {
- *   it.maxBy { v -> v.value }.value
- * }
- * result // result: kotlin.Int
- * ```
- * In the example above, the function [share] wil return a value that is the max found in the field.
- * ```
- * val result = share(0) {
+ * val result = shareYielding(0) {
  *   val maxValue = it.maxBy { v -> v.value }.value
- *   maxValue yielding "Something different"
+ *   maxValue.yielding { "Something different" }
  * }
  * result // result: kotlin.String
  * ```
@@ -56,7 +48,7 @@ fun <Return> AggregateContext.neighbouring(type: Return): Field<Return> {
  * }
  * ```
  */
-fun <Initial, Return> AggregateContext.shareYielding(
+fun <Initial, Return> AggregateContext.sharing(
     initial: Initial,
     transform: SharingContext<Initial, Return>.(Field<Initial>) -> SharingResult<Initial, Return>,
 ): Return {
@@ -80,7 +72,7 @@ fun <Initial, Return> AggregateContext.shareYielding(
  * In the example above, the function [share] wil return a value that is the max found in the field.
  **/
 fun <Initial> AggregateContext.share(initial: Initial, transform: (Field<Initial>) -> Initial): Initial =
-    shareYielding(initial) {
+    sharing(initial) {
         val res = transform(it)
         SharingResult(res, res)
     }
