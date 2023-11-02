@@ -9,31 +9,33 @@ class SharingContext<Initial, Return> {
     internal var areSameType = true
 
     /**
-     * Express the lambda [toReturn] when the [share] computation is done.
+     * Express the lambda [toReturn] when the [shareYielding] computation is done.
      * Usually the [toReturn] value is different from the [toSend],
      * otherwise use [share] without calling this function to return the value [toSend].
      * It can be used with checks after the invocation.
      * ## Example
      * ```
-     * val result = share(0) {
+     * val result = shareYielding(0) {
      *   val maxValue = it.maxBy { v -> v.value }.value
      *   maxValue.yielding { "A string" }
      * }
      * result // result: Kotlin.String
      * ```
      * ```
-     * val result = share(0) {
+     * val result = shareYielding(0) {
      *   val max = it.maxBy { v -> v.value }.value
-     *   max.yielding { if (max > 1) "Hello" else null }
+     *   max.yielding { "Hello".takeIf { min > 1 } }
      * }
      * result // result: Kotlin.String?
      * ```
      * The invoke of [yielding] as the last statement of the body of the [share],
      * sent to the neighbours the [toSend] value, but returns from the [share] the [toReturn] value.
      */
-    fun Initial.yielding(toReturn: () -> Return): Return {
-        toBeSent = this
-        areSameType = false
-        return toReturn().also { toBeReturned = it }
-    }
+    fun Initial.yielding(toReturn: () -> Return): SharingResult<Initial, Return> =
+        SharingResult(this, toReturn())
 }
+
+/**
+ * Specifies the value [toSend] and the value [toReturn] of a [SharingContext.yielding] function.
+ */
+data class SharingResult<Initial, Return>(val toSend: Initial, val toReturn: Return)
