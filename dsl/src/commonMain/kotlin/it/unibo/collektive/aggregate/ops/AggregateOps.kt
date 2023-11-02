@@ -1,5 +1,9 @@
 package it.unibo.collektive.aggregate.ops
 
+import arrow.core.Option
+import arrow.core.getOrElse
+import arrow.core.none
+import arrow.core.some
 import it.unibo.collektive.aggregate.AggregateContext
 import it.unibo.collektive.field.Field
 
@@ -47,23 +51,36 @@ fun <Return> AggregateContext.neighbouring(type: Return): Field<Return> {
  * ```
  * share(0) {
  *  val maxValue = it.maxBy { v -> v.value }.value
- *  maxValue yielding "Don't do this"
+ *  maxValue.yielding { "Don't do this" }
  *  maxValue
  * }
  * ```
  */
-@Suppress("UNCHECKED_CAST")
-fun <Initial, Return> AggregateContext.share(
+fun <Initial, Return> AggregateContext.shareYielding(
     initial: Initial,
-    transform: SharingContext<Initial, Return>.(Field<Initial>) -> Return,
+    transform: SharingContext<Initial, Return>.(Field<Initial>) -> SharingResult<Initial, Return>,
 ): Return {
     val context = SharingContext<Initial, Return>()
-    val local = exchange(initial) {
-        it.mapField { _, _ ->
-            val ts = transform(context, it)
-            if (!context.areSameType) context.toBeSent else ts as Initial
-        }
-    }.local
-
-    return if (context.areSameType) local as Return else context.toBeReturned as Return
+    var res: Option<SharingResult<Initial, Return>> = none()
+    exchange(initial) {
+        it.mapField { _, _ -> transform(context, it).also { r -> res = r.some() }.toSend }
+    }
+    return res.getOrElse { error("This error should never be thrown") }.toReturn
 }
+
+/**
+ * [share] captures the space-time nature of field computation through observation of neighbours' values, starting from an [initial] value,
+ * it reduces to a single local value given a [transform] function and updating and sharing to neighbours of a local variable.
+ * ```
+ * val result = share(0) {
+ *   it.maxBy { v -> v.value }.value
+ * }
+ * result // result: kotlin.Int
+ * ```
+ * In the example above, the function [share] wil return a value that is the max found in the field.
+ **/
+fun <Initial> AggregateContext.share(initial: Initial, transform: (Field<Initial>) -> Initial): Initial =
+    shareYielding(initial) {
+        val res = transform(it)
+        SharingResult(res, res)
+    }
