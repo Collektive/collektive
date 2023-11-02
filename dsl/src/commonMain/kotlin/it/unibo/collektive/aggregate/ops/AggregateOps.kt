@@ -26,8 +26,9 @@ fun <Return> AggregateContext.neighbouring(type: Return): Field<Return> {
 }
 
 /**
- * [sharing] captures the space-time nature of field computation through observation of neighbours' values, starting from an [initial] value,
- * it reduces to a single local value given a [transform] function and updating and sharing to neighbours of a local variable.
+ * [sharing] captures the space-time nature of field computation through observation of neighbours' values, starting
+ * from an [initial] value, it reduces to a single local value given a [transform] function and updating and sharing
+ * to neighbours of a local variable.
  * ```
  * val result = sharing(0) {
  *   val maxValue = it.maxBy { v -> v.value }.value
@@ -61,8 +62,9 @@ fun <Initial, Return> AggregateContext.sharing(
 }
 
 /**
- * [share] captures the space-time nature of field computation through observation of neighbours' values, starting from an [initial] value,
- * it reduces to a single local value given a [transform] function and updating and sharing to neighbours of a local variable.
+ * [share] captures the space-time nature of field computation through observation of neighbours' values, starting
+ * from an [initial] value, it reduces to a single local value given a [transform] function and updating and sharing to
+ * neighbours of a local variable.
  * ```
  * val result = share(0) {
  *   it.maxBy { v -> v.value }.value
