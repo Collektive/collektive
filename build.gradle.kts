@@ -8,7 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.dokka)
     alias(libs.plugins.publishOnCentral)
-    alias(libs.plugins.detekt)
+    alias(libs.plugins.kotlin.qa)
     alias(libs.plugins.gitSemVer)
     alias(libs.plugins.taskTree)
     alias(libs.plugins.kover)
@@ -30,7 +30,7 @@ allprojects {
     with(rootProject.libs.plugins) {
         apply(plugin = dokka.id)
         apply(plugin = publishOnCentral.id)
-        apply(plugin = detekt.id)
+        apply(plugin = kotlin.qa.id)
         apply(plugin = gitSemVer.id)
         apply(plugin = taskTree.id)
         apply(plugin = kover.id)
@@ -87,7 +87,7 @@ allprojects {
     }
 
     // Enforce the use of the Kotlin version in all subprojects
-    configurations.all {
+    configurations.matching { it.name != "detekt" }.all {
         resolutionStrategy.eachDependency {
             if (requested.group == "org.jetbrains.kotlin") {
                 useVersion(rootProject.libs.versions.kotlin.get())
@@ -98,15 +98,6 @@ allprojects {
         }
     }
 
-    detekt {
-        config.setFrom("${rootDir.absolutePath}/detekt.yml")
-        parallel = true
-        buildUponDefaultConfig = true
-        ignoreFailures = false
-    }
-    dependencies {
-        detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.3")
-    }
     tasks.withType<Detekt>().configureEach { finalizedBy(reportMerge) }
     reportMerge {
         input.from(tasks.withType<Detekt>().map { it.sarifReportFile })
