@@ -15,14 +15,14 @@ class SharingContext<Initial, Return> {
      * It can be used with checks after the invocation.
      * ## Example
      * ```
-     * val result = shareYielding(0) {
+     * val result = sharing(0) {
      *   val maxValue = it.maxBy { v -> v.value }.value
      *   maxValue.yielding { "A string" }
      * }
      * result // result: Kotlin.String
      * ```
      * ```
-     * val result = shareYielding(0) {
+     * val result = sharing(0) {
      *   val max = it.maxBy { v -> v.value }.value
      *   max.yielding { "Hello".takeIf { min > 1 } }
      * }
