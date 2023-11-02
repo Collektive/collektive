@@ -4,7 +4,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.ops.share
-import it.unibo.collektive.aggregate.ops.shareYielding
+import it.unibo.collektive.aggregate.ops.sharing
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
@@ -96,7 +96,7 @@ class SharingTest : StringSpec({
         val testNetwork1 = NetworkImplTest(nm, id1)
 
         aggregate(id1, condition, testNetwork1) {
-            val res = shareYielding(initV1) {
+            val res = sharing(initV1) {
                 val min = it.maxBy { v -> v.value }.value
                 min.yielding { "A string" }
             }
@@ -111,7 +111,7 @@ class SharingTest : StringSpec({
         val testNetwork1 = NetworkImplTest(nm, id1)
 
         aggregate(id1, condition, testNetwork1) {
-            val res = shareYielding(initV1) {
+            val res = sharing(initV1) {
                 val min = it.minBy { v -> v.value }.value
                 min.yielding { "Hello".takeIf { min > 1 } }
             }
