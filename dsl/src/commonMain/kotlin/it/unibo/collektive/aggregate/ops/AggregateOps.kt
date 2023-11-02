@@ -22,8 +22,9 @@ fun <Return> AggregateContext.neighbouring(type: Return): Field<Return> {
 }
 
 /**
- * [share] captures the space-time nature of field computation through observation of neighbours' values, starting from an [initial] value,
- * it reduces to a single local value given a [transform] function and updating and sharing to neighbours of a local variable.
+ * [share] captures the space-time nature of field computation through observation of neighbours' values, starting from
+ * an [initial] value, it reduces to a single local value given a [transform] function and updating and sharing to
+ * neighbours of a local variable.
  * ```
  * val result = share(0) {
  *   it.toMap().maxBy { v -> v.value }.value
@@ -48,7 +49,10 @@ fun <Return> AggregateContext.neighbouring(type: Return): Field<Return> {
  * ```
  */
 @Suppress("UNCHECKED_CAST")
-fun <Initial, Return> AggregateContext.share(initial: Initial, transform: SharingContext<Initial, Return>.(Field<Initial>) -> Return): Return {
+fun <Initial, Return> AggregateContext.share(
+    initial: Initial,
+    transform: SharingContext<Initial, Return>.(Field<Initial>) -> Return,
+): Return {
     val context = SharingContext<Initial, Return>()
     val local = exchange(initial) {
         it.mapField { _, _ ->

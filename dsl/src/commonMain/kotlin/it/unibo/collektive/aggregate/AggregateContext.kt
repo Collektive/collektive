@@ -53,8 +53,8 @@ class AggregateContext(
      *  f.mapField { _, v -> if (v % 2 == 0) v + 1 else v * 2 }
      * }
      * ```
-     * The result of the exchange function is a field with as messages a map with key the id of devices across the network
-     * and the result of the computation passed as relative local values.
+     * The result of the exchange function is a field with as messages a map with key the id of devices across the
+     * network and the result of the computation passed as relative local values.
      */
     fun <X, Y> exchange(initial: X, body: (Field<X>) -> Field<Y>): Field<Y> {
         val messages = messagesAt<X>(stack.currentPath())
@@ -76,12 +76,15 @@ class AggregateContext(
                         ).toSet()
                 }
             }
-            state = state.filterNot { stack.currentPath() == it.path }.toSet() + State(stack.currentPath(), field.local)
+            state = state
+                .filterNot { stack.currentPath() == it.path }
+                .toSet() + State(stack.currentPath(), field.local)
         }
     }
 
     /**
-     * Iteratively updates the value of the input expression [repeat] at each device using the last computed value or the [initial].
+     * Iteratively updates the value of the input expression [repeat] at each device using the last computed value or
+     * the [initial].
      */
     fun <X, Y> repeating(initial: X, repeat: (X) -> Y): Y {
         val res = stateAt<X>(stack.currentPath())?.let { repeat(it) } ?: repeat(initial)
@@ -109,8 +112,8 @@ class AggregateContext(
 }
 
 /**
- * Aggregate program entry point which computes a single iteration of a device [localId], taking as parameters the previous [state],
- * the [messages] received from the neighbours and the [init] with AggregateContext
+ * Aggregate program entry point which computes a single iteration of a device [localId], taking as parameters
+ * the previous [state], the [messages] received from the neighbours and the [init] with AggregateContext
  * object receiver that provides the aggregate constructs.
  */
 fun <X> aggregate(

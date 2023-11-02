@@ -43,6 +43,8 @@ class RepeatingTest : StringSpec({
             }
         }
         result.result.local shouldBe initV1 * 2
-        result.toSend.firstOrNull()?.getPaths()?.shouldContain(Path(listOf("repeating.1", "neighbouring.1", "exchange.1")))
+        result.toSend.firstOrNull()?.getPaths()?.shouldContain(
+            Path(listOf("repeating.1", "neighbouring.1", "exchange.1")),
+        )
     }
 })
