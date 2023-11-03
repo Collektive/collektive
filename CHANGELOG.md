@@ -1,3 +1,38 @@
+## [2.0.0](https://github.com/Collektive/collektive/compare/1.0.0...2.0.0) (2023-11-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* update usage and functioning of old "butReturn" into "yielding" in share function (#90)
+
+### Features
+
+* update usage and functioning of old "butReturn" into "yielding" in share function ([#90](https://github.com/Collektive/collektive/issues/90)) ([d7e8c7f](https://github.com/Collektive/collektive/commit/d7e8c7ff1cf830ad4a4bff1ef8747d9c7d450c4c))
+
+
+### Dependency updates
+
+* **deps:** update dependency io.gitlab.arturbosch.detekt:detekt-formatting to v1.23.2 ([9f4b5a8](https://github.com/Collektive/collektive/commit/9f4b5a888c4d3cb42b9b7a1e8780be353bdc5abb))
+* **deps:** update dependency io.gitlab.arturbosch.detekt:detekt-formatting to v1.23.3 ([786ab0c](https://github.com/Collektive/collektive/commit/786ab0c5f266eaba666134a93642a82b5ed237a4))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.70 ([7e07f66](https://github.com/Collektive/collektive/commit/7e07f665d891f5af7964a5154f1c219e02035ad4))
+* **deps:** update plugin detekt to v1.23.2 ([a13f8c6](https://github.com/Collektive/collektive/commit/a13f8c62dd1870c60cd075341fe3175a503a07c3))
+* **deps:** update plugin detekt to v1.23.3 ([f227bc6](https://github.com/Collektive/collektive/commit/f227bc6ed35b2c8b2631ca61bf319cd2554b1e8e))
+* **deps:** update plugin gitsemver to v2.0.1 ([b4357f2](https://github.com/Collektive/collektive/commit/b4357f29fe625cd21774ca9583bb285b6986f394))
+* **deps:** update plugin kotlin-qa to v0.25.1 ([3ffd0a7](https://github.com/Collektive/collektive/commit/3ffd0a755553fabaed26628ee0f7e8e5746711ab))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v1.1.14 ([ad55cd5](https://github.com/Collektive/collektive/commit/ad55cd5acb49e153bab871a857570d0768b998bc))
+* **deps:** update plugin publishoncentral to v5.0.17 ([25e59c3](https://github.com/Collektive/collektive/commit/25e59c3361c3d1b670f845231e64b78c1ba02502))
+* **deps:** update plugin publishoncentral to v5.0.18 ([3061639](https://github.com/Collektive/collektive/commit/30616395da9ea82009f419b9df44ca21f6d00a92))
+
+
+### Build and continuous integration
+
+* switch to gradle-kotlin-qa ([fc929ca](https://github.com/Collektive/collektive/commit/fc929ca9f67c1d6daa0291ac2806a4c91d171574))
+
+
+### General maintenance
+
+* **license:** create license file ([29a96e4](https://github.com/Collektive/collektive/commit/29a96e4a9382ce128388bc6f0cb12771cf8d26f4))
+
 ## [1.0.0](https://github.com/Collektive/collektive/compare/0.4.2...1.0.0) (2023-10-27)
 
 
