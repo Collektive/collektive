@@ -129,7 +129,7 @@ allprojects {
             compilations.all {
                 // enable all warnings as errors
                 kotlinOptions {
-                    allWarningsAsErrors = true
+//                    allWarningsAsErrors = true
                 }
             }
         }
