@@ -2,10 +2,14 @@ import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektPlugin
 import io.gitlab.arturbosch.detekt.report.ReportMergeTask
 import org.danilopianini.gradle.mavencentral.DocStyle
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.internal.os.OperatingSystem
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
-    alias(libs.plugins.kotlin.jvm) apply false
-    alias(libs.plugins.kotlin.multiplatform) apply false
+    // alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.dokka)
     alias(libs.plugins.publishOnCentral)
     alias(libs.plugins.kotlin.qa)
@@ -20,6 +24,8 @@ val reportMerge by tasks.registering(ReportMergeTask::class) {
     output.set(project.layout.buildDirectory.file("reports/detekt/merge.sarif"))
 }
 
+val os: OperatingSystem = OperatingSystem.current()
+
 allprojects {
     group = "it.unibo.${rootProject.name}"
 
@@ -28,12 +34,129 @@ allprojects {
     }
 
     with(rootProject.libs.plugins) {
+        apply(plugin = kotlin.multiplatform.id)
         apply(plugin = dokka.id)
         apply(plugin = publishOnCentral.id)
         apply(plugin = kotlin.qa.id)
         apply(plugin = gitSemVer.id)
         apply(plugin = taskTree.id)
         apply(plugin = kover.id)
+    }
+
+    kotlin {
+        jvm {
+            testRuns["test"].executionTask.configure {
+                useJUnitPlatform()
+                filter {
+                    isFailOnNoMatchingTests = false
+                }
+                testLogging {
+                    showExceptions = true
+                    events = setOf(
+                        TestLogEvent.FAILED,
+                        TestLogEvent.PASSED,
+                    )
+                    exceptionFormat = TestExceptionFormat.FULL
+                }
+            }
+        }
+
+        sourceSets {
+            val commonMain by getting {
+                dependencies {
+                    implementation(rootProject.libs.kotlinx.coroutines)
+                }
+            }
+            val commonTest by getting {
+                dependencies {
+                    implementation(rootProject.libs.bundles.kotlin.testing.common)
+                }
+            }
+            val jvmTest by getting {
+                dependencies {
+                    implementation(rootProject.libs.kotest.runner.junit5.jvm)
+                }
+            }
+            val nativeMain by creating {
+                dependsOn(commonMain)
+            }
+            val nativeTest by creating {
+                dependsOn(commonTest)
+            }
+
+            all {
+                languageSettings {
+                    languageVersion = "2.0"
+                }
+            }
+        }
+
+        js(IR) {
+            browser()
+            nodejs()
+            binaries.library()
+        }
+
+        val nativeSetup: KotlinNativeTarget.() -> Unit = {
+            compilations["main"].defaultSourceSet.dependsOn(kotlin.sourceSets["nativeMain"])
+            compilations["test"].defaultSourceSet.dependsOn(kotlin.sourceSets["nativeTest"])
+            binaries {
+                sharedLib()
+                staticLib()
+            }
+        }
+
+        applyDefaultHierarchyTemplate()
+
+        linuxX64(nativeSetup)
+        linuxArm64(nativeSetup)
+
+        mingwX64(nativeSetup)
+
+        macosX64(nativeSetup)
+        macosArm64(nativeSetup)
+        iosArm64(nativeSetup)
+        iosX64(nativeSetup)
+        iosSimulatorArm64(nativeSetup)
+        watchosArm64(nativeSetup)
+        watchosX64(nativeSetup)
+        watchosSimulatorArm64(nativeSetup)
+        tvosArm64(nativeSetup)
+        tvosX64(nativeSetup)
+        tvosSimulatorArm64(nativeSetup)
+
+        targets.all {
+            compilations.all {
+                // enable all warnings as errors
+                kotlinOptions {
+                    allWarningsAsErrors = true
+                }
+            }
+        }
+
+        // Disable cross compilation
+        val excludeTargets = when {
+            os.isLinux -> kotlin.targets.filterNot { "linux" in it.name }
+            os.isWindows -> kotlin.targets.filterNot { "mingw" in it.name }
+            os.isMacOsX -> kotlin.targets.filter { "linux" in it.name || "mingw" in it.name }
+            else -> emptyList()
+        }.mapNotNull { it as? KotlinNativeTarget }
+
+        configure(excludeTargets) {
+            compilations.configureEach {
+                cinterops.configureEach { tasks[interopProcessingTaskName].enabled = false }
+                compileTaskProvider.get().enabled = false
+                tasks[processResourcesTaskName].enabled = false
+            }
+            binaries.configureEach { linkTask.enabled = false }
+
+            mavenPublication {
+                tasks.withType<AbstractPublishToMaven>()
+                    .configureEach { onlyIf { publication != this@mavenPublication } }
+                tasks.withType<GenerateModuleMetadata>()
+                    .configureEach { onlyIf { publication.get() != this@mavenPublication } }
+            }
+        }
     }
 
     signing {
