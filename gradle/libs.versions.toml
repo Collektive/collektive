@@ -14,7 +14,7 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotl
 kotlin-test-common = { module = "org.jetbrains.kotlin:kotlin-test-common", version.ref = "kotlin" }
 kotlin-test-annotations-common = { module = "org.jetbrains.kotlin:kotlin-test-annotations-common", version.ref = "kotlin" }
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
-arrow = { module = "io.arrow-kt:arrow-core", version = "1.2.0" }
+arrow = { module = "io.arrow-kt:arrow-core", version = "1.2.1" }
 
 [bundles]
 kotlin-testing-common = [
