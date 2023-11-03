@@ -16,7 +16,7 @@ class TestAlignment : StringSpec({
             val result = aggregate(IntId(0)) {
                 neighbouring(10) // path -> [neighbouring.1] = 10
                 share(0) {
-                    neighbouring(20) // path -> [sharing.1, neighbouring.2] = 20
+                    requireNotNull(neighbouring(20).local) // path -> [share.1, neighbouring.2] = 20
                 } // path -> [sharing.1] = Field(...)
                 neighbouring(30) // path -> [neighbouring.3] = 30
                 5
@@ -24,12 +24,14 @@ class TestAlignment : StringSpec({
 
             result.result shouldBe 5
             var paths = emptySet<Path>()
-            result.toSend.forEach { paths = paths + it.getPaths() }
+            result.toSend.forEach {
+                paths = paths + it.getPaths()
+            }
             paths.size shouldBe 4 // 4 paths of alignment
             paths shouldContainAll setOf(
                 Path(listOf("neighbouring.1", "exchange.1")),
-                Path(listOf("share.1", "exchange.1", "neighbouring.2", "exchange.1")),
-                Path(listOf("share.1", "exchange.1")),
+                Path(listOf("share.1", "sharing.1", "exchange.1", "neighbouring.2", "exchange.1")),
+                Path(listOf("share.1", "sharing.1", "exchange.1")),
                 Path(listOf("neighbouring.3", "exchange.1")),
             )
         }
