@@ -33,8 +33,11 @@ import org.jetbrains.kotlin.ir.expressions.IrWhen
 import org.jetbrains.kotlin.ir.expressions.impl.IrFunctionExpressionImpl
 import org.jetbrains.kotlin.ir.expressions.putArgument
 import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.types.classFqName
+import org.jetbrains.kotlin.ir.types.getClass
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.types.checker.SimpleClassicTypeSystemContext.asSimpleType
 
 internal fun IrSingleStatementBuilder.buildAlignedOn(
     pluginContext: IrPluginContext,
@@ -169,7 +172,7 @@ private fun conditionName(condition: IrExpression): String {
     return when (condition) {
         is IrGetValue -> condition.symbol.owner.name.asString()
         is IrConst<*> -> "constant"
-        is IrTypeOperatorCall -> condition.operator.name + " " + condition.typeOperand.asString() // 'is' in the 'when'
+        is IrTypeOperatorCall -> condition.operator.name + " " + condition.typeOperand.classFqName // 'is' in the 'when'
         is IrCall -> condition.symbol.owner.name.asString() +
             if (condition.origin == IrStatementOrigin.EXCL && condition.dispatchReceiver != null) {
                 " " + conditionName(condition.dispatchReceiver!!)
