@@ -4,9 +4,6 @@ package it.unibo.collektive.aggregate.ops
  * The lambda context passed to the [share] function.
  */
 class SharingContext<Initial, Return> {
-    internal var toBeSent: Initial? = null
-    internal var toBeReturned: Return? = null
-    internal var areSameType = true
 
     /**
      * Express the lambda [toReturn] when the [sharing] computation is done.
