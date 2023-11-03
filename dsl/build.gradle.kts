@@ -69,6 +69,8 @@ kotlin {
         }
     }
 
+    applyDefaultHierarchyTemplate()
+
     linuxX64(nativeSetup)
     linuxArm64(nativeSetup)
 
@@ -76,9 +78,15 @@ kotlin {
 
     macosX64(nativeSetup)
     macosArm64(nativeSetup)
-    ios(nativeSetup)
-    watchos(nativeSetup)
-    tvos(nativeSetup)
+    iosArm64(nativeSetup)
+    iosX64(nativeSetup)
+    iosSimulatorArm64(nativeSetup)
+    watchosArm64(nativeSetup)
+    watchosX64(nativeSetup)
+    watchosSimulatorArm64(nativeSetup)
+    tvosArm64(nativeSetup)
+    tvosX64(nativeSetup)
+    tvosSimulatorArm64(nativeSetup)
 
     targets.all {
         compilations.all {
