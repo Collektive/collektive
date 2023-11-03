@@ -28,6 +28,14 @@ allprojects {
         apply(plugin = taskTree.id)
     }
 
+    kotlin {
+        sourceSets.all {
+            languageSettings {
+                languageVersion = "2.0"
+            }
+        }
+    }
+
     signing {
         if (System.getenv("CI") == "true") {
             val signingKey: String? by project
