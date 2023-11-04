@@ -34,10 +34,8 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrFunctionExpressionImpl
 import org.jetbrains.kotlin.ir.expressions.putArgument
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classFqName
-import org.jetbrains.kotlin.ir.types.getClass
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.types.checker.SimpleClassicTypeSystemContext.asSimpleType
 
 internal fun IrSingleStatementBuilder.buildAlignedOn(
     pluginContext: IrPluginContext,
@@ -174,24 +172,16 @@ private fun conditionName(condition: IrExpression): String {
         is IrConst<*> -> "constant"
         is IrTypeOperatorCall -> condition.operator.name + " " + condition.typeOperand.classFqName // 'is' in the 'when'
         is IrCall -> condition.symbol.owner.name.asString() +
-            if (condition.origin == IrStatementOrigin.EXCL && condition.dispatchReceiver != null) {
-                " " + conditionName(condition.dispatchReceiver!!)
-            } else {
-                ""
-            }
+            (condition.dispatchReceiver?.let { " " + conditionName(it) } ?: "")
+        is IrWhen -> conditionName(condition.branches[0].condition) + when {
+            condition.origin == IrStatementOrigin.ANDAND -> " & " + conditionName(condition.branches[0].result)
+            else -> " | " + conditionName(condition.branches[1].result)
+        }
 
-        is IrWhen -> conditionName(condition.branches[0].condition) +
-            if (condition.origin == IrStatementOrigin.ANDAND) {
-                " & " + conditionName(condition.branches[0].result)
-            } else {
-                " | " + conditionName(condition.branches[1].result)
-            }
-
-        else ->
-            throw IllegalStateException(
-                "The current if condition type ${condition::class} has not been handled for the alignment yet. " +
-                    "Update the compiler plugin.",
-            )
+        else -> error(
+            "The current if condition type ${condition::class} has not been handled for the alignment yet. " +
+                "Update the compiler plugin.",
+        )
     }
 }
 
