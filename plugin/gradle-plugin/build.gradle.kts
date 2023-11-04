@@ -1,11 +1,10 @@
 plugins {
-    id("java-gradle-plugin")
+    `java-gradle-plugin`
     alias(libs.plugins.gradlePluginPublish)
 }
 
 dependencies {
-    implementation(kotlin("stdlib"))
-    implementation(kotlin("gradle-plugin-api"))
+    implementation(libs.kotlin.gradle.plugin)
 }
 
 buildConfig {
