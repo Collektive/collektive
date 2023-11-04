@@ -8,7 +8,6 @@ import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
-    // alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.dokka)
     alias(libs.plugins.publishOnCentral)
@@ -16,6 +15,7 @@ plugins {
     alias(libs.plugins.gitSemVer)
     alias(libs.plugins.taskTree)
     alias(libs.plugins.kover)
+    id("it.unibo.collektive.collektive-plugin")
 }
 
 val Provider<PluginDependency>.id: String get() = get().pluginId
@@ -42,6 +42,7 @@ allprojects {
         apply(plugin = taskTree.id)
         apply(plugin = kover.id)
     }
+    apply(plugin = "it.unibo.collektive.collektive-plugin")
 
     kotlin {
         jvm {
