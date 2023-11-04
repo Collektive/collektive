@@ -1,3 +1,30 @@
+## [2.0.1](https://github.com/Collektive/collektive/compare/2.0.0...2.0.1) (2023-11-04)
+
+
+### Dependency updates
+
+* **core-deps:** update kotlin monorepo to v1.9.20 ([f4ce9bb](https://github.com/Collektive/collektive/commit/f4ce9bbc193bbc8c9b51ce11001dcbb87b475810))
+* **deps:** add kotlin gradle api in the catalog ([870d3bc](https://github.com/Collektive/collektive/commit/870d3bc5b842f5553f25aaf3a6dced6ec3d931b2))
+* **deps:** update dependency io.arrow-kt:arrow-core to v1.2.1 ([8675ba4](https://github.com/Collektive/collektive/commit/8675ba4c73763741af3622b2e656bf815c556de6))
+* **deps:** update kotest to v5.8.0 ([7c5d415](https://github.com/Collektive/collektive/commit/7c5d4157795e3dab8c76b0de676b1d6e269c023d))
+
+
+### Bug Fixes
+
+* get alignOn function direclty from the AggregateContext class ([4f9507b](https://github.com/Collektive/collektive/commit/4f9507b3d2bea8ff574a8efb50a7a6627941deb7))
+* simplify branch representation for the alignemnt adpating to new K2 representation ([ba4fd08](https://github.com/Collektive/collektive/commit/ba4fd08d9db4fda653b12ece9bc367a9ce249849))
+* use new k2 compiler api ([c36561c](https://github.com/Collektive/collektive/commit/c36561c08d63c7b9a3d2755190529d3ee3c0dc8d))
+
+
+### Build and continuous integration
+
+* add arrow dependency ([5d04552](https://github.com/Collektive/collektive/commit/5d045520855867427f11795f8dff5a79859bcbf9))
+* apply collektive plugin to all (future) subprojects and not only to 'dsl' ([20b850f](https://github.com/Collektive/collektive/commit/20b850f8865e36a8cb625856256b0bdf7c41841d))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.2.11 ([8e3caee](https://github.com/Collektive/collektive/commit/8e3caeece78608b9e35e7b85095c2c7ab8691ebc))
+* enable default hierarchy template and remove deprecated targets ([e0a875b](https://github.com/Collektive/collektive/commit/e0a875b1401d650ab446638c8d45a6379bcd8f32))
+* enable k2 and minor gradle project refactoring ([49cb1b1](https://github.com/Collektive/collektive/commit/49cb1b1a9695ab2300f44bf0daa7b661da41ee11))
+* use catalog dependencies ([1d72f2f](https://github.com/Collektive/collektive/commit/1d72f2f1adf8904b22bb79daf30a4f06a68e3599))
+
 ## [2.0.0](https://github.com/Collektive/collektive/compare/1.0.0...2.0.0) (2023-11-03)
 
 
