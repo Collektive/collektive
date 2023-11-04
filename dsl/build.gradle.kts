@@ -1,7 +1,3 @@
-plugins {
-    id("it.unibo.collektive.collektive-plugin")
-}
-
 kotlin {
     sourceSets {
         val commonMain by getting {
