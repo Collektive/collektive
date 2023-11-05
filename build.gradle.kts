@@ -21,7 +21,7 @@ plugins {
 val Provider<PluginDependency>.id: String get() = get().pluginId
 
 val reportMerge by tasks.registering(ReportMergeTask::class) {
-    output.set(project.layout.buildDirectory.file("reports/detekt/merge.sarif"))
+    output = project.layout.buildDirectory.file("reports/detekt/merge.sarif")
 }
 
 val os: OperatingSystem = OperatingSystem.current()
@@ -172,26 +172,41 @@ allprojects {
     }
 
     publishOnCentral {
-        projectUrl.set("https://github.com/Collektive/${rootProject.name}")
-        projectLongName.set("collektive")
-        projectDescription.set("DSL for Aggregate Computing in Kotlin")
-        licenseName.set("MIT License")
-        licenseUrl.set("https://opensource.org/license/mit/")
-        docStyle.set(DocStyle.HTML)
+        projectUrl = "https://github.com/Collektive/${rootProject.name}"
+        projectLongName = "collektive"
+        projectDescription = "DSL for Aggregate Computing in Kotlin"
+        licenseName = "Apache License 2.0"
+        licenseUrl = "https://opensource.org/license/Apache-2.0/"
+        docStyle = DocStyle.HTML
         publishing {
             publications {
                 withType<MavenPublication>().configureEach {
                     if ("OSSRH" !in name) {
                         artifact(tasks.javadocJar)
                     }
-                    scmConnection.set("git:git@github.com:Collektive/${rootProject.name}")
-                    projectUrl.set("https://github.com/Collektive/${rootProject.name}")
+                    scmConnection = "git:git@github.com:Collektive/${rootProject.name}"
+                    projectUrl = "https://github.com/Collektive/${rootProject.name}"
                     pom {
                         developers {
                             developer {
-                                name.set("Elisa Tronetti")
-                                email.set("elisa.tronetti@studio.unibo.it")
-                                url.set("https://github.com/ElisaTronetti")
+                                name = "Elisa Tronetti"
+                                email = "elisa.tronetti@studio.unibo.it"
+                                url = "https://github.com/ElisaTronetti"
+                            }
+                            developer {
+                                name = "Danilo Pianini"
+                                email = "danilo.pianini@unibo.it"
+                                url = "https://danilopianini.org"
+                            }
+                            developer {
+                                name = "Nicolas Farabegoli"
+                                email = "nicolas.farabegoli@unibo.it"
+                                url = "https://nicolasfarabegoli.it"
+                            }
+                            developer {
+                                name = "Angela Cortecchia"
+                                email = "angela.cortecchia@studio.unibo.it"
+                                url = "https://github.com/angelacorte"
                             }
                         }
                     }
