@@ -15,7 +15,7 @@ interface Field<out T> : Map<ID, T> {
     /**
      * The value associated with the [localId].
      */
-    val local: T?
+    val local: T
 
     /**
      * Exclude the local node from the field.
@@ -52,5 +52,5 @@ internal data class FieldImpl<T>(
     override val localId: ID,
     private val messages: Map<ID, T>,
 ) : Field<T>, Map<ID, T> by messages {
-    override val local: T? = this[localId]
+    override val local: T = this[localId]!!
 }

@@ -2,10 +2,9 @@ package it.unibo.collektive.aggregate
 
 import it.unibo.collektive.ID
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.messages.AnisotropicMessage
 import it.unibo.collektive.messages.InboundMessage
-import it.unibo.collektive.messages.IsotropicMessage
 import it.unibo.collektive.messages.OutboundMessage
+import it.unibo.collektive.messages.SingleOutboundMessage
 import it.unibo.collektive.networking.Network
 import it.unibo.collektive.runUntil
 import it.unibo.collektive.singleCycle
@@ -26,12 +25,12 @@ class AggregateContext(
 
     private val stack = Stack<Any>()
     private var state = setOf<State<*>>()
-    private var toBeSent = setOf<OutboundMessage>()
+    private var toBeSent = OutboundMessage(localId, emptyMap())
 
     /**
      * Messages to send to the other nodes.
      */
-    fun messagesToSend(): Set<OutboundMessage> = toBeSent
+    fun messagesToSend(): OutboundMessage = toBeSent
 
     /**
      * Return the current state of the device as a new state.
@@ -56,26 +55,28 @@ class AggregateContext(
      * The result of the exchange function is a field with as messages a map with key the id of devices across the
      * network and the result of the computation passed as relative local values.
      */
-    fun <X, Y> exchange(initial: X, body: (Field<X>) -> Field<Y>): Field<Y> {
+    fun <X> exchange(initial: X, body: (Field<X>) -> Field<X>): Field<X> {
         val messages = messagesAt<X>(stack.currentPath())
         val previous = stateAt<X>(stack.currentPath()) ?: initial
         val subject = Field(localId, messages + (localId to previous))
         return body(subject).also { field ->
-            toBeSent = toBeSent + IsotropicMessage(localId, mapOf(stack.currentPath() to field.local))
-            if (messages.isNotEmpty()) {
-                field.toMap().filterNot { it.key == localId }.map { (id, value) ->
-                    val old = toBeSent
-                        .filterIsInstance<AnisotropicMessage>()
-                        .firstOrNull { it.senderId == localId && it.receiverId == id }
-                        ?: AnisotropicMessage(localId, id, mapOf(stack.currentPath() to value))
-                    toBeSent = (
-                        toBeSent
-                            .filterNot {
-                                it is AnisotropicMessage && it.senderId == localId && it.receiverId == id
-                            } + AnisotropicMessage(localId, id, old.message + (stack.currentPath() to value))
-                        ).toSet()
-                }
-            }
+            val message = SingleOutboundMessage<X>(field.local, field)
+            toBeSent = toBeSent.copy(messages = toBeSent.messages + (stack.currentPath() to message))
+//            toBeSent = toBeSent + IsotropicMessage(localId, mapOf(stack.currentPath() to field.local))
+//            if (messages.isNotEmpty()) {
+//                field.toMap().filterNot { it.key == localId }.map { (id, value) ->
+//                    val old = toBeSent
+//                        .filterIsInstance<AnisotropicMessage>()
+//                        .firstOrNull { it.senderId == localId && it.receiverId == id }
+//                        ?: AnisotropicMessage(localId, id, mapOf(stack.currentPath() to value))
+//                    toBeSent = (
+//                        toBeSent
+//                            .filterNot {
+//                                it is AnisotropicMessage && it.senderId == localId && it.receiverId == id
+//                            } + AnisotropicMessage(localId, id, old.message + (stack.currentPath() to value))
+//                        ).toSet()
+//                }
+//            }
             state = state
                 .filterNot { stack.currentPath() == it.path }
                 .toSet() + State(stack.currentPath(), field.local)

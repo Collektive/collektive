@@ -12,6 +12,6 @@ import it.unibo.collektive.state.State
 data class AggregateResult<R>(
     val localId: ID,
     val result: R,
-    val toSend: Set<OutboundMessage>,
+    val toSend: OutboundMessage,
     val newState: Set<State<*>>,
 )
