@@ -16,7 +16,7 @@ class TestAlignment : StringSpec({
             val result = aggregate(IntId(0)) {
                 neighbouring(10) // path -> [neighbouring.1] = 10
                 share(0) {
-                    requireNotNull(neighbouring(20).local) // path -> [share.1, neighbouring.2] = 20
+                    requireNotNull(neighbouring(20).localValue) // path -> [share.1, neighbouring.2] = 20
                 } // path -> [sharing.1] = Field(...)
                 neighbouring(30) // path -> [neighbouring.3] = 30
                 5

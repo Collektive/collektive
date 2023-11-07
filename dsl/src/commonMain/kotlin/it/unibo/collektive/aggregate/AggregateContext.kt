@@ -38,6 +38,8 @@ class AggregateContext(
      */
     fun newState(): Set<State<*>> = state
 
+    private fun <T> newField(localValue: T, others: Map<ID, T>): Field<T> = Field(localId, localValue, others)
+
     /**
      * This function computes the local value of e_i, substituting variable n with the nvalue w of
      * messages received from neighbours, using the local value of e_i ([initial]) as a default.
@@ -59,9 +61,9 @@ class AggregateContext(
     fun <X, Y> exchange(initial: X, body: (Field<X>) -> Field<Y>): Field<Y> {
         val messages = messagesAt<X>(stack.currentPath())
         val previous = stateAt<X>(stack.currentPath()) ?: initial
-        val subject = Field(localId, messages + (localId to previous))
+        val subject = newField(previous, messages)
         return body(subject).also { field ->
-            toBeSent = toBeSent + IsotropicMessage(localId, mapOf(stack.currentPath() to field.local))
+            toBeSent = toBeSent + IsotropicMessage(localId, mapOf(stack.currentPath() to field.localValue))
             if (messages.isNotEmpty()) {
                 field.toMap().filterNot { it.key == localId }.map { (id, value) ->
                     val old = toBeSent
@@ -78,7 +80,7 @@ class AggregateContext(
             }
             state = state
                 .filterNot { stack.currentPath() == it.path }
-                .toSet() + State(stack.currentPath(), field.local)
+                .toSet() + State(stack.currentPath(), field.localValue)
         }
     }
 

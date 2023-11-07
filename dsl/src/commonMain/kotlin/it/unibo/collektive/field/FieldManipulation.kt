@@ -1,36 +1,35 @@
 package it.unibo.collektive.field
 
-import it.unibo.collektive.ID
+import it.unibo.collektive.field.Field.Companion.hood
+import it.unibo.collektive.field.Field.Companion.reduce
 
 /**
  * Get the minimum value of a field.
  * @param includingSelf if true the local node is included in the computation.
  */
-fun <T : Comparable<T>> Field<T>.min(includingSelf: Boolean = true): Map.Entry<ID, T>? =
-    handle(includingSelf).minByOrNull { it.value }
+fun <T : Comparable<T>> Field<T>.min(includingSelf: Boolean = true): T = when (includingSelf) {
+    true -> hood(localValue) { acc, value -> if (value < acc) value else acc }
+    false -> reduce { acc, value -> if (value < acc) value else acc }
+}
 
 /**
  * Get the maximum value of a field.
  * @param includingSelf if true the local node is included in the computation.
  */
-fun <T : Comparable<T>> Field<T>.max(includingSelf: Boolean = true): Map.Entry<ID, T>? =
-    handle(includingSelf).maxByOrNull { it.value }
-
-/**
- * Manages the field to exclude the local node if [includingSelf] is false.
- */
-private fun <T : Comparable<T>> Field<T>.handle(includingSelf: Boolean): Map<ID, T> =
-    if (includingSelf) this.toMap() else this.excludeSelf()
+fun <T : Comparable<T>> Field<T>.max(includingSelf: Boolean = true): T = when (includingSelf) {
+    true -> hood(localValue) { acc, value -> if (value > acc) value else acc }
+    false -> reduce { acc, value -> if (value > acc) value else acc }
+}
 
 /**
  * Operator to sum a [value] to all the values of the field.
  */
-operator fun <T : Number> Field<T>.plus(value: T): Field<T> = mapField { _, oldValue -> add(oldValue, value) }
+operator fun <T : Number> Field<T>.plus(value: T): Field<T> = map { _, oldValue -> add(oldValue, value) }
 
 /**
  * Operator to subtract a [value] to all the values of the field.
  */
-operator fun <T : Number> Field<T>.minus(value: T): Field<T> = mapField { _, oldValue -> sub(oldValue, value) }
+operator fun <T : Number> Field<T>.minus(value: T): Field<T> = map { _, oldValue -> sub(oldValue, value) }
 
 /**
  * Sum a field with [other] field.
@@ -49,8 +48,7 @@ operator fun <T : Number> Field<T>.minus(other: Field<T>): Field<T> = combine(th
  * The two fields must be aligned, otherwise an error is thrown.
  */
 fun <T, V, R> combine(field1: Field<T>, field: Field<V>, transform: (T, V) -> R): Field<R> {
-    val res = field1.mapValues { (id, value) -> transform(value, field[id] ?: error("Field not aligned")) }
-    return Field(field1.localId, res)
+    return field1.map { id, value -> transform(value, field[id] ?: error("Field not aligned")) }
 }
 
 @Suppress("UNCHECKED_CAST")
