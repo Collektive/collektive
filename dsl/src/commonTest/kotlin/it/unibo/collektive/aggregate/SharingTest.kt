@@ -6,6 +6,8 @@ import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.ops.share
 import it.unibo.collektive.aggregate.ops.sharing
 import it.unibo.collektive.field.Field
+import it.unibo.collektive.field.max
+import it.unibo.collektive.field.min
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 
@@ -25,7 +27,7 @@ class SharingTest : StringSpec({
     val initV7 = 7
     val initV10 = 10
 
-    val findMax: (Field<Int>) -> Int = { e -> e.maxBy { it.value }.value }
+    val findMax: (Field<Int>) -> Int = { e -> e.max() }
 
     "first time sharing" {
         aggregate(id0) {
@@ -83,7 +85,7 @@ class SharingTest : StringSpec({
 
         aggregate(id1, condition, testNetwork1) {
             val res = share(initV1) {
-                it.maxBy { v -> v.value }.value
+                it.max()
             }
             res shouldBe initV1
         }
@@ -97,7 +99,7 @@ class SharingTest : StringSpec({
 
         aggregate(id1, condition, testNetwork1) {
             val res = sharing(initV1) {
-                val min = it.maxBy { v -> v.value }.value
+                val min = it.max()
                 min.yielding { "A string" }
             }
             res shouldBe "A string"
@@ -112,7 +114,7 @@ class SharingTest : StringSpec({
 
         aggregate(id1, condition, testNetwork1) {
             val res = sharing(initV1) {
-                val min = it.minBy { v -> v.value }.value
+                val min = it.min()
                 min.yielding { "Hello".takeIf { min > 1 } }
             }
             res shouldBe null

@@ -31,7 +31,7 @@ class FieldManipulationTest : StringSpec({
         aggregate(id1, condition, network1) {
             val res = neighbouring(double(2)).min()
             res shouldNotBe null
-            if (res != null) res.value shouldBe 4
+            res shouldBe 4
         }
     }
 
@@ -48,7 +48,7 @@ class FieldManipulationTest : StringSpec({
         aggregate(id1, condition, network1) {
             val res = neighbouring(double(2)).min(includingSelf = false)
             res shouldNotBe null
-            if (res != null) res.value shouldBe 6
+            res shouldBe 6
         }
     }
 
@@ -65,7 +65,7 @@ class FieldManipulationTest : StringSpec({
         aggregate(id1, condition, network1) {
             val res = neighbouring(double(2)).max(includingSelf = false)
             res shouldNotBe null
-            if (res != null) res.value shouldBe 6
+            res shouldBe 6
         }
     }
 })
