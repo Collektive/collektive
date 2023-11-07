@@ -21,7 +21,7 @@ import it.unibo.collektive.field.Field
  * In this case, the field returned has the result of the computation as local value.
  */
 fun <Return> AggregateContext.neighbouring(type: Return): Field<Return> {
-    val body: (Field<Return>) -> Field<Return> = { f -> f.mapField { _, x -> x } }
+    val body: (Field<Return>) -> Field<Return> = { f -> f.map { _, x -> x } }
     return exchange(type, body)
 }
 
@@ -56,7 +56,7 @@ fun <Initial, Return> AggregateContext.sharing(
     val context = SharingContext<Initial, Return>()
     var res: Option<SharingResult<Initial, Return>> = none()
     exchange(initial) {
-        it.mapField { _, _ -> transform(context, it).also { r -> res = r.some() }.toSend }
+        it.map { _, _ -> transform(context, it).also { r -> res = r.some() }.toSend }
     }
     return res.getOrElse { error("This error should never be thrown") }.toReturn
 }
