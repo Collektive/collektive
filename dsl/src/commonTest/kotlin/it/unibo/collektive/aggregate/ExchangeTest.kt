@@ -33,7 +33,7 @@ class ExchangeTest : StringSpec({
     val path2 = Path(listOf("exchange.2"))
 
     val increaseOrDouble: (Field<Int>) -> Field<Int> = { f ->
-        f.map { _, v -> if (v % 2 == 0) v + 1 else v * 2 }
+        f.mapWithId { _, v -> if (v % 2 == 0) v + 1 else v * 2 }
     }
 
     "First time exchange should return the initial value" {
