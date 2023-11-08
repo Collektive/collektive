@@ -44,14 +44,6 @@ interface Field<out T> {
     fun toMap(): Map<ID, T>
 
     companion object {
-        /**
-         * Build a field from a [localId] and a list of messages.
-         */
-        internal operator fun <T> invoke(
-            localId: ID,
-            localValue: T,
-            others: List<Pair<ID, T>> = emptyList(),
-        ): Field<T> = FieldImpl(localId, localValue, others)
 
         /**
          * Build a field from a [localId], [localValue] and [others] neighbours values.
