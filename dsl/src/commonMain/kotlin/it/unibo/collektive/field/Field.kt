@@ -23,9 +23,14 @@ interface Field<out T> {
     fun excludeSelf(): Map<ID, T>
 
     /**
-     * Function for generic manipulation of the field.
+     * Map the field using the [transform] function.
      */
-    fun <B> map(transform: (ID, T) -> B): Field<B>
+    fun <B> mapWithId(transform: (ID, T) -> B): Field<B>
+
+    /**
+     * Map the field using the [transform] function.
+     */
+    fun <B> map(transform: (T) -> B): Field<B> = mapWithId { _, value -> transform(value) }
 
     /**
      * Get the value associated with the [id].
@@ -39,7 +44,7 @@ interface Field<out T> {
     fun asSequence(): Sequence<Pair<ID, T>>
 
     /**
-     * Returns a map repesenting the field.
+     * Returns a map representing the field.
      */
     fun toMap(): Map<ID, T>
 
@@ -49,7 +54,7 @@ interface Field<out T> {
          * Build a field from a [localId], [localValue] and [others] neighbours values.
          */
         internal operator fun <T> invoke(localId: ID, localValue: T, others: Map<ID, T> = emptyMap()): Field<T> =
-            FieldImpl(localId, localValue, others.map { it.toPair() })
+            ArrayBasedField(localId, localValue, others.map { it.toPair() })
 
         /**
          * Reduce the elements of the field using the [transform] function.
@@ -60,7 +65,7 @@ interface Field<out T> {
         /**
          * Reduce the elements of a field starting with a [initial] value and a [transform] function.
          */
-        fun <T> Field<T>.hoodInto(initial: T = localValue, transform: (T, T) -> T): T {
+        fun <T, R> Field<T>.hoodInto(initial: R, transform: (R, T) -> R): R {
             var accumulator = initial
             for ((_, value) in excludeSelf()) {
                 accumulator = transform(accumulator, value)
@@ -69,37 +74,43 @@ interface Field<out T> {
         }
 
         /**
-         * Reduce the elements of a field starting with a [initial] value and a [transform] function.
+         * Reduce the elements of a field using the [transform] function.
          */
-        fun <T, R> Field<T>.hood(initial: R, transform: (R, T) -> R): R {
-            var accumulator = initial
-            for ((_, value) in asSequence()) {
-                accumulator = transform(accumulator, value)
-            }
-            return accumulator
-        }
+        fun <T> Field<T>.hood(transform: (T, T) -> T): T = hoodInto(localValue, transform)
     }
 }
 
-internal data class FieldImpl<T>(
+internal data class ArrayBasedField<T>(
     override val localId: ID,
     override val localValue: T,
     private val others: List<Pair<ID, T>>,
 ) : Field<T> {
-    private val otherClosedToMap by lazy { others.toMap() }
 
     override fun excludeSelf(): Map<ID, T> = others.toMap()
-    override fun get(id: ID): T {
-        return if (id == localId) localValue else otherClosedToMap[id] ?: error("Field not aligned")
-    }
-
-    override fun toMap(): Map<ID, T> = otherClosedToMap + (localId to localValue)
 
     override fun asSequence(): Sequence<Pair<ID, T>> = others.asSequence() + (localId to localValue)
 
-    override fun <B> map(transform: (ID, T) -> B): Field<B> {
+    override fun toMap(): Map<ID, T> = (others + (localId to localValue)).toMap()
+
+    override fun get(id: ID): T = when {
+        id == localId -> localValue
+        else -> others.first { it.first == id }.second
+    }
+
+    override fun <B> mapWithId(transform: (ID, T) -> B): Field<B> {
         val mappedValues = others.map { (id, value) -> id to transform(id, value) }
-        val mappedLocalValue = transform(localId, localValue)
-        return FieldImpl(localId, mappedLocalValue, mappedValues)
+        return ArrayBasedField(localId, transform(localId, localValue), mappedValues)
+    }
+}
+
+internal data class SequenceBasedField<T>(
+    override val localId: ID,
+    override val localValue: T,
+    private val others: Sequence<Pair<ID, T>>,
+) : Field<T> by ArrayBasedField(localId, localValue, others.toList()) {
+
+    override fun <B> mapWithId(transform: (ID, T) -> B): Field<B> {
+        val mappedValues = others.map { (id, value) -> id to transform(id, value) }
+        return SequenceBasedField(localId, transform(localId, localValue), mappedValues)
     }
 }

@@ -8,7 +8,7 @@ import it.unibo.collektive.field.Field.Companion.reduce
  * @param includingSelf if true the local node is included in the computation.
  */
 fun <T : Comparable<T>> Field<T>.min(includingSelf: Boolean = true): T = when (includingSelf) {
-    true -> hood(localValue) { acc, value -> if (value < acc) value else acc }
+    true -> hood { acc, value -> if (value < acc) value else acc }
     false -> reduce { acc, value -> if (value < acc) value else acc }
 }
 
@@ -17,19 +17,19 @@ fun <T : Comparable<T>> Field<T>.min(includingSelf: Boolean = true): T = when (i
  * @param includingSelf if true the local node is included in the computation.
  */
 fun <T : Comparable<T>> Field<T>.max(includingSelf: Boolean = true): T = when (includingSelf) {
-    true -> hood(localValue) { acc, value -> if (value > acc) value else acc }
+    true -> hood { acc, value -> if (value > acc) value else acc }
     false -> reduce { acc, value -> if (value > acc) value else acc }
 }
 
 /**
  * Operator to sum a [value] to all the values of the field.
  */
-operator fun <T : Number> Field<T>.plus(value: T): Field<T> = map { _, oldValue -> add(oldValue, value) }
+operator fun <T : Number> Field<T>.plus(value: T): Field<T> = mapWithId { _, oldValue -> add(oldValue, value) }
 
 /**
  * Operator to subtract a [value] to all the values of the field.
  */
-operator fun <T : Number> Field<T>.minus(value: T): Field<T> = map { _, oldValue -> sub(oldValue, value) }
+operator fun <T : Number> Field<T>.minus(value: T): Field<T> = mapWithId { _, oldValue -> sub(oldValue, value) }
 
 /**
  * Sum a field with [other] field.
@@ -48,7 +48,7 @@ operator fun <T : Number> Field<T>.minus(other: Field<T>): Field<T> = combine(th
  * The two fields must be aligned, otherwise an error is thrown.
  */
 fun <T, V, R> combine(field1: Field<T>, field: Field<V>, transform: (T, V) -> R): Field<R> {
-    return field1.map { id, value -> transform(value, field[id] ?: error("Field not aligned")) }
+    return field1.mapWithId { id, value -> transform(value, field[id] ?: error("Field not aligned")) }
 }
 
 @Suppress("UNCHECKED_CAST")
