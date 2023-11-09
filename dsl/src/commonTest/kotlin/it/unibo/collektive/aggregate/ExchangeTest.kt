@@ -39,7 +39,7 @@ class ExchangeTest : StringSpec({
     "First time exchange should return the initial value" {
         aggregate(id0) {
             val res = exchange(initV1, increaseOrDouble)
-            res shouldBe Field(id0, 2)
+            res[id0] shouldBe 2
             messagesToSend() shouldBe setOf(IsotropicMessage(id0, mapOf(path1 to res.localValue)) as OutboundMessage)
         }
     }
@@ -55,8 +55,8 @@ class ExchangeTest : StringSpec({
             val res1 = exchange(initV1, increaseOrDouble)
             val res2 = exchange(initV2, increaseOrDouble)
             testNetwork1.read() shouldHaveSize 0
-            res1 shouldBe Field(id1, 2)
-            res2 shouldBe Field(id1, 3)
+            res1[id1] shouldBe 2
+            res2[id1] shouldBe 3
             messagesToSend() shouldBe setOf(
                 IsotropicMessage(id1, mapOf(path1 to res1.localValue)),
                 IsotropicMessage(id1, mapOf(path2 to res2.localValue)),
@@ -70,8 +70,8 @@ class ExchangeTest : StringSpec({
             val res1 = exchange(initV3, increaseOrDouble)
             val res2 = exchange(initV4, increaseOrDouble)
             testNetwork2.read() shouldHaveSize 2
-            res1 shouldBe Field(id2, 6, mapOf(id1 to 3))
-            res2 shouldBe Field(id2, 5, mapOf(id1 to 6))
+            res1.toMap() shouldBe mapOf(id2 to 6, id1 to 3)
+            res2.toMap() shouldBe mapOf(id2 to 5, id1 to 6)
             messagesToSend() shouldBe setOf(
                 IsotropicMessage(id2, mapOf(path1 to initV3 * 2)),
                 IsotropicMessage(id2, mapOf(path2 to initV4 + 1)),
@@ -86,8 +86,8 @@ class ExchangeTest : StringSpec({
             val res1 = exchange(initV5, increaseOrDouble)
             val res2 = exchange(initV6, increaseOrDouble)
             testNetwork3.read() shouldHaveSize 4
-            res1 shouldBe Field(id3, 10, mapOf(id1 to 3, id2 to 7))
-            res2 shouldBe Field(id3, 7, mapOf(id1 to 6, id2 to 10))
+            res1.toMap() shouldBe mapOf(id3 to 10, id1 to 3, id2 to 7)
+            res2.toMap() shouldBe mapOf(id3 to 7, id1 to 6, id2 to 10)
             messagesToSend() shouldBe setOf(
                 IsotropicMessage(id3, mapOf(path1 to initV5 * 2)),
                 IsotropicMessage(id3, mapOf(path2 to initV6 + 1)),
