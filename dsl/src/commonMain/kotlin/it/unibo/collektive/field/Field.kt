@@ -99,7 +99,7 @@ internal data class ArrayBasedField<T>(
 
     override fun <B> mapWithId(transform: (ID, T) -> B): Field<B> {
         val mappedValues = others.map { (id, value) -> id to transform(id, value) }
-        return ArrayBasedField(localId, transform(localId, localValue), mappedValues)
+        return SequenceBasedField(localId, transform(localId, localValue), mappedValues.asSequence())
     }
 }
 
