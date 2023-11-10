@@ -1,12 +1,13 @@
 package it.unibo.collektive.field
 
 import it.unibo.collektive.ID
+import it.unibo.collektive.field.Field.Companion.isEqualTo
 
 /**
  * A field is a map of messages where the key is the [ID] of a node and [T] the associated value.
  * @param T the type of the field.
  */
-interface Field<out T> {
+sealed interface Field<out T> {
     /**
      * The [ID] of the local node.
      */
@@ -59,8 +60,11 @@ interface Field<out T> {
         /**
          * Reduce the elements of the field using the [transform] function.
          */
-        fun <T> Field<T>.reduce(transform: (accumulator: T, T) -> T): T =
-            excludeSelf().values.reduce(transform)
+        fun <T> Field<T>.reduce(includingSelf: Boolean = true, transform: (accumulator: T, T) -> T): T =
+            when (includingSelf) {
+                true -> toMap().values.reduce(transform)
+                false -> excludeSelf().values.reduce(transform)
+            }
 
         /**
          * Reduce the elements of a field starting with a [initial] value and a [transform] function.
@@ -77,40 +81,84 @@ interface Field<out T> {
          * Reduce the elements of a field using the [transform] function.
          */
         fun <T> Field<T>.hood(transform: (T, T) -> T): T = hoodInto(localValue, transform)
+
+        internal fun Field<*>.isEqualTo(other: Any?): Boolean = when (other) {
+            this -> true
+            is Field<*> -> toMap() == other.toMap()
+            else -> false
+        }
     }
 }
 
-internal data class ArrayBasedField<T>(
+internal abstract class AbstractField<T>(
     override val localId: ID,
     override val localValue: T,
-    private val others: List<Pair<ID, T>>,
 ) : Field<T> {
 
-    override fun excludeSelf(): Map<ID, T> = others.toMap()
+    private val asMap: Map<ID, T> by lazy { neighborsMap() + (localId to localValue) }
+    private val neighborhood: Map<ID, T> by lazy { neighborsMap() }
+
+    final override fun toMap(): Map<ID, T> = asMap
+
+    final override fun excludeSelf(): Map<ID, T> = neighborhood
+
+    final override fun equals(other: Any?): Boolean = isEqualTo(other)
+
+    final override fun hashCode(): Int = toMap().hashCode()
+
+    final override operator fun get(id: ID): T = when {
+        id == localId -> localValue
+        else -> neighborValueOf(id)
+    }
+
+    final override fun <B> mapWithId(transform: (ID, T) -> B): Field<B> {
+        return SequenceBasedField(localId, transform(localId, localValue), mapOthersAsSequence(transform))
+    }
+
+    protected abstract fun neighborsMap(): Map<ID, T>
+
+    protected abstract fun neighborValueOf(id: ID): T
+
+    protected abstract fun <R> mapOthersAsSequence(transform: (ID, T) -> R): Sequence<Pair<ID, R>>
+
+    final override fun toString() = toMap().toString()
+}
+
+internal class ArrayBasedField<T>(
+    localId: ID,
+    localValue: T,
+    private val others: List<Pair<ID, T>>,
+) : AbstractField<T>(localId, localValue) {
+
+    override fun neighborValueOf(id: ID): T = when {
+        others.size <= MAP_OVER_LIST_PERFORMANCE_CROSSING_POINT -> others.first { it.first == id }.second
+        else -> excludeSelf().getValue(id)
+    }
+
+    override fun <R> mapOthersAsSequence(transform: (ID, T) -> R): Sequence<Pair<ID, R>> =
+        others.map { (id, value) -> id to transform(id, value) }.asSequence()
+
+    override fun neighborsMap(): Map<ID, T> = others.toMap()
 
     override fun asSequence(): Sequence<Pair<ID, T>> = others.asSequence() + (localId to localValue)
 
-    override fun toMap(): Map<ID, T> = (others + (localId to localValue)).toMap()
-
-    override fun get(id: ID): T = when {
-        id == localId -> localValue
-        else -> others.first { it.first == id }.second
-    }
-
-    override fun <B> mapWithId(transform: (ID, T) -> B): Field<B> {
-        val mappedValues = others.map { (id, value) -> id to transform(id, value) }
-        return SequenceBasedField(localId, transform(localId, localValue), mappedValues.asSequence())
+    companion object {
+        const val MAP_OVER_LIST_PERFORMANCE_CROSSING_POINT = 16
     }
 }
 
-internal data class SequenceBasedField<T>(
-    override val localId: ID,
-    override val localValue: T,
+internal class SequenceBasedField<T>(
+    localId: ID,
+    localValue: T,
     private val others: Sequence<Pair<ID, T>>,
-) : Field<T> by ArrayBasedField(localId, localValue, others.toList()) {
+) : AbstractField<T>(localId, localValue) {
 
-    override fun <B> mapWithId(transform: (ID, T) -> B): Field<B> {
-        val mappedValues = others.map { (id, value) -> id to transform(id, value) }
-        return SequenceBasedField(localId, transform(localId, localValue), mappedValues)
-    }
+    override fun asSequence(): Sequence<Pair<ID, T>> = others + (localId to localValue)
+
+    override fun neighborsMap(): Map<ID, T> = others.toMap()
+
+    override fun neighborValueOf(id: ID): T = excludeSelf().getValue(id)
+
+    override fun <R> mapOthersAsSequence(transform: (ID, T) -> R): Sequence<Pair<ID, R>> =
+        others.map { (id, value) -> id to transform(id, value) }
 }
