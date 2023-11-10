@@ -1,3 +1,52 @@
+## [2.1.0](https://github.com/Collektive/collektive/compare/2.0.1...2.1.0) (2023-11-10)
+
+
+### Features
+
+* rename actual map in mapWithId and add map which not considers the ids ([3c95142](https://github.com/Collektive/collektive/commit/3c9514271cbeb06d54f0b2edb040bbdeb8560e47))
+
+
+### Dependency updates
+
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.71 ([710fa00](https://github.com/Collektive/collektive/commit/710fa00ab3f9f89c7d09e3bffb88d33d94c34968))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.72 ([cd1e069](https://github.com/Collektive/collektive/commit/cd1e069e9f0cd83219e69f46c5bba4e218ef3b09))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.73 ([8de97b3](https://github.com/Collektive/collektive/commit/8de97b3df12391c4c5bfc32834a146f03b7e8153))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.74 ([21f3d67](https://github.com/Collektive/collektive/commit/21f3d67c412b82f580c260973b2c0c1620c59b0c))
+* **deps:** update plugin kotlin-qa to v0.54.0 ([25dc557](https://github.com/Collektive/collektive/commit/25dc5575da0cbb9c7c7548dc79a469b7e291e79d))
+* **deps:** update plugin publishoncentral to v5.0.19 ([eb13b70](https://github.com/Collektive/collektive/commit/eb13b7049924258ae81107fadc5f95adea08ed33))
+
+
+### Bug Fixes
+
+* solve a StackOverflowException in equals on fields ([f73047d](https://github.com/Collektive/collektive/commit/f73047da7fbeb0331c9eca30302a2c76e1a282bf))
+
+
+### Tests
+
+* add field operation tests ([6d1000e](https://github.com/Collektive/collektive/commit/6d1000e8326e2d2c2010edb72e9e4e56db928c3a))
+* test the field using a closing operation insead the returning lazy field ([b596958](https://github.com/Collektive/collektive/commit/b5969589e42c32c2404e0d6d5f20fff4a7a6b1f4))
+
+
+### Build and continuous integration
+
+* fix license and developers for maven pubblication ([7ace8cb](https://github.com/Collektive/collektive/commit/7ace8cb1790b787230d1ca548a69f5c32ad885b8))
+* revert to non-K2 language version and re-enable allWarningsAsErrors = true ([946097d](https://github.com/Collektive/collektive/commit/946097deb4f334e7e77329054ef54000353b5d73))
+* revert to non-K2 the compiler plugin ([9f64b06](https://github.com/Collektive/collektive/commit/9f64b0655109b9c868180df3a90711a9ae5464d4))
+* set jvm target to 1.8 ([bb60c6e](https://github.com/Collektive/collektive/commit/bb60c6e397033f537a37df38f845d83d2a33bb71))
+
+
+### Style improvements
+
+* remove unused imports ([b6a7036](https://github.com/Collektive/collektive/commit/b6a7036719499e678f93f3ffdad7b9d66e5ef759))
+
+
+### Refactoring
+
+* implement cache-based field implementation ([9658d00](https://github.com/Collektive/collektive/commit/9658d00ccd8efa86440645d325f2303efe7bf15b))
+* new field implementation ([67f136e](https://github.com/Collektive/collektive/commit/67f136e812915ae580c41cd47eeee5723aa2c5b4))
+* remove smart contructor with list ([148c04c](https://github.com/Collektive/collektive/commit/148c04cba5a81b09e35253d4af73bb55348d2c79))
+* use lazy field when mapping ([dd85ba8](https://github.com/Collektive/collektive/commit/dd85ba820bbb52c645f003bc26666793788af095))
+
 ## [2.0.1](https://github.com/Collektive/collektive/compare/2.0.0...2.0.1) (2023-11-04)
 
 
