@@ -88,11 +88,11 @@ allprojects {
                 dependsOn(commonTest)
             }
 
-            all {
-                languageSettings {
-                    languageVersion = "2.0"
-                }
-            }
+//            all {
+//                languageSettings {
+//                    languageVersion = "2.0"
+//                }
+//            }
         }
 
         js(IR) {
@@ -133,7 +133,7 @@ allprojects {
             compilations.all {
                 // enable all warnings as errors
                 kotlinOptions {
-//                    allWarningsAsErrors = true
+                    allWarningsAsErrors = true
                 }
             }
         }
