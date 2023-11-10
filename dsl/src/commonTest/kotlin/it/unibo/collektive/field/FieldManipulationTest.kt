@@ -10,7 +10,7 @@ import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 
 class FieldManipulationTest : StringSpec({
-    var nm = NetworkManager()
+    val nm = NetworkManager()
     val double: (Int) -> Int = { it * 2 }
     var i = 0
     val condition: () -> Boolean = { i++ < 1 }

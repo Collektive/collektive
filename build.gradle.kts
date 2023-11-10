@@ -15,6 +15,7 @@ plugins {
     alias(libs.plugins.gitSemVer)
     alias(libs.plugins.taskTree)
     alias(libs.plugins.kover)
+    alias(libs.plugins.kotest)
     id("it.unibo.collektive.collektive-plugin")
 }
 
@@ -41,6 +42,7 @@ allprojects {
         apply(plugin = gitSemVer.id)
         apply(plugin = taskTree.id)
         apply(plugin = kover.id)
+        apply(plugin = kotest.id)
     }
     apply(plugin = "it.unibo.collektive.collektive-plugin")
 

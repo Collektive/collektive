@@ -9,7 +9,7 @@ import it.unibo.collektive.field.Field.Companion.reduce
  */
 fun <T : Comparable<T>> Field<T>.min(includingSelf: Boolean = true): T = when (includingSelf) {
     true -> hood { acc, value -> if (value < acc) value else acc }
-    false -> reduce { acc, value -> if (value < acc) value else acc }
+    false -> reduce(includingSelf = false) { acc, value -> if (value < acc) value else acc }
 }
 
 /**
@@ -18,7 +18,7 @@ fun <T : Comparable<T>> Field<T>.min(includingSelf: Boolean = true): T = when (i
  */
 fun <T : Comparable<T>> Field<T>.max(includingSelf: Boolean = true): T = when (includingSelf) {
     true -> hood { acc, value -> if (value > acc) value else acc }
-    false -> reduce { acc, value -> if (value > acc) value else acc }
+    false -> reduce(includingSelf = false) { acc, value -> if (value > acc) value else acc }
 }
 
 /**
