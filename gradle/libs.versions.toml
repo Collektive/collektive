@@ -40,3 +40,4 @@ detekt = "io.gitlab.arturbosch.detekt:1.23.3"
 build-config = { id = "com.github.gmazzo.buildconfig", version.ref = "build-config" }
 gradlePluginPublish = { id = "com.gradle.plugin-publish", version = "1.2.1" }
 kover = "org.jetbrains.kotlinx.kover:0.7.4"
+kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
