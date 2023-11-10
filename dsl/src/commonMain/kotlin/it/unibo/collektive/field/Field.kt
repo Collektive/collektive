@@ -1,7 +1,6 @@
 package it.unibo.collektive.field
 
 import it.unibo.collektive.ID
-import it.unibo.collektive.field.Field.Companion.isEqualTo
 
 /**
  * A field is a map of messages where the key is the [ID] of a node and [T] the associated value.
@@ -81,12 +80,6 @@ sealed interface Field<out T> {
          * Reduce the elements of a field using the [transform] function.
          */
         fun <T> Field<T>.hood(transform: (T, T) -> T): T = hoodInto(localValue, transform)
-
-        internal fun Field<*>.isEqualTo(other: Any?): Boolean = when (other) {
-            this -> true
-            is Field<*> -> toMap() == other.toMap()
-            else -> false
-        }
     }
 }
 
@@ -102,7 +95,13 @@ internal abstract class AbstractField<T>(
 
     final override fun excludeSelf(): Map<ID, T> = neighborhood
 
-    final override fun equals(other: Any?): Boolean = isEqualTo(other)
+    final override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        return when (other) {
+            is Field<*> -> toMap() == other.toMap()
+            else -> false
+        }
+    }
 
     final override fun hashCode(): Int = toMap().hashCode()
 
