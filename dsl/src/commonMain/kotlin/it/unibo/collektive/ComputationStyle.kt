@@ -15,7 +15,7 @@ import it.unibo.collektive.state.State
  */
 fun <X> singleCycle(
     localId: ID,
-    messages: Set<InboundMessage>,
+    messages: Collection<InboundMessage>,
     state: Set<State<*>>,
     compute: AggregateContext.() -> X,
 ): AggregateResult<X> {
