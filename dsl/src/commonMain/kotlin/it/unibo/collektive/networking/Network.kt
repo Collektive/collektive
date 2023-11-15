@@ -15,5 +15,5 @@ interface Network {
     /**
      * Returns a set of [InboundMessage]s representing the received messages from the neighbours.
      */
-    fun read(): Set<InboundMessage>
+    fun read(): Collection<InboundMessage>
 }
