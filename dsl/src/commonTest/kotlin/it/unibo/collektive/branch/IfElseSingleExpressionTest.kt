@@ -6,7 +6,6 @@ import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.aggregate
 import it.unibo.collektive.aggregate.ops.neighbouring
 import it.unibo.collektive.stack.Path
-import it.unibo.collektive.utils.getPaths
 
 class IfElseSingleExpressionTest : StringSpec({
     val id0 = IntId(0)
@@ -16,9 +15,13 @@ class IfElseSingleExpressionTest : StringSpec({
         val result = aggregate(id0) {
             if (customCondition) neighbouring("test") else neighbouring("test")
         }
-        var paths = emptySet<Path>()
-        result.toSend.forEach { paths = paths + it.getPaths() }
-        paths shouldContain Path(listOf("branch[customCondition, true]", "neighbouring.1", "exchange.1"))
+        result.toSend.messages.keys shouldContain Path(
+            listOf(
+                "branch[customCondition, true]",
+                "neighbouring.1",
+                "exchange.1",
+            ),
+        )
     }
 
     "False condition in if else block" {
@@ -26,8 +29,12 @@ class IfElseSingleExpressionTest : StringSpec({
         val result = aggregate(id0) {
             if (customCondition) neighbouring("test") else neighbouring("test")
         }
-        var paths = emptySet<Path>()
-        result.toSend.forEach { paths = paths + it.getPaths() }
-        paths shouldContain Path(listOf("branch[constant, false]", "neighbouring.2", "exchange.1"))
+        result.toSend.messages.keys shouldContain Path(
+            listOf(
+                "branch[constant, false]",
+                "neighbouring.2",
+                "exchange.1",
+            ),
+        )
     }
 })

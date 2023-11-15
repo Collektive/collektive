@@ -1,12 +1,11 @@
 package it.unibo.collektive.branch
 
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.shouldBe
 import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.aggregate
 import it.unibo.collektive.aggregate.ops.neighbouring
 import it.unibo.collektive.stack.Path
-import it.unibo.collektive.utils.getPaths
 
 class WhenTest : StringSpec({
     val id0 = IntId(0)
@@ -20,11 +19,11 @@ class WhenTest : StringSpec({
                 else -> neighbouring("test")
             }
         }
-        var paths = emptySet<Path>()
-        result.toSend.forEach { paths = paths + it.getPaths() }
-        paths.toString() shouldContain "INSTANCEOF"
-        paths.toString() shouldContain "String"
-        paths.toString() shouldContain "true"
+        result.toSend.messages.keys shouldBe setOf(
+            Path(
+                listOf("branch[INSTANCEOF kotlin.String, true]", "neighbouring.1", "exchange.1"),
+            ),
+        )
     }
 
     "When in single expression in else case" {
@@ -36,9 +35,11 @@ class WhenTest : StringSpec({
                 else -> neighbouring("test")
             }
         }
-        var paths = emptySet<Path>()
-        result.toSend.forEach { paths = paths + it.getPaths() }
-        paths.toString() shouldContain "false"
+        result.toSend.messages.keys shouldBe setOf(
+            Path(
+                listOf("branch[constant, false]", "neighbouring.2", "exchange.1"),
+            ),
+        )
     }
 
     "When with nested function" {
@@ -57,12 +58,10 @@ class WhenTest : StringSpec({
                 else -> test()
             }
         }
-        var paths = emptySet<Path>()
-        result.toSend.forEach { paths = paths + it.getPaths() }
-        paths.toString() shouldContain "INSTANCEOF"
-        paths.toString() shouldContain "String"
-        paths.toString() shouldContain "test"
-        paths.toString() shouldContain "test2"
-        paths.toString() shouldContain "true"
+        result.toSend.messages.keys shouldBe setOf(
+            Path(
+                listOf("branch[INSTANCEOF kotlin.String, true]", "test2.1", "neighbouring.2", "exchange.1"),
+            ),
+        )
     }
 })

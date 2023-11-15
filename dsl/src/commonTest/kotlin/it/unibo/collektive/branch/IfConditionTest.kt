@@ -6,7 +6,6 @@ import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.aggregate
 import it.unibo.collektive.aggregate.ops.neighbouring
 import it.unibo.collektive.stack.Path
-import it.unibo.collektive.utils.getPaths
 
 class IfConditionTest : StringSpec({
     val id0 = IntId(0)
@@ -14,9 +13,7 @@ class IfConditionTest : StringSpec({
         val result = aggregate(id0) {
             if (true) neighbouring("test")
         }
-        var paths = emptySet<Path>()
-        result.toSend.forEach { paths = paths + it.getPaths() }
-        paths shouldContain Path(listOf("branch[constant, true]", "neighbouring.1", "exchange.1"))
+        result.toSend.messages.keys shouldContain Path(listOf("branch[constant, true]", "neighbouring.1", "exchange.1"))
     }
 
     "Variable condition if" {
@@ -24,9 +21,13 @@ class IfConditionTest : StringSpec({
         val result = aggregate(id0) {
             if (customCondition) neighbouring("test")
         }
-        var paths = emptySet<Path>()
-        result.toSend.forEach { paths = paths + it.getPaths() }
-        paths shouldContain Path(listOf("branch[customCondition, true]", "neighbouring.1", "exchange.1"))
+        result.toSend.messages.keys shouldContain Path(
+            listOf(
+                "branch[customCondition, true]",
+                "neighbouring.1",
+                "exchange.1",
+            ),
+        )
     }
 
     "Function condition if" {
@@ -34,9 +35,13 @@ class IfConditionTest : StringSpec({
         val result = aggregate(id0) {
             if (customFunction()) neighbouring("test")
         }
-        var paths = emptySet<Path>()
-        result.toSend.forEach { paths = paths + it.getPaths() }
-        paths shouldContain Path(listOf("branch[customFunction, true]", "neighbouring.1", "exchange.1"))
+        result.toSend.messages.keys shouldContain Path(
+            listOf(
+                "branch[customFunction, true]",
+                "neighbouring.1",
+                "exchange.1",
+            ),
+        )
     }
 
     "Function and condition if" {
@@ -45,9 +50,7 @@ class IfConditionTest : StringSpec({
         val result = aggregate(id0) {
             if (customCondition1 && customCondition2) neighbouring("test")
         }
-        var paths = emptySet<Path>()
-        result.toSend.forEach { paths = paths + it.getPaths() }
-        paths shouldContain Path(
+        result.toSend.messages.keys shouldContain Path(
             listOf("branch[customCondition1 & customCondition2, true]", "neighbouring.1", "exchange.1"),
         )
     }
@@ -58,9 +61,7 @@ class IfConditionTest : StringSpec({
         val result = aggregate(id0) {
             if (customCondition1 || customCondition2) neighbouring("test")
         }
-        var paths = emptySet<Path>()
-        result.toSend.forEach { paths = paths + it.getPaths() }
-        paths shouldContain Path(
+        result.toSend.messages.keys shouldContain Path(
             listOf(
                 "branch[customCondition1 | customCondition2, true]",
                 "neighbouring.1",
@@ -75,9 +76,7 @@ class IfConditionTest : StringSpec({
         val result = aggregate(id0) {
             if (customCondition1 && !customCondition2) neighbouring("test")
         }
-        var paths = emptySet<Path>()
-        result.toSend.forEach { paths = paths + it.getPaths() }
-        paths shouldContain Path(
+        result.toSend.messages.keys shouldContain Path(
             listOf(
                 "branch[customCondition1 & not customCondition2, true]",
                 "neighbouring.1",
