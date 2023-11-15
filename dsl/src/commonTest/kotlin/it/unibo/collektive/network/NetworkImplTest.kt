@@ -7,9 +7,9 @@ import it.unibo.collektive.networking.Network
 
 class NetworkImplTest(private val networkManager: NetworkManager, private val localId: ID) : Network {
 
-    override fun write(messages: Set<OutboundMessage>) {
+    override fun write(messages: OutboundMessage) {
         networkManager.send(messages)
     }
 
-    override fun read(): Set<InboundMessage> = networkManager.receive(localId)
+    override fun read(): Collection<InboundMessage> = networkManager.receive(localId)
 }

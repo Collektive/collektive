@@ -23,15 +23,8 @@ class NetworkManager {
     fun receive(receiverId: ID): Collection<InboundMessage> = messageBuffer.map { received ->
         val sender = received.localId
         val payloads = received.messages.mapValues { (_, outbound) ->
-            outbound.overrides.getOrElse(receiverId) { outbound.default })
+            outbound.overrides.getOrElse(receiverId) { outbound.default }
         }
         InboundMessage(sender, payloads)
     }
-//            .filter {
-//                (it is AnisotropicMessage && it.receiverId == receiverId) ||
-//                    (it is IsotropicMessage && it.senderId != receiverId)
-//            }
-//            .map { entry -> entry.convertToReceivedMessage() }
-//            .toSet()
-//        return filtered
 }
