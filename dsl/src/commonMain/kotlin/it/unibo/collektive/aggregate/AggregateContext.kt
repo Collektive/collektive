@@ -62,7 +62,7 @@ class AggregateContext(
         val previous = stateAt<X>(stack.currentPath()) ?: initial
         val subject = newField(previous, messages)
         return body(subject).also { field ->
-            val message = SingleOutboundMessage<X>(field.localValue, field.excludeSelf())
+            val message = SingleOutboundMessage(field.localValue, field.excludeSelf())
             toBeSent = toBeSent.copy(messages = toBeSent.messages + (stack.currentPath() to message))
             state = state
                 .filterNot { stack.currentPath() == it.path }
