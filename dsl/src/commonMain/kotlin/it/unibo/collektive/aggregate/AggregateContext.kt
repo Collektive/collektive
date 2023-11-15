@@ -64,21 +64,6 @@ class AggregateContext(
         return body(subject).also { field ->
             val message = SingleOutboundMessage<X>(field.localValue, field.excludeSelf())
             toBeSent = toBeSent.copy(messages = toBeSent.messages + (stack.currentPath() to message))
-//            toBeSent = toBeSent + IsotropicMessage(localId, mapOf(stack.currentPath() to field.local))
-//            if (messages.isNotEmpty()) {
-//                field.toMap().filterNot { it.key == localId }.map { (id, value) ->
-//                    val old = toBeSent
-//                        .filterIsInstance<AnisotropicMessage>()
-//                        .firstOrNull { it.senderId == localId && it.receiverId == id }
-//                        ?: AnisotropicMessage(localId, id, mapOf(stack.currentPath() to value))
-//                    toBeSent = (
-//                        toBeSent
-//                            .filterNot {
-//                                it is AnisotropicMessage && it.senderId == localId && it.receiverId == id
-//                            } + AnisotropicMessage(localId, id, old.message + (stack.currentPath() to value))
-//                        ).toSet()
-//                }
-//            }
             state = state
                 .filterNot { stack.currentPath() == it.path }
                 .toSet() + State(stack.currentPath(), field.localValue)
