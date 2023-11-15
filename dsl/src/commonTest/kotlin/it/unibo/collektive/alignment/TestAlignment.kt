@@ -2,13 +2,13 @@ package it.unibo.collektive.alignment
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.aggregate
 import it.unibo.collektive.aggregate.ops.neighbouring
 import it.unibo.collektive.aggregate.ops.share
 import it.unibo.collektive.stack.Path
-import it.unibo.collektive.utils.getPaths
 
 class TestAlignment : StringSpec({
     "The alignment should be performed consistently also for the same aggregate operation called multiple times " +
@@ -23,12 +23,10 @@ class TestAlignment : StringSpec({
             }
 
             result.result shouldBe 5
-            var paths = emptySet<Path>()
-            result.toSend.forEach {
-                paths = paths + it.getPaths()
-            }
-            paths.size shouldBe 4 // 4 paths of alignment
-            paths shouldContainAll setOf(
+//            var paths = emptySet<Path>()
+            result.toSend.messages.keys shouldHaveSize 4 // 4 paths of alignment
+            println("keys ${result.toSend.messages.keys}")
+            result.toSend.messages.keys shouldContainAll setOf(
                 Path(listOf("neighbouring.1", "exchange.1")),
                 Path(listOf("share.1", "sharing.1", "exchange.1", "neighbouring.2", "exchange.1")),
                 Path(listOf("share.1", "sharing.1", "exchange.1")),

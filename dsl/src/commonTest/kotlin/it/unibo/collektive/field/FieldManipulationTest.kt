@@ -10,7 +10,6 @@ import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 
 class FieldManipulationTest : StringSpec({
-    val nm = NetworkManager()
     val double: (Int) -> Int = { it * 2 }
     var i = 0
     val condition: () -> Boolean = { i++ < 1 }
@@ -20,6 +19,7 @@ class FieldManipulationTest : StringSpec({
     val id1 = IntId(1)
 
     "Get the min value including self" {
+        val nm = NetworkManager()
         val network0 = NetworkImplTest(nm, id0)
         val network1 = NetworkImplTest(nm, id1)
 
@@ -36,6 +36,7 @@ class FieldManipulationTest : StringSpec({
     }
 
     "Get min value non including self" {
+        val nm = NetworkManager()
         val network0 = NetworkImplTest(nm, id0)
         val network1 = NetworkImplTest(nm, id1)
 
@@ -53,6 +54,7 @@ class FieldManipulationTest : StringSpec({
     }
 
     "Get max value non including self" {
+        val nm = NetworkManager()
         val network0 = NetworkImplTest(nm, id0)
         val network1 = NetworkImplTest(nm, id1)
 

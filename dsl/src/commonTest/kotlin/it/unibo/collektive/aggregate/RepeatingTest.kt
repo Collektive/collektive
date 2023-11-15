@@ -8,7 +8,6 @@ import it.unibo.collektive.aggregate.ops.neighbouring
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.stack.Path
-import it.unibo.collektive.utils.getPaths
 
 class RepeatingTest : StringSpec({
     val id0 = IntId(0)
@@ -43,8 +42,6 @@ class RepeatingTest : StringSpec({
             }
         }
         result.result.localValue shouldBe initV1 * 2
-        result.toSend.firstOrNull()?.getPaths()?.shouldContain(
-            Path(listOf("repeating.1", "neighbouring.1", "exchange.1")),
-        )
+        result.toSend.messages.keys shouldContain Path(listOf("repeating.1", "neighbouring.1", "exchange.1"))
     }
 })

@@ -7,7 +7,6 @@ import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.aggregate
 import it.unibo.collektive.aggregate.ops.neighbouring
 import it.unibo.collektive.stack.Path
-import it.unibo.collektive.utils.getPaths
 
 class BranchAlignment : StringSpec({
     val id0 = IntId(0)
@@ -26,10 +25,9 @@ class BranchAlignment : StringSpec({
                 test2()
             }
         }
-
-        result.toSend.firstOrNull()?.getPaths()?.shouldHaveSize(1) // 1 path of alignment
-        result.toSend.firstOrNull()?.getPaths()?.shouldContain(
-            Path(listOf("branch[condition, true]", "test2.1", "test.1", "neighbouring.1", "exchange.1")),
+        result.toSend.messages.keys shouldHaveSize 1 // 1 path of alignment
+        result.toSend.messages.keys shouldContain Path(
+            listOf("branch[condition, true]", "test2.1", "test.1", "neighbouring.1", "exchange.1"),
         )
     }
     "The branch alignment should not occur in non aggregate context" {
@@ -43,6 +41,6 @@ class BranchAlignment : StringSpec({
                 test2()
             }
         }
-        result.toSend.firstOrNull()?.getPaths()?.shouldHaveSize(0) // 0 path of alignment
+        result.toSend.messages.keys shouldHaveSize 0 // 0 path of alignment
     }
 })
