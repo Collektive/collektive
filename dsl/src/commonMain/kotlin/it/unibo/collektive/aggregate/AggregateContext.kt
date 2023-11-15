@@ -19,7 +19,7 @@ import it.unibo.collektive.state.State
  */
 class AggregateContext(
     private val localId: ID,
-    private val messages: Set<InboundMessage>,
+    private val messages: Collection<InboundMessage>,
     private val previousState: Set<State<*>>,
 ) {
 
@@ -62,7 +62,7 @@ class AggregateContext(
         val previous = stateAt<X>(stack.currentPath()) ?: initial
         val subject = newField(previous, messages)
         return body(subject).also { field ->
-            val message = SingleOutboundMessage<X>(field.local, field)
+            val message = SingleOutboundMessage<X>(field.localValue, field.excludeSelf())
             toBeSent = toBeSent.copy(messages = toBeSent.messages + (stack.currentPath() to message))
 //            toBeSent = toBeSent + IsotropicMessage(localId, mapOf(stack.currentPath() to field.local))
 //            if (messages.isNotEmpty()) {
