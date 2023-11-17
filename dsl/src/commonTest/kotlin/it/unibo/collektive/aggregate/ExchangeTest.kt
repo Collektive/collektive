@@ -2,12 +2,12 @@ package it.unibo.collektive.aggregate
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.IntId
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.messages.AnisotropicMessage
-import it.unibo.collektive.messages.IsotropicMessage
 import it.unibo.collektive.messages.OutboundMessage
+import it.unibo.collektive.messages.SingleOutboundMessage
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.stack.Path
@@ -32,6 +32,14 @@ class ExchangeTest : StringSpec({
     val path1 = Path(listOf("exchange.1"))
     val path2 = Path(listOf("exchange.2"))
 
+    // expected
+    val expected2 = 2
+    val expected3 = 3
+    val expected5 = 5
+    val expected6 = 6
+    val expected7 = 7
+    val expected10 = 10
+
     val increaseOrDouble: (Field<Int>) -> Field<Int> = { f ->
         f.mapWithId { _, v -> if (v % 2 == 0) v + 1 else v * 2 }
     }
@@ -39,12 +47,15 @@ class ExchangeTest : StringSpec({
     "First time exchange should return the initial value" {
         aggregate(id0) {
             val res = exchange(initV1, increaseOrDouble)
-            res[id0] shouldBe 2
-            messagesToSend() shouldBe setOf(IsotropicMessage(id0, mapOf(path1 to res.localValue)) as OutboundMessage)
+            res.localValue shouldBe expected2
+            messagesToSend() shouldBe OutboundMessage(
+                id0,
+                mapOf(path1 to SingleOutboundMessage(expected2, emptyMap())),
+            )
         }
     }
 
-    "Exchange should work between two aligned devices" {
+    "Exchange should work between three aligned devices" {
         val nm = NetworkManager()
         var i = 0
         val condition: () -> Boolean = { i++ < 1 }
@@ -55,11 +66,14 @@ class ExchangeTest : StringSpec({
             val res1 = exchange(initV1, increaseOrDouble)
             val res2 = exchange(initV2, increaseOrDouble)
             testNetwork1.read() shouldHaveSize 0
-            res1[id1] shouldBe 2
-            res2[id1] shouldBe 3
-            messagesToSend() shouldBe setOf(
-                IsotropicMessage(id1, mapOf(path1 to res1.localValue)),
-                IsotropicMessage(id1, mapOf(path2 to res2.localValue)),
+            res1.localValue shouldBe expected2
+            res2.localValue shouldBe expected3
+            messagesToSend() shouldBe OutboundMessage(
+                id1,
+                mapOf(
+                    path1 to SingleOutboundMessage(expected2, emptyMap()),
+                    path2 to SingleOutboundMessage(expected3, emptyMap()),
+                ),
             )
         }
 
@@ -69,13 +83,27 @@ class ExchangeTest : StringSpec({
         aggregate(id2, condition, testNetwork2) {
             val res1 = exchange(initV3, increaseOrDouble)
             val res2 = exchange(initV4, increaseOrDouble)
-            testNetwork2.read() shouldHaveSize 2
-            res1.toMap() shouldBe mapOf(id2 to 6, id1 to 3)
-            res2.toMap() shouldBe mapOf(id2 to 5, id1 to 6)
-            messagesToSend() shouldBe setOf(
-                IsotropicMessage(id2, mapOf(path1 to initV3 * 2)),
-                IsotropicMessage(id2, mapOf(path2 to initV4 + 1)),
-                AnisotropicMessage(id2, id1, mapOf(path1 to res1[id1], path2 to res2[id1])),
+            testNetwork2.read() shouldHaveSize 1
+
+            val readMessages = testNetwork2.read().first().messages
+            readMessages shouldHaveSize 2
+            readMessages[path1] shouldBe expected2
+            readMessages[path2] shouldBe expected3
+
+            res1.localValue shouldBe expected6
+            res2.localValue shouldBe expected5
+            messagesToSend() shouldBe OutboundMessage(
+                id2,
+                mapOf(
+                    path1 to SingleOutboundMessage(
+                        expected6,
+                        mapOf(id1 to expected3),
+                    ),
+                    path2 to SingleOutboundMessage(
+                        expected5,
+                        mapOf(id1 to expected6),
+                    ),
+                ),
             )
         }
 
@@ -85,14 +113,41 @@ class ExchangeTest : StringSpec({
         aggregate(id3, condition, testNetwork3) {
             val res1 = exchange(initV5, increaseOrDouble)
             val res2 = exchange(initV6, increaseOrDouble)
-            testNetwork3.read() shouldHaveSize 4
-            res1.toMap() shouldBe mapOf(id3 to 10, id1 to 3, id2 to 7)
-            res2.toMap() shouldBe mapOf(id3 to 7, id1 to 6, id2 to 10)
-            messagesToSend() shouldBe setOf(
-                IsotropicMessage(id3, mapOf(path1 to initV5 * 2)),
-                IsotropicMessage(id3, mapOf(path2 to initV6 + 1)),
-                AnisotropicMessage(id3, id1, mapOf(path1 to res1[id1], path2 to res2[id1])),
-                AnisotropicMessage(id3, id2, mapOf(path1 to res1[id2], path2 to res2[id2])),
+            val read = testNetwork3.read()
+            read shouldHaveSize 2
+
+            val sentFromDev1 = read.first { it.senderId == id1 }
+            val sentFromDev2 = read.first { it.senderId == id2 }
+
+            sentFromDev1.messages shouldHaveSize 2
+            sentFromDev2.messages shouldHaveSize 2
+
+            sentFromDev1.messages[path1] shouldBe expected2
+            sentFromDev1.messages[path2] shouldBe expected3
+
+            sentFromDev2.messages[path1] shouldBe expected6
+            sentFromDev2.messages[path2] shouldBe expected5
+
+            res1.localValue shouldBe expected10
+            res2.localValue shouldBe expected7
+            messagesToSend() shouldBe OutboundMessage(
+                id3,
+                mapOf(
+                    path1 to SingleOutboundMessage(
+                        expected10,
+                        mapOf(
+                            id1 to expected3,
+                            id2 to expected7,
+                        ),
+                    ),
+                    path2 to SingleOutboundMessage(
+                        expected7,
+                        mapOf(
+                            id1 to expected6,
+                            id2 to expected10,
+                        ),
+                    ),
+                ),
             )
         }
     }

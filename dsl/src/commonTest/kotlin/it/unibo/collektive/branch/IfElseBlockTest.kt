@@ -6,7 +6,6 @@ import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.aggregate
 import it.unibo.collektive.aggregate.ops.neighbouring
 import it.unibo.collektive.stack.Path
-import it.unibo.collektive.utils.getPaths
 
 class IfElseBlockTest : StringSpec({
     val id0 = IntId(0)
@@ -20,9 +19,13 @@ class IfElseBlockTest : StringSpec({
                 neighbouring("test2")
             }
         }
-        var paths = emptySet<Path>()
-        result.toSend.forEach { paths = paths + it.getPaths() }
-        paths shouldContain Path(listOf("branch[customCondition, true]", "neighbouring.1", "exchange.1"))
+        result.toSend.messages.keys shouldContain Path(
+            listOf(
+                "branch[customCondition, true]",
+                "neighbouring.1",
+                "exchange.1",
+            ),
+        )
     }
 
     "False condition in if else should not evaluate if block" {
@@ -34,9 +37,13 @@ class IfElseBlockTest : StringSpec({
                 neighbouring("test2")
             }
         }
-        var paths = emptySet<Path>()
-        result.toSend.forEach { paths = paths + it.getPaths() }
-        paths shouldContain Path(listOf("branch[constant, false]", "neighbouring.2", "exchange.1"))
+        result.toSend.messages.keys shouldContain Path(
+            listOf(
+                "branch[constant, false]",
+                "neighbouring.2",
+                "exchange.1",
+            ),
+        )
     }
 
     "If else block should only evaluate when the condition is true" {
@@ -51,8 +58,12 @@ class IfElseBlockTest : StringSpec({
                 neighbouring("test3")
             }
         }
-        var paths = emptySet<Path>()
-        result.toSend.forEach { paths = paths + it.getPaths() }
-        paths shouldContain Path(listOf("branch[customCondition2, true]", "neighbouring.2", "exchange.1"))
+        result.toSend.messages.keys shouldContain Path(
+            listOf(
+                "branch[customCondition2, true]",
+                "neighbouring.2",
+                "exchange.1",
+            ),
+        )
     }
 })

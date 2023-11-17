@@ -10,10 +10,10 @@ interface Network {
     /**
      * Sends a set of [messages] of type [OutboundMessage] to the neighbours.
      */
-    fun write(messages: Set<OutboundMessage>)
+    fun write(messages: OutboundMessage)
 
     /**
      * Returns a set of [InboundMessage]s representing the received messages from the neighbours.
      */
-    fun read(): Set<InboundMessage>
+    fun read(): Collection<InboundMessage>
 }
