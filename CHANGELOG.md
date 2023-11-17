@@ -1,3 +1,17 @@
+## [2.1.1](https://github.com/Collektive/collektive/compare/2.1.0...2.1.1) (2023-11-17)
+
+
+### Dependency updates
+
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.75 ([93c4ac4](https://github.com/Collektive/collektive/commit/93c4ac4a0b4fc3828ab6fede7e674291f47bca22))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.76 ([33638b0](https://github.com/Collektive/collektive/commit/33638b03a01eb0f28ab77ab8c1b1cb8749b8e82a))
+* **deps:** update plugin gitsemver to v2.0.2 ([33293d2](https://github.com/Collektive/collektive/commit/33293d2b63d2507a8d7c5afaabbbc4ee68c7d420))
+
+
+### Performance improvements
+
+* fast exchange ([#118](https://github.com/Collektive/collektive/issues/118)) ([dc3156d](https://github.com/Collektive/collektive/commit/dc3156d87b5ff16d7ef7aef338d74a6976e8120e))
+
 ## [2.1.0](https://github.com/Collektive/collektive/compare/2.0.1...2.1.0) (2023-11-10)
 
 
