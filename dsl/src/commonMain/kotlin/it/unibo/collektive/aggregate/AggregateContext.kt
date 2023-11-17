@@ -101,15 +101,26 @@ class AggregateContext(
 
 /**
  * Aggregate program entry point which computes a single iteration of a device [localId], taking as parameters
- * the previous [state], the [messages] received from the neighbours and the [init] with AggregateContext
+ * the previous [state], the [messages] received from the neighbours and the [compute] with AggregateContext
  * object receiver that provides the aggregate constructs.
  */
 fun <X> aggregate(
     localId: ID,
     messages: Set<InboundMessage> = emptySet(),
     state: Set<State<*>> = emptySet(),
-    init: AggregateContext.() -> X,
-) = singleCycle(localId, messages, state, compute = init)
+    compute: AggregateContext.() -> X,
+) = singleCycle(localId, messages, state, compute = compute)
+
+/**
+ * Aggregate program entry point which computes a single iteration of a device [localId], taking as parameters
+ * the previous [state], the [messages] received from the neighbours and the [compute] with AggregateContext
+ * object receiver that provides the aggregate constructs.
+ */
+// fun <X> aggregate(
+//    localId: ID,
+//
+//    compute: AggregateContext.() -> X,
+// ) = singleCycle(localId, messages, state, compute = compute)
 
 /**
  * Aggregate program entry point which computes multiple iterations of a device [localId],
