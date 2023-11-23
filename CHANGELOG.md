@@ -1,3 +1,13 @@
+## [2.1.2](https://github.com/Collektive/collektive/compare/2.1.1...2.1.2) (2023-11-23)
+
+
+### Dependency updates
+
+* **core-deps:** update kotlin monorepo to v1.9.21 ([8061420](https://github.com/Collektive/collektive/commit/8061420aab6a3c393806d6dc7017bf9a22d90181))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v4.2.0 ([6e3b452](https://github.com/Collektive/collektive/commit/6e3b45261fcf63a2f4aeb70d9578ac2b9386c673))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.77 ([1fc29b5](https://github.com/Collektive/collektive/commit/1fc29b542b252023a835aa366bdf6fff9bf7eb97))
+* **deps:** update node.js to 20.10 ([01d795b](https://github.com/Collektive/collektive/commit/01d795ba1fd78c8e9046ac398668b4c6c6b972eb))
+
 ## [2.1.1](https://github.com/Collektive/collektive/compare/2.1.0...2.1.1) (2023-11-17)
 
 
