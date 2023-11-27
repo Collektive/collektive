@@ -13,5 +13,5 @@ data class AggregateResult<R>(
     val localId: ID,
     val result: R,
     val toSend: OutboundMessage,
-    val newState: Set<State<*>>,
+    val newState: State,
 )
