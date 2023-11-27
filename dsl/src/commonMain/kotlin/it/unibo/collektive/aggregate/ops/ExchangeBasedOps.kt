@@ -5,6 +5,7 @@ import arrow.core.getOrElse
 import arrow.core.none
 import arrow.core.some
 import it.unibo.collektive.aggregate.AggregateContext
+import it.unibo.collektive.aggregate.ops.RepeatingContext.RepeatingResult
 import it.unibo.collektive.field.Field
 
 /**
@@ -78,3 +79,4 @@ fun <Initial> AggregateContext.share(initial: Initial, transform: (Field<Initial
         val res = transform(it)
         SharingResult(res, res)
     }
+
