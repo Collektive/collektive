@@ -16,7 +16,7 @@ import it.unibo.collektive.state.State
 fun <X> singleCycle(
     localId: ID,
     messages: Collection<InboundMessage>,
-    state: Set<State<*>>,
+    state: State,
     compute: AggregateContext.() -> X,
 ): AggregateResult<X> {
     return with(AggregateContext(localId, messages, state)) {
@@ -36,7 +36,7 @@ fun <X> runUntil(
     network: Network,
     compute: AggregateContext.() -> X,
 ): AggregateResult<X> {
-    var state = emptySet<State<*>>()
+    var state: State = emptyMap()
     var computed: AggregateResult<X>? = null
     while (condition()) {
         computed = singleCycle(localId, network.read(), state, compute)
