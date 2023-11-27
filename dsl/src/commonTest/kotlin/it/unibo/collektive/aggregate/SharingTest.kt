@@ -91,7 +91,7 @@ class SharingTest : StringSpec({
         }
     }
 
-    "sharing should return the value passed in the yielding function" {
+    "Sharing should return the value passed in the yielding function" {
         val nm = NetworkManager()
         var i = 0
         val condition: () -> Boolean = { i++ < 1 }
@@ -106,7 +106,7 @@ class SharingTest : StringSpec({
         }
     }
 
-    "sharing should work fine even with null as value" {
+    "Sharing should work fine even with null as value" {
         val nm = NetworkManager()
         var i = 0
         val condition: () -> Boolean = { i++ < 1 }
