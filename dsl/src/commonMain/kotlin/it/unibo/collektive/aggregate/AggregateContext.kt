@@ -1,6 +1,11 @@
 package it.unibo.collektive.aggregate
 
+import arrow.core.Option
+import arrow.core.getOrElse
+import arrow.core.some
 import it.unibo.collektive.ID
+import it.unibo.collektive.aggregate.ops.RepeatingContext
+import it.unibo.collektive.aggregate.ops.RepeatingContext.RepeatingResult
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.messages.InboundMessage
 import it.unibo.collektive.messages.OutboundMessage
@@ -11,6 +16,7 @@ import it.unibo.collektive.singleCycle
 import it.unibo.collektive.stack.Path
 import it.unibo.collektive.stack.Stack
 import it.unibo.collektive.state.State
+import it.unibo.collektive.state.getTyped
 
 /**
  * Context for managing aggregate computation.
@@ -19,12 +25,12 @@ import it.unibo.collektive.state.State
  */
 class AggregateContext(
     private val localId: ID,
-    private val messages: Collection<InboundMessage>,
-    private val previousState: Set<State<*>>,
+    private val messages: Iterable<InboundMessage>,
+    private val previousState: State,
 ) {
 
     private val stack = Stack<Any>()
-    private var state = setOf<State<*>>()
+    private var state: State = mapOf()
     private var toBeSent = OutboundMessage(localId, emptyMap())
 
     /**
@@ -35,7 +41,7 @@ class AggregateContext(
     /**
      * Return the current state of the device as a new state.
      */
-    fun newState(): Set<State<*>> = state
+    fun newState(): State = state
 
     private fun <T> newField(localValue: T, others: Map<ID, T>): Field<T> = Field(localId, localValue, others)
 
@@ -59,14 +65,12 @@ class AggregateContext(
      */
     fun <X> exchange(initial: X, body: (Field<X>) -> Field<X>): Field<X> {
         val messages = messagesAt<X>(stack.currentPath())
-        val previous = stateAt<X>(stack.currentPath()) ?: initial
+        val previous = stateAt(stack.currentPath(), initial)
         val subject = newField(previous, messages)
         return body(subject).also { field ->
             val message = SingleOutboundMessage(field.localValue, field.excludeSelf())
             toBeSent = toBeSent.copy(messages = toBeSent.messages + (stack.currentPath() to message))
-            state = state
-                .filterNot { stack.currentPath() == it.path }
-                .toSet() + State(stack.currentPath(), field.localValue)
+            state = state + (stack.currentPath() to field.localValue)
         }
     }
 
@@ -74,10 +78,17 @@ class AggregateContext(
      * Iteratively updates the value of the input expression [repeat] at each device using the last computed value or
      * the [initial].
      */
-    fun <X, Y> repeating(initial: X, repeat: (X) -> Y): Y {
-        val res = stateAt<X>(stack.currentPath())?.let { repeat(it) } ?: repeat(initial)
-        state = state.filterNot { stack.currentPath() == it.path }.toSet() + State(stack.currentPath(), res)
-        return res
+    fun <Initial, Return> repeating(
+        initial: Initial,
+        transform: RepeatingContext<Initial, Return>.(Initial) -> RepeatingResult<Initial, Return>,
+    ): Return {
+        val context = RepeatingContext<Initial, Return>()
+        var res: Option<RepeatingResult<Initial, Return>>
+        transform(context, stateAt(stack.currentPath(), initial)).also { r ->
+            res = r.some()
+            state = state + (stack.currentPath() to r.toReturn)
+        }
+        return res.getOrElse { error("This error should never be thrown") }.toReturn
     }
 
     /**
@@ -95,8 +106,21 @@ class AggregateContext(
         .filter { it.messages.containsKey(path) }
         .associate { it.senderId to it.messages[path] as T }
 
-    @Suppress("UNCHECKED_CAST")
-    private fun <T> stateAt(path: Path): T? = previousState.firstOrNull { it.path == path }?.value as? T
+    private fun <T> stateAt(path: Path, default: T): T = previousState.getTyped(path, default)
+
+    /**
+     * Iteratively updates the value of the input expression [repeat] at each device using the last computed value or
+     * the [initial].
+     * TODO finish.
+     */
+    fun <Initial> repeat(
+        initial: Initial,
+        transform: (Initial) -> Initial,
+    ): Initial =
+        repeating(initial) {
+            val res = transform(it)
+            RepeatingResult(res, res)
+        }
 }
 
 /**
@@ -107,7 +131,7 @@ class AggregateContext(
 fun <X> aggregate(
     localId: ID,
     messages: Set<InboundMessage> = emptySet(),
-    state: Set<State<*>> = emptySet(),
+    state: State = emptyMap(),
     compute: AggregateContext.() -> X,
 ) = singleCycle(localId, messages, state, compute = compute)
 
