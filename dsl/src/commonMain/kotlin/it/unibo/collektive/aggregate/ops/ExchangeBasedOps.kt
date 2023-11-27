@@ -5,7 +5,6 @@ import arrow.core.getOrElse
 import arrow.core.none
 import arrow.core.some
 import it.unibo.collektive.aggregate.AggregateContext
-import it.unibo.collektive.aggregate.ops.RepeatingContext.RepeatingResult
 import it.unibo.collektive.field.Field
 
 /**
