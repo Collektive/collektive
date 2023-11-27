@@ -5,7 +5,7 @@ import it.unibo.collektive.stack.Path
 /**
  * State composed of [path] and [value] of a node.
  */
-data class State<X>(
-    val path: Path,
-    val value: X?,
-)
+typealias State = Map<Path, Any?>
+
+@Suppress("UNCHECKED_CAST")
+internal fun <T> State.getTyped(path: Path, default: T): T = (this as Map<Path, T>).getOrElse(path) { default }
