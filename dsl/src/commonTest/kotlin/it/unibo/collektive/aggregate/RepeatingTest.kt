@@ -18,7 +18,7 @@ class RepeatingTest : StringSpec({
 
     "First time repeating" {
         aggregate(id0) {
-            repeating(initV1, double) shouldBe 2
+            repeat(initV1, double) shouldBe 2
         }
     }
 
@@ -30,18 +30,48 @@ class RepeatingTest : StringSpec({
 
         val networkImpl = NetworkImplTest(nm, id1)
         aggregate(id1, condition, networkImpl) {
-            res = repeating(initV1, double)
+            res = repeat(initV1, double)
         }
         res shouldBe 4
     }
 
-    "Repeating with lambda body should work fine" {
-        val result = aggregate(id1) {
-            repeating(initV1) {
-                neighbouring(it * 2)
+    "Repeat with lambda body should work fine" {
+        val nm = NetworkManager()
+        var i = 0
+        val condition: () -> Boolean = { i++ < 1 }
+        val testNetwork1 = NetworkImplTest(nm, id1)
+
+        aggregate(id1, condition, testNetwork1) {
+            val res = repeat(initV1) {
+                it * 2
             }
+            res shouldBe 2
         }
-        result.result.localValue shouldBe initV1 * 2
+    }
+
+    "Repeating should return the value passed in the yielding function" {
+        val result = aggregate(id1) {
+            val res = repeating(initV1) {
+                val nbr = neighbouring(it * 2).localValue
+                nbr.yielding { "A string" }
+            }
+            res shouldBe "A string"
+        }
         result.toSend.messages.keys shouldContain Path(listOf("repeating.1", "neighbouring.1", "exchange.1"))
+    }
+
+    "Repeating should work fine even with null as value" {
+        val nm = NetworkManager()
+        var i = 0
+        val condition: () -> Boolean = { i++ < 1 }
+        val testNetwork1 = NetworkImplTest(nm, id1)
+
+        aggregate(id1, condition, testNetwork1) {
+            val res = repeating(initV1) {
+                val mult = it * 2
+                mult.yielding { "Hello".takeIf { mult < 1 } }
+            }
+            res shouldBe null
+        }
     }
 })
