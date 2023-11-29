@@ -1,3 +1,18 @@
+## [2.1.3](https://github.com/Collektive/collektive/compare/2.1.2...2.1.3) (2023-11-29)
+
+
+### Dependency updates
+
+* **core-deps:** update plugin kover to v0.7.5 ([52cb126](https://github.com/Collektive/collektive/commit/52cb126f545891301b6afab6d8dd277b5f53ee17))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.78 ([79a7d6f](https://github.com/Collektive/collektive/commit/79a7d6f0f4e66db068e725264b897a7ef33b848c))
+* **deps:** update plugin detekt to v1.23.4 ([362f618](https://github.com/Collektive/collektive/commit/362f618038547a79531f92523d69affd422beb0e))
+* **deps:** update plugin gitsemver to v2.0.3 ([b033d42](https://github.com/Collektive/collektive/commit/b033d4253f0afe16310f4c30ed8a4039f2abf4ab))
+* **deps:** update plugin kotlin-qa to v0.54.1 ([569afe9](https://github.com/Collektive/collektive/commit/569afe9f7413fc40c9e1f3c8ae4a8b69b309523d))
+* **deps:** update plugin kotlin-qa to v0.55.1 ([ef43f6a](https://github.com/Collektive/collektive/commit/ef43f6a4926cab09c45da5db18720f0b6abb30dc))
+* **deps:** update plugin multijvmtesting to v0.5.7 ([a49737b](https://github.com/Collektive/collektive/commit/a49737b61f4fcfdd0719220b7e25b847227e9157))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v1.1.15 ([2f208b0](https://github.com/Collektive/collektive/commit/2f208b0427f29eea08e2f2151a4adfd4a7896e46))
+* **deps:** update plugin publishoncentral to v5.0.20 ([3448af8](https://github.com/Collektive/collektive/commit/3448af81a8bf0bc31c5c358320e21c4bb8483537))
+
 ## [2.1.2](https://github.com/Collektive/collektive/compare/2.1.1...2.1.2) (2023-11-23)
 
 
