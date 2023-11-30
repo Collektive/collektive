@@ -10,9 +10,6 @@ import it.unibo.collektive.field.Field
 import it.unibo.collektive.messages.InboundMessage
 import it.unibo.collektive.messages.OutboundMessage
 import it.unibo.collektive.messages.SingleOutboundMessage
-import it.unibo.collektive.networking.Network
-import it.unibo.collektive.runUntil
-import it.unibo.collektive.singleCycle
 import it.unibo.collektive.stack.Path
 import it.unibo.collektive.stack.Stack
 import it.unibo.collektive.state.State
@@ -70,6 +67,7 @@ class AggregateContext(
         return body(subject).also { field ->
             val message = SingleOutboundMessage(field.localValue, field.excludeSelf())
             toBeSent = toBeSent.copy(messages = toBeSent.messages + (stack.currentPath() to message))
+            println("tobesent $toBeSent")
             state = state + (stack.currentPath() to field.localValue)
         }
     }
@@ -92,6 +90,20 @@ class AggregateContext(
     }
 
     /**
+     * Iteratively updates the value of the input expression [repeat] at each device using the last computed value or
+     * the [initial].
+     * TODO finish.
+     */
+    fun <Initial> repeat(
+        initial: Initial,
+        transform: (Initial) -> Initial,
+    ): Initial =
+        repeating(initial) {
+            val res = transform(it)
+            RepeatingResult(res, res)
+        }
+
+    /**
      * Alignment function that pushes in the stack the pivot, executes the body and pop the last
      * element of the stack after it is called.
      * Returns the body's return element.
@@ -107,53 +119,4 @@ class AggregateContext(
         .associate { it.senderId to it.messages[path] as T }
 
     private fun <T> stateAt(path: Path, default: T): T = previousState.getTyped(path, default)
-
-    /**
-     * Iteratively updates the value of the input expression [repeat] at each device using the last computed value or
-     * the [initial].
-     * TODO finish.
-     */
-    fun <Initial> repeat(
-        initial: Initial,
-        transform: (Initial) -> Initial,
-    ): Initial =
-        repeating(initial) {
-            val res = transform(it)
-            RepeatingResult(res, res)
-        }
 }
-
-/**
- * Aggregate program entry point which computes a single iteration of a device [localId], taking as parameters
- * the previous [state], the [messages] received from the neighbours and the [compute] with AggregateContext
- * object receiver that provides the aggregate constructs.
- */
-fun <X> aggregate(
-    localId: ID,
-    messages: Set<InboundMessage> = emptySet(),
-    state: State = emptyMap(),
-    compute: AggregateContext.() -> X,
-) = singleCycle(localId, messages, state, compute = compute)
-
-/**
- * Aggregate program entry point which computes a single iteration of a device [localId], taking as parameters
- * the previous [state], the [messages] received from the neighbours and the [compute] with AggregateContext
- * object receiver that provides the aggregate constructs.
- */
-// fun <X> aggregate(
-//    localId: ID,
-//
-//    compute: AggregateContext.() -> X,
-// ) = singleCycle(localId, messages, state, compute = compute)
-
-/**
- * Aggregate program entry point which computes multiple iterations of a device [localId],
- * over a [condition] and a [network] of devices, with the lambda [init] with AggregateContext
- * object receiver that provides the aggregate constructs.
- */
-fun <X> aggregate(
-    localId: ID,
-    condition: () -> Boolean,
-    network: Network,
-    init: AggregateContext.() -> X,
-) = runUntil(localId, condition, network, compute = init)
