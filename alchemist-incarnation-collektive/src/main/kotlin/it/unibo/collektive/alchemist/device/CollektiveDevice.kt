@@ -2,17 +2,14 @@ package it.unibo.collektive.alchemist.device
 
 import it.unibo.alchemist.model.Environment
 import it.unibo.alchemist.model.Node
-import it.unibo.alchemist.model.Node.Companion.asPropertyOrNull
 import it.unibo.alchemist.model.NodeProperty
 import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Time
-import it.unibo.collektive.ID
 import it.unibo.collektive.IntId
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.messages.OutboundMessage
 import it.unibo.collektive.messages.InboundMessage
+import it.unibo.collektive.messages.OutboundMessage
 import it.unibo.collektive.networking.Network
-import it.unibo.collektive.stack.Path
 
 /**
  * Collektive device in Alchemist.
@@ -34,25 +31,33 @@ class CollektiveDevice<P>(
      */
     var currentTime: Time = Time.ZERO
 
-    private var validMessages = mapOf<ID, TimedMessage>()
+    private var validMessages: Iterable<TimedMessage> = emptySet()
 
-    private fun receiveMessage(time: Time, from: ID, message: InboundMessage) {
-        validMessages += from to TimedMessage(time, message)
+    private fun receiveMessage(time: Time, message: InboundMessage) {
+        validMessages += TimedMessage(time, message)
     }
 
     override fun cloneOnNewNode(node: Node<Any>) = TODO()
 
     override fun read(): Set<InboundMessage> {
         return validMessages
-            .filter { (_, timedMessage) -> timedMessage.receivedAt + retainMessagesFor >= currentTime }
+            .filter { it.receivedAt + retainMessagesFor >= currentTime }
             .also { validMessages = it }
-            .mapValues { (id, value) -> InboundMessage(id, value.second) }
-            .values
+            .map { it.payload }
             .toSet()
     }
 
     override fun write(message: OutboundMessage) {
-        val actualMessages: Map<> = message.messages.map {  (path, message) ->
+        message.messages.mapValues { (path, outbound) ->
+            receiveMessage(
+                currentTime,
+                InboundMessage(
+                    message.senderId,
+                    mapOf(path to outbound.overrides.getOrElse(IntId(node.id)) { outbound.default }),
+                ),
+            )
+        }
+/*        val actualMessages: Map<> = message.messages.map {  (path, message) ->
             message.
         }
         environment.getNeighborhood(node).
@@ -68,14 +73,16 @@ class CollektiveDevice<P>(
                         .firstOrNull { it.node.id == (message.receiverId as IntId).id }
                         ?.also { it.receiveMessage(currentTime, message.senderId, message.message) }
             }
-        }
+        }*/
     }
 
     override fun distances(): Field<Double> {
-        val res: Map<ID, Double> = mapOf(IntId(node.id) to 0.0) +
-            environment
-                .getNeighborhood(node)
-                .associate { IntId(it.id) to environment.getDistanceBetweenNodes(node, it) }
-        return Field(IntId(node.id), res)
+        println(environment)
+        TODO()
+        //        val res: Map<ID, Double> = mapOf(IntId(node.id) to 0.0) +
+//            environment
+//                .getNeighborhood(node)
+//                .associate { IntId(it.id) to environment.getDistanceBetweenNodes(node, it) }
+//        return Field(IntId(node.id), res)
     }
 }
