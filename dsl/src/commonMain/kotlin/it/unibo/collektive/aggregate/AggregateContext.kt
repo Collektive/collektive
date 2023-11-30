@@ -67,7 +67,6 @@ class AggregateContext(
         return body(subject).also { field ->
             val message = SingleOutboundMessage(field.localValue, field.excludeSelf())
             toBeSent = toBeSent.copy(messages = toBeSent.messages + (stack.currentPath() to message))
-            println("tobesent $toBeSent")
             state = state + (stack.currentPath() to field.localValue)
         }
     }
