@@ -20,11 +20,12 @@ class NetworkManager {
     /**
      * Return the messages directed to a specific [receiverId].
      */
-    fun receive(receiverId: ID): Collection<InboundMessage> = messageBuffer.map { received ->
-        val sender = received.localId
-        val payloads = received.messages.mapValues { (_, outbound) ->
-            outbound.overrides.getOrElse(receiverId) { outbound.default }
+    fun receive(receiverId: ID): Collection<InboundMessage> = messageBuffer
+        .map { received ->
+            val sender = received.senderId
+            val payloads = received.messages.mapValues { (_, outbound) ->
+                outbound.overrides.getOrElse(receiverId) { outbound.default }
+            }
+            InboundMessage(sender, payloads)
         }
-        InboundMessage(sender, payloads)
-    }
 }
