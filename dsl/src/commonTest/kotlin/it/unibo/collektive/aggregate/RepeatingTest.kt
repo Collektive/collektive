@@ -3,6 +3,7 @@ package it.unibo.collektive.aggregate
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
+import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.ops.neighbouring
 import it.unibo.collektive.network.NetworkImplTest
@@ -23,25 +24,20 @@ class RepeatingTest : StringSpec({
     }
 
     "Repeating more than once" {
-        val nm = NetworkManager()
-        var counter = 0
-        val condition: () -> Boolean = { counter++ != 2 }
         var res = 0
 
-        val networkImpl = NetworkImplTest(nm, id1)
-        aggregate(id1, condition, networkImpl) {
+        val testNetwork = NetworkImplTest(NetworkManager(), id1)
+        aggregate(id1, testNetwork) {
             res = repeat(initV1, double)
+            res = repeat(res, double)
         }
         res shouldBe 4
     }
 
     "Repeat with lambda body should work fine" {
-        val nm = NetworkManager()
-        var i = 0
-        val condition: () -> Boolean = { i++ < 1 }
-        val testNetwork1 = NetworkImplTest(nm, id1)
+        val testNetwork = NetworkImplTest(NetworkManager(), id1)
 
-        aggregate(id1, condition, testNetwork1) {
+        aggregate(id1, testNetwork) {
             val res = repeat(initV1) {
                 it * 2
             }
@@ -61,12 +57,9 @@ class RepeatingTest : StringSpec({
     }
 
     "Repeating should work fine even with null as value" {
-        val nm = NetworkManager()
-        var i = 0
-        val condition: () -> Boolean = { i++ < 1 }
-        val testNetwork1 = NetworkImplTest(nm, id1)
+        val testNetwork1 = NetworkImplTest(NetworkManager(), id1)
 
-        aggregate(id1, condition, testNetwork1) {
+        aggregate(id1, testNetwork1) {
             val res = repeating(initV1) {
                 val mult = it * 2
                 mult.yielding { "Hello".takeIf { mult < 1 } }
