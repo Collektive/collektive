@@ -4,6 +4,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
+import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.IntId
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.messages.OutboundMessage
@@ -57,12 +58,10 @@ class ExchangeTest : StringSpec({
 
     "Exchange should work between three aligned devices" {
         val nm = NetworkManager()
-        var i = 0
-        val condition: () -> Boolean = { i++ < 1 }
 
         // Device 1
         val testNetwork1 = NetworkImplTest(nm, id1)
-        aggregate(id1, condition, testNetwork1) {
+        aggregate(id1, testNetwork1) {
             val res1 = exchange(initV1, increaseOrDouble)
             val res2 = exchange(initV2, increaseOrDouble)
             testNetwork1.read() shouldHaveSize 0
@@ -77,10 +76,9 @@ class ExchangeTest : StringSpec({
             )
         }
 
-        i = 0
         // Device 2
         val testNetwork2 = NetworkImplTest(nm, id2)
-        aggregate(id2, condition, testNetwork2) {
+        aggregate(id2, testNetwork2) {
             val res1 = exchange(initV3, increaseOrDouble)
             val res2 = exchange(initV4, increaseOrDouble)
             testNetwork2.read() shouldHaveSize 1
@@ -107,10 +105,9 @@ class ExchangeTest : StringSpec({
             )
         }
 
-        i = 0
         // Device 3
         val testNetwork3 = NetworkImplTest(nm, id3)
-        aggregate(id3, condition, testNetwork3) {
+        aggregate(id3, testNetwork3) {
             val res1 = exchange(initV5, increaseOrDouble)
             val res2 = exchange(initV6, increaseOrDouble)
             val read = testNetwork3.read()
