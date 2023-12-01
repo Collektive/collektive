@@ -21,6 +21,7 @@ class NetworkManager {
      * Return the messages directed to a specific [receiverId].
      */
     fun receive(receiverId: ID): Collection<InboundMessage> = messageBuffer
+        .filterNot { it.senderId == receiverId }
         .map { received ->
             val sender = received.senderId
             val payloads = received.messages.mapValues { (_, outbound) ->
