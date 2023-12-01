@@ -54,7 +54,16 @@ class AggregateCallTransformer(
                     ),
                     null,
                 )
-                is IrCall -> println("TODO")
+                is IrCall -> expression.transformChildren(
+                    AlignmentTransformer(
+                        pluginContext,
+                        logger,
+                        aggregateContextClass,
+                        aggregateLambdaBody.symbol.owner,
+                        alignedOnFunction,
+                    ),
+                    null,
+                )
                 else -> {
                     logger.debug("Error on visiting call ${expression.symbol.owner.dumpKotlinLike()}")
                     logger.error(
