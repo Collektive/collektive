@@ -9,7 +9,11 @@ import it.unibo.collektive.state.State
 /**
  * [id] [network] [computeFunction] TODO.
  */
-class Collektive<R>(val id: ID, val network: Network, val computeFunction: AggregateContext.() -> R) {
+class Collektive<R> private constructor(
+    private val id: ID,
+    private val network: Network,
+    private val computeFunction: AggregateContext.() -> R
+) {
 
     /**
      * TODO.
@@ -17,18 +21,31 @@ class Collektive<R>(val id: ID, val network: Network, val computeFunction: Aggre
     var state: State = emptyMap()
         private set
 
-//    fun cycle(): R = aggregate(id, network, state, computeFunction).also { state = it.newState }.result
-//
-//    fun cycleWhile(condition: (AggregateResult<R>) -> Boolean): R {
-//        var computed = aggregate(id, network, state, computeFunction)
-//        while (condition(computed)) {
-//            computed = aggregate(id, network, state, computeFunction)
-//            state = computed.newState
-//        }
-//        return computed.result
-//    }
+    /**
+     * TODO.
+     */
+    fun cycle(): R = aggregate(id, network, state, computeFunction).also { state = it.newState }.result
+
+    /**
+     * TODO.
+     */
+    fun cycleWhile(condition: (AggregateResult<R>) -> Boolean): R {
+        var computed = aggregate(id, network, state, computeFunction)
+        while (condition(computed)) {
+            computed = aggregate(id, network, state, computeFunction)
+            state = computed.newState
+        }
+        return computed.result
+    }
 
     companion object {
+
+        /**
+         * TODO.
+         */
+        operator fun <R> invoke(id: ID, network: Network, computeFunction: AggregateContext.() -> R): Collektive<R> =
+            Collektive(id, network, computeFunction)
+
         /**
          * Aggregate program entry point which computes an iteration of a device [localId], taking as parameters
          * the previous [state], the [messages] received from the neighbours and the [compute] with AggregateContext
