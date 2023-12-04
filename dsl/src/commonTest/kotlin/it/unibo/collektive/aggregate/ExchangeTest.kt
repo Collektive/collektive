@@ -30,8 +30,8 @@ class ExchangeTest : StringSpec({
     val initV6 = 6
 
     // paths
-    val path1 = Path(listOf("exchange.1"))
-    val path2 = Path(listOf("exchange.2"))
+    val path1 = Path(listOf("invoke.1", "exchange.1"))
+    val path2 = Path(listOf("invoke.1", "exchange.2"))
 
     // expected
     val expected2 = 2

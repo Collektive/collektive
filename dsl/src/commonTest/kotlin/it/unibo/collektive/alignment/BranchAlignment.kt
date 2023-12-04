@@ -27,7 +27,7 @@ class BranchAlignment : StringSpec({
         }
         result.toSend.messages.keys shouldHaveSize 1 // 1 path of alignment
         result.toSend.messages.keys shouldContain Path(
-            listOf("branch[condition, true]", "test2.1", "test.1", "neighbouring.1", "exchange.1"),
+            listOf("invoke.1", true, "test2.1", "test.1", "neighbouring.1", "exchange.1"),
         )
     }
     "The branch alignment should not occur in non aggregate context" {

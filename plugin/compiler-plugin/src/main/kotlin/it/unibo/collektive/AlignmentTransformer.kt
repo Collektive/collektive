@@ -38,9 +38,12 @@ class AlignmentTransformer(
     override fun visitCall(expression: IrCall): IrExpression {
         val contextReference = expression.receiverAndArgs().find { it.type == aggregateContextClass.defaultType }
             ?: collectAggregateContextReference(aggregateContextClass, expression.symbol.owner)
-
         return contextReference?.let { context ->
-            val functionName = expression.symbol.owner.name.asString()
+            val symbolName = expression.symbol.owner.name
+            val functionName = when {
+                symbolName.isSpecial -> "?"
+                else -> symbolName.asString()
+            }
             // We don't want to align the alignedOn function :)
             if (functionName == ALIGNED_ON_FUNCTION) return super.visitCall(expression)
 

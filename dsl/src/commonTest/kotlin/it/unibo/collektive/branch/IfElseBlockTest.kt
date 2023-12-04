@@ -21,7 +21,8 @@ class IfElseBlockTest : StringSpec({
         }
         result.toSend.messages.keys shouldContain Path(
             listOf(
-                "branch[customCondition, true]",
+                "invoke.1",
+                true,
                 "neighbouring.1",
                 "exchange.1",
             ),
@@ -39,7 +40,8 @@ class IfElseBlockTest : StringSpec({
         }
         result.toSend.messages.keys shouldContain Path(
             listOf(
-                "branch[constant, false]",
+                "invoke.1",
+                false,
                 "neighbouring.2",
                 "exchange.1",
             ),
@@ -60,7 +62,8 @@ class IfElseBlockTest : StringSpec({
         }
         result.toSend.messages.keys shouldContain Path(
             listOf(
-                "branch[customCondition2, true]",
+                "invoke.1",
+                true,
                 "neighbouring.2",
                 "exchange.1",
             ),
