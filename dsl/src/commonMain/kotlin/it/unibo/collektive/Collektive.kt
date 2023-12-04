@@ -9,10 +9,10 @@ import it.unibo.collektive.state.State
 /**
  * [id] [network] [computeFunction] TODO.
  */
-class Collektive<R> (
+class Collektive<R> constructor(
     private val id: ID,
     private val network: Network,
-    private val computeFunction: AggregateContext.() -> R
+    private val computeFunction: AggregateContext.() -> R,
 ) {
 
     /**
@@ -39,6 +39,15 @@ class Collektive<R> (
     }
 
     companion object {
+        /**
+         * TODO.
+         */
+        operator fun <T> invoke(
+            id: ID,
+            network: Network,
+            funccccc: AggregateContext.() -> T,
+        ): Collektive<T> = Collektive(id, network) { funccccc() }
+
         /**
          * Aggregate program entry point which computes an iteration of a device [localId], taking as parameters
          * the previous [state], the [messages] received from the neighbours and the [compute] with AggregateContext

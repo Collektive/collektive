@@ -13,7 +13,7 @@ class IfConditionTest : StringSpec({
         val result = aggregate(id0) {
             if (true) neighbouring("test")
         }
-        result.toSend.messages.keys shouldContain Path(listOf("branch[constant, true]", "neighbouring.1", "exchange.1"))
+        result.toSend.messages.keys shouldContain Path(listOf("invoke.1", true, "neighbouring.1", "exchange.1"))
     }
 
     "Variable condition if" {
@@ -23,7 +23,8 @@ class IfConditionTest : StringSpec({
         }
         result.toSend.messages.keys shouldContain Path(
             listOf(
-                "branch[customCondition, true]",
+                "invoke.1",
+                true,
                 "neighbouring.1",
                 "exchange.1",
             ),
@@ -37,7 +38,8 @@ class IfConditionTest : StringSpec({
         }
         result.toSend.messages.keys shouldContain Path(
             listOf(
-                "branch[customFunction, true]",
+                "invoke.1",
+                true,
                 "neighbouring.1",
                 "exchange.1",
             ),
@@ -51,7 +53,7 @@ class IfConditionTest : StringSpec({
             if (customCondition1 && customCondition2) neighbouring("test")
         }
         result.toSend.messages.keys shouldContain Path(
-            listOf("branch[customCondition1 & customCondition2, true]", "neighbouring.1", "exchange.1"),
+            listOf("invoke.1", true, "neighbouring.1", "exchange.1"),
         )
     }
 
@@ -63,7 +65,8 @@ class IfConditionTest : StringSpec({
         }
         result.toSend.messages.keys shouldContain Path(
             listOf(
-                "branch[customCondition1 | customCondition2, true]",
+                "invoke.1",
+                true,
                 "neighbouring.1",
                 "exchange.1",
             ),
@@ -78,7 +81,8 @@ class IfConditionTest : StringSpec({
         }
         result.toSend.messages.keys shouldContain Path(
             listOf(
-                "branch[customCondition1 & not customCondition2, true]",
+                "invoke.1",
+                true,
                 "neighbouring.1",
                 "exchange.1",
             ),
