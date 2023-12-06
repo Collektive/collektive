@@ -8,8 +8,8 @@ import it.unibo.alchemist.model.Time
 import it.unibo.collektive.IntId
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.InboundMessage
-import it.unibo.collektive.networking.OutboundMessage
 import it.unibo.collektive.networking.Network
+import it.unibo.collektive.networking.OutboundMessage
 
 /**
  * Collektive device in Alchemist.
@@ -57,28 +57,11 @@ class CollektiveDevice<P>(
                 ),
             )
         }
-/*        val actualMessages: Map<> = message.messages.map {  (path, message) ->
-            message.
-        }
-        environment.getNeighborhood(node).
-        messages.forEach { message ->
-            when (message) {
-                is IsotropicMessage ->
-                    environment.getNeighborhood(node)
-                        .mapNotNull { it.asPropertyOrNull<Any, CollektiveDevice<P>>() }
-                        .forEach { it.receiveMessage(currentTime, message.senderId, message.message) }
-                is AnisotropicMessage ->
-                    environment.getNeighborhood(node)
-                        .mapNotNull { it.asPropertyOrNull<Any, CollektiveDevice<P>>() }
-                        .firstOrNull { it.node.id == (message.receiverId as IntId).id }
-                        ?.also { it.receiveMessage(currentTime, message.senderId, message.message) }
-            }
-        }*/
     }
 
     override fun distances(): Field<Double> {
         println(environment)
-        TODO()
+        TODO("Not yet implemented")
         //        val res: Map<ID, Double> = mapOf(IntId(node.id) to 0.0) +
 //            environment
 //                .getNeighborhood(node)
