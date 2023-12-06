@@ -52,8 +52,6 @@ class NeighbouringTest : StringSpec({
         val testNetwork3 = NetworkImplTest(nm, id3)
         aggregate(id3, testNetwork3) {
             val field = neighbouring(double(initV3))
-//            println("field $field")
-//            field.toMap() shouldContainValue 2
             field.toMap() shouldContainValue 4
             field.toMap() shouldContainValue 6
         }

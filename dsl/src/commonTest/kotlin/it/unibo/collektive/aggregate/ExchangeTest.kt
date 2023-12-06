@@ -81,12 +81,6 @@ class ExchangeTest : StringSpec({
         aggregate(id2, testNetwork2) {
             val res1 = exchange(initV3, increaseOrDouble)
             val res2 = exchange(initV4, increaseOrDouble)
-//            testNetwork2.read() shouldHaveSize 1
-
-//            val readMessages = testNetwork2.read().first().messages
-//            readMessages shouldHaveSize 2
-//            readMessages[path1] shouldBe expected2
-//            readMessages[path2] shouldBe expected3
 
             res1.localValue shouldBe expected6
             res2.localValue shouldBe expected5
@@ -110,20 +104,6 @@ class ExchangeTest : StringSpec({
         aggregate(id3, testNetwork3) {
             val res1 = exchange(initV5, increaseOrDouble)
             val res2 = exchange(initV6, increaseOrDouble)
-//            val read = testNetwork3.read()
-//            read shouldHaveSize 2
-
-//            val sentFromDev1 = read.first { it.senderId == id1 }
-//            val sentFromDev2 = read.first { it.senderId == id2 }
-
-//            sentFromDev1.messages shouldHaveSize 2
-//            sentFromDev2.messages shouldHaveSize 2
-
-//            sentFromDev1.messages[path1] shouldBe expected2
-//            sentFromDev1.messages[path2] shouldBe expected3
-
-//            sentFromDev2.messages[path1] shouldBe expected6
-//            sentFromDev2.messages[path2] shouldBe expected5
 
             res1.localValue shouldBe expected10
             res2.localValue shouldBe expected7
@@ -133,14 +113,12 @@ class ExchangeTest : StringSpec({
                     path1 to SingleOutboundMessage(
                         expected10,
                         mapOf(
-//                            id1 to expected3,
                             id2 to expected7,
                         ),
                     ),
                     path2 to SingleOutboundMessage(
                         expected7,
                         mapOf(
-//                            id1 to expected6,
                             id2 to expected10,
                         ),
                     ),

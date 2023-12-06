@@ -23,7 +23,6 @@ class TestAlignment : StringSpec({
             }
 
             result.result shouldBe 5
-//            var paths = emptySet<Path>()
             result.toSend.messages.keys shouldHaveSize 4 // 4 paths of alignment
             result.toSend.messages.keys shouldContainAll setOf(
                 Path(listOf("invoke.1", "neighbouring.1", "exchange.1")),
