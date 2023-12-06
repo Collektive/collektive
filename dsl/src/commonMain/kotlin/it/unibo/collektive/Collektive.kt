@@ -9,7 +9,7 @@ import it.unibo.collektive.state.State
 /**
  * [id] [network] [computeFunction] TODO.
  */
-class Collektive<R> constructor(
+class Collektive<R> (
     private val id: ID,
     private val network: Network,
     private val computeFunction: AggregateContext.() -> R,
@@ -24,18 +24,23 @@ class Collektive<R> constructor(
     /**
      * TODO.
      */
-    fun cycle(): R = aggregate(id, network, state, computeFunction).also { state = it.newState }.result
+    fun cycle(): R = applyAggregate().result
 
     /**
      * TODO.
      */
     fun cycleWhile(condition: (AggregateResult<R>) -> Boolean): R {
-        var computed = aggregate(id, network, state, computeFunction)
-        while (condition(computed)) {
-            computed = aggregate(id, network, state, computeFunction)
-            state = computed.newState
+        var compute = applyAggregate()
+        while (condition(compute)) {
+            compute = applyAggregate()
         }
-        return computed.result
+        return compute.result
+    }
+
+    private fun applyAggregate(): AggregateResult<R> {
+        val result = aggregate(id, network, state, computeFunction)
+        state = result.newState
+        return result
     }
 
     companion object {
