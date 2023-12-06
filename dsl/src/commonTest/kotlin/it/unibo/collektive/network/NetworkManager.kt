@@ -1,8 +1,8 @@
 package it.unibo.collektive.network
 
 import it.unibo.collektive.ID
-import it.unibo.collektive.messages.InboundMessage
-import it.unibo.collektive.messages.OutboundMessage
+import it.unibo.collektive.networking.InboundMessage
+import it.unibo.collektive.networking.OutboundMessage
 
 /**
  * Implementation of the Network interface.
@@ -23,10 +23,11 @@ class NetworkManager {
     fun receive(receiverId: ID): Collection<InboundMessage> = messageBuffer
         .filterNot { it.senderId == receiverId }
         .map { received ->
-            val sender = received.senderId
-            val payloads = received.messages.mapValues { (_, outbound) ->
-                outbound.overrides.getOrElse(receiverId) { outbound.default }
-            }
-            InboundMessage(sender, payloads)
+            InboundMessage(
+                received.senderId,
+                received.messages.mapValues { (_, outbound) ->
+                    outbound.overrides.getOrElse(receiverId) { outbound.default }
+                },
+            )
         }
 }

@@ -7,7 +7,7 @@ import it.unibo.collektive.Collektive
 import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.AggregateContext
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.messages.InboundMessage
+import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.stack.Path

@@ -7,8 +7,8 @@ import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.IntId
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.messages.OutboundMessage
-import it.unibo.collektive.messages.SingleOutboundMessage
+import it.unibo.collektive.networking.OutboundMessage
+import it.unibo.collektive.networking.SingleOutboundMessage
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.stack.Path

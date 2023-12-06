@@ -7,9 +7,9 @@ import it.unibo.collektive.ID
 import it.unibo.collektive.aggregate.ops.RepeatingContext
 import it.unibo.collektive.aggregate.ops.RepeatingContext.RepeatingResult
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.messages.InboundMessage
-import it.unibo.collektive.messages.OutboundMessage
-import it.unibo.collektive.messages.SingleOutboundMessage
+import it.unibo.collektive.networking.InboundMessage
+import it.unibo.collektive.networking.OutboundMessage
+import it.unibo.collektive.networking.SingleOutboundMessage
 import it.unibo.collektive.stack.Path
 import it.unibo.collektive.stack.Stack
 import it.unibo.collektive.state.State

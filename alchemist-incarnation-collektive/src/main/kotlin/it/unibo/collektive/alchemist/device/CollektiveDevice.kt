@@ -7,8 +7,8 @@ import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Time
 import it.unibo.collektive.IntId
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.messages.InboundMessage
-import it.unibo.collektive.messages.OutboundMessage
+import it.unibo.collektive.networking.InboundMessage
+import it.unibo.collektive.networking.OutboundMessage
 import it.unibo.collektive.networking.Network
 
 /**

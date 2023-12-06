@@ -1,4 +1,4 @@
-package it.unibo.collektive.messages
+package it.unibo.collektive.networking
 
 import it.unibo.collektive.ID
 import it.unibo.collektive.stack.Path

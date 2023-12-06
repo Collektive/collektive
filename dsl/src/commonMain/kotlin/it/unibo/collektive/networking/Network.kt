@@ -1,8 +1,5 @@
 package it.unibo.collektive.networking
 
-import it.unibo.collektive.messages.InboundMessage
-import it.unibo.collektive.messages.OutboundMessage
-
 /**
  * Network interface for the aggregate computation.
  */
