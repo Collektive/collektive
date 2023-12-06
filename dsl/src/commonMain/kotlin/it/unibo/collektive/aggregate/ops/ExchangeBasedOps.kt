@@ -78,4 +78,3 @@ fun <Initial> AggregateContext.share(initial: Initial, transform: (Field<Initial
         val res = transform(it)
         SharingResult(res, res)
     }
-
