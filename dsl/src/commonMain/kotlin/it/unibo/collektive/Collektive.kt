@@ -7,27 +7,30 @@ import it.unibo.collektive.networking.Network
 import it.unibo.collektive.state.State
 
 /**
- * [id] [network] [computeFunction] TODO.
+ * Create a Collektive device with a specific [id] and a [network] to manage incoming and outgoing messages,
+ * the [computeFunction] is the function to apply within the [AggregateContext].
  */
-class Collektive<R> (
+class Collektive<R>(
     private val id: ID,
     private val network: Network,
     private val computeFunction: AggregateContext.() -> R,
 ) {
 
     /**
-     * TODO.
+     * The [State] of the Collektive device.
      */
     var state: State = emptyMap()
         private set
 
     /**
-     * TODO.
+     * Apply once the aggregate function to the parameters of the device,
+     * then returns the result of the computation.
      */
     fun cycle(): R = applyAggregate().result
 
     /**
-     * TODO.
+     * Apply the aggregate function to the parameters of the device while the [condition] is satisfied,
+     * then returns the result of the computation.
      */
     fun cycleWhile(condition: (AggregateResult<R>) -> Boolean): R {
         var compute = applyAggregate()
@@ -44,14 +47,6 @@ class Collektive<R> (
     }
 
     companion object {
-        /**
-         * TODO.
-         */
-        operator fun <T> invoke(
-            id: ID,
-            network: Network,
-            funccccc: AggregateContext.() -> T,
-        ): Collektive<T> = Collektive(id, network) { funccccc() }
 
         /**
          * Aggregate program entry point which computes an iteration of a device [localId], taking as parameters
