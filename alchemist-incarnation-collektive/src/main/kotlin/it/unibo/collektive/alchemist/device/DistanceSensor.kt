@@ -7,7 +7,7 @@ import it.unibo.collektive.field.Field
  */
 interface DistanceSensor {
     /**
-     * @return the distances from the current node to all the other nodes.
+     * The distances from the current node to all the other nodes.
      */
     fun distances(): Field<Double>
 }
