@@ -1,3 +1,31 @@
+## [3.0.0](https://github.com/Collektive/collektive/compare/2.1.3...3.0.0) (2023-12-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* introduce Collektive entrypoint (#142)
+
+### Features
+
+* introduce Collektive entrypoint ([#142](https://github.com/Collektive/collektive/issues/142)) ([8bf8517](https://github.com/Collektive/collektive/commit/8bf8517edbdde8611d1bd99991abc72d4410513a))
+
+
+### Dependency updates
+
+* **deps:** update alchemist to v29 ([ce990da](https://github.com/Collektive/collektive/commit/ce990da0fc75ea85b1825cf56145671ff6acc3d0))
+* **deps:** update dependency gradle to v8.5 ([a18e39b](https://github.com/Collektive/collektive/commit/a18e39b652681d69108cf7f89d7be60b516437a1))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.79 ([b58fd5a](https://github.com/Collektive/collektive/commit/b58fd5a5955d643cf067271dcf8bf5674eebad97))
+* **deps:** update plugin com.gradle.enterprise to v3.16 ([0bb24d6](https://github.com/Collektive/collektive/commit/0bb24d694baaa4e69ab837cec35804c9d6815add))
+* **deps:** update plugin gitsemver to v2.0.4 ([29c2bae](https://github.com/Collektive/collektive/commit/29c2bae51b456a41514af67a1683760758a82e04))
+* **deps:** update plugin kotlin-qa to v0.55.2 ([9d22b7a](https://github.com/Collektive/collektive/commit/9d22b7a389fc1f397a5e6e072dcef87b5eb20e63))
+* **deps:** update plugin kotlin-qa to v0.56.0 ([7849958](https://github.com/Collektive/collektive/commit/7849958d25f589e13ae6e866c69347212966e654))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v1.1.16 ([215292e](https://github.com/Collektive/collektive/commit/215292e565f7dad34f960ea0826d0c999f0b6bcf))
+
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.2.12 ([c9e1d72](https://github.com/Collektive/collektive/commit/c9e1d728fbe3ccd4615ab66db4784b4710218ebb))
+
 ## [2.1.3](https://github.com/Collektive/collektive/compare/2.1.2...2.1.3) (2023-11-29)
 
 
