@@ -77,8 +77,8 @@ class AggregateContext(
     }
 
     /**
-     * Iteratively updates the value of the input expression [repeat] at each device using the last computed value or
-     * the [initial].
+     * Iteratively updates the value computing the [transform] expression from a [RepeatingContext]
+     * at each device using the last computed value or the [initial].
      */
     fun <Initial, Return> repeating(
         initial: Initial,
@@ -86,17 +86,16 @@ class AggregateContext(
     ): Return {
         val context = RepeatingContext<Initial, Return>()
         var res: Option<RepeatingResult<Initial, Return>>
-        transform(context, stateAt(stack.currentPath(), initial)).also { r ->
-            res = r.some()
-            state = state + (stack.currentPath() to r.toReturn)
+        transform(context, stateAt(stack.currentPath(), initial)).also {
+            res = it.some()
+            state = state + (stack.currentPath() to it.toReturn)
         }
         return res.getOrElse { error("This error should never be thrown") }.toReturn
     }
 
     /**
-     * Iteratively updates the value of the input expression [repeat] at each device using the last computed value or
-     * the [initial].
-     * TODO finish.
+     * Iteratively updates the value computing the [transform] expression at each device using the last
+     * computed value or the [initial].
      */
     fun <Initial> repeat(
         initial: Initial,

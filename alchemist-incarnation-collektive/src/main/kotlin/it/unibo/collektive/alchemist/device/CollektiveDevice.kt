@@ -12,11 +12,10 @@ import it.unibo.collektive.networking.Network
 import it.unibo.collektive.networking.OutboundMessage
 
 /**
- * Collektive device in Alchemist.
- * @param P the position type.
- * @property environment the environment.
- * @property node the node.
- * @property retainMessagesFor the time for which messages are retained.
+ * Representation of a Collektive device in Alchemist.
+ * [P] is the position type, the [environment] property represent the environment in which the device is located,
+ * the [node] property represent a node in the environment, [retainMessagesFor] is the time for which messages
+ * are retained.
  */
 class CollektiveDevice<P>(
     private val environment: Environment<Any, P>,
@@ -37,7 +36,7 @@ class CollektiveDevice<P>(
         validMessages += TimedMessage(time, message)
     }
 
-    override fun cloneOnNewNode(node: Node<Any>) = TODO()
+    override fun cloneOnNewNode(node: Node<Any>) = TODO("Not yet implemented")
 
     override fun read(): Set<InboundMessage> {
         return validMessages
@@ -62,10 +61,5 @@ class CollektiveDevice<P>(
     override fun distances(): Field<Double> {
         println(environment)
         TODO("Not yet implemented")
-        //        val res: Map<ID, Double> = mapOf(IntId(node.id) to 0.0) +
-//            environment
-//                .getNeighborhood(node)
-//                .associate { IntId(it.id) to environment.getDistanceBetweenNodes(node, it) }
-//        return Field(IntId(node.id), res)
     }
 }
