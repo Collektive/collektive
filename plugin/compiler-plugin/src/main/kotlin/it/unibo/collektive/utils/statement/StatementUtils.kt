@@ -11,10 +11,9 @@ fun <T : IrElement> irStatement(
     aggregateLambdaBody: IrFunction,
     expression: IrElement,
     body: IrSingleStatementBuilder.() -> T,
-): T =
-    IrSingleStatementBuilder(
-        pluginContext,
-        Scope(aggregateLambdaBody.symbol),
-        expression.startOffset,
-        expression.endOffset,
-    ).build(body)
+): T = IrSingleStatementBuilder(
+    pluginContext,
+    Scope(aggregateLambdaBody.symbol),
+    expression.startOffset,
+    expression.endOffset,
+).build(body)
