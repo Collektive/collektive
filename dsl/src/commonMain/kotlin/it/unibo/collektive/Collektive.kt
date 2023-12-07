@@ -11,7 +11,7 @@ import it.unibo.collektive.state.State
  * the [computeFunction] is the function to apply within the [AggregateContext].
  */
 class Collektive<R>(
-    private val id: ID,
+    val id: ID,
     private val network: Network,
     private val computeFunction: AggregateContext.() -> R,
 ) {
@@ -26,21 +26,21 @@ class Collektive<R>(
      * Apply once the aggregate function to the parameters of the device,
      * then returns the result of the computation.
      */
-    fun cycle(): R = applyAggregate().result
+    fun cycle(): R = executeRound().result
 
     /**
      * Apply the aggregate function to the parameters of the device while the [condition] is satisfied,
      * then returns the result of the computation.
      */
     fun cycleWhile(condition: (AggregateResult<R>) -> Boolean): R {
-        var compute = applyAggregate()
+        var compute = executeRound()
         while (condition(compute)) {
-            compute = applyAggregate()
+            compute = executeRound()
         }
         return compute.result
     }
 
-    private fun applyAggregate(): AggregateResult<R> {
+    private fun executeRound(): AggregateResult<R> {
         val result = aggregate(id, network, state, computeFunction)
         state = result.newState
         return result
