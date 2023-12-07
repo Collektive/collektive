@@ -17,19 +17,12 @@ import org.jetbrains.kotlin.name.ClassId
 /**
  * Put a value argument at the head of the function's arguments.
  */
-internal fun IrFunctionAccessExpression.putValueArgument(argument: IrExpression) {
-    putValueArgument(
-        0,
-        argument,
-    )
-}
+internal fun IrFunctionAccessExpression.putValueArgument(argument: IrExpression) = putValueArgument(0, argument)
 
 /**
  * Set the type argument and the type.
  */
-internal fun IrFunctionAccessExpression.putTypeArgument(
-    type: IrType,
-) {
+internal fun IrFunctionAccessExpression.putTypeArgument(type: IrType) {
     this.type = type
     putTypeArgument(0, type)
 }
@@ -43,7 +36,8 @@ internal fun IrCall.getLastValueArgument(): IrExpression? = this.getValueArgumen
  * Looking in the receiver and args of a IrCall if there is one that matches the
  * type of class passed as argument.
  */
-internal fun IrCall.receiverAndArgs(classToMatch: IrClass): IrExpression? = this.receiverAndArgs().find { it.type == classToMatch.defaultType }
+internal fun IrCall.receiverAndArgs(classToMatch: IrClass): IrExpression? =
+    this.receiverAndArgs().find { it.type == classToMatch.defaultType }
 
 internal fun getLambdaType(
     pluginContext: IrPluginContext,
