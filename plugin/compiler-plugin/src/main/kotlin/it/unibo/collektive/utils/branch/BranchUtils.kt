@@ -21,7 +21,13 @@ fun IrBranch.addBranchAlignment(
     val aggregateContextReference = result.findAggregateReference(aggregateContextClass)
     if (aggregateContextReference != null) {
         this.result = irStatement(pluginContext, aggregateLambdaBody, this) {
-            buildAlignedOn(pluginContext, aggregateContextReference, alignedOnFunction, this@addBranchAlignment, conditionValue)
+            buildAlignedOn(
+                pluginContext,
+                aggregateContextReference,
+                alignedOnFunction,
+                this@addBranchAlignment,
+                conditionValue,
+            )
         }
     }
 }
@@ -31,9 +37,13 @@ private fun IrBlock.findAggregateReference(aggregateContextClass: IrClass): IrEx
     val statements = this.statements
     for (statement in statements) {
         when (statement) {
-            is IrCall -> collectAggregateContextReference(aggregateContextClass, statement)?.let { aggregateContextReferences.add(it) }
-                ?: aggregateContextReferences.add(collectAggregateContextReference(aggregateContextClass, statement.symbol.owner))
-            is IrTypeOperatorCall -> aggregateContextReferences.add(collectAggregateContextReference(aggregateContextClass, statement))
+            is IrCall -> collectAggregateContextReference(aggregateContextClass, statement)
+                ?.let { aggregateContextReferences.add(it) }
+                ?: aggregateContextReferences.add(
+                    collectAggregateContextReference(aggregateContextClass, statement.symbol.owner),
+                )
+            is IrTypeOperatorCall ->
+                aggregateContextReferences.add(collectAggregateContextReference(aggregateContextClass, statement))
         }
     }
     return aggregateContextReferences.filterNotNull().firstOrNull()
