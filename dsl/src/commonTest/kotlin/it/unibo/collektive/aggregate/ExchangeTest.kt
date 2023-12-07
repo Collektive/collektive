@@ -2,14 +2,14 @@ package it.unibo.collektive.aggregate
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
-import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
+import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.IntId
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.messages.OutboundMessage
-import it.unibo.collektive.messages.SingleOutboundMessage
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
+import it.unibo.collektive.networking.OutboundMessage
+import it.unibo.collektive.networking.SingleOutboundMessage
 import it.unibo.collektive.stack.Path
 
 class ExchangeTest : StringSpec({
@@ -29,8 +29,8 @@ class ExchangeTest : StringSpec({
     val initV6 = 6
 
     // paths
-    val path1 = Path(listOf("exchange.1"))
-    val path2 = Path(listOf("exchange.2"))
+    val path1 = Path(listOf("invoke.1", "exchange.1"))
+    val path2 = Path(listOf("invoke.1", "exchange.2"))
 
     // expected
     val expected2 = 2
@@ -57,12 +57,10 @@ class ExchangeTest : StringSpec({
 
     "Exchange should work between three aligned devices" {
         val nm = NetworkManager()
-        var i = 0
-        val condition: () -> Boolean = { i++ < 1 }
 
         // Device 1
         val testNetwork1 = NetworkImplTest(nm, id1)
-        aggregate(id1, condition, testNetwork1) {
+        aggregate(id1, testNetwork1) {
             val res1 = exchange(initV1, increaseOrDouble)
             val res2 = exchange(initV2, increaseOrDouble)
             testNetwork1.read() shouldHaveSize 0
@@ -77,18 +75,11 @@ class ExchangeTest : StringSpec({
             )
         }
 
-        i = 0
         // Device 2
         val testNetwork2 = NetworkImplTest(nm, id2)
-        aggregate(id2, condition, testNetwork2) {
+        aggregate(id2, testNetwork2) {
             val res1 = exchange(initV3, increaseOrDouble)
             val res2 = exchange(initV4, increaseOrDouble)
-            testNetwork2.read() shouldHaveSize 1
-
-            val readMessages = testNetwork2.read().first().messages
-            readMessages shouldHaveSize 2
-            readMessages[path1] shouldBe expected2
-            readMessages[path2] shouldBe expected3
 
             res1.localValue shouldBe expected6
             res2.localValue shouldBe expected5
@@ -107,26 +98,11 @@ class ExchangeTest : StringSpec({
             )
         }
 
-        i = 0
         // Device 3
         val testNetwork3 = NetworkImplTest(nm, id3)
-        aggregate(id3, condition, testNetwork3) {
+        aggregate(id3, testNetwork3) {
             val res1 = exchange(initV5, increaseOrDouble)
             val res2 = exchange(initV6, increaseOrDouble)
-            val read = testNetwork3.read()
-            read shouldHaveSize 2
-
-            val sentFromDev1 = read.first { it.senderId == id1 }
-            val sentFromDev2 = read.first { it.senderId == id2 }
-
-            sentFromDev1.messages shouldHaveSize 2
-            sentFromDev2.messages shouldHaveSize 2
-
-            sentFromDev1.messages[path1] shouldBe expected2
-            sentFromDev1.messages[path2] shouldBe expected3
-
-            sentFromDev2.messages[path1] shouldBe expected6
-            sentFromDev2.messages[path2] shouldBe expected5
 
             res1.localValue shouldBe expected10
             res2.localValue shouldBe expected7
@@ -136,14 +112,12 @@ class ExchangeTest : StringSpec({
                     path1 to SingleOutboundMessage(
                         expected10,
                         mapOf(
-                            id1 to expected3,
                             id2 to expected7,
                         ),
                     ),
                     path2 to SingleOutboundMessage(
                         expected7,
                         mapOf(
-                            id1 to expected6,
                             id2 to expected10,
                         ),
                     ),

@@ -1,12 +1,15 @@
 [versions]
-build-config = "4.2.0"
+alchemist = "28.5.4"
+build-config = "4.1.2"
 coroutines = "1.7.3"
 dokka = "1.9.10"
 kotest = "5.8.0"
 kotlin = "1.9.21"
 
 [libraries]
-arrow = { module = "io.arrow-kt:arrow-core", version = "1.2.1" }
+alchemist-api = { module = "it.unibo.alchemist:alchemist-api", version.ref = "alchemist" }
+alchemist = { module = "it.unibo.alchemist:alchemist", version.ref = "alchemist" }
+arrow = "io.arrow-kt:arrow-core:1.2.1"
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-framework-datatest = { module = "io.kotest:kotest-framework-datatest", version.ref = "kotest" }
@@ -26,6 +29,7 @@ kotlin-testing-common = [
     "kotlin-test-common",
     "kotlin-test-annotations-common",
 ]
+alchemist = ["alchemist"]
 
 [plugins]
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }

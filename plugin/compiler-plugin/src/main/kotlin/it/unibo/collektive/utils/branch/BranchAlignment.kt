@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.ir.builders.IrSingleStatementBuilder
 import org.jetbrains.kotlin.ir.builders.declarations.buildFun
 import org.jetbrains.kotlin.ir.builders.irBlock
 import org.jetbrains.kotlin.ir.builders.irBlockBody
+import org.jetbrains.kotlin.ir.builders.irBoolean
 import org.jetbrains.kotlin.ir.builders.irCall
 import org.jetbrains.kotlin.ir.builders.irReturn
 import org.jetbrains.kotlin.ir.builders.irString
@@ -78,7 +79,7 @@ internal fun IrSingleStatementBuilder.buildAlignedOnBlock(
             putArgument(alignedOnFunction.dispatchReceiverParameter!!, aggregateContextReference)
             // Set the argument that is going to be push in the stack
             putValueArgument(
-                irString(createConditionArgument(branch.condition, conditionValue)),
+                irBoolean(conditionValue),
             )
             // Create the lambda that is going to call expression
             val lambda = buildLambdaArgument(pluginContext, block)
@@ -102,7 +103,7 @@ internal fun IrSingleStatementBuilder.buildAlignedOnCall(
         putArgument(alignedOnFunction.dispatchReceiverParameter!!, aggregateContextReference)
         // Set the argument that is going to be push in the stack
         putValueArgument(
-            irString(createConditionArgument(branch.condition, conditionValue)),
+            irBoolean(conditionValue),
         )
         // Create the lambda that is going to call expression
         val lambda = buildLambdaArgument(pluginContext, statement)
@@ -162,9 +163,6 @@ private fun IrBuilderWithScope.buildLambda(
         +irReturn(lastExpression)
     }
 }
-
-private fun createConditionArgument(condition: IrExpression, conditionValue: Boolean): String =
-    "branch[${conditionName(condition)}, $conditionValue]"
 
 private fun conditionName(condition: IrExpression): String {
     return when (condition) {

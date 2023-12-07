@@ -1,4 +1,4 @@
-package it.unibo.collektive.messages
+package it.unibo.collektive.networking
 
 import it.unibo.collektive.ID
 import it.unibo.collektive.stack.Path
@@ -14,9 +14,9 @@ sealed interface Message
 data class InboundMessage(val senderId: ID, val messages: Map<Path, *>) : Message
 
 /**
- * An [OutboundMessage] are [messages] that a device [localId] sends to all other neighbours.
+ * An [OutboundMessage] are [messages] that a device [senderId] sends to all other neighbours.
  */
-data class OutboundMessage(val localId: ID, val messages: Map<Path, SingleOutboundMessage<*>>) : Message
+data class OutboundMessage(val senderId: ID, val messages: Map<Path, SingleOutboundMessage<*>>) : Message
 
 /**
  * A [SingleOutboundMessage] contains the values associated to a [Path] in the [messages] of [OutboundMessage].

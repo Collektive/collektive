@@ -1,16 +1,13 @@
 package it.unibo.collektive.networking
 
-import it.unibo.collektive.messages.InboundMessage
-import it.unibo.collektive.messages.OutboundMessage
-
 /**
  * Network interface for the aggregate computation.
  */
 interface Network {
     /**
-     * Sends a set of [messages] of type [OutboundMessage] to the neighbours.
+     * Sends a [message] of type [OutboundMessage] to the neighbours.
      */
-    fun write(messages: OutboundMessage)
+    fun write(message: OutboundMessage)
 
     /**
      * Returns a set of [InboundMessage]s representing the received messages from the neighbours.

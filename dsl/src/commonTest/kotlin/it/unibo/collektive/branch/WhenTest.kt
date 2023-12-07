@@ -2,8 +2,8 @@ package it.unibo.collektive.branch
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.IntId
-import it.unibo.collektive.aggregate.aggregate
 import it.unibo.collektive.aggregate.ops.neighbouring
 import it.unibo.collektive.stack.Path
 
@@ -21,7 +21,7 @@ class WhenTest : StringSpec({
         }
         result.toSend.messages.keys shouldBe setOf(
             Path(
-                listOf("branch[INSTANCEOF kotlin.String, true]", "neighbouring.1", "exchange.1"),
+                listOf("invoke.1", true, "neighbouring.1", "exchange.1"),
             ),
         )
     }
@@ -37,7 +37,7 @@ class WhenTest : StringSpec({
         }
         result.toSend.messages.keys shouldBe setOf(
             Path(
-                listOf("branch[constant, false]", "neighbouring.2", "exchange.1"),
+                listOf("invoke.1", false, "neighbouring.2", "exchange.1"),
             ),
         )
     }
@@ -60,7 +60,7 @@ class WhenTest : StringSpec({
         }
         result.toSend.messages.keys shouldBe setOf(
             Path(
-                listOf("branch[INSTANCEOF kotlin.String, true]", "test2.1", "neighbouring.2", "exchange.1"),
+                listOf("invoke.1", true, "test2.1", "neighbouring.2", "exchange.1"),
             ),
         )
     }

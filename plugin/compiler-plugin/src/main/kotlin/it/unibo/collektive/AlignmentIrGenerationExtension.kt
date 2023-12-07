@@ -1,6 +1,7 @@
 package it.unibo.collektive
 
 import it.unibo.collektive.utils.common.AggregateFunctionNames
+import it.unibo.collektive.utils.logging.error
 import it.unibo.collektive.utils.logging.warn
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -27,9 +28,17 @@ class AlignmentIrGenerationExtension(private val logger: MessageCollector) : IrG
             ?.functions
             ?.filter { it.owner.name == Name.identifier(AggregateFunctionNames.ALIGNED_ON_FUNCTION) }
             ?.firstOrNull()
-
+        requireNotNull(alignedOnFunction) {
+            val error = """
+                Aggregate alignment requires function ${AggregateFunctionNames.ALIGNED_ON_FUNCTION} to be available.
+                Please, add the required library TODO TODO (gradle block):
+            """.trimIndent()
+            error.also(logger::error)
+        }
         val (alignFunc, aggCtxClass) = getBothOrNull(alignedOnFunction, aggregateContextClass)
-            ?: return logger.warn("The function and the class used to handle the alignment have not been found.")
+            ?: return logger.error(
+                "The function and the class used to handle the alignment have not been found.",
+            )
 
         moduleFragment.transform(
             AggregateCallTransformer(pluginContext, logger, aggCtxClass.owner, alignFunc.owner),

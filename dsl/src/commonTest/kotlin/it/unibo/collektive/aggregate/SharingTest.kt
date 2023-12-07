@@ -2,6 +2,7 @@ package it.unibo.collektive.aggregate
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.ops.share
 import it.unibo.collektive.aggregate.ops.sharing
@@ -38,12 +39,10 @@ class SharingTest : StringSpec({
 
     "Share with two aligned devices" {
         val nm = NetworkManager()
-        var i = 0
-        val condition: () -> Boolean = { i++ < 1 }
 
         // Device 1
         val testNetwork1 = NetworkImplTest(nm, id1)
-        aggregate(id1, condition, testNetwork1) {
+        aggregate(id1, testNetwork1) {
             val r1 = share(initV1, findMax)
             val r2 = share(initV2, findMax)
             val r3 = share(initV10, findMax)
@@ -52,10 +51,9 @@ class SharingTest : StringSpec({
             r3 shouldBe initV10
         }
 
-        i = 0
         // Device 2
         val testNetwork2 = NetworkImplTest(nm, id2)
-        aggregate(id2, condition, testNetwork2) {
+        aggregate(id2, testNetwork2) {
             val r1 = share(initV2, findMax)
             val r2 = share(initV7, findMax)
             val r3 = share(initV4, findMax)
@@ -64,10 +62,9 @@ class SharingTest : StringSpec({
             r3 shouldBe initV10
         }
 
-        i = 0
         // Device 3
         val testNetwork3 = NetworkImplTest(nm, id3)
-        aggregate(id3, condition, testNetwork3) {
+        aggregate(id3, testNetwork3) {
             val r1 = share(initV5, findMax)
             val r2 = share(initV1, findMax)
             val r3 = share(initV3, findMax)
@@ -78,12 +75,9 @@ class SharingTest : StringSpec({
     }
 
     "Share with lambda body should work fine" {
-        val nm = NetworkManager()
-        var i = 0
-        val condition: () -> Boolean = { i++ < 1 }
-        val testNetwork1 = NetworkImplTest(nm, id1)
+        val testNetwork = NetworkImplTest(NetworkManager(), id1)
 
-        aggregate(id1, condition, testNetwork1) {
+        aggregate(id1, testNetwork) {
             val res = share(initV1) {
                 it.max()
             }
@@ -91,13 +85,10 @@ class SharingTest : StringSpec({
         }
     }
 
-    "sharing should return the value passed in the yielding function" {
-        val nm = NetworkManager()
-        var i = 0
-        val condition: () -> Boolean = { i++ < 1 }
-        val testNetwork1 = NetworkImplTest(nm, id1)
+    "Sharing should return the value passed in the yielding function" {
+        val testNetwork = NetworkImplTest(NetworkManager(), id1)
 
-        aggregate(id1, condition, testNetwork1) {
+        aggregate(id1, testNetwork) {
             val res = sharing(initV1) {
                 val min = it.max()
                 min.yielding { "A string" }
@@ -106,13 +97,10 @@ class SharingTest : StringSpec({
         }
     }
 
-    "sharing should work fine even with null as value" {
-        val nm = NetworkManager()
-        var i = 0
-        val condition: () -> Boolean = { i++ < 1 }
-        val testNetwork1 = NetworkImplTest(nm, id1)
+    "Sharing should work fine even with null as value" {
+        val testNetwork = NetworkImplTest(NetworkManager(), id1)
 
-        aggregate(id1, condition, testNetwork1) {
+        aggregate(id1, testNetwork) {
             val res = sharing(initV1) {
                 val min = it.min()
                 min.yielding { "Hello".takeIf { min > 1 } }
