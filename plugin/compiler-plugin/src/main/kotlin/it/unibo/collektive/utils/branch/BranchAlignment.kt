@@ -38,13 +38,14 @@ internal fun IrSingleStatementBuilder.buildAlignedOn(
     conditionValue: Boolean,
 ): IrContainerExpression {
     return irBlock {
-        val expr = when (val conditionResult = branch.result) {
-            is IrBlock -> conditionResult.statements.lastOrNull() as IrExpression
-            else -> conditionResult
+        val block = branch.result
+        val lastExpression = when (block) {
+            is IrBlock -> block.statements.lastOrNull() as IrExpression
+            else -> block
         }
         +irCall(alignedOnFunction).apply {
             // Set generics type
-            putTypeArgument(getReturnType(expr))
+            putTypeArgument(getReturnType(lastExpression))
             // Set aggregate context
             putArgument(alignedOnFunction.dispatchReceiverParameter!!, aggregateContextReference)
             // Set the argument that is going to be push in the stack
@@ -52,7 +53,7 @@ internal fun IrSingleStatementBuilder.buildAlignedOn(
                 irBoolean(conditionValue),
             )
             // Create the lambda that is going to call expression
-            val lambda = buildLambdaArgument(pluginContext, expr)
+            val lambda = buildLambdaArgument(pluginContext, block)
             putValueArgument(1, lambda)
         }
     }
