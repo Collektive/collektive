@@ -5,6 +5,7 @@ import it.unibo.collektive.utils.common.putTypeArgument
 import it.unibo.collektive.utils.common.putValueArgument
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
+import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.ir.builders.IrBuilderWithScope
 import org.jetbrains.kotlin.ir.builders.IrSingleStatementBuilder
@@ -18,51 +19,45 @@ import org.jetbrains.kotlin.ir.builders.parent
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
-import org.jetbrains.kotlin.ir.expressions.IrBlock
-import org.jetbrains.kotlin.ir.expressions.IrBranch
-import org.jetbrains.kotlin.ir.expressions.IrContainerExpression
-import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
-import org.jetbrains.kotlin.ir.expressions.IrTypeOperatorCall
+import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrFunctionExpressionImpl
-import org.jetbrains.kotlin.ir.expressions.putArgument
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.name.Name
 
+context(MessageCollector)
 internal fun IrSingleStatementBuilder.buildAlignedOn(
     pluginContext: IrPluginContext,
     aggregateContextReference: IrExpression,
     alignedOnFunction: IrFunction,
     branch: IrBranch,
     conditionValue: Boolean,
-): IrContainerExpression {
-    return irBlock {
-        val block = branch.result
-        val lastExpression = when (block) {
-            is IrBlock -> block.statements.lastOrNull() as IrExpression
-            else -> block
-        }
-        +irCall(alignedOnFunction).apply {
-            // Set generics type
-            putTypeArgument(getReturnType(lastExpression))
-            // Set aggregate context
-            putArgument(alignedOnFunction.dispatchReceiverParameter!!, aggregateContextReference)
-            // Set the argument that is going to be push in the stack
-            putValueArgument(
-                irBoolean(conditionValue),
-            )
-            // Create the lambda that is going to call expression
-            val lambda = buildLambdaArgument(pluginContext, block)
-            putValueArgument(1, lambda)
-        }
+): IrContainerExpression = irBlock {
+    val block = branch.result
+    val lastExpression = when (block) {
+        is IrBlock -> block.statements.lastOrNull() as IrExpression
+        else -> block
+    }
+    +irCall(alignedOnFunction).apply {
+        // Set generics type
+        putTypeArgument(getReturnType(lastExpression))
+        // Set aggregate context
+        putArgument(alignedOnFunction.dispatchReceiverParameter!!, aggregateContextReference)
+        // Set the argument that is going to be push in the stack
+        putValueArgument(
+            irBoolean(conditionValue),
+        )
+        // Create the lambda that is going to call expression
+        val lambda = buildLambdaArgument(pluginContext, block)
+        putValueArgument(1, lambda)
     }
 }
 
+context(MessageCollector)
 private fun IrBuilderWithScope.buildLambdaArgument(
     pluginContext: IrPluginContext,
     element: IrExpression,
-): IrFunctionExpressionImpl {
+): IrFunctionExpression {
     val lambda = buildLambda(pluginContext, element)
     return IrFunctionExpressionImpl(
         startOffset,
@@ -95,25 +90,6 @@ private fun IrBuilderWithScope.buildLambda(
         +irReturn(lastExpression)
     }
 }
-
-// private fun conditionName(condition: IrExpression): String {
-//    return when (condition) {
-//        is IrGetValue -> condition.symbol.owner.name.asString()
-//        is IrConst<*> -> "constant"
-//        is IrTypeOperatorCall -> condition.operator.name + " " + condition.typeOperand.classFqName
-//        is IrCall -> condition.symbol.owner.name.asString() +
-//            (condition.dispatchReceiver?.let { " " + conditionName(it) } ?: "")
-//        is IrWhen -> conditionName(condition.branches[0].condition) + when {
-//            condition.origin == IrStatementOrigin.ANDAND -> " & " + conditionName(condition.branches[0].result)
-//            else -> " | " + conditionName(condition.branches[1].result)
-//        }
-//
-//        else -> error(
-//            "The current if condition type ${condition::class} has not been handled for the alignment yet. " +
-//                "Update the compiler plugin.",
-//        )
-//    }
-// }
 
 private fun getReturnType(expression: IrExpression): IrType {
     return when (expression) {

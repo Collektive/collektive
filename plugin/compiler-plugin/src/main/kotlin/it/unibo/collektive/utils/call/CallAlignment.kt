@@ -6,6 +6,7 @@ import it.unibo.collektive.utils.common.putTypeArgument
 import it.unibo.collektive.utils.common.putValueArgument
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
+import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.ir.builders.IrBuilderWithScope
 import org.jetbrains.kotlin.ir.builders.IrSingleStatementBuilder
@@ -28,6 +29,7 @@ import org.jetbrains.kotlin.ir.types.isUnit
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.name.Name
 
+context(MessageCollector)
 fun IrSingleStatementBuilder.buildAlignedOnCall(
     pluginContext: IrPluginContext,
     aggregateLambdaBody: IrFunction,
@@ -57,6 +59,7 @@ fun IrSingleStatementBuilder.buildAlignedOnCall(
  * Create a IrFunctionExpression that transform a lambda to an expression
  * that can be used as argument for another function.
  */
+context(MessageCollector)
 private fun IrBuilderWithScope.buildLambdaArgument(
     pluginContext: IrPluginContext,
     aggregateLambdaBody: IrFunction,
@@ -85,14 +88,13 @@ private fun IrBuilderWithScope.buildLambda(
     expression: IrCall,
 ): IrSimpleFunction = pluginContext.irFactory.buildFun {
     name = Name.special("<anonymous>")
-    this.returnType = expression.type
-    this.origin = IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA
-    this.visibility = DescriptorVisibilities.LOCAL
+    returnType = expression.type
+    origin = IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA
+    visibility = DescriptorVisibilities.LOCAL
 }.apply {
-    this.patchDeclarationParents(this@buildLambda.parent)
-    if (expression.symbol.owner.returnType.isUnit()) {
-        this.body = context.irBuiltIns.createIrBuilder(symbol).irBlockBody { +expression }
-    } else {
-        this.body = context.irBuiltIns.createIrBuilder(symbol).irBlockBody { +irReturn(expression) }
+    patchDeclarationParents(this@buildLambda.parent)
+    body = when (expression.symbol.owner.returnType.isUnit()) {
+        true -> context.irBuiltIns.createIrBuilder(symbol).irBlockBody { +expression }
+        false -> context.irBuiltIns.createIrBuilder(symbol).irBlockBody { +irReturn(expression) }
     }
 }

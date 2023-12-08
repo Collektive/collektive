@@ -52,25 +52,37 @@ class AlignmentTransformer(
             expression.transformChildren(this, null)
 
             irStatement(pluginContext, aggregateLambdaBody, expression) {
-                buildAlignedOnCall(
-                    pluginContext,
-                    aggregateLambdaBody,
-                    context,
-                    alignedOnFunction,
-                    expression,
-                    alignedFunctions,
-                )
+                with(logger) {
+                    buildAlignedOnCall(
+                        pluginContext,
+                        aggregateLambdaBody,
+                        context,
+                        alignedOnFunction,
+                        expression,
+                        alignedFunctions,
+                    )
+                }
             }
         } ?: super.visitCall(expression)
     }
 
     override fun visitBranch(branch: IrBranch): IrBranch {
-        branch.addBranchAlignment(pluginContext, aggregateContextClass, aggregateLambdaBody, alignedOnFunction)
+        with (logger) {
+            branch.addBranchAlignment(pluginContext, aggregateContextClass, aggregateLambdaBody, alignedOnFunction)
+        }
         return super.visitBranch(branch)
     }
 
     override fun visitElseBranch(branch: IrElseBranch): IrElseBranch {
-        branch.addBranchAlignment(pluginContext, aggregateContextClass, aggregateLambdaBody, alignedOnFunction, false)
+        with (logger) {
+            branch.addBranchAlignment(
+                pluginContext,
+                aggregateContextClass,
+                aggregateLambdaBody,
+                alignedOnFunction,
+                false
+            )
+        }
         return super.visitElseBranch(branch)
     }
 }
