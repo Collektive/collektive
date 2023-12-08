@@ -2,6 +2,7 @@ import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektPlugin
 import org.danilopianini.gradle.mavencentral.DocStyle
 import org.gradle.internal.os.OperatingSystem
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
@@ -90,6 +91,12 @@ allprojects {
                 check.dependsOn(this)
                 detektAll.dependsOn(this)
             }
+    }
+
+    tasks.withType<KotlinCompile<*>>().configureEach {
+        kotlinOptions {
+            freeCompilerArgs += listOf("-Xcontext-receivers")
+        }
     }
 }
 
