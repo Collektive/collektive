@@ -2,7 +2,6 @@ package it.unibo.collektive
 
 import it.unibo.collektive.utils.common.AggregateFunctionNames
 import it.unibo.collektive.utils.logging.error
-import it.unibo.collektive.utils.logging.warn
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
