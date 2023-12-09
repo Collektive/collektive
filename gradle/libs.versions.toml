@@ -1,6 +1,6 @@
 [versions]
+alchemist = "29.0.7"
 build-config = "4.2.0"
-alchemist = "29.0.6"
 coroutines = "1.7.3"
 dokka = "1.9.10"
 kotest = "5.8.0"
