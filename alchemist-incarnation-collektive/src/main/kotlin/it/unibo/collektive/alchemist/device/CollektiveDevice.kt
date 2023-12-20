@@ -6,10 +6,13 @@ import it.unibo.alchemist.model.NodeProperty
 import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Time
 import it.unibo.collektive.IntId
+import it.unibo.collektive.aggregate.AggregateContext
+import it.unibo.collektive.aggregate.ops.neighbouring
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.Network
 import it.unibo.collektive.networking.OutboundMessage
+import kotlin.math.abs
 
 /**
  * Representation of a Collektive device in Alchemist.
@@ -36,7 +39,8 @@ class CollektiveDevice<P>(
         validMessages += TimedMessage(time, message)
     }
 
-    override fun cloneOnNewNode(node: Node<Any>) = TODO("Not yet implemented")
+    override fun cloneOnNewNode(node: Node<Any>): NodeProperty<Any> =
+        CollektiveDevice(environment, node, retainMessagesFor)
 
     override fun read(): Set<InboundMessage> {
         return validMessages
@@ -58,8 +62,8 @@ class CollektiveDevice<P>(
         }
     }
 
-    override fun distances(): Field<Double> {
-        println(environment)
-        TODO("Not yet implemented")
+    override fun AggregateContext.distances(): Field<Double> {
+        val nodePosition = environment.getPosition(node)
+        return neighbouring(nodePosition).map { p -> abs(nodePosition.distanceTo(p)) }
     }
 }
