@@ -1,3 +1,36 @@
+## [3.0.1](https://github.com/Collektive/collektive/compare/3.0.0...3.0.1) (2023-12-21)
+
+
+### Dependency updates
+
+* **core-deps:** update kotlin monorepo to v1.9.22 ([ffee000](https://github.com/Collektive/collektive/commit/ffee0000c2dcec516535e560a683f2b16e022aec))
+* **deps:** update alchemist to v29.0.7 ([d8d9241](https://github.com/Collektive/collektive/commit/d8d9241dd6179e3df64c259832b2f648bed5243f))
+* **deps:** update alchemist to v29.1.0 ([8e014ab](https://github.com/Collektive/collektive/commit/8e014ab4b1cf945788ccbab1a552c8b3d232a23d))
+* **deps:** update alchemist to v29.1.1 ([9e7d929](https://github.com/Collektive/collektive/commit/9e7d929fd5fde5454c952751b4c15778e2ad000f))
+* **deps:** update alchemist to v29.2.0 ([bbed5f6](https://github.com/Collektive/collektive/commit/bbed5f675da2c53387cb522509383c35ac2a89c9))
+* **deps:** update alchemist to v29.3.0 ([0d77894](https://github.com/Collektive/collektive/commit/0d778942576be0b2d3eea6ca64a3c15eabd31f24))
+* **deps:** update alchemist to v29.3.1 ([ddc1a29](https://github.com/Collektive/collektive/commit/ddc1a29e4c915b667f78708c4e6017bf2c6d698f))
+* **deps:** update alchemist to v29.3.2 ([d45371b](https://github.com/Collektive/collektive/commit/d45371b5070527a93c5dd93af744b6fb39151944))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5 ([619cd55](https://github.com/Collektive/collektive/commit/619cd55dcd4b6a382128fe3991dac18d2aab6c24))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5.0.1 ([40b8323](https://github.com/Collektive/collektive/commit/40b832369693257b59be4d4a032b83332df2dab7))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.80 ([7ed40bc](https://github.com/Collektive/collektive/commit/7ed40bc8980cb6da61d871159fafac5b3eb1547a))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.81 ([7440ba4](https://github.com/Collektive/collektive/commit/7440ba442374ab0ef01b94fb5389d09ba27b55bf))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.82 ([82fac18](https://github.com/Collektive/collektive/commit/82fac1859f98bba9e46c7057c29a52a3024e87cd))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.83 ([39ae86a](https://github.com/Collektive/collektive/commit/39ae86a593530955374bd59c4d4eb26970340f00))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.84 ([bfa62b0](https://github.com/Collektive/collektive/commit/bfa62b004f7a1adbf3c88987399d56c5078d6001))
+* **deps:** update plugin com.gradle.enterprise to v3.16.1 ([0693294](https://github.com/Collektive/collektive/commit/069329464441d5a15e86b8a4b34fbe1f73d58802))
+* **deps:** update plugin kotlin-qa to v0.57.0 ([20e5eda](https://github.com/Collektive/collektive/commit/20e5edab6b30e1344db76d47eabd041bfafea925))
+
+
+### Build and continuous integration
+
+* **deps:** update actions/setup-node action to v4.0.1 ([7262acf](https://github.com/Collektive/collektive/commit/7262acf624d05d3c71acae1b17867930ec75703a))
+
+
+### Refactoring
+
+* simplify the alignment logic ([#145](https://github.com/Collektive/collektive/issues/145)) ([cfb479d](https://github.com/Collektive/collektive/commit/cfb479db0797c80f236785b6ed1286c00d40cb01))
+
 ## [3.0.0](https://github.com/Collektive/collektive/compare/2.1.3...3.0.0) (2023-12-07)
 
 
