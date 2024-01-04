@@ -57,24 +57,6 @@ sealed interface Field<out T> {
      */
     val neighborsCount: Int get() = excludeSelf().size
 
-    /**
-     * TODO.
-     */
-    fun AggregateContext.project(): Field<T> {
-        val others = neighbouring(0.toByte())
-        return when {
-            neighborsCount == others.neighborsCount -> this@Field
-            neighborsCount > others.neighborsCount -> others.mapWithId { id, _ -> this@Field[id] }
-            else -> error(
-                """
-                Collektive is in an inconsistent state, this is most likely a bug in the implementation.
-                Field ${this@Field} with $neighborsCount neighbors has been projected into a context
-                with more neighbors, ${others.neighborsCount}: ${others.excludeSelf().keys}.
-                """.trimIndent().replace(Regex("'\\R"), " ")
-            )
-        }
-    }
-
     companion object {
 
         /**
@@ -191,4 +173,22 @@ internal class SequenceBasedField<T>(
 
     override fun <R> mapOthersAsSequence(transform: (ID, T) -> R): Sequence<Pair<ID, R>> =
         others.map { (id, value) -> id to transform(id, value) }
+}
+
+/**
+ * TODO.
+ */
+fun <T> AggregateContext.project(field: Field<T>): Field<T> {
+    val others = neighbouring(0.toByte())
+    return when {
+        field.neighborsCount == others.neighborsCount -> field
+        field.neighborsCount > others.neighborsCount -> others.mapWithId { id, _ -> field[id] }
+        else -> error(
+            """
+                Collektive is in an inconsistent state, this is most likely a bug in the implementation.
+                Field ${field} with ${field.neighborsCount} neighbors has been projected into a context
+                with more neighbors, ${others.neighborsCount}: ${others.excludeSelf().keys}.
+                """.trimIndent().replace(Regex("'\\R"), " ")
+        )
+    }
 }
