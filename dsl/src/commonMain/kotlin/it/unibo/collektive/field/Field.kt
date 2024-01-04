@@ -1,6 +1,8 @@
 package it.unibo.collektive.field
 
 import it.unibo.collektive.ID
+import it.unibo.collektive.aggregate.AggregateContext
+import it.unibo.collektive.aggregate.ops.neighbouring
 
 /**
  * A field is a map of messages where the key is the [ID] of a node and [T] the associated value.
@@ -18,7 +20,7 @@ sealed interface Field<out T> {
     val localValue: T
 
     /**
-     * Exclude the local node from the field.
+     * Returns a map with the neighboring values of this field (namely, all values but self).
      */
     fun excludeSelf(): Map<ID, T>
 
@@ -44,9 +46,34 @@ sealed interface Field<out T> {
     fun asSequence(): Sequence<Pair<ID, T>>
 
     /**
-     * Returns a map representing the field.
+     * Converts the Field into a [Map].
+     * This method is meant to bridge the aggregate APIs with the Kotlin collections framework.
+     * The resulting map _will contain the local value_.
      */
     fun toMap(): Map<ID, T>
+
+    /**
+     * Returns the number of neighbors of the field.
+     */
+    val neighborsCount: Int get() = excludeSelf().size
+
+    /**
+     * TODO.
+     */
+    fun AggregateContext.project(): Field<T> {
+        val others = neighbouring(0.toByte())
+        return when {
+            neighborsCount == others.neighborsCount -> this@Field
+            neighborsCount > others.neighborsCount -> others.mapWithId { id, _ -> this@Field[id] }
+            else -> error(
+                """
+                Collektive is in an inconsistent state, this is most likely a bug in the implementation.
+                Field ${this@Field} with $neighborsCount neighbors has been projected into a context
+                with more neighbors, ${others.neighborsCount}: ${others.excludeSelf().keys}.
+                """.trimIndent().replace(Regex("'\\R"), " ")
+            )
+        }
+    }
 
     companion object {
 
@@ -129,6 +156,8 @@ internal class ArrayBasedField<T>(
     private val others: List<Pair<ID, T>>,
 ) : AbstractField<T>(localId, localValue) {
 
+    override val neighborsCount: Int get() = others.size
+
     override fun neighborValueOf(id: ID): T = when {
         others.size <= MAP_OVER_LIST_PERFORMANCE_CROSSING_POINT -> others.first { it.first == id }.second
         else -> excludeSelf().getValue(id)
@@ -151,6 +180,8 @@ internal class SequenceBasedField<T>(
     localValue: T,
     private val others: Sequence<Pair<ID, T>>,
 ) : AbstractField<T>(localId, localValue) {
+
+    override val neighborsCount by lazy { others.count() }
 
     override fun asSequence(): Sequence<Pair<ID, T>> = others + (localId to localValue)
 
