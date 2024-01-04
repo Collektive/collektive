@@ -15,7 +15,7 @@ class NetworkManager {
      * Adds the [message] to the message buffer.
      */
     fun send(message: OutboundMessage) {
-        messageBuffer = messageBuffer + message
+        messageBuffer = messageBuffer.filterNot { it.senderId == message.senderId }.toSet() + message
     }
 
     /**
@@ -30,30 +30,5 @@ class NetworkManager {
                     single.overrides.getOrElse(receiverId) { single.default }
                 },
             )
-        }.also {
-            remove(receiverId)
         }
-
-    private fun remove(receiverId: ID) {
-        messageBuffer = messageBuffer.mapNotNull { outbound ->
-            if (outbound.senderId != receiverId) {
-                val newOutbound = OutboundMessage(
-                    outbound.senderId,
-                    outbound.messages.mapValues { (_, message) ->
-                        SingleOutboundMessage(
-                            message.default,
-                            message.overrides.filterNot { it.key == receiverId },
-                        )
-                    },
-                )
-                if (newOutbound.messages.filterNot { it.value.overrides.isEmpty() }.isNotEmpty()) {
-                    newOutbound
-                } else {
-                    null
-                }
-            } else {
-                outbound
-            }
-        }.toSet()
-    }
 }
