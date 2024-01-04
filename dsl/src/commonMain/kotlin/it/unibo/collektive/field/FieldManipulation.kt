@@ -35,20 +35,28 @@ operator fun <T : Number> Field<T>.minus(value: T): Field<T> = mapWithId { _, ol
  * Sum a field with [other] field.
  * The two fields must be aligned, otherwise an error is thrown.
  */
-operator fun <T : Number> Field<T>.plus(other: Field<T>): Field<T> = combine(this, other) { a, b -> add(a, b) }
+operator fun <T : Number> Field<T>.plus(other: Field<T>): Field<T> = combine(other) { a, b -> add(a, b) }
 
 /**
  * Subtract a field with [other] field.
  * The two fields must be aligned, otherwise an error is thrown.
  */
-operator fun <T : Number> Field<T>.minus(other: Field<T>): Field<T> = combine(this, other) { a, b -> sub(a, b) }
+operator fun <T : Number> Field<T>.minus(other: Field<T>): Field<T> = combine(other) { a, b -> sub(a, b) }
 
 /**
  * Combine two fields with a [transform] function.
  * The two fields must be aligned, otherwise an error is thrown.
  */
-fun <T, V, R> combine(field1: Field<T>, field: Field<V>, transform: (T, V) -> R): Field<R> {
-    return field1.mapWithId { id, value -> transform(value, field[id] ?: error("Field not aligned")) }
+fun <T, V, R> Field<T>.combine(otherField: Field<V>, transform: (T, V) -> R): Field<R> {
+    require(neighborsCount == otherField.neighborsCount) {
+        """
+            The two fields are not aligned.
+            field: $this
+            otherField: $otherField
+            The field has $neighborsCount neighbors, while the other field has ${otherField.neighborsCount} neighbors.
+        """.trimIndent()
+    }
+    return mapWithId { id, value -> transform(value, otherField[id] ?: error("Field not aligned")) }
 }
 
 @Suppress("UNCHECKED_CAST")
