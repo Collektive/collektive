@@ -11,6 +11,7 @@ import it.unibo.collektive.aggregate.ops.neighbouring
 import it.unibo.collektive.field.Field.Companion.hood
 import it.unibo.collektive.field.minus
 import it.unibo.collektive.field.plus
+import it.unibo.collektive.field.project
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.stack.Path
@@ -53,7 +54,7 @@ class BranchAlignment : StringSpec({
     }
     "A field should be projected when used in a body of a branch condition (issue #171)" {
         val nm = NetworkManager()
-        (0..3)
+        (0..2)
             .map { IntId(it) }
             .map { NetworkImplTest(nm, it) to it }
             .map { (net, id) ->
