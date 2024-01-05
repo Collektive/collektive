@@ -20,8 +20,8 @@ import it.unibo.collektive.field.Field
  * ```
  * In this case, the field returned has the result of the computation as local value.
  */
-fun <Return> AggregateContext.neighbouring(type: Return): Field<Return> =
-    exchange(type) { it.mapWithId { _, x -> x } }
+fun <Scalar> AggregateContext.neighbouring(local: Scalar): Field<Scalar> =
+    exchange(local) { it.mapWithId { _, x -> x } }
 
 /**
  * [sharing] captures the space-time nature of field computation through observation of neighbours' values, starting
