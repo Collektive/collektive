@@ -1,12 +1,10 @@
 package it.unibo.collektive.field
 
-import it.unibo.collektive.ID
-
 /**
  * A field is a map of messages where the key is the [ID] of a node and [T] the associated value.
  * @param T the type of the field.
  */
-sealed interface Field<out T> {
+sealed interface Field<ID : Any, out T> {
     /**
      * The [ID] of the local node.
      */
@@ -25,12 +23,12 @@ sealed interface Field<out T> {
     /**
      * Map the field using the [transform] function.
      */
-    fun <B> mapWithId(transform: (ID, T) -> B): Field<B>
+    fun <B> mapWithId(transform: (ID, T) -> B): Field<ID, B>
 
     /**
      * Map the field using the [transform] function.
      */
-    fun <B> map(transform: (T) -> B): Field<B> = mapWithId { _, value -> transform(value) }
+    fun <B> map(transform: (T) -> B): Field<ID, B> = mapWithId { _, value -> transform(value) }
 
     /**
      * Get the value associated with the [id].
@@ -60,22 +58,25 @@ sealed interface Field<out T> {
         /**
          * Build a field from a [localId], [localValue] and [others] neighbours values.
          */
-        internal operator fun <T> invoke(localId: ID, localValue: T, others: Map<ID, T> = emptyMap()): Field<T> =
-            ArrayBasedField(localId, localValue, others.map { it.toPair() })
+        internal operator fun <ID: Any, T> invoke(
+            localId: ID,
+            localValue: T,
+            others: Map<ID, T> = emptyMap()
+        ): Field<ID, T> = ArrayBasedField(localId, localValue, others.map { it.toPair() })
 
         /**
          * Reduce the elements of the field using the [transform] function.
          */
-        fun <T> Field<T>.reduce(includingSelf: Boolean = true, transform: (accumulator: T, T) -> T): T =
+        fun <ID : Any, T> Field<ID, T>.reduce(includingSelf: Boolean = true, transform: (accumulator: T, T) -> T): T =
             when (includingSelf) {
                 true -> toMap().values.reduce(transform)
                 false -> excludeSelf().values.reduce(transform)
             }
 
         /**
-         * Reduce the elements of a field starting with a [initial] value and a [transform] function.
+         * Folds the elements of a field starting with an [initial] through a [transform] function.
          */
-        fun <T, R> Field<T>.hoodInto(initial: R, transform: (R, T) -> R): R {
+        fun <ID : Any, T, R> Field<ID, T>.fold(initial: R, transform: (R, T) -> R): R {
             var accumulator = initial
             for ((_, value) in excludeSelf()) {
                 accumulator = transform(accumulator, value)
@@ -84,18 +85,21 @@ sealed interface Field<out T> {
         }
 
         /**
-         * Reduce the elements of a field using the [transform] function.
+         * Folds the elements of a field using the [transform] function and starting from the local value as initial.
          */
-        fun <T> Field<T>.hood(transform: (T, T) -> T): T = hoodInto(localValue, transform)
+        fun <ID: Any, T> Field<ID, T>.fold(transform: (T, T) -> T): T = fold(localValue, transform)
     }
 }
 
-internal abstract class AbstractField<T>(
+internal abstract class AbstractField<ID: Any, T>(
     override val localId: ID,
     override val localValue: T,
-) : Field<T> {
+) : Field<ID, T> {
 
-    private val asMap: Map<ID, T> by lazy { neighborsMap() + (localId to localValue) }
+    private val asMap: Map<ID, T> by lazy {
+        val result: Map<ID, T> = neighborsMap() + (localId to localValue)
+        result
+    }
     private val neighborhood: Map<ID, T> by lazy { neighborsMap() }
 
     final override fun toMap(): Map<ID, T> = asMap
@@ -105,7 +109,7 @@ internal abstract class AbstractField<T>(
     final override fun equals(other: Any?): Boolean {
         if (this === other) return true
         return when (other) {
-            is Field<*> -> toMap() == other.toMap()
+            is Field<*, *> -> toMap() == other.toMap()
             else -> false
         }
     }
@@ -117,7 +121,7 @@ internal abstract class AbstractField<T>(
         else -> neighborValueOf(id)
     }
 
-    final override fun <B> mapWithId(transform: (ID, T) -> B): Field<B> {
+    final override fun <B> mapWithId(transform: (ID, T) -> B): Field<ID, B> {
         return SequenceBasedField(localId, transform(localId, localValue), mapOthersAsSequence(transform))
     }
 
@@ -130,11 +134,11 @@ internal abstract class AbstractField<T>(
     final override fun toString() = toMap().toString()
 }
 
-internal class ArrayBasedField<T>(
+internal class ArrayBasedField<ID : Any, T>(
     localId: ID,
     localValue: T,
     private val others: List<Pair<ID, T>>,
-) : AbstractField<T>(localId, localValue) {
+) : AbstractField<ID, T>(localId, localValue) {
 
     override val neighborsCount: Int get() = others.size
 
@@ -155,11 +159,11 @@ internal class ArrayBasedField<T>(
     }
 }
 
-internal class SequenceBasedField<T>(
+internal class SequenceBasedField<ID: Any, T>(
     localId: ID,
     localValue: T,
     private val others: Sequence<Pair<ID, T>>,
-) : AbstractField<T>(localId, localValue) {
+) : AbstractField<ID, T>(localId, localValue) {
 
     override val neighborsCount by lazy { others.count() }
 

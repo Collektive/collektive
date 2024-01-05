@@ -11,7 +11,11 @@ import it.unibo.collektive.state.State
  * Create a Collektive device with a specific [id] and a [network] to manage incoming and outgoing messages,
  * the [computeFunction] is the function to apply within the [AggregateContext].
  */
-class Collektive<R>(val id: ID, private val network: Network, private val computeFunction: Aggregate.() -> R) {
+class Collektive<ID: Any, R>(
+    val id: ID,
+    private val network: Network,
+    private val computeFunction: Aggregate.() -> R,
+) {
 
     /**
      * The [State] of the Collektive device.
@@ -50,7 +54,7 @@ class Collektive<R>(val id: ID, private val network: Network, private val comput
          * the previous [state], the [messages] received from the neighbours and the [compute] with AggregateContext
          * object receiver that provides the aggregate constructs.
          */
-        fun <R> aggregate(
+        fun <ID: Any, R> aggregate(
             localId: ID,
             inbound: Iterable<InboundMessage> = emptySet(),
             previousState: State = emptyMap(),
@@ -64,7 +68,7 @@ class Collektive<R>(val id: ID, private val network: Network, private val comput
          * over a [network] of devices, with the lambda [init] with AggregateContext
          * object receiver that provides the aggregate constructs.
          */
-        fun <R> aggregate(
+        fun <ID: Any, R> aggregate(
             localId: ID,
             network: Network,
             previousState: State = emptyMap(),
