@@ -22,7 +22,7 @@ import it.unibo.collektive.state.getTyped
  * and the [previousState] of the device.
  */
 class AggregateContext(
-    private val localId: ID,
+    val localId: ID,
     private val messages: Iterable<InboundMessage>,
     private val previousState: State,
 ) {
