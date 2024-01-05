@@ -55,3 +55,11 @@ internal fun getLambdaType(pluginContext: IrPluginContext, lambda: IrSimpleFunct
         throw ClassNotFoundException("Unable to reference ${classFqn.parent()}")
     }
 }
+
+internal fun IrCall.getFunctionName(): String {
+    val symbolName = symbol.owner.name
+    return when {
+        symbolName.isSpecial -> "?"
+        else -> symbolName.asString()
+    }
+}

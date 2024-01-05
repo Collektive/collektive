@@ -1,6 +1,7 @@
 package it.unibo.collektive.utils.call
 
 import it.unibo.collektive.AlignedData
+import it.unibo.collektive.utils.common.getFunctionName
 import it.unibo.collektive.utils.common.getLambdaType
 import it.unibo.collektive.utils.common.putTypeArgument
 import it.unibo.collektive.utils.common.putValueArgument
@@ -44,12 +45,7 @@ fun IrSingleStatementBuilder.buildAlignedOnCall(
         // Set aggregate context
         putArgument(alignedOnFunction.dispatchReceiverParameter!!, aggregateContextReference)
         // Set the argument that is going to be push in the stack
-        val symbolName = expression.symbol.owner.name
-        val functionName = when {
-            symbolName.isSpecial -> "?"
-            else -> symbolName.asString()
-        }
-        //
+        val functionName = expression.getFunctionName()
         val count = data[functionName]!! // Here the key should be present!
         putValueArgument(
             irString("$functionName.$count"),

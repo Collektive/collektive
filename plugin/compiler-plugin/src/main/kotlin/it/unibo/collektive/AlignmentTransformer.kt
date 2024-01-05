@@ -4,6 +4,7 @@ import it.unibo.collektive.utils.branch.addBranchAlignment
 import it.unibo.collektive.utils.branch.findAggregateReference
 import it.unibo.collektive.utils.call.buildAlignedOnCall
 import it.unibo.collektive.utils.common.AggregateFunctionNames.ALIGNED_ON_FUNCTION
+import it.unibo.collektive.utils.common.getFunctionName
 import it.unibo.collektive.utils.statement.irStatement
 import it.unibo.collektive.visitors.collectAggregateContextReference
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -37,11 +38,7 @@ class AlignmentTransformer(
         val contextReference = expression.receiverAndArgs().find { it.type == aggregateContextClass.defaultType }
             ?: collectAggregateContextReference(aggregateContextClass, expression.symbol.owner)
         return contextReference?.let { context ->
-            val symbolName = expression.symbol.owner.name
-            val functionName = when {
-                symbolName.isSpecial -> "?"
-                else -> symbolName.asString()
-            }
+            val functionName = expression.getFunctionName()
             // We don't want to align the alignedOn function :)
             if (functionName == ALIGNED_ON_FUNCTION) return super.visitCall(expression)
 
