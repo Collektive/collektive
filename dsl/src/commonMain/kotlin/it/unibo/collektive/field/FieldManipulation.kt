@@ -48,7 +48,8 @@ operator fun <T : Number> Field<T>.minus(other: Field<T>): Field<T> = combine(ot
  * The two fields must be aligned, otherwise an error is thrown.
  */
 fun <T, V, R> Field<T>.combine(otherField: Field<V>, transform: (T, V) -> R): Field<R> {
-    fun fieldAlignmentErrorMessage(): String = """
+    fun fieldAlignmentErrorMessage(): String =
+        """
             Field misalignment. This is most likely a bug in Collektive,
             please report at https://github.com/Collektive/collektive/issues/new/choose
             base field: $this
