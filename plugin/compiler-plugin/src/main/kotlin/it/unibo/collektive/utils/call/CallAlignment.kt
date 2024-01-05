@@ -44,7 +44,12 @@ fun IrSingleStatementBuilder.buildAlignedOnCall(
         // Set aggregate context
         putArgument(alignedOnFunction.dispatchReceiverParameter!!, aggregateContextReference)
         // Set the argument that is going to be push in the stack
-        val functionName = expression.symbol.owner.name.asString()
+        val symbolName = expression.symbol.owner.name
+        val functionName = when {
+            symbolName.isSpecial -> "?"
+            else -> symbolName.asString()
+        }
+        //
         val count = data[functionName]!! // Here the key should be present!
         putValueArgument(
             irString("$functionName.$count"),
