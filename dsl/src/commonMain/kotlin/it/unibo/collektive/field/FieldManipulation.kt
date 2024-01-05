@@ -55,6 +55,7 @@ fun <T, V, R> Field<T>.combine(otherField: Field<V>, transform: (T, V) -> R): Fi
             base field: $this
             field it has being combined with: $otherField
             The field has $neighborsCount neighbors, while the other field has ${otherField.neighborsCount} neighbors.
+            The set of different neighbors IDs is: ${excludeSelf().keys - otherField.excludeSelf().keys}
         """.trimIndent()
     }
     return mapWithId { id, value -> transform(value, otherField[id] ?: error("Field not aligned")) }
