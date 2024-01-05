@@ -1,6 +1,7 @@
 package it.unibo.collektive
 
 import it.unibo.collektive.utils.branch.addBranchAlignment
+import it.unibo.collektive.utils.branch.findAggregateReference
 import it.unibo.collektive.utils.call.buildAlignedOnCall
 import it.unibo.collektive.utils.common.AggregateFunctionNames.ALIGNED_ON_FUNCTION
 import it.unibo.collektive.utils.statement.irStatement
@@ -70,7 +71,10 @@ class AlignmentTransformer(
         with (logger) {
             branch.addBranchAlignment(pluginContext, aggregateContextClass, aggregateLambdaBody, alignedOnFunction)
         }
-        return super.visitBranch(branch)
+        val aggregateReference = branch.result.findAggregateReference(aggregateContextClass)
+        return super.visitBranch(branch.transform(
+            FieldProjectionVisitor(pluginContext, logger, aggregateContextClass, aggregateReference), null)
+        )
     }
 
     override fun visitElseBranch(branch: IrElseBranch): IrElseBranch {
@@ -83,6 +87,9 @@ class AlignmentTransformer(
                 false
             )
         }
-        return super.visitElseBranch(branch)
+        val aggregateReference = branch.result.findAggregateReference(aggregateContextClass)
+        return super.visitElseBranch(branch.transform(
+            FieldProjectionVisitor(pluginContext, logger, aggregateContextClass, aggregateReference), null)
+        )
     }
 }
