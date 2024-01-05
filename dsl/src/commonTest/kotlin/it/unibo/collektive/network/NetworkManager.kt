@@ -3,7 +3,6 @@ package it.unibo.collektive.network
 import it.unibo.collektive.ID
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.OutboundMessage
-import it.unibo.collektive.networking.SingleOutboundMessage
 
 /**
  * Implementation of the Network interface.
