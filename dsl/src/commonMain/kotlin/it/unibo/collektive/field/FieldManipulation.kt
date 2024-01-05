@@ -50,9 +50,10 @@ operator fun <T : Number> Field<T>.minus(other: Field<T>): Field<T> = combine(ot
 fun <T, V, R> Field<T>.combine(otherField: Field<V>, transform: (T, V) -> R): Field<R> {
     require(neighborsCount == otherField.neighborsCount) {
         """
-            The two fields are not aligned.
-            field: $this
-            otherField: $otherField
+            Field misalignment. This is most likely a bug in Collektive,
+            please report at https://github.com/Collektive/collektive/issues/new/choose
+            base field: $this
+            field it has being combined with: $otherField
             The field has $neighborsCount neighbors, while the other field has ${otherField.neighborsCount} neighbors.
         """.trimIndent()
     }
