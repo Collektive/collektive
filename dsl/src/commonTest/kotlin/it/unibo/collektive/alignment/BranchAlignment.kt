@@ -1,6 +1,5 @@
 package it.unibo.collektive.alignment
 
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldHaveSize
@@ -8,14 +7,12 @@ import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.ops.neighbouring
-import it.unibo.collektive.field.Field.Companion.hood
+import it.unibo.collektive.field.min
 import it.unibo.collektive.field.minus
 import it.unibo.collektive.field.plus
-import it.unibo.collektive.field.project
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.stack.Path
-import kotlin.random.Random
 
 class BranchAlignment : StringSpec({
     val id0 = IntId(0)
@@ -59,14 +56,32 @@ class BranchAlignment : StringSpec({
             .map { NetworkImplTest(nm, it) to it }
             .map { (net, id) ->
                 aggregate(id, net) {
-                    val x = neighbouring(0)
-                    x.neighborsCount shouldBe id.id
+                    val outerField = neighbouring(0)
+                    outerField.neighborsCount shouldBe id.id
                     if (id.id % 2 == 0) {
                         neighbouring(1).neighborsCount shouldBe id.id / 2
-                        neighbouring(1) + x
+                        neighbouring(1) + outerField
                     } else {
                         neighbouring(1).neighborsCount shouldBe (id.id - 1) / 2
-                        neighbouring(1) - x
+                        neighbouring(1) - outerField
+                        outerField.min()
+                    }
+                }
+            }
+    }
+    "A field should be projected also when the field is referenced as lambda parameter (issue #171)" {
+        val nm = NetworkManager()
+        (0..2)
+            .map { IntId(it) }
+            .map { NetworkImplTest(nm, it) to it }
+            .map { (net, id) ->
+                aggregate(id, net) {
+                    exchange(0) {
+                        if (id.id % 2 == 0) {
+                            neighbouring(1) + it
+                        } else {
+                            neighbouring(1) - it
+                        }
                     }
                 }
             }
