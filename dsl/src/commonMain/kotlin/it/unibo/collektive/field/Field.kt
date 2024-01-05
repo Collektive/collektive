@@ -18,7 +18,7 @@ sealed interface Field<out T> {
     val localValue: T
 
     /**
-     * Returns a map with the neighboring values of this field (namely, all values but self).
+     * Returns a [Map] with the neighboring values of this field (namely, all values but self).
      */
     fun excludeSelf(): Map<ID, T>
 
