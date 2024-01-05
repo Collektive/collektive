@@ -48,8 +48,7 @@ operator fun <T : Number> Field<T>.minus(other: Field<T>): Field<T> = combine(ot
  * The two fields must be aligned, otherwise an error is thrown.
  */
 fun <T, V, R> Field<T>.combine(otherField: Field<V>, transform: (T, V) -> R): Field<R> {
-    require(neighborsCount == otherField.neighborsCount) {
-        """
+    fun fieldAlignmentErrorMessage(): String = """
             Field misalignment. This is most likely a bug in Collektive,
             please report at https://github.com/Collektive/collektive/issues/new/choose
             base field: $this
@@ -57,8 +56,8 @@ fun <T, V, R> Field<T>.combine(otherField: Field<V>, transform: (T, V) -> R): Fi
             The field has $neighborsCount neighbors, while the other field has ${otherField.neighborsCount} neighbors.
             The set of different neighbors IDs is: ${excludeSelf().keys - otherField.excludeSelf().keys}
         """.trimIndent()
-    }
-    return mapWithId { id, value -> transform(value, otherField[id] ?: error("Field not aligned")) }
+    require(neighborsCount == otherField.neighborsCount) { fieldAlignmentErrorMessage() }
+    return mapWithId { id, value -> transform(value, otherField[id] ?: error(fieldAlignmentErrorMessage())) }
 }
 
 @Suppress("UNCHECKED_CAST")
