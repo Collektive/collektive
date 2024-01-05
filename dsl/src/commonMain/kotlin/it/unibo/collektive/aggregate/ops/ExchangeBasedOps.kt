@@ -23,7 +23,6 @@ import it.unibo.collektive.field.Field
 fun <Return> AggregateContext.neighbouring(type: Return): Field<Return> =
     exchange(type) { it.mapWithId { _, x -> x } }
 
-
 /**
  * [sharing] captures the space-time nature of field computation through observation of neighbours' values, starting
  * from an [initial] value, it reduces to a single local value given a [transform] function and updating and sharing
