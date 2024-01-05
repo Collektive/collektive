@@ -6,6 +6,7 @@ import arrow.core.some
 import it.unibo.collektive.ID
 import it.unibo.collektive.aggregate.ops.RepeatingContext
 import it.unibo.collektive.aggregate.ops.RepeatingContext.RepeatingResult
+import it.unibo.collektive.aggregate.ops.neighbouring
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.OutboundMessage
@@ -114,6 +115,27 @@ class AggregateContext(
     fun <R> alignedOn(pivot: Any?, body: () -> R): R {
         stack.alignRaw(pivot)
         return body().also { stack.dealign() }
+    }
+
+    /**
+     * Projects the field to be aligned with the neighbours.
+     * A field de-alignment can occur when the field is used inside a body of a branch condition.
+     * Take the [field] to project and returns a new field aligned with the neighbours.
+     * This method is meant to be used internally by the compiler plugin.
+     */
+    fun <T> project(field: Field<T>): Field<T> {
+        val others = neighbouring(0.toByte())
+        return when {
+            field.neighborsCount == others.neighborsCount -> field
+            field.neighborsCount > others.neighborsCount -> others.mapWithId { id, _ -> field[id] }
+            else -> error(
+                """
+                Collektive is in an inconsistent state, this is most likely a bug in the implementation.
+                Field $field with ${field.neighborsCount} neighbors has been projected into a context
+                with more neighbors, ${others.neighborsCount}: ${others.excludeSelf().keys}.
+                """.trimIndent().replace(Regex("'\\R"), " "),
+            )
+        }
     }
 
     @Suppress("UNCHECKED_CAST")
