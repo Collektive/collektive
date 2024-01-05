@@ -6,7 +6,9 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.IntId
+import it.unibo.collektive.aggregate.AggregateContext
 import it.unibo.collektive.aggregate.ops.neighbouring
+import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.min
 import it.unibo.collektive.field.minus
 import it.unibo.collektive.field.plus
@@ -69,21 +71,35 @@ class BranchAlignment : StringSpec({
                 }
             }
     }
-    "A field should be projected also when the field is referenced as lambda parameter (issue #171)" {
+    fun exchangeWithThreeDevices(body: AggregateContext.(Field<Int>) -> Field<Int>) {
         val nm = NetworkManager()
         (0..2)
             .map { IntId(it) }
             .map { NetworkImplTest(nm, it) to it }
             .map { (net, id) ->
                 aggregate(id, net) {
-                    exchange(0) {
-                        if (id.id % 2 == 0) {
-                            neighbouring(1) + it
-                        } else {
-                            neighbouring(1) - it
-                        }
-                    }
+                    exchange(0) { body(it) }
                 }
             }
+    }
+    "A field should be projected also when the field is referenced as lambda parameter (issue #171)" {
+        exchangeWithThreeDevices {
+            if ((localId as IntId).id % 2 == 0) {
+                neighbouring(1) + it
+            } else {
+                neighbouring(1) - it
+            }
+        }
+    }
+    fun manuallyAlignedExchangeWithThreeDevices(pivot: (Int) -> Any?) = exchangeWithThreeDevices { field ->
+        alignedOn(pivot((localId as IntId).id)) {
+            neighbouring(1) + field
+        }
+    }
+    "A field should be projected whenever there is an alignment operation, not just on branches (issue #171)" {
+        manuallyAlignedExchangeWithThreeDevices { it % 2 == 0 }
+    }
+    "A field should be projected whenever there is an alignment regardless of the type, not just booleans (issue #171)" {
+        manuallyAlignedExchangeWithThreeDevices { it % 2 }
     }
 })
