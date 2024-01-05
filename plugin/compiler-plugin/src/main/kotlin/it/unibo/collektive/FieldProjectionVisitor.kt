@@ -39,7 +39,7 @@ class FieldProjectionVisitor(
                     return wrapInProjectFunction(expression, aggregateRef, projectFunc)
                 } ?: logger.error(
                     """
-                        Fail to look up the `project` function to perform the field projection.
+                        Failed to look up the `Field.project` function required for performing the field projection.
                         This can happen if the `AggregateContext` class is not found by the compiler plugin.
                     """.trimIndent()
                 )
