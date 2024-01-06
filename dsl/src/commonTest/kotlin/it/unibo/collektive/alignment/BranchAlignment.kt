@@ -9,6 +9,7 @@ import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.AggregateContext
 import it.unibo.collektive.aggregate.ops.neighbouring
 import it.unibo.collektive.field.Field
+import it.unibo.collektive.field.combine
 import it.unibo.collektive.field.min
 import it.unibo.collektive.field.minus
 import it.unibo.collektive.field.plus
@@ -101,5 +102,18 @@ class BranchAlignment : StringSpec({
     }
     "A field should be projected whenever there is an alignment regardless of the type, not just booleans (issue #171)" {
         manuallyAlignedExchangeWithThreeDevices { it % 2 }
+    }
+    "A field should be projected when it is a non-direct receiver (issue #171)" {
+        exchangeWithThreeDevices {
+            with(it) {
+                with((localId as IntId).id % 2 == 0) {
+                    if (this) {
+                        combine(neighbouring(1)) { a, b -> a + b }
+                    } else {
+                        combine(neighbouring(1)) { a, b -> a - b }
+                    }
+                }
+            }
+        }
     }
 })
