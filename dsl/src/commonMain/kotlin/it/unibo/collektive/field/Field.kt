@@ -1,5 +1,7 @@
 package it.unibo.collektive.field
 
+import arrow.core.firstOrNone
+
 /**
  * A field is a map of messages where the key is the [ID] of a node and [T] the associated value.
  * @param T the type of the field.
@@ -19,6 +21,14 @@ sealed interface Field<ID : Any, out T> {
      * Returns a [Map] with the neighboring values of this field (namely, all values but self).
      */
     fun excludeSelf(): Map<ID, T>
+
+    /**
+     * Combines this field with another (aligned) one.
+     */
+    fun <B, R> alignedMap(other: Field<ID, B>, transform: (T, B) -> R): Field<ID, R> {
+        checkAligned(this, other)
+        return mapWithId { id, value -> transform(value, other[id] ?: error("Unintercepted misalignment")) }
+    }
 
     /**
      * Map the field using the [transform] function.
@@ -54,6 +64,21 @@ sealed interface Field<ID : Any, out T> {
     val neighborsCount: Int get() = excludeSelf().size
 
     companion object {
+
+        /**
+         * Check if two fields are aligned, throws an IllegalStateException otherwise.
+         */
+        fun checkAligned(field1: Field<*, *>, field2: Field<*, *>) {
+            val ids1: Set<Any?> = field1.toMap().keys
+            val ids2: Set<Any?> = field2.toMap().keys
+            check(ids1 == ids2) {
+                """
+                Alignment issue between $field1 and $field2, the different ids are: ${ids1 - ids2 + (ids2 - ids1)}
+                This is most likely caused by a bug in Collektive, please report at
+                https://github.com/Collektive/collektive/issues/new/choose
+                """.trimIndent()
+            }
+        }
 
         /**
          * Build a field from a [localId], [localValue] and [others] neighbours values.

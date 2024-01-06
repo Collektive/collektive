@@ -4,10 +4,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import it.unibo.collektive.Collektive.Companion.aggregate
-import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.operators.neighboring
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.combine
 import it.unibo.collektive.field.min

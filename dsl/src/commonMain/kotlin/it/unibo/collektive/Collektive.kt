@@ -13,7 +13,7 @@ import it.unibo.collektive.state.State
  */
 class Collektive<ID: Any, R>(
     val id: ID,
-    private val network: Network,
+    private val network: Network<ID>,
     private val computeFunction: Aggregate.() -> R,
 ) {
 
@@ -33,7 +33,7 @@ class Collektive<ID: Any, R>(
      * Apply the aggregate function to the parameters of the device while the [condition] is satisfied,
      * then returns the result of the computation.
      */
-    fun cycleWhile(condition: (AggregateResult<R>) -> Boolean): R {
+    fun cycleWhile(condition: (AggregateResult<ID, R>) -> Boolean): R {
         var compute = executeRound()
         while (condition(compute)) {
             compute = executeRound()
@@ -41,7 +41,7 @@ class Collektive<ID: Any, R>(
         return compute.result
     }
 
-    private fun executeRound(): AggregateResult<R> {
+    private fun executeRound(): AggregateResult<ID, R> {
         val result = aggregate(id, network, state, computeFunction)
         state = result.newState
         return result
@@ -56,24 +56,24 @@ class Collektive<ID: Any, R>(
          */
         fun <ID: Any, R> aggregate(
             localId: ID,
-            inbound: Iterable<InboundMessage> = emptySet(),
+            inbound: Iterable<InboundMessage<ID>> = emptySet(),
             previousState: State = emptyMap(),
             compute: Aggregate.() -> R,
-        ): AggregateResult<R> = AggregateContext(localId, inbound, previousState).run {
+        ): AggregateResult<ID, R> = AggregateContext(localId, inbound, previousState).run {
             AggregateResult(localId, compute(), messagesToSend(), newState())
         }
 
         /**
-         * Aggregate program entry point which computes an iterations of a device [localId],
-         * over a [network] of devices, with the lambda [init] with AggregateContext
-         * object receiver that provides the aggregate constructs.
+         * Aggregate program entry point which computes an iteration of a device [localId],
+         * over a [network] of devices, optionally from a [previousState],
+         * running the [compute] aggregate program.
          */
         fun <ID: Any, R> aggregate(
             localId: ID,
-            network: Network,
+            network: Network<ID>,
             previousState: State = emptyMap(),
             compute: Aggregate.() -> R,
-        ): AggregateResult<R> = with(AggregateContext(localId, network.read(), previousState)) {
+        ): AggregateResult<ID, R> = with(AggregateContext(localId, network.read(), previousState)) {
             AggregateResult(localId, compute(), messagesToSend(), newState()).also {
                 network.write(it.toSend)
             }

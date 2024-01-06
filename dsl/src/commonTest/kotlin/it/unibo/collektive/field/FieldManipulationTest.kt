@@ -4,8 +4,6 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import it.unibo.collektive.Collektive.Companion.aggregate
-import it.unibo.collektive.IntId
-import it.unibo.collektive.aggregate.api.operators.neighboring
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 
@@ -13,8 +11,8 @@ class FieldManipulationTest : StringSpec({
     val double: (Int) -> Int = { it * 2 }
 
     // ids
-    val id0 = IntId(0)
-    val id1 = IntId(1)
+    val id0 = 0
+    val id1 = 1
 
     "Get the min value including self" {
         val nm = NetworkManager()
@@ -42,7 +40,7 @@ class FieldManipulationTest : StringSpec({
         }
 
         aggregate(id1, network1) {
-            val res = neighboring(double(2)).min(includingSelf = false)
+            val res = neighboring(double(2)).min(Int.MAX_VALUE)
             res shouldNotBe null
             res shouldBe 6
         }
@@ -58,7 +56,7 @@ class FieldManipulationTest : StringSpec({
         }
 
         aggregate(id1, network1) {
-            val res = neighboring(double(2)).max(includingSelf = false)
+            val res = neighboring(double(2)).max(Int.MIN_VALUE)
             res shouldNotBe null
             res shouldBe 6
         }

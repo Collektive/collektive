@@ -3,12 +3,11 @@ package it.unibo.collektive.branch
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
-import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.api.operators.neighboring
 import it.unibo.collektive.path.Path
 
 class WhenTest : StringSpec({
-    val id0 = IntId(0)
+    val id0 = 0
 
     "When in single expression" {
         val condition = true
