@@ -1,6 +1,7 @@
 package it.unibo.collektive.field
 
 import it.unibo.collektive.field.Field.Companion.fold
+import it.unibo.collektive.field.Field.Companion.hood
 
 /**
  * Get the minimum value of a field.
@@ -9,7 +10,12 @@ import it.unibo.collektive.field.Field.Companion.fold
 fun <ID: Any, T : Comparable<T>> Field<ID, T>.min(base: T = localValue): T =
     fold(base) { acc, value -> if (value < acc) value else acc }
 
-fun <ID: Any, T : Comparable<T>> Field<ID, T>.minHood(default: T = localValue): T = TODO()
+/**
+ * Returns the minimum among elements of the field, exculding the local value
+ * and returning the provided default in case of field with no neighbors.
+ */
+fun <ID: Any, T : Comparable<T>> Field<ID, T>.minHood(default: T): T =
+    hood(default) { v1, v2 -> if (v1 < v2) v1 else v2 }
 
 /**
  * Get the maximum value of a field.
@@ -17,6 +23,13 @@ fun <ID: Any, T : Comparable<T>> Field<ID, T>.minHood(default: T = localValue): 
  */
 fun <ID: Any, T : Comparable<T>> Field<ID, T>.max(base: T = localValue): T =
     fold(base) { acc, value -> if (value > acc) value else acc }
+
+/**
+ * Returns the maximum among elements of the field, exculding the local value
+ * and returning the provided default in case of field with no neighbors.
+ */
+fun <ID: Any, T : Comparable<T>> Field<ID, T>.maxHood(default: T): T =
+    hood(default) { v1, v2 -> if (v1 > v2) v1 else v2 }
 
 /**
  * Adds [value] to all the field values.

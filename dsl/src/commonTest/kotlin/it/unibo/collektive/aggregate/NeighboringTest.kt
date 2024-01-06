@@ -4,17 +4,16 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.maps.shouldContainValue
 import io.kotest.matchers.maps.shouldHaveSize
 import it.unibo.collektive.Collektive.Companion.aggregate
-import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.api.operators.neighboring
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 
 class NeighboringTest : StringSpec({
     // device ids
-    val id0 = IntId(0)
-    val id1 = IntId(1)
-    val id2 = IntId(2)
-    val id3 = IntId(3)
+    val id0 = 0
+    val id1 = 1
+    val id2 = 2
+    val id3 = 3
 
     // values
     val initV1 = 1

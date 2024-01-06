@@ -92,11 +92,13 @@ sealed interface Field<ID : Any, out T> {
         /**
          * Reduce the elements of the field using the [transform] function.
          */
-        fun <ID : Any, T> Field<ID, T>.reduce(includingSelf: Boolean = true, transform: (accumulator: T, T) -> T): T =
-            when (includingSelf) {
-                true -> toMap().values.reduce(transform)
-                false -> excludeSelf().values.reduce(transform)
+        fun <ID : Any, T> Field<ID, T>.hood(default: T, transform: (accumulator: T, T) -> T): T {
+            val neighbors = excludeSelf()
+            return when {
+                neighbors.isEmpty() -> default
+                else -> neighbors.values.reduce(transform)
             }
+        }
 
         /**
          * Folds the elements of a field starting with an [initial] through a [transform] function.
