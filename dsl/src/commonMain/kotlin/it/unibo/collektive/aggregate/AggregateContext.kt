@@ -70,7 +70,7 @@ class AggregateContext(
             val path = stack.currentPath()
             check(!toBeSent.messages.containsKey(path)) {
                 "Alignment was broken by multiple aligned calls with the same path: $path. " +
-                        "The most likely cause is an aggregate function call within a loop"
+                    "The most likely cause is an aggregate function call within a loop"
             }
             toBeSent = toBeSent.copy(messages = toBeSent.messages + (stack.currentPath() to message))
             state = state + (stack.currentPath() to field.localValue)
