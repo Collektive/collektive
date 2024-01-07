@@ -5,7 +5,8 @@ import it.unibo.collektive.aggregate.api.YieldingContext.YieldingResult
 import it.unibo.collektive.field.Field
 
 /**
- * TODO.
+ * Models the minimal set of aggregate operations.
+ * Holds the [localId] of the device executing the aggregate program.
  */
 interface Aggregate {
     /**
@@ -34,7 +35,7 @@ interface Aggregate {
     fun <X> exchange(initial: X, body: (Field<X>) -> Field<X>): Field<X>
 
     /**
-     * TODO.
+     * Same behavior of [exchange] but this function can yield a [Field] of [Ret] value.
      */
     fun <Init, Ret> exchanging(
         initial: Init,
