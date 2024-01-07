@@ -23,7 +23,7 @@ class FieldProjectionVisitor(
     private val pluginContext: IrPluginContext,
     private val logger: MessageCollector,
     private val aggregateContextClass: IrClass,
-    private val aggregateReference: IrExpression?,
+    private val aggregateReference: IrExpression,
 ) : IrElementTransformerVoid() {
 
     private val projectFunction by lazy {
@@ -34,20 +34,12 @@ class FieldProjectionVisitor(
 
     override fun visitGetValue(expression: IrGetValue): IrExpression {
         if (expression.type.classFqName == FqName(FIELD_CLASS)) {
-            aggregateReference?.let { aggregateRef ->
-                projectFunction?.let { projectFunc ->
-                    return wrapInProjectFunction(expression, aggregateRef, projectFunc)
-                } ?: logger.error(
-                    """
-                        Failed to look up the `Field.project` function required for performing the field projection.
-                        This can happen if the `AggregateContext` class is not found by the compiler plugin.
-                    """.trimIndent()
-                )
+            projectFunction?.let { projectFunc ->
+                return wrapInProjectFunction(expression, projectFunc, aggregateReference)
             } ?: logger.error(
                 """
-                    Fail to look up the aggregate context reference to perform the field projection.
-                    This can happen if the aggregate context reference is not available in the current scope,
-                    and likely means that a field operation is being performed outside of an aggregate scope.
+                    Failed to look up the `Field.project` function required for performing the field projection.
+                    This can happen if the `AggregateContext` class is not found by the compiler plugin.
                 """.trimIndent()
             )
         }
@@ -55,17 +47,17 @@ class FieldProjectionVisitor(
     }
 
     private fun wrapInProjectFunction(
-        expression: IrExpression,
-        context: IrExpression,
-        function: IrFunction
+        fieldExpression: IrExpression,
+        projectFunction: IrFunction,
+        dispatchReceiver: IrExpression,
     ): IrExpression {
-        return irStatement(pluginContext, function, expression) {
-            irCall(function).apply {
+        return irStatement(pluginContext, projectFunction, fieldExpression) {
+            irCall(projectFunction).apply {
                 // Set generics type
-                putTypeArgument(expression.type)
+                putTypeArgument(fieldExpression.type)
                 // Set aggregate context
-                putArgument(function.dispatchReceiverParameter!!, context)
-                putValueArgument(0, expression)
+                putArgument(projectFunction.dispatchReceiverParameter!!, dispatchReceiver)
+                putValueArgument(0, fieldExpression)
             }
         }
     }

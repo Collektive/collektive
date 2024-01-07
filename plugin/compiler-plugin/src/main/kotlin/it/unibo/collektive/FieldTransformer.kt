@@ -1,0 +1,66 @@
+package it.unibo.collektive
+
+import it.unibo.collektive.utils.common.AggregateFunctionNames.ALIGNED_ON_FUNCTION
+import it.unibo.collektive.utils.logging.debug
+import it.unibo.collektive.visitors.collectAggregateContextReference
+import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.backend.jvm.ir.receiverAndArgs
+import org.jetbrains.kotlin.cli.common.messages.MessageCollector
+import org.jetbrains.kotlin.ir.declarations.IrClass
+import org.jetbrains.kotlin.ir.expressions.IrBranch
+import org.jetbrains.kotlin.ir.expressions.IrCall
+import org.jetbrains.kotlin.ir.expressions.IrElseBranch
+import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.types.classFqName
+import org.jetbrains.kotlin.ir.util.defaultType
+import org.jetbrains.kotlin.ir.util.dumpKotlinLike
+import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
+import org.jetbrains.kotlin.name.Name
+
+/**
+ * Transforms the generated IR only when an operation on a field is involved:
+ * for each field operation inside the `alignedOn` function and inside the bodies of a branch,
+ * the field is wrapped in the `project` function.
+ */
+class FieldTransformer(
+    private val pluginContext: IrPluginContext,
+    private val logger: MessageCollector,
+    private val aggregateContextClass: IrClass,
+) : IrElementTransformerVoid() {
+    override fun visitCall(expression: IrCall): IrExpression {
+        if (expression.symbol.owner.name == Name.identifier(ALIGNED_ON_FUNCTION)) {
+            logger.debug("Found alignedOn function call: ${expression.dumpKotlinLike()}")
+            val contextReference = expression.receiverAndArgs().find { it.type == aggregateContextClass.defaultType }
+                ?: collectAggregateContextReference(aggregateContextClass, expression.symbol.owner)
+            contextReference?.let {
+                // If the expression contains a lambda, this recursion is necessary to visit the children
+                expression.transformChildren(this, null)
+                return expression.transform(
+                    FieldProjectionVisitor(pluginContext, logger, aggregateContextClass, it),
+                    null
+                )
+            }
+        }
+        return super.visitCall(expression)
+    }
+
+    override fun visitBranch(branch: IrBranch): IrBranch {
+        val contextReference = collectAggregateContextReference(aggregateContextClass, branch.result)
+        contextReference?.let {
+            logger.debug("Found AggregateContext reference in branch: ${it.type.classFqName}")
+            branch.result.transform(this, null)
+            branch.transformChildren(FieldProjectionVisitor(pluginContext, logger, aggregateContextClass, it), null)
+        }
+        return super.visitBranch(branch)
+    }
+
+    override fun visitElseBranch(branch: IrElseBranch): IrElseBranch {
+        val contextReference = collectAggregateContextReference(aggregateContextClass, branch.result)
+        contextReference?.let {
+            logger.debug("Found AggregateContext reference in else branch: ${it.type.classFqName}")
+            branch.result.transform(this, null)
+            branch.transformChildren(FieldProjectionVisitor(pluginContext, logger, aggregateContextClass, it), null)
+        }
+        return super.visitElseBranch(branch)
+    }
+}
