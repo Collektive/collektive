@@ -1,12 +1,12 @@
-package it.unibo.collektive.aggregate
+package it.unibo.collektive.aggregate.api.impl
 
 import arrow.core.Option
 import arrow.core.getOrElse
 import arrow.core.some
 import it.unibo.collektive.ID
-import it.unibo.collektive.aggregate.ops.RepeatingContext
-import it.unibo.collektive.aggregate.ops.RepeatingContext.RepeatingResult
-import it.unibo.collektive.aggregate.ops.neighbouring
+import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.YieldingContext
+import it.unibo.collektive.aggregate.api.YieldingContext.YieldingResult
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.OutboundMessage
@@ -21,11 +21,11 @@ import it.unibo.collektive.state.getTyped
  * It represents the [localId] of the device, the [messages] received from the neighbours,
  * and the [previousState] of the device.
  */
-class AggregateContext(
-    val localId: ID,
+internal class AggregateContext(
+    override val localId: ID,
     private val messages: Iterable<InboundMessage>,
     private val previousState: State,
-) {
+) : Aggregate {
 
     private val stack = Stack<Any>()
     private var state: State = mapOf()
@@ -61,7 +61,7 @@ class AggregateContext(
      * The result of the exchange function is a field with as messages a map with key the id of devices across the
      * network and the result of the computation passed as relative local values.
      */
-    fun <X> exchange(initial: X, body: (Field<X>) -> Field<X>): Field<X> {
+    override fun <X> exchange(initial: X, body: (Field<X>) -> Field<X>): Field<X> {
         val messages = messagesAt<X>(stack.currentPath())
         val previous = stateAt(stack.currentPath(), initial)
         val subject = newField(previous, messages)
@@ -69,24 +69,42 @@ class AggregateContext(
             val message = SingleOutboundMessage(field.localValue, field.excludeSelf())
             val path = stack.currentPath()
             check(!toBeSent.messages.containsKey(path)) {
-                "Alignment was broken by multiple aligned calls with the same path: $path. " +
-                    "The most likely cause is an aggregate function call within a loop"
+                """
+                    Alignment was broken by multiple aligned calls with the same path: $path.
+                    The most likely cause is an aggregate function call within a loop
+                """.trimIndent()
             }
             toBeSent = toBeSent.copy(messages = toBeSent.messages + (stack.currentPath() to message))
             state = state + (stack.currentPath() to field.localValue)
         }
     }
 
+    override fun <Init, Ret> exchanging(
+        initial: Init,
+        body: YieldingContext<Field<Init>, Field<Ret>>.(Field<Init>) -> YieldingResult<Field<Init>, Field<Ret>>,
+    ): Field<Ret> {
+        val messages = messagesAt<Init>(stack.currentPath())
+        val previous = stateAt(stack.currentPath(), initial)
+        val subject = newField(previous, messages)
+        val context = YieldingContext<Field<Init>, Field<Ret>>()
+        var res: Option<YieldingResult<Field<Init>, Field<Ret>>>
+        body(context, subject).also {
+            res = it.some()
+            state = state + (stack.currentPath() to it.toReturn.localValue)
+        }
+        return res.getOrElse { error("This error should never be thrown") }.toReturn
+    }
+
     /**
-     * Iteratively updates the value computing the [transform] expression from a [RepeatingContext]
+     * Iteratively updates the value computing the [transform] expression from a [YieldingContext]
      * at each device using the last computed value or the [initial].
      */
-    fun <Initial, Return> repeating(
+    override fun <Initial, Return> repeating(
         initial: Initial,
-        transform: RepeatingContext<Initial, Return>.(Initial) -> RepeatingResult<Initial, Return>,
+        transform: YieldingContext<Initial, Return>.(Initial) -> YieldingResult<Initial, Return>,
     ): Return {
-        val context = RepeatingContext<Initial, Return>()
-        var res: Option<RepeatingResult<Initial, Return>>
+        val context = YieldingContext<Initial, Return>()
+        var res: Option<YieldingResult<Initial, Return>>
         transform(context, stateAt(stack.currentPath(), initial)).also {
             res = it.some()
             state = state + (stack.currentPath() to it.toReturn)
@@ -98,20 +116,21 @@ class AggregateContext(
      * Iteratively updates the value computing the [transform] expression at each device using the last
      * computed value or the [initial].
      */
-    fun <Initial> repeat(
+    override fun <Initial> repeat(
         initial: Initial,
         transform: (Initial) -> Initial,
-    ): Initial = repeating(initial) {
-        val res = transform(it)
-        RepeatingResult(res, res)
-    }
+    ): Initial =
+        repeating(initial) {
+            val res = transform(it)
+            YieldingResult(res, res)
+        }
 
     /**
      * Alignment function that pushes in the stack the pivot, executes the body and pop the last
      * element of the stack after it is called.
      * Returns the body's return element.
      */
-    fun <R> alignedOn(pivot: Any?, body: () -> R): R {
+    override fun <R> alignedOn(pivot: Any?, body: () -> R): R {
         stack.alignRaw(pivot)
         return body().also { stack.dealign() }
     }

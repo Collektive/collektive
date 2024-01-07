@@ -3,7 +3,7 @@ package it.unibo.collektive.aggregate.ops
 /**
  * The lambda context passed to the [share] function.
  */
-class SharingContext<Initial, Return> {
+class YieldingContext<Initial, Return> {
 
     /**
      * Express the lambda [toReturn] when the [sharing] computation is done.
@@ -28,11 +28,11 @@ class SharingContext<Initial, Return> {
      * The invoke of [yielding] as the last statement of the body of the [share],
      * sent to the neighbours the [toSend] value, but returns from the [share] the [toReturn] value.
      */
-    fun Initial.yielding(toReturn: () -> Return): SharingResult<Initial, Return> =
-        SharingResult(this, toReturn())
-}
+    fun Initial.yielding(toReturn: () -> Return): YieldingResult<Initial, Return> =
+        YieldingResult(this, toReturn())
 
-/**
- * Specifies the value [toSend] and the value [toReturn] of a [SharingContext.yielding] function.
- */
-data class SharingResult<Initial, Return>(val toSend: Initial, val toReturn: Return)
+    /**
+     * Specifies the value [toSend] and the value [toReturn] of a [SharingContext.yielding] function.
+     */
+    data class YieldingResult<Initial, Return>(val toSend: Initial, val toReturn: Return)
+}
