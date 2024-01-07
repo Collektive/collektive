@@ -1,7 +1,6 @@
 package it.unibo.collektive
 
 import it.unibo.collektive.utils.branch.addBranchAlignment
-import it.unibo.collektive.utils.branch.findAggregateReference
 import it.unibo.collektive.utils.call.buildAlignedOnCall
 import it.unibo.collektive.utils.common.AggregateFunctionNames.ALIGNED_ON_FUNCTION
 import it.unibo.collektive.utils.common.getFunctionName
@@ -31,7 +30,6 @@ class AlignmentTransformer(
     private val aggregateLambdaBody: IrFunction,
     private val alignedOnFunction: IrFunction,
 ) : IrElementTransformerVoid() {
-
     private var alignedFunctions: AlignedData = emptyMap()
 
     override fun visitCall(expression: IrCall): IrExpression {
@@ -42,7 +40,7 @@ class AlignmentTransformer(
             // We don't want to align the alignedOn function :)
             if (functionName == ALIGNED_ON_FUNCTION) return super.visitCall(expression)
 
-            // If no function, the first time the counter is 0
+            // If no function, the first time the counter is 1
             val actualCounter = alignedFunctions[functionName]?.let { it + 1 } ?: 1
             alignedFunctions += functionName to actualCounter
 
@@ -65,17 +63,14 @@ class AlignmentTransformer(
     }
 
     override fun visitBranch(branch: IrBranch): IrBranch {
-        with (logger) {
+        with(logger) {
             branch.addBranchAlignment(pluginContext, aggregateContextClass, aggregateLambdaBody, alignedOnFunction)
         }
-        val aggregateReference = branch.result.findAggregateReference(aggregateContextClass)
-        return super.visitBranch(branch.transform(
-            FieldProjectionVisitor(pluginContext, logger, aggregateContextClass, aggregateReference), null)
-        )
+        return super.visitBranch(branch)
     }
 
     override fun visitElseBranch(branch: IrElseBranch): IrElseBranch {
-        with (logger) {
+        with(logger) {
             branch.addBranchAlignment(
                 pluginContext,
                 aggregateContextClass,
@@ -84,9 +79,6 @@ class AlignmentTransformer(
                 false
             )
         }
-        val aggregateReference = branch.result.findAggregateReference(aggregateContextClass)
-        return super.visitElseBranch(branch.transform(
-            FieldProjectionVisitor(pluginContext, logger, aggregateContextClass, aggregateReference), null)
-        )
+        return super.visitElseBranch(branch)
     }
 }
