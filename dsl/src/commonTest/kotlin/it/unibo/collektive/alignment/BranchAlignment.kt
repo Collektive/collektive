@@ -100,9 +100,10 @@ class BranchAlignment : StringSpec({
     "A field should be projected whenever there is an alignment operation, not just on branches (issue #171)" {
         manuallyAlignedExchangeWithThreeDevices { it % 2 == 0 }
     }
-    "A field should be projected whenever there is an alignment regardless of the type, not just booleans (issue #171)" {
-        manuallyAlignedExchangeWithThreeDevices { it % 2 }
-    }
+    "A field should be projected whenever there is an alignment regardless of the type," +
+        " not just booleans (issue #171)" {
+            manuallyAlignedExchangeWithThreeDevices { it % 2 }
+        }
     "A field should be projected when it is a non-direct receiver (issue #171)" {
         exchangeWithThreeDevices {
             with(it) {
