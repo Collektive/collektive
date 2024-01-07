@@ -1,14 +1,14 @@
 package it.unibo.collektive.aggregate.api
 
 /**
- * The lambda context passed to the [share] function.
+ * Context for yielding operations.
+ * Yielding operations means that an operator can send a [Initial] value to the neighbours,
+ * but return a [Return] value to the caller.
  */
 class YieldingContext<Initial, Return> {
 
     /**
-     * Express the lambda [toReturn] when the [sharing] computation is done.
-     * Usually the [toReturn] value is different from the [toSend],
-     * otherwise use [share] without calling this function to return the value [toSend].
+     * Express the lambda [toReturn] when the computation is done.
      * It can be used with checks after the invocation.
      * ## Example
      * ```
@@ -25,14 +25,15 @@ class YieldingContext<Initial, Return> {
      * }
      * result // result: Kotlin.String?
      * ```
-     * The invoke of [yielding] as the last statement of the body of the [share],
-     * sent to the neighbours the [toSend] value, but returns from the [share] the [toReturn] value.
+     * The call of [yielding] as the last statement of the body of a yielding operator,
+     * sent to the neighbours the [Initial] value (from the extension receiver),
+     * but returns the [toReturn] value.
      */
     fun Initial.yielding(toReturn: () -> Return): YieldingResult<Initial, Return> =
         YieldingResult(this, toReturn())
 
     /**
-     * Specifies the value [toSend] and the value [toReturn] of a [SharingContext.yielding] function.
+     * Specifies the value [toSend] and the value [toReturn] of a yielding operator.
      */
     data class YieldingResult<Initial, Return>(val toSend: Initial, val toReturn: Return)
 }
