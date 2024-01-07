@@ -70,7 +70,7 @@ class AggregateContext(
             val path = stack.currentPath()
             check(!toBeSent.messages.containsKey(path)) {
                 "Alignment was broken by multiple aligned calls with the same path: $path. " +
-                    "The most likely cause is an aggregate function call within a loop"
+                        "The most likely cause is an aggregate function call within a loop"
             }
             toBeSent = toBeSent.copy(messages = toBeSent.messages + (stack.currentPath() to message))
             state = state + (stack.currentPath() to field.localValue)
@@ -101,11 +101,10 @@ class AggregateContext(
     fun <Initial> repeat(
         initial: Initial,
         transform: (Initial) -> Initial,
-    ): Initial =
-        repeating(initial) {
-            val res = transform(it)
-            RepeatingResult(res, res)
-        }
+    ): Initial = repeating(initial) {
+        val res = transform(it)
+        RepeatingResult(res, res)
+    }
 
     /**
      * Alignment function that pushes in the stack the pivot, executes the body and pop the last
