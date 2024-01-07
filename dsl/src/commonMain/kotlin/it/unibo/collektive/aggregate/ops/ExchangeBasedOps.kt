@@ -4,7 +4,8 @@ import arrow.core.Option
 import arrow.core.getOrElse
 import arrow.core.none
 import arrow.core.some
-import it.unibo.collektive.aggregate.AggregateContext
+import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.YieldingContext
 import it.unibo.collektive.field.Field
 
 /**
@@ -20,8 +21,10 @@ import it.unibo.collektive.field.Field
  * ```
  * In this case, the field returned has the result of the computation as local value.
  */
-fun <Scalar> AggregateContext.neighbouring(local: Scalar): Field<Scalar> =
-    exchange(local) { it.mapWithId { _, x -> x } }
+fun <Return> Aggregate.neighbouring(type: Return): Field<Return> {
+    val body: (Field<Return>) -> Field<Return> = { f -> f.mapWithId { _, x -> x } }
+    return exchange(type, body)
+}
 
 /**
  * [sharing] captures the space-time nature of field computation through observation of neighbours' values, starting
@@ -47,12 +50,12 @@ fun <Scalar> AggregateContext.neighbouring(local: Scalar): Field<Scalar> =
  * }
  * ```
  */
-fun <Initial, Return> AggregateContext.sharing(
+fun <Initial, Return> Aggregate.sharing(
     initial: Initial,
-    transform: SharingContext<Initial, Return>.(Field<Initial>) -> SharingResult<Initial, Return>,
+    transform: YieldingContext<Initial, Return>.(Field<Initial>) -> YieldingContext.YieldingResult<Initial, Return>,
 ): Return {
-    val context = SharingContext<Initial, Return>()
-    var res: Option<SharingResult<Initial, Return>> = none()
+    val context = YieldingContext<Initial, Return>()
+    var res: Option<YieldingContext.YieldingResult<Initial, Return>> = none()
     exchange(initial) {
         it.mapWithId { _, _ -> transform(context, it).also { r -> res = r.some() }.toSend }
     }
@@ -71,8 +74,8 @@ fun <Initial, Return> AggregateContext.sharing(
  * ```
  * In the example above, the function [share] wil return a value that is the max found in the field.
  **/
-fun <Initial> AggregateContext.share(initial: Initial, transform: (Field<Initial>) -> Initial): Initial =
+fun <Initial> Aggregate.share(initial: Initial, transform: (Field<Initial>) -> Initial): Initial =
     sharing(initial) {
         val res = transform(it)
-        SharingResult(res, res)
+        YieldingContext.YieldingResult(res, res)
     }
