@@ -15,14 +15,7 @@ class IfElseSingleExpressionTest : StringSpec({
         val result = aggregate(id0) {
             if (customCondition) neighbouring("test") else neighbouring("test")
         }
-        result.toSend.messages.keys shouldContain Path(
-            listOf(
-                "invoke.1",
-                true,
-                "neighbouring.1",
-                "exchange.1",
-            ),
-        )
+        result.toSend.messages.keys shouldContain Path(listOf(true, "neighbouring.1", "exchange.1"))
     }
 
     "False condition in if else block" {
@@ -30,13 +23,6 @@ class IfElseSingleExpressionTest : StringSpec({
         val result = aggregate(id0) {
             if (customCondition) neighbouring("test") else neighbouring("test")
         }
-        result.toSend.messages.keys shouldContain Path(
-            listOf(
-                "invoke.1",
-                false,
-                "neighbouring.2",
-                "exchange.1",
-            ),
-        )
+        result.toSend.messages.keys shouldContain Path(listOf(false, "neighbouring.2", "exchange.1"))
     }
 })

@@ -13,7 +13,7 @@ class IfConditionTest : StringSpec({
         val result = aggregate(id0) {
             if (true) neighbouring("test")
         }
-        result.toSend.messages.keys shouldContain Path(listOf("invoke.1", true, "neighbouring.1", "exchange.1"))
+        result.toSend.messages.keys shouldContain Path(listOf(true, "neighbouring.1", "exchange.1"))
     }
 
     "Variable condition if" {
@@ -21,14 +21,7 @@ class IfConditionTest : StringSpec({
         val result = aggregate(id0) {
             if (customCondition) neighbouring("test")
         }
-        result.toSend.messages.keys shouldContain Path(
-            listOf(
-                "invoke.1",
-                true,
-                "neighbouring.1",
-                "exchange.1",
-            ),
-        )
+        result.toSend.messages.keys shouldContain Path(listOf(true, "neighbouring.1", "exchange.1"))
     }
 
     "Function condition if" {
@@ -36,14 +29,7 @@ class IfConditionTest : StringSpec({
         val result = aggregate(id0) {
             if (customFunction()) neighbouring("test")
         }
-        result.toSend.messages.keys shouldContain Path(
-            listOf(
-                "invoke.1",
-                true,
-                "neighbouring.1",
-                "exchange.1",
-            ),
-        )
+        result.toSend.messages.keys shouldContain Path(listOf(true, "neighbouring.1", "exchange.1"))
     }
 
     "Function and condition if" {
@@ -52,9 +38,7 @@ class IfConditionTest : StringSpec({
         val result = aggregate(id0) {
             if (customCondition1 && customCondition2) neighbouring("test")
         }
-        result.toSend.messages.keys shouldContain Path(
-            listOf("invoke.1", true, "neighbouring.1", "exchange.1"),
-        )
+        result.toSend.messages.keys shouldContain Path(listOf(true, "neighbouring.1", "exchange.1"))
     }
 
     "Function or condition if" {
@@ -63,14 +47,7 @@ class IfConditionTest : StringSpec({
         val result = aggregate(id0) {
             if (customCondition1 || customCondition2) neighbouring("test")
         }
-        result.toSend.messages.keys shouldContain Path(
-            listOf(
-                "invoke.1",
-                true,
-                "neighbouring.1",
-                "exchange.1",
-            ),
-        )
+        result.toSend.messages.keys shouldContain Path(listOf(true, "neighbouring.1", "exchange.1"))
     }
 
     "Function not condition if" {
@@ -79,13 +56,6 @@ class IfConditionTest : StringSpec({
         val result = aggregate(id0) {
             if (customCondition1 && !customCondition2) neighbouring("test")
         }
-        result.toSend.messages.keys shouldContain Path(
-            listOf(
-                "invoke.1",
-                true,
-                "neighbouring.1",
-                "exchange.1",
-            ),
-        )
+        result.toSend.messages.keys shouldContain Path(listOf(true, "neighbouring.1", "exchange.1"))
     }
 })
