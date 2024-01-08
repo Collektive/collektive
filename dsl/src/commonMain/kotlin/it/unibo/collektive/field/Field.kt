@@ -18,7 +18,7 @@ sealed interface Field<out T> {
     val localValue: T
 
     /**
-     * Exclude the local node from the field.
+     * Returns a [Map] with the neighboring values of this field (namely, all values but self).
      */
     fun excludeSelf(): Map<ID, T>
 
@@ -44,9 +44,16 @@ sealed interface Field<out T> {
     fun asSequence(): Sequence<Pair<ID, T>>
 
     /**
-     * Returns a map representing the field.
+     * Converts the Field into a [Map].
+     * This method is meant to bridge the aggregate APIs with the Kotlin collections framework.
+     * The resulting map _will contain the local value_.
      */
     fun toMap(): Map<ID, T>
+
+    /**
+     * Returns the number of neighbors of the field.
+     */
+    val neighborsCount: Int get() = excludeSelf().size
 
     companion object {
 
@@ -129,6 +136,8 @@ internal class ArrayBasedField<T>(
     private val others: List<Pair<ID, T>>,
 ) : AbstractField<T>(localId, localValue) {
 
+    override val neighborsCount: Int get() = others.size
+
     override fun neighborValueOf(id: ID): T = when {
         others.size <= MAP_OVER_LIST_PERFORMANCE_CROSSING_POINT -> others.first { it.first == id }.second
         else -> excludeSelf().getValue(id)
@@ -151,6 +160,8 @@ internal class SequenceBasedField<T>(
     localValue: T,
     private val others: Sequence<Pair<ID, T>>,
 ) : AbstractField<T>(localId, localValue) {
+
+    override val neighborsCount by lazy { others.count() }
 
     override fun asSequence(): Sequence<Pair<ID, T>> = others + (localId to localValue)
 

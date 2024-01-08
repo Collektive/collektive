@@ -43,7 +43,7 @@ private fun IrBlock.findAggregateReference(aggregateContextClass: IrClass): IrEx
     return aggregateContextReferences.filterNotNull().firstOrNull()
 }
 
-private fun IrExpression.findAggregateReference(aggregateContextClass: IrClass): IrExpression? = when (this) {
+internal fun IrExpression.findAggregateReference(aggregateContextClass: IrClass): IrExpression? = when (this) {
     is IrBlock -> findAggregateReference(aggregateContextClass)
     is IrCall -> collectAggregateContextReference(aggregateContextClass, this)
         ?: collectAggregateContextReference(aggregateContextClass, symbol.owner)

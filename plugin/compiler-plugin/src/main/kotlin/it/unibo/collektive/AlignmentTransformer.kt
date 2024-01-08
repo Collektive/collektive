@@ -3,6 +3,7 @@ package it.unibo.collektive
 import it.unibo.collektive.utils.branch.addBranchAlignment
 import it.unibo.collektive.utils.call.buildAlignedOnCall
 import it.unibo.collektive.utils.common.AggregateFunctionNames.ALIGNED_ON_FUNCTION
+import it.unibo.collektive.utils.common.getFunctionName
 import it.unibo.collektive.utils.statement.irStatement
 import it.unibo.collektive.visitors.collectAggregateContextReference
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -29,22 +30,17 @@ class AlignmentTransformer(
     private val aggregateLambdaBody: IrFunction,
     private val alignedOnFunction: IrFunction,
 ) : IrElementTransformerVoid() {
-
     private var alignedFunctions: AlignedData = emptyMap()
 
     override fun visitCall(expression: IrCall): IrExpression {
         val contextReference = expression.receiverAndArgs().find { it.type == aggregateContextClass.defaultType }
             ?: collectAggregateContextReference(aggregateContextClass, expression.symbol.owner)
         return contextReference?.let { context ->
-            val symbolName = expression.symbol.owner.name
-            val functionName = when {
-                symbolName.isSpecial -> "?"
-                else -> symbolName.asString()
-            }
+            val functionName = expression.getFunctionName()
             // We don't want to align the alignedOn function :)
             if (functionName == ALIGNED_ON_FUNCTION) return super.visitCall(expression)
 
-            // If no function, the first time the counter is 0
+            // If no function, the first time the counter is 1
             val actualCounter = alignedFunctions[functionName]?.let { it + 1 } ?: 1
             alignedFunctions += functionName to actualCounter
 
@@ -67,14 +63,14 @@ class AlignmentTransformer(
     }
 
     override fun visitBranch(branch: IrBranch): IrBranch {
-        with (logger) {
+        with(logger) {
             branch.addBranchAlignment(pluginContext, aggregateContextClass, aggregateLambdaBody, alignedOnFunction)
         }
         return super.visitBranch(branch)
     }
 
     override fun visitElseBranch(branch: IrElseBranch): IrElseBranch {
-        with (logger) {
+        with(logger) {
             branch.addBranchAlignment(
                 pluginContext,
                 aggregateContextClass,
