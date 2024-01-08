@@ -1,3 +1,27 @@
+## [4.0.0](https://github.com/Collektive/collektive/compare/3.0.1...4.0.0) (2024-01-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* implement rule `[E-FLD]` as described in https://doi.org/10.1145/3285956. Fixes #171 (#172)
+
+### Dependency updates
+
+* **deps:** update alchemist to v29.3.4 ([c2090e9](https://github.com/Collektive/collektive/commit/c2090e96090f611587ee6e09a1a5f3756c12feaa))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5.3.2 ([fd5efbf](https://github.com/Collektive/collektive/commit/fd5efbf0b577cba3c2eaf4fccc0060a335eb9288))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5.3.3 ([01573c4](https://github.com/Collektive/collektive/commit/01573c4d029189552b42f594f47ffd5b73a2501b))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.85 ([312363b](https://github.com/Collektive/collektive/commit/312363b95311d2d7f9790879157ef37abc507728))
+* **deps:** update plugin gitsemver to v2.0.5 ([f654e59](https://github.com/Collektive/collektive/commit/f654e59d8cfe2aad197ba98c70ea7bc85f58dcf1))
+* **deps:** update plugin kotlin-qa to v0.57.1 ([5c4a72b](https://github.com/Collektive/collektive/commit/5c4a72bb80e8283e3b98e5792de8599fa1cf1eda))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v1.1.17 ([9b9382f](https://github.com/Collektive/collektive/commit/9b9382f3b419e9cb8b05a8a6a2d119f29744ee80))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2 ([eb03b09](https://github.com/Collektive/collektive/commit/eb03b09802f59d51139ea0742a3902da834941d2))
+* **deps:** update plugin publishoncentral to v5.0.22 ([5627bab](https://github.com/Collektive/collektive/commit/5627bab0075ef00716e240a96bda18eda0d97094))
+
+
+### Bug Fixes
+
+* implement rule `[E-FLD]` as described in https://doi.org/10.1145/3285956. Fixes [#171](https://github.com/Collektive/collektive/issues/171) ([#172](https://github.com/Collektive/collektive/issues/172)) ([bb70be2](https://github.com/Collektive/collektive/commit/bb70be229bf9a1afb81f584eb226e641b3acbafc))
+
 ## [3.0.1](https://github.com/Collektive/collektive/compare/3.0.0...3.0.1) (2023-12-21)
 
 
