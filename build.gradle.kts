@@ -87,6 +87,10 @@ allprojects {
         }
     }
 
+    dependencies {
+        detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.4")
+    }
+
     plugins.withType<DetektPlugin> {
         val check by tasks.getting
         val detektAll by tasks.creating { group = "verification" }
