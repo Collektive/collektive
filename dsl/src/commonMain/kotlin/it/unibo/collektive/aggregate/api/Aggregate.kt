@@ -4,7 +4,7 @@ import it.unibo.collektive.ID
 import it.unibo.collektive.aggregate.api.YieldingContext.YieldingResult
 import it.unibo.collektive.field.Field
 
-typealias YieldingScope<Initial, Return> = YieldingContext<Initial,Return>.(Initial) -> YieldingResult<Initial, Return>
+typealias YieldingScope<Initial, Return> = YieldingContext<Initial, Return>.(Initial) -> YieldingResult<Initial, Return>
 
 /**
  * Models the minimal set of aggregate operations.
