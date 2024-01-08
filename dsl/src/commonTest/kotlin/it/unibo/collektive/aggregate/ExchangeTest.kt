@@ -124,7 +124,7 @@ class ExchangeTest : StringSpec({
                 path2 to SingleOutboundMessage(
                     expected7,
                     mapOf(
-                        id1 to expected3,
+                        id1 to expected6,
                         id2 to expected10,
                     ),
                 ),
