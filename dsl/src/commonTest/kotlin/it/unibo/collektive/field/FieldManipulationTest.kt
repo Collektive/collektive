@@ -24,7 +24,7 @@ class FieldManipulationTest : StringSpec({
         }
 
         aggregate(id1, network1) {
-            val res = neighboring(double(2)).min()
+            val res = neighboring(double(2)).minWithSelf()
             res shouldNotBe null
             res shouldBe 4
         }

@@ -11,9 +11,9 @@ class FieldOpsTest : StringSpec({
     val fulfilledField = Field(0, 0, mapOf(1 to 10, 2 to 20))
 
     "An empty field should return the self value value when is folded" {
-        emptyField.fold { acc, elem -> acc + elem } shouldBe "localVal"
+        emptyField.fold(emptyField.localValue) { acc, elem -> acc + elem } shouldBe "localVal"
     }
-    "An empty field should return the initial value when is hooded excluding self" {
+    "An empty field should return the initial value when is folded excluding self" {
         emptyField.fold("initial") { acc, elem -> acc + elem } shouldBe "initial"
     }
     "An empty field when mapped only the local value should be transformed" {

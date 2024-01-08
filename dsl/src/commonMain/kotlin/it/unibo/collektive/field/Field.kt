@@ -1,5 +1,7 @@
 package it.unibo.collektive.field
 
+import arrow.core.fold
+
 /**
  * A field is a map of messages where the key is the [ID] of a node and [T] the associated value.
  * @param T the type of the field.
@@ -89,8 +91,9 @@ sealed interface Field<ID : Any, out T> {
 
         /**
          * Reduce the elements of the field using the [transform] function.
+         * The local value is not considered, unless explicitly passed as [default].
          */
-        fun <ID : Any, T> Field<ID, T>.hood(default: T, transform: (accumulator: T, T) -> T): T {
+        fun <ID : Any, T> Field<ID, T>.hood(default: T, transform: (T, T) -> T): T {
             val neighbors = excludeSelf()
             return when {
                 neighbors.isEmpty() -> default
@@ -100,19 +103,10 @@ sealed interface Field<ID : Any, out T> {
 
         /**
          * Folds the elements of a field starting with an [initial] through a [transform] function.
+         * The local value is not considered, unless explicitly passed as [initial].
          */
-        fun <ID : Any, T, R> Field<ID, T>.fold(initial: R, transform: (R, T) -> R): R {
-            var accumulator = initial
-            for ((_, value) in excludeSelf()) {
-                accumulator = transform(accumulator, value)
-            }
-            return accumulator
-        }
-
-        /**
-         * Folds the elements of a field using the [transform] function and starting from the local value as initial.
-         */
-        fun <ID : Any, T> Field<ID, T>.fold(transform: (T, T) -> T): T = fold(localValue, transform)
+        fun <ID : Any, T, R> Field<ID, T>.fold(initial: R, transform: (R, T) -> R): R =
+            excludeSelf().fold(initial) { accumulator, entry -> transform(accumulator, entry.value) }
     }
 }
 

@@ -27,7 +27,7 @@ class SharingTest : StringSpec({
     val initV7 = 7
     val initV10 = 10
 
-    val findMax: (Field<*, Int>) -> Int = { e -> e.max() }
+    val findMax: (Field<*, Int>) -> Int = { e -> e.max(e.localValue) }
 
     "first time sharing" {
         aggregate(id0) {
@@ -78,7 +78,7 @@ class SharingTest : StringSpec({
 
         aggregate(id1, testNetwork) {
             val res = share(initV1) {
-                it.max()
+                it.max(it.localValue)
             }
             res shouldBe initV1
         }
@@ -89,7 +89,7 @@ class SharingTest : StringSpec({
 
         aggregate(id1, testNetwork) {
             val res = sharing(initV1) {
-                val min = it.max()
+                val min = it.max(it.localValue)
                 min.yielding { "A string" }
             }
             res shouldBe "A string"
@@ -101,7 +101,7 @@ class SharingTest : StringSpec({
 
         aggregate(id1, testNetwork) {
             val res = sharing(initV1) {
-                val min = it.min()
+                val min = it.min(it.localValue)
                 min.yielding { "Hello".takeIf { min > 1 } }
             }
             res shouldBe null

@@ -1,35 +1,30 @@
 package it.unibo.collektive.field
 
 import it.unibo.collektive.field.Field.Companion.fold
-import it.unibo.collektive.field.Field.Companion.hood
 
 /**
- * Get the minimum value of a field.
- * If [base] is unspecified, the local field value is used as base.
+ * Get the minimum value of a field, excluding the local value, starting from [base].
+ * To consider the local value, explicitly provide it as [base].
  */
-fun <ID : Any, T : Comparable<T>> Field<ID, T>.min(base: T = localValue): T =
+fun <ID : Any, T : Comparable<T>> Field<ID, T>.min(base: T): T =
     fold(base) { acc, value -> if (value < acc) value else acc }
 
 /**
- * Returns the minimum among elements of the field, exculding the local value
- * and returning the provided default in case of field with no neighbors.
+ * Get the minimum value of a field, including the local value.
  */
-fun <ID : Any, T : Comparable<T>> Field<ID, T>.minHood(default: T): T =
-    hood(default) { v1, v2 -> if (v1 < v2) v1 else v2 }
+fun <ID : Any, T : Comparable<T>> Field<ID, T>.minWithSelf(): T = min(localValue)
 
 /**
- * Get the maximum value of a field.
- * If [base] is unspecified, the local field value is used as base.
+ * Get the maximum value of a field, excluding the local value, starting from [base].
+ * To consider the local value, explicitly provide it as [base].
  */
-fun <ID : Any, T : Comparable<T>> Field<ID, T>.max(base: T = localValue): T =
+fun <ID : Any, T : Comparable<T>> Field<ID, T>.max(base: T): T =
     fold(base) { acc, value -> if (value > acc) value else acc }
 
 /**
- * Returns the maximum among elements of the field, exculding the local value
- * and returning the provided default in case of field with no neighbors.
+ * Get the maximum value of a field, including the local value.
  */
-fun <ID : Any, T : Comparable<T>> Field<ID, T>.maxHood(default: T): T =
-    hood(default) { v1, v2 -> if (v1 > v2) v1 else v2 }
+fun <ID : Any, T : Comparable<T>> Field<ID, T>.maxWithSelf(): T = min(localValue)
 
 /**
  * Adds [value] to all the field values.
