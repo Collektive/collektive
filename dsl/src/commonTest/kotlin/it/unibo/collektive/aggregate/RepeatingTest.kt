@@ -8,7 +8,7 @@ import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.api.operators.neighbouring
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
-import it.unibo.collektive.stack.Path
+import it.unibo.collektive.path.Path
 
 class RepeatingTest : StringSpec({
     val id0 = IntId(0)

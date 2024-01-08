@@ -11,7 +11,7 @@ import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.networking.OutboundMessage
 import it.unibo.collektive.networking.SingleOutboundMessage
-import it.unibo.collektive.stack.Path
+import it.unibo.collektive.path.Path
 
 class ExchangeTest : StringSpec({
 

@@ -10,7 +10,7 @@ import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.api.operators.neighbouring
 import it.unibo.collektive.aggregate.api.operators.share
-import it.unibo.collektive.stack.Path
+import it.unibo.collektive.path.Path
 
 class TestAlignment : StringSpec({
     "The alignment should be performed also for the same aggregate operation called multiple times (issue #51)" {

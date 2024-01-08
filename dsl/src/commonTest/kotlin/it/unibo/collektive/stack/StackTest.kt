@@ -1,5 +1,6 @@
 package it.unibo.collektive.stack
 
+import it.unibo.collektive.aggregate.api.impl.stack.Stack
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -10,22 +11,22 @@ class StackTest {
     @Test
     fun emptyStack() {
         val stack: Stack<Any> = Stack()
-        assertTrue(stack.currentPath().path.isEmpty())
+        assertTrue(stack.currentPath().tokens().isEmpty())
     }
 
     @Test
     fun addTokenToStack() {
         val stack: Stack<Any> = Stack()
         stack.alignRaw(token)
-        assertTrue(stack.currentPath().path.contains(token))
+        assertTrue(stack.currentPath().tokens().contains(token))
     }
 
     @Test
     fun removeTokenFromStack() {
         val stack: Stack<Any> = Stack()
         stack.alignRaw(token)
-        assertTrue(stack.currentPath().path.contains(token))
+        assertTrue(stack.currentPath().tokens().contains(token))
         stack.dealign()
-        assertFalse(stack.currentPath().path.contains(token))
+        assertFalse(stack.currentPath().tokens().contains(token))
     }
 }

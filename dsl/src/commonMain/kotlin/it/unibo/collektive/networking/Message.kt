@@ -1,7 +1,7 @@
 package it.unibo.collektive.networking
 
 import it.unibo.collektive.ID
-import it.unibo.collektive.stack.Path
+import it.unibo.collektive.path.Path
 
 /**
  * Types of messages.

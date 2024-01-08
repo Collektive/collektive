@@ -7,14 +7,14 @@ import it.unibo.collektive.ID
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.YieldingContext
 import it.unibo.collektive.aggregate.api.YieldingContext.YieldingResult
+import it.unibo.collektive.aggregate.api.impl.stack.Stack
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.OutboundMessage
 import it.unibo.collektive.networking.SingleOutboundMessage
-import it.unibo.collektive.stack.Path
-import it.unibo.collektive.stack.Stack
+import it.unibo.collektive.path.Path
 import it.unibo.collektive.state.State
-import it.unibo.collektive.state.getTyped
+import it.unibo.collektive.state.impl.getTyped
 
 /**
  * Context for managing aggregate computation.
