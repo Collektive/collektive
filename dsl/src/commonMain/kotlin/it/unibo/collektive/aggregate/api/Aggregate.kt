@@ -4,6 +4,8 @@ import it.unibo.collektive.ID
 import it.unibo.collektive.aggregate.api.YieldingContext.YieldingResult
 import it.unibo.collektive.field.Field
 
+typealias YieldingScope<Initial, Return> = YieldingContext<Initial,Return>.(Initial) -> YieldingResult<Initial, Return>
+
 /**
  * Models the minimal set of aggregate operations.
  * Holds the [localId] of the device executing the aggregate program.
@@ -32,15 +34,15 @@ interface Aggregate {
      * The result of the exchange function is a field with as messages a map with key the id of devices across the
      * network and the result of the computation passed as relative local values.
      */
-    fun <X> exchange(initial: X, body: (Field<X>) -> Field<X>): Field<X>
+    fun <Initial> exchange(initial: Initial, body: (Field<Initial>) -> Field<Initial>): Field<Initial>
 
     /**
-     * Same behavior of [exchange] but this function can yield a [Field] of [Ret] value.
+     * Same behavior of [exchange] but this function can yield a [Field] of [Return] value.
      */
-    fun <Init, Ret> exchanging(
-        initial: Init,
-        body: YieldingContext<Field<Init>, Field<Ret>>.(Field<Init>) -> YieldingResult<Field<Init>, Field<Ret>>,
-    ): Field<Ret>
+    fun <Initial, Return> exchanging(
+        initial: Initial,
+        body: YieldingScope<Field<Initial>, Field<Return>>
+    ): Field<Return>
 
     /**
      * Iteratively updates the value computing the [transform] expression at each device using the last
@@ -52,10 +54,7 @@ interface Aggregate {
      * Iteratively updates the value computing the [transform] expression from a [YieldingContext]
      * at each device using the last computed value or the [initial].
      */
-    fun <Initial, Return> repeating(
-        initial: Initial,
-        transform: YieldingContext<Initial, Return>.(Initial) -> YieldingResult<Initial, Return>,
-    ): Return
+    fun <Initial, Return> repeating(initial: Initial, transform: YieldingScope<Initial, Return>): Return
 
     /**
      * Alignment function that pushes in the stack the pivot, executes the body and pop the last
