@@ -41,7 +41,7 @@ interface Aggregate {
      */
     fun <Initial, Return> exchanging(
         initial: Initial,
-        body: YieldingScope<Field<Initial>, Field<Return>>
+        body: YieldingScope<Field<Initial>, Field<Return>>,
     ): Field<Return>
 
     /**
