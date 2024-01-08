@@ -3,7 +3,7 @@ package it.unibo.collektive.aggregate.api.impl.stack
 import it.unibo.collektive.path.Path
 import it.unibo.collektive.path.impl.PathImpl
 
-internal class StackDequeue : Stack {
+internal class StackDeque : Stack {
     private val currentStack = ArrayDeque<Any?>()
 
     override fun currentPath(): Path = PathImpl(currentStack.toList())

@@ -25,6 +25,6 @@ internal interface Stack {
         /**
          * Smart constructor for the [Stack] interface.
          */
-        internal operator fun invoke(): Stack = StackDequeue()
+        internal operator fun invoke(): Stack = StackDeque()
     }
 }
