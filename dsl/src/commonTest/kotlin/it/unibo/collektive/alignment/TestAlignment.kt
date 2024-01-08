@@ -8,8 +8,8 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.IntId
-import it.unibo.collektive.aggregate.ops.neighbouring
-import it.unibo.collektive.aggregate.ops.share
+import it.unibo.collektive.aggregate.api.operators.neighbouring
+import it.unibo.collektive.aggregate.api.operators.share
 import it.unibo.collektive.stack.Path
 
 class TestAlignment : StringSpec({

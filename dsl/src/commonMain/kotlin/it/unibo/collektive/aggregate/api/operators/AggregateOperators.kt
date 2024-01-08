@@ -1,4 +1,4 @@
-package it.unibo.collektive.aggregate.ops
+package it.unibo.collektive.aggregate.api.operators
 
 import arrow.core.Option
 import arrow.core.getOrElse
@@ -9,22 +9,23 @@ import it.unibo.collektive.aggregate.api.YieldingContext
 import it.unibo.collektive.field.Field
 
 /**
- * Observes the value of an expression [type] across neighbours.
+ * Observes the value of an expression [local] across neighbours.
  *
  * ## Example
- * ```
+ *
+ * ```kotlin
  * val field = neighbouring(0)
  * ```
+ *
  * The field returned has as local value the value passed as input (0 in this example).
- * ```
+ *
+ * ```kotlin
  * val field = neighbouring({ 2 * 2 })
  * ```
+ *
  * In this case, the field returned has the result of the computation as local value.
  */
-fun <Return> Aggregate.neighbouring(type: Return): Field<Return> {
-    val body: (Field<Return>) -> Field<Return> = { f -> f.mapWithId { _, x -> x } }
-    return exchange(type, body)
-}
+fun <Scalar> Aggregate.neighbouring(local: Scalar): Field<Scalar> = exchange(local) { it.mapWithId { _, x -> x } }
 
 /**
  * [sharing] captures the space-time nature of field computation through observation of neighbours' values, starting
@@ -37,11 +38,13 @@ fun <Return> Aggregate.neighbouring(type: Return): Field<Return> {
  * }
  * result // result: kotlin.String
  * ```
- * In the example above, the function [share] wil return the string initialised as in [sendButReturn].
+ *
+ * In the example above, the function [sharing] will return the string initialised as in yielding.
  *
  * ### Invalid use:
  *
  * Do not write code after calling the sending or returning values, they must be written at last inside the lambda.
+ *
  * ```
  * share(0) {
  *  val maxValue = it.maxBy { v -> v.value }.value
@@ -55,11 +58,11 @@ fun <Initial, Return> Aggregate.sharing(
     transform: YieldingContext<Initial, Return>.(Field<Initial>) -> YieldingContext.YieldingResult<Initial, Return>,
 ): Return {
     val context = YieldingContext<Initial, Return>()
-    var res: Option<YieldingContext.YieldingResult<Initial, Return>> = none()
+    var yieldingContext: Option<YieldingContext.YieldingResult<Initial, Return>> = none()
     exchange(initial) {
-        it.mapWithId { _, _ -> transform(context, it).also { r -> res = r.some() }.toSend }
+        it.mapWithId { _, _ -> transform(context, it).also { context -> yieldingContext = context.some() }.toSend }
     }
-    return res.getOrElse { error("This error should never be thrown") }.toReturn
+    return yieldingContext.getOrElse { error("This error should never be thrown") }.toReturn
 }
 
 /**
@@ -74,8 +77,7 @@ fun <Initial, Return> Aggregate.sharing(
  * ```
  * In the example above, the function [share] wil return a value that is the max found in the field.
  **/
-fun <Initial> Aggregate.share(initial: Initial, transform: (Field<Initial>) -> Initial): Initial =
-    sharing(initial) {
-        val res = transform(it)
-        YieldingContext.YieldingResult(res, res)
-    }
+fun <Initial> Aggregate.share(initial: Initial, transform: (Field<Initial>) -> Initial): Initial = sharing(initial) {
+    val res = transform(it)
+    YieldingContext.YieldingResult(res, res)
+}

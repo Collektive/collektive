@@ -4,7 +4,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.IntId
-import it.unibo.collektive.aggregate.ops.neighbouring
+import it.unibo.collektive.aggregate.api.operators.neighbouring
 import it.unibo.collektive.stack.Path
 
 class WhenTest : StringSpec({

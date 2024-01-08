@@ -6,8 +6,8 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.IntId
-import it.unibo.collektive.aggregate.AggregateContext
-import it.unibo.collektive.aggregate.ops.neighbouring
+import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.operators.neighbouring
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.combine
 import it.unibo.collektive.field.min
@@ -72,7 +72,7 @@ class BranchAlignment : StringSpec({
                 }
             }
     }
-    fun exchangeWithThreeDevices(body: AggregateContext.(Field<Int>) -> Field<Int>) {
+    fun exchangeWithThreeDevices(body: Aggregate.(Field<Int>) -> Field<Int>) {
         val nm = NetworkManager()
         (0..2)
             .map { IntId(it) }
