@@ -28,7 +28,7 @@ internal class AggregateContext(
     private val previousState: State,
 ) : Aggregate {
 
-    private val stack = Stack<Any>()
+    private val stack = Stack()
     private var state: State = mapOf()
     private var toBeSent = OutboundMessage(localId, emptyMap())
 

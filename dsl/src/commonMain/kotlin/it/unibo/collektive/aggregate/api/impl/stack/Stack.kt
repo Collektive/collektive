@@ -5,7 +5,7 @@ import it.unibo.collektive.path.Path
 /**
  * Simple Stack interface with additional methods for the aggregate computation.
  */
-internal interface Stack<X> {
+internal interface Stack {
     /**
      * Returns the current path of the stack.
      */
@@ -14,7 +14,7 @@ internal interface Stack<X> {
     /**
      * Pushes the [token] in the stack.
      */
-    fun alignRaw(token: X?)
+    fun alignRaw(token: Any?)
 
     /**
      * Pops the last element of the stack.
@@ -25,6 +25,6 @@ internal interface Stack<X> {
         /**
          * Smart constructor for the [Stack] interface.
          */
-        operator fun <X> invoke(): Stack<X> = StackDequeue()
+        internal operator fun invoke(): Stack = StackDequeue()
     }
 }
