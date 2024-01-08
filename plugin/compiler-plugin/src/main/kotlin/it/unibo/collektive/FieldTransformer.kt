@@ -2,11 +2,12 @@ package it.unibo.collektive
 
 import it.unibo.collektive.utils.common.AggregateFunctionNames.ALIGNED_ON_FUNCTION
 import it.unibo.collektive.utils.logging.debug
-import it.unibo.collektive.visitors.collectAggregateContextReference
+import it.unibo.collektive.visitors.collectAggregateReference
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.jvm.ir.receiverAndArgs
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.declarations.IrClass
+import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.expressions.IrBranch
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrElseBranch
@@ -25,19 +26,20 @@ import org.jetbrains.kotlin.name.Name
 class FieldTransformer(
     private val pluginContext: IrPluginContext,
     private val logger: MessageCollector,
-    private val aggregateContextClass: IrClass,
+    private val aggregateClass: IrClass,
+    private val projectFunction: IrFunction,
 ) : IrElementTransformerVoid() {
     override fun visitCall(expression: IrCall): IrExpression {
         if (expression.symbol.owner.name == Name.identifier(ALIGNED_ON_FUNCTION)) {
             logger.debug("Found alignedOn function call: ${expression.dumpKotlinLike()}")
-            val contextReference = expression.receiverAndArgs().find { it.type == aggregateContextClass.defaultType }
-                ?: collectAggregateContextReference(aggregateContextClass, expression.symbol.owner)
+            val contextReference = expression.receiverAndArgs().find { it.type == aggregateClass.defaultType }
+                ?: collectAggregateReference(aggregateClass, expression.symbol.owner)
             contextReference?.let {
                 // If the expression contains a lambda, this recursion is necessary to visit the children
                 expression.transformChildren(this, null)
                 return expression.transform(
-                    FieldProjectionVisitor(pluginContext, logger, aggregateContextClass, it),
-                    null
+                    FieldProjectionVisitor(pluginContext, logger, projectFunction, it),
+                    null,
                 )
             }
         }
@@ -45,21 +47,35 @@ class FieldTransformer(
     }
 
     override fun visitBranch(branch: IrBranch): IrBranch {
-        val contextReference = collectAggregateContextReference(aggregateContextClass, branch.result)
+        val contextReference = collectAggregateReference(aggregateClass, branch.result)
         contextReference?.let {
             logger.debug("Found AggregateContext reference in branch: ${it.type.classFqName}")
             branch.result.transform(this, null)
-            branch.transformChildren(FieldProjectionVisitor(pluginContext, logger, aggregateContextClass, it), null)
+            return branch.transform(
+                FieldProjectionVisitor(
+                    pluginContext,
+                    logger,
+                    projectFunction,
+                    it
+                ), null
+            )
         }
         return super.visitBranch(branch)
     }
 
     override fun visitElseBranch(branch: IrElseBranch): IrElseBranch {
-        val contextReference = collectAggregateContextReference(aggregateContextClass, branch.result)
+        val contextReference = collectAggregateReference(aggregateClass, branch.result)
         contextReference?.let {
             logger.debug("Found AggregateContext reference in else branch: ${it.type.classFqName}")
             branch.result.transform(this, null)
-            branch.transformChildren(FieldProjectionVisitor(pluginContext, logger, aggregateContextClass, it), null)
+            return branch.transform(
+                FieldProjectionVisitor(
+                    pluginContext,
+                    logger,
+                    projectFunction,
+                    it
+                ), null
+            )
         }
         return super.visitElseBranch(branch)
     }
