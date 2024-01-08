@@ -8,7 +8,6 @@ import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.operators.neighbouring
-import it.unibo.collektive.path.Path
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.combine
 import it.unibo.collektive.field.min
@@ -16,6 +15,7 @@ import it.unibo.collektive.field.minus
 import it.unibo.collektive.field.plus
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
+import it.unibo.collektive.path.Path
 
 class BranchAlignment : StringSpec({
     val id0 = IntId(0)
