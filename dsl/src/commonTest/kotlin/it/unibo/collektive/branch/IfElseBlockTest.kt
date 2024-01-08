@@ -6,7 +6,7 @@ import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.path.Path
 
 class IfElseBlockTest : StringSpec({
-    val id0 = IntId(0)
+    val id0 = 0
 
     "True condition in if else should not evaluate else block" {
         val customCondition = true

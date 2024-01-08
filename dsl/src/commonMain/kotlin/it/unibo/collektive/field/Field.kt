@@ -1,7 +1,5 @@
 package it.unibo.collektive.field
 
-import arrow.core.firstOrNone
-
 /**
  * A field is a map of messages where the key is the [ID] of a node and [T] the associated value.
  * @param T the type of the field.
@@ -83,10 +81,10 @@ sealed interface Field<ID : Any, out T> {
         /**
          * Build a field from a [localId], [localValue] and [others] neighbours values.
          */
-        internal operator fun <ID: Any, T> invoke(
+        internal operator fun <ID : Any, T> invoke(
             localId: ID,
             localValue: T,
-            others: Map<ID, T> = emptyMap()
+            others: Map<ID, T> = emptyMap(),
         ): Field<ID, T> = ArrayBasedField(localId, localValue, others.map { it.toPair() })
 
         /**
@@ -114,11 +112,11 @@ sealed interface Field<ID : Any, out T> {
         /**
          * Folds the elements of a field using the [transform] function and starting from the local value as initial.
          */
-        fun <ID: Any, T> Field<ID, T>.fold(transform: (T, T) -> T): T = fold(localValue, transform)
+        fun <ID : Any, T> Field<ID, T>.fold(transform: (T, T) -> T): T = fold(localValue, transform)
     }
 }
 
-internal abstract class AbstractField<ID: Any, T>(
+internal abstract class AbstractField<ID : Any, T>(
     override val localId: ID,
     override val localValue: T,
 ) : Field<ID, T> {
@@ -186,7 +184,7 @@ internal class ArrayBasedField<ID : Any, T>(
     }
 }
 
-internal class SequenceBasedField<ID: Any, T>(
+internal class SequenceBasedField<ID : Any, T>(
     localId: ID,
     localValue: T,
     private val others: Sequence<Pair<ID, T>>,

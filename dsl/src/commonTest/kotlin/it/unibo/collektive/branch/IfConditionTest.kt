@@ -7,7 +7,7 @@ import it.unibo.collektive.aggregate.api.operators.neighboring
 import it.unibo.collektive.path.Path
 
 class IfConditionTest : StringSpec({
-    val id0 = IntId(0)
+    val id0 = 0
     "Branches with constant conditions should get aligned" {
         val result =
             aggregate(id0) {

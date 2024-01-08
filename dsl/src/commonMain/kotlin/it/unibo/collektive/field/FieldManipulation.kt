@@ -7,45 +7,45 @@ import it.unibo.collektive.field.Field.Companion.hood
  * Get the minimum value of a field.
  * If [base] is unspecified, the local field value is used as base.
  */
-fun <ID: Any, T : Comparable<T>> Field<ID, T>.min(base: T = localValue): T =
+fun <ID : Any, T : Comparable<T>> Field<ID, T>.min(base: T = localValue): T =
     fold(base) { acc, value -> if (value < acc) value else acc }
 
 /**
  * Returns the minimum among elements of the field, exculding the local value
  * and returning the provided default in case of field with no neighbors.
  */
-fun <ID: Any, T : Comparable<T>> Field<ID, T>.minHood(default: T): T =
+fun <ID : Any, T : Comparable<T>> Field<ID, T>.minHood(default: T): T =
     hood(default) { v1, v2 -> if (v1 < v2) v1 else v2 }
 
 /**
  * Get the maximum value of a field.
  * If [base] is unspecified, the local field value is used as base.
  */
-fun <ID: Any, T : Comparable<T>> Field<ID, T>.max(base: T = localValue): T =
+fun <ID : Any, T : Comparable<T>> Field<ID, T>.max(base: T = localValue): T =
     fold(base) { acc, value -> if (value > acc) value else acc }
 
 /**
  * Returns the maximum among elements of the field, exculding the local value
  * and returning the provided default in case of field with no neighbors.
  */
-fun <ID: Any, T : Comparable<T>> Field<ID, T>.maxHood(default: T): T =
+fun <ID : Any, T : Comparable<T>> Field<ID, T>.maxHood(default: T): T =
     hood(default) { v1, v2 -> if (v1 > v2) v1 else v2 }
 
 /**
  * Adds [value] to all the field values.
  */
-operator fun <ID: Any, T : Number> Field<ID, T>.plus(value: T): Field<ID, T> = map { add(it, value) }
+operator fun <ID : Any, T : Number> Field<ID, T>.plus(value: T): Field<ID, T> = map { add(it, value) }
 
 /**
  * Subtracts [value] from all the field values.
  */
-operator fun <ID: Any, T : Number> Field<ID, T>.minus(value: T): Field<ID, T> = map { sub(it, value) }
+operator fun <ID : Any, T : Number> Field<ID, T>.minus(value: T): Field<ID, T> = map { sub(it, value) }
 
 /**
  * Sum a field with [other] field.
  * The two fields must be aligned, otherwise an error is thrown.
  */
-operator fun <ID: Any, T : Number> Field<ID, T>.plus(other: Field<ID, T>): Field<ID, T> =
+operator fun <ID : Any, T : Number> Field<ID, T>.plus(other: Field<ID, T>): Field<ID, T> =
     alignedMap(other) { a, b -> add(a, b) }
 
 /**
@@ -55,18 +55,18 @@ operator fun <ID: Any, T : Number> Field<ID, T>.plus(other: Field<ID, T>): Field
 operator fun <ID : Any, T : Number> Field<ID, T>.minus(other: Field<ID, T>): Field<ID, T> =
     alignedMap(other) { a, b -> sub(a, b) }
 
-///**
+// /**
 // * Combine two fields with a [transform] function.
 // * The two fields must be aligned, otherwise an error is thrown.
 // */
-//fun <ID: Any, Type1, Type2, Result> combine(
+// fun <ID: Any, Type1, Type2, Result> combine(
 //    field1: Field<ID, Type1>,
 //    field2: Field<ID, Type2>,
 //    transform: (Type1, Type2) -> Result
-//): Field<ID, Result> {
+// ): Field<ID, Result> {
 //    // TODO: we should have a function producing a clear error every time there is a misalignment bug
 //    field1.mapWithId { id, value -> transform(value, field2[id] ?: error("Field not aligned")) }
-//}
+// }
 
 @Suppress("UNCHECKED_CAST")
 private fun <T : Number> add(value: T, other: T): T {

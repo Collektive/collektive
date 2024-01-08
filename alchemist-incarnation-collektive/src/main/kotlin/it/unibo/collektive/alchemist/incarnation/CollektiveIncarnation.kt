@@ -59,7 +59,7 @@ class CollektiveIncarnation<P> : Incarnation<Any, P> where P : Position<P> {
         val aggregateEntrypoint: Method
         val programIdentifier = SimpleMolecule(additionalParameters)
         val localDevice: CollektiveDevice<P> by lazy { this.node.asProperty() }
-        val run: () -> AggregateResult<*>
+        val run: () -> AggregateResult<Int, *>
 
         init {
             declareDependencyTo(programIdentifier)
@@ -75,7 +75,10 @@ class CollektiveIncarnation<P> : Incarnation<Any, P> where P : Position<P> {
                 .first {
                     it.name == additionalParameters.substring(lastDotIndex + 1) && it.parameters.isEmpty()
                 }
-            run = { aggregateEntrypoint.invoke(instance) as AggregateResult<*> }
+            run = {
+                @Suppress("UNCHECKED_CAST")
+                aggregateEntrypoint.invoke(instance) as AggregateResult<Int, *>
+            }
         }
 
         override fun cloneAction(node: Node<Any>, reaction: Reaction<Any>): Action<Any> {

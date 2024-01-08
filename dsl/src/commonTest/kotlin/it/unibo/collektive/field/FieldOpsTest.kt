@@ -1,22 +1,15 @@
 package it.unibo.collektive.field
 
-import io.kotest.assertions.throwables.shouldThrowUnit
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.equals.shouldNotBeEqual
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.field.Field.Companion.fold
-import it.unibo.collektive.field.Field.Companion.reduce
 
 class FieldOpsTest : StringSpec({
     val emptyField = Field(0, "localVal")
     val fulfilledField = Field(0, 0, mapOf(1 to 10, 2 to 20))
 
-    "An empty field should raise an exception when is reduced" {
-        shouldThrowUnit<UnsupportedOperationException> {
-            emptyField.reduce(includingSelf = false) { acc, elem -> acc + elem }
-        }
-    }
     "An empty field should return the self value value when is folded" {
         emptyField.fold { acc, elem -> acc + elem } shouldBe "localVal"
     }

@@ -7,7 +7,6 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import it.unibo.collektive.Collektive.Companion.aggregate
-import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.api.operators.neighboring
 import it.unibo.collektive.aggregate.api.operators.share
 import it.unibo.collektive.path.Path

@@ -3,19 +3,11 @@ package it.unibo.collektive.alignment
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldHaveSize
-import io.kotest.matchers.shouldBe
-import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.combine
-import it.unibo.collektive.field.min
-import it.unibo.collektive.field.minus
-import it.unibo.collektive.field.plus
-import it.unibo.collektive.network.NetworkImplTest
-import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.path.Path
+import it.unibo.collektive.Collektive.Companion.aggregate
 
 class BranchAlignment : StringSpec({
-    val id0 = IntId(0)
+    val id0 = 0
 
     "Branch alignment should work in nested functions" {
         val result = aggregate(id0) {

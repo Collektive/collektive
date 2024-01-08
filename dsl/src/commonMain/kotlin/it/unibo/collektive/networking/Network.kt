@@ -3,7 +3,7 @@ package it.unibo.collektive.networking
 /**
  * Network interface for the aggregate computation.
  */
-interface Network<ID: Any> {
+interface Network<ID : Any> {
     /**
      * Sends a [message] of type [OutboundMessage] to the neighbours.
      */

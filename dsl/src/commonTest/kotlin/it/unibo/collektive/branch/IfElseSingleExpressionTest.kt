@@ -7,7 +7,7 @@ import it.unibo.collektive.aggregate.api.operators.neighboring
 import it.unibo.collektive.path.Path
 
 class IfElseSingleExpressionTest : StringSpec({
-    val id0 = IntId(0)
+    val id0 = 0
 
     "True condition in if else block" {
         val customCondition = true

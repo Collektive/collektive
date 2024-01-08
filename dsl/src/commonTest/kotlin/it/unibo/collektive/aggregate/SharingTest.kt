@@ -3,7 +3,6 @@ package it.unibo.collektive.aggregate
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
-import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.api.operators.share
 import it.unibo.collektive.aggregate.api.operators.sharing
 import it.unibo.collektive.field.Field
@@ -14,10 +13,10 @@ import it.unibo.collektive.network.NetworkManager
 
 class SharingTest : StringSpec({
     // device ids
-    val id0 = IntId(0)
-    val id1 = IntId(1)
-    val id2 = IntId(2)
-    val id3 = IntId(3)
+    val id0 = 0
+    val id1 = 1
+    val id2 = 2
+    val id3 = 3
 
     // initial values
     val initV1 = 1
@@ -28,7 +27,7 @@ class SharingTest : StringSpec({
     val initV7 = 7
     val initV10 = 10
 
-    val findMax: (Field<Int>) -> Int = { e -> e.max() }
+    val findMax: (Field<*, Int>) -> Int = { e -> e.max() }
 
     "first time sharing" {
         aggregate(id0) {

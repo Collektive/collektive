@@ -5,7 +5,7 @@ import it.unibo.alchemist.model.Node
 import it.unibo.alchemist.model.NodeProperty
 import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Time
-import it.unibo.collektive.IntId
+import it.unibo.collektive.aggregate.AggregateContext
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.Network
@@ -21,9 +21,9 @@ class CollektiveDevice<P>(
     private val environment: Environment<Any, P>,
     override val node: Node<Any>,
     private val retainMessagesFor: Time,
-) : NodeProperty<Any>, Network, DistanceSensor where P : Position<P> {
+) : NodeProperty<Any>, Network<Int>, DistanceSensor where P : Position<P> {
 
-    private data class TimedMessage(val receivedAt: Time, val payload: InboundMessage)
+    private data class TimedMessage(val receivedAt: Time, val payload: InboundMessage<Int>)
 
     /**
      * The current time.
@@ -32,13 +32,13 @@ class CollektiveDevice<P>(
 
     private var validMessages: Iterable<TimedMessage> = emptySet()
 
-    private fun receiveMessage(time: Time, message: InboundMessage) {
+    private fun receiveMessage(time: Time, message: InboundMessage<Int>) {
         validMessages += TimedMessage(time, message)
     }
 
     override fun cloneOnNewNode(node: Node<Any>) = TODO("Not yet implemented")
 
-    override fun read(): Set<InboundMessage> {
+    override fun read(): Set<InboundMessage<Int>> {
         return validMessages
             .filter { it.receivedAt + retainMessagesFor >= currentTime }
             .also { validMessages = it }
@@ -46,20 +46,18 @@ class CollektiveDevice<P>(
             .toSet()
     }
 
-    override fun write(message: OutboundMessage) {
+    override fun write(message: OutboundMessage<Int>) {
         message.messages.mapValues { (path, outbound) ->
             receiveMessage(
                 currentTime,
                 InboundMessage(
                     message.senderId,
-                    mapOf(path to outbound.overrides.getOrElse(IntId(node.id)) { outbound.default }),
+                    mapOf(path to outbound.overrides.getOrElse(node.id) { outbound.default }),
                 ),
             )
         }
     }
 
-    override fun distances(): Field<Double> {
-        println(environment)
-        TODO("Not yet implemented")
-    }
+    override fun <ID : Any> AggregateContext<ID>.distances(): Field<ID, Double> =
+        neighboring(environment.getPosition(node)).map { it.distanceTo(environment.getPosition(node)) }
 }

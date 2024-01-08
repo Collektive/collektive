@@ -8,7 +8,7 @@ import it.unibo.collektive.state.State
  * It represents the [localId] of the device, the [result] of the computation,
  * the messages [toSend] to other devices and the [newState] of the device.
  */
-data class AggregateResult<ID: Any, R>(
+data class AggregateResult<ID : Any, R>(
     val localId: ID,
     val result: R,
     val toSend: OutboundMessage<ID>,
