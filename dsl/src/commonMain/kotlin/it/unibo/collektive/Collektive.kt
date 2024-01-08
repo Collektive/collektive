@@ -11,11 +11,7 @@ import it.unibo.collektive.state.State
  * Create a Collektive device with a specific [id] and a [network] to manage incoming and outgoing messages,
  * the [computeFunction] is the function to apply within the [AggregateContext].
  */
-class Collektive<R>(
-    val id: ID,
-    private val network: Network,
-    private val computeFunction: Aggregate.() -> R,
-) {
+class Collektive<R>(val id: ID, private val network: Network, private val computeFunction: Aggregate.() -> R) {
 
     /**
      * The [State] of the Collektive device.
