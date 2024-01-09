@@ -1,12 +1,10 @@
 package it.unibo.collektive.aggregate.api.impl
 
-import arrow.core.Option
-import arrow.core.getOrElse
-import arrow.core.some
 import it.unibo.collektive.ID
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.YieldingContext
 import it.unibo.collektive.aggregate.api.YieldingContext.YieldingResult
+import it.unibo.collektive.aggregate.api.YieldingScope
 import it.unibo.collektive.aggregate.api.impl.stack.Stack
 import it.unibo.collektive.aggregate.api.operators.neighbouring
 import it.unibo.collektive.field.Field
@@ -44,61 +42,40 @@ internal class AggregateContext(
 
     private fun <T> newField(localValue: T, others: Map<ID, T>): Field<T> = Field(localId, localValue, others)
 
-    override fun <X> exchange(initial: X, body: (Field<X>) -> Field<X>): Field<X> {
-        val messages = messagesAt<X>(stack.currentPath())
-        val previous = stateAt(stack.currentPath(), initial)
-        val subject = newField(previous, messages)
-        return body(subject).also { field ->
-            val message = SingleOutboundMessage(field.localValue, field.excludeSelf())
-            val path = stack.currentPath()
-            check(!toBeSent.messages.containsKey(path)) {
-                """
-                    Alignment was broken by multiple aligned calls with the same path: $path.
-                    The most likely cause is an aggregate function call within a loop
-                """.trimIndent()
-            }
-            toBeSent = toBeSent.copy(messages = toBeSent.messages + (stack.currentPath() to message))
-            state = state + (stack.currentPath() to field.localValue)
-        }
-    }
+    override fun <X> exchange(initial: X, body: (Field<X>) -> Field<X>): Field<X> =
+        exchanging(initial) { field -> body(field).let { YieldingResult(it, it) } }
 
-    override fun <Init, Ret> exchanging(
-        initial: Init,
-        body: YieldingContext<Field<Init>, Field<Ret>>.(Field<Init>) -> YieldingResult<Field<Init>, Field<Ret>>,
-    ): Field<Ret> {
+    override fun <Init, Ret> exchanging(initial: Init, body: YieldingScope<Field<Init>, Field<Ret>>): Field<Ret> {
         val messages = messagesAt<Init>(stack.currentPath())
         val previous = stateAt(stack.currentPath(), initial)
         val subject = newField(previous, messages)
         val context = YieldingContext<Field<Init>, Field<Ret>>()
-        var res: Option<YieldingResult<Field<Init>, Field<Ret>>>
-        body(context, subject).also {
-            res = it.some()
-            state = state + (stack.currentPath() to it.toReturn.localValue)
-        }
-        return res.getOrElse { error("This error should never be thrown") }.toReturn
+        return body(context, subject).also {
+            val message = SingleOutboundMessage(it.toSend.localValue, it.toSend.excludeSelf())
+            val path = stack.currentPath()
+            check(!toBeSent.messages.containsKey(path)) {
+                """
+                    Aggregate alignment clash by multiple aligned calls with the same path: $path.
+                    The most likely cause is an aggregate function call within a loop
+                """.trimIndent()
+            }
+            toBeSent = toBeSent.copy(messages = toBeSent.messages + (stack.currentPath() to message))
+            state += (stack.currentPath() to it.toSend.localValue)
+        }.toReturn
     }
 
-    override fun <Initial, Return> repeating(
-        initial: Initial,
-        transform: YieldingContext<Initial, Return>.(Initial) -> YieldingResult<Initial, Return>,
-    ): Return {
+    override fun <Initial, Return> repeating(initial: Initial, transform: YieldingScope<Initial, Return>): Return {
         val context = YieldingContext<Initial, Return>()
-        var res: Option<YieldingResult<Initial, Return>>
-        transform(context, stateAt(stack.currentPath(), initial)).also {
-            res = it.some()
-            state = state + (stack.currentPath() to it.toReturn)
-        }
-        return res.getOrElse { error("This error should never be thrown") }.toReturn
+        val stateAtPath = stateAt(stack.currentPath(), initial)
+        return transform(context, stateAtPath).also {
+            state += (stack.currentPath() to it.toReturn)
+        }.toReturn
     }
 
-    override fun <Initial> repeat(
-        initial: Initial,
-        transform: (Initial) -> Initial,
-    ): Initial =
-        repeating(initial) {
-            val res = transform(it)
-            YieldingResult(res, res)
-        }
+    override fun <Initial> repeat(initial: Initial, transform: (Initial) -> Initial): Initial = repeating(initial) {
+        val res = transform(it)
+        YieldingResult(res, res)
+    }
 
     override fun <R> alignedOn(pivot: Any?, body: () -> R): R {
         stack.alignRaw(pivot)
