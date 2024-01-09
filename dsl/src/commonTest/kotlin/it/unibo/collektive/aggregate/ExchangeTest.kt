@@ -32,6 +32,7 @@ class ExchangeTest : StringSpec({
     // paths
     val path1 = Path(listOf("exchange.1"))
     val path2 = Path(listOf("exchange.2"))
+    val exchangingPath = Path("exchanging.1")
 
     // expected
     val expected2 = 2
@@ -133,22 +134,30 @@ class ExchangeTest : StringSpec({
     }
 
     "Exchange can yield a result but return a different value" {
-        aggregate(id0) {
+        val result = aggregate(id0) {
             val xcRes = exchanging(initV1) {
                 val fieldResult = it + 1
-                fieldResult.yielding { fieldResult.map { value -> value.toString() } }
+                fieldResult.yielding { fieldResult.map { value -> "return: $value" } }
             }
-            xcRes.toMap() shouldBe mapOf(id0 to "2")
+            xcRes.toMap() shouldBe mapOf(id0 to "return: 2")
         }
+        result.toSend shouldBe OutboundMessage(
+            id0,
+            mapOf(exchangingPath to SingleOutboundMessage(2)),
+        )
     }
 
     "Exchange can yield a result of nullable values" {
-        aggregate(id0) {
+        val result = aggregate(id0) {
             val xcRes = exchanging(initV1) {
                 val fieldResult = it + 1
                 fieldResult.yielding { fieldResult.map { value -> value.takeIf { value > 10 } } }
             }
             xcRes.toMap() shouldBe mapOf(id0 to null)
         }
+        result.toSend shouldBe OutboundMessage(
+            id0,
+            mapOf(exchangingPath to SingleOutboundMessage(2)),
+        )
     }
 })
