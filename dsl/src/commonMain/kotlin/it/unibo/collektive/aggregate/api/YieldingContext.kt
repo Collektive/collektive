@@ -1,33 +1,31 @@
 package it.unibo.collektive.aggregate.api
 
 /**
- * Context for yielding operations.
- * Yielding operations means that an operator can send a [Initial] value to the neighbours,
- * but return a [Return] value to the caller.
+ * Context for yielding operations (exchanging, sharing).
+ * Yielding operations means operate on an [Initial] value (usually exchanged with neighbors),
+ * but return a possibly different value [Return] to the caller.
  */
 class YieldingContext<Initial, Return> {
 
     /**
-     * Express the lambda [toReturn] when the computation is done.
-     * It can be used with checks after the invocation.
+     * Computes [toReturn] after the data exchange operation is complete.
      * ## Example
      * ```
-     * val result = sharing(0) {
-     *   val maxValue = it.maxBy { v -> v.value }.value
-     *   maxValue.yielding { "A string" }
+     * sharing(0) { // Sent to neighbors: kotlin.Int
+     *     it.max(Int.MIN_VALUE).yielding { it.toString() }
      * }
-     * result // result: Kotlin.String
+     * result // result: kotlin.String
      * ```
      * ```
      * val result = sharing(0) {
-     *   val max = it.maxBy { v -> v.value }.value
-     *   max.yielding { "Hello".takeIf { min > 1 } }
+     *     val max = it.max(Int.MIN_VALUE)
+     *     max.yielding { max.toString().takeIf { max > 1 } }
      * }
-     * result // result: Kotlin.String?
+     * result // result: kotlin.String?
      * ```
-     * The call of [yielding] as the last statement of the body of a yielding operator,
-     * sent to the neighbours the [Initial] value (from the extension receiver),
-     * but returns the [toReturn] value.
+     * Calling [yielding] in the body effectively performs the information exchange with neighbors,
+     * preparing the local [Initial] value (from the extension receiver) to be sent away,
+     * but returns the value produced by [toReturn].
      */
     fun Initial.yielding(toReturn: () -> Return): YieldingResult<Initial, Return> =
         YieldingResult(this, toReturn())
