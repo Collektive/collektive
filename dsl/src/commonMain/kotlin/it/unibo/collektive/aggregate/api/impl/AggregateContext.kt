@@ -91,10 +91,13 @@ internal class AggregateContext(
 }
 
 /**
- * Projects the field to be aligned with the neighbours.
- * A field de-alignment can occur when the field is used inside a body of a branch condition.
- * Take the [field] to project and returns a new field aligned with the neighbours.
- * This method is meant to be used internally by the compiler plugin.
+ * Projects the field into the current context.
+ * This method is meant to be used internally by the Collektive compiler plugin and,
+ * unless there is some major bug that needs to be worked around with a kludge,
+ * it should never be called, as it incurs in a performance penalty
+ * both in computation and message size.
+ * A field may be misaligned if captured by a sub-scope which contains an alignment operation.
+ * This function takes such [field] and restricts it to be aligned with the current neighbors.
  */
 fun <T> Aggregate.project(field: Field<T>): Field<T> {
     val others = neighbouring(0.toByte())
