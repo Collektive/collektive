@@ -84,8 +84,14 @@ internal class AggregateContext(
 
     @Suppress("UNCHECKED_CAST")
     private fun <T> messagesAt(path: Path): Map<ID, T> = messages
-        .filter { it.messages.containsKey(path) }
-        .associate { it.senderId to it.messages[path] as T }
+        .mapNotNull { received ->
+            received.messages.getOrElse(path) { NoEntry }
+                .takeIf { it != NoEntry }
+                ?.let { received.senderId to it as T }
+        }
+        .associate { it }
+
+    private object NoEntry
 
     private fun <T> stateAt(path: Path, default: T): T = previousState.getTyped(path, default)
 }
