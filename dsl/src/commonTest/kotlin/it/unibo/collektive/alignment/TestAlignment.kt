@@ -32,7 +32,7 @@ class TestAlignment : StringSpec({
             Path(listOf("invoke.1", "neighbouring.3", "exchange.1")),
         )
     }
-    "An alignment error must be raised when an aggregate operation is called inside a loop" {
+    "Alignment must fail clearly when entries try to override each other" {
         val exception = shouldThrowUnit<IllegalStateException> {
             aggregate(IntId(0)) {
                 kotlin.repeat(2) {
