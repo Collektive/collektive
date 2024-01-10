@@ -12,17 +12,19 @@ class IfElseSingleExpressionTest : StringSpec({
 
     "True condition in if else block" {
         val customCondition = true
-        val result = aggregate(id0) {
-            if (customCondition) neighboring("test") else neighboring("test")
-        }
-        result.toSend.messages.keys shouldContain Path(listOf(true, "neighbouring.1", "exchange.1"))
+        val result =
+            aggregate(id0) {
+                if (customCondition) neighboring("test") else neighboring("test")
+            }
+        result.toSend.messages.keys shouldContain Path(listOf(true, "neighboring.1", "exchange.1"))
     }
 
     "False condition in if else block" {
         val customCondition = false
-        val result = aggregate(id0) {
-            if (customCondition) neighboring("test") else neighboring("test")
-        }
-        result.toSend.messages.keys shouldContain Path(listOf(false, "neighbouring.2", "exchange.1"))
+        val result =
+            aggregate(id0) {
+                if (customCondition) neighboring("test") else neighboring("test")
+            }
+        result.toSend.messages.keys shouldContain Path(listOf(false, "neighboring.2", "exchange.1"))
     }
 })

@@ -13,43 +13,46 @@ class WhenTest : StringSpec({
     "When in single expression" {
         val condition = true
         val x = if (condition) "hello" else 123
-        val result = aggregate(id0) {
-            when (x) {
-                is String -> neighboring("string")
-                else -> neighboring("test")
+        val result =
+            aggregate(id0) {
+                when (x) {
+                    is String -> neighboring("string")
+                    else -> neighboring("test")
+                }
             }
-        }
-        result.toSend.messages.keys shouldBe setOf(Path(listOf(true, "neighbouring.1", "exchange.1")))
+        result.toSend.messages.keys shouldBe setOf(Path(listOf(true, "neighboring.1", "exchange.1")))
     }
 
     "When in single expression in else case" {
         val condition = false
         val x = if (condition) "hello" else 123
-        val result = aggregate(id0) {
-            when (x) {
-                is String -> neighboring("string")
-                else -> neighboring("test")
+        val result =
+            aggregate(id0) {
+                when (x) {
+                    is String -> neighboring("string")
+                    else -> neighboring("test")
+                }
             }
-        }
-        result.toSend.messages.keys shouldBe setOf(Path(listOf(false, "neighbouring.2", "exchange.1")))
+        result.toSend.messages.keys shouldBe setOf(Path(listOf(false, "neighboring.2", "exchange.1")))
     }
 
     "When with nested function" {
         val condition = true
         val x = if (condition) "hello" else 123
-        val result = aggregate(id0) {
-            fun test() {
-                neighboring("test")
-            }
+        val result =
+            aggregate(id0) {
+                fun test() {
+                    neighboring("test")
+                }
 
-            fun test2() {
-                neighboring("test2")
+                fun test2() {
+                    neighboring("test2")
+                }
+                when (x) {
+                    is String -> test2()
+                    else -> test()
+                }
             }
-            when (x) {
-                is String -> test2()
-                else -> test()
-            }
-        }
-        result.toSend.messages.keys shouldBe setOf(Path(listOf(true, "test2.1", "neighbouring.2", "exchange.1")))
+        result.toSend.messages.keys shouldBe setOf(Path(listOf(true, "test2.1", "neighboring.2", "exchange.1")))
     }
 })

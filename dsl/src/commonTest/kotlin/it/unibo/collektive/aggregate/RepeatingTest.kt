@@ -38,34 +38,39 @@ class RepeatingTest : StringSpec({
         val testNetwork = NetworkImplTest(NetworkManager(), id1)
 
         aggregate(id1, testNetwork) {
-            val res = repeat(initV1) {
-                it * 2
-            }
+            val res =
+                repeat(initV1) {
+                    it * 2
+                }
             res shouldBe 2
         }
     }
 
     "Repeating should return the value passed in the yielding function" {
-        val result = aggregate(id1) {
-            val res = repeating(initV1) {
-                val nbr = neighboring(it * 2).localValue
-                nbr.yielding { "A string" }
+        val result =
+            aggregate(id1) {
+                val res =
+                    repeating(initV1) {
+                        val nbr = neighboring(it * 2).localValue
+                        nbr.yielding { "A string" }
+                    }
+                res shouldBe "A string"
             }
-            res shouldBe "A string"
-        }
-        result.toSend.messages.keys shouldContain Path(
-            listOf("repeating.1", "neighbouring.1", "exchange.1"),
-        )
+        result.toSend.messages.keys shouldContain
+            Path(
+                listOf("repeating.1", "neighboring.1", "exchange.1"),
+            )
     }
 
     "Repeating should work fine even with null as value" {
         val testNetwork1 = NetworkImplTest(NetworkManager(), id1)
 
         aggregate(id1, testNetwork1) {
-            val res = repeating(initV1) {
-                val mult = it * 2
-                mult.yielding { "Hello".takeIf { mult < 1 } }
-            }
+            val res =
+                repeating(initV1) {
+                    val mult = it * 2
+                    mult.yielding { "Hello".takeIf { mult < 1 } }
+                }
             res shouldBe null
         }
     }

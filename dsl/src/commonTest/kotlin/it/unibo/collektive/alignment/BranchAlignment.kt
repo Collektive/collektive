@@ -21,35 +21,41 @@ class BranchAlignment : StringSpec({
     val id0 = IntId(0)
 
     "The branch alignment should occur also for nested functions" {
-        val result = aggregate(id0) {
-            val condition = true
-            fun test() {
-                neighboring("test")
-            }
+        val result =
+            aggregate(id0) {
+                val condition = true
 
-            fun test2() {
-                test()
+                fun test() {
+                    neighboring("test")
+                }
+
+                fun test2() {
+                    test()
+                }
+                if (condition) {
+                    test2()
+                }
             }
-            if (condition) {
-                test2()
-            }
-        }
         result.toSend.messages.keys shouldHaveSize 1 // 1 path of alignment
-        result.toSend.messages.keys shouldContain Path(
-            listOf(true, "test2.1", "test.1", "neighbouring.1", "exchange.1"),
-        )
+        result.toSend.messages.keys shouldContain
+            Path(
+                listOf(true, "test2.1", "test.1", "neighboring.1", "exchange.1"),
+            )
     }
     "The branch alignment should not occur in non aggregate context" {
-        val result = aggregate(id0) {
-            val condition = true
-            fun test(): String = "hello"
-            fun test2() {
-                test()
+        val result =
+            aggregate(id0) {
+                val condition = true
+
+                fun test(): String = "hello"
+
+                fun test2() {
+                    test()
+                }
+                if (condition) {
+                    test2()
+                }
             }
-            if (condition) {
-                test2()
-            }
-        }
         result.toSend.messages.keys shouldHaveSize 0 // 0 path of alignment
     }
     "A field should be projected when used in a body of a branch condition (issue #171)" {
@@ -72,6 +78,7 @@ class BranchAlignment : StringSpec({
                 }
             }
     }
+
     fun exchangeWithThreeDevices(body: Aggregate.(Field<Int>) -> Field<Int>) {
         val nm = NetworkManager()
         (0..2)
@@ -92,11 +99,13 @@ class BranchAlignment : StringSpec({
             }
         }
     }
-    fun manuallyAlignedExchangeWithThreeDevices(pivot: (Int) -> Any?) = exchangeWithThreeDevices { field ->
-        alignedOn(pivot((localId as IntId).id)) {
-            neighboring(1) + field
+
+    fun manuallyAlignedExchangeWithThreeDevices(pivot: (Int) -> Any?) =
+        exchangeWithThreeDevices { field ->
+            alignedOn(pivot((localId as IntId).id)) {
+                neighboring(1) + field
+            }
         }
-    }
     "A field should be projected whenever there is an alignment operation, not just on branches (issue #171)" {
         manuallyAlignedExchangeWithThreeDevices { it % 2 == 0 }
     }
