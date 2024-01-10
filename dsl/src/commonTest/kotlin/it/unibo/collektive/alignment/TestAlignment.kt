@@ -8,18 +8,18 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.IntId
-import it.unibo.collektive.aggregate.api.operators.neighbouring
+import it.unibo.collektive.aggregate.api.operators.neighboring
 import it.unibo.collektive.aggregate.api.operators.share
 import it.unibo.collektive.path.Path
 
 class TestAlignment : StringSpec({
     "The alignment should be performed also for the same aggregate operation called multiple times (issue #51)" {
         val result = aggregate(IntId(0)) {
-            neighbouring(10) // path -> [neighbouring.1] = 10
+            neighboring(10) // path -> [neighbouring.1] = 10
             share(0) {
-                requireNotNull(neighbouring(20).localValue) // path -> [share.1, neighbouring.2] = 20
+                requireNotNull(neighboring(20).localValue) // path -> [share.1, neighbouring.2] = 20
             } // path -> [sharing.1] = Field(...)
-            neighbouring(30) // path -> [neighbouring.3] = 30
+            neighboring(30) // path -> [neighbouring.3] = 30
             5
         }
 
@@ -36,7 +36,7 @@ class TestAlignment : StringSpec({
         val exception = shouldThrowUnit<IllegalStateException> {
             aggregate(IntId(0)) {
                 kotlin.repeat(2) {
-                    neighbouring(0)
+                    neighboring(0)
                 }
             }
         }

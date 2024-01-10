@@ -6,7 +6,7 @@ import it.unibo.collektive.aggregate.api.YieldingContext
 import it.unibo.collektive.aggregate.api.YieldingContext.YieldingResult
 import it.unibo.collektive.aggregate.api.YieldingScope
 import it.unibo.collektive.aggregate.api.impl.stack.Stack
-import it.unibo.collektive.aggregate.api.operators.neighbouring
+import it.unibo.collektive.aggregate.api.operators.neighboring
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.OutboundMessage
@@ -106,7 +106,7 @@ internal class AggregateContext(
  * This function takes such [field] and restricts it to be aligned with the current neighbors.
  */
 fun <T> Aggregate.project(field: Field<T>): Field<T> {
-    val others = neighbouring(0.toByte())
+    val others = neighboring(0.toByte())
     return when {
         field.neighborsCount == others.neighborsCount -> field
         field.neighborsCount > others.neighborsCount -> others.mapWithId { id, _ -> field[id] }

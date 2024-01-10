@@ -7,7 +7,7 @@ import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.operators.neighbouring
+import it.unibo.collektive.aggregate.api.operators.neighboring
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.combine
 import it.unibo.collektive.field.min
@@ -24,7 +24,7 @@ class BranchAlignment : StringSpec({
         val result = aggregate(id0) {
             val condition = true
             fun test() {
-                neighbouring("test")
+                neighboring("test")
             }
 
             fun test2() {
@@ -59,14 +59,14 @@ class BranchAlignment : StringSpec({
             .map { NetworkImplTest(nm, it) to it }
             .map { (net, id) ->
                 aggregate(id, net) {
-                    val outerField = neighbouring(0)
+                    val outerField = neighboring(0)
                     outerField.neighborsCount shouldBe id.id
                     if (id.id % 2 == 0) {
-                        neighbouring(1).neighborsCount shouldBe id.id / 2
-                        neighbouring(1) + outerField
+                        neighboring(1).neighborsCount shouldBe id.id / 2
+                        neighboring(1) + outerField
                     } else {
-                        neighbouring(1).neighborsCount shouldBe (id.id - 1) / 2
-                        neighbouring(1) - outerField
+                        neighboring(1).neighborsCount shouldBe (id.id - 1) / 2
+                        neighboring(1) - outerField
                         outerField.min()
                     }
                 }
@@ -86,15 +86,15 @@ class BranchAlignment : StringSpec({
     "A field should be projected also when the field is referenced as lambda parameter (issue #171)" {
         exchangeWithThreeDevices {
             if ((localId as IntId).id % 2 == 0) {
-                neighbouring(1) + it
+                neighboring(1) + it
             } else {
-                neighbouring(1) - it
+                neighboring(1) - it
             }
         }
     }
     fun manuallyAlignedExchangeWithThreeDevices(pivot: (Int) -> Any?) = exchangeWithThreeDevices { field ->
         alignedOn(pivot((localId as IntId).id)) {
-            neighbouring(1) + field
+            neighboring(1) + field
         }
     }
     "A field should be projected whenever there is an alignment operation, not just on branches (issue #171)" {
@@ -109,9 +109,9 @@ class BranchAlignment : StringSpec({
             with(it) {
                 with((localId as IntId).id % 2 == 0) {
                     if (this) {
-                        combine(neighbouring(1)) { a, b -> a + b }
+                        combine(neighboring(1)) { a, b -> a + b }
                     } else {
-                        combine(neighbouring(1)) { a, b -> a - b }
+                        combine(neighboring(1)) { a, b -> a - b }
                     }
                 }
             }
