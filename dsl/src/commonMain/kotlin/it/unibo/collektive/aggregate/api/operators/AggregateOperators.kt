@@ -77,7 +77,5 @@ fun <Initial, Return> Aggregate.sharing(
  * ```
  * In the example above, the function [share] wil return a value that is the max found in the field.
  **/
-fun <Initial> Aggregate.share(initial: Initial, transform: (Field<Initial>) -> Initial): Initial = sharing(initial) {
-    val res = transform(it)
-    YieldingContext.YieldingResult(res, res)
-}
+fun <Initial> Aggregate.share(initial: Initial, transform: (Field<Initial>) -> Initial): Initial =
+    sharing(initial) { field -> transform(field).let { YieldingContext.YieldingResult(it, it) } }
