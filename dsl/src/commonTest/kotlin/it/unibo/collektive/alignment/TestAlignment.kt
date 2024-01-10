@@ -40,6 +40,6 @@ class TestAlignment : StringSpec({
                 }
             }
         }
-        exception.message shouldContain "Alignment was broken by multiple aligned calls"
+        exception.message shouldContain "Aggregate alignment clash by multiple aligned calls with the same path"
     }
 })
