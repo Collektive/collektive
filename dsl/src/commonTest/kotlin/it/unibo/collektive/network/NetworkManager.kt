@@ -14,20 +14,21 @@ class NetworkManager {
      * Adds the [message] to the message buffer.
      */
     fun send(message: OutboundMessage) {
-        messageBuffer = messageBuffer.filterNot { it.senderId == message.senderId }.toSet() + message
+        messageBuffer = messageBuffer + message
     }
 
     /**
      * Return the messages directed to a specific [receiverId].
      */
-    fun receive(receiverId: ID): Collection<InboundMessage> = messageBuffer
-        .filterNot { it.senderId == receiverId }
-        .map { received ->
-            InboundMessage(
-                received.senderId,
-                received.messages.mapValues { (_, single) ->
-                    single.overrides.getOrElse(receiverId) { single.default }
-                },
-            )
-        }
+    fun receive(receiverId: ID): Collection<InboundMessage> =
+        messageBuffer
+            .filterNot { it.senderId == receiverId }
+            .map { received ->
+                InboundMessage(
+                    received.senderId,
+                    received.messages.mapValues { (_, single) ->
+                        single.overrides.getOrElse(receiverId) { single.default }
+                    },
+                )
+            }
 }
