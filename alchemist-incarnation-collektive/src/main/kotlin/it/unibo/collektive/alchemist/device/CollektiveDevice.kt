@@ -5,9 +5,11 @@ import it.unibo.alchemist.model.Node
 import it.unibo.alchemist.model.NodeProperty
 import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Time
+import it.unibo.collektive.ID
 import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.AggregateContext
 import it.unibo.collektive.aggregate.ops.neighbouring
+import it.unibo.collektive.alchemist.utils.toId
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.Network
@@ -21,11 +23,10 @@ import kotlin.math.abs
  * are retained.
  */
 class CollektiveDevice<P>(
-    private val environment: Environment<Any, P>,
-    override val node: Node<Any>,
+    private val environment: Environment<Any?, P>,
+    override val node: Node<Any?>,
     private val retainMessagesFor: Time,
-) : NodeProperty<Any>, Network, DistanceSensor where P : Position<P> {
-
+) : NodeProperty<Any?>, Network, DistanceSensor where P : Position<P> {
     private data class TimedMessage(val receivedAt: Time, val payload: InboundMessage)
 
     /**
@@ -33,18 +34,32 @@ class CollektiveDevice<P>(
      */
     var currentTime: Time = Time.ZERO
 
+    /**
+     * The ID of the node.
+     */
+    val id: ID = IntId(node.id)
+
     private var validMessages: Iterable<TimedMessage> = emptySet()
 
-    private fun receiveMessage(time: Time, message: InboundMessage) {
+    private fun receiveMessage(
+        time: Time,
+        message: InboundMessage,
+    ) {
         validMessages += TimedMessage(time, message)
     }
 
-    override fun cloneOnNewNode(node: Node<Any>): NodeProperty<Any> =
+    override fun AggregateContext.distances(): Field<Double> =
+        environment.getPosition(node).let { nodePosition ->
+            neighbouring(nodePosition).map { position -> abs(nodePosition.distanceTo(position)) }
+        }
+
+    override fun cloneOnNewNode(node: Node<Any?>): NodeProperty<Any?> =
         CollektiveDevice(environment, node, retainMessagesFor)
 
     override fun read(): Set<InboundMessage> {
         return validMessages
             .filter { it.receivedAt + retainMessagesFor >= currentTime }
+            .filterNot { it.payload.senderId == node.toId() }
             .also { validMessages = it }
             .map { it.payload }
             .toSet()
@@ -56,14 +71,9 @@ class CollektiveDevice<P>(
                 currentTime,
                 InboundMessage(
                     message.senderId,
-                    mapOf(path to outbound.overrides.getOrElse(IntId(node.id)) { outbound.default }),
+                    mapOf(path to (outbound.overrides[node.toId()] ?: outbound.default)),
                 ),
             )
         }
-    }
-
-    override fun AggregateContext.distances(): Field<Double> {
-        val nodePosition = environment.getPosition(node)
-        return neighbouring(nodePosition).map { p -> abs(nodePosition.distanceTo(p)) }
     }
 }
