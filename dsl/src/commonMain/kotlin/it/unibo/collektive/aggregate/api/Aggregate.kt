@@ -19,7 +19,7 @@ interface Aggregate {
     /**
      * This function computes the local value of e_i, substituting variable n with the nvalue w of
      * messages received from neighbours, using the local value of e_i ([initial]) as a default.
-     * The exchange returns the neighbouring or local value v_r from the evaluation of e_r applied to the [body].
+     * The exchange returns the neighboring or local value v_r from the evaluation of e_r applied to the [body].
      * e_s evaluates to a nvalue w_s consisting of local values to be sent to neighbour devices δ′,
      * which will use their corresponding w_s(δ') as soon as they wake up and perform their next execution round.
      *

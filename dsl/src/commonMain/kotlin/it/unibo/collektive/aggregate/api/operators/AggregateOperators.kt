@@ -14,13 +14,13 @@ import it.unibo.collektive.field.Field
  * ## Example
  *
  * ```kotlin
- * val field = neighbouring(0)
+ * val field = neighboring(0)
  * ```
  *
  * The field returned has as local value the value passed as input (0 in this example).
  *
  * ```kotlin
- * val field = neighbouring({ 2 * 2 })
+ * val field = neighboring({ 2 * 2 })
  * ```
  *
  * In this case, the field returned has the result of the computation as local value.
