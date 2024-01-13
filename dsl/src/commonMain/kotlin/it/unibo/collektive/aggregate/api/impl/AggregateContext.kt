@@ -43,7 +43,7 @@ internal class AggregateContext(
     private fun <T> newField(localValue: T, others: Map<ID, T>): Field<T> = Field(localId, localValue, others)
 
     override fun <X> exchange(initial: X, body: (Field<X>) -> Field<X>): Field<X> =
-        exchanging(initial) { field -> body(field).let { YieldingResult(it, it) } }
+        exchanging(initial) { field -> body(field).run { yielding { this } } }
 
     override fun <Init, Ret> exchanging(initial: Init, body: YieldingScope<Field<Init>, Field<Ret>>): Field<Ret> {
         val messages = messagesAt<Init>(stack.currentPath())
