@@ -60,17 +60,14 @@ internal class AggregateContext(
                 """.trimIndent()
             }
             toBeSent = toBeSent.copy(messages = toBeSent.messages + (stack.currentPath() to message))
-            state += (stack.currentPath() to it.toSend.localValue)
+            state += stack.currentPath() to it.toSend.localValue
         }.toReturn
     }
 
-    override fun <Initial, Return> repeating(initial: Initial, transform: YieldingScope<Initial, Return>): Return {
-        val context = YieldingContext<Initial, Return>()
-        val stateAtPath = stateAt(stack.currentPath(), initial)
-        return transform(context, stateAtPath).also {
-            state += (stack.currentPath() to it.toReturn)
-        }.toReturn
-    }
+    override fun <Initial, Return> repeating(initial: Initial, transform: YieldingScope<Initial, Return>): Return =
+        transform(YieldingContext(), stateAt(stack.currentPath(), initial))
+            .also { state += stack.currentPath() to it.toReturn }
+            .toReturn
 
     override fun <Initial> repeat(initial: Initial, transform: (Initial) -> Initial): Initial = repeating(initial) {
         val res = transform(it)
