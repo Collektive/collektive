@@ -15,7 +15,7 @@ class RepeatingTest : StringSpec({
     val id1 = IntId(1)
 
     val double: (Int) -> Int = { it * 2 }
-    val initV1: Int = 1
+    val initV1 = 1
 
     "First time repeating" {
         aggregate(id0) {
@@ -36,42 +36,28 @@ class RepeatingTest : StringSpec({
 
     "Repeat with lambda body should work fine" {
         val testNetwork = NetworkImplTest(NetworkManager(), id1)
-
         aggregate(id1, testNetwork) {
-            val res =
-                repeat(initV1) {
-                    it * 2
-                }
-            res shouldBe 2
+            repeat(initV1) { it * 2 } shouldBe 2
         }
     }
 
     "Repeating should return the value passed in the yielding function" {
-        val result =
-            aggregate(id1) {
-                val res =
-                    repeating(initV1) {
-                        val nbr = neighboring(it * 2).localValue
-                        nbr.yielding { "A string" }
-                    }
-                res shouldBe "A string"
-            }
-        result.toSend.messages.keys shouldContain
-            Path(
-                listOf("repeating.1", "neighboring.1", "exchange.1"),
-            )
+        val result = aggregate(id1) {
+            repeating(initV1) {
+                val nbr = neighboring(it * 2).localValue
+                nbr.yielding { "A string" }
+            } shouldBe "A string"
+        }
+        result.toSend.messages.keys shouldContain Path("repeating.1", "neighboring.1", "exchange.1")
     }
 
     "Repeating should work fine even with null as value" {
         val testNetwork1 = NetworkImplTest(NetworkManager(), id1)
-
         aggregate(id1, testNetwork1) {
-            val res =
-                repeating(initV1) {
-                    val mult = it * 2
-                    mult.yielding { "Hello".takeIf { mult < 1 } }
-                }
-            res shouldBe null
+            repeating(initV1) {
+                val mult = it * 2
+                mult.yielding { "Hello".takeIf { mult < 1 } }
+            } shouldBe null
         }
     }
 })

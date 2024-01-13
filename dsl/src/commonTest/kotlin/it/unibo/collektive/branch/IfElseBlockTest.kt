@@ -20,7 +20,7 @@ class IfElseBlockTest : StringSpec({
                     neighboring("test2")
                 }
             }
-        result.toSend.messages.keys shouldContain Path(listOf(true, "neighboring.1", "exchange.1"))
+        result.toSend.messages.keys shouldContain Path(true, "neighboring.1", "exchange.1")
     }
 
     "False condition in if else should not evaluate if block" {
@@ -33,7 +33,7 @@ class IfElseBlockTest : StringSpec({
                     neighboring("test2")
                 }
             }
-        result.toSend.messages.keys shouldContain Path(listOf(false, "neighboring.2", "exchange.1"))
+        result.toSend.messages.keys shouldContain Path(false, "neighboring.2", "exchange.1")
     }
 
     "If else block should only evaluate when the condition is true" {
@@ -49,6 +49,6 @@ class IfElseBlockTest : StringSpec({
                     neighboring("test3")
                 }
             }
-        result.toSend.messages.keys shouldContain Path(listOf(true, "neighboring.2", "exchange.1"))
+        result.toSend.messages.keys shouldContain Path(true, "neighboring.2", "exchange.1")
     }
 })

@@ -9,21 +9,21 @@ import it.unibo.collektive.path.Path
 
 class IfConditionTest : StringSpec({
     val id0 = IntId(0)
-    "Constant condition if" {
+    "Branches with constant conditions should get aligned" {
         val result =
             aggregate(id0) {
                 if (true) neighboring("test")
             }
-        result.toSend.messages.keys shouldContain Path(listOf(true, "neighboring.1", "exchange.1"))
+        result.toSend.messages.keys shouldContain Path(true, "neighboring.1", "exchange.1")
     }
 
-    "Variable condition if" {
+    "Branches with conditions read from variables should get aligned" {
         val customCondition = true
         val result =
             aggregate(id0) {
                 if (customCondition) neighboring("test")
             }
-        result.toSend.messages.keys shouldContain Path(listOf(true, "neighboring.1", "exchange.1"))
+        result.toSend.messages.keys shouldContain Path(true, "neighboring.1", "exchange.1")
     }
 
     "Function condition if" {
@@ -32,7 +32,7 @@ class IfConditionTest : StringSpec({
             aggregate(id0) {
                 if (customFunction()) neighboring("test")
             }
-        result.toSend.messages.keys shouldContain Path(listOf(true, "neighboring.1", "exchange.1"))
+        result.toSend.messages.keys shouldContain Path(true, "neighboring.1", "exchange.1")
     }
 
     "Function and condition if" {
@@ -42,7 +42,7 @@ class IfConditionTest : StringSpec({
             aggregate(id0) {
                 if (customCondition1 && customCondition2) neighboring("test")
             }
-        result.toSend.messages.keys shouldContain Path(listOf(true, "neighboring.1", "exchange.1"))
+        result.toSend.messages.keys shouldContain Path(true, "neighboring.1", "exchange.1")
     }
 
     "Function or condition if" {
@@ -52,7 +52,7 @@ class IfConditionTest : StringSpec({
             aggregate(id0) {
                 if (customCondition1 || customCondition2) neighboring("test")
             }
-        result.toSend.messages.keys shouldContain Path(listOf(true, "neighboring.1", "exchange.1"))
+        result.toSend.messages.keys shouldContain Path(true, "neighboring.1", "exchange.1")
     }
 
     "Function not condition if" {
@@ -62,6 +62,6 @@ class IfConditionTest : StringSpec({
             aggregate(id0) {
                 if (customCondition1 && !customCondition2) neighboring("test")
             }
-        result.toSend.messages.keys shouldContain Path(listOf(true, "neighboring.1", "exchange.1"))
+        result.toSend.messages.keys shouldContain Path(true, "neighboring.1", "exchange.1")
     }
 })
