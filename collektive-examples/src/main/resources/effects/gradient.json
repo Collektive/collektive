@@ -34,7 +34,7 @@
       "val": 10
     },
     "molFilter": false,
-    "molString": "it.unibo.collektive.Aggregate.entrypoint",
+    "molString": "gradient",
     "molPropertyFilter": true,
     "property": "\u003cvalue\u003e",
     "writingPropertyValue": false,
@@ -94,7 +94,7 @@
       "val": 25
     },
     "molFilter": true,
-    "molString": "it.unibo.collektive.Aggregate.entrypoint",
+    "molString": "gradient",
     "molPropertyFilter": true,
     "property": "\u003cvalue\u003e \u003d\u003d 0",
     "writingPropertyValue": false,
@@ -154,7 +154,7 @@
       "val": 15
     },
     "molFilter": true,
-    "molString": "it.unibo.collektive.Aggregate.entrypoint",
+    "molString": "gradient",
     "molPropertyFilter": true,
     "property": "\u003cvalue\u003e \u003d\u003d 0",
     "writingPropertyValue": false,
