@@ -22,9 +22,9 @@ import it.unibo.alchemist.model.times.DoubleTime
 import it.unibo.alchemist.util.RandomGenerators.nextDouble
 import it.unibo.collektive.Collektive
 import it.unibo.collektive.alchemist.device.CollektiveDevice
-import kotlin.reflect.jvm.kotlinFunction
 import org.apache.commons.math3.random.RandomGenerator
 import org.danilopianini.util.ListSet
+import kotlin.reflect.jvm.kotlinFunction
 
 /**
  * Collektive incarnation in Alchemist.
@@ -67,9 +67,9 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
 
         init {
             declareDependencyTo(programIdentifier)
-
             val collektive = Collektive(localDevice.id, localDevice) {
-                method.kotlinFunction?.call(this@Collektive) ?: error("No aggregate function found")
+                method.kotlinFunction?.call(localDevice, this@Collektive, localDevice.id)
+                    ?: error("No aggregate function found")
             }
             run = { collektive.cycle() }
         }
@@ -83,7 +83,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
             run().also {
                 node?.setConcentration(
                     SimpleMolecule(method.name),
-                    it
+                    it,
                 ) ?: error("Trying to set concentration for null node")
             }
         }
