@@ -59,21 +59,24 @@ class CollektiveDevice<P>(
     override fun read(): Set<InboundMessage> {
         return validMessages
             .filter { it.receivedAt + retainMessagesFor >= currentTime }
-            .filterNot { it.payload.senderId == node.toId() }
             .also { validMessages = it }
             .map { it.payload }
             .toSet()
     }
 
     override fun write(message: OutboundMessage) {
-        message.messages.mapValues { (path, outbound) ->
-            receiveMessage(
-                currentTime,
-                InboundMessage(
-                    message.senderId,
-                    mapOf(path to (outbound.overrides[node.toId()] ?: outbound.default)),
-                ),
-            )
+        message.messages.forEach { (path, outbound) ->
+            environment.getNeighborhood(node)
+                .mapNotNull { it.asPropertyOrNull(CollektiveDevice::class) }
+                .forEach {
+                    it.receiveMessage(
+                        currentTime,
+                        InboundMessage(
+                            message.senderId,
+                            mapOf(path to (outbound.overrides[node.toId()] ?: outbound.default)),
+                        ),
+                    )
+                }
         }
     }
 }
