@@ -1,7 +1,7 @@
 [
   {
     "type": "class it.unibo.alchemist.boundary.gui.effects.DrawShape",
-    "curIncarnation": "protelis",
+    "curIncarnation": "collektive",
     "mode": "FILL_ELLIPSE",
     "red": {
       "max": 255,
@@ -34,16 +34,16 @@
       "val": 10
     },
     "molFilter": false,
-    "molString": "gradient",
+    "molString": "main",
     "molPropertyFilter": true,
     "property": "\u003cvalue\u003e",
     "writingPropertyValue": false,
-    "c": "SATURATION",
+    "c": "HUE",
     "reverse": true,
     "propoom": {
       "max": 10,
       "min": -10,
-      "val": 0
+      "val": 1
     },
     "minprop": {
       "max": 10,
@@ -53,7 +53,7 @@
     "maxprop": {
       "max": 10,
       "min": -10,
-      "val": 5
+      "val": 4
     },
     "colorCache": {
       "value": -7602176
@@ -94,7 +94,7 @@
       "val": 25
     },
     "molFilter": true,
-    "molString": "gradient",
+    "molString": "main",
     "molPropertyFilter": true,
     "property": "\u003cvalue\u003e \u003d\u003d 0",
     "writingPropertyValue": false,
@@ -154,7 +154,7 @@
       "val": 15
     },
     "molFilter": true,
-    "molString": "gradient",
+    "molString": "main",
     "molPropertyFilter": true,
     "property": "\u003cvalue\u003e \u003d\u003d 0",
     "writingPropertyValue": false,
