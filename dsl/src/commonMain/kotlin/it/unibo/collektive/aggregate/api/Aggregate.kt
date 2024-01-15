@@ -17,13 +17,11 @@ interface Aggregate {
     val localId: ID
 
     /**
-     * This function computes the local value of e_i, substituting variable n with the nvalue w of
-     * messages received from neighbours, using the local value of e_i ([initial]) as a default.
-     * The exchange returns the neighboring or local value v_r from the evaluation of e_r applied to the [body].
-     * e_s evaluates to a nvalue w_s consisting of local values to be sent to neighbour devices δ′,
-     * which will use their corresponding w_s(δ') as soon as they wake up and perform their next execution round.
-     *
-     * Often, expressions e_r and e_s coincide, so this function provides a shorthand for exchange(e_i, (n) => (e, e)).
+     * The [exchange] function manages the computation of values between neighbors in a specific context.
+     * It computes a [body] function starting from the [initial] value and the messages received from other neighbors,
+     * then sends the results from the evaluation to specific neighbors or to everyone,
+     * it is contingent upon the origin of the calculated value, whether it was received from a neighbor or if it
+     * constituted the initial value.
      *
      * ## Example
      * ```
@@ -38,6 +36,14 @@ interface Aggregate {
 
     /**
      * Same behavior of [exchange] but this function can yield a [Field] of [Return] value.
+     *
+     * ## Example
+     * ```
+     * exchanging(initial = 1) {
+     *   val fieldResult = it + 1
+     *   fieldResult.yielding { fieldResult.map { value -> "return: $value" } }
+     * }
+     * ```
      */
     fun <Initial, Return> exchanging(
         initial: Initial,
