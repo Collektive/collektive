@@ -1,5 +1,6 @@
 package it.unibo.collektive.examples.aggregate
 
+import it.unibo.collektive.ID
 import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.AggregateContext
 import it.unibo.collektive.aggregate.ops.neighbouring
@@ -17,7 +18,7 @@ fun AggregateContext.neighborCounter(): Int = neighbouring(1).hoodInto(0) { acc,
  * TODO.
  */
 context(DistanceSensor)
-fun AggregateContext.gradient(id: IntId): Double {
+fun AggregateContext.gradient(id: ID): Double {
     val paths = distances()
     return share(Double.POSITIVE_INFINITY) { dist ->
         val minByPath = (paths + dist).hoodInto(Double.POSITIVE_INFINITY) { acc, value -> acc.coerceAtMost(value) }
@@ -28,3 +29,9 @@ fun AggregateContext.gradient(id: IntId): Double {
         }
     }
 }
+
+/**
+ * TODO.
+ */
+context(DistanceSensor)
+fun AggregateContext.main() = gradient(localId)
