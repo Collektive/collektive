@@ -68,7 +68,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         init {
             declareDependencyTo(programIdentifier)
             val collektive = Collektive(localDevice.id, localDevice) {
-                method.kotlinFunction?.call(localDevice, this@Collektive, localDevice.id)
+                method.kotlinFunction?.call(localDevice, this@Collektive)
                     ?: error("No aggregate function found")
             }
             run = { collektive.cycle() }
