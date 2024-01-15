@@ -29,7 +29,7 @@ class AlignmentIrGenerationExtension(private val logger: MessageCollector) : IrG
                 FqName("it.unibo.collektive.aggregate.api.impl"),
                 Name.identifier(PROJECT_FUNCTION)
             )
-        ).firstOrNull()
+        ).firstOrNull() ?: return logger.error("Unable to find the 'project' function")
 
         // Function that handles the alignment
         val alignedOnFunction = aggregateClass
@@ -43,21 +43,18 @@ class AlignmentIrGenerationExtension(private val logger: MessageCollector) : IrG
             """.trimIndent()
             error.also(logger::error)
         }
-        val (alignFunc, aggClass) = getBothOrNull(alignedOnFunction, aggregateClass)
+        val (alignFunction, aggClass) = getBothOrNull(alignedOnFunction, aggregateClass)
             ?: return logger.error(
                 "The function and the class used to handle the alignment have not been found.",
             )
-        val prjFunc = projectFunction ?: return logger.error(
-            "Unable to find the 'project' function"
-        )
 
         moduleFragment.transform(
             AggregateCallTransformer(
                 pluginContext,
                 logger,
                 aggClass.owner,
-                alignFunc.owner,
-                prjFunc.owner,
+                alignFunction.owner,
+                projectFunction.owner,
             ),
             null,
         )

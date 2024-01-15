@@ -43,7 +43,8 @@ fun <Scalar> Aggregate.neighboring(local: Scalar): Field<Scalar> = exchange(loca
  *
  * ### Invalid use:
  *
- * Do not write code after calling the sending or returning values, they must be written at last inside the lambda.
+ * Do not write code after calling the sending or returning values,
+ * they must be the last statement of the body (the lambda expression).
  *
  * ```
  * share(0) {
