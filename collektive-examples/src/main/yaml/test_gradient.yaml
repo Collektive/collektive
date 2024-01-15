@@ -1,0 +1,29 @@
+network-model:
+  type: ConnectWithinDistance
+  parameters: [5]
+
+incarnation: collektive
+
+_pool: &program
+  - time-distribution: 2
+    type: Event
+    actions:
+      - type: RunCollektiveProgram
+        parameters: [it.unibo.collektive.examples.aggregate.AggregateFunctionsKt.main]
+  - program: send
+
+deployments:
+  - type: Rectangle
+    parameters: [20, 0, 0, 10, 10]
+    programs:
+      - *program
+    contents:
+      - molecule: source
+        concentration: false
+  - type: Point
+    parameters: [2, 2]
+    programs:
+      - *program
+    contents:
+      - molecule: source
+        concentration: true
