@@ -13,12 +13,12 @@ import javax.swing.JFrame
 /**
  * The quantity of [NODES] to set up in the simulation.
  */
-const val NODES = 200
+const val NODES = 1000
 
 /**
  * The [MAX_SPACE].
  */
-const val MAX_SPACE = 5.0
+const val MAX_SPACE = 10.0
 
 /**
  * TODO.
@@ -65,7 +65,6 @@ fun main() {
     @Suppress("DEPRECATION")
     it.unibo.alchemist.boundary.swingui.impl.SingleRunGUI.make(
         engine,
-        "/Users/angela/DocsUni/UNI/TESI/collektive/collektive-examples/src/main/resources/effects/gradient.json",
         JFrame.EXIT_ON_CLOSE,
     )
     engine.run()
