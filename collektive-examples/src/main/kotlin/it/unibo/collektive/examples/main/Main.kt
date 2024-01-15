@@ -5,7 +5,7 @@ import it.unibo.alchemist.model.LinkingRule
 import it.unibo.alchemist.model.environments.Continuous2DEnvironment
 import it.unibo.alchemist.model.linkingrules.ConnectWithinDistance
 import it.unibo.alchemist.model.positions.Euclidean2DPosition
-import it.unibo.collektive.alchemist.incarnation.CollektiveIncarnation
+import it.unibo.alchemist.CollektiveIncarnation
 import org.apache.commons.math3.random.RandomGeneratorFactory
 import java.util.*
 import javax.swing.JFrame
@@ -45,7 +45,7 @@ fun main() {
                         environment,
                         n,
                         incarnation.createTimeDistribution(randomGenerator, environment, n, null),
-                        "it.unibo.collektive.examples.aggregate.AggregateFunctionsKt.gradient",
+                        "it.unibo.collektive.examples.aggregate.AggregateFunctionsKt.main",
                     ),
                 )
             }
