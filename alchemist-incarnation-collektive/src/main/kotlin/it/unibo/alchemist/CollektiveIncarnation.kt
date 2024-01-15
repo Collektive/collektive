@@ -1,4 +1,4 @@
-package it.unibo.collektive.alchemist.incarnation
+package it.unibo.alchemist
 
 import it.unibo.alchemist.model.Action
 import it.unibo.alchemist.model.Actionable
