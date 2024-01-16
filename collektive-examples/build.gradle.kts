@@ -1,3 +1,5 @@
+import java.util.Locale
+
 apply(plugin = libs.plugins.kotlin.jvm.id)
 
 plugins{
@@ -32,6 +34,12 @@ val runAll by tasks.register<DefaultTask>("runAll") {
     description = "Launches all simulations"
 }
 
+fun String.capitalizeString(): String = this.replaceFirstChar {
+    if (it.isLowerCase()) it.titlecase(
+        Locale.getDefault()
+    ) else it.toString()
+}
+
 /*
  * Scan the folder with the simulation files, and create a task for each one of them.
  */
@@ -43,7 +51,7 @@ File(rootProject.rootDir.path + "/collektive-examples/src/main/yaml").listFiles(
     .filter { it.extension == "yaml" }
     .sortedBy { it.nameWithoutExtension }
     .forEach {
-        val task by tasks.register<JavaExec>("run${it.nameWithoutExtension.uppercase()}") {
+        val task by tasks.register<JavaExec>("run${it.nameWithoutExtension.capitalizeString()}") {
             javaLauncher.set(
                 javaToolchains.launcherFor {
                     languageVersion.set(JavaLanguageVersion.of(multiJvm.latestJava))
