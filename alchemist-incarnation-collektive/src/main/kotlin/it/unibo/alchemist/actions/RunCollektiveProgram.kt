@@ -5,34 +5,62 @@ import it.unibo.alchemist.model.Actionable
 import it.unibo.alchemist.model.Context
 import it.unibo.alchemist.model.Environment
 import it.unibo.alchemist.model.Node
+import it.unibo.alchemist.model.Node.Companion.asProperty
 import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Reaction
 import it.unibo.alchemist.model.TimeDistribution
 import it.unibo.alchemist.model.actions.AbstractAction
-import java.util.random.RandomGenerator
+import it.unibo.alchemist.model.molecules.SimpleMolecule
+import it.unibo.collektive.Collektive
+import it.unibo.collektive.alchemist.device.CollektiveDevice
+import org.apache.commons.math3.random.RandomGenerator
+import kotlin.reflect.jvm.kotlinFunction
 
 /**
  * TODO.
  */
 class RunCollektiveProgram<P : Position<P>>(
-//    randomGenerator: RandomGenerator,
-//    environment: Environment<Any?, P>,
     node: Node<Any?>?,
-//    time: TimeDistribution<Any?>,
-//    actionable: Actionable<Any?>,
-//    additionalParameters: String,
+    private val time: TimeDistribution<Any?>,
+    additionalParameters: String,
 ): AbstractAction<Any?>(
     requireNotNull(node) { "Collektive does not support an environment with null as nodes" },
     ) {
+
+    private val programIdentifier = SimpleMolecule(additionalParameters)
+
+    private val localDevice: CollektiveDevice<P> = node?.asProperty() ?: error("Trying to create action for null node")
+    private val run: () -> Any?
+
+    private val className = additionalParameters.substringBeforeLast(".")
+    private val methodName = additionalParameters.substringAfterLast(".")
+    private val classNameFoo = Class.forName(className)
+    private val method = classNameFoo.methods.find { it.name == methodName }
+        ?: error("Method $additionalParameters not found")
+
+    init {
+        declareDependencyTo(programIdentifier)
+        val collektive = Collektive(localDevice.id, localDevice) {
+            method.kotlinFunction?.call(localDevice, this@Collektive)
+                ?: error("No aggregate function found")
+        }
+        run = { collektive.cycle() }
+    }
+
     override fun cloneAction(node: Node<Any?>?, reaction: Reaction<Any?>?): Action<Any?> {
         TODO("Not yet implemented")
     }
 
     override fun execute() {
-        TODO("Not yet implemented")
+        this.
+        localDevice.currentTime = time.nextOccurence
+        run.also {
+            node.setConcentration(
+                SimpleMolecule(method.name),
+                it,
+            )
+        }
     }
 
-    override fun getContext(): Context {
-        TODO("Not yet implemented")
-    }
+    override fun getContext(): Context = Context.NEIGHBORHOOD
 }
