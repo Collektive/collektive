@@ -5,7 +5,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.IntId
-import it.unibo.collektive.aggregate.ops.neighbouring
+import it.unibo.collektive.aggregate.api.operators.neighboring
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 
@@ -22,11 +22,11 @@ class FieldManipulationTest : StringSpec({
         val network1 = NetworkImplTest(nm, id1)
 
         aggregate(id0, network0) {
-            neighbouring(double(3))
+            neighboring(double(3))
         }
 
         aggregate(id1, network1) {
-            val res = neighbouring(double(2)).min()
+            val res = neighboring(double(2)).min()
             res shouldNotBe null
             res shouldBe 4
         }
@@ -38,11 +38,11 @@ class FieldManipulationTest : StringSpec({
         val network1 = NetworkImplTest(nm, id1)
 
         aggregate(id0, network0) {
-            neighbouring(double(3))
+            neighboring(double(3))
         }
 
         aggregate(id1, network1) {
-            val res = neighbouring(double(2)).min(includingSelf = false)
+            val res = neighboring(double(2)).min(includingSelf = false)
             res shouldNotBe null
             res shouldBe 6
         }
@@ -54,11 +54,11 @@ class FieldManipulationTest : StringSpec({
         val network1 = NetworkImplTest(nm, id1)
 
         aggregate(id0, network0) {
-            neighbouring(double(3))
+            neighboring(double(3))
         }
 
         aggregate(id1, network1) {
-            val res = neighbouring(double(2)).max(includingSelf = false)
+            val res = neighboring(double(2)).max(includingSelf = false)
             res shouldNotBe null
             res shouldBe 6
         }

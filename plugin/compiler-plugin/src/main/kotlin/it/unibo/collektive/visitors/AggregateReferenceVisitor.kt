@@ -33,5 +33,5 @@ class AggregateRefChildrenVisitor(
 /**
  * Retrieve the aggregate context reference by looking in all the function call in the element found.
  */
-fun collectAggregateContextReference(aggregateContextClass: IrClass, element: IrElement): IrExpression? =
+fun collectAggregateReference(aggregateContextClass: IrClass, element: IrElement): IrExpression? =
     buildList { element.accept(AggregateRefChildrenVisitor(aggregateContextClass, this), null) }.firstOrNull()

@@ -5,11 +5,11 @@ import io.kotest.matchers.maps.shouldContainValue
 import io.kotest.matchers.maps.shouldHaveSize
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.IntId
-import it.unibo.collektive.aggregate.ops.neighbouring
+import it.unibo.collektive.aggregate.api.operators.neighboring
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 
-class NeighbouringTest : StringSpec({
+class NeighboringTest : StringSpec({
     // device ids
     val id0 = IntId(0)
     val id1 = IntId(1)
@@ -23,27 +23,27 @@ class NeighbouringTest : StringSpec({
     val double: (Int) -> Int = { it * 2 }
     val add: (Int) -> Int = { it + 1 }
 
-    "Neighbouring without messages" {
+    "Neighboring without messages" {
         aggregate(id0) {
-            val field = neighbouring(initV1)
+            val field = neighboring(initV1)
             field.toMap() shouldContainValue initV1
         }
     }
 
-    "Neighbouring with three aligned devices" {
+    "Neighboring with three aligned devices" {
         val nm = NetworkManager()
 
         // Device 1
         val testNetwork1 = NetworkImplTest(nm, id1)
         aggregate(id1, testNetwork1) {
-            val field = neighbouring(double(initV1))
+            val field = neighboring(double(initV1))
             field.toMap() shouldContainValue 2
         }
 
         // Device 2
         val testNetwork2 = NetworkImplTest(nm, id2)
         aggregate(id2, testNetwork2) {
-            val field = neighbouring(double(initV2))
+            val field = neighboring(double(initV2))
             field.toMap() shouldContainValue 2
             field.toMap() shouldContainValue 4
         }
@@ -51,21 +51,22 @@ class NeighbouringTest : StringSpec({
         // Device 3
         val testNetwork3 = NetworkImplTest(nm, id3)
         aggregate(id3, testNetwork3) {
-            val field = neighbouring(double(initV3))
+            val field = neighboring(double(initV3))
             field.toMap() shouldContainValue 4
             field.toMap() shouldContainValue 6
         }
     }
 
-    "Neighbouring with two not aligned devices" {
+    "Neighboring with two not aligned devices" {
         val nm = NetworkManager()
 
         // Device 1
         val isDeviceOneKing = true
         val testNetwork1 = NetworkImplTest(nm, id1)
         aggregate(id1, testNetwork1) {
-            fun kingBehaviour() = neighbouring(double(initV2))
-            fun queenBehaviour() = neighbouring(add(initV1))
+            fun kingBehaviour() = neighboring(double(initV2))
+
+            fun queenBehaviour() = neighboring(add(initV1))
             val f = if (isDeviceOneKing) kingBehaviour() else queenBehaviour()
             f.toMap() shouldHaveSize 1
         }
@@ -74,8 +75,9 @@ class NeighbouringTest : StringSpec({
         val isDeviceTwoKing = false
         val testNetwork2 = NetworkImplTest(nm, id2)
         aggregate(id2, testNetwork2) {
-            fun kingBehaviour() = neighbouring(double(initV1))
-            fun queenBehaviour() = neighbouring(add(initV2))
+            fun kingBehaviour() = neighboring(double(initV1))
+
+            fun queenBehaviour() = neighboring(add(initV2))
             val field = if (isDeviceTwoKing) kingBehaviour() else queenBehaviour()
             field.toMap() shouldHaveSize 1
         }

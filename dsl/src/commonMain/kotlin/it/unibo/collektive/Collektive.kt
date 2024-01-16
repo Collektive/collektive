@@ -1,7 +1,8 @@
 package it.unibo.collektive
 
-import it.unibo.collektive.aggregate.AggregateContext
 import it.unibo.collektive.aggregate.AggregateResult
+import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.impl.AggregateContext
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.Network
 import it.unibo.collektive.state.State
@@ -10,11 +11,7 @@ import it.unibo.collektive.state.State
  * Create a Collektive device with a specific [id] and a [network] to manage incoming and outgoing messages,
  * the [computeFunction] is the function to apply within the [AggregateContext].
  */
-class Collektive<R>(
-    val id: ID,
-    private val network: Network,
-    private val computeFunction: AggregateContext.() -> R,
-) {
+class Collektive<R>(val id: ID, private val network: Network, private val computeFunction: Aggregate.() -> R) {
 
     /**
      * The [State] of the Collektive device.
@@ -57,7 +54,7 @@ class Collektive<R>(
             localId: ID,
             inbound: Iterable<InboundMessage> = emptySet(),
             previousState: State = emptyMap(),
-            compute: AggregateContext.() -> R,
+            compute: Aggregate.() -> R,
         ): AggregateResult<R> = AggregateContext(localId, inbound, previousState).run {
             AggregateResult(localId, compute(), messagesToSend(), newState())
         }
@@ -71,7 +68,7 @@ class Collektive<R>(
             localId: ID,
             network: Network,
             previousState: State = emptyMap(),
-            compute: AggregateContext.() -> R,
+            compute: Aggregate.() -> R,
         ): AggregateResult<R> = with(AggregateContext(localId, network.read(), previousState)) {
             AggregateResult(localId, compute(), messagesToSend(), newState()).also {
                 network.write(it.toSend)

@@ -5,7 +5,7 @@ import it.unibo.collektive.utils.call.buildAlignedOnCall
 import it.unibo.collektive.utils.common.AggregateFunctionNames.ALIGNED_ON_FUNCTION
 import it.unibo.collektive.utils.common.getFunctionName
 import it.unibo.collektive.utils.statement.irStatement
-import it.unibo.collektive.visitors.collectAggregateContextReference
+import it.unibo.collektive.visitors.collectAggregateReference
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.jvm.ir.receiverAndArgs
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -34,7 +34,7 @@ class AlignmentTransformer(
 
     override fun visitCall(expression: IrCall): IrExpression {
         val contextReference = expression.receiverAndArgs().find { it.type == aggregateContextClass.defaultType }
-            ?: collectAggregateContextReference(aggregateContextClass, expression.symbol.owner)
+            ?: collectAggregateReference(aggregateContextClass, expression.symbol.owner)
         return contextReference?.let { context ->
             val functionName = expression.getFunctionName()
             // We don't want to align the alignedOn function :)

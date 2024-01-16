@@ -17,11 +17,12 @@ typealias AlignedData = Map<String, Int>
 class AggregateCallTransformer(
     private val pluginContext: IrPluginContext,
     private val logger: MessageCollector,
-    private val aggregateContextClass: IrClass,
+    private val aggregateClass: IrClass,
     private val alignedOnFunction: IrFunction,
+    private val projectFunction: IrFunction,
 ) : IrElementTransformerVoid() {
 
-    private val aggregateContext = aggregateContextClass.thisReceiver?.type
+    private val aggregateContext = aggregateClass.thisReceiver?.type
 
     override fun visitFunction(declaration: IrFunction): IrStatement {
         if (declaration.extensionReceiverParameter?.type == aggregateContext) {
@@ -32,14 +33,14 @@ class AggregateCallTransformer(
              we made a projection, which is not necessary.
              */
             declaration.transformChildren(
-                FieldTransformer(pluginContext, logger, aggregateContextClass),
+                FieldTransformer(pluginContext, logger, aggregateClass, projectFunction),
                 null,
             )
             /*
              This transformation is needed to add the `alignOn` function call to the aggregate functions.
              */
             declaration.transformChildren(
-                AlignmentTransformer(pluginContext, logger, aggregateContextClass, declaration, alignedOnFunction),
+                AlignmentTransformer(pluginContext, logger, aggregateClass, declaration, alignedOnFunction),
                 null,
             )
         }
