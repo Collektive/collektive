@@ -3,7 +3,7 @@ package it.unibo.collektive.branch
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import it.unibo.collektive.Collektive.Companion.aggregate
-import it.unibo.collektive.aggregate.api.operators.neighboring
+import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.path.Path
 
 class IfConditionTest : StringSpec({
@@ -11,7 +11,7 @@ class IfConditionTest : StringSpec({
     "Branches with constant conditions should get aligned" {
         val result =
             aggregate(id0) {
-                if (true) neighboring("test")
+                if (true) neighboringViaExchange("test")
             }
         result.toSend.messages.keys shouldContain Path(true, "neighboring.1", "exchange.1")
     }
@@ -20,7 +20,7 @@ class IfConditionTest : StringSpec({
         val customCondition = true
         val result =
             aggregate(id0) {
-                if (customCondition) neighboring("test")
+                if (customCondition) neighboringViaExchange("test")
             }
         result.toSend.messages.keys shouldContain Path(true, "neighboring.1", "exchange.1")
     }
@@ -29,7 +29,7 @@ class IfConditionTest : StringSpec({
         fun customFunction() = true
         val result =
             aggregate(id0) {
-                if (customFunction()) neighboring("test")
+                if (customFunction()) neighboringViaExchange("test")
             }
         result.toSend.messages.keys shouldContain Path(true, "neighboring.1", "exchange.1")
     }
@@ -39,7 +39,7 @@ class IfConditionTest : StringSpec({
         val customCondition2 = true
         val result =
             aggregate(id0) {
-                if (customCondition1 && customCondition2) neighboring("test")
+                if (customCondition1 && customCondition2) neighboringViaExchange("test")
             }
         result.toSend.messages.keys shouldContain Path(true, "neighboring.1", "exchange.1")
     }
@@ -49,7 +49,7 @@ class IfConditionTest : StringSpec({
         val customCondition2 = true
         val result =
             aggregate(id0) {
-                if (customCondition1 || customCondition2) neighboring("test")
+                if (customCondition1 || customCondition2) neighboringViaExchange("test")
             }
         result.toSend.messages.keys shouldContain Path(true, "neighboring.1", "exchange.1")
     }
@@ -59,7 +59,7 @@ class IfConditionTest : StringSpec({
         val customCondition2 = false
         val result =
             aggregate(id0) {
-                if (customCondition1 && !customCondition2) neighboring("test")
+                if (customCondition1 && !customCondition2) neighboringViaExchange("test")
             }
         result.toSend.messages.keys shouldContain Path(true, "neighboring.1", "exchange.1")
     }

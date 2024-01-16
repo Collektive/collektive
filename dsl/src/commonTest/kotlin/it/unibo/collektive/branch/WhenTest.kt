@@ -3,7 +3,7 @@ package it.unibo.collektive.branch
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
-import it.unibo.collektive.aggregate.api.operators.neighboring
+import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.path.Path
 
 class WhenTest : StringSpec({
@@ -15,8 +15,8 @@ class WhenTest : StringSpec({
         val result =
             aggregate(id0) {
                 when (x) {
-                    is String -> neighboring("string")
-                    else -> neighboring("test")
+                    is String -> neighboringViaExchange("string")
+                    else -> neighboringViaExchange("test")
                 }
             }
         result.toSend.messages.keys shouldBe setOf(Path(true, "neighboring.1", "exchange.1"))
@@ -28,8 +28,8 @@ class WhenTest : StringSpec({
         val result =
             aggregate(id0) {
                 when (x) {
-                    is String -> neighboring("string")
-                    else -> neighboring("test")
+                    is String -> neighboringViaExchange("string")
+                    else -> neighboringViaExchange("test")
                 }
             }
         result.toSend.messages.keys shouldBe setOf(Path(false, "neighboring.2", "exchange.1"))
@@ -41,11 +41,11 @@ class WhenTest : StringSpec({
         val result =
             aggregate(id0) {
                 fun test() {
-                    neighboring("test")
+                    neighboringViaExchange("test")
                 }
 
                 fun test2() {
-                    neighboring("test2")
+                    neighboringViaExchange("test2")
                 }
                 when (x) {
                     is String -> test2()

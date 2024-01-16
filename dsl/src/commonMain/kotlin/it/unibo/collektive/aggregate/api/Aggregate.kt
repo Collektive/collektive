@@ -1,6 +1,5 @@
 package it.unibo.collektive.aggregate.api
 
-import it.unibo.collektive.ID
 import it.unibo.collektive.aggregate.api.YieldingContext.YieldingResult
 import it.unibo.collektive.field.Field
 
@@ -10,7 +9,7 @@ typealias YieldingScope<Initial, Return> = YieldingContext<Initial, Return>.(Ini
  * Models the minimal set of aggregate operations.
  * Holds the [localId] of the device executing the aggregate program.
  */
-interface Aggregate {
+interface Aggregate<ID : Any> {
     /**
      * The local [ID] of the device.
      */
@@ -32,7 +31,10 @@ interface Aggregate {
      * The result of the exchange function is a field with as messages a map with key the id of devices across the
      * network and the result of the computation passed as relative local values.
      */
-    fun <Initial> exchange(initial: Initial, body: (Field<Initial>) -> Field<Initial>): Field<Initial>
+    fun <Initial> exchange(
+        initial: Initial,
+        body: (Field<ID, Initial>) -> Field<ID, Initial>,
+    ): Field<ID, Initial>
 
     /**
      * Same behavior of [exchange] but this function can yield a [Field] of [Return] value.
@@ -47,8 +49,8 @@ interface Aggregate {
      */
     fun <Initial, Return> exchanging(
         initial: Initial,
-        body: YieldingScope<Field<Initial>, Field<Return>>,
-    ): Field<Return>
+        body: YieldingScope<Field<ID, Initial>, Field<ID, Return>>,
+    ): Field<ID, Return>
 
     /**
      * Iteratively updates the value computing the [transform] expression at each device using the last

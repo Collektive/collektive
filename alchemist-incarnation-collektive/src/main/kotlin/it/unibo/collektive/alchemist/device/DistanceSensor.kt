@@ -1,6 +1,6 @@
 package it.unibo.collektive.alchemist.device
 
-import it.unibo.collektive.aggregate.AggregateContext
+import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.field.Field
 
 /**
@@ -10,5 +10,5 @@ interface DistanceSensor {
     /**
      * The distances from the current node to all the other nodes.
      */
-    fun <ID : Any> AggregateContext<ID>.distances(): Field<ID, Double>
+    fun <ID : Any> Aggregate<ID>.distances(): Field<ID, Double>
 }

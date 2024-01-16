@@ -26,7 +26,7 @@ import it.unibo.collektive.field.Field
  *
  * In this case, the field returned has the result of the computation as local value.
  */
-fun <ID : Any, Scalar> Aggregate.neighboringViaExchange(local: Scalar): Field<ID, Scalar> =
+fun <ID : Any, Scalar> Aggregate<ID>.neighboringViaExchange(local: Scalar): Field<ID, Scalar> =
     exchange(local, ::identity)
 
 /**
@@ -56,14 +56,18 @@ fun <ID : Any, Scalar> Aggregate.neighboringViaExchange(local: Scalar): Field<ID
  * }
  * ```
  */
-fun <ID : Any, Initial, Return> Aggregate.sharing(
+fun <ID : Any, Initial, Return> Aggregate<ID>.sharing(
     initial: Initial,
     transform: YieldingContext<Initial, Return>.(Field<ID, Initial>) -> YieldingContext.YieldingResult<Initial, Return>,
 ): Return {
     val context = YieldingContext<Initial, Return>()
     var yieldingContext: Option<YieldingContext.YieldingResult<Initial, Return>> = none()
     exchange(initial) { initialField ->
-        initialField.map { _ -> transform(context, initialField).also { context -> yieldingContext = context.some() }.toSend }
+        initialField.map { _ ->
+            transform(context, initialField).also { context ->
+                yieldingContext = context.some()
+            }.toSend
+        }
     }
     return yieldingContext.getOrElse { error("This error should never be thrown") }.toReturn
 }
@@ -80,5 +84,5 @@ fun <ID : Any, Initial, Return> Aggregate.sharing(
  * ```
  * In the example above, the function [share] wil return a value that is the max found in the field.
  **/
-fun <ID : Any, Initial> Aggregate.share(initial: Initial, transform: (Field<ID, Initial>) -> Initial): Initial =
+fun <ID : Any, Initial> Aggregate<ID>.share(initial: Initial, transform: (Field<ID, Initial>) -> Initial): Initial =
     sharing(initial) { field -> transform(field).run { yielding { this } } }

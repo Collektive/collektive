@@ -4,7 +4,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
-import it.unibo.collektive.aggregate.api.operators.neighboring
+import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.path.Path
@@ -43,7 +43,7 @@ class RepeatingTest : StringSpec({
     "Repeating should return the value passed in the yielding function" {
         val result = aggregate(id1) {
             repeating(initV1) {
-                val nbr = neighboring(it * 2).localValue
+                val nbr = neighboringViaExchange(it * 2).localValue
                 nbr.yielding { "A string" }
             } shouldBe "A string"
         }

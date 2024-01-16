@@ -5,7 +5,8 @@ import it.unibo.alchemist.model.Node
 import it.unibo.alchemist.model.NodeProperty
 import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Time
-import it.unibo.collektive.aggregate.AggregateContext
+import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.Network
@@ -58,6 +59,6 @@ class CollektiveDevice<P>(
         }
     }
 
-    override fun <ID : Any> AggregateContext<ID>.distances(): Field<ID, Double> =
-        neighboring(environment.getPosition(node)).map { it.distanceTo(environment.getPosition(node)) }
+    override fun <ID : Any> Aggregate<ID>.distances(): Field<ID, Double> =
+        neighboringViaExchange(environment.getPosition(node)).map { it.distanceTo(environment.getPosition(node)) }
 }
