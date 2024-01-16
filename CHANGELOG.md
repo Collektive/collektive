@@ -1,3 +1,34 @@
+## [5.0.0](https://github.com/Collektive/collektive/compare/4.0.0...5.0.0) (2024-01-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* introduce the `exchanging` function to be consistent with `sharing` and `repeating` and refactor implementation (#177)
+
+### Features
+
+* introduce the `exchanging` function to be consistent with `sharing` and `repeating` and refactor implementation ([#177](https://github.com/Collektive/collektive/issues/177)) ([2bf33d9](https://github.com/Collektive/collektive/commit/2bf33d90627d72e71093c17fce271cbb647edc29)), closes [#190](https://github.com/Collektive/collektive/issues/190)
+
+
+### Dependency updates
+
+* **deps:** update alchemist to v29.3.5 ([4db7363](https://github.com/Collektive/collektive/commit/4db7363ef746c4d20fb2db4c573b2ff3aa62b793))
+* **deps:** update alchemist to v29.4.0 ([a14609a](https://github.com/Collektive/collektive/commit/a14609ab3b8453fb39f23b383ac5b27afb9c5f13))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5.3.5 ([52b5c64](https://github.com/Collektive/collektive/commit/52b5c643541067f11b1eb06772284904e66afdc0))
+* **deps:** update node.js to 20.11 ([bf1ff85](https://github.com/Collektive/collektive/commit/bf1ff854446078c993ada5fd978749a754bdf141))
+* **deps:** update plugin kotlin-qa to v0.58.0 ([33e774d](https://github.com/Collektive/collektive/commit/33e774dbaf0edfbb4d9cf215fb3d81a7d43410b7))
+* **deps:** update plugin org.gradle.toolchains.foojay-resolver-convention to v0.8.0 ([69bffbd](https://github.com/Collektive/collektive/commit/69bffbde6d519da27a0feed11b6366d22a8ecdaa))
+
+
+### Tests
+
+* **dsl:** aligment fails clearly when a value is sent multiple times with the same path ([#185](https://github.com/Collektive/collektive/issues/185)) ([8e383fd](https://github.com/Collektive/collektive/commit/8e383fdf7ed51cb58d7bde7b2372eb53bb2610a0))
+
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.2.13 ([89f1db0](https://github.com/Collektive/collektive/commit/89f1db09e84c64f789d62f7fe5915554c6d116a8))
+
 ## [4.0.0](https://github.com/Collektive/collektive/compare/3.0.1...4.0.0) (2024-01-08)
 
 
