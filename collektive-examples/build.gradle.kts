@@ -32,9 +32,6 @@ val runAll by tasks.register<DefaultTask>("runAll") {
     description = "Launches all simulations"
 }
 
-val batch: String by project
-val maxTime: String by project
-
 /*
  * Scan the folder with the simulation files, and create a task for each one of them.
  */
@@ -43,7 +40,7 @@ println(rootProject.rootDir.path)
 File(rootProject.rootDir.path + "/collektive-examples/src/main/yaml").listFiles()
     .orEmpty()
     .apply { check(isNotEmpty()) }
-    .filter { it.extension == "yml" }
+    .filter { it.extension == "yaml" }
     .sortedBy { it.nameWithoutExtension }
     .forEach {
         val task by tasks.register<JavaExec>("run${it.nameWithoutExtension.uppercase()}") {
@@ -63,22 +60,10 @@ File(rootProject.rootDir.path + "/collektive-examples/src/main/yaml").listFiles(
                 }
             }
             args("run", it.absolutePath)
-            if (System.getenv("CI") == "true" || batch == "true") {
-                args(
-                    "--override",
-                    """
-                    {
-                        launcher: { type: HeadlessSimulationLauncher, parameters: [] },
-                        terminate: { type: AfterTime, parameters: 2 }
-                    }
-                    """.trimIndent()
-                )
-            } else {
-                args(
-                    "--override",
-                    "{ launcher: { parameters: { graphics: \"effects/${it.nameWithoutExtension}.json\" } } }"
-                )
-            }
+            args(
+                "--override",
+                "{ launcher: { parameters: { graphics: \"effects/${it.nameWithoutExtension}.json\" } } }"
+            )
             outputs.dir(exportsDir)
         }
         runAll.dependsOn(task)
