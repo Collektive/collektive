@@ -19,20 +19,11 @@ class SharingTest : StringSpec({
     val id2 = IntId(2)
     val id3 = IntId(3)
 
-    // initial values
-    val initV1 = 1
-    val initV2 = 2
-    val initV3 = 3
-    val initV4 = 4
-    val initV5 = 5
-    val initV7 = 7
-    val initV10 = 10
-
     val findMax: (Field<Int>) -> Int = { e -> e.max() }
 
     "first time sharing" {
         aggregate(id0) {
-            val res = share(initV1, findMax)
+            val res = share(1, findMax)
             res shouldBe 1
         }
     }
@@ -43,34 +34,34 @@ class SharingTest : StringSpec({
         // Device 1
         val testNetwork1 = NetworkImplTest(nm, id1)
         aggregate(id1, testNetwork1) {
-            val r1 = share(initV1, findMax)
-            val r2 = share(initV2, findMax)
-            val r3 = share(initV10, findMax)
-            r1 shouldBe initV1
-            r2 shouldBe initV2
-            r3 shouldBe initV10
+            val r1 = share(1, findMax)
+            val r2 = share(2, findMax)
+            val r3 = share(10, findMax)
+            r1 shouldBe 1
+            r2 shouldBe 2
+            r3 shouldBe 10
         }
 
         // Device 2
         val testNetwork2 = NetworkImplTest(nm, id2)
         aggregate(id2, testNetwork2) {
-            val r1 = share(initV2, findMax)
-            val r2 = share(initV7, findMax)
-            val r3 = share(initV4, findMax)
-            r1 shouldBe initV2
-            r2 shouldBe initV7
-            r3 shouldBe initV10
+            val r1 = share(2, findMax)
+            val r2 = share(7, findMax)
+            val r3 = share(4, findMax)
+            r1 shouldBe 2
+            r2 shouldBe 7
+            r3 shouldBe 10
         }
 
         // Device 3
         val testNetwork3 = NetworkImplTest(nm, id3)
         aggregate(id3, testNetwork3) {
-            val r1 = share(initV5, findMax)
-            val r2 = share(initV1, findMax)
-            val r3 = share(initV3, findMax)
-            r1 shouldBe initV5
-            r2 shouldBe initV7
-            r3 shouldBe initV10
+            val r1 = share(5, findMax)
+            val r2 = share(1, findMax)
+            val r3 = share(3, findMax)
+            r1 shouldBe 5
+            r2 shouldBe 7
+            r3 shouldBe 10
         }
     }
 
@@ -78,10 +69,10 @@ class SharingTest : StringSpec({
         val testNetwork = NetworkImplTest(NetworkManager(), id1)
 
         aggregate(id1, testNetwork) {
-            val res = share(initV1) {
+            val res = share(1) {
                 it.max()
             }
-            res shouldBe initV1
+            res shouldBe 1
         }
     }
 
@@ -89,7 +80,7 @@ class SharingTest : StringSpec({
         val testNetwork = NetworkImplTest(NetworkManager(), id1)
 
         aggregate(id1, testNetwork) {
-            val res = sharing(initV1) {
+            val res = sharing(1) {
                 val min = it.max()
                 min.yielding { "A string" }
             }
@@ -101,7 +92,7 @@ class SharingTest : StringSpec({
         val testNetwork = NetworkImplTest(NetworkManager(), id1)
 
         aggregate(id1, testNetwork) {
-            val res = sharing(initV1) {
+            val res = sharing(1) {
                 val min = it.min()
                 min.yielding { "Hello".takeIf { min > 1 } }
             }
