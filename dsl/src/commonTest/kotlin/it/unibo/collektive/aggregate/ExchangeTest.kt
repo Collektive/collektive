@@ -21,26 +21,10 @@ class ExchangeTest : StringSpec({
     val id2 = IntId(2)
     val id3 = IntId(3)
 
-    // initial values
-    val initV1 = 1
-    val initV2 = 2
-    val initV3 = 3
-    val initV4 = 4
-    val initV5 = 5
-    val initV6 = 6
-
     // paths
     val path1 = Path(listOf("exchange.1"))
     val path2 = Path(listOf("exchange.2"))
     val exchangingPath = Path("exchanging.1")
-
-    // expected
-    val expected2 = 2
-    val expected3 = 3
-    val expected5 = 5
-    val expected6 = 6
-    val expected7 = 7
-    val expected10 = 10
 
     val increaseOrDouble: (Field<Int>) -> Field<Int> = { f ->
         f.mapWithId { _, v -> if (v % 2 == 0) v + 1 else v * 2 }
@@ -48,12 +32,12 @@ class ExchangeTest : StringSpec({
 
     "First time exchange should return the initial value" {
         val result = aggregate(id0) {
-            val res = exchange(initV1, increaseOrDouble)
-            res.localValue shouldBe expected2
+            val res = exchange(1, increaseOrDouble)
+            res.localValue shouldBe 2
         }
         result.toSend shouldBe OutboundMessage(
             id0,
-            mapOf(path1 to SingleOutboundMessage(expected2, emptyMap())),
+            mapOf(path1 to SingleOutboundMessage(2, emptyMap())),
         )
     }
 
@@ -63,41 +47,41 @@ class ExchangeTest : StringSpec({
         // Device 1
         val testNetwork1 = NetworkImplTest(nm, id1)
         val resultDevice1 = aggregate(id1, testNetwork1) {
-            val res1 = exchange(initV1, increaseOrDouble)
-            val res2 = exchange(initV2, increaseOrDouble)
+            val res1 = exchange(1, increaseOrDouble)
+            val res2 = exchange(2, increaseOrDouble)
             testNetwork1.read() shouldHaveSize 0
-            res1.localValue shouldBe expected2
-            res2.localValue shouldBe expected3
+            res1.localValue shouldBe 2
+            res2.localValue shouldBe 3
         }
 
         resultDevice1.toSend shouldBe OutboundMessage(
             id1,
             mapOf(
-                path1 to SingleOutboundMessage(expected2, emptyMap()),
-                path2 to SingleOutboundMessage(expected3, emptyMap()),
+                path1 to SingleOutboundMessage(2, emptyMap()),
+                path2 to SingleOutboundMessage(3, emptyMap()),
             ),
         )
 
         // Device 2
         val testNetwork2 = NetworkImplTest(nm, id2)
         val resultDevice2 = aggregate(id2, testNetwork2) {
-            val res1 = exchange(initV3, increaseOrDouble)
-            val res2 = exchange(initV4, increaseOrDouble)
+            val res1 = exchange(3, increaseOrDouble)
+            val res2 = exchange(4, increaseOrDouble)
 
-            res1.localValue shouldBe expected6
-            res2.localValue shouldBe expected5
+            res1.localValue shouldBe 6
+            res2.localValue shouldBe 5
         }
 
         resultDevice2.toSend shouldBe OutboundMessage(
             id2,
             mapOf(
                 path1 to SingleOutboundMessage(
-                    expected6,
-                    mapOf(id1 to expected3),
+                    6,
+                    mapOf(id1 to 3),
                 ),
                 path2 to SingleOutboundMessage(
-                    expected5,
-                    mapOf(id1 to expected6),
+                    5,
+                    mapOf(id1 to 6),
                 ),
             ),
         )
@@ -105,28 +89,28 @@ class ExchangeTest : StringSpec({
         // Device 3
         val testNetwork3 = NetworkImplTest(nm, id3)
         val resultDevice3 = aggregate(id3, testNetwork3) {
-            val res1 = exchange(initV5, increaseOrDouble)
-            val res2 = exchange(initV6, increaseOrDouble)
+            val res1 = exchange(5, increaseOrDouble)
+            val res2 = exchange(6, increaseOrDouble)
 
-            res1.localValue shouldBe expected10
-            res2.localValue shouldBe expected7
+            res1.localValue shouldBe 10
+            res2.localValue shouldBe 7
         }
 
         resultDevice3.toSend shouldBe OutboundMessage(
             id3,
             mapOf(
                 path1 to SingleOutboundMessage(
-                    expected10,
+                    10,
                     mapOf(
-                        id1 to expected3,
-                        id2 to expected7,
+                        id1 to 3,
+                        id2 to 7,
                     ),
                 ),
                 path2 to SingleOutboundMessage(
-                    expected7,
+                    7,
                     mapOf(
-                        id1 to expected6,
-                        id2 to expected10,
+                        id1 to 6,
+                        id2 to 10,
                     ),
                 ),
             ),
@@ -135,7 +119,7 @@ class ExchangeTest : StringSpec({
 
     "Exchange can yield a result but return a different value" {
         val result = aggregate(id0) {
-            val xcRes = exchanging(initV1) {
+            val xcRes = exchanging(1) {
                 val fieldResult = it + 1
                 fieldResult.yielding { fieldResult.map { value -> "return: $value" } }
             }
@@ -149,7 +133,7 @@ class ExchangeTest : StringSpec({
 
     "Exchange can yield a result of nullable values" {
         val result = aggregate(id0) {
-            val xcRes = exchanging(initV1) {
+            val xcRes = exchanging(1) {
                 val fieldResult = it + 1
                 fieldResult.yielding { fieldResult.map { value -> value.takeIf { value > 10 } } }
             }
