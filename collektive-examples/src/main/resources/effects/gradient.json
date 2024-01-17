@@ -16,7 +16,7 @@
     "green": {
       "max": 255,
       "min": 0,
-      "val": 0
+      "val": 255
     },
     "alpha": {
       "max": 255,
