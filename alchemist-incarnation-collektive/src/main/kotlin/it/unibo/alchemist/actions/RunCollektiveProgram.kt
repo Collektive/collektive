@@ -36,12 +36,10 @@ class RunCollektiveProgram<P : Position<P>>(
         ?: error("Method $additionalParameters not found")
 
     private var parameterCache: Map<Class<*>, Any> = method.parameters.associate { param ->
-        if (param.type.isAssignableFrom(Aggregate::class.java)) {
-            param.type to Aggregate::class.java
-        } else if (param.type.isAssignableFrom(CollektiveDevice::class.java)) {
-            param.type to localDevice
-        } else {
-            error("No allowed context parameters found, expected at least Aggregate as context")
+        when {
+            param.type.isAssignableFrom(Aggregate::class.java) -> param.type to Aggregate::class.java
+            param.type.isAssignableFrom(CollektiveDevice::class.java) -> param.type to localDevice
+            else -> error("No allowed context parameters found, expected at least Aggregate as context")
         }
     }
 
