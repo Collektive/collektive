@@ -35,17 +35,21 @@ class RunCollektiveProgram<P : Position<P>>(
     private val method = classNameFoo.methods.find { it.name == methodName }
             ?: error("Method $additionalParameters not found")
 
+    private var parameterCache: Map<Class<*>, Any> = method.parameters.associate { param ->
+        if(param.type.isAssignableFrom(Aggregate::class.java)) {
+             param.type to Aggregate::class.java
+        } else if(param.type.isAssignableFrom(CollektiveDevice::class.java)){
+            param.type to localDevice
+        } else {
+            error("No allowed context parameters found, expected at least Aggregate as context")
+        }
+    }
+
     init {
         declareDependencyTo(programIdentifier)
         val collektive = Collektive(localDevice.id, localDevice) {
-            val args = method.parameters.map {
-                if(it.type.isAssignableFrom(Aggregate::class.java)) {
-                    this
-                } else if(it.type.isAssignableFrom(CollektiveDevice::class.java)){
-                    localDevice
-                } else { error("No allowed context parameters found, expected at least Aggregate as context") }
-            }.toTypedArray()
-            method.kotlinFunction?.call(*args) ?: error("No aggregate function found")
+            parameterCache += mapOf(Aggregate::class.java to this)
+            method.kotlinFunction?.call(*parameterCache.values.toTypedArray()) ?: error("No aggregate function found")
             }
         run = { collektive.cycle() }
     }
