@@ -32,22 +32,19 @@ class RunCollektiveProgram<P : Position<P>>(
     private val className = additionalParameters.substringBeforeLast(".")
     private val methodName = additionalParameters.substringAfterLast(".")
     private val classNameFoo = Class.forName(className)
-    private val method =
-        classNameFoo.methods.find { it.name == methodName }
+    private val method = classNameFoo.methods.find { it.name == methodName }
             ?: error("Method $additionalParameters not found")
 
     init {
         declareDependencyTo(programIdentifier)
-
         val collektive = Collektive(localDevice.id, localDevice) {
             val args = method.parameters.map {
                 if(it.type.isAssignableFrom(AggregateContext::class.java)) {
                     this
                 } else if(it.type.isAssignableFrom(CollektiveDevice::class.java)){
                     localDevice
-                } else { error("aa") } }.toTypedArray()
-            method.kotlinFunction?.call(*args)
-                    ?: error("No aggregate function found")
+                } else { error("No context parameters found") } }.toTypedArray()
+            method.kotlinFunction?.call(*args) ?: error("No aggregate function found")
             }
         run = { collektive.cycle() }
     }
