@@ -10,7 +10,6 @@ import it.unibo.collektive.ID
 import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboring
-import it.unibo.collektive.alchemist.utils.toId
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.Network
@@ -83,7 +82,7 @@ class CollektiveDevice<P>(
                 when {
                     mayNeedOverride.isEmpty() -> baseMessage
                     else -> baseMessage + mayNeedOverride.mapValues { (_, anisotropic) ->
-                        anisotropic.overrides.getOrDefault(node.toId(), anisotropic.default)
+                        anisotropic.overrides.getOrDefault(IntId(node.id), anisotropic.default)
                     }
                 },
             )
