@@ -35,4 +35,4 @@ fun AggregateContext.gradient(id: ID): Double {
  * TODO.
  */
 context(DistanceSensor)
-fun AggregateContext.main() = gradient(localId)
+fun AggregateContext.entrypoint(): Double = gradient(localId)
