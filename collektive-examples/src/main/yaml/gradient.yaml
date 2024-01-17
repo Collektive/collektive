@@ -2,6 +2,11 @@ network-model:
   type: ConnectWithinDistance
   parameters: [5]
 
+launcher:
+  type: SingleRunSwingUI
+  parameters:
+    graphics: /effects/gradient.json
+
 incarnation: collektive
 
 _pool: &program
@@ -9,12 +14,11 @@ _pool: &program
     type: Event
     actions:
       - type: RunCollektiveProgram
-        parameters: [it.unibo.collektive.examples.aggregate.AggregateFunctionsKt.main]
-  - program: send
+        parameters: [it.unibo.collektive.examples.aggregate.AggregateFunctionsKt.entrypoint]
 
 deployments:
   - type: Rectangle
-    parameters: [20, 0, 0, 10, 10]
+    parameters: [200, 0, 0, 20, 20]
     programs:
       - *program
     contents:
