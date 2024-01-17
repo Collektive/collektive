@@ -1,5 +1,6 @@
 package it.unibo.alchemist
 
+import it.unibo.alchemist.actions.RunCollektiveProgram
 import it.unibo.alchemist.model.Action
 import it.unibo.alchemist.model.Actionable
 import it.unibo.alchemist.model.Condition
@@ -8,11 +9,9 @@ import it.unibo.alchemist.model.Environment
 import it.unibo.alchemist.model.Incarnation
 import it.unibo.alchemist.model.Molecule
 import it.unibo.alchemist.model.Node
-import it.unibo.alchemist.model.Node.Companion.asProperty
 import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Reaction
 import it.unibo.alchemist.model.TimeDistribution
-import it.unibo.alchemist.model.actions.AbstractAction
 import it.unibo.alchemist.model.conditions.AbstractCondition
 import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.alchemist.model.nodes.GenericNode
@@ -20,11 +19,9 @@ import it.unibo.alchemist.model.reactions.Event
 import it.unibo.alchemist.model.timedistributions.DiracComb
 import it.unibo.alchemist.model.times.DoubleTime
 import it.unibo.alchemist.util.RandomGenerators.nextDouble
-import it.unibo.collektive.Collektive
 import it.unibo.collektive.alchemist.device.CollektiveDevice
 import org.apache.commons.math3.random.RandomGenerator
 import org.danilopianini.util.ListSet
-import kotlin.reflect.jvm.kotlinFunction
 
 /**
  * Collektive incarnation in Alchemist.
@@ -42,7 +39,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
 
     override fun createConcentration(s: String?) = s
 
-    override fun createConcentration() = TODO("create concentration not yet implemented")
+    override fun createConcentration() = 0.0
 
     override fun createAction(
         randomGenerator: RandomGenerator,
@@ -51,45 +48,8 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         time: TimeDistribution<Any?>,
         actionable: Actionable<Any?>,
         additionalParameters: String,
-    ): Action<Any?> = object : AbstractAction<Any?>(
-        requireNotNull(node) { "Collektive does not support an environment with null as nodes" },
-    ) {
-        val programIdentifier = SimpleMolecule(additionalParameters)
-
-        val localDevice: CollektiveDevice<P> = node?.asProperty() ?: error("Trying to create action for null node")
-        val run: () -> Any?
-
-        val className = additionalParameters.substringBeforeLast(".")
-        val methodName = additionalParameters.substringAfterLast(".")
-        val classNameFoo = Class.forName(className)
-        val method = classNameFoo.methods.find { it.name == methodName }
-            ?: error("Method $additionalParameters not found")
-
-        init {
-            declareDependencyTo(programIdentifier)
-            val collektive = Collektive(localDevice.id, localDevice) {
-                method.kotlinFunction?.call(localDevice, this@Collektive)
-                    ?: error("No aggregate function found")
-            }
-            run = { collektive.cycle() }
-        }
-
-        override fun cloneAction(node: Node<Any?>?, reaction: Reaction<Any?>?): Action<Any?> {
-            TODO("Not yet implemented")
-        }
-
-        override fun execute() {
-            localDevice.currentTime = time.nextOccurence
-            run().also {
-                node?.setConcentration(
-                    SimpleMolecule(method.name),
-                    it,
-                ) ?: error("Trying to set concentration for null node")
-            }
-        }
-
-        override fun getContext(): Context = Context.NEIGHBORHOOD // or Context.LOCAL
-    }
+    ): Action<Any?> =
+        RunCollektiveProgram(node, time, additionalParameters)
 
     override fun createCondition(
         randomGenerator: RandomGenerator,
