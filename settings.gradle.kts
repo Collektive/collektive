@@ -31,4 +31,4 @@ gitHooks {
 rootProject.name = "collektive"
 
 includeBuild("plugin")
-include("dsl", "alchemist-incarnation-collektive", "collektive-examples")
+include("dsl", "alchemist-incarnation-collektive")
