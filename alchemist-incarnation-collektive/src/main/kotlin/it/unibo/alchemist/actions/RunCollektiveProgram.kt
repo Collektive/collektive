@@ -10,7 +10,7 @@ import it.unibo.alchemist.model.TimeDistribution
 import it.unibo.alchemist.model.actions.AbstractAction
 import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.collektive.Collektive
-import it.unibo.collektive.aggregate.AggregateContext
+import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.alchemist.device.CollektiveDevice
 import kotlin.reflect.jvm.kotlinFunction
 
@@ -39,7 +39,7 @@ class RunCollektiveProgram<P : Position<P>>(
         declareDependencyTo(programIdentifier)
         val collektive = Collektive(localDevice.id, localDevice) {
             val args = method.parameters.map {
-                if(it.type.isAssignableFrom(AggregateContext::class.java)) {
+                if(it.type.isAssignableFrom(Aggregate::class.java)) {
                     this
                 } else if(it.type.isAssignableFrom(CollektiveDevice::class.java)){
                     localDevice

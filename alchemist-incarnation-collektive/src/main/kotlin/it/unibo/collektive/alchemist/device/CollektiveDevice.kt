@@ -8,16 +8,15 @@ import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Time
 import it.unibo.collektive.ID
 import it.unibo.collektive.IntId
-import it.unibo.collektive.aggregate.AggregateContext
-import it.unibo.collektive.aggregate.ops.neighbouring
+import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.operators.neighboring
 import it.unibo.collektive.alchemist.utils.toId
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.Network
 import it.unibo.collektive.networking.OutboundMessage
 import it.unibo.collektive.networking.SingleOutboundMessage
-import it.unibo.collektive.stack.Path
-import kotlin.math.abs
+import it.unibo.collektive.path.Path
 
 /**
  * Representation of a Collektive device in Alchemist.
@@ -51,9 +50,9 @@ class CollektiveDevice<P>(
         validMessages += TimedMessage(time, message)
     }
 
-    override fun AggregateContext.distances(): Field<Double> =
+    override fun Aggregate.distances(): Field<Double> =
         environment.getPosition(node).let { nodePosition ->
-            neighbouring(nodePosition).map { position -> nodePosition.distanceTo(position) }
+            neighboring(nodePosition).map { position -> nodePosition.distanceTo(position) }
         }
 
     override fun cloneOnNewNode(node: Node<Any?>): NodeProperty<Any?> =
@@ -90,16 +89,5 @@ class CollektiveDevice<P>(
             )
             neighbor.receiveMessage(currentTime, customMessage)
         }
-//        message.messages.forEach { (path, outbound) ->
-//            neighborhood.forEach { neighbor ->
-//                neighbor.receiveMessage(
-//                    currentTime,
-//                    InboundMessage(
-//                        message.senderId,
-//                        mapOf(path to (outbound.overrides[node.toId()] ?: outbound.default)),
-//                    ),
-//                )
-//            }
-//        }
     }
 }
