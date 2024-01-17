@@ -42,10 +42,7 @@ class CollektiveDevice<P>(
 
     private val validMessages: MutableList<TimedMessage> = mutableListOf()
 
-    private fun receiveMessage(
-        time: Time,
-        message: InboundMessage,
-    ) {
+    private fun receiveMessage(time: Time, message: InboundMessage) {
         validMessages += TimedMessage(time, message)
     }
 
