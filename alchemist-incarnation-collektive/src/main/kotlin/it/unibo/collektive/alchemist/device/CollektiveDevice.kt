@@ -85,7 +85,7 @@ class CollektiveDevice<P>(
                     else -> baseMessage + mayNeedOverride.mapValues { (_, anisotropic) ->
                         anisotropic.overrides.getOrDefault(node.toId(), anisotropic.default)
                     }
-                }
+                },
             )
             neighbor.receiveMessage(currentTime, customMessage)
         }

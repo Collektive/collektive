@@ -22,8 +22,8 @@ class RunCollektiveProgram<P : Position<P>>(
     private val time: TimeDistribution<Any?>,
     additionalParameters: String,
 ) : AbstractAction<Any?>(
-        requireNotNull(node) { "Collektive does not support an environment with null as nodes" },
-    ) {
+    requireNotNull(node) { "Collektive does not support an environment with null as nodes" },
+) {
     private val programIdentifier = SimpleMolecule(additionalParameters)
 
     private val localDevice: CollektiveDevice<P> = node?.asProperty() ?: error("Trying to create action for null node")
@@ -33,12 +33,12 @@ class RunCollektiveProgram<P : Position<P>>(
     private val methodName = additionalParameters.substringAfterLast(".")
     private val classNameFoo = Class.forName(className)
     private val method = classNameFoo.methods.find { it.name == methodName }
-            ?: error("Method $additionalParameters not found")
+        ?: error("Method $additionalParameters not found")
 
     private var parameterCache: Map<Class<*>, Any> = method.parameters.associate { param ->
-        if(param.type.isAssignableFrom(Aggregate::class.java)) {
-             param.type to Aggregate::class.java
-        } else if(param.type.isAssignableFrom(CollektiveDevice::class.java)){
+        if (param.type.isAssignableFrom(Aggregate::class.java)) {
+            param.type to Aggregate::class.java
+        } else if (param.type.isAssignableFrom(CollektiveDevice::class.java)) {
             param.type to localDevice
         } else {
             error("No allowed context parameters found, expected at least Aggregate as context")
@@ -50,11 +50,11 @@ class RunCollektiveProgram<P : Position<P>>(
         val collektive = Collektive(localDevice.id, localDevice) {
             parameterCache += mapOf(Aggregate::class.java to this)
             method.kotlinFunction?.call(*parameterCache.values.toTypedArray()) ?: error("No aggregate function found")
-            }
+        }
         run = { collektive.cycle() }
     }
 
-    override fun cloneAction(node: Node<Any?>?, reaction: Reaction<Any?>?, ): Action<Any?> {
+    override fun cloneAction(node: Node<Any?>?, reaction: Reaction<Any?>?): Action<Any?> {
         TODO("Not yet implemented")
     }
 

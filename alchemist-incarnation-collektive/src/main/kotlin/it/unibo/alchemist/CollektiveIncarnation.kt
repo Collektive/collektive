@@ -71,7 +71,6 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         timeDistribution: TimeDistribution<Any?>,
         parameter: String,
     ): Reaction<Any?> = Event(node, timeDistribution).also {
-
         it.actions = ListSet.of(
             createAction(randomGenerator, environment, node, timeDistribution, it, parameter),
         )
@@ -91,7 +90,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         environment: Environment<Any?, P>,
         parameter: String?,
     ): Node<Any?> = GenericNode(environment).also {
-        it.addProperty(CollektiveDevice(environment, it,  DoubleTime(parameter.toDefaultDouble())))
+        it.addProperty(CollektiveDevice(environment, it, DoubleTime(parameter.toDefaultDouble())))
     }
 
     private fun String?.toDefaultDouble(): Double = this?.toDoubleOrNull() ?: 1.0
