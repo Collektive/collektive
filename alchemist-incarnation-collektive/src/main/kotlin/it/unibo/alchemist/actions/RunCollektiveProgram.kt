@@ -15,7 +15,9 @@ import it.unibo.collektive.alchemist.device.CollektiveDevice
 import kotlin.reflect.jvm.kotlinFunction
 
 /**
- * TODO.
+ * An [Alchemist] [Action] that runs a [Collektive] program.
+ * It takes the [node] on which execute the action, the [time] distribution and the [additionalParameters]
+ * which is the of the aggregate function to execute.
  */
 class RunCollektiveProgram<P : Position<P>>(
     private val node: Node<Any?>?,
