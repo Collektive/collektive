@@ -7,8 +7,6 @@ kotlinJvm {
                 implementation(project(":dsl"))
                 implementation(kotlin("reflect"))
                 implementation(libs.bundles.alchemist)
-                implementation(rootProject.libs.alchemist.api)
-                implementation(rootProject.libs.alchemist)
             }
         }
         val test by getting {

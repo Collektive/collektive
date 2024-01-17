@@ -9,9 +9,6 @@ kotlin = "1.9.22"
 [libraries]
 alchemist-api = { module = "it.unibo.alchemist:alchemist-api", version.ref = "alchemist" }
 alchemist = { module = "it.unibo.alchemist:alchemist", version.ref = "alchemist" }
-alchemist-incarnation-protelis = { module = "it.unibo.alchemist:alchemist-incarnation-protelis", version.ref = "alchemist" }
-alchemist-swingui = { module = "it.unibo.alchemist:alchemist-swingui", version.ref = "alchemist" }
-alchemist-euclidean-geometry = { module = "it.unibo.alchemist:alchemist-euclidean-geometry", version.ref = "alchemist" }
 arrow = "io.arrow-kt:arrow-core:1.2.1"
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
@@ -34,9 +31,7 @@ kotlin-testing-common = [
 ]
 alchemist = [
     "alchemist",
-    "alchemist-euclidean-geometry",
-    "alchemist-incarnation-protelis",
-    "alchemist-swingui"
+    "alchemist-api",
 ]
 
 [plugins]
