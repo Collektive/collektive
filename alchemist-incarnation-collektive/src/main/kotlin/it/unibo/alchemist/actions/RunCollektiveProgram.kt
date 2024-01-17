@@ -43,7 +43,8 @@ class RunCollektiveProgram<P : Position<P>>(
                     this
                 } else if(it.type.isAssignableFrom(CollektiveDevice::class.java)){
                     localDevice
-                } else { error("No context parameters found") } }.toTypedArray()
+                } else { error("No allowed context parameters found, expected at least Aggregate as context") }
+            }.toTypedArray()
             method.kotlinFunction?.call(*args) ?: error("No aggregate function found")
             }
         run = { collektive.cycle() }
