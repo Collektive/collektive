@@ -39,7 +39,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
 
     override fun createConcentration(s: String?) = s
 
-    override fun createConcentration() = 0.0
+    override fun createConcentration() = null
 
     override fun createAction(
         randomGenerator: RandomGenerator,
