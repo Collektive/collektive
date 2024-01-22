@@ -67,7 +67,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
     override fun createReaction(
         randomGenerator: RandomGenerator,
         environment: Environment<Any?, P>,
-        node: Node<Any?>?,
+        node: Node<Any?>,
         timeDistribution: TimeDistribution<Any?>,
         parameter: String,
     ): Reaction<Any?> = Event(node, timeDistribution).also {
@@ -77,16 +77,16 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
     }
 
     override fun createTimeDistribution(
-        randomGenerator: RandomGenerator?,
+        randomGenerator: RandomGenerator,
         environment: Environment<Any?, P>,
         node: Node<Any?>?,
         parameter: String?,
     ): TimeDistribution<Any?> = parameter.toDefaultDouble().let { frequency ->
-        DiracComb(randomGenerator?.let { DoubleTime(it.nextDouble(0.0, 1.0 / frequency)) }, frequency)
+        DiracComb(DoubleTime(randomGenerator.nextDouble(0.0, 1.0 / frequency)), frequency)
     }
 
     override fun createNode(
-        randomGenerator: RandomGenerator?,
+        randomGenerator: RandomGenerator,
         environment: Environment<Any?, P>,
         parameter: String?,
     ): Node<Any?> = GenericNode(environment).also {
