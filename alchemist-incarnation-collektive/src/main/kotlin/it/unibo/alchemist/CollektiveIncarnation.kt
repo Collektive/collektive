@@ -35,9 +35,9 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
             else -> error("$data is not a doublify-able value")
         }
 
-    override fun createMolecule(s: String) = SimpleMolecule(s)
+    override fun createMolecule(molecule: String) = SimpleMolecule(molecule)
 
-    override fun createConcentration(s: String?) = s
+    override fun createConcentration(concentration: String?) = concentration
 
     override fun createConcentration() = null
 
