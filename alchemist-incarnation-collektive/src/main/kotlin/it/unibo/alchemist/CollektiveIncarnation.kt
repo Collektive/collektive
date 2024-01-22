@@ -81,8 +81,9 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         environment: Environment<Any?, P>,
         node: Node<Any?>?,
         parameter: String?,
-    ): TimeDistribution<Any?> = parameter.toDefaultDouble().let { frequency ->
-        DiracComb(DoubleTime(randomGenerator.nextDouble(0.0, 1.0 / frequency)), frequency)
+    ): TimeDistribution<Any?> = parameter?.toDoubleOrNull().let { frequency ->
+        val actualFrequency = frequency ?: 1.0
+        DiracComb(DoubleTime(randomGenerator.nextDouble(0.0, 1.0 / actualFrequency)), actualFrequency)
     }
 
     override fun createNode(
@@ -90,8 +91,6 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         environment: Environment<Any?, P>,
         parameter: String?,
     ): Node<Any?> = GenericNode(environment).also {
-        it.addProperty(CollektiveDevice(environment, it, DoubleTime(parameter.toDefaultDouble())))
+        it.addProperty(CollektiveDevice(environment, it, DoubleTime(parameter?.toDoubleOrNull() ?: 0.0)))
     }
-
-    private fun String?.toDefaultDouble(): Double = this?.toDoubleOrNull() ?: 1.0
 }
