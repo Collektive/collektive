@@ -14,7 +14,7 @@ sealed interface Message
 data class InboundMessage(val senderId: ID, val messages: Map<Path, *>) : Message
 
 /**
- * An [OutboundMessage] are [messages] that a device [senderId] sends to all other neighbours.
+ * An [OutboundMessage] are [messages] that a device [senderId] sends to all other neighbors.
  */
 data class OutboundMessage(val senderId: ID, val messages: Map<Path, SingleOutboundMessage<*>>) : Message
 

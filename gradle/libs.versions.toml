@@ -29,7 +29,10 @@ kotlin-testing-common = [
     "kotlin-test-common",
     "kotlin-test-annotations-common",
 ]
-alchemist = ["alchemist"]
+alchemist = [
+    "alchemist",
+    "alchemist-api",
+]
 
 [plugins]
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
