@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 apply(plugin = libs.plugins.kotlin.jvm.id)
 
 kotlinJvm {
@@ -17,6 +19,6 @@ kotlinJvm {
     }
 }
 
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class).all {
+tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions.freeCompilerArgs = listOf("-Xcontext-receivers")
 }
