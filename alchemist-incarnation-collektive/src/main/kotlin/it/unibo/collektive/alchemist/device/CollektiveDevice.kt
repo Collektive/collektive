@@ -24,7 +24,7 @@ import it.unibo.collektive.path.Path
 class CollektiveDevice<P>(
     private val environment: Environment<Any?, P>,
     override val node: Node<Any?>,
-    private val retainMessagesFor: Time,
+    private val retainMessagesFor: Time?,
 ) : NodeProperty<Any?>, Network<Int>, DistanceSensor where P : Position<P> {
     private data class TimedMessage(val receivedAt: Time, val payload: InboundMessage<Int>)
 
@@ -52,9 +52,14 @@ class CollektiveDevice<P>(
     override fun cloneOnNewNode(node: Node<Any?>): NodeProperty<Any?> =
         CollektiveDevice(environment, node, retainMessagesFor)
 
-    override fun read(): Set<InboundMessage<Int>> {
-        validMessages.retainAll { it.receivedAt + retainMessagesFor >= currentTime }
-        return validMessages.mapTo(mutableSetOf()) { it.payload }
+    override fun read(): Set<InboundMessage<InT>> {
+        return when(retainMessagesFor){
+            null -> validMessages.mapTo(mutableSetOf()) { it.payload }.also { validMessages.clear() }
+            else -> {
+                validMessages.retainAll { it.receivedAt + retainMessagesFor >= currentTime }
+                validMessages.mapTo(mutableSetOf()) { it.payload }
+            }
+        }
     }
 
     override fun write(message: OutboundMessage<Int>) {
