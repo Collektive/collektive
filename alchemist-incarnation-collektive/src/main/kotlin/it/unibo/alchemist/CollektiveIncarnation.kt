@@ -126,7 +126,6 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
                 ScriptEngineManager().getEngineByName(property.name)
                     ?: error("No script engine with ${property.name} found.")
         }
-//        private val groovy by ScriptEngine
         private val kotlin by ScriptEngine
 
         private val cache: LoadingCache<String, (Any?) -> Any?> = Caffeine.newBuilder()
