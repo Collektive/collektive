@@ -33,19 +33,20 @@ import kotlin.reflect.full.starProjectedType
  */
 class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
     override fun getProperty(node: Node<Any?>, molecule: Molecule, property: String?): Double {
-        val interpreted = if (property.isNullOrBlank()) {
-            node.getConcentration(molecule)
-        } else {
-            val concentration = node.getConcentration(molecule)
-            val concentrationType = when (concentration) {
-                null -> "Any?"
-                else -> {
-                    val type = concentration::class.starProjectedType
-                    "$type${"?".takeIf { type.isMarkedNullable}.orEmpty()}"
+        val interpreted = when (property.isNullOrBlank()) {
+            true -> node.getConcentration(molecule)
+            else -> {
+                val concentration = node.getConcentration(molecule)
+                val concentrationType = when (concentration) {
+                    null -> "Any?"
+                    else -> {
+                        val type = concentration::class.starProjectedType
+                        "$type${"?".takeIf { type.isMarkedNullable }.orEmpty()}"
+                    }
                 }
+                val toInvoke = cache.get("import kotlin.math.*; val x: ($concentrationType) -> Any? = { $property }; x")
+                toInvoke(concentration)
             }
-            val toInvoke = cache.get("import kotlin.math.*; val x: ($concentrationType) -> Any? = { $property }; x")
-            toInvoke(concentration)
         }
         return when (interpreted) {
             is Double -> interpreted
@@ -116,13 +117,12 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
             CollektiveDevice(
                 environment,
                 genericNode,
-               parameter?.let { DoubleTime(it.toDouble()) },
+                parameter?.let { DoubleTime(it.toDouble()) },
             ),
         )
     }
 
     companion object {
-        // a delegate
         private object ScriptEngine {
             operator fun getValue(thisRef: Any?, property: KProperty<*>) =
                 ScriptEngineManager().getEngineByName(property.name)
