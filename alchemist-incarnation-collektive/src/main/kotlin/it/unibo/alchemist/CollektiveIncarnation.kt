@@ -1,5 +1,8 @@
 package it.unibo.alchemist
 
+import com.github.benmanes.caffeine.cache.Cache
+import com.github.benmanes.caffeine.cache.Caffeine
+import com.github.benmanes.caffeine.cache.LoadingCache
 import it.unibo.alchemist.actions.RunCollektiveProgram
 import it.unibo.alchemist.model.Action
 import it.unibo.alchemist.model.Actionable
@@ -22,18 +25,26 @@ import it.unibo.alchemist.util.RandomGenerators.nextDouble
 import it.unibo.collektive.alchemist.device.CollektiveDevice
 import org.apache.commons.math3.random.RandomGenerator
 import org.danilopianini.util.ListSet
+import javax.script.ScriptEngineManager
+import kotlin.reflect.KProperty
 
 /**
  * Collektive incarnation in Alchemist.
  */
 class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
-    override fun getProperty(node: Node<Any?>, molecule: Molecule, property: String?): Double =
-        when (val data = node.getConcentration(molecule)) {
-            is Double -> data
-            is Number -> data.toDouble()
-            is String -> data.toDoubleOrNull() ?: Double.NaN
-            else -> error("$data is not a doublify-able value")
+    override fun getProperty(node: Node<Any?>, molecule: Molecule, property: String?): Double {
+        val interpreted = if(property.isNullOrBlank()) {
+            node.getConcentration(molecule)
+        } else {
+            cache.get("val x: (Any?) -> Any? = { $property }; x")(node.getConcentration(molecule))
         }
+        return when (interpreted) {
+            is Double -> interpreted
+            is Number -> interpreted.toDouble()
+            is String -> interpreted.toDoubleOrNull() ?: Double.NaN
+            else -> Double.NaN
+        }
+    }
 
     override fun createMolecule(molecule: String) = SimpleMolecule(molecule)
 
@@ -48,8 +59,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         time: TimeDistribution<Any?>,
         actionable: Actionable<Any?>,
         additionalParameters: String,
-    ): Action<Any?> =
-        RunCollektiveProgram(node, time, additionalParameters)
+    ): Action<Any?> = RunCollektiveProgram(node, time, additionalParameters)
 
     override fun createCondition(
         randomGenerator: RandomGenerator,
@@ -58,11 +68,14 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         time: TimeDistribution<Any?>,
         actionable: Actionable<Any?>,
         additionalParameters: String?,
-    ): Condition<Any?> = object : AbstractCondition<Any>(requireNotNull(node)) {
-        override fun getContext() = Context.LOCAL
-        override fun getPropensityContribution(): Double = 1.0
-        override fun isValid(): Boolean = true
-    }
+    ): Condition<Any?> =
+        object : AbstractCondition<Any>(requireNotNull(node)) {
+            override fun getContext() = Context.LOCAL
+
+            override fun getPropensityContribution(): Double = 1.0
+
+            override fun isValid(): Boolean = true
+        }
 
     override fun createReaction(
         randomGenerator: RandomGenerator,
@@ -70,27 +83,57 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         node: Node<Any?>,
         timeDistribution: TimeDistribution<Any?>,
         parameter: String,
-    ): Reaction<Any?> = Event(node, timeDistribution).also {
-        it.actions = ListSet.of(
-            createAction(randomGenerator, environment, node, timeDistribution, it, parameter),
-        )
-    }
+    ): Reaction<Any?> =
+        Event(node, timeDistribution).also {
+            it.actions =
+                ListSet.of(
+                    createAction(randomGenerator, environment, node, timeDistribution, it, parameter),
+                )
+        }
 
     override fun createTimeDistribution(
         randomGenerator: RandomGenerator,
         environment: Environment<Any?, P>,
         node: Node<Any?>?,
         parameter: String?,
-    ): TimeDistribution<Any?> = parameter?.toDoubleOrNull().let { frequency ->
-        val actualFrequency = frequency ?: 1.0
-        DiracComb(DoubleTime(randomGenerator.nextDouble(0.0, 1.0 / actualFrequency)), actualFrequency)
-    }
+    ): TimeDistribution<Any?> =
+        parameter?.toDoubleOrNull().let { frequency ->
+            val actualFrequency = frequency ?: 1.0
+            DiracComb(DoubleTime(randomGenerator.nextDouble(0.0, 1.0 / actualFrequency)), actualFrequency)
+        }
 
     override fun createNode(
         randomGenerator: RandomGenerator,
         environment: Environment<Any?, P>,
         parameter: String?,
-    ): Node<Any?> = GenericNode(environment).also {
-        it.addProperty(CollektiveDevice(environment, it, DoubleTime(parameter?.toDoubleOrNull() ?: 0.0)))
+    ): Node<Any?> =
+        GenericNode(environment).also {
+            it.addProperty(
+                CollektiveDevice(
+                    environment,
+                    it,
+                    parameter?.toDoubleOrNull().let { p ->
+                        if (p != null) DoubleTime(p) else null
+                    },
+                ),
+            )
+        }
+
+    companion object {
+        // a delegate
+        private object ScriptEngine {
+            operator fun getValue(thisRef: Any?, property: KProperty<*>) =
+                ScriptEngineManager().getEngineByName(property.name)
+                    ?: error("No script engine with ${property.name} found.")
+        }
+//        private val groovy by ScriptEngine
+        private val kotlin by ScriptEngine
+
+        private val cache: LoadingCache<String, (Any?) -> Any?> = Caffeine.newBuilder()
+            .build { property ->
+                @Suppress("UNCHECKED_CAST")
+                kotlin.eval(property) as (Any?) -> Any?
+            }
     }
 }
+
