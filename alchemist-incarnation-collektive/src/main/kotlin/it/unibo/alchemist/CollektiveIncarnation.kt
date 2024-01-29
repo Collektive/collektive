@@ -78,8 +78,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         time: TimeDistribution<Any?>,
         actionable: Actionable<Any?>,
         additionalParameters: String?,
-    ): Condition<Any?> =
-        object : AbstractCondition<Any>(requireNotNull(node)) {
+    ): Condition<Any?> = object : AbstractCondition<Any>(requireNotNull(node)) {
             override fun getContext() = Context.LOCAL
 
             override fun getPropensityContribution(): Double = 1.0
@@ -93,12 +92,10 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         node: Node<Any?>,
         timeDistribution: TimeDistribution<Any?>,
         parameter: String,
-    ): Reaction<Any?> =
-        Event(node, timeDistribution).also {
-            it.actions =
-                ListSet.of(
-                    createAction(randomGenerator, environment, node, timeDistribution, it, parameter),
-                )
+    ): Reaction<Any?> = Event(node, timeDistribution).also {
+        it.actions = ListSet.of(
+                createAction(randomGenerator, environment, node, timeDistribution, it, parameter),
+            )
         }
 
     override fun createTimeDistribution(
@@ -106,28 +103,26 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         environment: Environment<Any?, P>,
         node: Node<Any?>?,
         parameter: String?,
-    ): TimeDistribution<Any?> =
-        parameter?.toDoubleOrNull().let { frequency ->
-            val actualFrequency = frequency ?: 1.0
-            DiracComb(DoubleTime(randomGenerator.nextDouble(0.0, 1.0 / actualFrequency)), actualFrequency)
-        }
+    ): TimeDistribution<Any?> = parameter?.toDoubleOrNull().let { frequency ->
+        val actualFrequency = frequency ?: 1.0
+        DiracComb(DoubleTime(randomGenerator.nextDouble(0.0, 1.0 / actualFrequency)), actualFrequency)
+    }
 
     override fun createNode(
         randomGenerator: RandomGenerator,
         environment: Environment<Any?, P>,
         parameter: String?,
-    ): Node<Any?> =
-        GenericNode(environment).also {
-            it.addProperty(
-                CollektiveDevice(
-                    environment,
-                    it,
-                    parameter?.toDoubleOrNull().let { p ->
-                        if (p != null) DoubleTime(p) else null
-                    },
-                ),
-            )
-        }
+    ): Node<Any?> = GenericNode(environment).also { genericNode ->
+        genericNode.addProperty(
+            CollektiveDevice(
+                environment,
+                genericNode,
+                parameter?.toDoubleOrNull().let {
+                    if (it != null) DoubleTime(it) else null
+                },
+            ),
+        )
+    }
 
     companion object {
         // a delegate
