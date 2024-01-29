@@ -45,13 +45,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
                     "$type${"?".takeIf { type.isMarkedNullable}.orEmpty()}"
                 }
             }
-            val toInvoke = cache.get(
-                """
-                import kotlin.math.*
-                val x: ($concentrationType) -> Any? = { $property }
-                x
-                """.trimIndent()
-            )
+            val toInvoke = cache.get("import kotlin.math.*; val x: ($concentrationType) -> Any? = { $property }; x")
             toInvoke(concentration)
         }
         return when (interpreted) {
