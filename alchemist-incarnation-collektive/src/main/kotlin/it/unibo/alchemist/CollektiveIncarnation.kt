@@ -27,6 +27,7 @@ import org.apache.commons.math3.random.RandomGenerator
 import org.danilopianini.util.ListSet
 import javax.script.ScriptEngineManager
 import kotlin.reflect.KProperty
+import kotlin.reflect.full.starProjectedType
 
 /**
  * Collektive incarnation in Alchemist.
@@ -36,7 +37,22 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         val interpreted = if(property.isNullOrBlank()) {
             node.getConcentration(molecule)
         } else {
-            cache.get("val x: (Any?) -> Any? = { $property }; x")(node.getConcentration(molecule))
+            val concentration = node.getConcentration(molecule)
+            val concentrationType = when (concentration) {
+                null -> "Any?"
+                else -> {
+                    val type = concentration::class.starProjectedType
+                    "$type${"?".takeIf { type.isMarkedNullable}.orEmpty()}"
+                }
+            }
+            val toInvoke = cache.get(
+                """
+                import kotlin.math.*
+                val x: ($concentrationType) -> Any? = { $property }
+                x
+                """.trimIndent()
+            )
+            toInvoke(concentration)
         }
         return when (interpreted) {
             is Double -> interpreted
@@ -127,11 +143,17 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
                     ?: error("No script engine with ${property.name} found.")
         }
         private val kotlin by ScriptEngine
+        private val defaultLambda: (Any?) -> Any? = { Double.NaN }
 
         private val cache: LoadingCache<String, (Any?) -> Any?> = Caffeine.newBuilder()
             .build { property ->
-                @Suppress("UNCHECKED_CAST")
-                kotlin.eval(property) as (Any?) -> Any?
+                runCatching {
+                    @Suppress("UNCHECKED_CAST")
+                    when (val interpreted = kotlin.eval(property)) {
+                        is (Nothing) -> Any? -> interpreted
+                        else -> defaultLambda
+                    } as (Any?) -> Any?
+                }.getOrElse { defaultLambda }
             }
     }
 }
