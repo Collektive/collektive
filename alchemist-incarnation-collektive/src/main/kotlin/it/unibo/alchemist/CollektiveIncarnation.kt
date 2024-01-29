@@ -1,6 +1,5 @@
 package it.unibo.alchemist
 
-import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.LoadingCache
 import it.unibo.alchemist.actions.RunCollektiveProgram
@@ -34,7 +33,7 @@ import kotlin.reflect.full.starProjectedType
  */
 class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
     override fun getProperty(node: Node<Any?>, molecule: Molecule, property: String?): Double {
-        val interpreted = if(property.isNullOrBlank()) {
+        val interpreted = if (property.isNullOrBlank()) {
             node.getConcentration(molecule)
         } else {
             val concentration = node.getConcentration(molecule)
@@ -79,12 +78,12 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         actionable: Actionable<Any?>,
         additionalParameters: String?,
     ): Condition<Any?> = object : AbstractCondition<Any>(requireNotNull(node)) {
-            override fun getContext() = Context.LOCAL
+        override fun getContext() = Context.LOCAL
 
-            override fun getPropensityContribution(): Double = 1.0
+        override fun getPropensityContribution(): Double = 1.0
 
-            override fun isValid(): Boolean = true
-        }
+        override fun isValid(): Boolean = true
+    }
 
     override fun createReaction(
         randomGenerator: RandomGenerator,
@@ -94,9 +93,9 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         parameter: String,
     ): Reaction<Any?> = Event(node, timeDistribution).also {
         it.actions = ListSet.of(
-                createAction(randomGenerator, environment, node, timeDistribution, it, parameter),
-            )
-        }
+            createAction(randomGenerator, environment, node, timeDistribution, it, parameter),
+        )
+    }
 
     override fun createTimeDistribution(
         randomGenerator: RandomGenerator,
@@ -146,4 +145,3 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
             }
     }
 }
-
