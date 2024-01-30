@@ -1,6 +1,7 @@
 package it.unibo.collektive
 
 import it.unibo.collektive.utils.common.AggregateFunctionNames.ALIGNED_ON_FUNCTION
+import it.unibo.collektive.utils.common.isAssignableFrom
 import it.unibo.collektive.utils.logging.debug
 import it.unibo.collektive.visitors.collectAggregateReference
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -13,7 +14,6 @@ import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrElseBranch
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.types.classFqName
-import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.dumpKotlinLike
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.name.Name
@@ -32,7 +32,8 @@ class FieldTransformer(
     override fun visitCall(expression: IrCall): IrExpression {
         if (expression.symbol.owner.name == Name.identifier(ALIGNED_ON_FUNCTION)) {
             logger.debug("Found alignedOn function call: ${expression.dumpKotlinLike()}")
-            val contextReference = expression.receiverAndArgs().find { it.type == aggregateClass.defaultType }
+            val contextReference = expression.receiverAndArgs()
+                .find { it.type.isAssignableFrom(aggregateClass.thisReceiver?.type!!) }
                 ?: collectAggregateReference(aggregateClass, expression.symbol.owner)
             contextReference?.let {
                 // If the expression contains a lambda, this recursion is necessary to visit the children

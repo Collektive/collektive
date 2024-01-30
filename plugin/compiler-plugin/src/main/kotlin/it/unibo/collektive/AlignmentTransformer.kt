@@ -4,6 +4,7 @@ import it.unibo.collektive.utils.branch.addBranchAlignment
 import it.unibo.collektive.utils.call.buildAlignedOnCall
 import it.unibo.collektive.utils.common.AggregateFunctionNames.ALIGNED_ON_FUNCTION
 import it.unibo.collektive.utils.common.getFunctionName
+import it.unibo.collektive.utils.common.isAssignableFrom
 import it.unibo.collektive.utils.statement.irStatement
 import it.unibo.collektive.visitors.collectAggregateReference
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -15,7 +16,6 @@ import org.jetbrains.kotlin.ir.expressions.IrBranch
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrElseBranch
 import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 
 /**
@@ -33,7 +33,8 @@ class AlignmentTransformer(
     private var alignedFunctions: AlignedData = emptyMap()
 
     override fun visitCall(expression: IrCall): IrExpression {
-        val contextReference = expression.receiverAndArgs().find { it.type == aggregateContextClass.defaultType }
+        val contextReference = expression.receiverAndArgs()
+            .find { it.type.isAssignableFrom(aggregateContextClass.thisReceiver?.type!!) }
             ?: collectAggregateReference(aggregateContextClass, expression.symbol.owner)
         return contextReference?.let { context ->
             val functionName = expression.getFunctionName()

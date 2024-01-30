@@ -1,5 +1,6 @@
 package it.unibo.collektive
 
+import it.unibo.collektive.utils.common.isAssignableFrom
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrStatement
@@ -25,7 +26,9 @@ class AggregateCallTransformer(
     private val aggregateContext = aggregateClass.thisReceiver?.type
 
     override fun visitFunction(declaration: IrFunction): IrStatement {
-        if (declaration.extensionReceiverParameter?.type == aggregateContext) {
+        val isAggregateFunction = declaration.extensionReceiverParameter?.type?.isAssignableFrom(aggregateContext!!)
+            ?: false
+        if (isAggregateFunction) {
             /*
              This transformation is needed to project field inside the `alignOn` function called directly by the user.
              This is made before the alignment transformation because of optimization reasons:
