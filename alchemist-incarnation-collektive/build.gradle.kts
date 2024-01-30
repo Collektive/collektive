@@ -9,6 +9,7 @@ kotlinJvm {
                 implementation(project(":dsl"))
                 implementation(kotlin("reflect"))
                 implementation(libs.bundles.alchemist)
+                implementation(libs.caffeine)
             }
         }
         val test by getting {
