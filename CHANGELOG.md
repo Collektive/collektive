@@ -1,3 +1,27 @@
+## [6.0.0](https://github.com/Collektive/collektive/compare/5.1.0...6.0.0) (2024-01-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* drop `ID` and revise several parts of the API (#179)
+
+### Dependency updates
+
+* **deps:** update alchemist to v30 ([718d5d8](https://github.com/Collektive/collektive/commit/718d5d845ea100c547c3ba3f17c9c6b198afe881))
+* **deps:** update alchemist to v30.0.1 ([69353af](https://github.com/Collektive/collektive/commit/69353afdc6da87fe40f229814e153a4fef273779))
+* **deps:** update alchemist to v30.0.2 ([77c6d71](https://github.com/Collektive/collektive/commit/77c6d71cc293f689eec61e80ab6f6d4fce7812b0))
+* **deps:** update plugin com.gradle.enterprise to v3.16.2 ([824311a](https://github.com/Collektive/collektive/commit/824311a05f6d737fb45dbbb810b6201e50349975))
+
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.2.15 ([9f7f6c0](https://github.com/Collektive/collektive/commit/9f7f6c07999365e8bf94de83acaf1a9ae8153811))
+
+
+### Refactoring
+
+* drop `ID` and revise several parts of the API ([#179](https://github.com/Collektive/collektive/issues/179)) ([ecca283](https://github.com/Collektive/collektive/commit/ecca283aa3d5e49d2dbb40a2894d20589be2d387))
+
 ## [5.1.0](https://github.com/Collektive/collektive/compare/5.0.0...5.1.0) (2024-01-22)
 
 
