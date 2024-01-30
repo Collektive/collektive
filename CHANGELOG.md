@@ -1,3 +1,23 @@
+## [5.1.0](https://github.com/Collektive/collektive/compare/5.0.0...5.1.0) (2024-01-22)
+
+
+### Features
+
+* add `alchemist-incarnation-collektive`, implementing an Alchemist incarnation to run Collektive in the simulator ([#193](https://github.com/Collektive/collektive/issues/193)) ([fee291e](https://github.com/Collektive/collektive/commit/fee291e4995d4c90e284c1cbdc8ac0f306b668e8))
+
+
+### Dependency updates
+
+* **deps:** update alchemist to v29.5.0 ([c3916bc](https://github.com/Collektive/collektive/commit/c3916bce50278b5c56ecd4d1ce38d4a05b34d222))
+* **deps:** update dependency it.unibo.alchemist:alchemist-api to v29.5.1 ([39b3dd8](https://github.com/Collektive/collektive/commit/39b3dd8be5aca97987f142067eab589107047a9b))
+* **deps:** update plugin gitsemver to v3 ([86849cd](https://github.com/Collektive/collektive/commit/86849cd8ee65b40cf0f38c957afa126f352a5cf9))
+* **deps:** update plugin gitsemver to v3.1.0 ([37f789a](https://github.com/Collektive/collektive/commit/37f789a8c7fe833228c67313c65a74de7454356b))
+
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.2.14 ([1c15691](https://github.com/Collektive/collektive/commit/1c156914860db1985d14fb83b02a14c4eabcaa10))
+
 ## [5.0.0](https://github.com/Collektive/collektive/compare/4.0.0...5.0.0) (2024-01-16)
 
 

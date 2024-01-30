@@ -1,5 +1,5 @@
 [versions]
-alchemist = "29.5.1"
+alchemist = "30.0.2"
 build-config = "5.3.5"
 coroutines = "1.7.3"
 dokka = "1.9.10"
@@ -29,7 +29,10 @@ kotlin-testing-common = [
     "kotlin-test-common",
     "kotlin-test-annotations-common",
 ]
-alchemist = ["alchemist"]
+alchemist = [
+    "alchemist",
+    "alchemist-api",
+]
 
 [plugins]
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }

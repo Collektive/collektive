@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 apply(plugin = libs.plugins.kotlin.jvm.id)
 
 kotlinJvm {
@@ -5,9 +7,18 @@ kotlinJvm {
         val main by getting {
             dependencies {
                 implementation(project(":dsl"))
-                implementation(rootProject.libs.alchemist.api)
-                implementation(rootProject.libs.alchemist)
+                implementation(kotlin("reflect"))
+                implementation(libs.bundles.alchemist)
+            }
+        }
+        val test by getting {
+            dependencies {
+                implementation(rootProject.libs.kotest.runner.junit5.jvm)
             }
         }
     }
+}
+
+tasks.withType<KotlinCompile>().configureEach {
+    kotlinOptions.freeCompilerArgs = listOf("-Xcontext-receivers")
 }

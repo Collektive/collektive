@@ -2,6 +2,7 @@ package it.unibo.collektive.alchemist.device
 
 import it.unibo.alchemist.model.Environment
 import it.unibo.alchemist.model.Node
+import it.unibo.alchemist.model.Node.Companion.asPropertyOrNull
 import it.unibo.alchemist.model.NodeProperty
 import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Time
@@ -11,6 +12,8 @@ import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.Network
 import it.unibo.collektive.networking.OutboundMessage
+import it.unibo.collektive.networking.SingleOutboundMessage
+import it.unibo.collektive.path.Path
 
 /**
  * Representation of a Collektive device in Alchemist.
@@ -19,11 +22,10 @@ import it.unibo.collektive.networking.OutboundMessage
  * are retained.
  */
 class CollektiveDevice<P>(
-    private val environment: Environment<Any, P>,
-    override val node: Node<Any>,
+    private val environment: Environment<Any?, P>,
+    override val node: Node<Any?>,
     private val retainMessagesFor: Time,
-) : NodeProperty<Any>, Network<Int>, DistanceSensor where P : Position<P> {
-
+) : NodeProperty<Any?>, Network<Int>, DistanceSensor where P : Position<P> {
     private data class TimedMessage(val receivedAt: Time, val payload: InboundMessage<Int>)
 
     /**
@@ -31,34 +33,55 @@ class CollektiveDevice<P>(
      */
     var currentTime: Time = Time.ZERO
 
-    private var validMessages: Iterable<TimedMessage> = emptySet()
+    /**
+     * The ID of the node.
+     */
+    val id = node.id
+
+    private val validMessages: MutableList<TimedMessage> = mutableListOf()
 
     private fun receiveMessage(time: Time, message: InboundMessage<Int>) {
         validMessages += TimedMessage(time, message)
     }
 
-    override fun cloneOnNewNode(node: Node<Any>) = TODO("Not yet implemented")
+    override fun <ID : Any> Aggregate<ID>.distances(): Field<ID, Double> =
+        environment.getPosition(node).let { nodePosition ->
+            neighboringViaExchange(nodePosition).map { position -> nodePosition.distanceTo(position) }
+        }
+
+    override fun cloneOnNewNode(node: Node<Any?>): NodeProperty<Any?> =
+        CollektiveDevice(environment, node, retainMessagesFor)
 
     override fun read(): Set<InboundMessage<Int>> {
-        return validMessages
-            .filter { it.receivedAt + retainMessagesFor >= currentTime }
-            .also { validMessages = it }
-            .map { it.payload }
-            .toSet()
+        validMessages.retainAll { it.receivedAt + retainMessagesFor >= currentTime }
+        return validMessages.mapTo(mutableSetOf()) { it.payload }
     }
 
     override fun write(message: OutboundMessage<Int>) {
-        message.messages.mapValues { (path, outbound) ->
-            receiveMessage(
-                currentTime,
-                InboundMessage(
-                    message.senderId,
-                    mapOf(path to outbound.overrides.getOrElse(node.id) { outbound.default }),
-                ),
+        val neighborhood = environment.getNeighborhood(node)
+            .mapNotNull { it.asPropertyOrNull<Any?, CollektiveDevice<P>>() }
+        val baseMessageBacking = mutableMapOf<Path, Any?>()
+        val mayNeedOverrideBacking = mutableMapOf<Path, SingleOutboundMessage<Int, *>>()
+        for ((path, payload) in message.messages) {
+            if (payload.overrides.isEmpty()) {
+                baseMessageBacking[path] = payload.default
+            } else {
+                mayNeedOverrideBacking[path] = payload
+            }
+        }
+        val baseMessage: Map<Path, Any?> = baseMessageBacking
+        val mayNeedOverride: Map<Path, SingleOutboundMessage<Int, *>> = mayNeedOverrideBacking
+        neighborhood.forEach { neighbor ->
+            val customMessage = InboundMessage(
+                message.senderId,
+                when {
+                    mayNeedOverride.isEmpty() -> baseMessage
+                    else -> baseMessage + mayNeedOverride.mapValues { (_, anisotropic) ->
+                        anisotropic.overrides.getOrDefault(node.id, anisotropic.default)
+                    }
+                },
             )
+            neighbor.receiveMessage(currentTime, customMessage)
         }
     }
-
-    override fun <ID : Any> Aggregate<ID>.distances(): Field<ID, Double> =
-        neighboringViaExchange(environment.getPosition(node)).map { it.distanceTo(environment.getPosition(node)) }
 }
