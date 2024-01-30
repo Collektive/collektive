@@ -116,9 +116,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
             CollektiveDevice(
                 environment,
                 genericNode,
-                parameter?.toDoubleOrNull().let {
-                    if (it != null) DoubleTime(it) else null
-                },
+               parameter?.let { DoubleTime(it.toDouble()) },
             ),
         )
     }
