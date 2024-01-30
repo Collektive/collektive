@@ -1,12 +1,13 @@
 package it.unibo.collektive.visitors
 
-import it.unibo.collektive.utils.common.receiverAndArgs
+import it.unibo.collektive.utils.common.isAssignableFrom
+import org.jetbrains.kotlin.backend.jvm.ir.receiverAndArgs
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
-import org.jetbrains.kotlin.utils.addIfNotNull
 
 /**
  * Class that visit all the children of the IR, looking for the
@@ -25,8 +26,9 @@ class AggregateRefChildrenVisitor(
     // Search in each call if in its receiver or arguments there is the reference to
     // the aggregate context
     override fun visitCall(expression: IrCall, data: Nothing?) {
-        elements.addIfNotNull(expression.receiverAndArgs(aggregateContextClass))
-        super.visitCall(expression, data)
+        val aggregateContextRef = expression.receiverAndArgs()
+            .find { it.type.isAssignableFrom(aggregateContextClass.defaultType) }
+        aggregateContextRef?.let { elements.add(it) } ?: super.visitCall(expression, data)
     }
 }
 
@@ -34,4 +36,5 @@ class AggregateRefChildrenVisitor(
  * Retrieve the aggregate context reference by looking in all the function call in the element found.
  */
 fun collectAggregateReference(aggregateContextClass: IrClass, element: IrElement): IrExpression? =
-    buildList { element.accept(AggregateRefChildrenVisitor(aggregateContextClass, this), null) }.firstOrNull()
+    buildList { element.accept(AggregateRefChildrenVisitor(aggregateContextClass, this), null) }
+        .firstOrNull()

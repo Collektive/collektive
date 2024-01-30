@@ -10,8 +10,9 @@ import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
-import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
+import org.jetbrains.kotlin.ir.symbols.FqNameEqualityChecker
 import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.types.classifierOrNull
 import org.jetbrains.kotlin.ir.types.typeWith
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.name.ClassId
@@ -30,10 +31,12 @@ internal fun IrFunctionAccessExpression.putTypeArgument(typeArgument: IrType) {
     putTypeArgument(0, typeArgument)
 }
 
-/**
- * Get the value argument in the last index available of the function call.
- */
-internal fun IrCall.getLastValueArgument(): IrExpression? = getValueArgument(valueArgumentsCount - 1)
+internal fun IrType.isAssignableFrom(other: IrType): Boolean = classifierOrNull?.let { base ->
+    other.classifierOrNull?.let { other ->
+        FqNameEqualityChecker.areEqual(base, other)
+    } ?: false
+} ?: false
+
 
 /**
  * Looking in the receiver and args of a IrCall if there is one that matches the
@@ -48,10 +51,12 @@ internal fun getLambdaType(pluginContext: IrPluginContext, lambda: IrSimpleFunct
     return pluginContext.referenceClass(ClassId(classFqn.parent(), classFqn.shortName()))?.let { base ->
         base.typeWith(lambda.valueParameters.map { it.type } + lambda.returnType)
     } ?: run {
-        error("""
+        error(
+            """
             Unable to reference the class ${classFqn.parent()}.
             This is may due to a bug in collektive compiler plugin.
-            """.trimIndent())
+            """.trimIndent()
+        )
         throw ClassNotFoundException("Unable to reference ${classFqn.parent()}")
     }
 }

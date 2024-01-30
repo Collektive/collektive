@@ -2,6 +2,7 @@ package it.unibo.collektive.aggregate.api.operators
 
 import arrow.core.Option
 import arrow.core.getOrElse
+import arrow.core.identity
 import arrow.core.none
 import arrow.core.some
 import it.unibo.collektive.aggregate.api.Aggregate
@@ -25,7 +26,8 @@ import it.unibo.collektive.field.Field
  *
  * In this case, the field returned has the result of the computation as local value.
  */
-fun <Scalar> Aggregate.neighboring(local: Scalar): Field<Scalar> = exchange(local) { it.mapWithId { _, x -> x } }
+fun <ID : Any, Scalar> Aggregate<ID>.neighboringViaExchange(local: Scalar): Field<ID, Scalar> =
+    exchange(local, ::identity)
 
 /**
  * [sharing] captures the space-time nature of field computation through observation of neighbours' values, starting
@@ -54,14 +56,16 @@ fun <Scalar> Aggregate.neighboring(local: Scalar): Field<Scalar> = exchange(loca
  * }
  * ```
  */
-fun <Initial, Return> Aggregate.sharing(
+fun <ID : Any, Initial, Return> Aggregate<ID>.sharing(
     initial: Initial,
-    transform: YieldingContext<Initial, Return>.(Field<Initial>) -> YieldingContext.YieldingResult<Initial, Return>,
+    transform: YieldingContext<Initial, Return>.(Field<ID, Initial>) -> YieldingContext.YieldingResult<Initial, Return>,
 ): Return {
     val context = YieldingContext<Initial, Return>()
     var yieldingContext: Option<YieldingContext.YieldingResult<Initial, Return>> = none()
-    exchange(initial) {
-        it.mapWithId { _, _ -> transform(context, it).also { context -> yieldingContext = context.some() }.toSend }
+    exchange(initial) { initialField ->
+        initialField.map { _ ->
+            transform(context, initialField).also { context -> yieldingContext = context.some() }.toSend
+        }
     }
     return yieldingContext.getOrElse { error("This error should never be thrown") }.toReturn
 }
@@ -78,5 +82,5 @@ fun <Initial, Return> Aggregate.sharing(
  * ```
  * In the example above, the function [share] wil return a value that is the max found in the field.
  **/
-fun <Initial> Aggregate.share(initial: Initial, transform: (Field<Initial>) -> Initial): Initial =
+fun <ID : Any, Initial> Aggregate<ID>.share(initial: Initial, transform: (Field<ID, Initial>) -> Initial): Initial =
     sharing(initial) { field -> transform(field).run { yielding { this } } }

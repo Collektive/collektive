@@ -1,12 +1,11 @@
 package it.unibo.collektive.aggregate.api.impl
 
-import it.unibo.collektive.ID
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.YieldingContext
 import it.unibo.collektive.aggregate.api.YieldingContext.YieldingResult
 import it.unibo.collektive.aggregate.api.YieldingScope
 import it.unibo.collektive.aggregate.api.impl.stack.Stack
-import it.unibo.collektive.aggregate.api.operators.neighboring
+import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.OutboundMessage
@@ -20,11 +19,11 @@ import it.unibo.collektive.state.impl.getTyped
  * It represents the [localId] of the device, the [messages] received from the neighbours,
  * and the [previousState] of the device.
  */
-internal class AggregateContext(
+internal class AggregateContext<ID : Any>(
     override val localId: ID,
-    private val messages: Iterable<InboundMessage>,
+    private val messages: Iterable<InboundMessage<ID>>,
     private val previousState: State,
-) : Aggregate {
+) : Aggregate<ID> {
 
     private val stack = Stack()
     private var state: State = mapOf()
@@ -33,23 +32,26 @@ internal class AggregateContext(
     /**
      * Messages to send to the other nodes.
      */
-    fun messagesToSend(): OutboundMessage = toBeSent
+    fun messagesToSend(): OutboundMessage<ID> = toBeSent
 
     /**
      * Return the current state of the device as a new state.
      */
     fun newState(): State = state
 
-    private fun <T> newField(localValue: T, others: Map<ID, T>): Field<T> = Field(localId, localValue, others)
+    private fun <T> newField(localValue: T, others: Map<ID, T>): Field<ID, T> = Field(localId, localValue, others)
 
-    override fun <X> exchange(initial: X, body: (Field<X>) -> Field<X>): Field<X> =
+    override fun <X> exchange(initial: X, body: (Field<ID, X>) -> Field<ID, X>): Field<ID, X> =
         exchanging(initial) { field -> body(field).run { yielding { this } } }
 
-    override fun <Init, Ret> exchanging(initial: Init, body: YieldingScope<Field<Init>, Field<Ret>>): Field<Ret> {
+    override fun <Init, Ret> exchanging(
+        initial: Init,
+        body: YieldingScope<Field<ID, Init>, Field<ID, Ret>>,
+    ): Field<ID, Ret> {
         val messages = messagesAt<Init>(stack.currentPath())
         val previous = stateAt(stack.currentPath(), initial)
         val subject = newField(previous, messages)
-        val context = YieldingContext<Field<Init>, Field<Ret>>()
+        val context = YieldingContext<Field<ID, Init>, Field<ID, Ret>>()
         return body(context, subject).also {
             val message = SingleOutboundMessage(it.toSend.localValue, it.toSend.excludeSelf())
             val path = stack.currentPath()
@@ -102,8 +104,8 @@ internal class AggregateContext(
  * A field may be misaligned if captured by a sub-scope which contains an alignment operation.
  * This function takes such [field] and restricts it to be aligned with the current neighbors.
  */
-fun <T> Aggregate.project(field: Field<T>): Field<T> {
-    val others = neighboring(0.toByte())
+fun <ID : Any, T> Aggregate<ID>.project(field: Field<ID, T>): Field<ID, T> {
+    val others = neighboringViaExchange(0.toByte())
     return when {
         field.neighborsCount == others.neighborsCount -> field
         field.neighborsCount > others.neighborsCount -> others.mapWithId { id, _ -> field[id] }

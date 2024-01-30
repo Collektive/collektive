@@ -3,12 +3,11 @@ package it.unibo.collektive.branch
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
-import it.unibo.collektive.IntId
-import it.unibo.collektive.aggregate.api.operators.neighboring
+import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.path.Path
 
 class WhenTest : StringSpec({
-    val id0 = IntId(0)
+    val id0 = 0
 
     "When in single expression" {
         val condition = true
@@ -16,11 +15,11 @@ class WhenTest : StringSpec({
         val result =
             aggregate(id0) {
                 when (x) {
-                    is String -> neighboring("string")
-                    else -> neighboring("test")
+                    is String -> neighboringViaExchange("string")
+                    else -> neighboringViaExchange("test")
                 }
             }
-        result.toSend.messages.keys shouldBe setOf(Path(true, "neighboring.1", "exchange.1"))
+        result.toSend.messages.keys shouldBe setOf(Path(true, "neighboringViaExchange.1", "exchange.1"))
     }
 
     "When in single expression in else case" {
@@ -29,11 +28,11 @@ class WhenTest : StringSpec({
         val result =
             aggregate(id0) {
                 when (x) {
-                    is String -> neighboring("string")
-                    else -> neighboring("test")
+                    is String -> neighboringViaExchange("string")
+                    else -> neighboringViaExchange("test")
                 }
             }
-        result.toSend.messages.keys shouldBe setOf(Path(false, "neighboring.2", "exchange.1"))
+        result.toSend.messages.keys shouldBe setOf(Path(false, "neighboringViaExchange.2", "exchange.1"))
     }
 
     "When with nested function" {
@@ -42,17 +41,17 @@ class WhenTest : StringSpec({
         val result =
             aggregate(id0) {
                 fun test() {
-                    neighboring("test")
+                    neighboringViaExchange("test")
                 }
 
                 fun test2() {
-                    neighboring("test2")
+                    neighboringViaExchange("test2")
                 }
                 when (x) {
                     is String -> test2()
                     else -> test()
                 }
             }
-        result.toSend.messages.keys shouldBe setOf(Path(true, "test2.1", "neighboring.2", "exchange.1"))
+        result.toSend.messages.keys shouldBe setOf(Path(true, "test2.1", "neighboringViaExchange.2", "exchange.1"))
     }
 })

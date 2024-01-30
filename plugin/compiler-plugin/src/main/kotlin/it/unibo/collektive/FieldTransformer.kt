@@ -1,6 +1,7 @@
 package it.unibo.collektive
 
 import it.unibo.collektive.utils.common.AggregateFunctionNames.ALIGNED_ON_FUNCTION
+import it.unibo.collektive.utils.common.isAssignableFrom
 import it.unibo.collektive.utils.logging.debug
 import it.unibo.collektive.visitors.collectAggregateReference
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -32,7 +33,8 @@ class FieldTransformer(
     override fun visitCall(expression: IrCall): IrExpression {
         if (expression.symbol.owner.name == Name.identifier(ALIGNED_ON_FUNCTION)) {
             logger.debug("Found alignedOn function call: ${expression.dumpKotlinLike()}")
-            val contextReference = expression.receiverAndArgs().find { it.type == aggregateClass.defaultType }
+            val contextReference = expression.receiverAndArgs()
+                .find { it.type.isAssignableFrom(aggregateClass.defaultType) }
                 ?: collectAggregateReference(aggregateClass, expression.symbol.owner)
             contextReference?.let {
                 // If the expression contains a lambda, this recursion is necessary to visit the children

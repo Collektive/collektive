@@ -10,5 +10,5 @@ interface DistanceSensor {
     /**
      * The distances from the current node to all the other nodes.
      */
-    fun Aggregate.distances(): Field<Double>
+    fun <ID : Any> Aggregate<ID>.distances(): Field<ID, Double>
 }

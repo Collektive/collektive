@@ -4,15 +4,14 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
-import it.unibo.collektive.IntId
-import it.unibo.collektive.aggregate.api.operators.neighboring
+import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.path.Path
 
 class RepeatingTest : StringSpec({
-    val id0 = IntId(0)
-    val id1 = IntId(1)
+    val id0 = 0
+    val id1 = 1
 
     val double: (Int) -> Int = { it * 2 }
     val initV1 = 1
@@ -44,11 +43,11 @@ class RepeatingTest : StringSpec({
     "Repeating should return the value passed in the yielding function" {
         val result = aggregate(id1) {
             repeating(initV1) {
-                val nbr = neighboring(it * 2).localValue
+                val nbr = neighboringViaExchange(it * 2).localValue
                 nbr.yielding { "A string" }
             } shouldBe "A string"
         }
-        result.toSend.messages.keys shouldContain Path("repeating.1", "neighboring.1", "exchange.1")
+        result.toSend.messages.keys shouldContain Path("repeating.1", "neighboringViaExchange.1", "exchange.1")
     }
 
     "Repeating should work fine even with null as value" {

@@ -4,29 +4,28 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive
-import it.unibo.collektive.IntId
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 
 class CollektiveTest : StringSpec({
-    val id0 = IntId(0)
-    val id1 = IntId(1)
+    val id0 = 0
+    val id1 = 1
 
     val initV1 = 1
     val initV2 = 2
     val initV3 = 3
 
-    val increaseOrDouble: (Field<Int>) -> Field<Int> = { f ->
+    val increaseOrDouble: (Field<Int, Int>) -> Field<Int, Int> = { f ->
         f.mapWithId { _, v -> if (v % 2 == 0) v + 1 else v * 2 }
     }
 
-    val computeFunctionDevice0: Aggregate.() -> Int = {
+    val computeFunctionDevice0: Aggregate<Int>.() -> Int = {
         exchange(initV2, increaseOrDouble).localValue
     }
 
-    fun Aggregate.computeFunctionDevice1(): Int = exchange(initV3, increaseOrDouble).localValue
+    fun Aggregate<Int>.computeFunctionDevice1(): Int = exchange(initV3, increaseOrDouble).localValue
 
     "One Collektive device with cycle() as entrypoint should work fine" {
         val networkManager = NetworkManager()

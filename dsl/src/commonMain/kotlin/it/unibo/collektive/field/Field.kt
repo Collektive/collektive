@@ -1,12 +1,12 @@
 package it.unibo.collektive.field
 
-import it.unibo.collektive.ID
+import arrow.core.fold
 
 /**
  * A field is a map of messages where the key is the [ID] of a node and [T] the associated value.
  * @param T the type of the field.
  */
-sealed interface Field<out T> {
+sealed interface Field<ID : Any, out T> {
     /**
      * The [ID] of the local node.
      */
@@ -23,14 +23,22 @@ sealed interface Field<out T> {
     fun excludeSelf(): Map<ID, T>
 
     /**
-     * Map the field using the [transform] function.
+     * Combines this field with another (aligned) one.
      */
-    fun <B> mapWithId(transform: (ID, T) -> B): Field<B>
+    fun <B, R> alignedMap(other: Field<ID, B>, transform: (T, B) -> R): Field<ID, R> {
+        checkAligned(this, other)
+        return mapWithId { id, value -> transform(value, other[id] ?: error("Unintercepted misalignment")) }
+    }
 
     /**
      * Map the field using the [transform] function.
      */
-    fun <B> map(transform: (T) -> B): Field<B> = mapWithId { _, value -> transform(value) }
+    fun <B> mapWithId(transform: (ID, T) -> B): Field<ID, B>
+
+    /**
+     * Map the field using the [transform] function.
+     */
+    fun <B> map(transform: (T) -> B): Field<ID, B> = mapWithId { _, value -> transform(value) }
 
     /**
      * Get the value associated with the [id].
@@ -58,44 +66,59 @@ sealed interface Field<out T> {
     companion object {
 
         /**
-         * Build a field from a [localId], [localValue] and [others] neighbours values.
+         * Check if two fields are aligned, throws an IllegalStateException otherwise.
          */
-        internal operator fun <T> invoke(localId: ID, localValue: T, others: Map<ID, T> = emptyMap()): Field<T> =
-            ArrayBasedField(localId, localValue, others.map { it.toPair() })
-
-        /**
-         * Reduce the elements of the field using the [transform] function.
-         */
-        fun <T> Field<T>.reduce(includingSelf: Boolean = true, transform: (accumulator: T, T) -> T): T =
-            when (includingSelf) {
-                true -> toMap().values.reduce(transform)
-                false -> excludeSelf().values.reduce(transform)
+        fun checkAligned(field1: Field<*, *>, field2: Field<*, *>) {
+            val ids1: Set<Any?> = field1.toMap().keys
+            val ids2: Set<Any?> = field2.toMap().keys
+            check(ids1 == ids2) {
+                """
+                Alignment issue between $field1 and $field2, the different ids are: ${ids1 - ids2 + (ids2 - ids1)}
+                This is most likely caused by a bug in Collektive, please report at
+                https://github.com/Collektive/collektive/issues/new/choose
+                """.trimIndent()
             }
-
-        /**
-         * Reduce the elements of a field starting with a [initial] value and a [transform] function.
-         */
-        fun <T, R> Field<T>.hoodInto(initial: R, transform: (R, T) -> R): R {
-            var accumulator = initial
-            for ((_, value) in excludeSelf()) {
-                accumulator = transform(accumulator, value)
-            }
-            return accumulator
         }
 
         /**
-         * Reduce the elements of a field using the [transform] function.
+         * Build a field from a [localId], [localValue] and [others] neighbours values.
          */
-        fun <T> Field<T>.hood(transform: (T, T) -> T): T = hoodInto(localValue, transform)
+        internal operator fun <ID : Any, T> invoke(
+            localId: ID,
+            localValue: T,
+            others: Map<ID, T> = emptyMap(),
+        ): Field<ID, T> = ArrayBasedField(localId, localValue, others.map { it.toPair() })
+
+        /**
+         * Reduce the elements of the field using the [transform] function.
+         * The local value is not considered, unless explicitly passed as [default].
+         */
+        fun <ID : Any, T> Field<ID, T>.hood(default: T, transform: (T, T) -> T): T {
+            val neighbors = excludeSelf()
+            return when {
+                neighbors.isEmpty() -> default
+                else -> neighbors.values.reduce(transform)
+            }
+        }
+
+        /**
+         * Folds the elements of a field starting with an [initial] through a [transform] function.
+         * The local value is not considered, unless explicitly passed as [initial].
+         */
+        fun <ID : Any, T, R> Field<ID, T>.fold(initial: R, transform: (R, T) -> R): R =
+            excludeSelf().fold(initial) { accumulator, entry -> transform(accumulator, entry.value) }
     }
 }
 
-internal abstract class AbstractField<T>(
+internal abstract class AbstractField<ID : Any, T>(
     override val localId: ID,
     override val localValue: T,
-) : Field<T> {
+) : Field<ID, T> {
 
-    private val asMap: Map<ID, T> by lazy { neighborsMap() + (localId to localValue) }
+    private val asMap: Map<ID, T> by lazy {
+        val result: Map<ID, T> = neighborsMap() + (localId to localValue)
+        result
+    }
     private val neighborhood: Map<ID, T> by lazy { neighborsMap() }
 
     final override fun toMap(): Map<ID, T> = asMap
@@ -105,7 +128,7 @@ internal abstract class AbstractField<T>(
     final override fun equals(other: Any?): Boolean {
         if (this === other) return true
         return when (other) {
-            is Field<*> -> toMap() == other.toMap()
+            is Field<*, *> -> toMap() == other.toMap()
             else -> false
         }
     }
@@ -117,7 +140,7 @@ internal abstract class AbstractField<T>(
         else -> neighborValueOf(id)
     }
 
-    final override fun <B> mapWithId(transform: (ID, T) -> B): Field<B> {
+    final override fun <B> mapWithId(transform: (ID, T) -> B): Field<ID, B> {
         return SequenceBasedField(localId, transform(localId, localValue), mapOthersAsSequence(transform))
     }
 
@@ -130,11 +153,11 @@ internal abstract class AbstractField<T>(
     final override fun toString() = toMap().toString()
 }
 
-internal class ArrayBasedField<T>(
+internal class ArrayBasedField<ID : Any, T>(
     localId: ID,
     localValue: T,
     private val others: List<Pair<ID, T>>,
-) : AbstractField<T>(localId, localValue) {
+) : AbstractField<ID, T>(localId, localValue) {
 
     override val neighborsCount: Int get() = others.size
 
@@ -155,11 +178,11 @@ internal class ArrayBasedField<T>(
     }
 }
 
-internal class SequenceBasedField<T>(
+internal class SequenceBasedField<ID : Any, T>(
     localId: ID,
     localValue: T,
     private val others: Sequence<Pair<ID, T>>,
-) : AbstractField<T>(localId, localValue) {
+) : AbstractField<ID, T>(localId, localValue) {
 
     override val neighborsCount by lazy { others.count() }
 

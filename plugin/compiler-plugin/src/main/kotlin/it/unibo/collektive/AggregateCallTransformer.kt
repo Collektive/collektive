@@ -1,10 +1,12 @@
 package it.unibo.collektive
 
+import it.unibo.collektive.utils.common.isAssignableFrom
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
+import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 
 typealias AlignedData = Map<String, Int>
@@ -22,10 +24,12 @@ class AggregateCallTransformer(
     private val projectFunction: IrFunction,
 ) : IrElementTransformerVoid() {
 
-    private val aggregateContext = aggregateClass.thisReceiver?.type
+    private val aggregateContext = aggregateClass.defaultType
 
     override fun visitFunction(declaration: IrFunction): IrStatement {
-        if (declaration.extensionReceiverParameter?.type == aggregateContext) {
+        val isAggregateFunction = declaration.extensionReceiverParameter?.type?.isAssignableFrom(aggregateContext)
+            ?: false
+        if (isAggregateFunction) {
             /*
              This transformation is needed to project field inside the `alignOn` function called directly by the user.
              This is made before the alignment transformation because of optimization reasons:
