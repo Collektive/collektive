@@ -52,15 +52,14 @@ class CollektiveDevice<P>(
     override fun cloneOnNewNode(node: Node<Any?>): NodeProperty<Any?> =
         CollektiveDevice(environment, node, retainMessagesFor)
 
-    override fun read(): Set<InboundMessage<Int>> {
-        return when (retainMessagesFor) {
+    override fun read(): Set<InboundMessage<Int>> =
+        when (retainMessagesFor) {
             null -> validMessages.mapTo(mutableSetOf()) { it.payload }.also { validMessages.clear() }
             else -> {
                 validMessages.retainAll { it.receivedAt + retainMessagesFor >= currentTime }
                 validMessages.mapTo(mutableSetOf()) { it.payload }
             }
         }
-    }
 
     override fun write(message: OutboundMessage<Int>) {
         val neighborhood = environment.getNeighborhood(node)
