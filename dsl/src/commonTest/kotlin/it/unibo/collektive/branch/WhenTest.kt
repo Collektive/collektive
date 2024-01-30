@@ -19,7 +19,7 @@ class WhenTest : StringSpec({
                     else -> neighboringViaExchange("test")
                 }
             }
-        result.toSend.messages.keys shouldBe setOf(Path(true, "neighboring.1", "exchange.1"))
+        result.toSend.messages.keys shouldBe setOf(Path(true, "neighboringViaExchange.1", "exchange.1"))
     }
 
     "When in single expression in else case" {
@@ -32,7 +32,7 @@ class WhenTest : StringSpec({
                     else -> neighboringViaExchange("test")
                 }
             }
-        result.toSend.messages.keys shouldBe setOf(Path(false, "neighboring.2", "exchange.1"))
+        result.toSend.messages.keys shouldBe setOf(Path(false, "neighboringViaExchange.2", "exchange.1"))
     }
 
     "When with nested function" {
@@ -52,6 +52,6 @@ class WhenTest : StringSpec({
                     else -> test()
                 }
             }
-        result.toSend.messages.keys shouldBe setOf(Path(true, "test2.1", "neighboring.2", "exchange.1"))
+        result.toSend.messages.keys shouldBe setOf(Path(true, "test2.1", "neighboringViaExchange.2", "exchange.1"))
     }
 })
