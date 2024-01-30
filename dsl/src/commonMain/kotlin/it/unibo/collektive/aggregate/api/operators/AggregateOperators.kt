@@ -64,9 +64,7 @@ fun <ID : Any, Initial, Return> Aggregate<ID>.sharing(
     var yieldingContext: Option<YieldingContext.YieldingResult<Initial, Return>> = none()
     exchange(initial) { initialField ->
         initialField.map { _ ->
-            transform(context, initialField).also { context ->
-                yieldingContext = context.some()
-            }.toSend
+            transform(context, initialField).also { context -> yieldingContext = context.some() }.toSend
         }
     }
     return yieldingContext.getOrElse { error("This error should never be thrown") }.toReturn
