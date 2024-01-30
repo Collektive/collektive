@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrElseBranch
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.types.classFqName
+import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.dumpKotlinLike
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.name.Name
@@ -33,7 +34,7 @@ class FieldTransformer(
         if (expression.symbol.owner.name == Name.identifier(ALIGNED_ON_FUNCTION)) {
             logger.debug("Found alignedOn function call: ${expression.dumpKotlinLike()}")
             val contextReference = expression.receiverAndArgs()
-                .find { it.type.isAssignableFrom(aggregateClass.thisReceiver?.type!!) }
+                .find { it.type.isAssignableFrom(aggregateClass.defaultType) }
                 ?: collectAggregateReference(aggregateClass, expression.symbol.owner)
             contextReference?.let {
                 // If the expression contains a lambda, this recursion is necessary to visit the children

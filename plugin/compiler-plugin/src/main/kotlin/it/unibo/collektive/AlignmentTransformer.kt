@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.ir.expressions.IrBranch
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrElseBranch
 import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 
 /**
@@ -34,7 +35,7 @@ class AlignmentTransformer(
 
     override fun visitCall(expression: IrCall): IrExpression {
         val contextReference = expression.receiverAndArgs()
-            .find { it.type.isAssignableFrom(aggregateContextClass.thisReceiver?.type!!) }
+            .find { it.type.isAssignableFrom(aggregateContextClass.defaultType) }
             ?: collectAggregateReference(aggregateContextClass, expression.symbol.owner)
         return contextReference?.let { context ->
             val functionName = expression.getFunctionName()
