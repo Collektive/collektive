@@ -39,7 +39,7 @@ class BranchAlignment : StringSpec({
             "test2.1",
             "test.1",
             "neighboringViaExchange.1",
-            "exchange.1"
+            "exchange.1",
         )
     }
     "Branch alignment should not occur in non aggregate context" {
@@ -108,9 +108,9 @@ class BranchAlignment : StringSpec({
         manuallyAlignedExchangeWithThreeDevices { it % 2 == 0 }
     }
     "A field should be projected whenever there is an alignment regardless of the type," +
-            " not just booleans (issue #171)" {
-                manuallyAlignedExchangeWithThreeDevices { it % 2 }
-            }
+        " not just booleans (issue #171)" {
+            manuallyAlignedExchangeWithThreeDevices { it % 2 }
+        }
     "A field should be projected when it is a non-direct receiver (issue #171)" {
         exchangeWithThreeDevices {
             with(it) {
