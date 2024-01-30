@@ -6,6 +6,7 @@ import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
+import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 
 typealias AlignedData = Map<String, Int>
@@ -23,10 +24,10 @@ class AggregateCallTransformer(
     private val projectFunction: IrFunction,
 ) : IrElementTransformerVoid() {
 
-    private val aggregateContext = aggregateClass.thisReceiver?.type
+    private val aggregateContext = aggregateClass.defaultType
 
     override fun visitFunction(declaration: IrFunction): IrStatement {
-        val isAggregateFunction = declaration.extensionReceiverParameter?.type?.isAssignableFrom(aggregateContext!!)
+        val isAggregateFunction = declaration.extensionReceiverParameter?.type?.isAssignableFrom(aggregateContext)
             ?: false
         if (isAggregateFunction) {
             /*
