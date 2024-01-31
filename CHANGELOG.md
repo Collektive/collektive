@@ -1,3 +1,15 @@
+## [6.1.0](https://github.com/Collektive/collektive/compare/6.0.0...6.1.0) (2024-01-31)
+
+
+### Features
+
+* **alchemist-incarnation:** add support for Kotlin-interpreted properties ([#204](https://github.com/Collektive/collektive/issues/204)) ([b23a25e](https://github.com/Collektive/collektive/commit/b23a25efb6053a77a1ab53a82b3e224450f315aa))
+
+
+### Dependency updates
+
+* **deps:** update alchemist to v30.0.3 ([74ade19](https://github.com/Collektive/collektive/commit/74ade19cf5719450db48ce7d6a7b1bb50304118b))
+
 ## [6.0.0](https://github.com/Collektive/collektive/compare/5.1.0...6.0.0) (2024-01-30)
 
 
