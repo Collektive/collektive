@@ -2,7 +2,7 @@ package it.unibo.collektive.aggregate.api.impl
 
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.YieldingContext
-import it.unibo.collektive.aggregate.api.YieldingContext.YieldingResult
+import it.unibo.collektive.aggregate.api.YieldingResult
 import it.unibo.collektive.aggregate.api.YieldingScope
 import it.unibo.collektive.aggregate.api.impl.stack.Stack
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
