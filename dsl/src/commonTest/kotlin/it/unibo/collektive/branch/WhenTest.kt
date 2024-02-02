@@ -1,6 +1,7 @@
 package it.unibo.collektive.branch
 
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
@@ -53,5 +54,21 @@ class WhenTest : StringSpec({
                 }
             }
         result.toSend.messages.keys shouldBe setOf(Path(true, "test2.1", "neighboringViaExchange.2", "exchange.1"))
+    }
+    "Nested when condition must be aligned" {
+        val condition1 = false
+        val condition2 = true
+        val res = aggregate(0) {
+            when {
+                condition1 -> neighboringViaExchange("test")
+                else -> when {
+                    condition2 -> neighboringViaExchange("test2")
+                    else -> neighboringViaExchange("test3")
+                }
+            }
+        }
+        res.toSend.messages.keys shouldContainAll setOf(
+            Path(false, true, "neighboringViaExchange.2", "exchange.1"),
+        )
     }
 })
