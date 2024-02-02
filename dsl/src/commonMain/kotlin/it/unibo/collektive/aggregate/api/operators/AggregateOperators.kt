@@ -1,12 +1,9 @@
 package it.unibo.collektive.aggregate.api.operators
 
-import arrow.core.Option
-import arrow.core.getOrElse
 import arrow.core.identity
-import arrow.core.none
-import arrow.core.some
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.YieldingContext
+import it.unibo.collektive.aggregate.api.YieldingResult
 import it.unibo.collektive.field.Field
 
 /**
@@ -58,17 +55,15 @@ fun <ID : Any, Scalar> Aggregate<ID>.neighboringViaExchange(local: Scalar): Fiel
  */
 fun <ID : Any, Initial, Return> Aggregate<ID>.sharing(
     initial: Initial,
-    transform: YieldingContext<Initial, Return>.(Field<ID, Initial>) -> YieldingContext.YieldingResult<Initial, Return>,
-): Return {
-    val context = YieldingContext<Initial, Return>()
-    var yieldingContext: Option<YieldingContext.YieldingResult<Initial, Return>> = none()
-    exchange(initial) { initialField ->
-        initialField.map { _ ->
-            transform(context, initialField).also { context -> yieldingContext = context.some() }.toSend
+    transform: YieldingContext<Initial, Return>.(Field<ID, Initial>) -> YieldingResult<Initial, Return>,
+): Return = exchanging(initial) { field: Field<ID, Initial> ->
+    with(YieldingContext<Initial, Return>()) {
+        val result: YieldingResult<Initial, Return> = transform(field)
+        field.map { result.toSend }.yielding {
+            field.map { result.toReturn }
         }
     }
-    return yieldingContext.getOrElse { error("This error should never be thrown") }.toReturn
-}
+}.localValue
 
 /**
  * [share] captures the space-time nature of field computation through observation of neighbours' values, starting

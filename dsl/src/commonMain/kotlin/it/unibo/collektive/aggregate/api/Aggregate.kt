@@ -1,6 +1,5 @@
 package it.unibo.collektive.aggregate.api
 
-import it.unibo.collektive.aggregate.api.YieldingContext.YieldingResult
 import it.unibo.collektive.field.Field
 
 typealias YieldingScope<Initial, Return> = YieldingContext<Initial, Return>.(Initial) -> YieldingResult<Initial, Return>

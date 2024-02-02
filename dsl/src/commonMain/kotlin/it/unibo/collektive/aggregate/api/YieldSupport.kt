@@ -29,9 +29,9 @@ class YieldingContext<Initial, Return> {
      */
     fun Initial.yielding(toReturn: () -> Return): YieldingResult<Initial, Return> =
         YieldingResult(this, toReturn())
-
-    /**
-     * Specifies the value [toSend] and the value [toReturn] of a yielding operator.
-     */
-    data class YieldingResult<Initial, Return>(val toSend: Initial, val toReturn: Return)
 }
+
+/**
+ * Specifies the value [toSend] and the value [toReturn] of a yielding operator.
+ */
+data class YieldingResult<Initial, Return>(val toSend: Initial, val toReturn: Return)
