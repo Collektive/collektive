@@ -1,3 +1,14 @@
+## [7.0.0](https://github.com/Collektive/collektive/compare/6.1.1...7.0.0) (2024-02-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* move `YieldingResult` off `YieldingContext` and write a nicer `sharing` (#215)
+
+### Refactoring
+
+* move `YieldingResult` off `YieldingContext` and write a nicer `sharing` ([#215](https://github.com/Collektive/collektive/issues/215)) ([1901044](https://github.com/Collektive/collektive/commit/1901044afaf5b9c26a67d637843767e8e0120793))
+
 ## [6.1.1](https://github.com/Collektive/collektive/compare/6.1.0...6.1.1) (2024-02-02)
 
 
