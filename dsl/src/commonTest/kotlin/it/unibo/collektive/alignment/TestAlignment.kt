@@ -28,8 +28,8 @@ class TestAlignment : StringSpec({
         result.toSend.messages.keys shouldContainAll
             setOf(
                 Path("neighboringViaExchange.1", "exchange.1"),
-                Path("share.1", "sharing.1", "exchange.1", "neighboringViaExchange.2", "exchange.1"),
-                Path("share.1", "sharing.1", "exchange.1"),
+                Path("share.1", "sharing.1", "exchanging.1", "neighboringViaExchange.2", "exchange.1"),
+                Path("share.1", "sharing.1", "exchanging.1"),
                 Path("neighboringViaExchange.3", "exchange.1"),
             )
     }
