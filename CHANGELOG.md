@@ -1,3 +1,26 @@
+## [6.1.1](https://github.com/Collektive/collektive/compare/6.1.0...6.1.1) (2024-02-02)
+
+
+### Dependency updates
+
+* **deps:** update alchemist to v30.0.4 ([3073566](https://github.com/Collektive/collektive/commit/307356660c8782b2b51621ed67f7e7e356318e73))
+* **deps:** update plugin detekt to v1.23.5 ([77df53e](https://github.com/Collektive/collektive/commit/77df53e1710ff07ef3381992357dbdae769fafa9))
+* **deps:** update plugin kotlin-qa to v0.59.0 ([458cfe4](https://github.com/Collektive/collektive/commit/458cfe41808c30eed53df2d7ebf0f68a0cd9d835))
+* **deps:** update plugin multijvmtesting to v0.5.8 ([0b86414](https://github.com/Collektive/collektive/commit/0b86414129055455b48d2290ca52d4d00bb98117))
+
+
+### Bug Fixes
+
+* solve an alignment issue preventing the right alignment of nested branch conditions ([#216](https://github.com/Collektive/collektive/issues/216)) ([1f514b9](https://github.com/Collektive/collektive/commit/1f514b99fd31354988ab323383cb74fc3f79f051))
+
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.2.16 ([ced754a](https://github.com/Collektive/collektive/commit/ced754aeb89ada4c4ac9e58951efa06f4db75138))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.2.17 ([8da39c2](https://github.com/Collektive/collektive/commit/8da39c2e783422bace92f1e74f19dd5152fcc4e6))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.2.18 ([29801f8](https://github.com/Collektive/collektive/commit/29801f8188b6696ea7ca04df7e9d62a568af3821))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.2.19 ([83c8695](https://github.com/Collektive/collektive/commit/83c8695d9c5ec63e5ecd5fb369a3e86dc664a849))
+
 ## [6.1.0](https://github.com/Collektive/collektive/compare/6.0.0...6.1.0) (2024-01-31)
 
 
