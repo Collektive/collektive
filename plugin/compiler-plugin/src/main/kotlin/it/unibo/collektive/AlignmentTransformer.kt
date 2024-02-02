@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.ir.expressions.IrBranch
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrElseBranch
 import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 
@@ -41,6 +42,7 @@ class AlignmentTransformer(
             val functionName = expression.getFunctionName()
             // We don't want to align the alignedOn function :)
             if (functionName == ALIGNED_ON_FUNCTION) return super.visitCall(expression)
+            if (expression.origin == IrStatementOrigin.GET_PROPERTY) return super.visitCall(expression)
 
             // If no function, the first time the counter is 1
             val actualCounter = alignedFunctions[functionName]?.let { it + 1 } ?: 1

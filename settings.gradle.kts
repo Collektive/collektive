@@ -25,7 +25,7 @@ gitHooks {
     preCommit {
         tasks("detektAll", "ktlintCheck")
     }
-    createHooks()
+    createHooks(overwriteExisting = true)
 }
 
 rootProject.name = "collektive"
