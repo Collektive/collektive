@@ -1,5 +1,5 @@
 [versions]
-alchemist = "30.0.4"
+alchemist = "30.0.5"
 build-config = "5.3.5"
 coroutines = "1.7.3"
 dokka = "1.9.10"
