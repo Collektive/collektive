@@ -42,7 +42,7 @@ sealed interface Field<ID : Any, out T> {
     /**
      * Map the field resulting in a new one where the value for the local and the neighbors is [singleton].
      */
-    fun <B> mapToConstantField(singleton: B): Field<ID, B> = SingletonField(localId, singleton, excludeSelf().keys)
+    fun <B> mapToConstantField(singleton: B): Field<ID, B> = ConstantField(localId, singleton, excludeSelf().keys)
 
     /**
      * Get the value associated with the [id].
@@ -200,7 +200,7 @@ internal class SequenceBasedField<ID : Any, T>(
         others.map { (id, value) -> id to transform(id, value) }
 }
 
-internal class SingletonField<ID : Any, T>(
+internal class ConstantField<ID : Any, T>(
     localId: ID,
     localValue: T,
     private val neighborsIds: Set<ID>,

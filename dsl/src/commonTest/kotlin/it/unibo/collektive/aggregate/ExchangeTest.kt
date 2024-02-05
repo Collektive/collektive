@@ -152,7 +152,7 @@ class ExchangeTest : StringSpec({
             val res = aggregate(id, networkManager.receive(id), emptyMap(), programUnderTest)
                 .also { networkManager.send(it.toSend) }
             res.toSend.messages.values.size shouldBe 1
-            // When the SingletonField is used, the map of overrides should be empty
+            // When a constant field is used, the map of overrides should be empty
             res.toSend.messages.values.firstOrNull()?.let { it.overrides shouldBe mapOf() }
         }
     }

@@ -6,8 +6,8 @@ import it.unibo.collektive.aggregate.api.YieldingResult
 import it.unibo.collektive.aggregate.api.YieldingScope
 import it.unibo.collektive.aggregate.api.impl.stack.Stack
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
+import it.unibo.collektive.field.ConstantField
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.SingletonField
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.OutboundMessage
 import it.unibo.collektive.networking.SingleOutboundMessage
@@ -58,7 +58,7 @@ internal class AggregateContext<ID : Any>(
             val message = SingleOutboundMessage(
                 it.toSend.localValue,
                 when (it.toSend) {
-                    is SingletonField<ID, Init> -> emptyMap()
+                    is ConstantField<ID, Init> -> emptyMap()
                     else -> it.toSend.excludeSelf()
                 },
             )
