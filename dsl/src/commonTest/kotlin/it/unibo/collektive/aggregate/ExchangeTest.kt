@@ -4,6 +4,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
+import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.plus
 import it.unibo.collektive.network.NetworkImplTest
@@ -136,5 +137,23 @@ class ExchangeTest : StringSpec({
             0,
             mapOf(exchangingPath to SingleOutboundMessage(2)),
         )
+    }
+    "Exchange should produce a message with no overrides when producing a constant field" {
+        val programUnderTest: Aggregate<Int>.() -> Unit = {
+            exchanging(0) {
+                it.mapToConstantField(10).yielding { it.mapToConstantField("singleton") }
+            }
+        }
+        val networkManager = NetworkManager()
+
+        // Three devices linked together executed for 2 round each.
+        (0..5).forEach { iteration ->
+            val id = iteration % 3
+            val res = aggregate(id, networkManager.receive(id), emptyMap(), programUnderTest)
+                .also { networkManager.send(it.toSend) }
+            res.toSend.messages.values.size shouldBe 1
+            // When a constant field is used, the map of overrides should be empty
+            res.toSend.messages.values.firstOrNull()?.let { it.overrides shouldBe mapOf() }
+        }
     }
 })

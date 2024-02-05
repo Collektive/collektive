@@ -6,6 +6,7 @@ import it.unibo.collektive.aggregate.api.YieldingResult
 import it.unibo.collektive.aggregate.api.YieldingScope
 import it.unibo.collektive.aggregate.api.impl.stack.Stack
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
+import it.unibo.collektive.field.ConstantField
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.OutboundMessage
@@ -48,21 +49,27 @@ internal class AggregateContext<ID : Any>(
         initial: Init,
         body: YieldingScope<Field<ID, Init>, Field<ID, Ret>>,
     ): Field<ID, Ret> {
-        val messages = messagesAt<Init>(stack.currentPath())
-        val previous = stateAt(stack.currentPath(), initial)
+        val path = stack.currentPath()
+        val messages = messagesAt<Init>(path)
+        val previous = stateAt(path, initial)
         val subject = newField(previous, messages)
         val context = YieldingContext<Field<ID, Init>, Field<ID, Ret>>()
         return body(context, subject).also {
-            val message = SingleOutboundMessage(it.toSend.localValue, it.toSend.excludeSelf())
-            val path = stack.currentPath()
+            val message = SingleOutboundMessage(
+                it.toSend.localValue,
+                when (it.toSend) {
+                    is ConstantField<ID, Init> -> emptyMap()
+                    else -> it.toSend.excludeSelf()
+                },
+            )
             check(!toBeSent.messages.containsKey(path)) {
                 """
                     Aggregate alignment clash by multiple aligned calls with the same path: $path.
                     The most likely cause is an aggregate function call within a loop
                 """.trimIndent()
             }
-            toBeSent = toBeSent.copy(messages = toBeSent.messages + (stack.currentPath() to message))
-            state += stack.currentPath() to it.toSend.localValue
+            toBeSent = toBeSent.copy(messages = toBeSent.messages + (path to message))
+            state += path to it.toSend.localValue
         }.toReturn
     }
 

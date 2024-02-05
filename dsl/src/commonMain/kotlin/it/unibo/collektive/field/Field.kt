@@ -4,7 +4,6 @@ import arrow.core.fold
 
 /**
  * A field is a map of messages where the key is the [ID] of a node and [T] the associated value.
- * @param T the type of the field.
  */
 sealed interface Field<ID : Any, out T> {
     /**
@@ -39,6 +38,11 @@ sealed interface Field<ID : Any, out T> {
      * Map the field using the [transform] function.
      */
     fun <B> map(transform: (T) -> B): Field<ID, B> = mapWithId { _, value -> transform(value) }
+
+    /**
+     * Map the field resulting in a new one where the value for the local and the neighbors is [singleton].
+     */
+    fun <B> mapToConstantField(singleton: B): Field<ID, B> = ConstantField(localId, singleton, excludeSelf().keys)
 
     /**
      * Get the value associated with the [id].
@@ -194,4 +198,29 @@ internal class SequenceBasedField<ID : Any, T>(
 
     override fun <R> mapOthersAsSequence(transform: (ID, T) -> R): Sequence<Pair<ID, R>> =
         others.map { (id, value) -> id to transform(id, value) }
+}
+
+internal class ConstantField<ID : Any, T>(
+    localId: ID,
+    localValue: T,
+    private val neighborsIds: Set<ID>,
+) : AbstractField<ID, T>(localId, localValue) {
+    override val neighborsCount: Int = neighborsIds.size
+
+    private val reified by lazy {
+        reifiedList.toMap()
+    }
+
+    private val reifiedList by lazy {
+        neighborsIds.map { id -> id to localValue }.toList()
+    }
+
+    override fun <R> mapOthersAsSequence(transform: (ID, T) -> R): Sequence<Pair<ID, R>> =
+        reifiedList.asSequence().map { (id, _) -> id to transform(id, localValue) }
+
+    override fun neighborValueOf(id: ID): T = localValue
+
+    override fun neighborsMap(): Map<ID, T> = reified
+
+    override fun asSequence(): Sequence<Pair<ID, T>> = reifiedList.asSequence() + (localId to localValue)
 }
