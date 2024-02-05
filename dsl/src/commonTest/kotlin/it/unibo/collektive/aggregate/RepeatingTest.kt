@@ -47,7 +47,7 @@ class RepeatingTest : StringSpec({
                 nbr.yielding { "A string" }
             } shouldBe "A string"
         }
-        result.toSend.messages.keys shouldContain Path("repeating.1", "neighboringViaExchange.1", "exchange.1")
+        result.toSend.messages.keys shouldContain Path("repeating.1", "neighboringViaExchange.1", "exchanging.1")
     }
 
     "Repeating should work fine even with null as value" {

@@ -27,10 +27,10 @@ class TestAlignment : StringSpec({
         result.toSend.messages.keys shouldHaveSize 4 // 4 paths of alignment
         result.toSend.messages.keys shouldContainAll
             setOf(
-                Path("neighboringViaExchange.1", "exchange.1"),
-                Path("share.1", "sharing.1", "exchanging.1", "neighboringViaExchange.2", "exchange.1"),
+                Path("neighboringViaExchange.1", "exchanging.1"),
+                Path("share.1", "sharing.1", "exchanging.1", "neighboringViaExchange.2", "exchanging.1"),
                 Path("share.1", "sharing.1", "exchanging.1"),
-                Path("neighboringViaExchange.3", "exchange.1"),
+                Path("neighboringViaExchange.3", "exchanging.1"),
             )
     }
     "Alignment must fail clearly when entries try to override each other" {
