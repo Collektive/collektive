@@ -24,7 +24,7 @@ import it.unibo.collektive.field.Field
  */
 fun <ID : Any, Scalar> Aggregate<ID>.neighboringViaExchange(local: Scalar): Field<ID, Scalar> =
     exchanging(local) { toYield ->
-        toYield.map { local }.yielding { toYield }
+        toYield.mapToConstantField(local).yielding { toYield }
     }
 
 /**
