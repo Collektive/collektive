@@ -1,6 +1,5 @@
 package it.unibo.collektive.aggregate.api.operators
 
-import arrow.core.identity
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.YieldingContext
 import it.unibo.collektive.aggregate.api.YieldingResult
@@ -24,7 +23,9 @@ import it.unibo.collektive.field.Field
  * In this case, the field returned has the result of the computation as local value.
  */
 fun <ID : Any, Scalar> Aggregate<ID>.neighboringViaExchange(local: Scalar): Field<ID, Scalar> =
-    exchange(local, ::identity)
+    exchanging(local) { toYield ->
+        toYield.map { local }.yielding { toYield }
+    }
 
 /**
  * [sharing] captures the space-time nature of field computation through observation of neighbours' values, starting
