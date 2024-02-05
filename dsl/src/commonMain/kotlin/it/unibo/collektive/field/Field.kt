@@ -42,7 +42,7 @@ sealed interface Field<ID : Any, out T> {
     /**
      * Map the field resulting in a new one where the value for the local and the neighbors is [singleton].
      */
-    fun <B> mapToConstant(singleton: B): Field<ID, B> = SingletonField(localId, singleton, excludeSelf().keys)
+    fun <B> mapToConstantField(singleton: B): Field<ID, B> = SingletonField(localId, singleton, excludeSelf().keys)
 
     /**
      * Get the value associated with the [id].
