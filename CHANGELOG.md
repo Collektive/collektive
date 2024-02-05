@@ -1,3 +1,30 @@
+## [7.0.1](https://github.com/Collektive/collektive/compare/7.0.0...7.0.1) (2024-02-05)
+
+
+### Dependency updates
+
+* **deps:** update alchemist to v30.0.5 ([0cf2973](https://github.com/Collektive/collektive/commit/0cf29733dc6adec5a96a992c50511935e8ef8748))
+* **deps:** update dependency gradle to v8.6 ([8da0fd3](https://github.com/Collektive/collektive/commit/8da0fd3b87c56e312d62603150bf2c7f27988683))
+* **deps:** update plugin gitsemver to v3.1.1 ([3f98223](https://github.com/Collektive/collektive/commit/3f98223f3887cef2eb6d39698eb4fb18e70aadca))
+* **deps:** update plugin kotlin-qa to v0.59.1 ([75ff12b](https://github.com/Collektive/collektive/commit/75ff12b22f19a3dc730f5b9f44332f1eec43ac68))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.1 ([4e4c9de](https://github.com/Collektive/collektive/commit/4e4c9de431c66c691aaa9b38171178bad3325ace))
+* **deps:** update plugin publishoncentral to v5.0.23 ([9141b6b](https://github.com/Collektive/collektive/commit/9141b6b6d2232da9b7469c133c213af55d453b7f))
+
+
+### Performance improvements
+
+* exchange optimization on outbound message when a field with the same values for all the neighbors should be sent ([#225](https://github.com/Collektive/collektive/issues/225)) ([7df12f6](https://github.com/Collektive/collektive/commit/7df12f6a8f55efd56e6cfc7535d563cd185dbd15))
+
+
+### Tests
+
+* add test which emulates the error thrown in the simulation (issue [#207](https://github.com/Collektive/collektive/issues/207)) ([#208](https://github.com/Collektive/collektive/issues/208)) ([ca65c7e](https://github.com/Collektive/collektive/commit/ca65c7e88a666d1f988868793be52316eaa1ea1a))
+
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.2.20 ([7429e4e](https://github.com/Collektive/collektive/commit/7429e4e31d5c6bde2b78e75104aceeeaa583da6e))
+
 ## [7.0.0](https://github.com/Collektive/collektive/compare/6.1.1...7.0.0) (2024-02-02)
 
 
