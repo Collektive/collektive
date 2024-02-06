@@ -1,3 +1,10 @@
+## [7.0.2](https://github.com/Collektive/collektive/compare/7.0.1...7.0.2) (2024-02-06)
+
+
+### Bug Fixes
+
+* use `exchanging` to send the same value to all the neighbors solving a problem where the same initial value is always sent when multiple call occurs ([#224](https://github.com/Collektive/collektive/issues/224)) ([124d8ac](https://github.com/Collektive/collektive/commit/124d8ac040f07c3136d43f881e8fb0683e0ba4a2))
+
 ## [7.0.1](https://github.com/Collektive/collektive/compare/7.0.0...7.0.1) (2024-02-05)
 
 
