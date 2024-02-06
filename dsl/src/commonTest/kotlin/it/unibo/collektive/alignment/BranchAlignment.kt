@@ -39,7 +39,7 @@ class BranchAlignment : StringSpec({
             "test2.1",
             "test.1",
             "neighboringViaExchange.1",
-            "exchange.1",
+            "exchanging.1",
         )
     }
     "Branch alignment should not occur in non aggregate context" {
