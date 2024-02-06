@@ -5,10 +5,14 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.string.shouldContain
 import it.unibo.collektive.Collektive.Companion.aggregate
+import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.aggregate.api.operators.share
+import it.unibo.collektive.field.Field
+import it.unibo.collektive.field.plus
 import it.unibo.collektive.path.Path
 
 class TestAlignment : StringSpec({
@@ -42,5 +46,42 @@ class TestAlignment : StringSpec({
             }
         }
         exception.message shouldContain "Aggregate alignment clash by multiple aligned calls with the same path"
+    }
+    "Different alignment should be performed when a function has an aggregate parameter" {
+        val x = 0
+        fun foo(agg: Aggregate<Int>) = agg.neighboringViaExchange(x)
+        val withFunction = aggregate(x) { foo(this) }
+        val bare = aggregate(x) { neighboringViaExchange(x) }
+        withFunction.toSend shouldNotBe bare.toSend
+        error(
+            """
+            Even if the test passes, the alignment is not performed correctly.
+            The path is different for the two computations, but a missing token (neighboringViaExchange) is missing
+            """.trimIndent(),
+        )
+    }
+    "Overload function with different arity should not align" {
+        val x = 0
+        fun foo(aggregate: Aggregate<Int>) = aggregate.neighboringViaExchange(x)
+        fun foo(value: Int, aggregate: Aggregate<Int>) = aggregate.neighboringViaExchange(value)
+        val withFunction = aggregate(x) { foo(this) }
+        val bare = aggregate(x) { foo(x, this) }
+        withFunction.toSend shouldNotBe bare.toSend
+    }
+    "Overload function with different arguments order should not align" {
+        val x = 0
+        fun foo(aggregate: Aggregate<Int>, value: Int) = aggregate.neighboringViaExchange(value)
+        fun foo(value: Int, aggregate: Aggregate<Int>) = aggregate.neighboringViaExchange(value)
+        val withFunction = aggregate(x) { foo(this, x) }
+        val bare = aggregate(x) { foo(x, this) }
+        withFunction.toSend shouldNotBe bare.toSend
+    }
+    "Outer non-collective function taking collective function as argument should align the non-collective function" {
+        val x = 0
+        fun foo(aggregate: Aggregate<Int>) = aggregate.neighboringViaExchange(x)
+        fun bar(f1: Field<Int, Int>, f2: Field<Int, Int>) = f1 + f2
+        val withFunction = aggregate(x) { foo(this) to foo(this) }
+        val bare = aggregate(x) { bar(foo(this), foo(this)) }
+        withFunction.toSend shouldNotBe bare.toSend
     }
 })
