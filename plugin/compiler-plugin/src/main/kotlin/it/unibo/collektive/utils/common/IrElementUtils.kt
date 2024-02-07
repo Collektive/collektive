@@ -12,9 +12,11 @@ import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.symbols.FqNameEqualityChecker
 import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.types.classifierOrNull
 import org.jetbrains.kotlin.ir.types.typeWith
 import org.jetbrains.kotlin.ir.util.defaultType
+import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.name.ClassId
 
 /**
@@ -61,10 +63,15 @@ internal fun getLambdaType(pluginContext: IrPluginContext, lambda: IrSimpleFunct
     }
 }
 
-internal fun IrCall.getFunctionName(): String {
-    val symbolName = symbol.owner.name
+internal fun IrCall.getAlignmentToken(): String {
+    val symbolOwner = symbol.owner
+    val dispatcher = receiverAndArgs()
+        .mapNotNull { it.type.classFqName?.shortName()?.asString() }
+        .joinToString(",", prefix = "<", postfix = ">")
     return when {
-        symbolName.isSpecial -> "?"
-        else -> symbolName.asString()
+        symbolOwner.name.isSpecial -> "?"
+        else -> symbolOwner.kotlinFqName.asString() + dispatcher
     }
 }
+
+internal fun IrCall.simpleFunctionName(): String = symbol.owner.name.asString()
