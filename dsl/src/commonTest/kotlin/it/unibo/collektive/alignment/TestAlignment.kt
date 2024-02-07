@@ -53,12 +53,11 @@ class TestAlignment : StringSpec({
         val withFunction = aggregate(x) { foo(this) }
         val bare = aggregate(x) { neighboringViaExchange(x) }
         withFunction.toSend shouldNotBe bare.toSend
-        error(
-            """
-            Even if the test passes, the alignment is not performed correctly.
-            The path is different for the two computations, but a missing token (neighboringViaExchange) is missing
-            """.trimIndent(),
-        )
+        withFunction.toSend.messages.size shouldBe 1
+        bare.toSend.messages.size shouldBe 1
+        // The program with `foo` has an additional token in the path
+        withFunction.toSend.messages.keys.first().tokens().size shouldBe 3
+        bare.toSend.messages.keys.first().tokens().size shouldBe 2
     }
     "Overload function with different arity should not align" {
         val x = 0
