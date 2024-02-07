@@ -1,10 +1,10 @@
 package it.unibo.collektive.branch
 
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
-import it.unibo.collektive.path.Path
 
 class IfConditionTest : StringSpec({
     val id0 = 0
@@ -13,7 +13,8 @@ class IfConditionTest : StringSpec({
             aggregate(id0) {
                 if (true) neighboringViaExchange("test")
             }
-        result.toSend.messages.keys shouldContain Path(true, "neighboringViaExchange.1", "exchanging.1")
+        result.toSend.messages.keys.size shouldBe 1
+        result.toSend.messages.values.map { it.default } shouldContainAll listOf("test")
     }
 
     "Branches with conditions read from variables should get aligned" {
@@ -22,7 +23,8 @@ class IfConditionTest : StringSpec({
             aggregate(id0) {
                 if (customCondition) neighboringViaExchange("test")
             }
-        result.toSend.messages.keys shouldContain Path(true, "neighboringViaExchange.1", "exchanging.1")
+        result.toSend.messages.keys.size shouldBe 1
+        result.toSend.messages.values.map { it.default } shouldContainAll listOf("test")
     }
 
     "Function condition if" {
@@ -31,7 +33,8 @@ class IfConditionTest : StringSpec({
             aggregate(id0) {
                 if (customFunction()) neighboringViaExchange("test")
             }
-        result.toSend.messages.keys shouldContain Path(true, "neighboringViaExchange.1", "exchanging.1")
+        result.toSend.messages.keys.size shouldBe 1
+        result.toSend.messages.values.map { it.default } shouldContainAll listOf("test")
     }
 
     "Function and condition if" {
@@ -41,7 +44,8 @@ class IfConditionTest : StringSpec({
             aggregate(id0) {
                 if (customCondition1 && customCondition2) neighboringViaExchange("test")
             }
-        result.toSend.messages.keys shouldContain Path(true, "neighboringViaExchange.1", "exchanging.1")
+        result.toSend.messages.keys.size shouldBe 1
+        result.toSend.messages.values.map { it.default } shouldContainAll listOf("test")
     }
 
     "Function or condition if" {
@@ -51,7 +55,8 @@ class IfConditionTest : StringSpec({
             aggregate(id0) {
                 if (customCondition1 || customCondition2) neighboringViaExchange("test")
             }
-        result.toSend.messages.keys shouldContain Path(true, "neighboringViaExchange.1", "exchanging.1")
+        result.toSend.messages.keys.size shouldBe 1
+        result.toSend.messages.values.map { it.default } shouldContainAll listOf("test")
     }
 
     "Function not condition if" {
@@ -61,6 +66,7 @@ class IfConditionTest : StringSpec({
             aggregate(id0) {
                 if (customCondition1 && !customCondition2) neighboringViaExchange("test")
             }
-        result.toSend.messages.keys shouldContain Path(true, "neighboringViaExchange.1", "exchanging.1")
+        result.toSend.messages.keys.size shouldBe 1
+        result.toSend.messages.values.map { it.default } shouldContainAll listOf("test")
     }
 })

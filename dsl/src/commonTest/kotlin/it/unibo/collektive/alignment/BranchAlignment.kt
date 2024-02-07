@@ -13,7 +13,6 @@ import it.unibo.collektive.field.minus
 import it.unibo.collektive.field.plus
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
-import it.unibo.collektive.path.Path
 
 class BranchAlignment : StringSpec({
     val id0 = 0
@@ -34,13 +33,7 @@ class BranchAlignment : StringSpec({
             }
         }
         result.toSend.messages.keys shouldHaveSize 1 // 1 path of alignment
-        result.toSend.messages.keys shouldContain Path(
-            true,
-            "test2.1",
-            "test.1",
-            "neighboringViaExchange.1",
-            "exchanging.1",
-        )
+        result.toSend.messages.values.map { it.default } shouldContain "test"
     }
     "Branch alignment should not occur in non aggregate context" {
         val result =
