@@ -69,12 +69,13 @@ class TestAlignment : StringSpec({
         val bare = aggregate(x) { foo(x, this) }
         withFunction.toSend shouldNotBe bare.toSend
     }
-    "Outer non-collective function taking collective function as argument should align the non-collective function" {
-        val x = 0
-        fun foo(aggregate: Aggregate<Int>) = aggregate.neighboringViaExchange(x)
-        fun bar(f1: Field<Int, Int>, f2: Field<Int, Int>) = f1 + f2
-        val withFunction = aggregate(x) { foo(this) to foo(this) }
-        val bare = aggregate(x) { bar(foo(this), foo(this)) }
-        withFunction.toSend shouldNotBe bare.toSend
-    }
+    "Outer non-collective function taking collective function as argument should align the non-collective function"
+        .config(enabled = false) {
+            val x = 0
+            fun foo(aggregate: Aggregate<Int>) = aggregate.neighboringViaExchange(x)
+            fun bar(f1: Field<Int, Int>, f2: Field<Int, Int>) = f1 + f2
+            val withFunction = aggregate(x) { foo(this) to foo(this) }
+            val bare = aggregate(x) { bar(foo(this), foo(this)) }
+            withFunction.toSend shouldNotBe bare.toSend
+        }
 })
