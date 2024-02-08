@@ -1,4 +1,4 @@
-package it.unibo.collektive
+package it.unibo.collektive.transformers
 
 import it.unibo.collektive.utils.common.AggregateFunctionNames.FIELD_CLASS
 import it.unibo.collektive.utils.common.putTypeArgument
@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.name.FqName
 
-class FieldProjectionVisitor(
+class FieldProjectionTransformer(
     private val pluginContext: IrPluginContext,
     private val logger: MessageCollector,
     private val projectFunction: IrFunction,

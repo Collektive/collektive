@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrBranch
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.expressions.IrTypeOperatorCall
 import org.jetbrains.kotlin.ir.expressions.IrWhen
 
@@ -44,8 +45,9 @@ private fun IrBlock.findAggregateReference(aggregateContextClass: IrClass): IrEx
 
 internal fun IrExpression.findAggregateReference(aggregateContextClass: IrClass): IrExpression? = when (this) {
     is IrBlock -> findAggregateReference(aggregateContextClass)
-    //    is IrGetValue -> collectAggregateReference(aggregateContextClass, this)
-    //        ?: collectAggregateReference(aggregateContextClass, symbol.owner)
+
+    is IrGetValue -> collectAggregateReference(aggregateContextClass, this)
+        ?: collectAggregateReference(aggregateContextClass, symbol.owner)
 
     is IrCall -> collectAggregateReference(aggregateContextClass, this)
         ?: collectAggregateReference(aggregateContextClass, symbol.owner)

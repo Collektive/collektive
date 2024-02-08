@@ -1,11 +1,12 @@
-package it.unibo.collektive
+package it.unibo.collektive.transformers
 
 import it.unibo.collektive.utils.branch.addBranchAlignment
 import it.unibo.collektive.utils.call.buildAlignedOnCall
-import it.unibo.collektive.utils.common.AggregateFunctionNames.ALIGNED_ON_FUNCTION
+import it.unibo.collektive.utils.common.AggregateFunctionNames
 import it.unibo.collektive.utils.common.getAlignmentToken
 import it.unibo.collektive.utils.common.isAssignableFrom
 import it.unibo.collektive.utils.common.simpleFunctionName
+import it.unibo.collektive.utils.stack.StackFunctionCall
 import it.unibo.collektive.utils.statement.irStatement
 import it.unibo.collektive.visitors.collectAggregateReference
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -17,7 +18,6 @@ import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.expressions.IrBranch
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrElseBranch
-import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 
@@ -32,24 +32,26 @@ class AlignmentTransformer(
     private val aggregateContextClass: IrClass,
     private val aggregateLambdaBody: IrFunction,
     private val alignedOnFunction: IrFunction,
-) : IrElementTransformer<IrExpression?> {
-    private var alignedFunctions: AlignedData = emptyMap()
+) : IrElementTransformer<StackFunctionCall> {
+    private var alignedFunctions = emptyMap<String, Int>()
 
-    override fun visitCall(expression: IrCall, data: IrExpression?): IrElement {
+    override fun visitCall(expression: IrCall, data: StackFunctionCall): IrElement {
         val contextReference = expression.receiverAndArgs()
             .find { it.type.isAssignableFrom(aggregateContextClass.defaultType) }
             ?: collectAggregateReference(aggregateContextClass, expression.symbol.owner)
-        return contextReference?.let { context ->
-            val functionName = expression.getAlignmentToken()
-            // We don't want to align the alignedOn function :)
-            if (expression.simpleFunctionName() == ALIGNED_ON_FUNCTION) return super.visitCall(expression, data)
 
+        val functionName = expression.getAlignmentToken()
+        if (contextReference == null) data.push(functionName)
+        return contextReference?.let { context ->
+            // We don't want to align the alignedOn function :)
+            if (expression.simpleFunctionName() == AggregateFunctionNames.ALIGNED_ON_FUNCTION)
+                return super.visitCall(expression, data)
             // If no function, the first time the counter is 1
             val actualCounter = alignedFunctions[functionName]?.let { it + 1 } ?: 1
             alignedFunctions += functionName to actualCounter
 
             // If the expression contains a lambda, this recursion is necessary to visit the children
-            expression.transformChildren(this, data)
+            expression.transformChildren(this, StackFunctionCall())
 
             irStatement(pluginContext, aggregateLambdaBody, expression) {
                 with(logger) {
@@ -59,6 +61,7 @@ class AlignmentTransformer(
                         context,
                         alignedOnFunction,
                         expression,
+                        data,
                         alignedFunctions,
                     )
                 }
@@ -66,14 +69,14 @@ class AlignmentTransformer(
         } ?: super.visitCall(expression, data)
     }
 
-    override fun visitBranch(branch: IrBranch, data: IrExpression?): IrBranch {
+    override fun visitBranch(branch: IrBranch, data: StackFunctionCall): IrBranch {
         with(logger) {
             branch.addBranchAlignment(pluginContext, aggregateContextClass, aggregateLambdaBody, alignedOnFunction)
         }
         return super.visitBranch(branch, data)
     }
 
-    override fun visitElseBranch(branch: IrElseBranch, data: IrExpression?): IrElseBranch {
+    override fun visitElseBranch(branch: IrElseBranch, data: StackFunctionCall): IrElseBranch {
         with(logger) {
             branch.addBranchAlignment(
                 pluginContext,

@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
  * Class that visit all the children of the IR, looking for the
  * AggregateContext class.
  */
-class AggregateRefChildrenVisitor(
+private class AggregateRefChildrenVisitor(
     private val aggregateContextClass: IrClass,
     private val elements: MutableList<IrExpression>
 ) : IrElementVisitor<Unit, Nothing?> {

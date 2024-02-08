@@ -1,6 +1,7 @@
-package it.unibo.collektive
+package it.unibo.collektive.transformers
 
 import it.unibo.collektive.utils.common.isAssignableFrom
+import it.unibo.collektive.utils.stack.StackFunctionCall
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrStatement
@@ -8,8 +9,6 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
-
-typealias AlignedData = Map<String, Int>
 
 /**
  * Looking for the aggregate function call, which is the one that contains the function calls
@@ -46,7 +45,7 @@ class AggregateCallTransformer(
              */
             declaration.transformChildren(
                 AlignmentTransformer(pluginContext, logger, aggregateClass, declaration, alignedOnFunction),
-                null,
+                StackFunctionCall(),
             )
         }
         return super.visitFunction(declaration)

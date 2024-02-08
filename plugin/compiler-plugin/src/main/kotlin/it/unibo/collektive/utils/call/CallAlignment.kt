@@ -1,10 +1,10 @@
 package it.unibo.collektive.utils.call
 
-import it.unibo.collektive.AlignedData
 import it.unibo.collektive.utils.common.getAlignmentToken
 import it.unibo.collektive.utils.common.getLambdaType
 import it.unibo.collektive.utils.common.putTypeArgument
 import it.unibo.collektive.utils.common.putValueArgument
+import it.unibo.collektive.utils.stack.StackFunctionCall
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -37,7 +37,8 @@ fun IrSingleStatementBuilder.buildAlignedOnCall(
     aggregateContextReference: IrExpression,
     alignedOnFunction: IrFunction,
     expression: IrCall,
-    data: AlignedData,
+    stack: StackFunctionCall,
+    data: Map<String, Int>,
 ): IrFunctionAccessExpression {
     return irCall(alignedOnFunction).apply {
         // Set generics type
@@ -47,8 +48,9 @@ fun IrSingleStatementBuilder.buildAlignedOnCall(
         // Set the argument that is going to be push in the stack
         val functionName = expression.getAlignmentToken()
         val count = data[functionName]!! // Here the key should be present!
+        val alignmentToken = stack.toString() + functionName + count
         putValueArgument(
-            irString("$functionName.$count"),
+            irString(alignmentToken),
         )
         // Create the lambda that is going to call expression
         val lambda = buildLambdaArgument(pluginContext, aggregateLambdaBody, expression)
