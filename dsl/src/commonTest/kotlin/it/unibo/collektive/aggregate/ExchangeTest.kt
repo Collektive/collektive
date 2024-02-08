@@ -1,8 +1,6 @@
 package it.unibo.collektive.aggregate
 
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.collections.shouldContain
-import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
@@ -23,7 +21,7 @@ class ExchangeTest : StringSpec({
             res.localValue shouldBe 2
         }
         result.toSend.messages.keys shouldHaveSize 1
-        result.toSend.messages.values.map { it.default } shouldContain 2
+        result.toSend.messages.values.map { it.default } shouldBe listOf(2)
     }
 
     "Exchange should work between three aligned devices" {
@@ -40,7 +38,8 @@ class ExchangeTest : StringSpec({
         }
 
         resultDevice1.toSend.messages.keys shouldHaveSize 2
-        resultDevice1.toSend.messages.values.map { it.default } shouldContainAll listOf(2, 3)
+        resultDevice1.toSend.messages.values.map { it.default } shouldBe listOf(2, 3)
+        resultDevice1.toSend.messages.values.map { it.overrides } shouldBe listOf(emptyMap(), emptyMap())
 
         // Device 2
         val testNetwork2 = NetworkImplTest(nm, 2)
@@ -53,8 +52,11 @@ class ExchangeTest : StringSpec({
         }
 
         resultDevice2.toSend.messages.keys shouldHaveSize 2
-        resultDevice2.toSend.messages.values.map { it.default } shouldContainAll listOf(6, 5)
-        resultDevice2.toSend.messages.values.flatMap { it.overrides.values } shouldContainAll listOf(3, 6)
+        resultDevice2.toSend.messages.values.map { it.default } shouldBe listOf(6, 5)
+        resultDevice2.toSend.messages.values.map { it.overrides } shouldBe listOf(
+            mapOf(1 to 3),
+            mapOf(1 to 6),
+        )
 
         // Device 3
         val testNetwork3 = NetworkImplTest(nm, 3)
@@ -67,8 +69,11 @@ class ExchangeTest : StringSpec({
         }
 
         resultDevice3.toSend.messages.keys shouldHaveSize 2
-        resultDevice3.toSend.messages.values.map { it.default } shouldContainAll listOf(10, 7)
-        resultDevice3.toSend.messages.values.flatMap { it.overrides.values } shouldContainAll listOf(3, 7, 6, 10)
+        resultDevice3.toSend.messages.values.map { it.default } shouldBe listOf(10, 7)
+        resultDevice3.toSend.messages.values.map { it.overrides } shouldBe listOf(
+            mapOf(1 to 3, 2 to 7),
+            mapOf(1 to 6, 2 to 10),
+        )
     }
 
     "Exchange can yield a result but return a different value" {
@@ -80,7 +85,7 @@ class ExchangeTest : StringSpec({
             xcRes.toMap() shouldBe mapOf(0 to "return: 2")
         }
         result.toSend.messages.keys shouldHaveSize 1
-        result.toSend.messages.values.map { it.default } shouldContainAll listOf(2)
+        result.toSend.messages.values.map { it.default } shouldBe listOf(2)
     }
 
     "Exchange can yield a result of nullable values" {
@@ -92,7 +97,7 @@ class ExchangeTest : StringSpec({
             xcRes.toMap() shouldBe mapOf(0 to null)
         }
         result.toSend.messages.keys shouldHaveSize 1
-        result.toSend.messages.values.map { it.default } shouldContainAll listOf(2)
+        result.toSend.messages.values.map { it.default } shouldBe listOf(2)
     }
     "Exchange should produce a message with no overrides when producing a constant field" {
         val programUnderTest: Aggregate<Int>.() -> Unit = {
