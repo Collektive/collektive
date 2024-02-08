@@ -48,7 +48,7 @@ fun IrSingleStatementBuilder.buildAlignedOnCall(
         // Set the argument that is going to be push in the stack
         val functionName = expression.getAlignmentToken()
         val count = data[functionName]!! // Here the key should be present!
-        val alignmentToken = stack.toString() + functionName + count
+        val alignmentToken = "$stack$functionName.$count"
         putValueArgument(
             irString(alignmentToken),
         )
