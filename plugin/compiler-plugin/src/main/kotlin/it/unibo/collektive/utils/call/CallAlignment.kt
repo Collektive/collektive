@@ -46,9 +46,9 @@ fun IrSingleStatementBuilder.buildAlignedOnCall(
         // Set aggregate context
         putArgument(alignedOnFunction.dispatchReceiverParameter!!, aggregateContextReference)
         // Set the argument that is going to be push in the stack
-        val functionName = expression.getAlignmentToken()
-        val count = data[functionName]!! // Here the key should be present!
-        val alignmentToken = "$stack$functionName.$count"
+        val token = expression.getAlignmentToken()
+        val count = data[token]!! // Here the key should be present!
+        val alignmentToken = "$stack$token.$count"
         putValueArgument(0, irString(alignmentToken))
         // Create the lambda that is going to call expression
         val lambda = buildLambdaArgument(pluginContext, aggregateLambdaBody, expression)

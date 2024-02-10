@@ -40,15 +40,15 @@ class AlignmentTransformer(
             .find { it.type.isAssignableFrom(aggregateContextClass.defaultType) }
             ?: collectAggregateReference(aggregateContextClass, expression.symbol.owner)
 
-        val functionName = expression.getAlignmentToken()
-        if (contextReference == null) data.push(functionName)
+        val alignmentToken = expression.getAlignmentToken()
+        if (contextReference == null) data.push(alignmentToken)
         return contextReference?.let { context ->
             // We don't want to align the alignedOn function :)
             if (expression.simpleFunctionName() == AggregateFunctionNames.ALIGNED_ON_FUNCTION)
                 return super.visitCall(expression, data)
             // If no function, the first time the counter is 1
-            val actualCounter = alignedFunctions[functionName]?.let { it + 1 } ?: 1
-            alignedFunctions += functionName to actualCounter
+            val actualCounter = alignedFunctions[alignmentToken]?.let { it + 1 } ?: 1
+            alignedFunctions += alignmentToken to actualCounter
 
             // If the expression contains a lambda, this recursion is necessary to visit the children
             expression.transformChildren(this, StackFunctionCall())
