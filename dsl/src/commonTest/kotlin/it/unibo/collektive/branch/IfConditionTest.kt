@@ -1,87 +1,66 @@
 package it.unibo.collektive.branch
 
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.collections.shouldContain
-import it.unibo.collektive.IntId
-import it.unibo.collektive.aggregate.aggregate
-import it.unibo.collektive.aggregate.ops.neighbouring
-import it.unibo.collektive.stack.Path
+import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.shouldBe
+import it.unibo.collektive.Collektive.Companion.aggregate
+import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 
 class IfConditionTest : StringSpec({
-    val id0 = IntId(0)
-    "Constant condition if" {
+    val id0 = 0
+    "Branches with constant conditions should get aligned" {
         val result = aggregate(id0) {
-            if (true) neighbouring("test")
+            if (true) neighboringViaExchange("test")
         }
-        result.toSend.messages.keys shouldContain Path(listOf("branch[constant, true]", "neighbouring.1", "exchange.1"))
+        result.toSend.messages.keys.size shouldBe 1
+        result.toSend.messages.values.map { it.default } shouldContainAll listOf("test")
     }
 
-    "Variable condition if" {
+    "Branches with conditions read from variables should get aligned" {
         val customCondition = true
         val result = aggregate(id0) {
-            if (customCondition) neighbouring("test")
+            if (customCondition) neighboringViaExchange("test")
         }
-        result.toSend.messages.keys shouldContain Path(
-            listOf(
-                "branch[customCondition, true]",
-                "neighbouring.1",
-                "exchange.1",
-            ),
-        )
+        result.toSend.messages.keys.size shouldBe 1
+        result.toSend.messages.values.map { it.default } shouldContainAll listOf("test")
     }
 
     "Function condition if" {
         fun customFunction() = true
         val result = aggregate(id0) {
-            if (customFunction()) neighbouring("test")
+            if (customFunction()) neighboringViaExchange("test")
         }
-        result.toSend.messages.keys shouldContain Path(
-            listOf(
-                "branch[customFunction, true]",
-                "neighbouring.1",
-                "exchange.1",
-            ),
-        )
+        result.toSend.messages.keys.size shouldBe 1
+        result.toSend.messages.values.map { it.default } shouldContainAll listOf("test")
     }
 
     "Function and condition if" {
         val customCondition1 = true
         val customCondition2 = true
         val result = aggregate(id0) {
-            if (customCondition1 && customCondition2) neighbouring("test")
+            if (customCondition1 && customCondition2) neighboringViaExchange("test")
         }
-        result.toSend.messages.keys shouldContain Path(
-            listOf("branch[customCondition1 & customCondition2, true]", "neighbouring.1", "exchange.1"),
-        )
+        result.toSend.messages.keys.size shouldBe 1
+        result.toSend.messages.values.map { it.default } shouldContainAll listOf("test")
     }
 
     "Function or condition if" {
         val customCondition1 = true
         val customCondition2 = true
         val result = aggregate(id0) {
-            if (customCondition1 || customCondition2) neighbouring("test")
+            if (customCondition1 || customCondition2) neighboringViaExchange("test")
         }
-        result.toSend.messages.keys shouldContain Path(
-            listOf(
-                "branch[customCondition1 | customCondition2, true]",
-                "neighbouring.1",
-                "exchange.1",
-            ),
-        )
+        result.toSend.messages.keys.size shouldBe 1
+        result.toSend.messages.values.map { it.default } shouldContainAll listOf("test")
     }
 
     "Function not condition if" {
         val customCondition1 = true
         val customCondition2 = false
         val result = aggregate(id0) {
-            if (customCondition1 && !customCondition2) neighbouring("test")
+            if (customCondition1 && !customCondition2) neighboringViaExchange("test")
         }
-        result.toSend.messages.keys shouldContain Path(
-            listOf(
-                "branch[customCondition1 & not customCondition2, true]",
-                "neighbouring.1",
-                "exchange.1",
-            ),
-        )
+        result.toSend.messages.keys.size shouldBe 1
+        result.toSend.messages.values.map { it.default } shouldContainAll listOf("test")
     }
 })

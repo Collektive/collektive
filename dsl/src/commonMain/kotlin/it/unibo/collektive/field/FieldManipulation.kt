@@ -1,55 +1,67 @@
 package it.unibo.collektive.field
 
-import it.unibo.collektive.field.Field.Companion.hood
-import it.unibo.collektive.field.Field.Companion.reduce
+import it.unibo.collektive.field.Field.Companion.fold
 
 /**
- * Get the minimum value of a field.
- * @param includingSelf if true the local node is included in the computation.
+ * Get the minimum value of a field, excluding the local value, starting from [base].
+ * To consider the local value, explicitly provide it as [base].
  */
-fun <T : Comparable<T>> Field<T>.min(includingSelf: Boolean = true): T = when (includingSelf) {
-    true -> hood { acc, value -> if (value < acc) value else acc }
-    false -> reduce(includingSelf = false) { acc, value -> if (value < acc) value else acc }
-}
+fun <ID : Any, T : Comparable<T>> Field<ID, T>.min(base: T): T =
+    fold(base) { acc, value -> if (value < acc) value else acc }
 
 /**
- * Get the maximum value of a field.
- * @param includingSelf if true the local node is included in the computation.
+ * Get the minimum value of a field, including the local value.
  */
-fun <T : Comparable<T>> Field<T>.max(includingSelf: Boolean = true): T = when (includingSelf) {
-    true -> hood { acc, value -> if (value > acc) value else acc }
-    false -> reduce(includingSelf = false) { acc, value -> if (value > acc) value else acc }
-}
+fun <ID : Any, T : Comparable<T>> Field<ID, T>.minWithSelf(): T = min(localValue)
 
 /**
- * Operator to sum a [value] to all the values of the field.
+ * Get the maximum value of a field, excluding the local value, starting from [base].
+ * To consider the local value, explicitly provide it as [base].
  */
-operator fun <T : Number> Field<T>.plus(value: T): Field<T> = mapWithId { _, oldValue -> add(oldValue, value) }
+fun <ID : Any, T : Comparable<T>> Field<ID, T>.max(base: T): T =
+    fold(base) { acc, value -> if (value > acc) value else acc }
 
 /**
- * Operator to subtract a [value] to all the values of the field.
+ * Get the maximum value of a field, including the local value.
  */
-operator fun <T : Number> Field<T>.minus(value: T): Field<T> = mapWithId { _, oldValue -> sub(oldValue, value) }
+fun <ID : Any, T : Comparable<T>> Field<ID, T>.maxWithSelf(): T = min(localValue)
+
+/**
+ * Adds [value] to all the field values.
+ */
+operator fun <ID : Any, T : Number> Field<ID, T>.plus(value: T): Field<ID, T> = map { add(it, value) }
+
+/**
+ * Subtracts [value] from all the field values.
+ */
+operator fun <ID : Any, T : Number> Field<ID, T>.minus(value: T): Field<ID, T> = map { sub(it, value) }
 
 /**
  * Sum a field with [other] field.
  * The two fields must be aligned, otherwise an error is thrown.
  */
-operator fun <T : Number> Field<T>.plus(other: Field<T>): Field<T> = combine(this, other) { a, b -> add(a, b) }
+operator fun <ID : Any, T : Number> Field<ID, T>.plus(other: Field<ID, T>): Field<ID, T> =
+    alignedMap(other) { a, b -> add(a, b) }
 
 /**
  * Subtract a field with [other] field.
  * The two fields must be aligned, otherwise an error is thrown.
  */
-operator fun <T : Number> Field<T>.minus(other: Field<T>): Field<T> = combine(this, other) { a, b -> sub(a, b) }
+operator fun <ID : Any, T : Number> Field<ID, T>.minus(other: Field<ID, T>): Field<ID, T> =
+    alignedMap(other) { a, b -> sub(a, b) }
 
-/**
- * Combine two fields with a [transform] function.
- * The two fields must be aligned, otherwise an error is thrown.
- */
-fun <T, V, R> combine(field1: Field<T>, field: Field<V>, transform: (T, V) -> R): Field<R> {
-    return field1.mapWithId { id, value -> transform(value, field[id] ?: error("Field not aligned")) }
-}
+// /**
+// * Combine two fields with a [transform] function.
+// * The two fields must be aligned, otherwise an error is thrown.
+// */
+// fun <ID: Any, Type1, Type2, Result> combine(
+//    field1: Field<ID, Type1>,
+//    field2: Field<ID, Type2>,
+//    transform: (Type1, Type2) -> Result
+// ): Field<ID, Result> {
+//    // TODO: we should have a function producing a clear error every time there is a misalignment bug
+//    field1.mapWithId { id, value -> transform(value, field2[id] ?: error("Field not aligned")) }
+// }
 
 @Suppress("UNCHECKED_CAST")
 private fun <T : Number> add(value: T, other: T): T {

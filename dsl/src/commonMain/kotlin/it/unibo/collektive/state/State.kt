@@ -1,11 +1,8 @@
 package it.unibo.collektive.state
 
-import it.unibo.collektive.stack.Path
+import it.unibo.collektive.path.Path
 
 /**
- * State composed of [path] and [value] of a node.
+ * State is an association between a path and a value.
  */
-data class State<X>(
-    val path: Path,
-    val value: X?,
-)
+typealias State = Map<Path, Any?>

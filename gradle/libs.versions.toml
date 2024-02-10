@@ -1,12 +1,15 @@
 [versions]
-build-config = "4.2.0"
+alchemist = "30.1.10"
+build-config = "5.3.5"
 coroutines = "1.7.3"
 dokka = "1.9.10"
 kotest = "5.8.0"
-kotlin = "1.9.21"
+kotlin = "1.9.22"
 
 [libraries]
-arrow = { module = "io.arrow-kt:arrow-core", version = "1.2.1" }
+alchemist-api = { module = "it.unibo.alchemist:alchemist-api", version.ref = "alchemist" }
+alchemist = { module = "it.unibo.alchemist:alchemist", version.ref = "alchemist" }
+arrow = "io.arrow-kt:arrow-core:1.2.1"
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-framework-datatest = { module = "io.kotest:kotest-framework-datatest", version.ref = "kotest" }
@@ -16,6 +19,7 @@ kotlin-test-common = { module = "org.jetbrains.kotlin:kotlin-test-common", versi
 kotlin-test-annotations-common = { module = "org.jetbrains.kotlin:kotlin-test-annotations-common", version.ref = "kotlin" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+caffeine = "com.github.ben-manes.caffeine:caffeine:3.1.8"
 
 [bundles]
 kotlin-testing-common = [
@@ -26,17 +30,21 @@ kotlin-testing-common = [
     "kotlin-test-common",
     "kotlin-test-annotations-common",
 ]
+alchemist = [
+    "alchemist",
+    "alchemist-api",
+]
 
 [plugins]
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-gitSemVer = "org.danilopianini.git-sensitive-semantic-versioning:2.0.4"
+gitSemVer = "org.danilopianini.git-sensitive-semantic-versioning:3.1.1"
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-publishOnCentral = "org.danilopianini.publish-on-central:5.0.20"
-kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.56.0"
-multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:0.5.7"
+publishOnCentral = "org.danilopianini.publish-on-central:5.0.23"
+kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.60.1"
+multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:0.5.8"
 taskTree = "com.dorongold.task-tree:2.1.1"
-detekt = "io.gitlab.arturbosch.detekt:1.23.4"
+detekt = "io.gitlab.arturbosch.detekt:1.23.5"
 build-config = { id = "com.github.gmazzo.buildconfig", version.ref = "build-config" }
 gradlePluginPublish = { id = "com.gradle.plugin-publish", version = "1.2.1" }
 kover = "org.jetbrains.kotlinx.kover:0.7.5"

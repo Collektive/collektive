@@ -1,3 +1,243 @@
+## [7.0.2](https://github.com/Collektive/collektive/compare/7.0.1...7.0.2) (2024-02-06)
+
+
+### Bug Fixes
+
+* use `exchanging` to send the same value to all the neighbors solving a problem where the same initial value is always sent when multiple call occurs ([#224](https://github.com/Collektive/collektive/issues/224)) ([124d8ac](https://github.com/Collektive/collektive/commit/124d8ac040f07c3136d43f881e8fb0683e0ba4a2))
+
+## [7.0.1](https://github.com/Collektive/collektive/compare/7.0.0...7.0.1) (2024-02-05)
+
+
+### Dependency updates
+
+* **deps:** update alchemist to v30.0.5 ([0cf2973](https://github.com/Collektive/collektive/commit/0cf29733dc6adec5a96a992c50511935e8ef8748))
+* **deps:** update dependency gradle to v8.6 ([8da0fd3](https://github.com/Collektive/collektive/commit/8da0fd3b87c56e312d62603150bf2c7f27988683))
+* **deps:** update plugin gitsemver to v3.1.1 ([3f98223](https://github.com/Collektive/collektive/commit/3f98223f3887cef2eb6d39698eb4fb18e70aadca))
+* **deps:** update plugin kotlin-qa to v0.59.1 ([75ff12b](https://github.com/Collektive/collektive/commit/75ff12b22f19a3dc730f5b9f44332f1eec43ac68))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.1 ([4e4c9de](https://github.com/Collektive/collektive/commit/4e4c9de431c66c691aaa9b38171178bad3325ace))
+* **deps:** update plugin publishoncentral to v5.0.23 ([9141b6b](https://github.com/Collektive/collektive/commit/9141b6b6d2232da9b7469c133c213af55d453b7f))
+
+
+### Performance improvements
+
+* exchange optimization on outbound message when a field with the same values for all the neighbors should be sent ([#225](https://github.com/Collektive/collektive/issues/225)) ([7df12f6](https://github.com/Collektive/collektive/commit/7df12f6a8f55efd56e6cfc7535d563cd185dbd15))
+
+
+### Tests
+
+* add test which emulates the error thrown in the simulation (issue [#207](https://github.com/Collektive/collektive/issues/207)) ([#208](https://github.com/Collektive/collektive/issues/208)) ([ca65c7e](https://github.com/Collektive/collektive/commit/ca65c7e88a666d1f988868793be52316eaa1ea1a))
+
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.2.20 ([7429e4e](https://github.com/Collektive/collektive/commit/7429e4e31d5c6bde2b78e75104aceeeaa583da6e))
+
+## [7.0.0](https://github.com/Collektive/collektive/compare/6.1.1...7.0.0) (2024-02-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* move `YieldingResult` off `YieldingContext` and write a nicer `sharing` (#215)
+
+### Refactoring
+
+* move `YieldingResult` off `YieldingContext` and write a nicer `sharing` ([#215](https://github.com/Collektive/collektive/issues/215)) ([1901044](https://github.com/Collektive/collektive/commit/1901044afaf5b9c26a67d637843767e8e0120793))
+
+## [6.1.1](https://github.com/Collektive/collektive/compare/6.1.0...6.1.1) (2024-02-02)
+
+
+### Dependency updates
+
+* **deps:** update alchemist to v30.0.4 ([3073566](https://github.com/Collektive/collektive/commit/307356660c8782b2b51621ed67f7e7e356318e73))
+* **deps:** update plugin detekt to v1.23.5 ([77df53e](https://github.com/Collektive/collektive/commit/77df53e1710ff07ef3381992357dbdae769fafa9))
+* **deps:** update plugin kotlin-qa to v0.59.0 ([458cfe4](https://github.com/Collektive/collektive/commit/458cfe41808c30eed53df2d7ebf0f68a0cd9d835))
+* **deps:** update plugin multijvmtesting to v0.5.8 ([0b86414](https://github.com/Collektive/collektive/commit/0b86414129055455b48d2290ca52d4d00bb98117))
+
+
+### Bug Fixes
+
+* solve an alignment issue preventing the right alignment of nested branch conditions ([#216](https://github.com/Collektive/collektive/issues/216)) ([1f514b9](https://github.com/Collektive/collektive/commit/1f514b99fd31354988ab323383cb74fc3f79f051))
+
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.2.16 ([ced754a](https://github.com/Collektive/collektive/commit/ced754aeb89ada4c4ac9e58951efa06f4db75138))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.2.17 ([8da39c2](https://github.com/Collektive/collektive/commit/8da39c2e783422bace92f1e74f19dd5152fcc4e6))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.2.18 ([29801f8](https://github.com/Collektive/collektive/commit/29801f8188b6696ea7ca04df7e9d62a568af3821))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.2.19 ([83c8695](https://github.com/Collektive/collektive/commit/83c8695d9c5ec63e5ecd5fb369a3e86dc664a849))
+
+## [6.1.0](https://github.com/Collektive/collektive/compare/6.0.0...6.1.0) (2024-01-31)
+
+
+### Features
+
+* **alchemist-incarnation:** add support for Kotlin-interpreted properties ([#204](https://github.com/Collektive/collektive/issues/204)) ([b23a25e](https://github.com/Collektive/collektive/commit/b23a25efb6053a77a1ab53a82b3e224450f315aa))
+
+
+### Dependency updates
+
+* **deps:** update alchemist to v30.0.3 ([74ade19](https://github.com/Collektive/collektive/commit/74ade19cf5719450db48ce7d6a7b1bb50304118b))
+
+## [6.0.0](https://github.com/Collektive/collektive/compare/5.1.0...6.0.0) (2024-01-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* drop `ID` and revise several parts of the API (#179)
+
+### Dependency updates
+
+* **deps:** update alchemist to v30 ([718d5d8](https://github.com/Collektive/collektive/commit/718d5d845ea100c547c3ba3f17c9c6b198afe881))
+* **deps:** update alchemist to v30.0.1 ([69353af](https://github.com/Collektive/collektive/commit/69353afdc6da87fe40f229814e153a4fef273779))
+* **deps:** update alchemist to v30.0.2 ([77c6d71](https://github.com/Collektive/collektive/commit/77c6d71cc293f689eec61e80ab6f6d4fce7812b0))
+* **deps:** update plugin com.gradle.enterprise to v3.16.2 ([824311a](https://github.com/Collektive/collektive/commit/824311a05f6d737fb45dbbb810b6201e50349975))
+
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.2.15 ([9f7f6c0](https://github.com/Collektive/collektive/commit/9f7f6c07999365e8bf94de83acaf1a9ae8153811))
+
+
+### Refactoring
+
+* drop `ID` and revise several parts of the API ([#179](https://github.com/Collektive/collektive/issues/179)) ([ecca283](https://github.com/Collektive/collektive/commit/ecca283aa3d5e49d2dbb40a2894d20589be2d387))
+
+## [5.1.0](https://github.com/Collektive/collektive/compare/5.0.0...5.1.0) (2024-01-22)
+
+
+### Features
+
+* add `alchemist-incarnation-collektive`, implementing an Alchemist incarnation to run Collektive in the simulator ([#193](https://github.com/Collektive/collektive/issues/193)) ([fee291e](https://github.com/Collektive/collektive/commit/fee291e4995d4c90e284c1cbdc8ac0f306b668e8))
+
+
+### Dependency updates
+
+* **deps:** update alchemist to v29.5.0 ([c3916bc](https://github.com/Collektive/collektive/commit/c3916bce50278b5c56ecd4d1ce38d4a05b34d222))
+* **deps:** update dependency it.unibo.alchemist:alchemist-api to v29.5.1 ([39b3dd8](https://github.com/Collektive/collektive/commit/39b3dd8be5aca97987f142067eab589107047a9b))
+* **deps:** update plugin gitsemver to v3 ([86849cd](https://github.com/Collektive/collektive/commit/86849cd8ee65b40cf0f38c957afa126f352a5cf9))
+* **deps:** update plugin gitsemver to v3.1.0 ([37f789a](https://github.com/Collektive/collektive/commit/37f789a8c7fe833228c67313c65a74de7454356b))
+
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.2.14 ([1c15691](https://github.com/Collektive/collektive/commit/1c156914860db1985d14fb83b02a14c4eabcaa10))
+
+## [5.0.0](https://github.com/Collektive/collektive/compare/4.0.0...5.0.0) (2024-01-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* introduce the `exchanging` function to be consistent with `sharing` and `repeating` and refactor implementation (#177)
+
+### Features
+
+* introduce the `exchanging` function to be consistent with `sharing` and `repeating` and refactor implementation ([#177](https://github.com/Collektive/collektive/issues/177)) ([2bf33d9](https://github.com/Collektive/collektive/commit/2bf33d90627d72e71093c17fce271cbb647edc29)), closes [#190](https://github.com/Collektive/collektive/issues/190)
+
+
+### Dependency updates
+
+* **deps:** update alchemist to v29.3.5 ([4db7363](https://github.com/Collektive/collektive/commit/4db7363ef746c4d20fb2db4c573b2ff3aa62b793))
+* **deps:** update alchemist to v29.4.0 ([a14609a](https://github.com/Collektive/collektive/commit/a14609ab3b8453fb39f23b383ac5b27afb9c5f13))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5.3.5 ([52b5c64](https://github.com/Collektive/collektive/commit/52b5c643541067f11b1eb06772284904e66afdc0))
+* **deps:** update node.js to 20.11 ([bf1ff85](https://github.com/Collektive/collektive/commit/bf1ff854446078c993ada5fd978749a754bdf141))
+* **deps:** update plugin kotlin-qa to v0.58.0 ([33e774d](https://github.com/Collektive/collektive/commit/33e774dbaf0edfbb4d9cf215fb3d81a7d43410b7))
+* **deps:** update plugin org.gradle.toolchains.foojay-resolver-convention to v0.8.0 ([69bffbd](https://github.com/Collektive/collektive/commit/69bffbde6d519da27a0feed11b6366d22a8ecdaa))
+
+
+### Tests
+
+* **dsl:** aligment fails clearly when a value is sent multiple times with the same path ([#185](https://github.com/Collektive/collektive/issues/185)) ([8e383fd](https://github.com/Collektive/collektive/commit/8e383fdf7ed51cb58d7bde7b2372eb53bb2610a0))
+
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.2.13 ([89f1db0](https://github.com/Collektive/collektive/commit/89f1db09e84c64f789d62f7fe5915554c6d116a8))
+
+## [4.0.0](https://github.com/Collektive/collektive/compare/3.0.1...4.0.0) (2024-01-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* implement rule `[E-FLD]` as described in https://doi.org/10.1145/3285956. Fixes #171 (#172)
+
+### Dependency updates
+
+* **deps:** update alchemist to v29.3.4 ([c2090e9](https://github.com/Collektive/collektive/commit/c2090e96090f611587ee6e09a1a5f3756c12feaa))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5.3.2 ([fd5efbf](https://github.com/Collektive/collektive/commit/fd5efbf0b577cba3c2eaf4fccc0060a335eb9288))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5.3.3 ([01573c4](https://github.com/Collektive/collektive/commit/01573c4d029189552b42f594f47ffd5b73a2501b))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.85 ([312363b](https://github.com/Collektive/collektive/commit/312363b95311d2d7f9790879157ef37abc507728))
+* **deps:** update plugin gitsemver to v2.0.5 ([f654e59](https://github.com/Collektive/collektive/commit/f654e59d8cfe2aad197ba98c70ea7bc85f58dcf1))
+* **deps:** update plugin kotlin-qa to v0.57.1 ([5c4a72b](https://github.com/Collektive/collektive/commit/5c4a72bb80e8283e3b98e5792de8599fa1cf1eda))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v1.1.17 ([9b9382f](https://github.com/Collektive/collektive/commit/9b9382f3b419e9cb8b05a8a6a2d119f29744ee80))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2 ([eb03b09](https://github.com/Collektive/collektive/commit/eb03b09802f59d51139ea0742a3902da834941d2))
+* **deps:** update plugin publishoncentral to v5.0.22 ([5627bab](https://github.com/Collektive/collektive/commit/5627bab0075ef00716e240a96bda18eda0d97094))
+
+
+### Bug Fixes
+
+* implement rule `[E-FLD]` as described in https://doi.org/10.1145/3285956. Fixes [#171](https://github.com/Collektive/collektive/issues/171) ([#172](https://github.com/Collektive/collektive/issues/172)) ([bb70be2](https://github.com/Collektive/collektive/commit/bb70be229bf9a1afb81f584eb226e641b3acbafc))
+
+## [3.0.1](https://github.com/Collektive/collektive/compare/3.0.0...3.0.1) (2023-12-21)
+
+
+### Dependency updates
+
+* **core-deps:** update kotlin monorepo to v1.9.22 ([ffee000](https://github.com/Collektive/collektive/commit/ffee0000c2dcec516535e560a683f2b16e022aec))
+* **deps:** update alchemist to v29.0.7 ([d8d9241](https://github.com/Collektive/collektive/commit/d8d9241dd6179e3df64c259832b2f648bed5243f))
+* **deps:** update alchemist to v29.1.0 ([8e014ab](https://github.com/Collektive/collektive/commit/8e014ab4b1cf945788ccbab1a552c8b3d232a23d))
+* **deps:** update alchemist to v29.1.1 ([9e7d929](https://github.com/Collektive/collektive/commit/9e7d929fd5fde5454c952751b4c15778e2ad000f))
+* **deps:** update alchemist to v29.2.0 ([bbed5f6](https://github.com/Collektive/collektive/commit/bbed5f675da2c53387cb522509383c35ac2a89c9))
+* **deps:** update alchemist to v29.3.0 ([0d77894](https://github.com/Collektive/collektive/commit/0d778942576be0b2d3eea6ca64a3c15eabd31f24))
+* **deps:** update alchemist to v29.3.1 ([ddc1a29](https://github.com/Collektive/collektive/commit/ddc1a29e4c915b667f78708c4e6017bf2c6d698f))
+* **deps:** update alchemist to v29.3.2 ([d45371b](https://github.com/Collektive/collektive/commit/d45371b5070527a93c5dd93af744b6fb39151944))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5 ([619cd55](https://github.com/Collektive/collektive/commit/619cd55dcd4b6a382128fe3991dac18d2aab6c24))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5.0.1 ([40b8323](https://github.com/Collektive/collektive/commit/40b832369693257b59be4d4a032b83332df2dab7))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.80 ([7ed40bc](https://github.com/Collektive/collektive/commit/7ed40bc8980cb6da61d871159fafac5b3eb1547a))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.81 ([7440ba4](https://github.com/Collektive/collektive/commit/7440ba442374ab0ef01b94fb5389d09ba27b55bf))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.82 ([82fac18](https://github.com/Collektive/collektive/commit/82fac1859f98bba9e46c7057c29a52a3024e87cd))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.83 ([39ae86a](https://github.com/Collektive/collektive/commit/39ae86a593530955374bd59c4d4eb26970340f00))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.84 ([bfa62b0](https://github.com/Collektive/collektive/commit/bfa62b004f7a1adbf3c88987399d56c5078d6001))
+* **deps:** update plugin com.gradle.enterprise to v3.16.1 ([0693294](https://github.com/Collektive/collektive/commit/069329464441d5a15e86b8a4b34fbe1f73d58802))
+* **deps:** update plugin kotlin-qa to v0.57.0 ([20e5eda](https://github.com/Collektive/collektive/commit/20e5edab6b30e1344db76d47eabd041bfafea925))
+
+
+### Build and continuous integration
+
+* **deps:** update actions/setup-node action to v4.0.1 ([7262acf](https://github.com/Collektive/collektive/commit/7262acf624d05d3c71acae1b17867930ec75703a))
+
+
+### Refactoring
+
+* simplify the alignment logic ([#145](https://github.com/Collektive/collektive/issues/145)) ([cfb479d](https://github.com/Collektive/collektive/commit/cfb479db0797c80f236785b6ed1286c00d40cb01))
+
+## [3.0.0](https://github.com/Collektive/collektive/compare/2.1.3...3.0.0) (2023-12-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* introduce Collektive entrypoint (#142)
+
+### Features
+
+* introduce Collektive entrypoint ([#142](https://github.com/Collektive/collektive/issues/142)) ([8bf8517](https://github.com/Collektive/collektive/commit/8bf8517edbdde8611d1bd99991abc72d4410513a))
+
+
+### Dependency updates
+
+* **deps:** update alchemist to v29 ([ce990da](https://github.com/Collektive/collektive/commit/ce990da0fc75ea85b1825cf56145671ff6acc3d0))
+* **deps:** update dependency gradle to v8.5 ([a18e39b](https://github.com/Collektive/collektive/commit/a18e39b652681d69108cf7f89d7be60b516437a1))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.79 ([b58fd5a](https://github.com/Collektive/collektive/commit/b58fd5a5955d643cf067271dcf8bf5674eebad97))
+* **deps:** update plugin com.gradle.enterprise to v3.16 ([0bb24d6](https://github.com/Collektive/collektive/commit/0bb24d694baaa4e69ab837cec35804c9d6815add))
+* **deps:** update plugin gitsemver to v2.0.4 ([29c2bae](https://github.com/Collektive/collektive/commit/29c2bae51b456a41514af67a1683760758a82e04))
+* **deps:** update plugin kotlin-qa to v0.55.2 ([9d22b7a](https://github.com/Collektive/collektive/commit/9d22b7a389fc1f397a5e6e072dcef87b5eb20e63))
+* **deps:** update plugin kotlin-qa to v0.56.0 ([7849958](https://github.com/Collektive/collektive/commit/7849958d25f589e13ae6e866c69347212966e654))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v1.1.16 ([215292e](https://github.com/Collektive/collektive/commit/215292e565f7dad34f960ea0826d0c999f0b6bcf))
+
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.2.12 ([c9e1d72](https://github.com/Collektive/collektive/commit/c9e1d728fbe3ccd4615ab66db4784b4710218ebb))
+
 ## [2.1.3](https://github.com/Collektive/collektive/compare/2.1.2...2.1.3) (2023-11-29)
 
 

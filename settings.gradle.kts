@@ -7,9 +7,9 @@ pluginManagement {
 }
 
 plugins {
-    id("com.gradle.enterprise") version "3.16"
-    id("org.danilopianini.gradle-pre-commit-git-hooks") version "1.1.16"
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.7.0"
+    id("com.gradle.enterprise") version "3.16.2"
+    id("org.danilopianini.gradle-pre-commit-git-hooks") version "2.0.1"
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
 gradleEnterprise {
@@ -23,12 +23,12 @@ gradleEnterprise {
 gitHooks {
     commitMsg { conventionalCommits() }
     preCommit {
-        tasks("detektAll")
+        tasks("detektAll", "ktlintCheck")
     }
-    createHooks()
+    createHooks(overwriteExisting = true)
 }
 
 rootProject.name = "collektive"
 
 includeBuild("plugin")
-include("dsl")
+include("dsl", "alchemist-incarnation-collektive")

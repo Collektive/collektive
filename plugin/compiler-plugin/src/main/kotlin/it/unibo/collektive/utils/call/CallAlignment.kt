@@ -1,11 +1,11 @@
 package it.unibo.collektive.utils.call
 
-import it.unibo.collektive.AlignedData
+import it.unibo.collektive.utils.common.getAlignmentToken
 import it.unibo.collektive.utils.common.getLambdaType
-import it.unibo.collektive.utils.common.putTypeArgument
-import it.unibo.collektive.utils.common.putValueArgument
+import it.unibo.collektive.utils.stack.StackFunctionCall
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
+import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.ir.builders.IrBuilderWithScope
 import org.jetbrains.kotlin.ir.builders.IrSingleStatementBuilder
@@ -28,25 +28,28 @@ import org.jetbrains.kotlin.ir.types.isUnit
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.name.Name
 
+context(MessageCollector)
 fun IrSingleStatementBuilder.buildAlignedOnCall(
     pluginContext: IrPluginContext,
     aggregateLambdaBody: IrFunction,
     aggregateContextReference: IrExpression,
     alignedOnFunction: IrFunction,
     expression: IrCall,
-    data: AlignedData,
+    stack: StackFunctionCall,
+    data: Map<String, Int>,
 ): IrFunctionAccessExpression {
     return irCall(alignedOnFunction).apply {
-        // Set generics type
-        putTypeArgument(expression.type)
+        // Set the return type
+        type = expression.type
+        // Set generics type of the `alignOn` function
+        putTypeArgument(0, type)
         // Set aggregate context
         putArgument(alignedOnFunction.dispatchReceiverParameter!!, aggregateContextReference)
         // Set the argument that is going to be push in the stack
-        val functionName = expression.symbol.owner.name.asString()
-        val count = data[functionName]!! // Here the key should be present!
-        putValueArgument(
-            irString("$functionName.$count"),
-        )
+        val token = expression.getAlignmentToken()
+        val count = data[token]!! // Here the key should be present!
+        val alignmentToken = "$stack$token.$count"
+        putValueArgument(0, irString(alignmentToken))
         // Create the lambda that is going to call expression
         val lambda = buildLambdaArgument(pluginContext, aggregateLambdaBody, expression)
         putValueArgument(1, lambda)
@@ -57,6 +60,7 @@ fun IrSingleStatementBuilder.buildAlignedOnCall(
  * Create a IrFunctionExpression that transform a lambda to an expression
  * that can be used as argument for another function.
  */
+context(MessageCollector)
 private fun IrBuilderWithScope.buildLambdaArgument(
     pluginContext: IrPluginContext,
     aggregateLambdaBody: IrFunction,
@@ -85,14 +89,13 @@ private fun IrBuilderWithScope.buildLambda(
     expression: IrCall,
 ): IrSimpleFunction = pluginContext.irFactory.buildFun {
     name = Name.special("<anonymous>")
-    this.returnType = expression.type
-    this.origin = IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA
-    this.visibility = DescriptorVisibilities.LOCAL
+    returnType = expression.type
+    origin = IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA
+    visibility = DescriptorVisibilities.LOCAL
 }.apply {
-    this.patchDeclarationParents(this@buildLambda.parent)
-    if (expression.symbol.owner.returnType.isUnit()) {
-        this.body = context.irBuiltIns.createIrBuilder(symbol).irBlockBody { +expression }
-    } else {
-        this.body = context.irBuiltIns.createIrBuilder(symbol).irBlockBody { +irReturn(expression) }
+    patchDeclarationParents(this@buildLambda.parent)
+    body = when (expression.symbol.owner.returnType.isUnit()) {
+        true -> context.irBuiltIns.createIrBuilder(symbol).irBlockBody { +expression }
+        false -> context.irBuiltIns.createIrBuilder(symbol).irBlockBody { +irReturn(expression) }
     }
 }

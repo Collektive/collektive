@@ -2,153 +2,119 @@ package it.unibo.collektive.aggregate
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
-import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import it.unibo.collektive.IntId
+import it.unibo.collektive.Collektive.Companion.aggregate
+import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.messages.OutboundMessage
-import it.unibo.collektive.messages.SingleOutboundMessage
+import it.unibo.collektive.field.plus
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
-import it.unibo.collektive.stack.Path
 
 class ExchangeTest : StringSpec({
-
-    // device ids
-    val id0 = IntId(0)
-    val id1 = IntId(1)
-    val id2 = IntId(2)
-    val id3 = IntId(3)
-
-    // initial values
-    val initV1 = 1
-    val initV2 = 2
-    val initV3 = 3
-    val initV4 = 4
-    val initV5 = 5
-    val initV6 = 6
-
-    // paths
-    val path1 = Path(listOf("exchange.1"))
-    val path2 = Path(listOf("exchange.2"))
-
-    // expected
-    val expected2 = 2
-    val expected3 = 3
-    val expected5 = 5
-    val expected6 = 6
-    val expected7 = 7
-    val expected10 = 10
-
-    val increaseOrDouble: (Field<Int>) -> Field<Int> = { f ->
+    val increaseOrDouble: (Field<Int, Int>) -> Field<Int, Int> = { f ->
         f.mapWithId { _, v -> if (v % 2 == 0) v + 1 else v * 2 }
     }
 
     "First time exchange should return the initial value" {
-        aggregate(id0) {
-            val res = exchange(initV1, increaseOrDouble)
-            res.localValue shouldBe expected2
-            messagesToSend() shouldBe OutboundMessage(
-                id0,
-                mapOf(path1 to SingleOutboundMessage(expected2, emptyMap())),
-            )
+        val result = aggregate(0) {
+            val res = exchange(1, increaseOrDouble)
+            res.localValue shouldBe 2
         }
+        result.toSend.messages.keys shouldHaveSize 1
+        result.toSend.messages.values.map { it.default } shouldBe listOf(2)
     }
 
     "Exchange should work between three aligned devices" {
         val nm = NetworkManager()
-        var i = 0
-        val condition: () -> Boolean = { i++ < 1 }
 
         // Device 1
-        val testNetwork1 = NetworkImplTest(nm, id1)
-        aggregate(id1, condition, testNetwork1) {
-            val res1 = exchange(initV1, increaseOrDouble)
-            val res2 = exchange(initV2, increaseOrDouble)
+        val testNetwork1 = NetworkImplTest(nm, 1)
+        val resultDevice1 = aggregate(1, testNetwork1) {
+            val res1 = exchange(1, increaseOrDouble)
+            val res2 = exchange(2, increaseOrDouble)
             testNetwork1.read() shouldHaveSize 0
-            res1.localValue shouldBe expected2
-            res2.localValue shouldBe expected3
-            messagesToSend() shouldBe OutboundMessage(
-                id1,
-                mapOf(
-                    path1 to SingleOutboundMessage(expected2, emptyMap()),
-                    path2 to SingleOutboundMessage(expected3, emptyMap()),
-                ),
-            )
+            res1.localValue shouldBe 2
+            res2.localValue shouldBe 3
         }
 
-        i = 0
+        resultDevice1.toSend.messages.keys shouldHaveSize 2
+        resultDevice1.toSend.messages.values.map { it.default } shouldBe listOf(2, 3)
+        resultDevice1.toSend.messages.values.map { it.overrides } shouldBe listOf(emptyMap(), emptyMap())
+
         // Device 2
-        val testNetwork2 = NetworkImplTest(nm, id2)
-        aggregate(id2, condition, testNetwork2) {
-            val res1 = exchange(initV3, increaseOrDouble)
-            val res2 = exchange(initV4, increaseOrDouble)
-            testNetwork2.read() shouldHaveSize 1
+        val testNetwork2 = NetworkImplTest(nm, 2)
+        val resultDevice2 = aggregate(2, testNetwork2) {
+            val res1 = exchange(3, increaseOrDouble)
+            val res2 = exchange(4, increaseOrDouble)
 
-            val readMessages = testNetwork2.read().first().messages
-            readMessages shouldHaveSize 2
-            readMessages[path1] shouldBe expected2
-            readMessages[path2] shouldBe expected3
-
-            res1.localValue shouldBe expected6
-            res2.localValue shouldBe expected5
-            messagesToSend() shouldBe OutboundMessage(
-                id2,
-                mapOf(
-                    path1 to SingleOutboundMessage(
-                        expected6,
-                        mapOf(id1 to expected3),
-                    ),
-                    path2 to SingleOutboundMessage(
-                        expected5,
-                        mapOf(id1 to expected6),
-                    ),
-                ),
-            )
+            res1.localValue shouldBe 6
+            res2.localValue shouldBe 5
         }
 
-        i = 0
+        resultDevice2.toSend.messages.keys shouldHaveSize 2
+        resultDevice2.toSend.messages.values.map { it.default } shouldBe listOf(6, 5)
+        resultDevice2.toSend.messages.values.map { it.overrides } shouldBe listOf(
+            mapOf(1 to 3),
+            mapOf(1 to 6),
+        )
+
         // Device 3
-        val testNetwork3 = NetworkImplTest(nm, id3)
-        aggregate(id3, condition, testNetwork3) {
-            val res1 = exchange(initV5, increaseOrDouble)
-            val res2 = exchange(initV6, increaseOrDouble)
-            val read = testNetwork3.read()
-            read shouldHaveSize 2
+        val testNetwork3 = NetworkImplTest(nm, 3)
+        val resultDevice3 = aggregate(3, testNetwork3) {
+            val res1 = exchange(5, increaseOrDouble)
+            val res2 = exchange(6, increaseOrDouble)
 
-            val sentFromDev1 = read.first { it.senderId == id1 }
-            val sentFromDev2 = read.first { it.senderId == id2 }
+            res1.localValue shouldBe 10
+            res2.localValue shouldBe 7
+        }
 
-            sentFromDev1.messages shouldHaveSize 2
-            sentFromDev2.messages shouldHaveSize 2
+        resultDevice3.toSend.messages.keys shouldHaveSize 2
+        resultDevice3.toSend.messages.values.map { it.default } shouldBe listOf(10, 7)
+        resultDevice3.toSend.messages.values.map { it.overrides } shouldBe listOf(
+            mapOf(1 to 3, 2 to 7),
+            mapOf(1 to 6, 2 to 10),
+        )
+    }
 
-            sentFromDev1.messages[path1] shouldBe expected2
-            sentFromDev1.messages[path2] shouldBe expected3
+    "Exchange can yield a result but return a different value" {
+        val result = aggregate(0) {
+            val xcRes = exchanging(1) {
+                val fieldResult = it + 1
+                fieldResult.yielding { fieldResult.map { value -> "return: $value" } }
+            }
+            xcRes.toMap() shouldBe mapOf(0 to "return: 2")
+        }
+        result.toSend.messages.keys shouldHaveSize 1
+        result.toSend.messages.values.map { it.default } shouldBe listOf(2)
+    }
 
-            sentFromDev2.messages[path1] shouldBe expected6
-            sentFromDev2.messages[path2] shouldBe expected5
+    "Exchange can yield a result of nullable values" {
+        val result = aggregate(0) {
+            val xcRes = exchanging(1) {
+                val fieldResult = it + 1
+                fieldResult.yielding { fieldResult.map { value -> value.takeIf { value > 10 } } }
+            }
+            xcRes.toMap() shouldBe mapOf(0 to null)
+        }
+        result.toSend.messages.keys shouldHaveSize 1
+        result.toSend.messages.values.map { it.default } shouldBe listOf(2)
+    }
+    "Exchange should produce a message with no overrides when producing a constant field" {
+        val programUnderTest: Aggregate<Int>.() -> Unit = {
+            exchanging(0) {
+                it.mapToConstantField(10).yielding { it.mapToConstantField("singleton") }
+            }
+        }
+        val networkManager = NetworkManager()
 
-            res1.localValue shouldBe expected10
-            res2.localValue shouldBe expected7
-            messagesToSend() shouldBe OutboundMessage(
-                id3,
-                mapOf(
-                    path1 to SingleOutboundMessage(
-                        expected10,
-                        mapOf(
-                            id1 to expected3,
-                            id2 to expected7,
-                        ),
-                    ),
-                    path2 to SingleOutboundMessage(
-                        expected7,
-                        mapOf(
-                            id1 to expected6,
-                            id2 to expected10,
-                        ),
-                    ),
-                ),
-            )
+        // Three devices linked together executed for 2 round each.
+        (0..5).forEach { iteration ->
+            val id = iteration % 3
+            val res = aggregate(id, networkManager.receive(id), emptyMap(), programUnderTest)
+                .also { networkManager.send(it.toSend) }
+            res.toSend.messages.values.size shouldBe 1
+            // When a constant field is used, the map of overrides should be empty
+            res.toSend.messages.values.firstOrNull()?.let { it.overrides shouldBe mapOf() }
         }
     }
 })
