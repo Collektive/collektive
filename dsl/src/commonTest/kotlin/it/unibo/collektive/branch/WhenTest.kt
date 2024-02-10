@@ -21,7 +21,6 @@ class WhenTest : StringSpec({
             }
         result.toSend.messages.keys.size shouldBe 1
         result.toSend.messages.values.map { it.default } shouldContainAll listOf("string")
-        //        result.toSend.messages.keys shouldBe setOf(Path(true, "neighboringViaExchange.1", "exchanging.1"))
     }
 
     "When in single expression in else case" {
@@ -36,7 +35,6 @@ class WhenTest : StringSpec({
             }
         result.toSend.messages.keys.size shouldBe 1
         result.toSend.messages.values.map { it.default } shouldContainAll listOf("test")
-        //        result.toSend.messages.keys shouldBe setOf(Path(false, "neighboringViaExchange.2", "exchanging.1"))
     }
 
     "When with nested function" {
@@ -58,7 +56,6 @@ class WhenTest : StringSpec({
             }
         result.toSend.messages.keys.size shouldBe 1
         result.toSend.messages.values.map { it.default } shouldContainAll listOf("test2")
-        //        result.toSend.messages.keys shouldBe setOf(Path(true, "test2.1", "neighboringViaExchange.2", "exchanging.1"))
     }
     "Nested when condition must be aligned" {
         val condition1 = false
@@ -74,8 +71,5 @@ class WhenTest : StringSpec({
         }
         res.toSend.messages.keys.size shouldBe 1
         res.toSend.messages.values.map { it.default } shouldContainAll listOf("test2")
-        //        res.toSend.messages.keys shouldContainAll setOf(
-        //            Path(false, true, "neighboringViaExchange.2", "exchanging.1"),
-        //        )
     }
 })
