@@ -4,10 +4,10 @@ import it.unibo.collektive.utils.branch.addBranchAlignment
 import it.unibo.collektive.utils.call.buildAlignedOnCall
 import it.unibo.collektive.utils.common.AggregateFunctionNames
 import it.unibo.collektive.utils.common.getAlignmentToken
+import it.unibo.collektive.utils.common.irStatement
 import it.unibo.collektive.utils.common.isAssignableFrom
 import it.unibo.collektive.utils.common.simpleFunctionName
 import it.unibo.collektive.utils.stack.StackFunctionCall
-import it.unibo.collektive.utils.statement.irStatement
 import it.unibo.collektive.visitors.collectAggregateReference
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.jvm.ir.receiverAndArgs

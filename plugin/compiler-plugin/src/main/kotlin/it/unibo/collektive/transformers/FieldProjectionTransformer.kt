@@ -1,8 +1,7 @@
 package it.unibo.collektive.transformers
 
 import it.unibo.collektive.utils.common.AggregateFunctionNames.FIELD_CLASS
-import it.unibo.collektive.utils.common.putTypeArgument
-import it.unibo.collektive.utils.statement.irStatement
+import it.unibo.collektive.utils.common.irStatement
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.builders.irCall
@@ -34,8 +33,10 @@ class FieldProjectionTransformer(
     ): IrExpression {
         return irStatement(pluginContext, projectFunction, fieldExpression) {
             irCall(projectFunction).apply {
-                // Set generics type
-                putTypeArgument(fieldExpression.type)
+                // Set the return type
+                type = fieldExpression.type
+                // Set generics type of the `alignOn` function
+                putTypeArgument(0, type)
                 // Set extension receiver
                 extensionReceiver = dispatchReceiver
                 // Set function argument

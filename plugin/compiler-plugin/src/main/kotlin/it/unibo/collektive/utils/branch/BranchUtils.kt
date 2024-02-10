@@ -1,6 +1,6 @@
 package it.unibo.collektive.utils.branch
 
-import it.unibo.collektive.utils.statement.irStatement
+import it.unibo.collektive.utils.common.irStatement
 import it.unibo.collektive.visitors.collectAggregateReference
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
