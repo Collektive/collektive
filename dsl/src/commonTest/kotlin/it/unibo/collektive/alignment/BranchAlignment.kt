@@ -1,7 +1,7 @@
 package it.unibo.collektive.alignment
 
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
@@ -33,7 +33,7 @@ class BranchAlignment : StringSpec({
             }
         }
         result.toSend.messages.keys shouldHaveSize 1 // 1 path of alignment
-        result.toSend.messages.values.map { it.default } shouldContain "test"
+        result.toSend.messages.values.map { it.default } shouldContainAll listOf("test")
     }
     "Branch alignment should not occur in non aggregate context" {
         val result =
