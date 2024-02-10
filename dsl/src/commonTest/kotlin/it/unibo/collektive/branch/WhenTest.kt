@@ -40,20 +40,19 @@ class WhenTest : StringSpec({
     "When with nested function" {
         val condition = true
         val x = if (condition) "hello" else 123
-        val result =
-            aggregate(id0) {
-                fun test() {
-                    neighboringViaExchange("test")
-                }
-
-                fun test2() {
-                    neighboringViaExchange("test2")
-                }
-                when (x) {
-                    is String -> test2()
-                    else -> test()
-                }
+        val result = aggregate(id0) {
+            fun test() {
+                neighboringViaExchange("test")
             }
+
+            fun test2() {
+                neighboringViaExchange("test2")
+            }
+            when (x) {
+                is String -> test2()
+                else -> test()
+            }
+        }
         result.toSend.messages.keys.size shouldBe 1
         result.toSend.messages.values.map { it.default } shouldContainAll listOf("test2")
     }

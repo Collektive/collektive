@@ -36,19 +36,18 @@ class BranchAlignment : StringSpec({
         result.toSend.messages.values.map { it.default } shouldContainAll listOf("test")
     }
     "Branch alignment should not occur in non aggregate context" {
-        val result =
-            aggregate(id0) {
-                val condition = true
+        val result = aggregate(id0) {
+            val condition = true
 
-                fun test(): String = "hello"
+            fun test(): String = "hello"
 
-                fun test2() {
-                    test()
-                }
-                if (condition) {
-                    test2()
-                }
+            fun test2() {
+                test()
             }
+            if (condition) {
+                test2()
+            }
+        }
         result.toSend.messages.keys shouldHaveSize 0 // 0 path of alignment
     }
     "A field should be projected when used in a body of a branch condition (issue #171)" {
