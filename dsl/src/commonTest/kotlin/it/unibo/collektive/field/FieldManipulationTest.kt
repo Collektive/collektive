@@ -2,7 +2,6 @@ package it.unibo.collektive.field
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.network.NetworkImplTest
@@ -21,13 +20,13 @@ class FieldManipulationTest : StringSpec({
         val network1 = NetworkImplTest(nm, id1)
 
         aggregate(id0, network0) {
-            neighboringViaExchange(double(3))
+            val sharedField = neighboringViaExchange(double(3))
+            sharedField.min(sharedField.localValue) shouldBe 6
         }
 
         aggregate(id1, network1) {
-            val res = neighboringViaExchange(double(2)).minWithSelf()
-            res shouldNotBe null
-            res shouldBe 4
+            val sharedField = neighboringViaExchange(double(2))
+            sharedField.min(sharedField.localValue) shouldBe 4
         }
     }
 
@@ -37,13 +36,13 @@ class FieldManipulationTest : StringSpec({
         val network1 = NetworkImplTest(nm, id1)
 
         aggregate(id0, network0) {
-            neighboringViaExchange(double(3))
+            val minValue = neighboringViaExchange(double(3)).min(Int.MAX_VALUE)
+            minValue shouldBe Int.MAX_VALUE
         }
 
         aggregate(id1, network1) {
-            val res = neighboringViaExchange(double(2)).min(Int.MAX_VALUE)
-            res shouldNotBe null
-            res shouldBe 6
+            val minValue = neighboringViaExchange(double(2)).min(Int.MAX_VALUE)
+            minValue shouldBe 6
         }
     }
 
@@ -53,13 +52,13 @@ class FieldManipulationTest : StringSpec({
         val network1 = NetworkImplTest(nm, id1)
 
         aggregate(id0, network0) {
-            neighboringViaExchange(double(3))
+            val maxValue = neighboringViaExchange(double(3)).max(Int.MIN_VALUE)
+            maxValue shouldBe Int.MIN_VALUE
         }
 
         aggregate(id1, network1) {
-            val res = neighboringViaExchange(double(2)).max(Int.MIN_VALUE)
-            res shouldNotBe null
-            res shouldBe 6
+            val maxValue = neighboringViaExchange(double(2)).max(Int.MIN_VALUE)
+            maxValue shouldBe 6
         }
     }
 })

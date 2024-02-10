@@ -1,8 +1,6 @@
 package it.unibo.collektive.utils.branch
 
 import it.unibo.collektive.utils.common.getLambdaType
-import it.unibo.collektive.utils.common.putTypeArgument
-import it.unibo.collektive.utils.common.putValueArgument
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -46,14 +44,14 @@ internal fun IrSingleStatementBuilder.buildAlignedOn(
         else -> block
     }
     +irCall(alignedOnFunction).apply {
-        // Set generics type
-        putTypeArgument(getReturnType(lastExpression))
+        // Set the return type
+        type = getReturnType(lastExpression)
+        // Set generics type of the `alignOn` function
+        putTypeArgument(0, type)
         // Set aggregate context
         putArgument(alignedOnFunction.dispatchReceiverParameter!!, aggregateContextReference)
         // Set the argument that is going to be push in the stack
-        putValueArgument(
-            irBoolean(conditionValue),
-        )
+        putValueArgument(0, irBoolean(conditionValue))
         // Create the lambda that is going to call expression
         val lambda = buildLambdaArgument(pluginContext, block)
         putValueArgument(1, lambda)

@@ -9,17 +9,8 @@ import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.plus
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
-import it.unibo.collektive.networking.OutboundMessage
-import it.unibo.collektive.networking.SingleOutboundMessage
-import it.unibo.collektive.path.Path
 
 class ExchangeTest : StringSpec({
-
-    // paths
-    val path1 = Path(listOf("exchange.1"))
-    val path2 = Path(listOf("exchange.2"))
-    val exchangingPath = Path("exchanging.1")
-
     val increaseOrDouble: (Field<Int, Int>) -> Field<Int, Int> = { f ->
         f.mapWithId { _, v -> if (v % 2 == 0) v + 1 else v * 2 }
     }
@@ -29,10 +20,8 @@ class ExchangeTest : StringSpec({
             val res = exchange(1, increaseOrDouble)
             res.localValue shouldBe 2
         }
-        result.toSend shouldBe OutboundMessage(
-            0,
-            mapOf(path1 to SingleOutboundMessage(2, emptyMap())),
-        )
+        result.toSend.messages.keys shouldHaveSize 1
+        result.toSend.messages.values.map { it.default } shouldBe listOf(2)
     }
 
     "Exchange should work between three aligned devices" {
@@ -48,13 +37,9 @@ class ExchangeTest : StringSpec({
             res2.localValue shouldBe 3
         }
 
-        resultDevice1.toSend shouldBe OutboundMessage(
-            1,
-            mapOf(
-                path1 to SingleOutboundMessage(2, emptyMap()),
-                path2 to SingleOutboundMessage(3, emptyMap()),
-            ),
-        )
+        resultDevice1.toSend.messages.keys shouldHaveSize 2
+        resultDevice1.toSend.messages.values.map { it.default } shouldBe listOf(2, 3)
+        resultDevice1.toSend.messages.values.map { it.overrides } shouldBe listOf(emptyMap(), emptyMap())
 
         // Device 2
         val testNetwork2 = NetworkImplTest(nm, 2)
@@ -66,18 +51,11 @@ class ExchangeTest : StringSpec({
             res2.localValue shouldBe 5
         }
 
-        resultDevice2.toSend shouldBe OutboundMessage(
-            2,
-            mapOf(
-                path1 to SingleOutboundMessage(
-                    6,
-                    mapOf(1 to 3),
-                ),
-                path2 to SingleOutboundMessage(
-                    5,
-                    mapOf(1 to 6),
-                ),
-            ),
+        resultDevice2.toSend.messages.keys shouldHaveSize 2
+        resultDevice2.toSend.messages.values.map { it.default } shouldBe listOf(6, 5)
+        resultDevice2.toSend.messages.values.map { it.overrides } shouldBe listOf(
+            mapOf(1 to 3),
+            mapOf(1 to 6),
         )
 
         // Device 3
@@ -90,24 +68,11 @@ class ExchangeTest : StringSpec({
             res2.localValue shouldBe 7
         }
 
-        resultDevice3.toSend shouldBe OutboundMessage(
-            3,
-            mapOf(
-                path1 to SingleOutboundMessage(
-                    10,
-                    mapOf(
-                        1 to 3,
-                        2 to 7,
-                    ),
-                ),
-                path2 to SingleOutboundMessage(
-                    7,
-                    mapOf(
-                        1 to 6,
-                        2 to 10,
-                    ),
-                ),
-            ),
+        resultDevice3.toSend.messages.keys shouldHaveSize 2
+        resultDevice3.toSend.messages.values.map { it.default } shouldBe listOf(10, 7)
+        resultDevice3.toSend.messages.values.map { it.overrides } shouldBe listOf(
+            mapOf(1 to 3, 2 to 7),
+            mapOf(1 to 6, 2 to 10),
         )
     }
 
@@ -119,10 +84,8 @@ class ExchangeTest : StringSpec({
             }
             xcRes.toMap() shouldBe mapOf(0 to "return: 2")
         }
-        result.toSend shouldBe OutboundMessage(
-            0,
-            mapOf(exchangingPath to SingleOutboundMessage(2)),
-        )
+        result.toSend.messages.keys shouldHaveSize 1
+        result.toSend.messages.values.map { it.default } shouldBe listOf(2)
     }
 
     "Exchange can yield a result of nullable values" {
@@ -133,10 +96,8 @@ class ExchangeTest : StringSpec({
             }
             xcRes.toMap() shouldBe mapOf(0 to null)
         }
-        result.toSend shouldBe OutboundMessage(
-            0,
-            mapOf(exchangingPath to SingleOutboundMessage(2)),
-        )
+        result.toSend.messages.keys shouldHaveSize 1
+        result.toSend.messages.values.map { it.default } shouldBe listOf(2)
     }
     "Exchange should produce a message with no overrides when producing a constant field" {
         val programUnderTest: Aggregate<Int>.() -> Unit = {

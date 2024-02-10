@@ -1,6 +1,6 @@
-package it.unibo.collektive
+package it.unibo.collektive.transformers
 
-import it.unibo.collektive.utils.common.AggregateFunctionNames.ALIGNED_ON_FUNCTION
+import it.unibo.collektive.utils.common.AggregateFunctionNames
 import it.unibo.collektive.utils.common.isAssignableFrom
 import it.unibo.collektive.utils.logging.debug
 import it.unibo.collektive.visitors.collectAggregateReference
@@ -31,7 +31,7 @@ class FieldTransformer(
     private val projectFunction: IrFunction,
 ) : IrElementTransformerVoid() {
     override fun visitCall(expression: IrCall): IrExpression {
-        if (expression.symbol.owner.name == Name.identifier(ALIGNED_ON_FUNCTION)) {
+        if (expression.symbol.owner.name == Name.identifier(AggregateFunctionNames.ALIGNED_ON_FUNCTION)) {
             logger.debug("Found alignedOn function call: ${expression.dumpKotlinLike()}")
             val contextReference = expression.receiverAndArgs()
                 .find { it.type.isAssignableFrom(aggregateClass.defaultType) }
@@ -40,7 +40,7 @@ class FieldTransformer(
                 // If the expression contains a lambda, this recursion is necessary to visit the children
                 expression.transformChildren(this, null)
                 return expression.transform(
-                    FieldProjectionVisitor(pluginContext, logger, projectFunction, it),
+                    FieldProjectionTransformer(pluginContext, logger, projectFunction, it),
                     null,
                 )
             }
@@ -54,7 +54,7 @@ class FieldTransformer(
             logger.debug("Found AggregateContext reference in branch: ${it.type.classFqName}")
             branch.result.transform(this, null)
             return branch.transform(
-                FieldProjectionVisitor(
+                FieldProjectionTransformer(
                     pluginContext,
                     logger,
                     projectFunction,
@@ -71,7 +71,7 @@ class FieldTransformer(
             logger.debug("Found AggregateContext reference in else branch: ${it.type.classFqName}")
             branch.result.transform(this, null)
             return branch.transform(
-                FieldProjectionVisitor(
+                FieldProjectionTransformer(
                     pluginContext,
                     logger,
                     projectFunction,

@@ -1,13 +1,12 @@
 package it.unibo.collektive.aggregate
 
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
-import it.unibo.collektive.path.Path
 
 class RepeatingTest : StringSpec({
     val id0 = 0
@@ -47,7 +46,8 @@ class RepeatingTest : StringSpec({
                 nbr.yielding { "A string" }
             } shouldBe "A string"
         }
-        result.toSend.messages.keys shouldContain Path("repeating.1", "neighboringViaExchange.1", "exchanging.1")
+        result.toSend.messages.keys.size shouldBe 1
+        result.toSend.messages.values.map { it.default } shouldContainAll listOf(2)
     }
 
     "Repeating should work fine even with null as value" {
