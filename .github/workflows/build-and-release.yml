@@ -72,6 +72,7 @@ jobs:
       - staging-repo
     if: ${{ always() && !contains(needs.staging-repo.result, 'failure') }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ windows-2022, macos-12, ubuntu-22.04 ]
     runs-on: ${{ matrix.os }}
@@ -97,33 +98,33 @@ jobs:
           signing-key: ${{ secrets.GPG_PRIVATEKEY }}
           signing-password: ${{ secrets.GPG_PASSPHRASE }}
 
-#  build-website:
-#    runs-on: ubuntu-22.04
-#    concurrency:
-#      group: ${{ github.workflow }}-build-website-${{ github.event.number || github.ref }}
-#      cancel-in-progress: true
-#    steps:
-#      - name: Checkout the repo
-#        uses: actions/checkout@v3.5.3
-#        with:
-#          submodules: true
-#          fetch-depth: 0
-#      - uses: DanySK/build-check-deploy-gradle-action@2.2.8
-#        with:
-#          build-command: |
-#            NEXT_VERSION="${{ needs.staging-repo.outputs.next-version }}"
-#            OVERRIDE_VERSION=$([[ "$NEXT_VERSION" != "" ]] && echo "-PforceVersion=$(echo $NEXT_VERSION)" || echo "")
-#            ./gradlew $OVERRIDE_VERSION hugoBuild --parallel
-#          check-command: true
-#          should-run-codecov: false
-#          should-deploy: false
-#          should-validate-wrapper: false
-#      - name: Release website to Github Pages
-#        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
-#        uses: JamesIves/github-pages-deploy-action@v4.4.3
-#        with:
-#          BRANCH: gh-pages
-#          FOLDER: build/website
+  #  build-website:
+  #    runs-on: ubuntu-22.04
+  #    concurrency:
+  #      group: ${{ github.workflow }}-build-website-${{ github.event.number || github.ref }}
+  #      cancel-in-progress: true
+  #    steps:
+  #      - name: Checkout the repo
+  #        uses: actions/checkout@v3.5.3
+  #        with:
+  #          submodules: true
+  #          fetch-depth: 0
+  #      - uses: DanySK/build-check-deploy-gradle-action@2.2.8
+  #        with:
+  #          build-command: |
+  #            NEXT_VERSION="${{ needs.staging-repo.outputs.next-version }}"
+  #            OVERRIDE_VERSION=$([[ "$NEXT_VERSION" != "" ]] && echo "-PforceVersion=$(echo $NEXT_VERSION)" || echo "")
+  #            ./gradlew $OVERRIDE_VERSION hugoBuild --parallel
+  #          check-command: true
+  #          should-run-codecov: false
+  #          should-deploy: false
+  #          should-validate-wrapper: false
+  #      - name: Release website to Github Pages
+  #        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+  #        uses: JamesIves/github-pages-deploy-action@v4.4.3
+  #        with:
+  #          BRANCH: gh-pages
+  #          FOLDER: build/website
 
   close-staging-repos:
     needs:
@@ -156,7 +157,7 @@ jobs:
     needs:
       - check-secrets
       - staging-repo
-#      - build-website
+      #      - build-website
       - build
       - close-staging-repos
     runs-on: ubuntu-22.04
@@ -201,7 +202,7 @@ jobs:
       - check-secrets
       - staging-repo
       - close-staging-repos
-#      - build-website
+      #      - build-website
       - release
       - build
     if: >-
