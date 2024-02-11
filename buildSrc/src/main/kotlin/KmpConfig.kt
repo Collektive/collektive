@@ -5,12 +5,8 @@ import org.gradle.api.publish.tasks.GenerateModuleMetadata
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.internal.os.OperatingSystem
-import org.gradle.kotlin.dsl.creating
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.getValue
-import org.gradle.kotlin.dsl.getting
-import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugin.use.PluginDependency
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
@@ -51,31 +47,17 @@ fun Project.configureKotlinMultiplatform() {
                 }
             }
         }
-        sourceSets.invoke {
-            val commonMain by getting
-            val commonTest by getting
-            val jvmTest by getting
-            val nativeMain by creating {
-                dependsOn(commonMain)
-            }
-            val nativeTest by creating {
-                dependsOn(commonTest)
-            }
-        }
         js(IR) {
             browser()
             nodejs()
             binaries.library()
         }
         val nativeSetup: KotlinNativeTarget.() -> Unit = {
-            compilations["main"].defaultSourceSet.dependsOn(kotlin.sourceSets.getByName("nativeMain"))
-            compilations["test"].defaultSourceSet.dependsOn(kotlin.sourceSets.getByName("nativeTest"))
             binaries {
                 sharedLib()
                 staticLib()
             }
         }
-        applyDefaultHierarchyTemplate()
         linuxX64(nativeSetup)
         linuxArm64(nativeSetup)
 
@@ -92,6 +74,9 @@ fun Project.configureKotlinMultiplatform() {
         tvosArm64(nativeSetup)
         tvosX64(nativeSetup)
         tvosSimulatorArm64(nativeSetup)
+
+        applyDefaultHierarchyTemplate()
+
         targets.all {
             compilations.all {
                 // enable all warnings as errors
