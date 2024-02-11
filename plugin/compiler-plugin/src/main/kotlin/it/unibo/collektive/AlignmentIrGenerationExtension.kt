@@ -1,5 +1,6 @@
 package it.unibo.collektive
 
+import it.unibo.collektive.alignment.AlignmentMode
 import it.unibo.collektive.transformers.AggregateCallTransformer
 import it.unibo.collektive.utils.common.AggregateFunctionNames
 import it.unibo.collektive.utils.common.AggregateFunctionNames.PROJECT_FUNCTION
@@ -18,7 +19,10 @@ import org.jetbrains.kotlin.name.Name
  * The generation extension is used to register the transformer plugin, which is going to modify
  * the IR using the function responsible for the alignment.
  */
-class AlignmentIrGenerationExtension(private val logger: MessageCollector) : IrGenerationExtension {
+class AlignmentIrGenerationExtension(
+    private val logger: MessageCollector,
+    private val alignmentMode: AlignmentMode,
+) : IrGenerationExtension {
     override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
         // Aggregate Context class that has the reference to the stack
         val aggregateClass = pluginContext.referenceClass(
@@ -53,6 +57,7 @@ class AlignmentIrGenerationExtension(private val logger: MessageCollector) : IrG
             AggregateCallTransformer(
                 pluginContext,
                 logger,
+                alignmentMode,
                 aggClass.owner,
                 alignFunction.owner,
                 projectFunction.owner,

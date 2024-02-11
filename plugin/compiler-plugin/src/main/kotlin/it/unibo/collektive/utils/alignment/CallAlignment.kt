@@ -1,7 +1,8 @@
-package it.unibo.collektive.utils.call
+package it.unibo.collektive.utils.alignment
 
 import it.unibo.collektive.alignment.AlignmentMode
 import it.unibo.collektive.alignment.DebugMode
+import it.unibo.collektive.alignment.HashedAlignmentRepresentation
 import it.unibo.collektive.alignment.PrototypeMode
 import it.unibo.collektive.alignment.ReleaseMode
 import it.unibo.collektive.utils.common.getAlignmentToken
@@ -55,8 +56,8 @@ fun IrSingleStatementBuilder.buildAlignedOnCall(
         val count = data[token]!! // Here the key should be present!
         val rawAlignmentToken = "$stack$token.$count"
         val alignmentToken: String = when (alignmentMode) {
-            DebugMode -> TODO()
-            PrototypeMode -> TODO()
+            DebugMode -> rawAlignmentToken
+            PrototypeMode -> HashedAlignmentRepresentation().invoke(rawAlignmentToken)
             ReleaseMode -> TODO()
         }
         putValueArgument(0, irString(alignmentToken))

@@ -1,7 +1,8 @@
 package it.unibo.collektive.transformers
 
+import it.unibo.collektive.alignment.AlignmentMode
+import it.unibo.collektive.utils.alignment.buildAlignedOnCall
 import it.unibo.collektive.utils.branch.addBranchAlignment
-import it.unibo.collektive.utils.call.buildAlignedOnCall
 import it.unibo.collektive.utils.common.AggregateFunctionNames
 import it.unibo.collektive.utils.common.getAlignmentToken
 import it.unibo.collektive.utils.common.irStatement
@@ -29,6 +30,7 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 class AlignmentTransformer(
     private val pluginContext: IrPluginContext,
     private val logger: MessageCollector,
+    private val alignmentMode: AlignmentMode,
     private val aggregateContextClass: IrClass,
     private val aggregateLambdaBody: IrFunction,
     private val alignedOnFunction: IrFunction,
@@ -61,6 +63,7 @@ class AlignmentTransformer(
                         context,
                         alignedOnFunction,
                         expression,
+                        alignmentMode,
                         data,
                         alignedFunctions,
                     )

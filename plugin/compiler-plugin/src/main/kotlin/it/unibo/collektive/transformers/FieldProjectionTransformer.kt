@@ -3,7 +3,6 @@ package it.unibo.collektive.transformers
 import it.unibo.collektive.utils.common.AggregateFunctionNames.FIELD_CLASS
 import it.unibo.collektive.utils.common.irStatement
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.builders.irCall
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.expressions.IrExpression
@@ -14,7 +13,6 @@ import org.jetbrains.kotlin.name.FqName
 
 class FieldProjectionTransformer(
     private val pluginContext: IrPluginContext,
-    private val logger: MessageCollector,
     private val projectFunction: IrFunction,
     private val aggregateReference: IrExpression,
 ) : IrElementTransformerVoid() {
