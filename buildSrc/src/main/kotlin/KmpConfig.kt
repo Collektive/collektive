@@ -5,7 +5,13 @@ import org.gradle.api.publish.tasks.GenerateModuleMetadata
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.internal.os.OperatingSystem
-import org.gradle.kotlin.dsl.*
+import org.gradle.kotlin.dsl.creating
+import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.getValue
+import org.gradle.kotlin.dsl.getting
+import org.gradle.kotlin.dsl.invoke
+import org.gradle.kotlin.dsl.withType
 import org.gradle.plugin.use.PluginDependency
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -49,8 +55,12 @@ fun Project.configureKotlinMultiplatform() {
             val commonMain by getting
             val commonTest by getting
             val jvmTest by getting
-            val nativeMain by creating
-            val nativeTest by creating
+            val nativeMain by creating {
+                dependsOn(commonMain)
+            }
+            val nativeTest by creating {
+                dependsOn(commonTest)
+            }
         }
         js(IR) {
             browser()
