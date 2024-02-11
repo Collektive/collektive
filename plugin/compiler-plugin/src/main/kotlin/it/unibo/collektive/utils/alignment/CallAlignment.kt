@@ -1,5 +1,9 @@
 package it.unibo.collektive.utils.call
 
+import it.unibo.collektive.alignment.AlignmentMode
+import it.unibo.collektive.alignment.DebugMode
+import it.unibo.collektive.alignment.PrototypeMode
+import it.unibo.collektive.alignment.ReleaseMode
 import it.unibo.collektive.utils.common.getAlignmentToken
 import it.unibo.collektive.utils.common.getLambdaType
 import it.unibo.collektive.utils.stack.StackFunctionCall
@@ -35,6 +39,7 @@ fun IrSingleStatementBuilder.buildAlignedOnCall(
     aggregateContextReference: IrExpression,
     alignedOnFunction: IrFunction,
     expression: IrCall,
+    alignmentMode: AlignmentMode,
     stack: StackFunctionCall,
     data: Map<String, Int>,
 ): IrFunctionAccessExpression {
@@ -48,7 +53,12 @@ fun IrSingleStatementBuilder.buildAlignedOnCall(
         // Set the argument that is going to be push in the stack
         val token = expression.getAlignmentToken()
         val count = data[token]!! // Here the key should be present!
-        val alignmentToken = "$stack$token.$count"
+        val rawAlignmentToken = "$stack$token.$count"
+        val alignmentToken: String = when (alignmentMode) {
+            DebugMode -> TODO()
+            PrototypeMode -> TODO()
+            ReleaseMode -> TODO()
+        }
         putValueArgument(0, irString(alignmentToken))
         // Create the lambda that is going to call expression
         val lambda = buildLambdaArgument(pluginContext, aggregateLambdaBody, expression)
