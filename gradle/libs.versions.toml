@@ -10,6 +10,7 @@ kotlin = "1.9.22"
 alchemist-api = { module = "it.unibo.alchemist:alchemist-api", version.ref = "alchemist" }
 alchemist = { module = "it.unibo.alchemist:alchemist", version.ref = "alchemist" }
 arrow = "io.arrow-kt:arrow-core:1.2.3"
+caffeine = "com.github.ben-manes.caffeine:caffeine:3.1.8"
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-framework-datatest = { module = "io.kotest:kotest-framework-datatest", version.ref = "kotest" }
@@ -36,16 +37,15 @@ alchemist = [
 ]
 
 [plugins]
+build-config = { id = "com.github.gmazzo.buildconfig", version.ref = "build-config" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 gitSemVer = "org.danilopianini.git-sensitive-semantic-versioning:3.1.1"
-kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-publishOnCentral = "org.danilopianini.publish-on-central:5.0.23"
-kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.60.1"
-multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:0.5.8"
-taskTree = "com.dorongold.task-tree:2.1.1"
-detekt = "io.gitlab.arturbosch.detekt:1.23.5"
-build-config = { id = "com.github.gmazzo.buildconfig", version.ref = "build-config" }
 gradlePluginPublish = { id = "com.gradle.plugin-publish", version = "1.2.1" }
-kover = "org.jetbrains.kotlinx.kover:0.7.6"
 kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.60.1"
+kover = "org.jetbrains.kotlinx.kover:0.7.6"
+multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:0.5.8"
+publishOnCentral = "org.danilopianini.publish-on-central:5.0.23"
+taskTree = "com.dorongold.task-tree:2.1.1"

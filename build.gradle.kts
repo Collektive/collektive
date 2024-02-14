@@ -5,12 +5,12 @@ import org.danilopianini.gradle.mavencentral.DocStyle
 
 plugins {
     alias(libs.plugins.dokka)
-    alias(libs.plugins.publishOnCentral)
-    alias(libs.plugins.kotlin.qa)
     alias(libs.plugins.gitSemVer)
-    alias(libs.plugins.taskTree)
     alias(libs.plugins.kover)
     alias(libs.plugins.kotest)
+    alias(libs.plugins.kotlin.qa)
+    alias(libs.plugins.publishOnCentral)
+    alias(libs.plugins.taskTree)
     id("it.unibo.collektive.collektive-plugin")
 }
 val reportMerge by tasks.registering(ReportMergeTask::class) {

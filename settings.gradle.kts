@@ -4,6 +4,7 @@ pluginManagement {
         google()
         mavenCentral()
     }
+    includeBuild("gradle-plugin")
 }
 
 plugins {
@@ -30,5 +31,5 @@ gitHooks {
 
 rootProject.name = "collektive"
 
-includeBuild("plugin")
+includeBuild("compiler-plugin")
 include("dsl", "alchemist-incarnation-collektive")
