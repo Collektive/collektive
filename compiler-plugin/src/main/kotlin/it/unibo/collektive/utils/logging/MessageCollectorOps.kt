@@ -7,5 +7,5 @@ fun MessageCollector.warn(message: String) = report(CompilerMessageSeverity.WARN
 fun MessageCollector.error(message: String) = report(CompilerMessageSeverity.ERROR, message)
 fun MessageCollector.info(message: String) = report(CompilerMessageSeverity.INFO, message)
 fun MessageCollector.debug(message: String) = report(CompilerMessageSeverity.LOGGING, message)
-fun MessageCollector.trace(message: String) = report(CompilerMessageSeverity.STRONG_WARNING, message)
+fun MessageCollector.strongWarning(message: String) = report(CompilerMessageSeverity.STRONG_WARNING, message)
 fun MessageCollector.fatal(message: String) = report(CompilerMessageSeverity.EXCEPTION, message)
