@@ -18,6 +18,11 @@ repositories {
     mavenCentral()
 }
 
+check(gradle.includedBuilds.size == 1) {
+    "This build is designed for a single inclusion. Fix it."
+}
+val compilerPlugin = gradle.includedBuilds.first().name
+
 dependencies {
     implementation(libs.kotlin.gradle.plugin)
 }
@@ -28,9 +33,9 @@ gitSemVer {
 
 buildConfig {
     packageName(project.group.toString())
-    buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"${project.group}.compiler-plugin\"")
+    buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"${project.group}.$compilerPlugin\"")
     buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${project.group}\"")
-    buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"compiler-plugin\"")
+    buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"$compilerPlugin\"")
     buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${project.version}\"")
 }
 
