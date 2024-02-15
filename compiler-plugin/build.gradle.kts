@@ -18,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:${libs.versions.kotlin.get()}")
+    compileOnly(libs.kotlin.compiler.embeddable)
 }
 
 buildConfig {
