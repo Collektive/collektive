@@ -23,9 +23,14 @@ kotlin-test-common = { module = "org.jetbrains.kotlin:kotlin-test-common", versi
 kotlin-test-annotations-common = { module = "org.jetbrains.kotlin:kotlin-test-annotations-common", version.ref = "kotlin" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
-caffeine = "com.github.ben-manes.caffeine:caffeine:3.1.8"
+slf4j = "org.slf4j:slf4j-api:2.0.12"
 
 [bundles]
+kotlin-compiler = [
+    "kotlin-compiler-embeddable",
+    "kotlin-scripting-compiler-embeddable",
+    "kotlin-scripting-jvm",
+]
 kotlin-testing-common = [
     "kotest-assertions-core",
     "kotest-framework-engine",

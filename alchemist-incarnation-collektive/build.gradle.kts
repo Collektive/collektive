@@ -27,6 +27,7 @@ kotlinJvm {
                 implementation(libs.bundles.alchemist)
                 implementation(libs.bundles.kotlin.compiler)
                 implementation(libs.caffeine)
+                implementation(libs.slf4j)
             }
         }
         val test by getting {
