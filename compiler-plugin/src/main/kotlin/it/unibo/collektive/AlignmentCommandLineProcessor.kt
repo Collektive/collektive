@@ -16,9 +16,10 @@ class AlignmentCommandLineProcessor : CommandLineProcessor {
     companion object {
         private const val OPTION_ENABLED = "enabled"
         val ARG_ENABLED = CompilerConfigurationKey<Boolean>(OPTION_ENABLED)
+        val pluginId = BuildConfig.KOTLIN_PLUGIN_ID
     }
 
-    override val pluginId: String = BuildConfig.KOTLIN_PLUGIN_ID
+    override val pluginId: String = Companion.pluginId
 
     override val pluginOptions: Collection<CliOption> = listOf(
         CliOption(
