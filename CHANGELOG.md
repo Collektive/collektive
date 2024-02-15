@@ -1,3 +1,17 @@
+## [7.0.4](https://github.com/Collektive/collektive/compare/7.0.3...7.0.4) (2024-02-15)
+
+
+### Dependency updates
+
+* **core-deps:** update dependency org.jetbrains.kotlinx:kotlinx-coroutines-core to v1.8.0 ([b655fee](https://github.com/Collektive/collektive/commit/b655feeb3a575f31e4fa3a945bb687f58e17492f))
+* **deps:** update alchemist to v30.1.11 ([e6344ef](https://github.com/Collektive/collektive/commit/e6344ef7ea0efc9206f86da53898bed75f6cabd3))
+
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.1 ([891f2b3](https://github.com/Collektive/collektive/commit/891f2b3be5b996be0d8b1054f825e65fd8fc5fcd))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.2 ([ced20fc](https://github.com/Collektive/collektive/commit/ced20fc985ae7f61bd5fb65ae4cd0bb96b186c35))
+
 ## [7.0.3](https://github.com/Collektive/collektive/compare/7.0.2...7.0.3) (2024-02-10)
 
 
