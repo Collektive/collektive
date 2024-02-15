@@ -1,0 +1,41 @@
+network-model:
+  type: ConnectWithinDistance
+  parameters: [5]
+
+incarnation: collektive
+
+_pool: &program
+  - time-distribution: 2
+    type: Event
+    actions:
+      - type: RunCollektiveProgram
+        parameters: |
+          package my.test
+
+          context(DistanceSensor)
+          fun Aggregate<Int>.gradient(source: Boolean): Double =
+            share(POSITIVE_INFINITY) {
+              val dist = distances()
+              when {
+                source -> 0.0
+                else -> (it + dist).min(POSITIVE_INFINITY)
+              }
+            }
+
+          collektive { gradient(localId == 0) }
+
+deployments:
+  - type: Rectangle
+    parameters: [200, 0, 0, 20, 20]
+    programs:
+      - *program
+    contents:
+      - molecule: source
+        concentration: false
+  - type: Point
+    parameters: [2, 2]
+    programs:
+      - *program
+    contents:
+      - molecule: source
+        concentration: true
