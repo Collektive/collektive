@@ -2,7 +2,7 @@ package it.unibo.collektive.compiler
 
 import it.unibo.collektive.AlignmentCommandLineProcessor
 import it.unibo.collektive.AlignmentComponentRegistrar
-import it.unibo.collektive.compiler.messagecollectors.SLF4JMessageCollector
+import it.unibo.collektive.compiler.logging.SLF4JMessageCollector
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
 import org.jetbrains.kotlin.cli.common.config.addKotlinSourceRoot
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector

@@ -1,4 +1,4 @@
-package it.unibo.collektive.compiler.messagecollectors
+package it.unibo.collektive.compiler.logging
 
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSourceLocation
