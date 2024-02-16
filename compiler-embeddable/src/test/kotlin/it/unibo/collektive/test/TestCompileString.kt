@@ -15,21 +15,11 @@ import com.sun.tools.javap.Main as Javap
 class TestCompileString : FreeSpec({
     "a simple aggregate function" - {
         val moduleName = "TestScript"
-        val program = """
-            @file:JvmName("$moduleName")
-            import it.unibo.collektive.aggregate.api.Aggregate
-            import it.unibo.collektive.aggregate.api.operators.*
-            fun Aggregate<Int>.myTest(): Unit = when(localId) {
-                in 1..10 -> println(neighboringViaExchange("ciao"))
-                else -> println(neighboringViaExchange("miao"))
-            }
-        """.trimIndent()
+        val program = checkNotNull(ClassLoader.getSystemClassLoader().getResource("TestScript.kt")).readText()
         "should compile" - {
             val result = CollektiveJVMCompiler.compileString(program, moduleName = moduleName)
             checkNotNull(result)
-            val outputs = result.jvmOutputDirectory()
-            checkNotNull(outputs)
-            val files = outputs.listFiles()
+            val files = result.jvmOutputDirectory().listFiles()
             checkNotNull(files)
             "producing some class files" {
                 files.count { it.extension == "class" } should beGreaterThan(0)
