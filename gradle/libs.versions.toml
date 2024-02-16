@@ -20,8 +20,6 @@ kotlin-test-annotations-common = { module = "org.jetbrains.kotlin:kotlin-test-an
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 caffeine = "com.github.ben-manes.caffeine:caffeine:3.1.8"
-cryptography-core = "dev.whyoleg.cryptography:cryptography-core:0.2.0"
-cryptography-provider = "dev.whyoleg.cryptography:cryptography-provider-jdk:0.2.0"
 
 [bundles]
 kotlin-testing-common = [
@@ -35,10 +33,6 @@ kotlin-testing-common = [
 alchemist = [
     "alchemist",
     "alchemist-api",
-]
-crypto = [
-    "cryptography-core",
-    "cryptography-provider",
 ]
 
 [plugins]
