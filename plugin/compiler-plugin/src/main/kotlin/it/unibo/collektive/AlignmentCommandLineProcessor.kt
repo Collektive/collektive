@@ -51,9 +51,9 @@ class AlignmentCommandLineProcessor : CommandLineProcessor {
 
     private fun parseAlignmentMode(value: String): AlignmentMode {
         return when (value) {
-            "debug", "Debug" -> DebugMode
-            "prototype", "Prototype" -> PrototypeMode
-            "release", "Release" -> ReleaseMode
+            "debug", "DebugMode" -> DebugMode
+            "prototype", "PrototypeMode" -> PrototypeMode
+            "release", "ReleaseMode" -> ReleaseMode
             else -> throw IllegalArgumentException("Unexpected alignment mode: $value")
         }
     }

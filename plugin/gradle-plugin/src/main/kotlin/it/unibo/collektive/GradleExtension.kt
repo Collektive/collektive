@@ -12,4 +12,10 @@ open class GradleExtension(objects: ObjectFactory) {
      * Determines if the compiler plugin should be enabled or disabled.
      */
     val enabled: Property<Boolean> = objects.property(Boolean::class.java).apply { convention(true) }
+
+    /**
+     * Determines the strategy to use for the representation of the alignment.
+     */
+    val representationStrategy: Property<CompilerPluginOption> = objects.property(CompilerPluginOption::class.java)
+        .apply { convention(PrototypeMode) }
 }
