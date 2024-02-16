@@ -2,6 +2,7 @@ package it.unibo.collektive.compiler
 
 import it.unibo.collektive.AlignmentCommandLineProcessor
 import it.unibo.collektive.AlignmentComponentRegistrar
+import it.unibo.collektive.compiler.messagecollectors.SLF4JMessageCollector
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
 import org.jetbrains.kotlin.cli.common.config.addKotlinSourceRoot
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -41,7 +42,8 @@ object CollektiveJVMCompiler {
         }
 
     /**
-     * Configures the Kotlin-JVM compiler to compile the [inputFiles] using the Collektive plugin.
+     * Configures the Kotlin-JVM compiler to compile the [inputFile] using the Collektive plugin.
+     * When [inputFile] is a directory, it is used as a source root.
      */
     @JvmStatic
     @JvmOverloads
