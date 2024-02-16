@@ -1,12 +1,10 @@
 package it.unibo.collektive.alignment
 
-import dev.whyoleg.cryptography.CryptographyProvider
-import dev.whyoleg.cryptography.algorithms.digest.SHA256
+import java.security.MessageDigest
 
 class HashedAlignmentRepresentation : AlignmentRepresentation {
-    override fun invoke(p1: String): String = CryptographyProvider.Default
-        .get(SHA256)
-        .hasher()
-        .hashBlocking(p1.toByteArray())
-        .joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
+    @OptIn(ExperimentalStdlibApi::class)
+    override fun invoke(p1: String): String = MessageDigest.getInstance("MD5")
+        .digest(p1.toByteArray())
+        .toHexString()
 }
