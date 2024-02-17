@@ -7,7 +7,7 @@ import io.kotest.matchers.should
 import io.kotest.matchers.shouldNot
 import io.kotest.matchers.string.beBlank
 import it.unibo.collektive.compiler.CollektiveJVMCompiler
-import it.unibo.collektive.compiler.jvmOutputDirectory
+import it.unibo.collektive.compiler.util.jvmOutputDirectory
 import java.io.ByteArrayOutputStream
 import java.io.PrintWriter
 import com.sun.tools.javap.Main as Javap

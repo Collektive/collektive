@@ -1,4 +1,4 @@
-package it.unibo.collektive.compiler
+package it.unibo.collektive.compiler.util
 
 import org.jetbrains.kotlin.codegen.state.GenerationState
 import org.jetbrains.kotlin.config.JVMConfigurationKeys.OUTPUT_DIRECTORY

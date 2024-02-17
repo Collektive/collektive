@@ -1,4 +1,4 @@
-package it.unibo.collektive.compiler
+package it.unibo.collektive.compiler.util
 
 import org.apache.commons.codec.binary.Base32
 import org.apache.commons.codec.binary.Base64
