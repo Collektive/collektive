@@ -6,4 +6,4 @@ data object DebugMode : AlignmentMode
 
 data object PrototypeMode : AlignmentMode
 
-data object ReleaseMode : AlignmentMode
+data class ReleaseMode(val password: String) : AlignmentMode

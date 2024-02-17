@@ -53,7 +53,10 @@ class AlignmentCommandLineProcessor : CommandLineProcessor {
         return when (value) {
             "debug", "DebugMode" -> DebugMode
             "prototype", "PrototypeMode" -> PrototypeMode
-            "release", "ReleaseMode" -> ReleaseMode
+            "release", "ReleaseMode" -> {
+                ReleaseMode("TODO()")
+            }
+
             else -> throw IllegalArgumentException("Unexpected alignment mode: $value")
         }
     }

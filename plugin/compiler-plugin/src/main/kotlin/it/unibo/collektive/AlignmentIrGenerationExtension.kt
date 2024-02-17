@@ -2,6 +2,7 @@ package it.unibo.collektive
 
 import it.unibo.collektive.alignment.AlignmentMode
 import it.unibo.collektive.alignment.AlignmentRepresentation
+import it.unibo.collektive.alignment.CryptoAlignmentRepresentation
 import it.unibo.collektive.alignment.DebugMode
 import it.unibo.collektive.alignment.HashedAlignmentRepresentation
 import it.unibo.collektive.alignment.PrototypeMode
@@ -61,7 +62,7 @@ class AlignmentIrGenerationExtension(
         val alignmentStrategy = when (alignmentMode) {
             DebugMode -> AlignmentRepresentation { e -> e }
             PrototypeMode -> HashedAlignmentRepresentation()
-            ReleaseMode -> TODO()
+            is ReleaseMode -> CryptoAlignmentRepresentation(alignmentMode.password)
         }
 
         moduleFragment.transform(
