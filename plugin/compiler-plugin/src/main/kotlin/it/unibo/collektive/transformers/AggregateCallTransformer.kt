@@ -1,6 +1,6 @@
 package it.unibo.collektive.transformers
 
-import it.unibo.collektive.alignment.AlignmentMode
+import it.unibo.collektive.alignment.AlignmentRepresentation
 import it.unibo.collektive.utils.common.isAssignableFrom
 import it.unibo.collektive.utils.stack.StackFunctionCall
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 class AggregateCallTransformer(
     private val pluginContext: IrPluginContext,
     private val logger: MessageCollector,
-    private val alignmentMode: AlignmentMode,
+    private val alignmentStrategy: AlignmentRepresentation,
     private val aggregateClass: IrClass,
     private val alignedOnFunction: IrFunction,
     private val projectFunction: IrFunction,
@@ -49,7 +49,7 @@ class AggregateCallTransformer(
                 AlignmentTransformer(
                     pluginContext,
                     logger,
-                    alignmentMode,
+                    alignmentStrategy,
                     aggregateClass,
                     declaration,
                     alignedOnFunction

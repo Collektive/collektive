@@ -1,10 +1,6 @@
 package it.unibo.collektive.utils.alignment
 
-import it.unibo.collektive.alignment.AlignmentMode
-import it.unibo.collektive.alignment.DebugMode
-import it.unibo.collektive.alignment.HashedAlignmentRepresentation
-import it.unibo.collektive.alignment.PrototypeMode
-import it.unibo.collektive.alignment.ReleaseMode
+import it.unibo.collektive.alignment.AlignmentRepresentation
 import it.unibo.collektive.utils.common.getAlignmentToken
 import it.unibo.collektive.utils.common.getLambdaType
 import it.unibo.collektive.utils.stack.StackFunctionCall
@@ -40,7 +36,7 @@ fun IrSingleStatementBuilder.buildAlignedOnCall(
     aggregateContextReference: IrExpression,
     alignedOnFunction: IrFunction,
     expression: IrCall,
-    alignmentMode: AlignmentMode,
+    alignmentStrategy: AlignmentRepresentation,
     stack: StackFunctionCall,
     data: Map<String, Int>,
 ): IrFunctionAccessExpression {
@@ -55,12 +51,7 @@ fun IrSingleStatementBuilder.buildAlignedOnCall(
         val token = expression.getAlignmentToken()
         val count = data[token]!! // Here the key should be present!
         val rawAlignmentToken = "$stack$token.$count"
-        val alignmentToken: String = when (alignmentMode) {
-            DebugMode -> rawAlignmentToken
-            PrototypeMode -> HashedAlignmentRepresentation().invoke(rawAlignmentToken)
-            ReleaseMode -> TODO()
-        }
-        putValueArgument(0, irString(alignmentToken))
+        putValueArgument(0, irString(alignmentStrategy.invoke(rawAlignmentToken)))
         // Create the lambda that is going to call expression
         val lambda = buildLambdaArgument(pluginContext, aggregateLambdaBody, expression)
         putValueArgument(1, lambda)

@@ -1,6 +1,11 @@
 package it.unibo.collektive
 
 import it.unibo.collektive.alignment.AlignmentMode
+import it.unibo.collektive.alignment.AlignmentRepresentation
+import it.unibo.collektive.alignment.DebugMode
+import it.unibo.collektive.alignment.HashedAlignmentRepresentation
+import it.unibo.collektive.alignment.PrototypeMode
+import it.unibo.collektive.alignment.ReleaseMode
 import it.unibo.collektive.transformers.AggregateCallTransformer
 import it.unibo.collektive.utils.common.AggregateFunctionNames
 import it.unibo.collektive.utils.common.AggregateFunctionNames.PROJECT_FUNCTION
@@ -53,11 +58,17 @@ class AlignmentIrGenerationExtension(
                 "The function and the class used to handle the alignment have not been found.",
             )
 
+        val alignmentStrategy = when (alignmentMode) {
+            DebugMode -> AlignmentRepresentation { e -> e }
+            PrototypeMode -> HashedAlignmentRepresentation()
+            ReleaseMode -> TODO()
+        }
+
         moduleFragment.transform(
             AggregateCallTransformer(
                 pluginContext,
                 logger,
-                alignmentMode,
+                alignmentStrategy,
                 aggClass.owner,
                 alignFunction.owner,
                 projectFunction.owner,
