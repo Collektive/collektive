@@ -22,6 +22,7 @@ kotlinJvm {
         val main by getting {
             dependencies {
                 implementation("it.unibo.collektive:compiler-plugin")
+                implementation(project(":compiler-embeddable"))
                 implementation(project(":dsl"))
                 implementation(kotlin("reflect"))
                 implementation(libs.bundles.alchemist)
