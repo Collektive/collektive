@@ -1,6 +1,7 @@
 package it.unibo.collektive
 
 import it.unibo.collektive.utils.logging.info
+import it.unibo.collektive.utils.logging.strongWarning
 import it.unibo.collektive.utils.logging.warn
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
@@ -27,8 +28,10 @@ class AlignmentComponentRegistrar : CompilerPluginRegistrar() {
             )
             null -> {
                 when {
-                    configuration.isReadOnly -> logger.warn(
-                        "The Kotlin-JVM IR backend has not been enabled, but the Collektive compiler plugin requires it"
+                    configuration.isReadOnly -> logger.strongWarning(
+                        "The Kotlin-JVM IR backend has not been explicitly enabled and the compiler configuration has" +
+                            "been finalized. The Collektive compiler plugin requires the IR generation," +
+                            "the plugin may not be able to apply its transformations correctly"
                     )
                     else -> configuration.put(JVMConfigurationKeys.IR, true).also {
                         logger.info(
