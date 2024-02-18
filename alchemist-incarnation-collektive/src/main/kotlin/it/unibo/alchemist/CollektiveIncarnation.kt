@@ -68,8 +68,11 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         node: Node<Any?>?,
         time: TimeDistribution<Any?>,
         actionable: Actionable<Any?>,
-        additionalParameters: String,
-    ): Action<Any?> = RunCollektiveProgram(node, time, additionalParameters)
+        additionalParameters: Any?,
+    ): Action<Any?> = RunCollektiveProgram(
+        requireNotNull(node) { "Collektive requires a device and cannot execute in a Global Reaction" },
+        additionalParameters?.toString().orEmpty(),
+    )
 
     override fun createCondition(
         randomGenerator: RandomGenerator,
@@ -77,7 +80,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         node: Node<Any?>?,
         time: TimeDistribution<Any?>,
         actionable: Actionable<Any?>,
-        additionalParameters: String?,
+        additionalParameters: Any?,
     ): Condition<Any?> = object : AbstractCondition<Any>(requireNotNull(node)) {
         override fun getContext() = Context.LOCAL
 
@@ -91,7 +94,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         environment: Environment<Any?, P>,
         node: Node<Any?>,
         timeDistribution: TimeDistribution<Any?>,
-        parameter: String,
+        parameter: Any?,
     ): Reaction<Any?> = Event(node, timeDistribution).also {
         it.actions = ListSet.of(
             createAction(randomGenerator, environment, node, timeDistribution, it, parameter),
@@ -102,22 +105,32 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         randomGenerator: RandomGenerator,
         environment: Environment<Any?, P>,
         node: Node<Any?>?,
-        parameter: String?,
-    ): TimeDistribution<Any?> = parameter?.toDoubleOrNull().let { frequency ->
-        val actualFrequency = frequency ?: 1.0
-        DiracComb(DoubleTime(randomGenerator.nextDouble(0.0, 1.0 / actualFrequency)), actualFrequency)
+        parameter: Any?,
+    ): TimeDistribution<Any?> {
+        val frequency = when (parameter) {
+            null -> 1.0
+            is Number -> parameter.toDouble()
+            is String -> parameter.toDouble()
+            else -> error("Invalid time distribution parameter: $parameter")
+        }
+        return DiracComb(DoubleTime(randomGenerator.nextDouble(0.0, 1.0 / frequency)), frequency)
     }
 
     override fun createNode(
         randomGenerator: RandomGenerator,
         environment: Environment<Any?, P>,
-        parameter: String?,
+        parameter: Any?,
     ): Node<Any?> = GenericNode(environment).also { genericNode ->
         genericNode.addProperty(
             CollektiveDevice(
                 environment,
                 genericNode,
-                parameter?.let { DoubleTime(it.toDouble()) },
+                when (parameter) {
+                    null -> null
+                    is Number -> DoubleTime(parameter.toDouble())
+                    is String -> DoubleTime(parameter.toDouble())
+                    else -> error("Invalid message retention time: $parameter")
+                },
             ),
         )
     }
