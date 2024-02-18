@@ -1,4 +1,4 @@
-package it.unibo.collektive.alchemist.device
+package it.unibo.alchemist.collektive.device
 
 import it.unibo.alchemist.model.Environment
 import it.unibo.alchemist.model.Node

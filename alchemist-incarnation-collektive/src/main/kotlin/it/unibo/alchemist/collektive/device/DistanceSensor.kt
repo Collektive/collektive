@@ -1,4 +1,4 @@
-package it.unibo.collektive.alchemist.device
+package it.unibo.alchemist.collektive.device
 
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.field.Field

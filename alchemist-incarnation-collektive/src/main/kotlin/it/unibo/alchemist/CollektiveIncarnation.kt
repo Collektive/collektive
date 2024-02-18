@@ -3,6 +3,7 @@ package it.unibo.alchemist
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.LoadingCache
 import it.unibo.alchemist.actions.RunCollektiveProgram
+import it.unibo.alchemist.collektive.device.CollektiveDevice
 import it.unibo.alchemist.model.Action
 import it.unibo.alchemist.model.Actionable
 import it.unibo.alchemist.model.Condition
@@ -21,7 +22,6 @@ import it.unibo.alchemist.model.reactions.Event
 import it.unibo.alchemist.model.timedistributions.DiracComb
 import it.unibo.alchemist.model.times.DoubleTime
 import it.unibo.alchemist.util.RandomGenerators.nextDouble
-import it.unibo.collektive.alchemist.device.CollektiveDevice
 import org.apache.commons.math3.random.RandomGenerator
 import org.danilopianini.util.ListSet
 import javax.script.ScriptEngineManager

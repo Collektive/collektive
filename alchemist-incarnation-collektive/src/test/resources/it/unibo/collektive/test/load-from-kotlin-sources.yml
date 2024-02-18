@@ -6,9 +6,14 @@ incarnation: collektive
 
 _pool: &program
   - time-distribution: 1
-    program: |
-      loadSources { kotlin }
-      gradient(localId == 0)
+    program:
+      name: Gradient
+      source-sets:
+        - kotlin
+      code: |
+        package some.package
+        import my.package.*
+      entrypoint: gradient(localId == 0)
 
 deployments:
   - type: Rectangle

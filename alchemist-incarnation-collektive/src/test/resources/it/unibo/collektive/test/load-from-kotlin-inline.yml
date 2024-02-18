@@ -6,12 +6,13 @@ incarnation: collektive
 
 _pool: &program
   - time-distribution: 1
-    program: |
+    name: Gradient
+    code: |
       package my.test
       
+      import it.unibo.alchemist.collektive.device.DistanceSensor
       import it.unibo.collektive.aggregate.api.Aggregate
       import it.unibo.collektive.aggregate.api.operators.share
-      import it.unibo.collektive.alchemist.device.DistanceSensor
       import it.unibo.collektive.field.*
       import kotlin.Double.Companion.POSITIVE_INFINITY
       
@@ -24,8 +25,7 @@ _pool: &program
             else -> (it + dist).min(POSITIVE_INFINITY)
           }
         }
-      
-      collektive { gradient(localId == 0) }
+    entrypoint: gradient(localId == 0)
 
 deployments:
   - type: Rectangle

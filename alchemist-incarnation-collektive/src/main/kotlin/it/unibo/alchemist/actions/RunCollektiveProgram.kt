@@ -1,5 +1,6 @@
 package it.unibo.alchemist.actions
 
+import it.unibo.alchemist.collektive.device.CollektiveDevice
 import it.unibo.alchemist.model.Action
 import it.unibo.alchemist.model.Context
 import it.unibo.alchemist.model.Node
@@ -11,12 +12,11 @@ import it.unibo.alchemist.model.actions.AbstractAction
 import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.collektive.Collektive
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.alchemist.device.CollektiveDevice
 import kotlin.reflect.jvm.kotlinFunction
 
 /**
- * An [Alchemist] [Action] that runs a [Collektive] program.
- * It takes the [node] on which execute the action, the [time] distribution and the [additionalParameters]
+ * An Alchemist [Action] that runs a [Collektive] program.
+ * It takes the [node] on which execute the action, the [time] distribution and the additional parameters
  * which is the of the aggregate function to execute.
  */
 class RunCollektiveProgram<P : Position<P>>(

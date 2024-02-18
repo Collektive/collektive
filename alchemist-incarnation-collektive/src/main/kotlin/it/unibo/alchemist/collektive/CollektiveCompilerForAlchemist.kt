@@ -1,7 +1,6 @@
-package it.unibo.collektive.alchemist
+package it.unibo.alchemist.collektive
 
 import it.unibo.alchemist.model.Position
-import it.unibo.collektive.alchemist.device.CollektiveDevice
 import it.unibo.collektive.compiler.util.md5
 import it.unibo.collektive.compiler.util.toBase32
 import java.io.File
@@ -33,7 +32,7 @@ object CollektiveCompilerForAlchemist {
     /**
      * Loads a Collektive program from a string.
      */
-    fun <P : Position<P>> loadFrom(inputText: String): CollektiveDevice<P>.() -> Any? {
+    fun <P : Position<P>> loadFrom(inputText: String): CollektiveAlchemistProgram<P> {
         val sourcesMatch = sourcesRegex.find(inputText)
         val sources = sourcesMatch?.groupValues?.get(2)
         val entryPoint = entryPointRegex.find(inputText)?.groupValues?.get(2)

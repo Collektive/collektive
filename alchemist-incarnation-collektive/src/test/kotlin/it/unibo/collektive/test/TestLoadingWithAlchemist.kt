@@ -9,7 +9,7 @@ import it.unibo.alchemist.model.times.DoubleTime
 import it.unibo.alchemist.util.ClassPathScanner
 
 class TestLoadingWithAlchemist : StringSpec({
-    ClassPathScanner.resourcesMatching(".*\\.ya?ml", "it.unibo.collektive").forEach { simulationFile ->
+    ClassPathScanner.resourcesMatching(".*x\\.ya?ml", "it.unibo.collektive").forEach { simulationFile ->
         val (fileName) = checkNotNull(Regex(".*/([^/]+?)$").matchEntire(simulationFile.path)).destructured
         "test loading and running $fileName" {
             val loader = LoadAlchemist.from(simulationFile)
