@@ -44,7 +44,9 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
                         "$type${"?".takeIf { type.isMarkedNullable }.orEmpty()}"
                     }
                 }
-                val toInvoke = cache.get("import kotlin.math.*; val x: ($concentrationType) -> Any? = { $property }; x")
+                val toInvoke = propertyCache.get(
+                    "import kotlin.math.*; val x: ($concentrationType) -> Any? = { $property }; x",
+                )
                 toInvoke(concentration)
             }
         }
@@ -58,7 +60,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
 
     override fun createMolecule(molecule: String) = SimpleMolecule(molecule)
 
-    override fun createConcentration(concentration: String?) = concentration
+    override fun createConcentration(concentration: String?) = concentrationCache[concentration]
 
     override fun createConcentration() = null
 
@@ -131,7 +133,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         private val kotlin by ScriptEngine
         private val defaultLambda: (Any?) -> Any? = { Double.NaN }
 
-        private val cache: LoadingCache<String, (Any?) -> Any?> = Caffeine.newBuilder()
+        private val propertyCache: LoadingCache<String, (Any?) -> Any?> = Caffeine.newBuilder()
             .build { property ->
                 runCatching {
                     @Suppress("UNCHECKED_CAST")
@@ -140,6 +142,10 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
                         else -> defaultLambda
                     } as (Any?) -> Any?
                 }.getOrElse { defaultLambda }
+            }
+        private val concentrationCache: LoadingCache<String, Any?> = Caffeine.newBuilder()
+            .build { molecule ->
+                kotlin.eval(molecule)
             }
     }
 }
