@@ -6,8 +6,11 @@ import it.unibo.alchemist.model.Node.Companion.asPropertyOrNull
 import it.unibo.alchemist.model.NodeProperty
 import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Time
+import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
+import it.unibo.collektive.alchemist.device.sensors.DistanceSensor
+import it.unibo.collektive.alchemist.device.sensors.LocalSensing
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.Network
@@ -25,7 +28,7 @@ class CollektiveDevice<P>(
     private val environment: Environment<Any?, P>,
     override val node: Node<Any?>,
     private val retainMessagesFor: Time? = null,
-) : NodeProperty<Any?>, Network<Int>, DistanceSensor where P : Position<P> {
+) : NodeProperty<Any?>, Network<Int>, LocalSensing, DistanceSensor where P : Position<P> {
     private data class TimedMessage(val receivedAt: Time, val payload: InboundMessage<Int>)
 
     /**
@@ -48,6 +51,13 @@ class CollektiveDevice<P>(
         environment.getPosition(node).let { nodePosition ->
             neighboringViaExchange(nodePosition).map { position -> nodePosition.distanceTo(position) }
         }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T> sense(name: String): T {
+        node.getConcentration(SimpleMolecule(name)).let { concentration ->
+            return concentration as T
+        }
+    }
 
     override fun cloneOnNewNode(node: Node<Any?>): NodeProperty<Any?> =
         CollektiveDevice(environment, node, retainMessagesFor)
