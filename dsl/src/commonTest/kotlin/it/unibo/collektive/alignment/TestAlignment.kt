@@ -15,10 +15,16 @@ import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.plus
 import it.unibo.collektive.matchers.acProgram
 import it.unibo.collektive.matchers.alignWith
+import it.unibo.collektive.path.Path
+import it.unibo.collektive.path.PathSummary
+import it.unibo.collektive.path.impl.IdentityPathSummary
 
 class TestAlignment : StringSpec({
+    val pathRepresentation: (Path) -> PathSummary = { IdentityPathSummary(it) }
+
     "The alignment should be performed also for the same aggregate operation called multiple times (issue #51)" {
-        val result = aggregate(0) {
+
+        val result = aggregate(0, pathRepresentation) {
             neighboringViaExchange(10) // path -> [neighboring.1] = 10
             share(0) {
                 requireNotNull(neighboringViaExchange(20).localValue) // path -> [share.1, neighboring.2] = 20
@@ -34,7 +40,7 @@ class TestAlignment : StringSpec({
     }
     "Alignment must fail clearly when entries try to override each other" {
         val exception = shouldThrowUnit<IllegalStateException> {
-            aggregate(0) {
+            aggregate(0, pathRepresentation) {
                 kotlin.repeat(2) {
                     neighboringViaExchange(0)
                 }
