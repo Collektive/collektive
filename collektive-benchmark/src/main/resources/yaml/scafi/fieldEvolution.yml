@@ -1,0 +1,19 @@
+network-model:
+  type: ConnectWithinDistance
+  parameters: [5]
+
+incarnation: scafi
+
+_pool: &program
+  - time-distribution: 1
+    type: Event
+    actions:
+      - type: RunScafiProgram
+        parameters: [it.unibo.scafi.example.FieldEvolution]
+  - program: send
+
+deployments:
+  - type: Rectangle
+    parameters: [200, 0, 0, 20, 20]
+    programs:
+      - *program

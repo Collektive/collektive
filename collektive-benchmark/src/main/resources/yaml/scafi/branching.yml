@@ -1,0 +1,29 @@
+incarnation: scafi
+
+network-model:
+  type: ConnectWithinDistance
+  parameters: [5]
+
+_pool: &program
+  - time-distribution: 1
+    type: Event
+    actions:
+      - type: RunScafiProgram
+        parameters: [it.unibo.scafi.example.Branching]
+  - program: send
+
+deployments:
+  - type: Rectangle
+    parameters: [199, 0, 0, 20, 20]
+    programs:
+      - *program
+    contents:
+      - molecule: source
+        concentration: false
+  - type: Point
+    parameters: [10, 10]
+    programs:
+      - *program
+    contents:
+      - molecule: source
+        concentration: true
