@@ -1,0 +1,19 @@
+incarnation: protelis
+
+network-model:
+  type: ConnectWithinDistance
+  parameters: [5]
+
+_gradient: &program
+  - time-distribution: 1
+    program: |
+      module protelis:neighborCounter
+      import protelis:coord:spreading
+      neighborhood()
+  - program: send
+
+deployments:
+  - type: Rectangle
+    parameters: [200, 0, 0, 20, 20]
+    programs:
+      - *program
