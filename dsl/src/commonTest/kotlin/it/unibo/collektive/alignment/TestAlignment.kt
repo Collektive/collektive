@@ -59,10 +59,16 @@ class TestAlignment : StringSpec({
         fun foo(value: Int, aggregate: Aggregate<Int>) = aggregate.neighboringViaExchange(value)
         acProgram { foo(this, x) } shouldNot alignWith { foo(x, this) }
     }
-    "Outer non-collective function taking collective function as argument should align the non-collective function" {
+    "Outer non-collektive function taking collective function as argument should align the non-collective function" {
         val x = 0
         fun foo(aggregate: Aggregate<Int>) = aggregate.neighboringViaExchange(x)
         fun bar(f1: Field<Int, Int>, f2: Field<Int, Int>) = f1 + f2
         acProgram { foo(this) to foo(this) } shouldNot alignWith { bar(foo(this), foo(this)) }
+    }
+    "Different outer non-collektive functions with the same aggregate body should not align" {
+        val x = 0
+        fun foo(aggregate: Aggregate<Int>) = aggregate.neighboringViaExchange(x)
+        fun bar(aggregate: Aggregate<Int>) = aggregate.neighboringViaExchange(x)
+        acProgram { foo(this) } shouldNot alignWith { bar(this) }
     }
 })
