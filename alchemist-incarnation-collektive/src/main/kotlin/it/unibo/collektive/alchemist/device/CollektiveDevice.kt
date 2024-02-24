@@ -16,7 +16,7 @@ import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.Network
 import it.unibo.collektive.networking.OutboundMessage
 import it.unibo.collektive.networking.SingleOutboundMessage
-import it.unibo.collektive.path.Path
+import it.unibo.collektive.path.PathSummary
 
 /**
  * Representation of a Collektive device in Alchemist.
@@ -74,8 +74,8 @@ class CollektiveDevice<P>(
     override fun write(message: OutboundMessage<Int>) {
         val neighborhood = environment.getNeighborhood(node)
             .mapNotNull { it.asPropertyOrNull<Any?, CollektiveDevice<P>>() }
-        val baseMessageBacking = mutableMapOf<Path, Any?>()
-        val mayNeedOverrideBacking = mutableMapOf<Path, SingleOutboundMessage<Int, *>>()
+        val baseMessageBacking = mutableMapOf<PathSummary, Any?>()
+        val mayNeedOverrideBacking = mutableMapOf<PathSummary, SingleOutboundMessage<Int, *>>()
         for ((path, payload) in message.messages) {
             if (payload.overrides.isEmpty()) {
                 baseMessageBacking[path] = payload.default
@@ -83,8 +83,8 @@ class CollektiveDevice<P>(
                 mayNeedOverrideBacking[path] = payload
             }
         }
-        val baseMessage: Map<Path, Any?> = baseMessageBacking
-        val mayNeedOverride: Map<Path, SingleOutboundMessage<Int, *>> = mayNeedOverrideBacking
+        val baseMessage: Map<PathSummary, Any?> = baseMessageBacking
+        val mayNeedOverride: Map<PathSummary, SingleOutboundMessage<Int, *>> = mayNeedOverrideBacking
         neighborhood.forEach { neighbor ->
             val customMessage = InboundMessage(
                 message.senderId,

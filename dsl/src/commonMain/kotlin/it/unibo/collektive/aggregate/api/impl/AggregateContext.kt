@@ -12,9 +12,9 @@ import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.OutboundMessage
 import it.unibo.collektive.networking.SingleOutboundMessage
 import it.unibo.collektive.path.Path
+import it.unibo.collektive.path.PathSummary
 import it.unibo.collektive.state.State
 import it.unibo.collektive.state.impl.getTyped
-
 /**
  * Context for managing aggregate computation.
  * It represents the [localId] of the device, the [messages] received from the neighbours,
@@ -24,11 +24,12 @@ internal class AggregateContext<ID : Any>(
     override val localId: ID,
     private val messages: Iterable<InboundMessage<ID>>,
     private val previousState: State,
+    private val pathTranslator: (Path) -> PathSummary,
 ) : Aggregate<ID> {
 
     private val stack = Stack()
-    private var state: State = mapOf()
-    private var toBeSent = OutboundMessage(localId, emptyMap())
+    private var state: MutableMap<PathSummary, Any?> = mutableMapOf()
+    private val toBeSent = OutboundMessage(localId)
 
     /**
      * Messages to send to the other nodes.
@@ -49,7 +50,7 @@ internal class AggregateContext<ID : Any>(
         initial: Init,
         body: YieldingScope<Field<ID, Init>, Field<ID, Ret>>,
     ): Field<ID, Ret> {
-        val path = stack.currentPath()
+        val path: PathSummary = pathTranslator(stack.currentPath())
         val messages = messagesAt<Init>(path)
         val previous = stateAt(path, initial)
         val subject = newField(previous, messages)
@@ -68,15 +69,17 @@ internal class AggregateContext<ID : Any>(
                     The most likely cause is an aggregate function call within a loop
                 """.trimIndent()
             }
-            toBeSent = toBeSent.copy(messages = toBeSent.messages + (path to message))
+            toBeSent.addMessage(path, message)
             state += path to it.toSend.localValue
         }.toReturn
     }
 
-    override fun <Initial, Return> repeating(initial: Initial, transform: YieldingScope<Initial, Return>): Return =
-        transform(YieldingContext(), stateAt(stack.currentPath(), initial))
-            .also { state += stack.currentPath() to it.toReturn }
+    override fun <Initial, Return> repeating(initial: Initial, transform: YieldingScope<Initial, Return>): Return {
+        val path = pathTranslator(stack.currentPath())
+        return transform(YieldingContext(), stateAt(path, initial))
+            .also { state += path to it.toReturn }
             .toReturn
+    }
 
     override fun <Initial> repeat(initial: Initial, transform: (Initial) -> Initial): Initial = repeating(initial) {
         val res = transform(it)
@@ -89,7 +92,7 @@ internal class AggregateContext<ID : Any>(
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun <T> messagesAt(path: Path): Map<ID, T> = messages
+    private fun <T> messagesAt(path: PathSummary): Map<ID, T> = messages
         .mapNotNull { received ->
             received.messages.getOrElse(path) { NoEntry }
                 .takeIf { it != NoEntry }
@@ -99,7 +102,7 @@ internal class AggregateContext<ID : Any>(
 
     private object NoEntry
 
-    private fun <T> stateAt(path: Path, default: T): T = previousState.getTyped(path, default)
+    private fun <T> stateAt(path: PathSummary, default: T): T = previousState.getTyped(path, default)
 }
 
 /**

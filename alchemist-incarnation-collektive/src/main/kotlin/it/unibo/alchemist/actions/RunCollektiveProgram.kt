@@ -12,6 +12,9 @@ import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.collektive.Collektive
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.alchemist.device.CollektiveDevice
+import it.unibo.collektive.path.Path
+import it.unibo.collektive.path.PathSummary
+import it.unibo.collektive.path.impl.IdentityPathSummary
 import kotlin.reflect.jvm.kotlinFunction
 
 /**
@@ -45,9 +48,11 @@ class RunCollektiveProgram<P : Position<P>>(
         }
     }
 
+    private val pathRepresentation: (Path) -> PathSummary = { IdentityPathSummary(it) }
+
     init {
         declareDependencyTo(programIdentifier)
-        val collektive = Collektive(localDevice.id, localDevice) {
+        val collektive = Collektive(localDevice.id, pathRepresentation, localDevice) {
             parameterCache += mapOf(Aggregate::class.java to this)
             method.kotlinFunction?.call(*parameterCache.values.toTypedArray()) ?: error("No aggregate function found")
         }
