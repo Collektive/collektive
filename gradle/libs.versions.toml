@@ -5,11 +5,19 @@ coroutines = "1.8.0"
 dokka = "1.9.10"
 kotest = "5.8.0"
 kotlin = "1.9.22"
+protelis = "17.3.16"
+scala = "2.13.12"
 
 [libraries]
 alchemist-api = { module = "it.unibo.alchemist:alchemist-api", version.ref = "alchemist" }
 alchemist = { module = "it.unibo.alchemist:alchemist", version.ref = "alchemist" }
+alchemist-test = { module = "it.unibo.alchemist:alchemist-test", version.ref = "alchemist" }
+alchemist-incarnation-protelis = { module = "it.unibo.alchemist:alchemist-incarnation-protelis", version.ref = "alchemist" }
+alchemist-incarnation-scafi = { module = "it.unibo.alchemist:alchemist-incarnation-scafi", version.ref = "alchemist" }
+alchemist-swingui = { module = "it.unibo.alchemist:alchemist-swingui", version.ref = "alchemist" }
+alchemist-euclidean-geometry = { module = "it.unibo.alchemist:alchemist-euclidean-geometry", version.ref = "alchemist" }
 arrow = "io.arrow-kt:arrow-core:1.2.2"
+caffeine = "com.github.ben-manes.caffeine:caffeine:3.1.8"
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-framework-datatest = { module = "io.kotest:kotest-framework-datatest", version.ref = "kotest" }
@@ -19,7 +27,10 @@ kotlin-test-common = { module = "org.jetbrains.kotlin:kotlin-test-common", versi
 kotlin-test-annotations-common = { module = "org.jetbrains.kotlin:kotlin-test-annotations-common", version.ref = "kotlin" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
-caffeine = "com.github.ben-manes.caffeine:caffeine:3.1.8"
+protelis = { module = "org.protelis:protelis", version.ref = "protelis" }
+protelis-interpreter = { module = "org.protelis:protelis-interpreter", version.ref = "protelis" }
+protelis-lang = { module = "org.protelis:protelis-lang", version.ref = "protelis" }
+scala = { module = "org.scala-lang:scala-library", version.ref = "scala"}
 
 [bundles]
 kotlin-testing-common = [
@@ -33,6 +44,16 @@ kotlin-testing-common = [
 alchemist = [
     "alchemist",
     "alchemist-api",
+    "alchemist-test",
+    "alchemist-incarnation-protelis",
+    "alchemist-incarnation-scafi",
+    "alchemist-swingui",
+    "alchemist-euclidean-geometry",
+]
+protelis = [
+    "protelis",
+    "protelis-interpreter",
+    "protelis-lang",
 ]
 
 [plugins]
