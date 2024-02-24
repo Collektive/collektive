@@ -5,6 +5,8 @@ import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.impl.AggregateContext
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.Network
+import it.unibo.collektive.path.Path
+import it.unibo.collektive.path.PathSummary
 import it.unibo.collektive.state.State
 
 /**
@@ -13,6 +15,7 @@ import it.unibo.collektive.state.State
  */
 class Collektive<ID : Any, R>(
     val localId: ID,
+    private val pathTranslator: (Path) -> PathSummary,
     private val network: Network<ID>,
     private val computeFunction: Aggregate<ID>.() -> R,
 ) {
@@ -42,13 +45,12 @@ class Collektive<ID : Any, R>(
     }
 
     private fun executeRound(): AggregateResult<ID, R> {
-        val result = aggregate(localId, network, state, computeFunction)
+        val result = aggregate(localId, pathTranslator, network, state, computeFunction)
         state = result.newState
         return result
     }
 
     companion object {
-
         /**
          * Aggregate program entry point which computes an iteration of a device [localId], taking as parameters
          * the previous [state], the [messages] received from the neighbours and the [compute] with AggregateContext
@@ -56,10 +58,11 @@ class Collektive<ID : Any, R>(
          */
         fun <ID : Any, R> aggregate(
             localId: ID,
-            inbound: Iterable<InboundMessage<ID>> = emptySet(),
+            pathTranslator: (Path) -> PathSummary,
             previousState: State = emptyMap(),
+            inbound: Iterable<InboundMessage<ID>> = emptySet(),
             compute: Aggregate<ID>.() -> R,
-        ): AggregateResult<ID, R> = AggregateContext(localId, inbound, previousState).run {
+        ): AggregateResult<ID, R> = AggregateContext(localId, inbound, previousState, pathTranslator).run {
             AggregateResult(localId, compute(), messagesToSend(), newState())
         }
 
@@ -70,10 +73,11 @@ class Collektive<ID : Any, R>(
          */
         fun <ID : Any, R> aggregate(
             localId: ID,
+            pathTranslator: (Path) -> PathSummary,
             network: Network<ID>,
             previousState: State = emptyMap(),
             compute: Aggregate<ID>.() -> R,
-        ): AggregateResult<ID, R> = with(AggregateContext(localId, network.read(), previousState)) {
+        ): AggregateResult<ID, R> = with(AggregateContext(localId, network.read(), previousState, pathTranslator)) {
             AggregateResult(localId, compute(), messagesToSend(), newState()).also {
                 network.write(it.toSend)
             }
