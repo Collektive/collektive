@@ -6,9 +6,13 @@ import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
+import it.unibo.collektive.path.Path
+import it.unibo.collektive.path.PathSummary
+import it.unibo.collektive.path.impl.IdentityPathSummary
 
 class FieldManipulationTest : StringSpec({
     val double: (Int) -> Int = { it * 2 }
+    val pathRepresentation: (Path) -> PathSummary = { IdentityPathSummary(it) }
 
     // ids
     val id0 = 0
@@ -19,12 +23,12 @@ class FieldManipulationTest : StringSpec({
         val network0 = NetworkImplTest(nm, id0)
         val network1 = NetworkImplTest(nm, id1)
 
-        aggregate(id0, network0) {
+        aggregate(id0, pathRepresentation, network0) {
             val sharedField = neighboringViaExchange(double(3))
             sharedField.min(sharedField.localValue) shouldBe 6
         }
 
-        aggregate(id1, network1) {
+        aggregate(id1, pathRepresentation, network1) {
             val sharedField = neighboringViaExchange(double(2))
             sharedField.min(sharedField.localValue) shouldBe 4
         }
@@ -35,12 +39,12 @@ class FieldManipulationTest : StringSpec({
         val network0 = NetworkImplTest(nm, id0)
         val network1 = NetworkImplTest(nm, id1)
 
-        aggregate(id0, network0) {
+        aggregate(id0, pathRepresentation, network0) {
             val minValue = neighboringViaExchange(double(3)).min(Int.MAX_VALUE)
             minValue shouldBe Int.MAX_VALUE
         }
 
-        aggregate(id1, network1) {
+        aggregate(id1, pathRepresentation, network1) {
             val minValue = neighboringViaExchange(double(2)).min(Int.MAX_VALUE)
             minValue shouldBe 6
         }
@@ -51,12 +55,12 @@ class FieldManipulationTest : StringSpec({
         val network0 = NetworkImplTest(nm, id0)
         val network1 = NetworkImplTest(nm, id1)
 
-        aggregate(id0, network0) {
+        aggregate(id0, pathRepresentation, network0) {
             val maxValue = neighboringViaExchange(double(3)).max(Int.MIN_VALUE)
             maxValue shouldBe Int.MIN_VALUE
         }
 
-        aggregate(id1, network1) {
+        aggregate(id1, pathRepresentation, network1) {
             val maxValue = neighboringViaExchange(double(2)).max(Int.MIN_VALUE)
             maxValue shouldBe 6
         }
