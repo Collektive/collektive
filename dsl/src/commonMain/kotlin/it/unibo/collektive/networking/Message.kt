@@ -1,6 +1,7 @@
 package it.unibo.collektive.networking
 
 import it.unibo.collektive.path.Path
+import it.unibo.collektive.path.PathSummary
 
 /**
  * Types of messages.
@@ -10,12 +11,24 @@ sealed interface Message
 /**
  * [messages] received by a node from [senderId].
  */
-data class InboundMessage<ID : Any>(val senderId: ID, val messages: Map<Path, *>) : Message
+data class InboundMessage<ID : Any>(val senderId: ID, val messages: Map<PathSummary, *>) : Message
 
 /**
  * An [OutboundMessage] are [messages] that a device [senderId] sends to all other neighbors.
  */
-data class OutboundMessage<ID : Any>(val senderId: ID, val messages: Map<Path, SingleOutboundMessage<ID, *>>) : Message
+class OutboundMessage<ID : Any>(val senderId: ID) : Message {
+
+    private val mutableMessages = mutableMapOf<PathSummary, SingleOutboundMessage<ID, *>>()
+
+    val messages: Map<PathSummary, SingleOutboundMessage<ID, *>> get() = mutableMessages
+
+    /**
+     * Add a [message] to the [messages] of the [OutboundMessage].
+     */
+    fun addMessage(path: PathSummary, message: SingleOutboundMessage<ID, *>) {
+        mutableMessages[path] = message
+    }
+}
 
 /**
  * A [SingleOutboundMessage] contains the values associated to a [Path] in the [messages] of [OutboundMessage].
