@@ -6,6 +6,8 @@ import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.AggregateResult
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.path.Path
+import it.unibo.collektive.path.PathSummary
+import it.unibo.collektive.path.impl.IdentityPathSummary
 
 /**
  * Matcher checking if the result of an aggregate program aligns with the [expected] result.
@@ -37,8 +39,9 @@ fun <ID : Any, R> alignWith(expected: AggregateResult<ID, R>) = Matcher<Aggregat
  * acProgram { neighboringViaExchange(0) } should alignWith { neighboringViaExchange(0) }
  */
 fun <R> alignWith(expected: Aggregate<Int>.() -> R): Matcher<Aggregate<Int>.() -> R> = Matcher { program ->
-    val expectedRes = aggregate(0, emptySet(), emptyMap(), expected).run { toSend.messages.keys }
-    val result = aggregate(0, emptySet(), emptyMap(), program).run { toSend.messages.keys }
+    val pathRepresentation: (Path) -> PathSummary = { IdentityPathSummary(it) }
+    val expectedRes = aggregate(0, pathRepresentation, emptyMap(), emptySet(), expected).run { toSend.messages.keys }
+    val result = aggregate(0, pathRepresentation, emptyMap(), emptySet(), program).run { toSend.messages.keys }
     aggregateMatcher(expectedRes, result)
 }
 
@@ -54,7 +57,7 @@ fun <R> alignWith(expected: Aggregate<Int>.() -> R): Matcher<Aggregate<Int>.() -
  */
 fun <R> acProgram(aggregateProgram: Aggregate<Int>.() -> R): Aggregate<Int>.() -> R = aggregateProgram
 
-private fun aggregateMatcher(expected: Set<Path>, actual: Set<Path>): MatcherResult {
+private fun aggregateMatcher(expected: Set<PathSummary>, actual: Set<PathSummary>): MatcherResult {
     return MatcherResult(
         actual == expected,
         { "Expected the following paths: $expected, but got: $actual" },
