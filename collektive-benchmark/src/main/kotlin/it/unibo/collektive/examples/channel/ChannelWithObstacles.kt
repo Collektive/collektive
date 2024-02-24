@@ -5,6 +5,7 @@ import it.unibo.collektive.aggregate.api.operators.share
 import it.unibo.collektive.alchemist.device.sensors.DistanceSensor
 import it.unibo.collektive.alchemist.device.sensors.LocalSensing
 import it.unibo.collektive.examples.gradient.gradient
+import it.unibo.collektive.field.Field.Companion.fold
 import it.unibo.collektive.field.plus
 import kotlin.Double.Companion.POSITIVE_INFINITY
 
@@ -36,26 +37,25 @@ fun Aggregate<Int>.distanceBetween(source: Boolean, target: Boolean): Double = b
  * Computes the [gradientCast] from the [source] with the [value] that is the distance from the [source] to the target.
  */
 context(DistanceSensor)
-fun <A>Aggregate<Int>.broadcast(source: Boolean, value: A): A = gradientCast(source, value) { it }
+fun Aggregate<Int>.broadcast(source: Boolean, value: Double): Double = gradientCast(source, value) { it }
 
 /**
  * Compute the gradient of the aggregate from the [source] to the [target].
  * The [accumulate] function is used to accumulate the value of the aggregate.
  */
 context(DistanceSensor)
-fun <A>Aggregate<Int>.gradientCast(source: Boolean, initial: A, accumulate: (A) -> A): A =
+fun Aggregate<Int>.gradientCast(source: Boolean, initial: Double, accumulate: (Double) -> Double): Double =
     share(POSITIVE_INFINITY to initial) { field ->
-        val gradient = distances() + field.map { it.first }
-        val accumulated = field.map { accumulate(it.second) }
-        val combined = gradient.alignedMap(accumulated) { g, a -> g to a }
-        val minTuple = combined.toMap().minBy { it.value.first }
-        if (source) {
-            0.0 to initial
-        } else {
-            if (minTuple.value.first == POSITIVE_INFINITY) {
-                POSITIVE_INFINITY to initial
-            } else {
-                minTuple.value
+        val dist = distances()
+        when {
+            source -> 0.0 to initial
+            else -> {
+                val resultField = dist.alignedMap(field) { distField, (currentDist, value) ->
+                    distField + currentDist to accumulate(value)
+                }
+                resultField.fold(POSITIVE_INFINITY to POSITIVE_INFINITY) { acc, value ->
+                    if (value.first < acc.first) value else acc
+                }
             }
         }
     }.second
