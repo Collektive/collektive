@@ -6,7 +6,7 @@ import it.unibo.collektive.path.impl.PathImpl
 internal class StackDeque : Stack {
     private val currentStack = ArrayDeque<Any?>()
 
-    override fun currentPath(): Path = PathImpl(currentStack.toList())
+    override fun currentPath(): Path = PathImpl.of(currentStack.toList())
 
     override fun alignRaw(token: Any?) = currentStack.addLast(token)
 
