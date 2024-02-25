@@ -29,7 +29,7 @@ internal class AggregateContext<ID : Any>(
 
     private val stack = Stack()
     private var state: MutableMap<PathSummary, Any?> = mutableMapOf()
-    private val toBeSent = OutboundMessage(localId)
+    private val toBeSent = OutboundMessage(messages.count(), localId)
 
     /**
      * Messages to send to the other nodes.
@@ -63,12 +63,6 @@ internal class AggregateContext<ID : Any>(
                     else -> it.toSend.excludeSelf()
                 },
             )
-            check(!toBeSent.messages.containsKey(path)) {
-                """
-                    Aggregate alignment clash by multiple aligned calls with the same path: $path.
-                    The most likely cause is an aggregate function call within a loop
-                """.trimIndent()
-            }
             toBeSent.addMessage(path, message)
             state += path to it.toSend.localValue
         }.toReturn
@@ -88,7 +82,9 @@ internal class AggregateContext<ID : Any>(
 
     override fun <R> alignedOn(pivot: Any?, body: () -> R): R {
         stack.alignRaw(pivot)
-        return body().also { stack.dealign() }
+        return body().also {
+            stack.dealign()
+        }
     }
 
     @Suppress("UNCHECKED_CAST")
