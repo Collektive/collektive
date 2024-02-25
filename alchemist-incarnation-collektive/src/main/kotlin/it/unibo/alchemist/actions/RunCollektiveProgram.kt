@@ -29,32 +29,32 @@ class RunCollektiveProgram<P : Position<P>>(
 ) : AbstractAction<Any?>(
     requireNotNull(node) { "Collektive does not support an environment with null as nodes" },
 ) {
-    private val programIdentifier = SimpleMolecule(additionalParameters)
 
+    private object AggregatePlaceHolder
+
+    private val programIdentifier = SimpleMolecule(additionalParameters)
     private val localDevice: CollektiveDevice<P> = node?.asProperty() ?: error("Trying to create action for null node")
     private val run: () -> Any?
-
     private val className = additionalParameters.substringBeforeLast(".")
     private val methodName = additionalParameters.substringAfterLast(".")
     private val classNameFoo = Class.forName(className)
     private val method = classNameFoo.methods.find { it.name == methodName }
         ?: error("Method $additionalParameters not found")
 
-    private var parameterCache: Map<Class<*>, Any> = method.parameters.associate { param ->
-        when {
-            param.type.isAssignableFrom(Aggregate::class.java) -> param.type to Aggregate::class.java
-            param.type.isAssignableFrom(CollektiveDevice::class.java) -> param.type to localDevice
-            else -> error("No allowed context parameters found, expected at least Aggregate as context")
-        }
-    }
-
-    private val pathRepresentation: (Path) -> PathSummary = { IdentityPathSummary(it) }
+    private val pathRepresentation: (Path) -> PathSummary = { it }
 
     init {
         declareDependencyTo(programIdentifier)
+        val parameters = method.parameters.map { param ->
+            when {
+                param.type.isAssignableFrom(Aggregate::class.java) -> AggregatePlaceHolder
+                param.type.isAssignableFrom(CollektiveDevice::class.java) -> localDevice
+                else -> error("Unsupported parameter of type ${param.type}")
+            }
+        }
+        val function = method.kotlinFunction ?: error("No aggregate function found for $programIdentifier")
         val collektive = Collektive(localDevice.id, pathRepresentation, localDevice) {
-            parameterCache += mapOf(Aggregate::class.java to this)
-            method.kotlinFunction?.call(*parameterCache.values.toTypedArray()) ?: error("No aggregate function found")
+            function.call(*parameters.map { if (it == AggregatePlaceHolder) this else it }.toTypedArray())
         }
         run = { collektive.cycle() }
     }
