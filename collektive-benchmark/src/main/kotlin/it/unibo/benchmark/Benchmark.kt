@@ -25,7 +25,6 @@ import kotlin.io.path.Path
  */
 fun main() {
     val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")
-    val startedAt = LocalDateTime.now().format(formatter)
     val store: MutableMap<SimulationType, Results> = mutableMapOf()
     val incarnations = listOf(
         "scafi",
@@ -40,8 +39,9 @@ fun main() {
         "channelWithObstacles",
     ).flatMap { t -> incarnations.map { i -> i to t } }
 
-    listOf(100, 1_000).forEach { simulationTime ->
-        repeat(3) { i ->
+    listOf(100, 1000).forEach { simulationTime ->
+        val startedAt = LocalDateTime.now().format(formatter)
+        repeat(10) { i ->
             tests.map { (incarnation, testType) ->
                 val experiment = incarnation to testType
                 val simulation = loadYamlSimulation<Any?, Euclidean2DPosition>("yaml/$incarnation/$testType.yml")
@@ -116,7 +116,7 @@ private fun Map<Pair<String, String>, Double>.toCSV(path: Path, terminationTime:
 
     if (!file.exists()) writer.write("Incarnation,TestType,Average,Simulation Time\n")
     this.forEach { (key, entry) ->
-        writer.write("${key.first},${key.second},$entry,$terminationTime,\n")
+        writer.write("${key.first},${key.second},$entry,$terminationTime\n")
     }
     writer.close()
 }
