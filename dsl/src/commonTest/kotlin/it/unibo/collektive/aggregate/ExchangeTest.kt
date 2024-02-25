@@ -2,6 +2,7 @@ package it.unibo.collektive.aggregate
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate
@@ -24,15 +25,16 @@ class ExchangeTest : StringSpec({
             val res = exchange(1, increaseOrDouble)
             res.localValue shouldBe 2
         }
-        result.toSend.messages.keys shouldHaveSize 1
-        result.toSend.messages.values.map { it.default } shouldBe listOf(2)
+        val messages = result.toSend.messagesFor(1)
+        messages.keys shouldHaveSize 1
+        messages.values.toList() shouldBe listOf(2)
     }
 
     "Exchange should work between three aligned devices" {
-        val nm = NetworkManager()
+        val networkManager = NetworkManager()
 
         // Device 1
-        val testNetwork1 = NetworkImplTest(nm, 1)
+        val testNetwork1 = NetworkImplTest(networkManager, 1)
         val resultDevice1 = aggregate(1, pathRepresentation, testNetwork1) {
             val res1 = exchange(1, increaseOrDouble)
             val res2 = exchange(2, increaseOrDouble)
@@ -40,44 +42,46 @@ class ExchangeTest : StringSpec({
             res1.localValue shouldBe 2
             res2.localValue shouldBe 3
         }
-
-        resultDevice1.toSend.messages.keys shouldHaveSize 2
-        resultDevice1.toSend.messages.values.map { it.default } shouldBe listOf(2, 3)
-        resultDevice1.toSend.messages.values.map { it.overrides } shouldBe listOf(emptyMap(), emptyMap())
+        val messagesFor2 = resultDevice1.toSend.messagesFor(2)
+        messagesFor2 shouldHaveSize 2
+        messagesFor2.values.toList() shouldBe listOf(2, 3)
 
         // Device 2
-        val testNetwork2 = NetworkImplTest(nm, 2)
+        val testNetwork2 = NetworkImplTest(networkManager, 2)
         val resultDevice2 = aggregate(2, pathRepresentation, testNetwork2) {
             val res1 = exchange(3, increaseOrDouble)
             val res2 = exchange(4, increaseOrDouble)
-
             res1.localValue shouldBe 6
             res2.localValue shouldBe 5
         }
-
-        resultDevice2.toSend.messages.keys shouldHaveSize 2
-        resultDevice2.toSend.messages.values.map { it.default } shouldBe listOf(6, 5)
-        resultDevice2.toSend.messages.values.map { it.overrides } shouldBe listOf(
-            mapOf(1 to 3),
-            mapOf(1 to 6),
-        )
+        val messagesFor1 = resultDevice2.toSend.messagesFor(1)
+        val messagesForAnyoneElse = resultDevice2.toSend.messagesFor(Int.MIN_VALUE)
+        messagesFor1 shouldHaveSize 2
+        messagesForAnyoneElse shouldHaveSize 2
+        messagesFor1.values.toList() shouldBe listOf(3, 6)
+        messagesForAnyoneElse.values.toList() shouldBe listOf(6, 5)
 
         // Device 3
-        val testNetwork3 = NetworkImplTest(nm, 3)
+        val testNetwork3 = NetworkImplTest(networkManager, 3)
         val resultDevice3 = aggregate(3, pathRepresentation, testNetwork3) {
             val res1 = exchange(5, increaseOrDouble)
             val res2 = exchange(6, increaseOrDouble)
-
             res1.localValue shouldBe 10
             res2.localValue shouldBe 7
         }
-
-        resultDevice3.toSend.messages.keys shouldHaveSize 2
-        resultDevice3.toSend.messages.values.map { it.default } shouldBe listOf(10, 7)
-        resultDevice3.toSend.messages.values.map { it.overrides } shouldBe listOf(
-            mapOf(1 to 3, 2 to 7),
-            mapOf(1 to 6, 2 to 10),
-        )
+        val messagesFrom3To1 = resultDevice3.toSend.messagesFor(1)
+        val messagesFrom3To2 = resultDevice3.toSend.messagesFor(2)
+        val messagesFrom3ToAnyoneElse = resultDevice3.toSend.messagesFor(Int.MIN_VALUE)
+        messagesFrom3To1 shouldHaveSize 2
+        messagesFrom3To2 shouldHaveSize 2
+        messagesFrom3ToAnyoneElse shouldHaveSize 2
+        messagesFrom3ToAnyoneElse.values.toList() shouldBe listOf(10, 7)
+        messagesFrom3To1.values.toList() shouldBe listOf(3, 6)
+        messagesFrom3To2.values.toList() shouldBe listOf(7, 10)
+//        resultDevice3.toSend.messages.values.map { it.overrides } shouldBe listOf(
+//            mapOf(1 to 3, 2 to 7),
+//            mapOf(1 to 6, 2 to 10),
+//        )
     }
 
     "Exchange can yield a result but return a different value" {
@@ -88,8 +92,9 @@ class ExchangeTest : StringSpec({
             }
             xcRes.toMap() shouldBe mapOf(0 to "return: 2")
         }
-        result.toSend.messages.keys shouldHaveSize 1
-        result.toSend.messages.values.map { it.default } shouldBe listOf(2)
+        val messages = result.toSend.messagesFor(1)
+        messages shouldHaveSize 1
+        messages.values.toList() shouldBe listOf(2)
     }
 
     "Exchange can yield a result of nullable values" {
@@ -100,9 +105,11 @@ class ExchangeTest : StringSpec({
             }
             xcRes.toMap() shouldBe mapOf(0 to null)
         }
-        result.toSend.messages.keys shouldHaveSize 1
-        result.toSend.messages.values.map { it.default } shouldBe listOf(2)
+        val messages = result.toSend.messagesFor(1)
+        messages shouldHaveSize 1
+        messages.values.toList() shouldBe listOf(2)
     }
+
     "Exchange should produce a message with no overrides when producing a constant field" {
         val programUnderTest: Aggregate<Int>.() -> Unit = {
             exchanging(0) {
@@ -116,9 +123,13 @@ class ExchangeTest : StringSpec({
             val id = iteration % 3
             val res = aggregate(id, pathRepresentation, emptyMap(), networkManager.receive(id), programUnderTest)
                 .also { networkManager.send(it.toSend) }
-            res.toSend.messages.values.size shouldBe 1
+            val toUnknown = res.toSend.messagesFor(Int.MIN_VALUE)
+            toUnknown shouldHaveSize 1
+            val next = res.toSend.messagesFor((id + 1) % 3)
+            val previous = res.toSend.messagesFor((id + 2) % 3)
             // When a constant field is used, the map of overrides should be empty
-            res.toSend.messages.values.firstOrNull()?.let { it.overrides shouldBe mapOf() }
+            next shouldBe toUnknown
+            previous shouldBe toUnknown
         }
     }
 })
