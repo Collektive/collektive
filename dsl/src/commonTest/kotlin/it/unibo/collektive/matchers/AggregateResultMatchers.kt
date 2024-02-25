@@ -23,8 +23,8 @@ import it.unibo.collektive.path.impl.IdentityPathSummary
  * ```
  */
 fun <ID : Any, R> alignWith(expected: AggregateResult<ID, R>) = Matcher<AggregateResult<ID, R>> { valueResult ->
-    val originPaths = valueResult.toSend.messages.keys
-    val expectedPaths = expected.toSend.messages.keys
+    val originPaths = valueResult.toSend.messagesFor(valueResult.localId).keys
+    val expectedPaths = expected.toSend.messagesFor(valueResult.localId).keys
     aggregateMatcher(expectedPaths, originPaths)
 }
 
@@ -40,8 +40,10 @@ fun <ID : Any, R> alignWith(expected: AggregateResult<ID, R>) = Matcher<Aggregat
  */
 fun <R> alignWith(expected: Aggregate<Int>.() -> R): Matcher<Aggregate<Int>.() -> R> = Matcher { program ->
     val pathRepresentation: (Path) -> PathSummary = { IdentityPathSummary(it) }
-    val expectedRes = aggregate(0, pathRepresentation, emptyMap(), emptySet(), expected).run { toSend.messages.keys }
-    val result = aggregate(0, pathRepresentation, emptyMap(), emptySet(), program).run { toSend.messages.keys }
+    val expectedRes = aggregate(0, pathRepresentation, emptyMap(), emptySet(), expected)
+        .run { toSend.messagesFor(this.localId).keys }
+    val result = aggregate(0, pathRepresentation, emptyMap(), emptySet(), program)
+        .run { toSend.messagesFor(this.localId).keys }
     aggregateMatcher(expectedRes, result)
 }
 

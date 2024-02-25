@@ -51,7 +51,7 @@ class RepeatingTest : StringSpec({
                 nbr.yielding { "A string" }
             } shouldBe "A string"
         }
-        val messages = result.toSend.messagesFor(id0)
+        val messages = result.toSend.messagesFor(id1)
         messages shouldHaveSize 1
         messages.values shouldContainAll listOf(2)
     }

@@ -78,10 +78,6 @@ class ExchangeTest : StringSpec({
         messagesFrom3ToAnyoneElse.values.toList() shouldBe listOf(10, 7)
         messagesFrom3To1.values.toList() shouldBe listOf(3, 6)
         messagesFrom3To2.values.toList() shouldBe listOf(7, 10)
-//        resultDevice3.toSend.messages.values.map { it.overrides } shouldBe listOf(
-//            mapOf(1 to 3, 2 to 7),
-//            mapOf(1 to 6, 2 to 10),
-//        )
     }
 
     "Exchange can yield a result but return a different value" {

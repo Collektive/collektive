@@ -36,7 +36,6 @@ class NestedCallsTest : StringSpec({
         collektiveDevice0.cycle() shouldBe 0
 
         val collektiveDevice1 = Collektive(1, pathRepresentation, network1) { bar() }
-        println(network1.read())
         collektiveDevice1.cycle() shouldBe Double.POSITIVE_INFINITY
     }
 })

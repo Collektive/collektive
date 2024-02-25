@@ -1,7 +1,7 @@
 package it.unibo.collektive.branch
 
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
@@ -16,8 +16,9 @@ class IfConditionTest : StringSpec({
         val result = aggregate(id0, pathRepresentation) {
             if (true) neighboringViaExchange("test")
         }
-        result.toSend.messages.keys.size shouldBe 1
-        result.toSend.messages.values.map { it.default } shouldContainAll listOf("test")
+        val messageFor0 = result.toSend.messagesFor(id0)
+        messageFor0 shouldHaveSize 1
+        messageFor0.values.toList() shouldBe listOf("test")
     }
 
     "Branches with conditions read from variables should get aligned" {
@@ -25,8 +26,9 @@ class IfConditionTest : StringSpec({
         val result = aggregate(id0, pathRepresentation) {
             if (customCondition) neighboringViaExchange("test")
         }
-        result.toSend.messages.keys.size shouldBe 1
-        result.toSend.messages.values.map { it.default } shouldContainAll listOf("test")
+        val messageFor0 = result.toSend.messagesFor(id0)
+        messageFor0 shouldHaveSize 1
+        messageFor0.values.toList() shouldBe listOf("test")
     }
 
     "Function condition if" {
@@ -34,8 +36,9 @@ class IfConditionTest : StringSpec({
         val result = aggregate(id0, pathRepresentation) {
             if (customFunction()) neighboringViaExchange("test")
         }
-        result.toSend.messages.keys.size shouldBe 1
-        result.toSend.messages.values.map { it.default } shouldContainAll listOf("test")
+        val messageFor0 = result.toSend.messagesFor(id0)
+        messageFor0 shouldHaveSize 1
+        messageFor0.values.toList() shouldBe listOf("test")
     }
 
     "Function and condition if" {
@@ -44,8 +47,9 @@ class IfConditionTest : StringSpec({
         val result = aggregate(id0, pathRepresentation) {
             if (customCondition1 && customCondition2) neighboringViaExchange("test")
         }
-        result.toSend.messages.keys.size shouldBe 1
-        result.toSend.messages.values.map { it.default } shouldContainAll listOf("test")
+        val messageFor0 = result.toSend.messagesFor(id0)
+        messageFor0 shouldHaveSize 1
+        messageFor0.values.toList() shouldBe listOf("test")
     }
 
     "Function or condition if" {
@@ -54,8 +58,9 @@ class IfConditionTest : StringSpec({
         val result = aggregate(id0, pathRepresentation) {
             if (customCondition1 || customCondition2) neighboringViaExchange("test")
         }
-        result.toSend.messages.keys.size shouldBe 1
-        result.toSend.messages.values.map { it.default } shouldContainAll listOf("test")
+        val messageFor0 = result.toSend.messagesFor(id0)
+        messageFor0 shouldHaveSize 1
+        messageFor0.values.toList() shouldBe listOf("test")
     }
 
     "Function not condition if" {
@@ -64,7 +69,8 @@ class IfConditionTest : StringSpec({
         val result = aggregate(id0, pathRepresentation) {
             if (customCondition1 && !customCondition2) neighboringViaExchange("test")
         }
-        result.toSend.messages.keys.size shouldBe 1
-        result.toSend.messages.values.map { it.default } shouldContainAll listOf("test")
+        val messageFor0 = result.toSend.messagesFor(id0)
+        messageFor0 shouldHaveSize 1
+        messageFor0.values.toList() shouldBe listOf("test")
     }
 })
