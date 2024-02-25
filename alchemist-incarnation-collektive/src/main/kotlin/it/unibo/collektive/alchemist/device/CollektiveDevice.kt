@@ -62,12 +62,14 @@ class CollektiveDevice<P>(
     override fun cloneOnNewNode(node: Node<Any?>): NodeProperty<Any?> =
         CollektiveDevice(environment, node, retainMessagesFor)
 
-    override fun read(): Set<InboundMessage<Int>> =
-        when (retainMessagesFor) {
-            null -> validMessages.mapTo(mutableSetOf()) { it.payload }.also { validMessages.clear() }
+    override fun read(): Collection<InboundMessage<Int>> =
+        when {
+            validMessages.isEmpty() -> emptySet()
+            retainMessagesFor == null ->
+                validMessages.map { it.payload }.also { validMessages.clear() }
             else -> {
                 validMessages.retainAll { it.receivedAt + retainMessagesFor >= currentTime }
-                validMessages.mapTo(mutableSetOf()) { it.payload }
+                validMessages.map { it.payload }
             }
         }
 
