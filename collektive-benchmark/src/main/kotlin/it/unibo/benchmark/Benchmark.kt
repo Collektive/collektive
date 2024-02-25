@@ -78,7 +78,7 @@ private fun generateFiles(
     startedAt: String,
     finishedAt: String,
 ) {
-    val path = File("${Path("").toAbsolutePath()}/collektive-benchmark/results")
+    val path = File("${Path("").toAbsolutePath()}/results")
     if (!path.exists()) path.mkdir()
     sortedMap.toTxt(
         Paths.get(path.toString(), "results$finishedAt.txt"),
@@ -98,6 +98,7 @@ private fun SortedMap<SimulationType, Results>.toTxt(
     finishedAt: String,
 ) {
     val file = File(path.toString())
+    println(path.toString())
     if (!file.exists()) file.createNewFile()
     Files.write(
         Paths.get(path.toString()),
