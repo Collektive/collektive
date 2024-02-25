@@ -14,15 +14,18 @@ sealed interface Message
 data class InboundMessage<ID : Any>(val senderId: ID, val messages: Map<PathSummary, *>) : Message
 
 /**
- * An [OutboundMessage] are messages that a device [senderId] sends to all other neighbors.
+ * An [OutboundMessage] are messages that a device [senderId] sends to all other neighbours.
  */
 class OutboundMessage<ID : Any>(
     expectedSize: Int,
     val senderId: ID,
 ) : Message {
 
+    /**
+     * The default messages to be sent to all neighbours.
+     */
+    val defaults: MutableMap<PathSummary, Any?> = LinkedHashMap(expectedSize * 2)
     private val overrides: MutableMap<ID, MutableList<Pair<PathSummary, Any?>>> = LinkedHashMap(expectedSize * 2)
-    private val defaults: MutableMap<PathSummary, Any?> = LinkedHashMap(expectedSize * 2)
 
     /**
      * Check if the [OutboundMessage] is empty.
@@ -67,6 +70,6 @@ class OutboundMessage<ID : Any>(
 /**
  * A [SingleOutboundMessage] contains the values associated to a [Path] in the messages of [OutboundMessage].
  * Has a [default] value that is sent regardless the awareness the device's neighbours, [overrides] specifies the
- * payload depending on the neighbours values.
+ * payload depending on the neighbours' values.
  */
 data class SingleOutboundMessage<ID : Any, Payload>(val default: Payload, val overrides: Map<ID, Payload> = emptyMap())
