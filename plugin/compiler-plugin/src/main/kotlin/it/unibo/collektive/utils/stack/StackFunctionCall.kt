@@ -13,5 +13,5 @@ class StackFunctionCall {
 
     fun pop(): String? = stack.removeFirstOrNull()
 
-    override fun toString(): String = stack.toString()
+    override fun toString(): String = stack.joinToString(separator = ",")
 }
