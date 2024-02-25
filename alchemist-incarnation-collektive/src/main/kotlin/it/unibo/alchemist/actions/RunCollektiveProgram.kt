@@ -14,13 +14,12 @@ import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.alchemist.device.CollektiveDevice
 import it.unibo.collektive.path.Path
 import it.unibo.collektive.path.PathSummary
-import it.unibo.collektive.path.impl.IdentityPathSummary
 import kotlin.reflect.jvm.kotlinFunction
 
 /**
- * An [Alchemist] [Action] that runs a [Collektive] program.
- * It takes the [node] on which execute the action, the [time] distribution and the [additionalParameters]
- * which is the of the aggregate function to execute.
+ * An Alchemist [Action] that runs a [Collektive] program.
+ * It takes the [node] on which execute the action, the [time] distribution and the
+ * aggregate function to execute.
  */
 class RunCollektiveProgram<P : Position<P>>(
     private val node: Node<Any?>?,

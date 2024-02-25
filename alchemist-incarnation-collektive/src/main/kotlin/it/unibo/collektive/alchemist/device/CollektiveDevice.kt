@@ -2,7 +2,6 @@ package it.unibo.collektive.alchemist.device
 
 import it.unibo.alchemist.model.Environment
 import it.unibo.alchemist.model.Node
-import it.unibo.alchemist.model.Node.Companion.asPropertyOrNull
 import it.unibo.alchemist.model.NodeProperty
 import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Time
@@ -15,8 +14,6 @@ import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.Network
 import it.unibo.collektive.networking.OutboundMessage
-import it.unibo.collektive.networking.SingleOutboundMessage
-import it.unibo.collektive.path.PathSummary
 
 /**
  * Representation of a Collektive device in Alchemist.
@@ -74,30 +71,20 @@ class CollektiveDevice<P>(
         }
 
     override fun write(message: OutboundMessage<Int>) {
-        val neighborhood = environment.getNeighborhood(node)
-            .mapNotNull { it.asPropertyOrNull<Any?, CollektiveDevice<P>>() }
-        val baseMessageBacking = mutableMapOf<PathSummary, Any?>()
-        val mayNeedOverrideBacking = mutableMapOf<PathSummary, SingleOutboundMessage<Int, *>>()
-        for ((path, payload) in message.messages) {
-            if (payload.overrides.isEmpty()) {
-                baseMessageBacking[path] = payload.default
-            } else {
-                mayNeedOverrideBacking[path] = payload
+        if (message.isNotEmpty()) {
+            val neighboringNodes = environment.getNeighborhood(node)
+            if (!neighboringNodes.isEmpty) {
+                val neighborhood = neighboringNodes.mapNotNull { node ->
+                    @Suppress("UNCHECKED_CAST")
+                    node.properties.firstOrNull { it is CollektiveDevice<*> } as? CollektiveDevice<P>
+                }
+                neighborhood.forEach { neighbor ->
+                    neighbor.receiveMessage(
+                        currentTime,
+                        InboundMessage(message.senderId, message.messagesFor(neighbor.id)),
+                    )
+                }
             }
-        }
-        val baseMessage: Map<PathSummary, Any?> = baseMessageBacking
-        val mayNeedOverride: Map<PathSummary, SingleOutboundMessage<Int, *>> = mayNeedOverrideBacking
-        neighborhood.forEach { neighbor ->
-            val customMessage = InboundMessage(
-                message.senderId,
-                when {
-                    mayNeedOverride.isEmpty() -> baseMessage
-                    else -> baseMessage + mayNeedOverride.mapValues { (_, anisotropic) ->
-                        anisotropic.overrides.getOrDefault(node.id, anisotropic.default)
-                    }
-                },
-            )
-            neighbor.receiveMessage(currentTime, customMessage)
         }
     }
 }
