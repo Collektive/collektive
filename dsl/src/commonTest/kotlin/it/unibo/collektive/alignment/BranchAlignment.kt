@@ -12,16 +12,12 @@ import it.unibo.collektive.field.minus
 import it.unibo.collektive.field.plus
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
-import it.unibo.collektive.path.Path
-import it.unibo.collektive.path.PathSummary
-import it.unibo.collektive.path.impl.IdentityPathSummary
 
 class BranchAlignment : StringSpec({
     val id0 = 0
-    val pathRepresentation: (Path) -> PathSummary = { IdentityPathSummary(it) }
 
     "Branch alignment should work in nested functions" {
-        val result = aggregate(id0, pathRepresentation) {
+        val result = aggregate(id0) {
             val condition = true
 
             fun test() {
@@ -40,7 +36,7 @@ class BranchAlignment : StringSpec({
         messageFor1.values.toList() shouldBe listOf("test")
     }
     "Branch alignment should not occur in non aggregate context" {
-        val result = aggregate(id0, pathRepresentation) {
+        val result = aggregate(id0) {
             val condition = true
 
             fun test(): String = "hello"
@@ -59,7 +55,7 @@ class BranchAlignment : StringSpec({
         (0..2)
             .map { NetworkImplTest(nm, it) to it }
             .map { (net, id) ->
-                aggregate(id, pathRepresentation, net) {
+                aggregate(id, net) {
                     val outerField = neighboringViaExchange(0)
                     outerField.neighborsCount shouldBe id
                     if (id % 2 == 0) {
@@ -79,7 +75,7 @@ class BranchAlignment : StringSpec({
         (0..2)
             .map { NetworkImplTest(nm, it) to it }
             .map { (net, id) ->
-                aggregate(id, pathRepresentation, net) {
+                aggregate(id, net) {
                     exchange(0) { body(it) }
                 }
             }

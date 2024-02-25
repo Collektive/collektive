@@ -12,7 +12,6 @@ import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.OutboundMessage
 import it.unibo.collektive.networking.SingleOutboundMessage
 import it.unibo.collektive.path.Path
-import it.unibo.collektive.path.PathSummary
 import it.unibo.collektive.state.State
 import it.unibo.collektive.state.impl.getTyped
 /**
@@ -24,11 +23,10 @@ internal class AggregateContext<ID : Any>(
     override val localId: ID,
     private val messages: Iterable<InboundMessage<ID>>,
     private val previousState: State,
-    private val pathTranslator: (Path) -> PathSummary,
 ) : Aggregate<ID> {
 
     private val stack = Stack()
-    private var state: MutableMap<PathSummary, Any?> = mutableMapOf()
+    private var state: MutableMap<Path, Any?> = mutableMapOf()
     private val toBeSent = OutboundMessage(messages.count(), localId)
 
     /**
@@ -50,7 +48,7 @@ internal class AggregateContext<ID : Any>(
         initial: Init,
         body: YieldingScope<Field<ID, Init>, Field<ID, Ret>>,
     ): Field<ID, Ret> {
-        val path: PathSummary = pathTranslator(stack.currentPath())
+        val path: Path = stack.currentPath()
         val messages = messagesAt<Init>(path)
         val previous = stateAt(path, initial)
         val subject = newField(previous, messages)
@@ -69,7 +67,7 @@ internal class AggregateContext<ID : Any>(
     }
 
     override fun <Initial, Return> repeating(initial: Initial, transform: YieldingScope<Initial, Return>): Return {
-        val path = pathTranslator(stack.currentPath())
+        val path = stack.currentPath()
         return transform(YieldingContext(), stateAt(path, initial))
             .also { state += path to it.toReturn }
             .toReturn
@@ -88,7 +86,7 @@ internal class AggregateContext<ID : Any>(
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun <T> messagesAt(path: PathSummary): Map<ID, T> = messages
+    private fun <T> messagesAt(path: Path): Map<ID, T> = messages
         .mapNotNull { received ->
             received.messages.getOrElse(path) { NoEntry }
                 .takeIf { it != NoEntry }
@@ -98,7 +96,7 @@ internal class AggregateContext<ID : Any>(
 
     private object NoEntry
 
-    private fun <T> stateAt(path: PathSummary, default: T): T = previousState.getTyped(path, default)
+    private fun <T> stateAt(path: Path, default: T): T = previousState.getTyped(path, default)
 }
 
 /**

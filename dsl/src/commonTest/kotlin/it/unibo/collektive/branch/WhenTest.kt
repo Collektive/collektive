@@ -5,19 +5,15 @@ import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
-import it.unibo.collektive.path.Path
-import it.unibo.collektive.path.PathSummary
-import it.unibo.collektive.path.impl.IdentityPathSummary
 
 class WhenTest : StringSpec({
     val id0 = 0
-    val pathRepresentation: (Path) -> PathSummary = { IdentityPathSummary(it) }
 
     "When in single expression" {
         val condition = true
         val x = if (condition) "hello" else 123
         val result =
-            aggregate(id0, pathRepresentation) {
+            aggregate(id0) {
                 when (x) {
                     is String -> neighboringViaExchange("string")
                     else -> neighboringViaExchange("test")
@@ -32,7 +28,7 @@ class WhenTest : StringSpec({
         val condition = false
         val x = if (condition) "hello" else 123
         val result =
-            aggregate(id0, pathRepresentation) {
+            aggregate(id0) {
                 when (x) {
                     is String -> neighboringViaExchange("string")
                     else -> neighboringViaExchange("test")
@@ -46,7 +42,7 @@ class WhenTest : StringSpec({
     "When with nested function" {
         val condition = true
         val x = if (condition) "hello" else 123
-        val result = aggregate(id0, pathRepresentation) {
+        val result = aggregate(id0) {
             fun test() {
                 neighboringViaExchange("test")
             }
@@ -66,7 +62,7 @@ class WhenTest : StringSpec({
     "Nested when condition must be aligned" {
         val condition1 = false
         val condition2 = true
-        val result = aggregate(0, pathRepresentation) {
+        val result = aggregate(0) {
             when {
                 condition1 -> neighboringViaExchange("test")
                 else -> when {
