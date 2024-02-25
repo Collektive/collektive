@@ -17,7 +17,7 @@ import java.nio.file.StandardOpenOption.APPEND
 import java.nio.file.StandardOpenOption.CREATE
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.SortedMap
 import kotlin.io.path.Path
 
 /**
@@ -27,16 +27,25 @@ fun main() {
     val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")
     val startedAt = LocalDateTime.now().format(formatter)
     val store: MutableMap<SimulationType, Results> = mutableMapOf()
-    val incarnations = listOf("collektive", "scafi", "protelis")
-    val tests = listOf("fieldEvolution", "neighborCounter", "branching", "gradient", "channelWithObstacles")
-        .flatMap { t -> incarnations.map { i -> i to t } }
+    val incarnations = listOf(
+        "scafi",
+        "protelis",
+        "collektive",
+    )
+    val tests = listOf(
+        "fieldEvolution",
+        "neighborCounter",
+        "branching",
+        "gradient",
+        "channelWithObstacles",
+    ).flatMap { t -> incarnations.map { i -> i to t } }
 
-    listOf(100.0, 1_000.0).forEach { simulationTime ->
+    listOf(100, 1_000).forEach { simulationTime ->
         repeat(3) { i ->
             tests.map { (incarnation, testType) ->
                 val experiment = incarnation to testType
                 val simulation = loadYamlSimulation<Any?, Euclidean2DPosition>("yaml/$incarnation/$testType.yml")
-                simulation.environment.addTerminator(AfterTime(DoubleTime(simulationTime)))
+                simulation.environment.addTerminator(AfterTime(DoubleTime(simulationTime.toDouble())))
                 Thread.sleep(1000)
 
                 val startTime = System.currentTimeMillis()
@@ -58,7 +67,7 @@ fun main() {
         val averageStore = store.entries.groupBy { it.key.incarnation to it.key.testType }.mapValues { (_, res) ->
             (res.sumOf { it.value.duration } / res.size).toDouble()
         }
-        generateFiles(sortedStore, averageStore, simulationTime, startedAt, finishedAt)
+        generateFiles(sortedStore, averageStore, simulationTime.toDouble(), startedAt, finishedAt)
     }
 }
 
