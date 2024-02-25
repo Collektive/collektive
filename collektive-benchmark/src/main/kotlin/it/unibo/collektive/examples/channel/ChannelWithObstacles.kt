@@ -6,7 +6,6 @@ import it.unibo.collektive.alchemist.device.sensors.DistanceSensor
 import it.unibo.collektive.alchemist.device.sensors.LocalSensing
 import it.unibo.collektive.examples.gradient.gradient
 import it.unibo.collektive.field.Field.Companion.fold
-import it.unibo.collektive.field.plus
 import kotlin.Double.Companion.POSITIVE_INFINITY
 
 /**
@@ -24,8 +23,13 @@ fun Aggregate<Int>.channelWithObstacles(): Any =
  * Compute the channel between the [source] and the [target] with a specific [channelWidth].
  */
 context(DistanceSensor)
-fun Aggregate<Int>.channel(source: Boolean, target: Boolean, channelWidth: Double): Boolean =
-    gradient(source) + gradient(target) <= distanceBetween(source, target) + channelWidth
+fun Aggregate<Int>.channel(source: Boolean, destination: Boolean, channelWidth: Double): Boolean {
+    val distancesToSource = gradient(source)
+    val distanceToDestination = gradient(destination)
+    val dBetween = distanceBetween(source, destination)
+    return !((distancesToSource + distanceToDestination).isInfinite() && dBetween.isInfinite()) &&
+        distancesToSource + distanceToDestination <= dBetween + channelWidth
+}
 
 /**
  * Compute the distance between the [source] and the [target].
