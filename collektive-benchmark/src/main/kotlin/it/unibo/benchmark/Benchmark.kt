@@ -39,9 +39,9 @@ fun main() {
         "channelWithObstacles",
     ).flatMap { t -> incarnations.map { i -> i to t } }
 
-    listOf(100, 1000).forEach { simulationTime ->
+    listOf(100).forEach { simulationTime ->
         val startedAt = LocalDateTime.now().format(formatter)
-        repeat(10) { i ->
+        repeat(1) { i ->
             tests.map { (incarnation, testType) ->
                 val experiment = incarnation to testType
                 val simulation = loadYamlSimulation<Any?, Euclidean2DPosition>("yaml/$incarnation/$testType.yml")
@@ -100,13 +100,17 @@ private fun SortedMap<SimulationType, Results>.toTxt(
     val file = File(path.toString())
     println(path.toString())
     if (!file.exists()) file.createNewFile()
+    val stringBuilder = StringBuilder()
+
+    stringBuilder.append("Test started at: $startedAt - Finished at $finishedAt\n")
+        .append("Results for simulation time $simulationTime s:\n")
+        .append(this.entries.joinToString("\n") { "${it.key} ${it.value}" })
+        .append("\nAverage:\n")
+        .append(average.entries.joinToString("\n") { "${it.key} ${it.value}" })
+
     Files.write(
         Paths.get(path.toString()),
-        (
-            "Test started at: $startedAt - Finished at $finishedAt\n" +
-                "Results for simulation time $simulationTime s:${this.map { "\n$it" }}\n" +
-                "Average:${average.map { "\n$it" }}\n"
-            ).toByteArray(),
+        stringBuilder.toString().toByteArray(),
         if (file.exists()) APPEND else CREATE,
     )
 }
