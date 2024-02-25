@@ -39,9 +39,9 @@ fun main() {
         "channelWithObstacles",
     ).flatMap { t -> incarnations.map { i -> i to t } }
 
-    listOf(100).forEach { simulationTime ->
+    listOf(100, 1000).forEach { simulationTime ->
         val startedAt = LocalDateTime.now().format(formatter)
-        repeat(1) { i ->
+        repeat(10) { i ->
             tests.map { (incarnation, testType) ->
                 val experiment = incarnation to testType
                 val simulation = loadYamlSimulation<Any?, Euclidean2DPosition>("yaml/$incarnation/$testType.yml")
@@ -98,7 +98,6 @@ private fun SortedMap<SimulationType, Results>.toTxt(
     finishedAt: String,
 ) {
     val file = File(path.toString())
-    println(path.toString())
     if (!file.exists()) file.createNewFile()
     val stringBuilder = StringBuilder()
 
