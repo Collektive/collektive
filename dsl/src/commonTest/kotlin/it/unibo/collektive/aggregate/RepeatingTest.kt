@@ -8,9 +8,6 @@ import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
-import it.unibo.collektive.path.Path
-import it.unibo.collektive.path.PathSummary
-import it.unibo.collektive.path.impl.IdentityPathSummary
 
 class RepeatingTest : StringSpec({
     val id0 = 0
@@ -18,10 +15,9 @@ class RepeatingTest : StringSpec({
 
     val double: (Int) -> Int = { it * 2 }
     val initV1 = 1
-    val pathRepresentation: (Path) -> PathSummary = { IdentityPathSummary(it) }
 
     "First time repeating" {
-        aggregate(id0, pathRepresentation) {
+        aggregate(id0) {
             repeat(initV1, double) shouldBe 2
         }
     }
@@ -30,7 +26,7 @@ class RepeatingTest : StringSpec({
         var res = 0
 
         val testNetwork = NetworkImplTest(NetworkManager(), id1)
-        aggregate(id1, pathRepresentation, testNetwork) {
+        aggregate(id1, testNetwork) {
             res = repeat(initV1, double)
             res = repeat(res, double)
         }
@@ -39,26 +35,26 @@ class RepeatingTest : StringSpec({
 
     "Repeat with lambda body should work fine" {
         val testNetwork = NetworkImplTest(NetworkManager(), id1)
-        aggregate(id1, pathRepresentation, testNetwork) {
+        aggregate(id1, testNetwork) {
             repeat(initV1) { it * 2 } shouldBe 2
         }
     }
 
     "Repeating should return the value passed in the yielding function" {
-        val result = aggregate(id1, pathRepresentation) {
+        val result = aggregate(id1) {
             repeating(initV1) {
                 val nbr = neighboringViaExchange(it * 2).localValue
                 nbr.yielding { "A string" }
             } shouldBe "A string"
         }
-        val messages = result.toSend.messagesFor(id0)
+        val messages = result.toSend.messagesFor(id1)
         messages shouldHaveSize 1
         messages.values shouldContainAll listOf(2)
     }
 
     "Repeating should work fine even with null as value" {
         val testNetwork1 = NetworkImplTest(NetworkManager(), id1)
-        aggregate(id1, pathRepresentation, testNetwork1) {
+        aggregate(id1, testNetwork1) {
             repeating(initV1) {
                 val mult = it * 2
                 mult.yielding { "Hello".takeIf { mult < 1 } }

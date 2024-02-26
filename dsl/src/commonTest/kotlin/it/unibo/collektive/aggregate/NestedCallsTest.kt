@@ -10,12 +10,8 @@ import it.unibo.collektive.field.min
 import it.unibo.collektive.field.plus
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
-import it.unibo.collektive.path.Path
-import it.unibo.collektive.path.PathSummary
-import it.unibo.collektive.path.impl.IdentityPathSummary
 
 class NestedCallsTest : StringSpec({
-    val pathRepresentation: (Path) -> PathSummary = { IdentityPathSummary(it) }
     fun Aggregate<Int>.foo(id: Int) = neighboringViaExchange(id.toDouble())
 
     fun Aggregate<Int>.bar(): Double {
@@ -32,11 +28,10 @@ class NestedCallsTest : StringSpec({
         val network0 = NetworkImplTest(networkManager, 0)
         val network1 = NetworkImplTest(networkManager, 1)
 
-        val collektiveDevice0 = Collektive(0, pathRepresentation, network0) { bar() }
+        val collektiveDevice0 = Collektive(0, network0) { bar() }
         collektiveDevice0.cycle() shouldBe 0
 
-        val collektiveDevice1 = Collektive(1, pathRepresentation, network1) { bar() }
-        println(network1.read())
+        val collektiveDevice1 = Collektive(1, network1) { bar() }
         collektiveDevice1.cycle() shouldBe Double.POSITIVE_INFINITY
     }
 })

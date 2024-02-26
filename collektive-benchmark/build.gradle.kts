@@ -3,7 +3,16 @@ import java.io.ByteArrayOutputStream
 import java.util.Locale
 
 apply(plugin = libs.plugins.kotlin.jvm.id)
-apply<ScalaPlugin>()
+
+plugins {
+    alias(libs.plugins.multiJvmTesting)
+    alias(libs.plugins.taskTree)
+    scala
+}
+
+multiJvm {
+    jvmVersionForCompilation.set(17)
+}
 
 kotlinJvm {
     sourceSets {
@@ -16,11 +25,6 @@ kotlinJvm {
                 implementation(libs.bundles.alchemist)
                 implementation(libs.caffeine)
                 implementation(libs.scala)
-            }
-        }
-        val test by getting {
-            dependencies {
-                implementation(rootProject.libs.kotest.runner.junit5.jvm)
             }
         }
     }
@@ -68,7 +72,7 @@ fun String.capitalizeString(): String =
 
 val incarnations = listOf("collektive", "protelis", "scafi")
 incarnations.forEach { incarnation ->
-    File(rootProject.rootDir.path + "/src/main/resources/yaml/$incarnation").listFiles()
+    File(rootProject.rootDir.path + "/collektive-benchmark/src/main/resources/yaml/$incarnation").listFiles()
         ?.filter { it.extension == "yml" }
         ?.sortedBy { it.nameWithoutExtension }
         ?.forEach {
@@ -78,7 +82,7 @@ incarnations.forEach { incarnation ->
             ) = tasks.register<JavaExec>(name) {
                 description = "Launches graphic simulation ${it.nameWithoutExtension} with Collektive incarnation"
                 mainClass.set("it.unibo.alchemist.Alchemist")
-//                classpath = sourceSets["main"].runtimeClasspath
+                classpath = sourceSets["main"].runtimeClasspath
                 args("run", it.absolutePath)
                 if (System.getenv("CI") == "true") {
                     args("--override", "terminate: { type: AfterTime, parameters: [2] } ")
@@ -115,5 +119,5 @@ tasks.register<JavaExec>("runBenchmark") {
     group = "Run Benchmark"
     description = "Launches benchmarks for Collektive, ScaFi and Protelis"
     mainClass.set("it.unibo.benchmark.BenchmarkKt")
-//    classpath = sourceSets["main"].runtimeClasspath
+    classpath = sourceSets["main"].runtimeClasspath
 }

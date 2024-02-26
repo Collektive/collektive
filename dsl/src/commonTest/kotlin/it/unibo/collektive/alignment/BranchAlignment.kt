@@ -1,8 +1,7 @@
 package it.unibo.collektive.alignment
 
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.collections.shouldContainAll
-import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate
@@ -13,16 +12,12 @@ import it.unibo.collektive.field.minus
 import it.unibo.collektive.field.plus
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
-import it.unibo.collektive.path.Path
-import it.unibo.collektive.path.PathSummary
-import it.unibo.collektive.path.impl.IdentityPathSummary
 
 class BranchAlignment : StringSpec({
     val id0 = 0
-    val pathRepresentation: (Path) -> PathSummary = { IdentityPathSummary(it) }
 
     "Branch alignment should work in nested functions" {
-        val result = aggregate(id0, pathRepresentation) {
+        val result = aggregate(id0) {
             val condition = true
 
             fun test() {
@@ -36,11 +31,12 @@ class BranchAlignment : StringSpec({
                 test2()
             }
         }
-        result.toSend.messages.keys shouldHaveSize 1 // 1 path of alignment
-        result.toSend.messages.values.map { it.default } shouldContainAll listOf("test")
+        val messageFor1 = result.toSend.messagesFor(id0)
+        messageFor1 shouldHaveSize 1 // 1 path of alignment
+        messageFor1.values.toList() shouldBe listOf("test")
     }
     "Branch alignment should not occur in non aggregate context" {
-        val result = aggregate(id0, pathRepresentation) {
+        val result = aggregate(id0) {
             val condition = true
 
             fun test(): String = "hello"
@@ -52,14 +48,14 @@ class BranchAlignment : StringSpec({
                 test2()
             }
         }
-        result.toSend.messages.keys shouldHaveSize 0 // 0 path of alignment
+        result.toSend.messagesFor(id0) shouldHaveSize 0 // 0 path of alignment
     }
     "A field should be projected when used in a body of a branch condition (issue #171)" {
         val nm = NetworkManager()
         (0..2)
             .map { NetworkImplTest(nm, it) to it }
             .map { (net, id) ->
-                aggregate(id, pathRepresentation, net) {
+                aggregate(id, net) {
                     val outerField = neighboringViaExchange(0)
                     outerField.neighborsCount shouldBe id
                     if (id % 2 == 0) {
@@ -79,7 +75,7 @@ class BranchAlignment : StringSpec({
         (0..2)
             .map { NetworkImplTest(nm, it) to it }
             .map { (net, id) ->
-                aggregate(id, pathRepresentation, net) {
+                aggregate(id, net) {
                     exchange(0) { body(it) }
                 }
             }

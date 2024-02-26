@@ -50,11 +50,9 @@ class CollektiveDevice<P>(
         }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T> sense(name: String): T {
-        node.getConcentration(SimpleMolecule(name)).let { concentration ->
-            return concentration as T
-        }
-    }
+    override fun <T> sense(name: String): T = node.getConcentration(SimpleMolecule(name)) as T
+
+    override fun <T> senseOrElse(name: String, default: T): T = sense(name) ?: default
 
     override fun cloneOnNewNode(node: Node<Any?>): NodeProperty<Any?> =
         CollektiveDevice(environment, node, retainMessagesFor)

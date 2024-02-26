@@ -6,12 +6,12 @@
     "red": {
       "max": 255,
       "min": 0,
-      "val": 255
+      "val": 0
     },
     "blue": {
       "max": 255,
       "min": 0,
-      "val": 0
+      "val": 255
     },
     "green": {
       "max": 255,
@@ -31,7 +31,7 @@
     "size": {
       "max": 100,
       "min": 0,
-      "val": 16
+      "val": 4
     },
     "molFilter": false,
     "molString": "",
@@ -56,7 +56,7 @@
       "val": 10
     },
     "colorCache": {
-      "value": -65536
+      "value": -16776961
     }
   },
   {
@@ -91,10 +91,10 @@
     "size": {
       "max": 100,
       "min": 0,
-      "val": 20
+      "val": 10
     },
     "molFilter": true,
-    "molString": "channelEntrypoint",
+    "molString": "channelWithObstacles",
     "molPropertyFilter": true,
     "property": "if (it \u003d\u003d true) 1 else 0",
     "writingPropertyValue": false,
@@ -122,16 +122,16 @@
   {
     "type": "class it.unibo.alchemist.boundary.gui.effects.DrawShape",
     "curIncarnation": "collektive",
-    "mode": "FILL_ELLIPSE",
+    "mode": "FILL_RECTANGLE",
     "red": {
       "max": 255,
       "min": 0,
-      "val": 0
+      "val": 255
     },
     "blue": {
       "max": 255,
       "min": 0,
-      "val": 255
+      "val": 0
     },
     "green": {
       "max": 255,
@@ -151,12 +151,12 @@
     "size": {
       "max": 100,
       "min": 0,
-      "val": 30
+      "val": 23
     },
     "molFilter": true,
-    "molString": "source",
+    "molString": "obstacle",
     "molPropertyFilter": true,
-    "property": "if (it \u003d\u003d \"true\") 1 else 0",
+    "property": "if (it \u003d\u003d true) 1 else 0",
     "writingPropertyValue": false,
     "c": "ALPHA",
     "reverse": false,
@@ -176,7 +176,7 @@
       "val": 1
     },
     "colorCache": {
-      "value": -16776961
+      "value": -65536
     }
   },
   {
@@ -214,9 +214,9 @@
       "val": 30
     },
     "molFilter": true,
-    "molString": "destination",
+    "molString": "target",
     "molPropertyFilter": true,
-    "property": "if (it \u003d\u003d \"true\") 1 else 0",
+    "property": "if (it \u003d\u003d true) 1 else 0",
     "writingPropertyValue": false,
     "c": "ALPHA",
     "reverse": false,
@@ -237,6 +237,66 @@
     },
     "colorCache": {
       "value": -16711681
+    }
+  },
+  {
+    "type": "class it.unibo.alchemist.boundary.gui.effects.DrawShape",
+    "curIncarnation": "collektive",
+    "mode": "FILL_RECTANGLE",
+    "red": {
+      "max": 255,
+      "min": 0,
+      "val": 255
+    },
+    "blue": {
+      "max": 255,
+      "min": 0,
+      "val": 0
+    },
+    "green": {
+      "max": 255,
+      "min": 0,
+      "val": 255
+    },
+    "alpha": {
+      "max": 255,
+      "min": 0,
+      "val": 255
+    },
+    "scaleFactor": {
+      "max": 100,
+      "min": 0,
+      "val": 50
+    },
+    "size": {
+      "max": 100,
+      "min": 0,
+      "val": 22
+    },
+    "molFilter": true,
+    "molString": "source",
+    "molPropertyFilter": true,
+    "property": "if (it \u003d\u003d true) 1 else 0",
+    "writingPropertyValue": false,
+    "c": "ALPHA",
+    "reverse": false,
+    "propoom": {
+      "max": 10,
+      "min": -10,
+      "val": -1
+    },
+    "minprop": {
+      "max": 10,
+      "min": -10,
+      "val": 0
+    },
+    "maxprop": {
+      "max": 10,
+      "min": -10,
+      "val": 10
+    },
+    "colorCache": {
+      "value": -256
     }
   }
 ]

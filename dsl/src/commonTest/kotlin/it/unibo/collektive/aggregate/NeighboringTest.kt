@@ -7,9 +7,6 @@ import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
-import it.unibo.collektive.path.Path
-import it.unibo.collektive.path.PathSummary
-import it.unibo.collektive.path.impl.IdentityPathSummary
 
 class NeighboringTest : StringSpec({
     // device ids
@@ -24,10 +21,9 @@ class NeighboringTest : StringSpec({
     val initV3 = 3
     val double: (Int) -> Int = { it * 2 }
     val add: (Int) -> Int = { it + 1 }
-    val pathRepresentation: (Path) -> PathSummary = { IdentityPathSummary(it) }
 
     "Neighboring without messages" {
-        aggregate(id0, pathRepresentation) {
+        aggregate(id0) {
             val field = neighboringViaExchange(initV1)
             field.toMap() shouldContainValue initV1
         }
@@ -38,14 +34,14 @@ class NeighboringTest : StringSpec({
 
         // Device 1
         val testNetwork1 = NetworkImplTest(nm, id1)
-        aggregate(id1, pathRepresentation, testNetwork1) {
+        aggregate(id1, testNetwork1) {
             val field = neighboringViaExchange(double(initV1))
             field.toMap() shouldContainValue 2
         }
 
         // Device 2
         val testNetwork2 = NetworkImplTest(nm, id2)
-        aggregate(id2, pathRepresentation, testNetwork2) {
+        aggregate(id2, testNetwork2) {
             val field = neighboringViaExchange(double(initV2))
             field.toMap() shouldContainValue 2
             field.toMap() shouldContainValue 4
@@ -53,7 +49,7 @@ class NeighboringTest : StringSpec({
 
         // Device 3
         val testNetwork3 = NetworkImplTest(nm, id3)
-        aggregate(id3, pathRepresentation, testNetwork3) {
+        aggregate(id3, testNetwork3) {
             val field = neighboringViaExchange(double(initV3))
             field.toMap() shouldContainValue 4
             field.toMap() shouldContainValue 6
@@ -66,7 +62,7 @@ class NeighboringTest : StringSpec({
         // Device 1
         val isDeviceOneKing = true
         val testNetwork1 = NetworkImplTest(nm, id1)
-        aggregate(id1, pathRepresentation, testNetwork1) {
+        aggregate(id1, testNetwork1) {
             fun kingBehaviour() = neighboringViaExchange(double(initV2))
 
             fun queenBehaviour() = neighboringViaExchange(add(initV1))
@@ -77,7 +73,7 @@ class NeighboringTest : StringSpec({
         // Device 2
         val isDeviceTwoKing = false
         val testNetwork2 = NetworkImplTest(nm, id2)
-        aggregate(id2, pathRepresentation, testNetwork2) {
+        aggregate(id2, testNetwork2) {
             fun kingBehaviour() = neighboringViaExchange(double(initV1))
 
             fun queenBehaviour() = neighboringViaExchange(add(initV2))

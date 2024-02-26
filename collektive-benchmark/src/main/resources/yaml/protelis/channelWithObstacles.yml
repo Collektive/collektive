@@ -14,7 +14,7 @@ _pool: &program
 
 deployments:
   - type: Grid
-    parameters: [ 0, 0, 200, 200, 7, 7]
+    parameters: [ 0, 0, 200, 200, 7, 7, 1, 1]
     programs:
       - *program
     contents:
@@ -24,10 +24,10 @@ deployments:
         concentration: false
       - molecule: target
         concentration: false
-      - in: { type: Rectangle, parameters: [ 84, 36, 10, 170 ] }
+      - in: { type: Rectangle, parameters: [ 83, 36, 10, 170 ] }
         molecule: obstacle
         concentration: true
-      - in: { type: Rectangle, parameters: [ 0, 103, 170, 10 ] }
+      - in: { type: Rectangle, parameters: [ 1, 103, 170, 10 ] }
         molecule: obstacle
         concentration: true
   - type: Point

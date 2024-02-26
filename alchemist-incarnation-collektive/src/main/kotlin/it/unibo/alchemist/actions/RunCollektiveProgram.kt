@@ -12,8 +12,6 @@ import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.collektive.Collektive
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.alchemist.device.CollektiveDevice
-import it.unibo.collektive.path.Path
-import it.unibo.collektive.path.PathSummary
 import kotlin.reflect.jvm.kotlinFunction
 
 /**
@@ -40,8 +38,6 @@ class RunCollektiveProgram<P : Position<P>>(
     private val method = classNameFoo.methods.find { it.name == methodName }
         ?: error("Method $additionalParameters not found")
 
-    private val pathRepresentation: (Path) -> PathSummary = { it }
-
     init {
         declareDependencyTo(programIdentifier)
         val parameters = method.parameters.map { param ->
@@ -52,7 +48,7 @@ class RunCollektiveProgram<P : Position<P>>(
             }
         }
         val function = method.kotlinFunction ?: error("No aggregate function found for $programIdentifier")
-        val collektive = Collektive(localDevice.id, pathRepresentation, localDevice) {
+        val collektive = Collektive(localDevice.id, localDevice) {
             function.call(*parameters.map { if (it == AggregatePlaceHolder) this else it }.toTypedArray())
         }
         run = { collektive.cycle() }

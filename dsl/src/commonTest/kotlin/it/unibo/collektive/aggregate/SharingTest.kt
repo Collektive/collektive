@@ -10,16 +10,12 @@ import it.unibo.collektive.field.max
 import it.unibo.collektive.field.min
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
-import it.unibo.collektive.path.Path
-import it.unibo.collektive.path.PathSummary
-import it.unibo.collektive.path.impl.IdentityPathSummary
 
 class SharingTest : StringSpec({
     val findMax: (Field<*, Int>) -> Int = { e -> e.max(e.localValue) }
-    val pathRepresentation: (Path) -> PathSummary = { IdentityPathSummary(it) }
 
     "first time sharing" {
-        aggregate(0, pathRepresentation) {
+        aggregate(0) {
             val res = share(1, findMax)
             res shouldBe 1
         }
@@ -30,7 +26,7 @@ class SharingTest : StringSpec({
 
         // Device 1
         val testNetwork1 = NetworkImplTest(nm, 1)
-        aggregate(1, pathRepresentation, testNetwork1) {
+        aggregate(1, testNetwork1) {
             val r1 = share(1, findMax)
             val r2 = share(2, findMax)
             val r3 = share(10, findMax)
@@ -41,7 +37,7 @@ class SharingTest : StringSpec({
 
         // Device 2
         val testNetwork2 = NetworkImplTest(nm, 2)
-        aggregate(2, pathRepresentation, testNetwork2) {
+        aggregate(2, testNetwork2) {
             val r1 = share(2, findMax)
             val r2 = share(7, findMax)
             val r3 = share(4, findMax)
@@ -52,7 +48,7 @@ class SharingTest : StringSpec({
 
         // Device 3
         val testNetwork3 = NetworkImplTest(nm, 3)
-        aggregate(3, pathRepresentation, testNetwork3) {
+        aggregate(3, testNetwork3) {
             val r1 = share(5, findMax)
             val r2 = share(1, findMax)
             val r3 = share(3, findMax)
@@ -65,7 +61,7 @@ class SharingTest : StringSpec({
     "Share with lambda body should work fine" {
         val testNetwork = NetworkImplTest(NetworkManager(), 1)
 
-        aggregate(1, pathRepresentation, testNetwork) {
+        aggregate(1, testNetwork) {
             val res = share(1) {
                 it.max(it.localValue)
             }
@@ -76,7 +72,7 @@ class SharingTest : StringSpec({
     "Sharing should return the value passed in the yielding function" {
         val testNetwork = NetworkImplTest(NetworkManager(), 1)
 
-        aggregate(1, pathRepresentation, testNetwork) {
+        aggregate(1, testNetwork) {
             val res = sharing(1) {
                 val min = it.max(it.localValue)
                 min.yielding { "A string" }
@@ -88,7 +84,7 @@ class SharingTest : StringSpec({
     "Sharing should work fine even with null as value" {
         val testNetwork = NetworkImplTest(NetworkManager(), 1)
 
-        aggregate(1, pathRepresentation, testNetwork) {
+        aggregate(1, testNetwork) {
             val res = sharing(1) {
                 val min = it.min(it.localValue)
                 min.yielding { "Hello".takeIf { min > 1 } }

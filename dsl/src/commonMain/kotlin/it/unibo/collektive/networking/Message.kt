@@ -1,7 +1,6 @@
 package it.unibo.collektive.networking
 
 import it.unibo.collektive.path.Path
-import it.unibo.collektive.path.PathSummary
 
 /**
  * Types of messages.
@@ -11,18 +10,21 @@ sealed interface Message
 /**
  * [messages] received by a node from [senderId].
  */
-data class InboundMessage<ID : Any>(val senderId: ID, val messages: Map<PathSummary, *>) : Message
+data class InboundMessage<ID : Any>(val senderId: ID, val messages: Map<Path, *>) : Message
 
 /**
- * An [OutboundMessage] are messages that a device [senderId] sends to all other neighbors.
+ * An [OutboundMessage] are messages that a device [senderId] sends to all other neighbours.
  */
 class OutboundMessage<ID : Any>(
     expectedSize: Int,
     val senderId: ID,
 ) : Message {
 
-    private val overrides: MutableMap<ID, MutableList<Pair<PathSummary, Any?>>> = LinkedHashMap(expectedSize * 2)
-    private val defaults: MutableMap<PathSummary, Any?> = LinkedHashMap(expectedSize * 2)
+    /**
+     * The default messages to be sent to all neighbours.
+     */
+    val defaults: MutableMap<Path, Any?> = LinkedHashMap(expectedSize * 2)
+    private val overrides: MutableMap<ID, MutableList<Pair<Path, Any?>>> = LinkedHashMap(expectedSize * 2)
 
     /**
      * Check if the [OutboundMessage] is empty.
@@ -37,7 +39,7 @@ class OutboundMessage<ID : Any>(
     /**
      * Returns the messages for device [id].
      */
-    fun messagesFor(id: ID): Map<PathSummary, *> = LinkedHashMap<PathSummary, Any?>(
+    fun messagesFor(id: ID): Map<Path, *> = LinkedHashMap<Path, Any?>(
         defaults.size + overrides.size,
         1.0f,
     ).also { result ->
@@ -48,7 +50,7 @@ class OutboundMessage<ID : Any>(
     /**
      * Add a [message] to the [OutboundMessage].
      */
-    fun addMessage(path: PathSummary, message: SingleOutboundMessage<ID, *>) {
+    fun addMessage(path: Path, message: SingleOutboundMessage<ID, *>) {
         check(!defaults.containsKey(path)) {
             """
             Aggregate alignment clash by multiple aligned calls originated at the same path: $path.
@@ -67,6 +69,6 @@ class OutboundMessage<ID : Any>(
 /**
  * A [SingleOutboundMessage] contains the values associated to a [Path] in the messages of [OutboundMessage].
  * Has a [default] value that is sent regardless the awareness the device's neighbours, [overrides] specifies the
- * payload depending on the neighbours values.
+ * payload depending on the neighbours' values.
  */
 data class SingleOutboundMessage<ID : Any, Payload>(val default: Payload, val overrides: Map<ID, Payload> = emptyMap())

@@ -1,50 +1,48 @@
 package it.unibo.collektive.branch
 
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
-import it.unibo.collektive.path.Path
-import it.unibo.collektive.path.PathSummary
-import it.unibo.collektive.path.impl.IdentityPathSummary
 
 class WhenTest : StringSpec({
     val id0 = 0
-    val pathRepresentation: (Path) -> PathSummary = { IdentityPathSummary(it) }
 
     "When in single expression" {
         val condition = true
         val x = if (condition) "hello" else 123
         val result =
-            aggregate(id0, pathRepresentation) {
+            aggregate(id0) {
                 when (x) {
                     is String -> neighboringViaExchange("string")
                     else -> neighboringViaExchange("test")
                 }
             }
-        result.toSend.messages.keys.size shouldBe 1
-        result.toSend.messages.values.map { it.default } shouldContainAll listOf("string")
+        val messageFor0 = result.toSend.messagesFor(id0)
+        messageFor0 shouldHaveSize 1
+        messageFor0.values.toList() shouldBe listOf("string")
     }
 
     "When in single expression in else case" {
         val condition = false
         val x = if (condition) "hello" else 123
         val result =
-            aggregate(id0, pathRepresentation) {
+            aggregate(id0) {
                 when (x) {
                     is String -> neighboringViaExchange("string")
                     else -> neighboringViaExchange("test")
                 }
             }
-        result.toSend.messages.keys.size shouldBe 1
-        result.toSend.messages.values.map { it.default } shouldContainAll listOf("test")
+        val messageFor0 = result.toSend.messagesFor(id0)
+        messageFor0 shouldHaveSize 1
+        messageFor0.values.toList() shouldBe listOf("test")
     }
 
     "When with nested function" {
         val condition = true
         val x = if (condition) "hello" else 123
-        val result = aggregate(id0, pathRepresentation) {
+        val result = aggregate(id0) {
             fun test() {
                 neighboringViaExchange("test")
             }
@@ -57,13 +55,14 @@ class WhenTest : StringSpec({
                 else -> test()
             }
         }
-        result.toSend.messages.keys.size shouldBe 1
-        result.toSend.messages.values.map { it.default } shouldContainAll listOf("test2")
+        val messageFor0 = result.toSend.messagesFor(id0)
+        messageFor0 shouldHaveSize 1
+        messageFor0.values.toList() shouldBe listOf("test2")
     }
     "Nested when condition must be aligned" {
         val condition1 = false
         val condition2 = true
-        val res = aggregate(0, pathRepresentation) {
+        val result = aggregate(0) {
             when {
                 condition1 -> neighboringViaExchange("test")
                 else -> when {
@@ -72,7 +71,8 @@ class WhenTest : StringSpec({
                 }
             }
         }
-        res.toSend.messages.keys.size shouldBe 1
-        res.toSend.messages.values.map { it.default } shouldContainAll listOf("test2")
+        val messageFor0 = result.toSend.messagesFor(id0)
+        messageFor0 shouldHaveSize 1
+        messageFor0.values.toList() shouldBe listOf("test2")
     }
 })
