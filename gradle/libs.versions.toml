@@ -9,7 +9,7 @@ kotlin = "1.9.22"
 [libraries]
 alchemist-api = { module = "it.unibo.alchemist:alchemist-api", version.ref = "alchemist" }
 alchemist = { module = "it.unibo.alchemist:alchemist", version.ref = "alchemist" }
-arrow = "io.arrow-kt:arrow-core:1.2.2"
+arrow = "io.arrow-kt:arrow-core:1.2.3"
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-framework-datatest = { module = "io.kotest:kotest-framework-datatest", version.ref = "kotest" }
