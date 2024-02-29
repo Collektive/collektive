@@ -8,9 +8,12 @@ import kotlin.reflect.jvm.kotlinFunction
 
 internal fun entrypointStyleSelector(entrypoint: String): EntrypointStyle? {
     val fqnRegex = "^(?:\\w+\\.)+\\w+\$".toRegex()
-    val inlineRegex = "\\{\\s*name=(.*?),\\s*code=(.*?),\\s*entrypoint=(.*?)\\s*}".toRegex()
-    val sourceRegex =
-        "\\{\\s*name=(.*?),\\s*source-sets=\\[(.*?)],\\s*code=(.*?),\\s*entrypoint=(.*?)\\s*}".toRegex()
+    val inlineRegex =
+        Regex("\\{\\s*name=(.*?),\\s*code=(.*?),\\s*entrypoint=(.*?)\\s*}", RegexOption.DOT_MATCHES_ALL)
+    val sourceRegex = Regex(
+        "\\{\\s*name=(.*?),\\s*source-sets=\\[(.*?)],\\s*code=(.*?),\\s*entrypoint=(.*?)\\s*}",
+        RegexOption.DOT_MATCHES_ALL,
+    )
 
     return when {
         fqnRegex.matches(entrypoint) -> LoadFromEntrypoint(entrypoint)
