@@ -1,6 +1,11 @@
 package it.unibo.alchemist.actions
 
 import it.unibo.alchemist.collektive.device.CollektiveDevice
+import it.unibo.alchemist.collektive.loading.LoadFromEntrypoint
+import it.unibo.alchemist.collektive.loading.LoadFromInline
+import it.unibo.alchemist.collektive.loading.LoadFromSource
+import it.unibo.alchemist.collektive.loading.entrypointFromRunProgram
+import it.unibo.alchemist.collektive.loading.entrypointStyleSelector
 import it.unibo.alchemist.model.Action
 import it.unibo.alchemist.model.Context
 import it.unibo.alchemist.model.Node
@@ -11,7 +16,6 @@ import it.unibo.alchemist.model.actions.AbstractAction
 import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.collektive.Collektive
 import it.unibo.collektive.aggregate.api.Aggregate
-import kotlin.reflect.jvm.kotlinFunction
 
 /**
  * An Alchemist [Action] that runs a [Collektive] program.
@@ -66,29 +70,12 @@ class RunCollektiveProgram<P : Position<P>>(
         private fun <P : Position<P>> findEntrypoint(
             entrypoint: String,
             localDevice: CollektiveDevice<P>,
-        ): context(CollektiveDevice<P>) Aggregate<Int>.() -> Any? {
-            val className = entrypoint.substringBeforeLast(".")
-            val methodName = entrypoint.substringAfterLast(".")
-            val clazz = Class.forName(className)
-            val method = clazz.methods.find { it.name == methodName }
-                ?: error("Entrypoint $entrypoint not found, no method $methodName found in class $className")
-            val ktfunction = checkNotNull(method.kotlinFunction) {
-                "Method $methodName in class $className cannot be converted to a Kotlin function"
+        ): context(CollektiveDevice<P>) Aggregate<Int>.() -> Any? =
+            when (val style = entrypointStyleSelector(entrypoint)) {
+                is LoadFromEntrypoint -> entrypointFromRunProgram(style.entrypoint, localDevice)
+                is LoadFromInline -> TODO()
+                is LoadFromSource -> TODO()
+                null -> error("Unsupported entrypoint style for $entrypoint")
             }
-            var parameters: Array<Any?> = emptyArray()
-            return {
-                if (parameters.isEmpty()) {
-                    parameters = method.parameters.map {
-                        when {
-                            it.type.isAssignableFrom(Aggregate::class.java) -> this
-                            it.type.isAssignableFrom(CollektiveDevice::class.java) -> localDevice
-                            it.type.isAssignableFrom(Node::class.java) -> localDevice.node
-                            else -> error("Unsupported type ${it.type} in entrypoint $entrypoint")
-                        }
-                    }.toTypedArray()
-                }
-                ktfunction.call(*parameters)
-            }
-        }
     }
 }
