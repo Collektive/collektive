@@ -117,7 +117,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
                 |@file:JvmName("$className")
                 |${code.replace("\n", "\n|")}
                 |context(CollektiveDevice<P>)
-                |fun Aggregate<Int>.$name() = $entrypoint
+                |fun <P : Position<P>> Aggregate<Int>.$name() = $entrypoint
                 """.trimMargin(),
             )
             val outputFolder = compilationFolderCache.get(name)
@@ -245,7 +245,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
          * Convert the source set to a list of files.
          */
         private fun Any?.toFiles(): List<File> = when (this) {
-            null -> emptyList() //error("Null Collektive source set provided")
+            null -> emptyList()
             is File -> listOf(this)
             is CharSequence -> {
                 val file = File(toString())

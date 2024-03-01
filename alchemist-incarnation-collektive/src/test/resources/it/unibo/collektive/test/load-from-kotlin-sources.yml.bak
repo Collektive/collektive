@@ -1,6 +1,6 @@
 network-model:
   type: ConnectWithinDistance
-  parameters: [5]
+  parameters: [ 5 ]
 
 incarnation: collektive
 
@@ -9,22 +9,22 @@ _pool: &program
     program:
       name: Gradient
       source-sets:
-        - kotlin
+        - src/test/resources/it/unibo/collektive/test/kotlin
       code: |
-        package some.package
-        import my.package.*
+        package some.pkg
+        import my.pkg.*
       entrypoint: gradient(localId == 0)
 
 deployments:
   - type: Rectangle
-    parameters: [200, 0, 0, 20, 20]
+    parameters: [ 200, 0, 0, 20, 20 ]
     programs:
       - *program
     contents:
       - molecule: source
         concentration: false
   - type: Point
-    parameters: [2, 2]
+    parameters: [ 2, 2 ]
     programs:
       - *program
     contents:
