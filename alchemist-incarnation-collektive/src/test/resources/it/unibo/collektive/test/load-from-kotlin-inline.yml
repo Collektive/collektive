@@ -10,6 +10,8 @@ _pool: &program
       name: Gradient
       code: |
         package my.test
+        import it.unibo.alchemist.model.Position
+        import it.unibo.alchemist.collektive.device.CollektiveDevice
         
         import it.unibo.alchemist.collektive.device.DistanceSensor
         import it.unibo.collektive.aggregate.api.Aggregate
@@ -18,7 +20,7 @@ _pool: &program
         import kotlin.Double.Companion.POSITIVE_INFINITY
         
         context(DistanceSensor)
-        fun Aggregate<Int>.gradient(source: Boolean): Double =
+        fun Aggregate<Int>.grad(source: Boolean): Double =
           share(POSITIVE_INFINITY) {
             val dist = distances()
             when {
@@ -26,7 +28,7 @@ _pool: &program
               else -> (it + dist).min(POSITIVE_INFINITY)
             }
           }
-      entrypoint: gradient(localId == 0)
+      entrypoint: grad(localId == 0)
 
 deployments:
   - type: Rectangle
