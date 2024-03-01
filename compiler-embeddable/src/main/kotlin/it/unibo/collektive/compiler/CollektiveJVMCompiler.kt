@@ -42,23 +42,26 @@ object CollektiveJVMCompiler {
         }
 
     /**
-     * Configures the Kotlin-JVM compiler to compile the [inputFile] using the Collektive plugin.
-     * When [inputFile] is a directory, it is used as a source root.
+     * Configures the Kotlin-JVM compiler to compile the [inputFiles] using the Collektive plugin.
+     * When [inputFiles] contains a directory, it is used as a source root.
      */
     @JvmStatic
     @JvmOverloads
     fun compile(
-        inputFile: File,
+        inputFiles: List<File>,
         jvmTarget: JvmTarget = defaultJvmTarget,
-        moduleName: String = "collektive-${inputFile.nameWithoutExtension}",
+        moduleName: String =
+            "collektive-${inputFiles.map { it.nameWithoutExtension }.sorted().joinToString("-")}",
         outputFolder: File = tempDir(moduleName),
         messageCollector: MessageCollector = SLF4JMessageCollector.default,
     ): GenerationState? {
         val configuration = CompilerConfiguration()
         // Input configuration
-        when {
-            inputFile.isDirectory -> configuration.addKotlinSourceRoot(inputFile.absolutePath)
-            else -> configuration.addKotlinSourceRoot(inputFile.parentFile.absolutePath)
+        inputFiles.forEach { file ->
+            when {
+                file.isDirectory -> configuration.addKotlinSourceRoot(file.absolutePath)
+                else -> configuration.addKotlinSourceRoot(file.parentFile.absolutePath)
+            }
         }
         // CLI compiler configuration
         configuration.put(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, messageCollector)
@@ -91,6 +94,26 @@ object CollektiveJVMCompiler {
         )
         return KotlinToJVMBytecodeCompiler.analyzeAndGenerate(environment)
     }
+
+    /**
+     * Configures the Kotlin-JVM compiler to compile the [inputFile] using the Collektive plugin.
+     * When [inputFile] is a directory, it is used as a source root.
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun compile(
+        inputFile: File,
+        jvmTarget: JvmTarget = defaultJvmTarget,
+        moduleName: String = "collektive-${inputFile.nameWithoutExtension}",
+        outputFolder: File = tempDir(moduleName),
+        messageCollector: MessageCollector = SLF4JMessageCollector.default,
+    ): GenerationState? = compile(
+        listOf(inputFile),
+        jvmTarget,
+        moduleName,
+        outputFolder,
+        messageCollector,
+    )
 
     /**
      * Compiles the [input] string as a Kotlin-JVM file using the Collektive plugin.

@@ -22,9 +22,26 @@ import it.unibo.alchemist.model.reactions.Event
 import it.unibo.alchemist.model.timedistributions.DiracComb
 import it.unibo.alchemist.model.times.DoubleTime
 import it.unibo.alchemist.util.RandomGenerators.nextDouble
+import it.unibo.collektive.compiler.CollektiveJVMCompiler
+import it.unibo.collektive.compiler.logging.CollectingMessageCollector
+import it.unibo.collektive.compiler.util.md5
+import it.unibo.collektive.compiler.util.toBase64
 import org.apache.commons.math3.random.RandomGenerator
 import org.danilopianini.util.ListSet
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.ERROR
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.EXCEPTION
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.INFO
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.LOGGING
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.OUTPUT
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.STRONG_WARNING
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.WARNING
+import org.jetbrains.kotlin.codegen.state.GenerationState
+import org.slf4j.LoggerFactory
+import java.io.File
+import java.lang.reflect.Method
+import java.net.URLClassLoader
 import javax.script.ScriptEngineManager
+import kotlin.io.path.createTempDirectory
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.starProjectedType
 
@@ -44,7 +61,9 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
                         "$type${"?".takeIf { type.isMarkedNullable }.orEmpty()}"
                     }
                 }
-                val toInvoke = cache.get("import kotlin.math.*; val x: ($concentrationType) -> Any? = { $property }; x")
+                val toInvoke = propertyCache.get(
+                    "import kotlin.math.*; val x: ($concentrationType) -> Any? = { $property }; x",
+                )
                 toInvoke(concentration)
             }
         }
@@ -69,10 +88,69 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         time: TimeDistribution<Any?>,
         actionable: Actionable<Any?>,
         additionalParameters: Any?,
-    ): Action<Any?> = RunCollektiveProgram(
-        requireNotNull(node) { "Collektive requires a device and cannot execute in a Global Reaction" },
-        additionalParameters?.toString().orEmpty(),
-    )
+    ): Action<Any?> {
+        requireNotNull(node) { "Collektive requires a device and cannot execute in a Global Reaction" }
+        if (additionalParameters is CharSequence) {
+            return RunCollektiveProgram(node, additionalParameters.toString())
+        }
+        val parameters = additionalParameters as? Map<*, *>
+        requireNotNull(parameters) {
+            val type = additionalParameters?.let { it::class.simpleName } ?: "null"
+            "Invalid parameters for Collektive. Map required, but $type has been provided: $additionalParameters"
+        }
+        val entrypoint: String = requireNotNull(parameters["entrypoint"]) {
+            "No entrypoint provided in $additionalParameters"
+        }.toString()
+        val code: String = parameters["code"]?.toString().orEmpty()
+        val sourceSets: List<File> = parameters["source-sets"].toFiles()
+        val classpath = sourceSets.joinToString(separator = File.pathSeparator) { it.absolutePath }
+        val internalIdentifier = "$classpath$code$entrypoint".md5().toBase64()
+        val name: String = parameters["name"]?.toString() ?: "collektive$internalIdentifier"
+        val className = name.replaceFirstChar { it.uppercase() }
+        val methodToCall: Method = runCatching {
+            Class.forName(className).methods.first { it.name == name }
+        }.recover { exception ->
+            logger.info("Collektive program $name not found, compiling", exception)
+            val inputFolder = createTempDirectory("collektive").toFile()
+            inputFolder.resolve("$className.kt").writeText(
+                """
+                |@file:JvmName("$className")
+                |${code.replace("\n", "\n|")}
+                |context(CollektiveDevice<P>) Aggregate<Int>.
+                |fun $name() = $entrypoint()
+                """.trimMargin(),
+            )
+            val outputFolder = compilationFolderCache.get(name)
+            val messages = CollectingMessageCollector()
+            val result: GenerationState? = CollektiveJVMCompiler.compile(
+                sourceSets + inputFolder,
+                moduleName = name,
+                outputFolder = outputFolder,
+                messageCollector = messages,
+            )
+            checkNotNull(result)
+            messages.messages.forEach { (severity, message) ->
+                when (severity) {
+                    ERROR, EXCEPTION -> logger.error(message)
+                    STRONG_WARNING, WARNING -> logger.error(message)
+                    INFO, OUTPUT -> logger.info(message)
+                    LOGGING -> logger.debug(message)
+                }
+            }
+            when {
+                messages.hasErrors() -> error("Compilation of Collektive program $name failed: $messages")
+                else -> {
+                    val classLoader = URLClassLoader(
+                        arrayOf(outputFolder.toURI().toURL()),
+                        Thread.currentThread().contextClassLoader,
+                    )
+                    val clazz = classLoader.loadClass(name)
+                    clazz.methods.first { it.name == name }
+                }
+            }
+        }.getOrThrow()
+        return RunCollektiveProgram(node, methodToCall, name)
+    }
 
     override fun createCondition(
         randomGenerator: RandomGenerator,
@@ -136,15 +214,20 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
     }
 
     companion object {
+
         private object ScriptEngine {
             operator fun getValue(thisRef: Any?, property: KProperty<*>) =
                 ScriptEngineManager().getEngineByName(property.name)
                     ?: error("No script engine with ${property.name} found.")
         }
+
+        private val logger = LoggerFactory.getLogger(CollektiveIncarnation::class.java)
         private val kotlin by ScriptEngine
         private val defaultLambda: (Any?) -> Any? = { Double.NaN }
 
-        private val cache: LoadingCache<String, (Any?) -> Any?> = Caffeine.newBuilder()
+        private val propertyCache: LoadingCache<String, (Any?) -> Any?> = Caffeine
+            .newBuilder()
+            .maximumSize(1000)
             .build { property ->
                 runCatching {
                     @Suppress("UNCHECKED_CAST")
@@ -154,5 +237,25 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
                     } as (Any?) -> Any?
                 }.getOrElse { defaultLambda }
             }
+
+        private val compilationFolderCache: LoadingCache<String, File> =
+            Caffeine.newBuilder().maximumSize(1000).build { name -> createTempDirectory(name).toFile() }
+
+        /**
+         * Convert the source set to a list of files.
+         */
+        private fun Any?.toFiles(): List<File> = when (this) {
+            null -> error("Null Collektive source set provided")
+            is File -> listOf(this)
+            is CharSequence -> {
+                val file = File(toString())
+                check(file.exists()) {
+                    "Collektive source root ${file.absolutePath} does not exist"
+                }
+                listOf(file)
+            }
+            is Iterable<*> -> flatMap { files -> files.toFiles() }
+            else -> error("Invalid source setof type ${this::class.simpleName ?: "anonymous"}: $this")
+        }
     }
 }
