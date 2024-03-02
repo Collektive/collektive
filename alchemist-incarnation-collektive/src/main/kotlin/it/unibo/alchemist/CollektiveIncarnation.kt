@@ -120,6 +120,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
                 |fun <P : Position<P>> Aggregate<Int>.$name() = $entrypoint
                 """.trimMargin(),
             )
+            val packageName = code.substringAfter("package ").substringBefore("\n").trim()
             val outputFolder = compilationFolderCache.get(name)
             val messages = CollectingMessageCollector()
             val result: GenerationState? = CollektiveJVMCompiler.compile(
@@ -144,7 +145,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
                         arrayOf(outputFolder.toURI().toURL()),
                         Thread.currentThread().contextClassLoader,
                     )
-                    val clazz = classLoader.loadClass(name)
+                    val clazz = classLoader.loadClass("$packageName.$name")
                     clazz.methods.first { it.name == name }
                 }
             }
