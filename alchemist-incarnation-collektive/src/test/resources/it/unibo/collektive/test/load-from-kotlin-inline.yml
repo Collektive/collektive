@@ -20,7 +20,7 @@ _pool: &program
         import kotlin.Double.Companion.POSITIVE_INFINITY
         
         context(DistanceSensor)
-        fun Aggregate<Int>.grad(source: Boolean): Double =
+        fun Aggregate<Int>.gradient(source: Boolean): Double =
           share(POSITIVE_INFINITY) {
             val dist = distances()
             when {
@@ -28,7 +28,7 @@ _pool: &program
               else -> (it + dist).min(POSITIVE_INFINITY)
             }
           }
-      entrypoint: grad(localId == 0)
+      entrypoint: gradient(localId == 0)
 
 deployments:
   - type: Rectangle
