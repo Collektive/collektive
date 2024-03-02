@@ -4,8 +4,10 @@ import it.unibo.collektive.AlignmentCommandLineProcessor
 import it.unibo.collektive.AlignmentComponentRegistrar
 import it.unibo.collektive.compiler.logging.SLF4JMessageCollector
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
+import org.jetbrains.kotlin.cli.common.arguments.K2JVMCompilerArguments
 import org.jetbrains.kotlin.cli.common.config.addKotlinSourceRoot
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
+import org.jetbrains.kotlin.cli.common.setupCommonArguments
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinToJVMBytecodeCompiler
@@ -53,6 +55,7 @@ object CollektiveJVMCompiler {
         moduleName: String =
             "collektive-${inputFiles.map { it.nameWithoutExtension }.sorted().joinToString("-")}",
         outputFolder: File = tempDir(moduleName),
+        enableContextReceivers: Boolean = true,
         messageCollector: MessageCollector = SLF4JMessageCollector.default,
     ): GenerationState? {
         val configuration = CompilerConfiguration()
@@ -72,10 +75,15 @@ object CollektiveJVMCompiler {
         configuration.put(JVMConfigurationKeys.OUTPUT_DIRECTORY, outputFolder)
         configuration.put(JVMConfigurationKeys.JDK_HOME, File(System.getProperty("java.home")))
         configuration.put(JVMConfigurationKeys.NO_JDK, false)
+        // Enable context-receivers
+        if (enableContextReceivers) {
+            val config = K2JVMCompilerArguments().apply { contextReceivers = true }
+            configuration.setupCommonArguments(config)
+        }
         // Enable the IR backend, or the Collektive plugin cannot be applied
         configuration.put(JVMConfigurationKeys.IR, true)
         // Classpath configuration
-        val classpath = checkNotNull(classpathFromClassloader(Thread.currentThread().getContextClassLoader())) {
+        val classpath = checkNotNull(classpathFromClassloader(Thread.currentThread().contextClassLoader)) {
             "Empty classpath from current classloader." +
                 "Likely a bug in alchemist-incarnation-collective's Kotlin compiler facade"
         }
@@ -106,12 +114,14 @@ object CollektiveJVMCompiler {
         jvmTarget: JvmTarget = defaultJvmTarget,
         moduleName: String = "collektive-${inputFile.nameWithoutExtension}",
         outputFolder: File = tempDir(moduleName),
+        enableContextReceivers: Boolean = true,
         messageCollector: MessageCollector = SLF4JMessageCollector.default,
     ): GenerationState? = compile(
         listOf(inputFile),
         jvmTarget,
         moduleName,
         outputFolder,
+        enableContextReceivers,
         messageCollector,
     )
 
@@ -126,6 +136,7 @@ object CollektiveJVMCompiler {
         moduleName: String = "CollektiveScript",
         outputFolder: File = createTempDirectory(moduleName).toFile(),
         temporaryFolder: File = tempDir(moduleName),
+        enableContextReceivers: Boolean = true,
         messageCollector: MessageCollector = SLF4JMessageCollector.default,
     ) = compile(
         temporaryFolder
@@ -135,6 +146,7 @@ object CollektiveJVMCompiler {
         jvmTarget,
         moduleName,
         outputFolder,
+        enableContextReceivers,
         messageCollector,
     )
 }
