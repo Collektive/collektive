@@ -1,3 +1,27 @@
+## [8.0.0](https://github.com/Collektive/collektive/compare/7.0.6...8.0.0) (2024-03-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* **alchemist-incarnation:** add collektive-scripting support (#244)
+
+### Features
+
+* **alchemist-incarnation:** add collektive-scripting support ([#244](https://github.com/Collektive/collektive/issues/244)) ([985de20](https://github.com/Collektive/collektive/commit/985de2020a11f6f3931939c4ffbd3432592885c6))
+
+
+### Dependency updates
+
+* **deps:** update plugin gitsemver to v3.1.2 ([c06f20f](https://github.com/Collektive/collektive/commit/c06f20fb30072b3b66aa01c2fae693fe26bccfcf))
+* **deps:** update plugin kotlin-qa to v0.60.2 ([caf3e8b](https://github.com/Collektive/collektive/commit/caf3e8bd4c5cce1e95f36a1aa2f17f56ee4b189f))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.2 ([871dfd4](https://github.com/Collektive/collektive/commit/871dfd48121d28830f14397e86e3d1e181c6ad23))
+* **deps:** update plugin publishoncentral to v5.0.24 ([728cfda](https://github.com/Collektive/collektive/commit/728cfdac958a8b6072b07351b40da453c969bdaa))
+
+
+### General maintenance
+
+* use correct task name ([cb6086e](https://github.com/Collektive/collektive/commit/cb6086e03f1d930c6fec22742ae907d3c91b536d))
+
 ## [7.0.6](https://github.com/Collektive/collektive/compare/7.0.5...7.0.6) (2024-03-04)
 
 
