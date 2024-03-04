@@ -13,7 +13,7 @@ import it.unibo.collektive.field.plus
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 
-class BranchAlignment : StringSpec({
+class TestBranchAlignment : StringSpec({
     val id0 = 0
 
     "Branch alignment should work in nested functions" {
@@ -35,6 +35,7 @@ class BranchAlignment : StringSpec({
         messageFor1 shouldHaveSize 1 // 1 path of alignment
         messageFor1.values.toList() shouldBe listOf("test")
     }
+
     "Branch alignment should not occur in non aggregate context" {
         val result = aggregate(id0) {
             val condition = true
@@ -50,6 +51,7 @@ class BranchAlignment : StringSpec({
         }
         result.toSend.messagesFor(id0) shouldHaveSize 0 // 0 path of alignment
     }
+
     "A field should be projected when used in a body of a branch condition (issue #171)" {
         val nm = NetworkManager()
         (0..2)
@@ -80,6 +82,7 @@ class BranchAlignment : StringSpec({
                 }
             }
     }
+
     "A field should be projected also when the field is referenced as lambda parameter (issue #171)" {
         exchangeWithThreeDevices {
             if (localId % 2 == 0) {
@@ -99,10 +102,12 @@ class BranchAlignment : StringSpec({
     "A field should be projected whenever there is an alignment operation, not just on branches (issue #171)" {
         manuallyAlignedExchangeWithThreeDevices { it % 2 == 0 }
     }
+
     "A field should be projected whenever there is an alignment regardless of the type," +
         " not just booleans (issue #171)" {
             manuallyAlignedExchangeWithThreeDevices { it % 2 }
         }
+
     "A field should be projected when it is a non-direct receiver (issue #171)" {
         exchangeWithThreeDevices {
             with(it) {
