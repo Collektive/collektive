@@ -49,13 +49,14 @@ alchemist = [
 [plugins]
 build-config = { id = "com.github.gmazzo.buildconfig", version.ref = "build-config" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-gitSemVer = "org.danilopianini.git-sensitive-semantic-versioning:3.1.1"
+gitSemVer = "org.danilopianini.git-sensitive-semantic-versioning:3.1.2"
 gradlePluginPublish = { id = "com.gradle.plugin-publish", version = "1.2.1" }
 kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.60.1"
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.60.2"
 kover = "org.jetbrains.kotlinx.kover:0.7.6"
 multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:0.5.8"
+publishOnCentral = "org.danilopianini.publish-on-central:5.0.24"
 publishOnCentral = "org.danilopianini.publish-on-central:5.0.23"
 taskTree = "com.dorongold.task-tree:2.1.1"
