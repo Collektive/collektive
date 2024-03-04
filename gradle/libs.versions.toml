@@ -41,7 +41,7 @@ gitSemVer = "org.danilopianini.git-sensitive-semantic-versioning:3.1.2"
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 publishOnCentral = "org.danilopianini.publish-on-central:5.0.24"
-kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.60.1"
+kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.60.2"
 multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:0.5.8"
 taskTree = "com.dorongold.task-tree:2.1.1"
 detekt = "io.gitlab.arturbosch.detekt:1.23.5"
