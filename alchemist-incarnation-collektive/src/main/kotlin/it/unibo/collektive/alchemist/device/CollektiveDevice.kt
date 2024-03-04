@@ -9,7 +9,7 @@ import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.alchemist.device.sensors.DistanceSensor
-import it.unibo.collektive.alchemist.device.sensors.LocalSensing
+import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.Network
@@ -25,7 +25,7 @@ class CollektiveDevice<P>(
     private val environment: Environment<Any?, P>,
     override val node: Node<Any?>,
     private val retainMessagesFor: Time? = null,
-) : NodeProperty<Any?>, Network<Int>, LocalSensing, DistanceSensor where P : Position<P> {
+) : NodeProperty<Any?>, Network<Int>, EnvironmentVariables, DistanceSensor where P : Position<P> {
     private data class TimedMessage(val receivedAt: Time, val payload: InboundMessage<Int>)
 
     /**
@@ -48,11 +48,6 @@ class CollektiveDevice<P>(
         environment.getPosition(node).let { nodePosition ->
             neighboringViaExchange(nodePosition).map { position -> nodePosition.distanceTo(position) }
         }
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <T> sense(name: String): T = node.getConcentration(SimpleMolecule(name)) as T
-
-    override fun <T> senseOrElse(name: String, default: T): T = sense(name) ?: default
 
     override fun cloneOnNewNode(node: Node<Any?>): NodeProperty<Any?> =
         CollektiveDevice(environment, node, retainMessagesFor)
@@ -85,4 +80,20 @@ class CollektiveDevice<P>(
             }
         }
     }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T> get(name: String): T = node.getConcentration(SimpleMolecule(name)) as T
+
+    override fun <T> getOrNull(name: String): T? =
+        if (isDefined(name)) {
+            get(name)
+        } else {
+            null
+        }
+
+    override fun <T> getOrDefault(name: String, default: T): T = get(name) ?: default
+
+    override fun isDefined(name: String): Boolean = node.contains(SimpleMolecule(name))
+
+    override fun <T> set(name: String, value: T): T = node.setConcentration(SimpleMolecule(name), value).let { value }
 }
