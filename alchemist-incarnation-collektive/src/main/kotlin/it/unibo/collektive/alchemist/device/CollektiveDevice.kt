@@ -91,9 +91,9 @@ class CollektiveDevice<P>(
             null
         }
 
-    override fun <T> getOrDefault(name: String, default: T): T = get(name) ?: default
+    override fun <T> getOrDefault(name: String, default: T): T = getOrNull(name) ?: default
 
     override fun isDefined(name: String): Boolean = node.contains(SimpleMolecule(name))
 
-    override fun <T> set(name: String, value: T): T = node.setConcentration(SimpleMolecule(name), value).let { value }
+    override fun <T> set(name: String, value: T): T = value.also { node.setConcentration(SimpleMolecule(name), it) }
 }
