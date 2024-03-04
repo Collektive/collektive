@@ -60,7 +60,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
 
     override fun createMolecule(molecule: String) = SimpleMolecule(molecule)
 
-    override fun createConcentration(concentration: String?) = concentrationCache[concentration]
+    override fun createConcentration(concentration: String?) = concentration
 
     override fun createConcentration() = null
 
@@ -142,10 +142,6 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
                         else -> defaultLambda
                     } as (Any?) -> Any?
                 }.getOrElse { defaultLambda }
-            }
-        private val concentrationCache: LoadingCache<String, Any?> = Caffeine.newBuilder()
-            .build { molecule ->
-                kotlin.eval(molecule)
             }
     }
 }
