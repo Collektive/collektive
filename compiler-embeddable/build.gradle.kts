@@ -9,11 +9,11 @@ plugins {
 
 apply(plugin = libs.plugins.kotlin.jvm.id)
 
-val targetJvm = JvmTarget.JVM_17
+val targetJvm = JvmTarget.JVM_1_8
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(targetJvm.target.toInt()))
+        languageVersion.set(JavaLanguageVersion.of(targetJvm.target.substringAfterLast('.').toInt()))
     }
 }
 
@@ -22,18 +22,16 @@ kotlinJvm {
         val main by getting {
             dependencies {
                 implementation("it.unibo.collektive:compiler-plugin")
-                implementation(project(":compiler-embeddable"))
-                implementation(project(":dsl"))
-                implementation(kotlin("reflect"))
-                implementation(libs.bundles.alchemist)
                 implementation(libs.bundles.kotlin.compiler)
-                implementation(libs.caffeine)
+                implementation(libs.apache.commons.codec)
                 implementation(libs.slf4j)
             }
         }
         val test by getting {
             dependencies {
+                implementation(project(":dsl"))
                 implementation(rootProject.libs.kotest.runner.junit5.jvm)
+                implementation(libs.javap)
             }
         }
     }
