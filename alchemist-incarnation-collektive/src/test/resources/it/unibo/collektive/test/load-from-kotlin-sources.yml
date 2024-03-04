@@ -11,8 +11,7 @@ _pool: &program
       source-sets:
         - src/test/resources/it/unibo/collektive/test/kotlin
       code: |
-        package some.pkg
-        import my.pkg.*
+        import my.test.*
       entrypoint: gradient(localId == 0)
 
 deployments:
