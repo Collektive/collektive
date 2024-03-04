@@ -59,6 +59,7 @@ class WhenTest : StringSpec({
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test2")
     }
+
     "Nested when condition must be aligned" {
         val condition1 = false
         val condition2 = true

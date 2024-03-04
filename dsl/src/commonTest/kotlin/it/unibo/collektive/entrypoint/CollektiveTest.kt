@@ -97,7 +97,6 @@ class CollektiveTest : StringSpec({
         val networkManager = NetworkManager()
         val network0 = NetworkImplTest(networkManager, id0)
         val network1 = NetworkImplTest(networkManager, id1)
-
         val collektiveDevice0 = Collektive(id0, network0) {
             exchange(1, increaseOrDouble).localValue
         }
