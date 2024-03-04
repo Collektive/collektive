@@ -25,6 +25,7 @@ import it.unibo.alchemist.util.RandomGenerators.nextDouble
 import it.unibo.collektive.compiler.CollektiveJVMCompiler
 import it.unibo.collektive.compiler.logging.CollectingMessageCollector
 import it.unibo.collektive.compiler.util.md5
+import it.unibo.collektive.compiler.util.toBase32
 import it.unibo.collektive.compiler.util.toBase64
 import org.apache.commons.math3.random.RandomGenerator
 import org.danilopianini.util.ListSet
@@ -104,24 +105,33 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         val code: String = parameters["code"]?.toString().orEmpty()
         val sourceSets: List<File> = parameters["source-sets"].toFiles()
         val classpath = sourceSets.joinToString(separator = File.pathSeparator) { it.absolutePath }
-        val internalIdentifier = "$classpath$code$entrypoint".md5().toBase64()
-        val name: String = parameters["name"]?.toString() ?: "collektive$internalIdentifier"
+        val internalIdentifier = "$classpath$code$entrypoint".md5().toBase32()
+        val name: String = parameters["name"]?.toString()?.replaceFirstChar { it.lowercase() }
+            ?: "collektive$internalIdentifier"
+        check(name.matches(validName)) {
+            "Invalid name for Collektive program: $name"
+        }
         val className = name.replaceFirstChar { it.uppercase() }
+        val packageName = findPackage.find(code)?.groupValues?.get(1).orEmpty()
+        val classFqName = "$packageName.$className"
+        val classLoader = classLoaders.get("$name$internalIdentifier")
+        fun loadMethod() = classLoader.loadClass(classFqName).methods.first { it.name == name }
         val methodToCall: Method = runCatching {
-            Class.forName(className).methods.first { it.name == name }
+            loadMethod()
         }.recover { exception ->
             logger.info("Collektive program $name not found, compiling", exception)
             val inputFolder = createTempDirectory("collektive").toFile()
-            inputFolder.resolve("$className.kt").writeText(
-                """
+            val finalCode = """
                 |@file:JvmName("$className")
                 |${code.replace("\n", "\n|")}
                 |context(CollektiveDevice<P>)
                 |fun <P : Position<P>> Aggregate<Int>.$name() = $entrypoint
-                """.trimMargin(),
-            )
-            val packageName = code.substringAfter("package ").substringBefore("\n").trim()
-            val outputFolder = compilationFolderCache.get(name)
+                """.trimMargin()
+            inputFolder.resolve("$className.kt").writeText(finalCode)
+            val outputFolder = File(classLoader.urLs.first().file)
+            check(outputFolder.exists() && outputFolder.isDirectory) {
+                "Output folder ${outputFolder.absolutePath} does not exist or is not a directory"
+            }
             val messages = CollectingMessageCollector()
             val result: GenerationState? = CollektiveJVMCompiler.compile(
                 sourceSets + inputFolder,
@@ -129,7 +139,6 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
                 outputFolder = outputFolder,
                 messageCollector = messages,
             )
-            checkNotNull(result)
             messages.messages.forEach { (severity, message) ->
                 when (severity) {
                     ERROR, EXCEPTION -> logger.error(message)
@@ -139,15 +148,9 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
                 }
             }
             when {
-                messages.hasErrors() -> error("Compilation of Collektive program $name failed: $messages")
-                else -> {
-                    val classLoader = URLClassLoader(
-                        arrayOf(outputFolder.toURI().toURL()),
-                        Thread.currentThread().contextClassLoader,
-                    )
-                    val clazz = classLoader.loadClass("$packageName.$name")
-                    clazz.methods.first { it.name == name }
-                }
+                messages.hasErrors() || result == null ->
+                    error("Compilation of Collektive program $name failed:\n$finalCode")
+                else -> loadMethod()
             }
         }.getOrThrow()
         return RunCollektiveProgram(node, methodToCall, name)
@@ -222,6 +225,8 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
                     ?: error("No script engine with ${property.name} found.")
         }
 
+        private val findPackage = Regex("""package\s+((\w+\.)*\w+)(\s|;|${'$'}|/)""", RegexOption.MULTILINE)
+        private val validName = Regex("^[a-zA-Z_][a-zA-Z0-9_]*$", RegexOption.MULTILINE)
         private val logger = LoggerFactory.getLogger(CollektiveIncarnation::class.java)
         private val kotlin by ScriptEngine
         private val defaultLambda: (Any?) -> Any? = { Double.NaN }
@@ -239,8 +244,11 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
                 }.getOrElse { defaultLambda }
             }
 
-        private val compilationFolderCache: LoadingCache<String, File> =
-            Caffeine.newBuilder().maximumSize(1000).build { name -> createTempDirectory(name).toFile() }
+        private val classLoaders: LoadingCache<String, URLClassLoader> =
+            Caffeine.newBuilder().maximumSize(1000).build { name ->
+                val outputFolder = createTempDirectory(name).toFile()
+                URLClassLoader(arrayOf(outputFolder.toURI().toURL()), Thread.currentThread().contextClassLoader)
+            }
 
         /**
          * Convert the source set to a list of files.
