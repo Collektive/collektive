@@ -1,3 +1,24 @@
+## [7.0.6](https://github.com/Collektive/collektive/compare/7.0.5...7.0.6) (2024-03-04)
+
+
+### Dependency updates
+
+* **deps:** update dependency io.arrow-kt:arrow-core to v1.2.2 ([0b5c2aa](https://github.com/Collektive/collektive/commit/0b5c2aaf306649436c451edec10e7dc394b08c23))
+* **deps:** update dependency io.arrow-kt:arrow-core to v1.2.3 ([016e85e](https://github.com/Collektive/collektive/commit/016e85e3369bb8f330dd1a9f5a83566dfcee049a))
+
+
+### Documentation
+
+* **deps:** update dependency org.jetbrains.dokka to v1.9.20 ([e79a022](https://github.com/Collektive/collektive/commit/e79a02222a7747ead880a1b5a12560777b227529))
+
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.3 ([c778ff4](https://github.com/Collektive/collektive/commit/c778ff4efcfcabfe7db44aae5aee98ecb577dba3))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.4 ([f47eb29](https://github.com/Collektive/collektive/commit/f47eb29629da83a0aed0fcf1ba85369023ec7b21))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.5 ([3ee71c7](https://github.com/Collektive/collektive/commit/3ee71c708f1134cebef313758a6c9baf2894598f))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.6 ([4a27e1a](https://github.com/Collektive/collektive/commit/4a27e1aa728a56ee93e1a3b92593e52189a23a6b))
+
 ## [7.0.5](https://github.com/Collektive/collektive/compare/7.0.4...7.0.5) (2024-02-17)
 
 
