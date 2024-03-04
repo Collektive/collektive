@@ -44,9 +44,9 @@ internal fun getLambdaType(pluginContext: IrPluginContext, lambda: IrSimpleFunct
 
 internal fun List<IrType?>.stringified(
     prefix: String = "(",
-    postfix: String = ")"
+    postfix: String = ")",
 ): String = joinToString(",", prefix = prefix, postfix = postfix) {
-    it?.classFqName?.asString() ?: "❓"
+    it?.classFqName?.asString() ?: "?"
 }
 
 internal fun IrCall.getAlignmentToken(): String {
@@ -54,7 +54,7 @@ internal fun IrCall.getAlignmentToken(): String {
     val dispatcher = receiverAndArgs().map { it.type }.stringified()
     val generics = typeArguments.stringified("<", ">")
     return when {
-        symbolOwner.name.isSpecial -> "?"
+        symbolOwner.name.isSpecial -> "λ"
         else -> symbolOwner.kotlinFqName.asString() + generics + dispatcher
     }
 }
