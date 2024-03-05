@@ -1,3 +1,21 @@
+## [9.0.0](https://github.com/Collektive/collektive/compare/8.0.0...9.0.0) (2024-03-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* alignment performance optimization (#250)
+
+### Dependency updates
+
+* **deps:** update alchemist to v31.0.3 ([f3b4b3d](https://github.com/Collektive/collektive/commit/f3b4b3d1bcfb7113bc4857a6dbcd6fc081d35219))
+* **deps:** update alchemist to v31.0.4 ([04620fa](https://github.com/Collektive/collektive/commit/04620fabc2c8e4170fb32ea2c44ef03d50e5dd42))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.2 ([c89cb51](https://github.com/Collektive/collektive/commit/c89cb51ae86640a65e0f1e7c85069b142eab4450))
+
+
+### Performance improvements
+
+* alignment performance optimization ([#250](https://github.com/Collektive/collektive/issues/250)) ([5a0d5e0](https://github.com/Collektive/collektive/commit/5a0d5e0d6be65a019e2029514c659c1e9eec36a1))
+
 ## [8.0.0](https://github.com/Collektive/collektive/compare/7.0.6...8.0.0) (2024-03-04)
 
 
