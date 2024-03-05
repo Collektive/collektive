@@ -49,7 +49,11 @@ internal fun IrSingleStatementBuilder.buildAlignedOn(
         // Set generics type of the `alignOn` function
         putTypeArgument(0, type)
         // Set aggregate context
-        putArgument(alignedOnFunction.dispatchReceiverParameter!!, aggregateContextReference)
+        putArgument(
+            alignedOnFunction.dispatchReceiverParameter
+                ?: error("The alignedOn has no dispatch receiver parameter"),
+            aggregateContextReference,
+        )
         // Set the argument that is going to be push in the stack
         putValueArgument(0, irBoolean(conditionValue))
         // Create the lambda that is going to call expression

@@ -46,8 +46,9 @@ class AlignmentTransformer(
         }
         return contextReference?.let { context ->
             // We don't want to align the alignedOn function :)
-            if (expression.simpleFunctionName() == AggregateFunctionNames.ALIGNED_ON_FUNCTION)
+            if (expression.simpleFunctionName() == AggregateFunctionNames.ALIGNED_ON_FUNCTION) {
                 return super.visitCall(expression, data)
+            }
             // If no function, the first time the counter is 1
             val actualCounter = alignedFunctions[alignmentToken]?.let { it + 1 } ?: 1
             alignedFunctions += alignmentToken to actualCounter
@@ -85,7 +86,7 @@ class AlignmentTransformer(
                 aggregateContextClass,
                 aggregateLambdaBody,
                 alignedOnFunction,
-                false
+                false,
             )
         }
         return super.visitElseBranch(branch, data)

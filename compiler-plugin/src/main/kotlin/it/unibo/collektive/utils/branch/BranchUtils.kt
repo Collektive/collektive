@@ -16,7 +16,7 @@ import org.jetbrains.kotlin.ir.expressions.IrTypeOperatorCall
 import org.jetbrains.kotlin.ir.expressions.IrWhen
 
 context(MessageCollector)
-fun IrBranch.addBranchAlignment(
+internal fun IrBranch.addBranchAlignment(
     pluginContext: IrPluginContext,
     aggregateContextClass: IrClass,
     aggregateLambdaBody: IrFunction,

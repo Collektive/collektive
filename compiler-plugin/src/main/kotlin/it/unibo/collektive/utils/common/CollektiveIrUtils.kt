@@ -29,17 +29,18 @@ internal fun IrType.isAssignableFrom(other: IrType): Boolean = classifierOrNull?
 context(MessageCollector)
 internal fun getLambdaType(pluginContext: IrPluginContext, lambda: IrSimpleFunction): IrType {
     val classFqn = StandardNames.getFunctionClassId(lambda.valueParameters.size).asSingleFqName()
-    return pluginContext.referenceClass(ClassId(classFqn.parent(), classFqn.shortName()))?.let { base ->
+    val type = pluginContext.referenceClass(ClassId(classFqn.parent(), classFqn.shortName()))?.let { base ->
         base.typeWith(lambda.valueParameters.map { it.type } + lambda.returnType)
-    } ?: run {
-        error(
-            """
-            Unable to reference the class ${classFqn.parent()}.
-            This is may due to a bug in collektive compiler plugin.
-            """.trimIndent()
-        )
-        throw ClassNotFoundException("Unable to reference ${classFqn.parent()}")
     }
+    requireNotNull(type) {
+        """
+        Unable to reference the class ${classFqn.parent()}.
+        This is may due to a bug in collektive compiler plugin.
+        """.trimIndent().also {
+            error(it)
+        }
+    }
+    return type
 }
 
 internal fun List<IrType?>.stringified(
@@ -61,7 +62,7 @@ internal fun IrCall.getAlignmentToken(): String {
 
 internal fun IrCall.simpleFunctionName(): String = symbol.owner.name.asString()
 
-fun <T : IrElement> irStatement(
+internal fun <T : IrElement> irStatement(
     pluginContext: IrPluginContext,
     aggregateLambdaBody: IrFunction,
     expression: IrElement,

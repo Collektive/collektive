@@ -14,12 +14,20 @@ import org.jetbrains.kotlin.config.CompilerConfigurationKey
 @OptIn(ExperimentalCompilerApi::class)
 class AlignmentCommandLineProcessor : CommandLineProcessor {
     companion object {
-        private const val OPTION_ENABLED = "enabled"
+        private const val OPTION_ENABLED = "collektiveEnabled"
+
+        /**
+         * The key used by the compiler to enable or disable the plugin.
+         */
         val ARG_ENABLED = CompilerConfigurationKey<Boolean>(OPTION_ENABLED)
-        val pluginId = BuildConfig.KOTLIN_PLUGIN_ID
+
+        /**
+         * The plugin id used to identify the plugin in the compiler.
+         */
+        const val PLUGIN_ID = BuildConfig.KOTLIN_PLUGIN_ID
     }
 
-    override val pluginId: String = Companion.pluginId
+    override val pluginId: String = PLUGIN_ID
 
     override val pluginOptions: Collection<CliOption> = listOf(
         CliOption(

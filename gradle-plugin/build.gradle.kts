@@ -58,6 +58,16 @@ gradlePlugin {
     }
 }
 
+tasks.generateBuildConfig.configure {
+    mustRunAfter(tasks.cpdKotlinCheck)
+}
+
+ktlint {
+    filter {
+        exclude { it.file.path.contains(layout.buildDirectory.dir("generated").get().toString()) }
+    }
+}
+
 signing {
     if (System.getenv("CI") == "true") {
         val signingKey: String? by project
