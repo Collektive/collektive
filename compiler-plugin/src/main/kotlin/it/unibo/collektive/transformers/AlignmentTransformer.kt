@@ -41,7 +41,9 @@ class AlignmentTransformer(
             ?: collectAggregateReference(aggregateContextClass, expression.symbol.owner)
 
         val alignmentToken = expression.getAlignmentToken()
-        if (contextReference == null) data.push(alignmentToken)
+        if (contextReference == null) {
+            data.push(alignmentToken)
+        }
         return contextReference?.let { context ->
             // We don't want to align the alignedOn function :)
             if (expression.simpleFunctionName() == AggregateFunctionNames.ALIGNED_ON_FUNCTION)

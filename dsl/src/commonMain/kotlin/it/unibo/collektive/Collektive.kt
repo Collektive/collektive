@@ -48,7 +48,6 @@ class Collektive<ID : Any, R>(
     }
 
     companion object {
-
         /**
          * Aggregate program entry point which computes an iteration of a device [localId], taking as parameters
          * the previous [state], the [messages] received from the neighbours and the [compute] with AggregateContext
@@ -56,8 +55,8 @@ class Collektive<ID : Any, R>(
          */
         fun <ID : Any, R> aggregate(
             localId: ID,
-            inbound: Iterable<InboundMessage<ID>> = emptySet(),
             previousState: State = emptyMap(),
+            inbound: Iterable<InboundMessage<ID>> = emptySet(),
             compute: Aggregate<ID>.() -> R,
         ): AggregateResult<ID, R> = AggregateContext(localId, inbound, previousState).run {
             AggregateResult(localId, compute(), messagesToSend(), newState())

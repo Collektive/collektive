@@ -14,7 +14,6 @@ import it.unibo.collektive.networking.SingleOutboundMessage
 import it.unibo.collektive.path.Path
 import it.unibo.collektive.state.State
 import it.unibo.collektive.state.impl.getTyped
-
 /**
  * Context for managing aggregate computation.
  * It represents the [localId] of the device, the [messages] received from the neighbours,
@@ -27,8 +26,8 @@ internal class AggregateContext<ID : Any>(
 ) : Aggregate<ID> {
 
     private val stack = Stack()
-    private var state: State = mapOf()
-    private var toBeSent = OutboundMessage(localId, emptyMap())
+    private var state: MutableMap<Path, Any?> = mutableMapOf()
+    private val toBeSent = OutboundMessage(messages.count(), localId)
 
     /**
      * Messages to send to the other nodes.
@@ -49,7 +48,7 @@ internal class AggregateContext<ID : Any>(
         initial: Init,
         body: YieldingScope<Field<ID, Init>, Field<ID, Ret>>,
     ): Field<ID, Ret> {
-        val path = stack.currentPath()
+        val path: Path = stack.currentPath()
         val messages = messagesAt<Init>(path)
         val previous = stateAt(path, initial)
         val subject = newField(previous, messages)
@@ -62,21 +61,17 @@ internal class AggregateContext<ID : Any>(
                     else -> it.toSend.excludeSelf()
                 },
             )
-            check(!toBeSent.messages.containsKey(path)) {
-                """
-                    Aggregate alignment clash by multiple aligned calls with the same path: $path.
-                    The most likely cause is an aggregate function call within a loop
-                """.trimIndent()
-            }
-            toBeSent = toBeSent.copy(messages = toBeSent.messages + (path to message))
+            toBeSent.addMessage(path, message)
             state += path to it.toSend.localValue
         }.toReturn
     }
 
-    override fun <Initial, Return> repeating(initial: Initial, transform: YieldingScope<Initial, Return>): Return =
-        transform(YieldingContext(), stateAt(stack.currentPath(), initial))
-            .also { state += stack.currentPath() to it.toReturn }
+    override fun <Initial, Return> repeating(initial: Initial, transform: YieldingScope<Initial, Return>): Return {
+        val path = stack.currentPath()
+        return transform(YieldingContext(), stateAt(path, initial))
+            .also { state += path to it.toReturn }
             .toReturn
+    }
 
     override fun <Initial> repeat(initial: Initial, transform: (Initial) -> Initial): Initial = repeating(initial) {
         val res = transform(it)
@@ -85,7 +80,9 @@ internal class AggregateContext<ID : Any>(
 
     override fun <R> alignedOn(pivot: Any?, body: () -> R): R {
         stack.alignRaw(pivot)
-        return body().also { stack.dealign() }
+        return body().also {
+            stack.dealign()
+        }
     }
 
     @Suppress("UNCHECKED_CAST")

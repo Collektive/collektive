@@ -97,19 +97,18 @@ class CollektiveTest : StringSpec({
         val networkManager = NetworkManager()
         val network0 = NetworkImplTest(networkManager, id0)
         val network1 = NetworkImplTest(networkManager, id1)
-
-        val collektiveDevice0 = Collektive(id0, network0) { exchange(1, increaseOrDouble).localValue }
-        val collektiveDevice1 = Collektive(id1, network1) { exchange(2, increaseOrDouble).localValue }
-
+        val collektiveDevice0 = Collektive(id0, network0) {
+            exchange(1, increaseOrDouble).localValue
+        }
+        val collektiveDevice1 = Collektive(id1, network1) {
+            exchange(2, increaseOrDouble).localValue
+        }
         // from its initial value 1, apply increaseOrDouble, then sends to device1
         collektiveDevice0.cycle() shouldBe 2
-
         // from its initial value 2, apply increaseOrDouble, then sends to device0
         collektiveDevice1.cycle() shouldBe 3
-
         // from its value after first cycle 2, apply increaseOrDouble, then sends to device1
         collektiveDevice0.cycle() shouldBe 3
-
         // from its value after first cycle 3, apply increaseOrDouble, then sends to device1
         collektiveDevice1.cycle() shouldBe 6
     }

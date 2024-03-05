@@ -1,8 +1,7 @@
 package it.unibo.collektive.alignment
 
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.collections.shouldContainAll
-import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate
@@ -14,7 +13,7 @@ import it.unibo.collektive.field.plus
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 
-class BranchAlignment : StringSpec({
+class TestBranchAlignment : StringSpec({
     val id0 = 0
 
     "Branch alignment should work in nested functions" {
@@ -32,9 +31,11 @@ class BranchAlignment : StringSpec({
                 test2()
             }
         }
-        result.toSend.messages.keys shouldHaveSize 1 // 1 path of alignment
-        result.toSend.messages.values.map { it.default } shouldContainAll listOf("test")
+        val messageFor1 = result.toSend.messagesFor(id0)
+        messageFor1 shouldHaveSize 1 // 1 path of alignment
+        messageFor1.values.toList() shouldBe listOf("test")
     }
+
     "Branch alignment should not occur in non aggregate context" {
         val result = aggregate(id0) {
             val condition = true
@@ -48,8 +49,9 @@ class BranchAlignment : StringSpec({
                 test2()
             }
         }
-        result.toSend.messages.keys shouldHaveSize 0 // 0 path of alignment
+        result.toSend.messagesFor(id0) shouldHaveSize 0 // 0 path of alignment
     }
+
     "A field should be projected when used in a body of a branch condition (issue #171)" {
         val nm = NetworkManager()
         (0..2)
@@ -80,6 +82,7 @@ class BranchAlignment : StringSpec({
                 }
             }
     }
+
     "A field should be projected also when the field is referenced as lambda parameter (issue #171)" {
         exchangeWithThreeDevices {
             if (localId % 2 == 0) {
@@ -99,10 +102,12 @@ class BranchAlignment : StringSpec({
     "A field should be projected whenever there is an alignment operation, not just on branches (issue #171)" {
         manuallyAlignedExchangeWithThreeDevices { it % 2 == 0 }
     }
+
     "A field should be projected whenever there is an alignment regardless of the type," +
         " not just booleans (issue #171)" {
             manuallyAlignedExchangeWithThreeDevices { it % 2 }
         }
+
     "A field should be projected when it is a non-direct receiver (issue #171)" {
         exchangeWithThreeDevices {
             with(it) {

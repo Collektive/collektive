@@ -2,18 +2,17 @@ package it.unibo.alchemist.collektive.device
 
 import it.unibo.alchemist.model.Environment
 import it.unibo.alchemist.model.Node
-import it.unibo.alchemist.model.Node.Companion.asPropertyOrNull
 import it.unibo.alchemist.model.NodeProperty
 import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Time
+import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
+import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.Network
 import it.unibo.collektive.networking.OutboundMessage
-import it.unibo.collektive.networking.SingleOutboundMessage
-import it.unibo.collektive.path.Path
 
 /**
  * Representation of a Collektive device in Alchemist.
@@ -25,7 +24,7 @@ class CollektiveDevice<P>(
     private val environment: Environment<Any?, P>,
     override val node: Node<Any?>,
     private val retainMessagesFor: Time? = null,
-) : NodeProperty<Any?>, Network<Int>, DistanceSensor where P : Position<P> {
+) : NodeProperty<Any?>, Network<Int>, EnvironmentVariables, DistanceSensor where P : Position<P> {
     private data class TimedMessage(val receivedAt: Time, val payload: InboundMessage<Int>)
 
     /**
@@ -52,40 +51,48 @@ class CollektiveDevice<P>(
     override fun cloneOnNewNode(node: Node<Any?>): NodeProperty<Any?> =
         CollektiveDevice(environment, node, retainMessagesFor)
 
-    override fun read(): Set<InboundMessage<Int>> =
-        when (retainMessagesFor) {
-            null -> validMessages.mapTo(mutableSetOf()) { it.payload }.also { validMessages.clear() }
+    override fun read(): Collection<InboundMessage<Int>> =
+        when {
+            validMessages.isEmpty() -> emptyList()
+            retainMessagesFor == null ->
+                validMessages.map { it.payload }.also { validMessages.clear() }
             else -> {
                 validMessages.retainAll { it.receivedAt + retainMessagesFor >= currentTime }
-                validMessages.mapTo(mutableSetOf()) { it.payload }
+                validMessages.map { it.payload }
             }
         }
 
     override fun write(message: OutboundMessage<Int>) {
-        val neighborhood = environment.getNeighborhood(node)
-            .mapNotNull { it.asPropertyOrNull<Any?, CollektiveDevice<P>>() }
-        val baseMessageBacking = mutableMapOf<Path, Any?>()
-        val mayNeedOverrideBacking = mutableMapOf<Path, SingleOutboundMessage<Int, *>>()
-        for ((path, payload) in message.messages) {
-            if (payload.overrides.isEmpty()) {
-                baseMessageBacking[path] = payload.default
-            } else {
-                mayNeedOverrideBacking[path] = payload
+        if (message.isNotEmpty()) {
+            val neighboringNodes = environment.getNeighborhood(node)
+            if (!neighboringNodes.isEmpty) {
+                val neighborhood = neighboringNodes.mapNotNull { node ->
+                    @Suppress("UNCHECKED_CAST")
+                    node.properties.firstOrNull { it is CollektiveDevice<*> } as? CollektiveDevice<P>
+                }
+                neighborhood.forEach { neighbor ->
+                    neighbor.receiveMessage(
+                        currentTime,
+                        InboundMessage(message.senderId, message.messagesFor(neighbor.id)),
+                    )
+                }
             }
         }
-        val baseMessage: Map<Path, Any?> = baseMessageBacking
-        val mayNeedOverride: Map<Path, SingleOutboundMessage<Int, *>> = mayNeedOverrideBacking
-        neighborhood.forEach { neighbor ->
-            val customMessage = InboundMessage(
-                message.senderId,
-                when {
-                    mayNeedOverride.isEmpty() -> baseMessage
-                    else -> baseMessage + mayNeedOverride.mapValues { (_, anisotropic) ->
-                        anisotropic.overrides.getOrDefault(node.id, anisotropic.default)
-                    }
-                },
-            )
-            neighbor.receiveMessage(currentTime, customMessage)
-        }
     }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T> get(name: String): T = node.getConcentration(SimpleMolecule(name)) as T
+
+    override fun <T> getOrNull(name: String): T? =
+        if (isDefined(name)) {
+            get(name)
+        } else {
+            null
+        }
+
+    override fun <T> getOrDefault(name: String, default: T): T = getOrNull(name) ?: default
+
+    override fun isDefined(name: String): Boolean = node.contains(SimpleMolecule(name))
+
+    override fun <T> set(name: String, value: T): T = value.also { node.setConcentration(SimpleMolecule(name), it) }
 }

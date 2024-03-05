@@ -6,6 +6,7 @@ import org.jetbrains.kotlin.backend.jvm.ir.receiverAndArgs
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrElement
+import org.jetbrains.kotlin.ir.backend.js.utils.typeArguments
 import org.jetbrains.kotlin.ir.builders.IrSingleStatementBuilder
 import org.jetbrains.kotlin.ir.builders.Scope
 import org.jetbrains.kotlin.ir.declarations.IrFunction
@@ -41,14 +42,20 @@ internal fun getLambdaType(pluginContext: IrPluginContext, lambda: IrSimpleFunct
     }
 }
 
+internal fun List<IrType?>.stringified(
+    prefix: String = "(",
+    postfix: String = ")",
+): String = joinToString(",", prefix = prefix, postfix = postfix) {
+    it?.classFqName?.asString() ?: "?"
+}
+
 internal fun IrCall.getAlignmentToken(): String {
     val symbolOwner = symbol.owner
-    val dispatcher = receiverAndArgs()
-        .mapNotNull { it.type.classFqName?.shortName()?.asString() }
-        .joinToString(",", prefix = "<", postfix = ">")
+    val arguments = receiverAndArgs().map { it.type }.stringified()
+    val generics = typeArguments.stringified("<", ">")
     return when {
-        symbolOwner.name.isSpecial -> "?"
-        else -> symbolOwner.kotlinFqName.asString() + dispatcher
+        symbolOwner.name.isSpecial -> "λ"
+        else -> symbolOwner.kotlinFqName.asString() + generics + arguments
     }
 }
 

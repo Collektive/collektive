@@ -12,7 +12,6 @@ import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 
 class NestedCallsTest : StringSpec({
-
     fun Aggregate<Int>.foo(id: Int) = neighboringViaExchange(id.toDouble())
 
     fun Aggregate<Int>.bar(): Double {
@@ -33,7 +32,6 @@ class NestedCallsTest : StringSpec({
         collektiveDevice0.cycle() shouldBe 0
 
         val collektiveDevice1 = Collektive(1, network1) { bar() }
-        println(network1.read())
         collektiveDevice1.cycle() shouldBe Double.POSITIVE_INFINITY
     }
 })
