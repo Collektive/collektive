@@ -18,7 +18,6 @@ import it.unibo.collektive.matchers.alignWith
 class TestAlignment : StringSpec({
 
     "The alignment should be performed also for the same aggregate operation called multiple times (issue #51)" {
-
         val result = aggregate(0) {
             neighboringViaExchange(10) // path -> [neighboring.1] = 10
             share(0) {

@@ -53,7 +53,7 @@ class CollektiveDevice<P>(
 
     override fun read(): Collection<InboundMessage<Int>> =
         when {
-            validMessages.isEmpty() -> emptySet()
+            validMessages.isEmpty() -> emptyList()
             retainMessagesFor == null ->
                 validMessages.map { it.payload }.also { validMessages.clear() }
             else -> {

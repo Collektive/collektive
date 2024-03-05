@@ -51,11 +51,11 @@ internal fun List<IrType?>.stringified(
 
 internal fun IrCall.getAlignmentToken(): String {
     val symbolOwner = symbol.owner
-    val dispatcher = receiverAndArgs().map { it.type }.stringified()
+    val arguments = receiverAndArgs().map { it.type }.stringified()
     val generics = typeArguments.stringified("<", ">")
     return when {
         symbolOwner.name.isSpecial -> "λ"
-        else -> symbolOwner.kotlinFqName.asString() + generics + dispatcher
+        else -> symbolOwner.kotlinFqName.asString() + generics + arguments
     }
 }
 
