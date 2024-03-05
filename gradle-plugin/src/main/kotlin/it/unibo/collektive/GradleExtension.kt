@@ -11,5 +11,5 @@ open class GradleExtension(objects: ObjectFactory) {
     /**
      * Determines if the compiler plugin should be enabled or disabled.
      */
-    val enabled: Property<Boolean> = objects.property(Boolean::class.java).apply { convention(true) }
+    val collektiveEnabled: Property<Boolean> = objects.property(Boolean::class.java).apply { convention(true) }
 }

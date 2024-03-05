@@ -2,6 +2,7 @@ package it.unibo.collektive.utils.call
 
 import it.unibo.collektive.utils.common.getAlignmentToken
 import it.unibo.collektive.utils.common.getLambdaType
+import it.unibo.collektive.utils.logging.error
 import it.unibo.collektive.utils.stack.StackFunctionCall
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
@@ -29,7 +30,7 @@ import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.name.Name
 
 context(MessageCollector)
-fun IrSingleStatementBuilder.buildAlignedOnCall(
+internal fun IrSingleStatementBuilder.buildAlignedOnCall(
     pluginContext: IrPluginContext,
     aggregateLambdaBody: IrFunction,
     aggregateContextReference: IrExpression,
@@ -44,10 +45,19 @@ fun IrSingleStatementBuilder.buildAlignedOnCall(
         // Set generics type of the `alignOn` function
         putTypeArgument(0, type)
         // Set aggregate context
-        putArgument(alignedOnFunction.dispatchReceiverParameter!!, aggregateContextReference)
+        putArgument(
+            alignedOnFunction.dispatchReceiverParameter
+                ?: kotlin.error("The alignedOn has no dispatch receiver parameter"),
+            aggregateContextReference,
+        )
         // Set the argument that is going to be push in the stack
         val token = expression.getAlignmentToken()
-        val count = data[token]!! // Here the key should be present!
+        val count = data[token] ?: error(
+            """
+            Unable to find the count for the token $token.
+            This is may due to a bug in collektive compiler plugin.
+            """.trimIndent(),
+        )
         val alignmentToken = "$stack$token.$count"
         putValueArgument(0, irString(alignmentToken))
         // Create the lambda that is going to call expression

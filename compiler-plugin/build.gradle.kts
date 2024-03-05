@@ -1,5 +1,5 @@
-import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.danilopianini.gradle.mavencentral.DocStyle
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 
 plugins {
     alias(libs.plugins.build.config)
@@ -29,6 +29,16 @@ buildConfig {
 tasks.withType<KotlinCompile<*>>().configureEach {
     kotlinOptions {
         freeCompilerArgs += listOf("-Xcontext-receivers")
+    }
+}
+
+tasks.generateBuildConfig.configure {
+    mustRunAfter(tasks.cpdKotlinCheck)
+}
+
+ktlint {
+    filter {
+        exclude { it.file.path.contains(layout.buildDirectory.dir("generated").get().toString()) }
     }
 }
 

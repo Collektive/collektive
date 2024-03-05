@@ -33,7 +33,7 @@ class GradlePlugin : KotlinCompilerPluginSupportPlugin {
         val extension = project.extensions.getByType(GradleExtension::class.java)
         return project.provider {
             listOf(
-                SubpluginOption(key = "enabled", value = extension.enabled.get().toString()),
+                SubpluginOption(key = "collektiveEnabled", value = extension.collektiveEnabled.get().toString()),
             )
         }
     }

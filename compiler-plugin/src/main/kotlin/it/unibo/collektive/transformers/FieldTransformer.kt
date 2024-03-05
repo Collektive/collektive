@@ -40,7 +40,7 @@ class FieldTransformer(
                 // If the expression contains a lambda, this recursion is necessary to visit the children
                 expression.transformChildren(this, null)
                 return expression.transform(
-                    FieldProjectionTransformer(pluginContext, logger, projectFunction, it),
+                    FieldProjectionTransformer(pluginContext, projectFunction, it),
                     null,
                 )
             }
@@ -54,12 +54,8 @@ class FieldTransformer(
             logger.debug("Found AggregateContext reference in branch: ${it.type.classFqName}")
             branch.result.transform(this, null)
             return branch.transform(
-                FieldProjectionTransformer(
-                    pluginContext,
-                    logger,
-                    projectFunction,
-                    it
-                ), null
+                FieldProjectionTransformer(pluginContext, projectFunction, it),
+                null,
             )
         }
         return super.visitBranch(branch)
@@ -71,12 +67,8 @@ class FieldTransformer(
             logger.debug("Found AggregateContext reference in else branch: ${it.type.classFqName}")
             branch.result.transform(this, null)
             return branch.transform(
-                FieldProjectionTransformer(
-                    pluginContext,
-                    logger,
-                    projectFunction,
-                    it
-                ), null
+                FieldProjectionTransformer(pluginContext, projectFunction, it),
+                null,
             )
         }
         return super.visitElseBranch(branch)
