@@ -1,27 +1,38 @@
 [versions]
-alchemist = "30.1.11"
+alchemist = "31.0.4"
 build-config = "5.3.5"
 coroutines = "1.8.0"
-dokka = "1.9.10"
+dokka = "1.9.20"
 kotest = "5.8.0"
 kotlin = "1.9.22"
 
 [libraries]
 alchemist-api = { module = "it.unibo.alchemist:alchemist-api", version.ref = "alchemist" }
 alchemist = { module = "it.unibo.alchemist:alchemist", version.ref = "alchemist" }
+apache-commons-codec = "commons-codec:commons-codec:1.16.1"
 arrow = "io.arrow-kt:arrow-core:1.2.3"
 caffeine = "com.github.ben-manes.caffeine:caffeine:3.1.8"
+javap = "com.perfma.wrapped:com.sun.tools:1.8.0_jdk8u275-b01_linux_x64"
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-framework-datatest = { module = "io.kotest:kotest-framework-datatest", version.ref = "kotest" }
 kotest-runner-junit5-jvm = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }
+kotlin-compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin" }
+kotlin-scripting-compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable", version.ref = "kotlin" }
+kotlin-scripting-jvm = { module = "org.jetbrains.kotlin:kotlin-scripting-jvm", version.ref = "kotlin" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-common = { module = "org.jetbrains.kotlin:kotlin-test-common", version.ref = "kotlin" }
 kotlin-test-annotations-common = { module = "org.jetbrains.kotlin:kotlin-test-annotations-common", version.ref = "kotlin" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+slf4j = "org.slf4j:slf4j-api:2.0.12"
 
 [bundles]
+kotlin-compiler = [
+    "kotlin-compiler-embeddable",
+    "kotlin-scripting-compiler-embeddable",
+    "kotlin-scripting-jvm",
+]
 kotlin-testing-common = [
     "kotest-assertions-core",
     "kotest-framework-engine",
@@ -36,16 +47,15 @@ alchemist = [
 ]
 
 [plugins]
+build-config = { id = "com.github.gmazzo.buildconfig", version.ref = "build-config" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-gitSemVer = "org.danilopianini.git-sensitive-semantic-versioning:3.1.1"
+gitSemVer = "org.danilopianini.git-sensitive-semantic-versioning:3.1.2"
+gradlePluginPublish = { id = "com.gradle.plugin-publish", version = "1.2.1" }
+kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-publishOnCentral = "org.danilopianini.publish-on-central:5.0.23"
-kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.60.1"
-multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:0.5.8"
-taskTree = "com.dorongold.task-tree:2.1.1"
-detekt = "io.gitlab.arturbosch.detekt:1.23.5"
-build-config = { id = "com.github.gmazzo.buildconfig", version.ref = "build-config" }
-gradlePluginPublish = { id = "com.gradle.plugin-publish", version = "1.2.1" }
+kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.60.2"
 kover = "org.jetbrains.kotlinx.kover:0.7.6"
-kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
+multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:0.5.8"
+publishOnCentral = "org.danilopianini.publish-on-central:5.0.24"
+taskTree = "com.dorongold.task-tree:2.1.1"

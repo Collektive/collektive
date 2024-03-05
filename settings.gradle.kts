@@ -4,11 +4,12 @@ pluginManagement {
         google()
         mavenCentral()
     }
+    includeBuild("gradle-plugin")
 }
 
 plugins {
     id("com.gradle.enterprise") version "3.16.2"
-    id("org.danilopianini.gradle-pre-commit-git-hooks") version "2.0.1"
+    id("org.danilopianini.gradle-pre-commit-git-hooks") version "2.0.2"
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
@@ -30,5 +31,5 @@ gitHooks {
 
 rootProject.name = "collektive"
 
-includeBuild("plugin")
-include("dsl", "alchemist-incarnation-collektive")
+includeBuild("compiler-plugin")
+include("alchemist-incarnation-collektive", "compiler-embeddable", "dsl")

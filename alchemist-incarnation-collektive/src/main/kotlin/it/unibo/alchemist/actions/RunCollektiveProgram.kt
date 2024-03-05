@@ -1,72 +1,109 @@
 package it.unibo.alchemist.actions
 
+import it.unibo.alchemist.collektive.device.CollektiveDevice
 import it.unibo.alchemist.model.Action
 import it.unibo.alchemist.model.Context
 import it.unibo.alchemist.model.Node
 import it.unibo.alchemist.model.Node.Companion.asProperty
 import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Reaction
-import it.unibo.alchemist.model.TimeDistribution
 import it.unibo.alchemist.model.actions.AbstractAction
 import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.collektive.Collektive
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.alchemist.device.CollektiveDevice
+import java.lang.reflect.Method
 import kotlin.reflect.jvm.kotlinFunction
 
 /**
  * An Alchemist [Action] that runs a [Collektive] program.
- * It takes the [node] on which execute the action, the [time] distribution and the
- * aggregate function to execute.
+ * Requires a [node], a program [name], and the actual [program] to execute.
  */
 class RunCollektiveProgram<P : Position<P>>(
-    private val node: Node<Any?>?,
-    private val time: TimeDistribution<Any?>,
-    additionalParameters: String,
-) : AbstractAction<Any?>(
-    requireNotNull(node) { "Collektive does not support an environment with null as nodes" },
-) {
+    node: Node<Any?>,
+    val name: String,
+    val program: context(CollektiveDevice<P>) Aggregate<Int>.() -> Any?,
+) : AbstractAction<Any?>(node) {
 
-    private object AggregatePlaceHolder
+    private val programIdentifier = SimpleMolecule(name)
 
-    private val programIdentifier = SimpleMolecule(additionalParameters)
-    private val localDevice: CollektiveDevice<P> = node?.asProperty() ?: error("Trying to create action for null node")
-    private val run: () -> Any?
-    private val className = additionalParameters.substringBeforeLast(".")
-    private val methodName = additionalParameters.substringAfterLast(".")
-    private val classNameFoo = Class.forName(className)
-    private val method = classNameFoo.methods.find { it.name == methodName }
-        ?: error("Method $additionalParameters not found")
+    /**
+     * The [CollektiveDevice] associated with the [node].
+     */
+    val localDevice: CollektiveDevice<P> = node.asProperty()
+
+    /**
+     * The [Collektive] program on which cycles will be executed.
+     */
+    val collektiveProgram: Collektive<Int, Any?>
 
     init {
         declareDependencyTo(programIdentifier)
-        val parameters = method.parameters.map { param ->
-            when {
-                param.type.isAssignableFrom(Aggregate::class.java) -> AggregatePlaceHolder
-                param.type.isAssignableFrom(CollektiveDevice::class.java) -> localDevice
-                else -> error("Unsupported parameter of type ${param.type}")
-            }
+        collektiveProgram = Collektive(localDevice.id, network = localDevice) {
+            program(localDevice, this)
         }
-        val function = method.kotlinFunction ?: error("No aggregate function found for $programIdentifier")
-        val collektive = Collektive(localDevice.id, localDevice) {
-            function.call(*parameters.map { if (it == AggregatePlaceHolder) this else it }.toTypedArray())
-        }
-        run = { collektive.cycle() }
     }
 
-    override fun cloneAction(node: Node<Any?>?, reaction: Reaction<Any?>?): Action<Any?> {
-        TODO("Not yet implemented")
-    }
+    /**
+     * Create a [RunCollektiveProgram] with a specific [entrypoint] and a [node].
+     */
+    constructor(
+        node: Node<Any?>,
+        entrypoint: String,
+    ) : this(node, entrypoint, findEntrypoint(entrypoint, node.asProperty()))
+
+    /**
+     * Create a [RunCollektiveProgram] with a specific [entrypoint] and a [node].
+     */
+    @JvmOverloads
+    constructor(
+        node: Node<Any?>,
+        entrypoint: Method,
+        name: String = entrypoint.name,
+    ) : this(node, name, buildEntryPoint(entrypoint, node.asProperty()))
+
+    override fun cloneAction(node: Node<Any?>, reaction: Reaction<Any?>): Action<Any?> =
+        RunCollektiveProgram(node, name, program)
 
     override fun execute() {
-        localDevice.currentTime = time.nextOccurence
-        run.invoke().also {
-            node?.setConcentration(
-                SimpleMolecule(method.name),
-                it,
-            ) ?: error("Trying to set concentration for null node")
+        collektiveProgram.cycle().also {
+            node.setConcentration(programIdentifier, it)
         }
     }
 
     override fun getContext(): Context = Context.NEIGHBORHOOD
+
+    companion object {
+
+        private fun <P : Position<P>> findEntrypoint(
+            entrypoint: String,
+            localDevice: CollektiveDevice<P>,
+        ): context(CollektiveDevice<P>) Aggregate<Int>.() -> Any? {
+            val className = entrypoint.substringBeforeLast(".")
+            val methodName = entrypoint.substringAfterLast(".")
+            val clazz = Class.forName(className)
+            val method = clazz.methods.find { it.name == methodName }
+                ?: error("Entrypoint $entrypoint not found, no method $methodName found in class $className")
+            return buildEntryPoint(method, localDevice)
+        }
+
+        private fun <P : Position<P>> buildEntryPoint(
+            method: Method,
+            localDevice: CollektiveDevice<P>,
+        ): context(CollektiveDevice<P>) Aggregate<Int>.() -> Any? {
+            val ktfunction = checkNotNull(method.kotlinFunction) {
+                "Method ${method.name} in class ${method.declaringClass.name} cannot be converted to a Kotlin function"
+            }
+            return {
+                val parameters = method.parameters.map {
+                    when {
+                        it.type.isAssignableFrom(Aggregate::class.java) -> this
+                        it.type.isAssignableFrom(CollektiveDevice::class.java) -> localDevice
+                        it.type.isAssignableFrom(Node::class.java) -> localDevice.node
+                        else -> error("Unsupported type ${it.type} in entrypoint ${ktfunction.name}")
+                    }
+                }.toTypedArray()
+                ktfunction.call(*parameters)
+            }
+        }
+    }
 }
