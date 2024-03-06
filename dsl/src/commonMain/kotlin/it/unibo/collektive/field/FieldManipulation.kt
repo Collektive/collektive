@@ -50,19 +50,6 @@ operator fun <ID : Any, T : Number> Field<ID, T>.plus(other: Field<ID, T>): Fiel
 operator fun <ID : Any, T : Number> Field<ID, T>.minus(other: Field<ID, T>): Field<ID, T> =
     alignedMap(other) { a, b -> sub(a, b) }
 
-// /**
-// * Combine two fields with a [transform] function.
-// * The two fields must be aligned, otherwise an error is thrown.
-// */
-// fun <ID: Any, Type1, Type2, Result> combine(
-//    field1: Field<ID, Type1>,
-//    field2: Field<ID, Type2>,
-//    transform: (Type1, Type2) -> Result
-// ): Field<ID, Result> {
-//    // TODO: we should have a function producing a clear error every time there is a misalignment bug
-//    field1.mapWithId { id, value -> transform(value, field2[id] ?: error("Field not aligned")) }
-// }
-
 @Suppress("UNCHECKED_CAST")
 private fun <T : Number> add(value: T, other: T): T {
     return when (value) {
