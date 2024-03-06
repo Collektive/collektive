@@ -1,3 +1,20 @@
+## [9.0.1](https://github.com/Collektive/collektive/compare/9.0.0...9.0.1) (2024-03-06)
+
+
+### Bug Fixes
+
+* fix broken support for aligned mapping of nullable fields ([a35976a](https://github.com/Collektive/collektive/commit/a35976a7904908a36c04efd89cc418c6a8fe05d0))
+
+
+### Build and continuous integration
+
+* enforce check also in plugin projects ([c5c724c](https://github.com/Collektive/collektive/commit/c5c724c1b382dff607b69e86f2cbbc1bb445b820))
+
+
+### Style improvements
+
+* format code according to style rules ([c47e563](https://github.com/Collektive/collektive/commit/c47e563316593262daadf3ce5a5de56f60f61078))
+
 ## [9.0.0](https://github.com/Collektive/collektive/compare/8.0.0...9.0.0) (2024-03-05)
 
 
