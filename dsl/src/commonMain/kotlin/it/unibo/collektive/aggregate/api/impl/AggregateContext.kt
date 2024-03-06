@@ -69,7 +69,12 @@ internal class AggregateContext<ID : Any>(
     override fun <Initial, Return> repeating(initial: Initial, transform: YieldingScope<Initial, Return>): Return {
         val path = stack.currentPath()
         return transform(YieldingContext(), stateAt(path, initial))
-            .also { state += path to it.toReturn }
+            .also {
+                check(it.toReturn !is Field<*, *>) {
+                    "repeating operations cannot return fields (guaranteed misalignment on every neighborhood change)"
+                }
+                state += path to it.toReturn
+            }
             .toReturn
     }
 
