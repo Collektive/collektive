@@ -72,15 +72,18 @@ sealed interface Field<ID : Any, out T> {
         /**
          * Check if two fields are aligned, throws an IllegalStateException otherwise.
          */
-        fun checkAligned(field1: Field<*, *>, field2: Field<*, *>) {
-            val ids1: Set<Any?> = field1.toMap().keys
-            val ids2: Set<Any?> = field2.toMap().keys
-            check(ids1 == ids2) {
-                """
-                Alignment issue between $field1 and $field2, the different ids are: ${ids1 - ids2 + (ids2 - ids1)}
-                This is most likely caused by a bug in Collektive, please report at
-                https://github.com/Collektive/collektive/issues/new/choose
-                """.trimIndent()
+        fun checkAligned(field1: Field<*, *>, field2: Field<*, *>, vararg fields: Field<*, *>) {
+            val ids: Collection<Any?> = field1.neighbors
+            sequenceOf(field2, *fields).map { it.neighbors }.forEach {
+                check (it.size == ids.size && it.containsAll(ids)) {
+                    """
+                    |Alignment issue among fields:
+                    | - ${listOf(field1, field2, *fields).joinToString(separator = "\n| - ")}
+                    |the different ids are: ${ids - it.toSet() + (it - ids.toSet())}
+                    |This is most likely caused by a bug in Collektive, please report at
+                    |https://github.com/Collektive/collektive/issues/new/choose
+                    """.trimMargin()
+                }
             }
         }
 
