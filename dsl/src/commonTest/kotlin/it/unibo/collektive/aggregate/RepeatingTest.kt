@@ -1,11 +1,13 @@
 package it.unibo.collektive.aggregate
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
+import it.unibo.collektive.field.plus
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 
@@ -59,6 +61,16 @@ class RepeatingTest : StringSpec({
                 val mult = it * 2
                 mult.yielding { "Hello".takeIf { mult < 1 } }
             } shouldBe null
+        }
+    }
+
+    "When the repeating returns a Field an exception must be raised" {
+        shouldThrow<IllegalStateException> {
+            aggregate(id1) {
+                exchange(0) { field ->
+                    repeat(field) { it + 1 }
+                }
+            }
         }
     }
 })
