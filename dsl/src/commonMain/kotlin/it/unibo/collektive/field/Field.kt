@@ -67,6 +67,11 @@ sealed interface Field<ID : Any, out T> {
      */
     val neighborsCount: Int get() = excludeSelf().size
 
+    /**
+     * Returns the number of neighbors of the field.
+     */
+    val neighbors: Collection<ID> // get() = excludeSelf().keys
+
     companion object {
 
         /**
@@ -167,6 +172,7 @@ internal class ArrayBasedField<ID : Any, T>(
 ) : AbstractField<ID, T>(localId, localValue) {
 
     override val neighborsCount: Int get() = others.size
+    override val neighbors: Collection<ID> by lazy { others.map { it.first } }
 
     override fun neighborValueOf(id: ID): T = when {
         others.size <= MAP_OVER_LIST_PERFORMANCE_CROSSING_POINT -> others.first { it.first == id }.second
@@ -191,7 +197,9 @@ internal class SequenceBasedField<ID : Any, T>(
     private val others: Sequence<Pair<ID, T>>,
 ) : AbstractField<ID, T>(localId, localValue) {
 
-    override val neighborsCount by lazy { others.count() }
+    override val neighborsCount get() = neighbors.size
+
+    override val neighbors: Collection<ID> by lazy { others.map { it.first }.toList() }
 
     override fun asSequence(): Sequence<Pair<ID, T>> = others + (localId to localValue)
 
@@ -209,6 +217,8 @@ internal class ConstantField<ID : Any, T>(
     private val neighborsIds: Set<ID>,
 ) : AbstractField<ID, T>(localId, localValue) {
     override val neighborsCount: Int = neighborsIds.size
+
+    override val neighbors: Collection<ID> = neighborsIds
 
     private val reified by lazy {
         reifiedList.toMap()
