@@ -80,7 +80,7 @@ sealed interface Field<ID : Any, out T> {
         fun checkAligned(field1: Field<*, *>, field2: Field<*, *>, vararg fields: Field<*, *>) {
             val ids: Collection<Any?> = field1.neighbors
             sequenceOf(field2, *fields).map { it.neighbors }.forEach {
-                check (it.size == ids.size && it.containsAll(ids)) {
+                check(it.size == ids.size && it.containsAll(ids)) {
                     """
                     |Alignment issue among fields:
                     | - ${listOf(field1, field2, *fields).joinToString(separator = "\n| - ")}

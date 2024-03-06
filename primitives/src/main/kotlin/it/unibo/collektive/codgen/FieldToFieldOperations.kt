@@ -12,7 +12,7 @@ import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.asTypeVariableName
 import com.squareup.kotlinpoet.typeNameOf
 import it.unibo.collektive.field.Field
-import kotlin.coroutines.CoroutineContext
+import kotlin.math.pow
 import kotlin.reflect.KCallable
 import kotlin.reflect.KType
 
@@ -38,10 +38,20 @@ class FieldToFieldOperations : CollektiveCodeGenerator<List<KType>> {
         private val INT_TYPE = typeNameOf<Int>()
         private val ID_BOUNDED_TYPE = TypeVariableName("ID", ANY_TYPE)
 
+        fun generateCombination(inputParameters: List<ParameterSpec>): List<List<ParameterSpec>> {
+            val binarySize = 2.0.pow(inputParameters.size.toDouble()).toInt()
+//            val listResult = mutableListOf<List<ParameterSpec>>()
+
+            for (i in 0 until binarySize) {
+
+            }
+            TODO()
+        }
+
         /**
          * TODO.
          */
-        fun generateFun(origin: KCallable<*>): String {
+        fun generateFunctions(origin: KCallable<*>): List<FunSpec> {
             val functionParameters = origin.parameters.drop(1).map {
                 ParameterSpec(it.name ?: error("No name found"), it.type.asTypeName())
             }
@@ -52,20 +62,24 @@ class FieldToFieldOperations : CollektiveCodeGenerator<List<KType>> {
                 addTypeVariables(origin.typeParameters.map { it.asTypeVariableName() })
                 addParameters(functionParameters)
                 receiver(FIELD_INTERFACE.parameterizedBy(ID_BOUNDED_TYPE, origin.parameters[0].type.asTypeName()))
-                returns(origin.returnType.asTypeName())
+                returns(FIELD_INTERFACE.parameterizedBy(ID_BOUNDED_TYPE, origin.returnType.asTypeName()))
                 when (functionParameters.size) {
                     0 -> {
                         addStatement("return map { it.${origin.name}() }")
                     }
                     1 -> {
                         addStatement("Field.checkAligned(this, ${fieldArguments.joinToString(separator = ", ") })")
-                        addStatement("return mapWithId { id, receiver -> receiver.${origin.name}(" +
-                                fieldArguments.joinToString(separator = ", ") { "$it[id]" } +
-                                ") })")
+                        addStatement(
+                            """
+                            return mapWithId { id, receiver ->
+                            receiver.${origin.name}(${fieldArguments.joinToString(separator = ", ") { "$it[id]" }})
+                            }
+                            """.trimIndent().replace("\n", " ")
+                        )
                     }
                 }
             }.build()
-            return functionSpecification.toString()
+            return listOf(functionSpecification)
         }
     }
 }
@@ -106,16 +120,9 @@ fun main() {
         Result::class,
         Throwable::class,
     )
-    fun KCallable<*>.paramTypes() = parameters.map { it.type }
+    fun KCallable<*>.paramTypes() = parameters.drop(1).map { it.type }
     val forbiddenMembers = Field::class.members.map { member -> member.name to member.paramTypes() }
     targetTypes.flatMap { it.members }
         .filterNot { it.name to it.paramTypes() in forbiddenMembers }
-        .forEach { println(FieldToFieldOperations.generateFun(it)) }
-    val fieldToFieldOperations = FieldToFieldOperations()
-    val fileSpec = fieldToFieldOperations.generate(
-        emptyList(),
-        "it.unibo.collektive.codgen",
-        "FieldToFieldOperations",
-    )
-    println(fileSpec)
+        .forEach { println(FieldToFieldOperations.generateFunctions(it)) }
 }
