@@ -26,7 +26,7 @@ sealed interface Field<ID : Any, out T> {
      */
     fun <B, R> alignedMap(other: Field<ID, B>, transform: (T, B) -> R): Field<ID, R> {
         checkAligned(this, other)
-        return mapWithId { id, value -> transform(value, other[id] ?: error("Unintercepted misalignment")) }
+        return mapWithId { id, value -> transform(value, other[id]) }
     }
 
     /**
