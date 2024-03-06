@@ -1,3 +1,20 @@
+## [9.0.2](https://github.com/Collektive/collektive/compare/9.0.1...9.0.2) (2024-03-06)
+
+
+### Bug Fixes
+
+* repeating cannot return Fields ([4b9bf76](https://github.com/Collektive/collektive/commit/4b9bf76c0e6dc96d659951b5e7e31a5ee89170a8))
+
+
+### Tests
+
+* add regression test checking that an exception is raised when the repeat returns a Field ([9a63615](https://github.com/Collektive/collektive/commit/9a6361550b302a1f4fd3cc5edaf03e13e6099b49))
+
+
+### Style improvements
+
+* remove uneeded comments ([6f84a7b](https://github.com/Collektive/collektive/commit/6f84a7bcd3efe849b0e6d06842106b43bee0dc2b))
+
 ## [9.0.1](https://github.com/Collektive/collektive/compare/9.0.0...9.0.1) (2024-03-06)
 
 
