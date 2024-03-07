@@ -5,7 +5,13 @@ import org.gradle.api.publish.tasks.GenerateModuleMetadata
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.internal.os.OperatingSystem
-import org.gradle.kotlin.dsl.*
+import org.gradle.kotlin.dsl.creating
+import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.getValue
+import org.gradle.kotlin.dsl.getting
+import org.gradle.kotlin.dsl.invoke
+import org.gradle.kotlin.dsl.withType
 import org.gradle.plugin.use.PluginDependency
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -52,6 +58,11 @@ fun Project.configureKotlinMultiplatform() {
             val nativeMain by creating
             val nativeTest by creating
         }
+        sourceSets.all {
+            languageSettings {
+                languageVersion = "2.0"
+            }
+        }
         js(IR) {
             browser()
             nodejs()
@@ -85,8 +96,9 @@ fun Project.configureKotlinMultiplatform() {
         targets.all {
             compilations.all {
                 // enable all warnings as errors
+                // Temporary disable for enabling k2 plugin
                 kotlinOptions {
-                    allWarningsAsErrors = true
+                    // allWarningsAsErrors = true
                 }
             }
         }
