@@ -1,7 +1,10 @@
 package it.unibo.collektive.codgen.utils
 
 import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.MemberName.Companion.member
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeVariableName
@@ -9,9 +12,11 @@ import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.asTypeVariableName
 import kotlin.math.pow
 import kotlin.reflect.KCallable
-import kotlin.reflect.KParameter
+import kotlin.reflect.KFunction
 
 private val FIELD_INTERFACE = ClassName("it.unibo.collektive.field", "Field")
+private val FIELD_COMPANION = ClassName("it.unibo.collektive.field.Field", "Companion")
+private val CHECK_ALIGNED = FIELD_COMPANION.member("checkAligned")
 private val ANY_TYPE = ClassName("kotlin", "Any")
 private val ID_BOUNDED_TYPE = TypeVariableName("ID", ANY_TYPE)
 
@@ -30,28 +35,27 @@ internal fun parameterCombinations(parameters: List<ParameterSpec>): List<List<P
             when (isField) {
                 true -> ParameterSpec(
                     parameter.name,
-                    FIELD_INTERFACE.parameterizedBy(ID_BOUNDED_TYPE, parameter.type)
+                    FIELD_INTERFACE.parameterizedBy(ID_BOUNDED_TYPE, parameter.type),
                 )
+
                 false -> parameter
             }
         }
     }
 }
 
-internal fun KCallable<*>.hasExtensionReceiver(): Boolean =
-    parameters.isNotEmpty() && parameters.first().kind == KParameter.Kind.EXTENSION_RECEIVER
-
-internal fun generateFunctionWithExtensionReceiver(callable: KCallable<*>, paramList: List<ParameterSpec>): FunSpec {
-    val extensionReceiver = paramList.first()
-    val functionParameters = paramList.drop(1)
+internal fun generateFunction(callable: KCallable<*>, paramList: List<ParameterSpec>): FunSpec {
     return FunSpec.builder(callable.name).apply {
         addTypeVariable(ID_BOUNDED_TYPE)
         addTypeVariables(callable.typeParameters.map { it.asTypeVariableName() })
-        addParameters(functionParameters)
-        receiver(extensionReceiver.type)
+        addParameters(paramList.filter { it.name != "this" })
+        receiver(paramList.first().type)
+        when (callable) {
+            is KFunction<*> -> if (callable.isOperator) addModifiers(KModifier.OPERATOR)
+        }
         returns(FIELD_INTERFACE.parameterizedBy(ID_BOUNDED_TYPE, callable.returnType.asTypeName()))
         when (paramList.size) {
-            0 -> addStatement("return map { it.${callable.name}() }")
+            1 -> addStatement("return·map·{·it.${callable.name}()·}")
             else -> {
                 val firstFieldParameter = paramList.first { it.type.toString().contains("Field") }
                 val otherParameters = paramList.filter { it != firstFieldParameter }
@@ -61,46 +65,17 @@ internal fun generateFunctionWithExtensionReceiver(callable: KCallable<*>, param
                         false -> it.name
                     }
                 }
-                addStatement("Field.checkAligned(this, ${functionParameters.joinToString(separator = ", ") { it.name }})")
-                addStatement(
-                    """
-                        return ${firstFieldParameter.name}.mapWithId { id, receiver ->
-                        receiver.${callable.name}(${arguments.joinToString(separator = ", ")})
-                        }
-                    """.trimIndent()
-                )
-            }
-        }
-    }.build()
-}
-
-internal fun generateFunction(callable: KCallable<*>, paramList: List<ParameterSpec>, withReceiver: Boolean): FunSpec {
-    return FunSpec.builder(callable.name).apply {
-        addTypeVariable(ID_BOUNDED_TYPE)
-        addTypeVariables(callable.typeParameters.map { it.asTypeVariableName() })
-        addParameters(paramList)
-        if (withReceiver) {
-            receiver(paramList.first().type)
-        }
-        returns(FIELD_INTERFACE.parameterizedBy(ID_BOUNDED_TYPE, callable.returnType.asTypeName()))
-        when (paramList.size) {
-            0 -> addStatement("return map { it.${callable.name}() }")
-            else -> {
-                val firstFieldParameter = paramList.first { it.type.toString().contains("Field") }
-                val otherParameters = paramList.filter { it != firstFieldParameter }
-                val arguments = otherParameters.map {
-                    when (it.type.toString().contains("Field")) {
-                        true -> "${it.name}[id]"
-                        false -> it.name
-                    }
+                val toCheckAligned = paramList.filter { it.type.toString().contains("Field") }
+                if (toCheckAligned.size > 1) {
+                    addStatement("%M(${toCheckAligned.joinToString(separator = ",·") { it.name }})", CHECK_ALIGNED)
                 }
-                addStatement("Field.checkAligned(this, ${paramList.joinToString(separator = ", ") { it.name }})")
                 addStatement(
-                    """
-                        return ${firstFieldParameter.name}.mapWithId { id, receiver ->
-                        receiver.${callable.name}(${arguments.joinToString(separator = ", ")})
-                        }
-                    """.trimIndent()
+                    "return ${firstFieldParameter.name}.mapWithId·{·id,·receiver·->·receiver.%N(${
+                        arguments.joinToString(
+                            separator = ",·",
+                        )
+                    })·}",
+                    callable.name,
                 )
             }
         }
@@ -108,45 +83,17 @@ internal fun generateFunction(callable: KCallable<*>, paramList: List<ParameterS
 }
 
 internal fun generateFunctions(origin: KCallable<*>): List<FunSpec> {
-    val functionArguments = origin.parameters.mapNotNull {
-        it.name?.let { name -> ParameterSpec(name, it.type.asTypeName()) }
+    val functionArguments = origin.parameters.map {
+        ParameterSpec(it.name ?: "this", it.type.asTypeName())
     }
-//    val hasExtensionReceiver = origin.hasExtensionReceiver()
 
     return parameterCombinations(functionArguments).map { paramList ->
-        when (origin.hasExtensionReceiver()) {
-            true -> generateFunctionWithExtensionReceiver(origin, paramList)
-            false -> generatePlainFunction(origin, paramList)
-        }
-//
-//
-//        val functionReceiver = paramList.first().type
-//        val functionParameters = paramList.drop(1)
-//        FunSpec.builder(origin.name).apply {
-//            addTypeVariable(ID_BOUNDED_TYPE)
-//            addTypeVariables(origin.typeParameters.map { it.asTypeVariableName() })
-//            addParameters(functionParameters)
-//            receiver(functionReceiver)
-//            returns(FIELD_INTERFACE.parameterizedBy(ID_BOUNDED_TYPE, origin.returnType.asTypeName()))
-//            when (paramList.size) {
-//                0 -> addStatement("return map { it.$functionName() }")
-//                else -> {
-//                    val arguments = paramList.map {
-//                        when (it.type == FIELD_INTERFACE.parameterizedBy(ID_BOUNDED_TYPE, it.type)) {
-//                            true -> "${it.name}[id]"
-//                            false -> it.name
-//                        }
-//                    }
-//                    addStatement("Field.checkAligned(this, ${functionParameters.joinToString(separator = ", ") { it.name }})")
-//                    addStatement(
-//                        """
-//                            return mapWithId { id, receiver ->
-//                            receiver.$functionName(${arguments.joinToString(separator = ", ")})
-//                            }
-//                        """.trimIndent()
-//                    )
-//                }
-//            }
-//        }.build()
+        generateFunction(origin, paramList)
     }
+}
+
+internal fun generatePrimitivesFile(origin: List<KCallable<*>>): FileSpec {
+    return FileSpec.builder("it.unibo.collektive.codgen", "FieldToFieldOperations").apply {
+        origin.flatMap { generateFunctions(it) }.forEach { addFunction(it) }
+    }.build()
 }
