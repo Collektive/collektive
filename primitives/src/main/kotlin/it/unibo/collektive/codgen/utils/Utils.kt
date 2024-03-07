@@ -64,7 +64,7 @@ internal fun generateFunctionWithExtensionReceiver(callable: KCallable<*>, param
                 addStatement("Field.checkAligned(this, ${functionParameters.joinToString(separator = ", ") { it.name }})")
                 addStatement(
                     """
-                        return $firstFieldParameter.mapWithId { id, receiver ->
+                        return ${firstFieldParameter.name}.mapWithId { id, receiver ->
                         receiver.${callable.name}(${arguments.joinToString(separator = ", ")})
                         }
                     """.trimIndent()
@@ -74,11 +74,14 @@ internal fun generateFunctionWithExtensionReceiver(callable: KCallable<*>, param
     }.build()
 }
 
-internal fun generatePlainFunction(callable: KCallable<*>, paramList: List<ParameterSpec>): FunSpec {
+internal fun generateFunction(callable: KCallable<*>, paramList: List<ParameterSpec>, withReceiver: Boolean): FunSpec {
     return FunSpec.builder(callable.name).apply {
         addTypeVariable(ID_BOUNDED_TYPE)
         addTypeVariables(callable.typeParameters.map { it.asTypeVariableName() })
         addParameters(paramList)
+        if (withReceiver) {
+            receiver(paramList.first().type)
+        }
         returns(FIELD_INTERFACE.parameterizedBy(ID_BOUNDED_TYPE, callable.returnType.asTypeName()))
         when (paramList.size) {
             0 -> addStatement("return map { it.${callable.name}() }")
@@ -94,7 +97,7 @@ internal fun generatePlainFunction(callable: KCallable<*>, paramList: List<Param
                 addStatement("Field.checkAligned(this, ${paramList.joinToString(separator = ", ") { it.name }})")
                 addStatement(
                     """
-                        return $firstFieldParameter.mapWithId { id, receiver ->
+                        return ${firstFieldParameter.name}.mapWithId { id, receiver ->
                         receiver.${callable.name}(${arguments.joinToString(separator = ", ")})
                         }
                     """.trimIndent()
@@ -105,8 +108,8 @@ internal fun generatePlainFunction(callable: KCallable<*>, paramList: List<Param
 }
 
 internal fun generateFunctions(origin: KCallable<*>): List<FunSpec> {
-    val functionArguments = origin.parameters.map {
-        ParameterSpec(it.name ?: "<receiver>", it.type.asTypeName())
+    val functionArguments = origin.parameters.mapNotNull {
+        it.name?.let { name -> ParameterSpec(name, it.type.asTypeName()) }
     }
 //    val hasExtensionReceiver = origin.hasExtensionReceiver()
 
