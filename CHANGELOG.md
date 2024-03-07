@@ -1,3 +1,13 @@
+## [9.0.3](https://github.com/Collektive/collektive/compare/9.0.2...9.0.3) (2024-03-07)
+
+
+### Dependency updates
+
+* **core-deps:** update kotlin monorepo to v1.9.23 ([8393427](https://github.com/Collektive/collektive/commit/8393427fe1b3f3c50a490cedde13caad3b874226))
+* **deps:** update plugin kotlin-qa to v0.60.3 ([8d63a83](https://github.com/Collektive/collektive/commit/8d63a83f25ab2897b3a51716e5d6e65bb23deabe))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.3 ([bcb2b88](https://github.com/Collektive/collektive/commit/bcb2b8888beb9223b6097174c3364ad0870bd4fb))
+* **deps:** update plugin publishoncentral to v5.0.25 ([564e9de](https://github.com/Collektive/collektive/commit/564e9de7bf87d882320d278f09b66667c7fcb614))
+
 ## [9.0.2](https://github.com/Collektive/collektive/compare/9.0.1...9.0.2) (2024-03-06)
 
 
