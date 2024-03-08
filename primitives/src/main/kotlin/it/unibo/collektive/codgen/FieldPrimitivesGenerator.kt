@@ -4,6 +4,7 @@ import it.unibo.collektive.codgen.utils.generatePrimitivesFile
 import it.unibo.collektive.field.Field
 import java.io.File
 import kotlin.reflect.KCallable
+import kotlin.reflect.KFunction
 
 /**
  * TODO.
@@ -47,7 +48,8 @@ fun main() {
     val forbiddenMembersName = listOf("compareTo")
     val origins = targetTypes.flatMap { it.members }
         .filterNot { it.name to it.paramTypes() in forbiddenMembers }
-        .filterNot { it.annotations.any { c -> c.annotationClass == Deprecated::class } }
+        .filter { it.annotations.isEmpty() }
+        .filterIsInstance<KFunction<*>>()
         .filterNot { it.name in forbiddenMembersName }
         .toList()
 
