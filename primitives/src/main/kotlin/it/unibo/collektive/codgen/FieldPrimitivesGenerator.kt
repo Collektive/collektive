@@ -4,7 +4,6 @@ import it.unibo.collektive.codgen.utils.generatePrimitivesFile
 import it.unibo.collektive.field.Field
 import java.io.File
 import kotlin.reflect.KCallable
-import kotlin.reflect.KFunction
 
 /**
  * TODO.
@@ -46,12 +45,19 @@ fun main() {
     fun KCallable<*>.paramTypes() = parameters.drop(1).map { it.type }
     val forbiddenMembers = Field::class.members.map { member -> member.name to member.paramTypes() }
     val forbiddenMembersName = listOf("compareTo")
-    val origins = targetTypes.flatMap { it.members }
-        .filterNot { it.name to it.paramTypes() in forbiddenMembers }
-        .filter { it.annotations.isEmpty() }
-        .filterIsInstance<KFunction<*>>()
-        .filterNot { it.name in forbiddenMembersName }
-        .toList()
+    val generatedFiles = targetTypes.map { clazz ->
+        val membersToField = clazz.members.filterNot { it.name to it.paramTypes() in forbiddenMembers }
+            .filter { it.annotations.isEmpty() }
+            .filterNot { it.name in forbiddenMembersName }
+            .toList()
+        generatePrimitivesFile(
+            membersToField,
+            "it.unibo.collektive.primitives",
+            "Field${clazz.simpleName}Primitives",
+        )
+    }
 
-    generatePrimitivesFile(origins).writeTo(File("primitives/src/main/resources/kotlin"))
+    generatedFiles.forEach {
+        it.writeTo(File("primitives/src/main/resources/kotlin"))
+    }
 }
