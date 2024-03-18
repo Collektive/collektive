@@ -20,7 +20,7 @@ interface EnvironmentVariables {
     fun <T> getOrDefault(name: String, default: T): T
 
     /**
-     * Check if the variable with the given [name] is defined.
+     * Check if the variable with the given [name] is defined inside the environment.
      */
     fun isDefined(name: String): Boolean
 
