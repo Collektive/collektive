@@ -78,7 +78,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
 
     override fun createMolecule(molecule: String) = SimpleMolecule(molecule)
 
-    override fun createConcentration(p0: Any?): Any? = p0
+    override fun createConcentration(concentration: Any?): Any? = concentration
 
     override fun createConcentration() = Unit
 
