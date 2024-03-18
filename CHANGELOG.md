@@ -1,3 +1,41 @@
+## [9.1.0](https://github.com/Collektive/collektive/compare/9.0.3...9.1.0) (2024-03-18)
+
+
+### Features
+
+* update incarnation to adapt to new Alchemist version ([5fc35de](https://github.com/Collektive/collektive/commit/5fc35ded252a4094c16222c3859d8db3c886debb))
+
+
+### Dependency updates
+
+* **deps:** update Alchemist dependency ([9fc68bc](https://github.com/Collektive/collektive/commit/9fc68bcb1af3e7e714073b5fb6fb9d6b1bad833f))
+* **deps:** update alchemist to v31.0.5 ([cb002a4](https://github.com/Collektive/collektive/commit/cb002a41fbaeb80c5532cae8f016a74e612f29f4))
+* **deps:** update alchemist to v31.0.6 ([9b3f591](https://github.com/Collektive/collektive/commit/9b3f591f2f49bec27069612a4ddce081ae2deac6))
+* **deps:** update kotest to v5.8.1 ([4a2ff02](https://github.com/Collektive/collektive/commit/4a2ff02ee2298146f52844565755359eb0db1f62))
+* **deps:** update plugin gitsemver to v3.1.3 ([3918029](https://github.com/Collektive/collektive/commit/3918029cc3646102faf63f6b686176fd2b5f469e))
+
+
+### Documentation
+
+* update environment variables doc ([7235075](https://github.com/Collektive/collektive/commit/7235075de7dd3d74d0aa70240abeb900f81edc0b))
+
+
+### Tests
+
+* add test that uses envirnoment variables in the entrypoint of the program ([8f70616](https://github.com/Collektive/collektive/commit/8f7061689c481623db57f664ae5a2d5a2c1b267f))
+
+
+### Build and continuous integration
+
+* **deps:** update actions/checkout action to v4.1.2 ([bed3371](https://github.com/Collektive/collektive/commit/bed337147bd7156b536ae1ef652aeb6bc9b0d257))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.7 ([29ed3c6](https://github.com/Collektive/collektive/commit/29ed3c6151588091a90f44729eea9b40ea8b0fbd))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.8 ([b31c77d](https://github.com/Collektive/collektive/commit/b31c77d98c5b0c4ce6b3cfed729fa5ffbd142bcd))
+
+
+### Refactoring
+
+* rename parameter name ([bca4dcd](https://github.com/Collektive/collektive/commit/bca4dcdd6de1703fd04253099d23f085142737c0))
+
 ## [9.0.3](https://github.com/Collektive/collektive/compare/9.0.2...9.0.3) (2024-03-07)
 
 
