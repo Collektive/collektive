@@ -1,7 +1,6 @@
 package it.unibo.collektive.codgen.utils
 
 import com.squareup.kotlinpoet.AnnotationSpec
-import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
@@ -11,19 +10,20 @@ import com.squareup.kotlinpoet.ParameterizedTypeName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeVariableName
+import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
+import it.unibo.collektive.field.Field
 import kotlin.math.pow
 import kotlin.reflect.KCallable
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty
 
-private val FIELD_INTERFACE = ClassName("it.unibo.collektive.field", "Field")
-private val FIELD_COMPANION = ClassName("it.unibo.collektive.field.Field", "Companion")
+private val FIELD_INTERFACE = Field::class.asClassName()
+private val FIELD_COMPANION = Field.Companion::class.asClassName()
 private val CHECK_ALIGNED = FIELD_COMPANION.member("checkAligned")
 private val FIELD_MAP = FIELD_INTERFACE.member("map")
 private val FIELD_MAP_WITH_ID = FIELD_INTERFACE.member("mapWithId")
-private val ANY_TYPE = ClassName("kotlin", "Any")
-private val ID_BOUNDED_TYPE = TypeVariableName("ID", ANY_TYPE)
+private val ID_BOUNDED_TYPE = TypeVariableName("ID", Any::class.asTypeName())
 private val operatorNotReturningField = listOf("compareTo", "contains")
 
 internal fun ParameterSpec.isField() = type.toString().contains("Field")
