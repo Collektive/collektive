@@ -4,6 +4,7 @@ import com.squareup.kotlinpoet.FileSpec
 import it.unibo.collektive.field.Field
 import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
+import kotlin.reflect.KVisibility
 
 /**
  * The base types for which to generate field functions.
@@ -54,6 +55,7 @@ fun generateFieldFunctionsForTypes(
     return types.map { clazz ->
         val membersToField = clazz.members.filterNot { it.name to it.paramTypes() in forbiddenMembers }
             .filter { it.annotations.isEmpty() }
+            .filterNot { it.visibility == KVisibility.INTERNAL }
             .filterNot { it.name in forbiddenMembersName }
             .toList()
         generatePrimitivesFile(
