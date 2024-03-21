@@ -81,7 +81,7 @@ internal fun FunSpec.Builder.addBodyForFieldReceiverFunction(callable: KCallable
             false -> it.name
         }
     }
-    val toCheckAligned = functionParameters.filter { it.isField() }
+    val toCheckAligned = parameters.filter { it.isField() }
     if (toCheckAligned.size > 1) {
         addStatement("%M(${toCheckAligned.joinToString(separator = ",·") { it.name }})", CHECK_ALIGNED)
     }
@@ -135,7 +135,7 @@ internal fun FunSpec.Builder.addBodyForNonFieldReceiverFunction(
             false -> it.name
         }
     }
-    val toCheckAligned = functionParameters.filter { it.isField() }
+    val toCheckAligned = parameters.filter { it.isField() }
     if (toCheckAligned.size > 1) {
         addStatement("%M(${toCheckAligned.joinToString(separator = ",·") { it.name }})", CHECK_ALIGNED)
     }
