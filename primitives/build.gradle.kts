@@ -27,8 +27,8 @@ kotlinJvm {
         }
         val test by getting {
             dependencies {
-                implementation(libs.kotest.runner.junit5.jvm)
                 implementation(libs.kotlin.compile.testing)
+                implementation(libs.kotest.runner.junit5.jvm)
                 implementation(project(":compiler-embeddable"))
             }
         }
