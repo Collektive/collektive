@@ -68,9 +68,9 @@ sealed interface Field<ID : Any, out T> {
     val neighborsCount: Int get() = excludeSelf().size
 
     /**
-     * Returns the number of neighbors of the field.
+     * Returns the [ID]s of all neighbors in this field.
      */
-    val neighbors: Collection<ID> // get() = excludeSelf().keys
+    val neighbors: Collection<ID>
 
     companion object {
 
