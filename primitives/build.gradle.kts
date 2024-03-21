@@ -20,15 +20,15 @@ kotlinJvm {
     sourceSets {
         val main by getting {
             dependencies {
-                implementation(project(":dsl"))
-                implementation(libs.kotlinpoet)
                 implementation(kotlin("reflect"))
+                implementation(libs.kotlinpoet)
+                implementation(project(":dsl"))
             }
         }
         val test by getting {
             dependencies {
                 implementation(libs.kotest.runner.junit5.jvm)
-                implementation("com.github.tschuchortdev:kotlin-compile-testing:1.5.0")
+                implementation(libs.kotlin.compile.testing)
                 implementation(project(":compiler-embeddable"))
             }
         }
