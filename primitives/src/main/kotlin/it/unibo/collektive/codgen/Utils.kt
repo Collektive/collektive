@@ -1,4 +1,4 @@
-package it.unibo.collektive.codgen.utils
+package it.unibo.collektive.codgen
 
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.FileSpec
