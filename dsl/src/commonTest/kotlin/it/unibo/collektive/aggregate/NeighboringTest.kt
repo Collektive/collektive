@@ -29,6 +29,13 @@ class NeighboringTest : StringSpec({
         }
     }
 
+    "Neighboring without messages with efficient neighboring implementation" {
+        aggregate(id0) {
+            val field = neighboring(initV1)
+            field.toMap() shouldContainValue initV1
+        }
+    }
+
     "Neighboring with three aligned devices" {
         val nm = NetworkManager()
 
@@ -56,6 +63,33 @@ class NeighboringTest : StringSpec({
         }
     }
 
+    "Neighboring with three aligned devices with efficient neighboring implementation" {
+        val nm = NetworkManager()
+
+        // Device 1
+        val testNetwork1 = NetworkImplTest(nm, id1)
+        aggregate(id1, testNetwork1) {
+            val field = neighboring(double(initV1))
+            field.toMap() shouldContainValue 2
+        }
+
+        // Device 2
+        val testNetwork2 = NetworkImplTest(nm, id2)
+        aggregate(id2, testNetwork2) {
+            val field = neighboring(double(initV2))
+            field.toMap() shouldContainValue 2
+            field.toMap() shouldContainValue 4
+        }
+
+        // Device 3
+        val testNetwork3 = NetworkImplTest(nm, id3)
+        aggregate(id3, testNetwork3) {
+            val field = neighboring(double(initV3))
+            field.toMap() shouldContainValue 4
+            field.toMap() shouldContainValue 6
+        }
+    }
+
     "Neighboring with two not aligned devices" {
         val nm = NetworkManager()
 
@@ -77,6 +111,32 @@ class NeighboringTest : StringSpec({
             fun kingBehaviour() = neighboringViaExchange(double(initV1))
 
             fun queenBehaviour() = neighboringViaExchange(add(initV2))
+            val field = if (isDeviceTwoKing) kingBehaviour() else queenBehaviour()
+            field.toMap() shouldHaveSize 1
+        }
+    }
+
+    "Neighboring with two not aligned devices with efficient neighboring implementation" {
+        val nm = NetworkManager()
+
+        // Device 1
+        val isDeviceOneKing = true
+        val testNetwork1 = NetworkImplTest(nm, id1)
+        aggregate(id1, testNetwork1) {
+            fun kingBehaviour() = neighboring(double(initV2))
+
+            fun queenBehaviour() = neighboring(add(initV1))
+            val f = if (isDeviceOneKing) kingBehaviour() else queenBehaviour()
+            f.toMap() shouldHaveSize 1
+        }
+
+        // Device 2
+        val isDeviceTwoKing = false
+        val testNetwork2 = NetworkImplTest(nm, id2)
+        aggregate(id2, testNetwork2) {
+            fun kingBehaviour() = neighboring(double(initV1))
+
+            fun queenBehaviour() = neighboring(add(initV2))
             val field = if (isDeviceTwoKing) kingBehaviour() else queenBehaviour()
             field.toMap() shouldHaveSize 1
         }
