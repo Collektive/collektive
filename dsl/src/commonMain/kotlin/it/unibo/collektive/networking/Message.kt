@@ -58,7 +58,6 @@ class OutboundMessage<ID : Any>(
             """.trimIndent()
         }
         defaults[path] = message.default
-//        mutableMessages[path] = message
         message.overrides.forEach { (id, value) ->
             val destination = overrides.getOrPut(id) { mutableListOf() }
             destination += path to value
