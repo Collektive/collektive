@@ -22,21 +22,21 @@ class NeighboringTest : StringSpec({
     val double: (Int) -> Int = { it * 2 }
     val add: (Int) -> Int = { it + 1 }
 
-    "Neighboring without messages" {
+    "Neighbouring must produce a field with the local value when no neighbours are present" {
         aggregate(id0) {
             val field = neighboringViaExchange(initV1)
             field.toMap() shouldContainValue initV1
         }
     }
 
-    "Neighboring without messages with efficient neighboring implementation" {
+    "Optimized neighbouring must produce a field with the local value when no neighbours are present" {
         aggregate(id0) {
             val field = neighboring(initV1)
             field.toMap() shouldContainValue initV1
         }
     }
 
-    "Neighboring with three aligned devices" {
+    "Neighboring works across three aligned devices" {
         val nm = NetworkManager()
 
         // Device 1
@@ -63,7 +63,7 @@ class NeighboringTest : StringSpec({
         }
     }
 
-    "Neighboring with three aligned devices with efficient neighboring implementation" {
+    "Optimized neighboring works across three aligned devices" {
         val nm = NetworkManager()
 
         // Device 1
@@ -90,7 +90,7 @@ class NeighboringTest : StringSpec({
         }
     }
 
-    "Neighboring with two not aligned devices" {
+    "Non-aligned devices do not communicate" {
         val nm = NetworkManager()
 
         // Device 1
@@ -116,7 +116,7 @@ class NeighboringTest : StringSpec({
         }
     }
 
-    "Neighboring with two not aligned devices with efficient neighboring implementation" {
+    "Non-aligned devices do not communicate with optimized neighboring" {
         val nm = NetworkManager()
 
         // Device 1
