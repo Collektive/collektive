@@ -78,7 +78,8 @@ interface Aggregate<ID : Any> {
      * val field = neighboring({ 2 * 2 })
      * ```
      *
-     * In this case, the field returned has the computation as a result.
+     * In this case, the field returned has the computation as a result,
+     * in form of a field of functions with type `() -> Int`.
      */
     fun <Scalar> neighboring(local: Scalar): Field<ID, Scalar>
 
