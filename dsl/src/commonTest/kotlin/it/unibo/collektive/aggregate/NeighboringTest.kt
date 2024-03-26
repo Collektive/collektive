@@ -22,14 +22,14 @@ class NeighboringTest : StringSpec({
     val double: (Int) -> Int = { it * 2 }
     val add: (Int) -> Int = { it + 1 }
 
-    "Neighbouring must produce a field with the local value when no neighbours are present" {
+    "Neighboring must produce a field with the local value when no neighbours are present" {
         aggregate(id0) {
             val field = neighboringViaExchange(initV1)
             field.toMap() shouldContainValue initV1
         }
     }
 
-    "Optimized neighbouring must produce a field with the local value when no neighbours are present" {
+    "Optimized neighboring must produce a field with the local value when no neighbours are present" {
         aggregate(id0) {
             val field = neighboring(initV1)
             field.toMap() shouldContainValue initV1
