@@ -1,3 +1,30 @@
+## [9.1.1](https://github.com/Collektive/collektive/compare/9.1.0...9.1.1) (2024-03-27)
+
+
+### Dependency updates
+
+* **deps:** update alchemist to v32.0.1 ([663dafc](https://github.com/Collektive/collektive/commit/663dafc84541b28ac9d5351838b5ad1ed73f4c0e))
+* **deps:** update alchemist to v33 ([c0dda84](https://github.com/Collektive/collektive/commit/c0dda84eb8d239b23f02f41ce77901026a0dfc91))
+* **deps:** update alchemist to v33.0.1 ([61ebc12](https://github.com/Collektive/collektive/commit/61ebc126c9ceb31da8d315945f7e89271563723c))
+* **deps:** update dependency gradle to v8.7 ([b8c73c1](https://github.com/Collektive/collektive/commit/b8c73c1433f17b37fa2723267e5ca45602e4789e))
+* **deps:** update plugin gitsemver to v3.1.4 ([f16b5f3](https://github.com/Collektive/collektive/commit/f16b5f3e85c0cf23d0bda9ac1aa7c32d562b95f6))
+* **deps:** update plugin kotlin-qa to v0.60.4 ([d1fb8c4](https://github.com/Collektive/collektive/commit/d1fb8c4f6fff7ca49f5783f1fcd80f2a0940cdc0))
+* **deps:** update plugin kotlin-qa to v0.61.0 ([affa897](https://github.com/Collektive/collektive/commit/affa897147f5869e69ccf26ee9d1e7f0d54b82c5))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.4 ([a21d6ad](https://github.com/Collektive/collektive/commit/a21d6adc68245760bddc92dbfe4bf203f58fbe9d))
+* **deps:** update plugin publishoncentral to v5.0.26 ([6dfe951](https://github.com/Collektive/collektive/commit/6dfe951c1d70852eec662859cd5f5341c0bf947f))
+
+
+### Performance improvements
+
+* efficient implementation of `neighboring` ([#284](https://github.com/Collektive/collektive/issues/284)) ([8b95e4d](https://github.com/Collektive/collektive/commit/8b95e4dbe3145578de41ea9b67c1a927eecd96a6))
+
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.10 ([5a718dc](https://github.com/Collektive/collektive/commit/5a718dc7b88feebe777eefe1034bda54b7c75210))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.11 ([04d7834](https://github.com/Collektive/collektive/commit/04d7834f0e489b6e0ab4196f5d45dc4ce2e51af7))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.9 ([f4e6e96](https://github.com/Collektive/collektive/commit/f4e6e9667d27a2c8c7e212e9c25c0b8230264b97))
+
 ## [9.1.0](https://github.com/Collektive/collektive/compare/9.0.3...9.1.0) (2024-03-18)
 
 
