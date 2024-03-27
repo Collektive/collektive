@@ -78,6 +78,13 @@ internal class AggregateContext<ID : Any>(
             .toReturn
     }
 
+    override fun <Scalar> neighboring(local: Scalar): Field<ID, Scalar> {
+        val path = stack.currentPath()
+        val neighborValues = messagesAt<Scalar>(path)
+        toBeSent.addMessage(path, SingleOutboundMessage(local))
+        return newField(local, neighborValues)
+    }
+
     override fun <Initial> repeat(initial: Initial, transform: (Initial) -> Initial): Initial = repeating(initial) {
         val res = transform(it)
         YieldingResult(res, res)

@@ -22,14 +22,21 @@ class NeighboringTest : StringSpec({
     val double: (Int) -> Int = { it * 2 }
     val add: (Int) -> Int = { it + 1 }
 
-    "Neighboring without messages" {
+    "Neighboring must produce a field with the local value when no neighbours are present" {
         aggregate(id0) {
             val field = neighboringViaExchange(initV1)
             field.toMap() shouldContainValue initV1
         }
     }
 
-    "Neighboring with three aligned devices" {
+    "Optimized neighboring must produce a field with the local value when no neighbours are present" {
+        aggregate(id0) {
+            val field = neighboring(initV1)
+            field.toMap() shouldContainValue initV1
+        }
+    }
+
+    "Neighboring works across three aligned devices" {
         val nm = NetworkManager()
 
         // Device 1
@@ -56,7 +63,34 @@ class NeighboringTest : StringSpec({
         }
     }
 
-    "Neighboring with two not aligned devices" {
+    "Optimized neighboring works across three aligned devices" {
+        val nm = NetworkManager()
+
+        // Device 1
+        val testNetwork1 = NetworkImplTest(nm, id1)
+        aggregate(id1, testNetwork1) {
+            val field = neighboring(double(initV1))
+            field.toMap() shouldContainValue 2
+        }
+
+        // Device 2
+        val testNetwork2 = NetworkImplTest(nm, id2)
+        aggregate(id2, testNetwork2) {
+            val field = neighboring(double(initV2))
+            field.toMap() shouldContainValue 2
+            field.toMap() shouldContainValue 4
+        }
+
+        // Device 3
+        val testNetwork3 = NetworkImplTest(nm, id3)
+        aggregate(id3, testNetwork3) {
+            val field = neighboring(double(initV3))
+            field.toMap() shouldContainValue 4
+            field.toMap() shouldContainValue 6
+        }
+    }
+
+    "Non-aligned devices do not communicate" {
         val nm = NetworkManager()
 
         // Device 1
@@ -77,6 +111,32 @@ class NeighboringTest : StringSpec({
             fun kingBehaviour() = neighboringViaExchange(double(initV1))
 
             fun queenBehaviour() = neighboringViaExchange(add(initV2))
+            val field = if (isDeviceTwoKing) kingBehaviour() else queenBehaviour()
+            field.toMap() shouldHaveSize 1
+        }
+    }
+
+    "Non-aligned devices do not communicate with optimized neighboring" {
+        val nm = NetworkManager()
+
+        // Device 1
+        val isDeviceOneKing = true
+        val testNetwork1 = NetworkImplTest(nm, id1)
+        aggregate(id1, testNetwork1) {
+            fun kingBehaviour() = neighboring(double(initV2))
+
+            fun queenBehaviour() = neighboring(add(initV1))
+            val f = if (isDeviceOneKing) kingBehaviour() else queenBehaviour()
+            f.toMap() shouldHaveSize 1
+        }
+
+        // Device 2
+        val isDeviceTwoKing = false
+        val testNetwork2 = NetworkImplTest(nm, id2)
+        aggregate(id2, testNetwork2) {
+            fun kingBehaviour() = neighboring(double(initV1))
+
+            fun queenBehaviour() = neighboring(add(initV2))
             val field = if (isDeviceTwoKing) kingBehaviour() else queenBehaviour()
             field.toMap() shouldHaveSize 1
         }
