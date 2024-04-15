@@ -53,8 +53,11 @@ class OutboundMessage<ID : Any>(
     fun addMessage(path: Path, message: SingleOutboundMessage<ID, *>) {
         check(!defaults.containsKey(path)) {
             """
-            Aggregate alignment clash by multiple aligned calls originated at the same path: $path.
-            The most likely cause is an aggregate function call within a loop without proper manual alignment.
+            Aggregate alignment clash originated at the same path: $path. 
+            Possible causes are: 
+                - compiler plugin is not enabled,
+                - multiple aligned calls. The most likely cause is an aggregate function call within a loop without proper manual alignment.
+            If none of the above, please open an issue at https://github.com/Collektive/collektive/issues .
             """.trimIndent()
         }
         defaults[path] = message.default
