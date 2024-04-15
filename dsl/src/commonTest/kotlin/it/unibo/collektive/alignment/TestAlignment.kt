@@ -42,7 +42,7 @@ class TestAlignment : StringSpec({
             }
         }
         exception.message shouldContain
-            "Aggregate alignment clash by multiple aligned calls originated at the same path:"
+            "Aggregate alignment clash originated at the same path:"
     }
 
     "Different alignment should be performed when a function has an aggregate parameter" {
