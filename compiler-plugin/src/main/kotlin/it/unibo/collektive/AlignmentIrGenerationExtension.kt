@@ -69,7 +69,6 @@ class AlignmentIrGenerationExtension(private val logger: MessageCollector) : IrG
             ),
             null,
         )
-
         /*
          This transformation changes the `isCompilerPluginApplied` function to return true.
          */

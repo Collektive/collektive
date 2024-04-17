@@ -87,7 +87,7 @@ class Collektive<ID : Any, R>(
 
         private fun checkCompilerPluginApplied() = require(isCompilerPluginApplied()) {
             """
-                The collektive compiler plugin is not applied.
+                The collektive compiler plugin has not been applied.
                 Please add the following to your build.gradle.kts:
                 
                 plugins {
