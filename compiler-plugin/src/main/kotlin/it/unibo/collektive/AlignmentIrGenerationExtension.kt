@@ -19,6 +19,7 @@ import org.jetbrains.kotlin.name.Name
  * The generation extension is used to register the transformer plugin, which is going to modify
  * the IR using the function responsible for the alignment.
  */
+@Suppress("ReturnCount")
 class AlignmentIrGenerationExtension(private val logger: MessageCollector) : IrGenerationExtension {
     override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
         // Aggregate Context class that has the reference to the stack

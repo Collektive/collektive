@@ -11,11 +11,14 @@ import org.jetbrains.kotlin.ir.builders.irReturn
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 
+/**
+ * This transformer replaces the body of the function `isEnabledFunction` with a return statement that returns `true`.
+ */
 class EnabledCompilerPluginTransformer(
     private val pluginContext: IrPluginContext,
     private val logger: MessageCollector,
     private val isEnabledFunction: IrFunction,
-): IrElementTransformerVoid() {
+) : IrElementTransformerVoid() {
 
     override fun visitFunction(declaration: IrFunction): IrStatement {
         if (declaration.name == isEnabledFunction.name) {
