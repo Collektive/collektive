@@ -1,3 +1,41 @@
+## [9.1.2](https://github.com/Collektive/collektive/compare/9.1.1...9.1.2) (2024-04-17)
+
+
+### Dependency updates
+
+* **deps:** update alchemist to v33.0.2 ([7339635](https://github.com/Collektive/collektive/commit/7339635262efb5841b3ffde98ec985f18160ac06))
+* **deps:** update alchemist to v33.0.3 ([9734b93](https://github.com/Collektive/collektive/commit/9734b93e28067e60c45b41e0fad804c3127f76c3))
+* **deps:** update alchemist to v33.0.4 ([d047410](https://github.com/Collektive/collektive/commit/d04741077049c4a779cc19d03e9d412cea69349e))
+* **deps:** update alchemist to v33.0.5 ([d376d98](https://github.com/Collektive/collektive/commit/d376d9811c697ac06b3ab1796e215cf6f71f1a31))
+* **deps:** update alchemist to v33.0.6 ([2d0d701](https://github.com/Collektive/collektive/commit/2d0d7014a4cc06394d960e12f8dba08f4550f83a))
+* **deps:** update alchemist to v33.0.7 ([9454db6](https://github.com/Collektive/collektive/commit/9454db665bcca67ca37a20eafd4aaa7065e8b9c6))
+* **deps:** update dependency io.arrow-kt:arrow-core to v1.2.4 ([4774227](https://github.com/Collektive/collektive/commit/4774227dec01e6174a44e01cf2c674f2cd000f4d))
+* **deps:** update dependency org.slf4j:slf4j-api to v2.0.13 ([83f4f97](https://github.com/Collektive/collektive/commit/83f4f971b9f54142ac8c93401e7f94faed928f64))
+* **deps:** update node.js to 20.12 ([7baa004](https://github.com/Collektive/collektive/commit/7baa0047e612be43c7d75d678f9b47d5d55f87cb))
+* **deps:** update plugin com.gradle.enterprise to v3.17 ([454b3a3](https://github.com/Collektive/collektive/commit/454b3a3d68cfd3028c6185daedf36df87ccab004))
+* **deps:** update plugin com.gradle.enterprise to v3.17.1 ([3a38dad](https://github.com/Collektive/collektive/commit/3a38dad2f7c58437474c38f91b82932a27678fcd))
+* **deps:** update plugin com.gradle.enterprise to v3.17.2 ([80a005c](https://github.com/Collektive/collektive/commit/80a005ce8c4246c4682bb434117bc405648898e3))
+* **deps:** update plugin publishoncentral to v5.1.0 ([817df0b](https://github.com/Collektive/collektive/commit/817df0b527a2d374db69ca9d9df1e4a23fdb6de1))
+* **deps:** update plugin tasktree to v3 ([aaafdd9](https://github.com/Collektive/collektive/commit/aaafdd900840a2566563a5690f5b4fcf68b2269d))
+
+
+### Bug Fixes
+
+* update error message ([05e2f7d](https://github.com/Collektive/collektive/commit/05e2f7d7b89dcf5ae6fe3fc48b5549af3cc89c60))
+
+
+### Tests
+
+* update tests with new error message ([7aa2235](https://github.com/Collektive/collektive/commit/7aa2235c4ed869082ffc1429e4b9ad8c2680514d))
+
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.12 ([548479f](https://github.com/Collektive/collektive/commit/548479fd0be19e423bbad55b8df5625af0a9bfa5))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.13 ([6058545](https://github.com/Collektive/collektive/commit/6058545543414e135c8b931f07056036146984ce))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.14 ([effb01f](https://github.com/Collektive/collektive/commit/effb01fec7ab745829cb5df9e7d93f8e6fb1fc15))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.15 ([e3a64da](https://github.com/Collektive/collektive/commit/e3a64da728168da6933d0745eba98af97af241df))
+
 ## [9.1.1](https://github.com/Collektive/collektive/compare/9.1.0...9.1.1) (2024-03-27)
 
 
