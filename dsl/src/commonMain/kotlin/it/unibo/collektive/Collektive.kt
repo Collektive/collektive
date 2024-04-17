@@ -3,6 +3,7 @@ package it.unibo.collektive
 import it.unibo.collektive.aggregate.AggregateResult
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.impl.AggregateContext
+import it.unibo.collektive.aggregate.api.impl.isCompilerPluginApplied
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.Network
 import it.unibo.collektive.state.State
@@ -50,16 +51,19 @@ class Collektive<ID : Any, R>(
     companion object {
         /**
          * Aggregate program entry point which computes an iteration of a device [localId], taking as parameters
-         * the previous [state], the [messages] received from the neighbours and the [compute] with AggregateContext
-         * object receiver that provides the aggregate constructs.
+         * the [previousState], the [inbound] messages received from the neighbours and the [compute]
+         * with AggregateContext receiver that provides the aggregate constructs.
          */
         fun <ID : Any, R> aggregate(
             localId: ID,
             previousState: State = emptyMap(),
             inbound: Iterable<InboundMessage<ID>> = emptySet(),
             compute: Aggregate<ID>.() -> R,
-        ): AggregateResult<ID, R> = AggregateContext(localId, inbound, previousState).run {
-            AggregateResult(localId, compute(), messagesToSend(), newState())
+        ): AggregateResult<ID, R> {
+            checkCompilerPluginApplied()
+            return AggregateContext(localId, inbound, previousState).run {
+                AggregateResult(localId, compute(), messagesToSend(), newState())
+            }
         }
 
         /**
@@ -72,10 +76,24 @@ class Collektive<ID : Any, R>(
             network: Network<ID>,
             previousState: State = emptyMap(),
             compute: Aggregate<ID>.() -> R,
-        ): AggregateResult<ID, R> = with(AggregateContext(localId, network.read(), previousState)) {
-            AggregateResult(localId, compute(), messagesToSend(), newState()).also {
-                network.write(it.toSend)
+        ): AggregateResult<ID, R> {
+            checkCompilerPluginApplied()
+            return with(AggregateContext(localId, network.read(), previousState)) {
+                AggregateResult(localId, compute(), messagesToSend(), newState()).also {
+                    network.write(it.toSend)
+                }
             }
+        }
+
+        private fun checkCompilerPluginApplied() = require(isCompilerPluginApplied()) {
+            """
+                The collektive compiler plugin is not applied.
+                Please add the following to your build.gradle.kts:
+                
+                plugins {
+                    id("it.unibo.collektive") version "<version>"
+                }
+            """.trimIndent()
         }
     }
 }
