@@ -1,6 +1,7 @@
 package it.unibo.collektive
 
 import it.unibo.collektive.transformers.AggregateCallTransformer
+import it.unibo.collektive.transformers.EnabledCompilerPluginTransformer
 import it.unibo.collektive.utils.common.AggregateFunctionNames
 import it.unibo.collektive.utils.common.AggregateFunctionNames.PROJECT_FUNCTION
 import it.unibo.collektive.utils.logging.error
@@ -37,6 +38,7 @@ class AlignmentIrGenerationExtension(private val logger: MessageCollector) : IrG
             ?.functions
             ?.filter { it.owner.name == Name.identifier(AggregateFunctionNames.ALIGNED_ON_FUNCTION) }
             ?.firstOrNull()
+
         requireNotNull(alignedOnFunction) {
             val error = """
                 Aggregate alignment requires function ${AggregateFunctionNames.ALIGNED_ON_FUNCTION} to be available.
@@ -49,6 +51,13 @@ class AlignmentIrGenerationExtension(private val logger: MessageCollector) : IrG
                 "The function and the class used to handle the alignment have not been found.",
             )
 
+        val isCompilerPluginAppliedFunction = pluginContext.referenceFunctions(
+            CallableId(
+                FqName("it.unibo.collektive.aggregate.api.impl"),
+                Name.identifier(AggregateFunctionNames.IS_COMPILER_PLUGIN_APPLIED_FUNCTION),
+            ),
+        ).firstOrNull() ?: return logger.error("Unable to find the 'isCompilerPluginApplied' function")
+
         moduleFragment.transform(
             AggregateCallTransformer(
                 pluginContext,
@@ -57,6 +66,14 @@ class AlignmentIrGenerationExtension(private val logger: MessageCollector) : IrG
                 alignFunction.owner,
                 projectFunction.owner,
             ),
+            null,
+        )
+
+        /*
+         This transformation changes the `isCompilerPluginApplied` function to return true.
+         */
+        moduleFragment.transform(
+            EnabledCompilerPluginTransformer(pluginContext, logger, isCompilerPluginAppliedFunction.owner),
             null,
         )
     }
