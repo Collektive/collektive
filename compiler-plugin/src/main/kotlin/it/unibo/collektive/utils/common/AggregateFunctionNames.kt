@@ -23,4 +23,9 @@ object AggregateFunctionNames {
      * The name of the function that is used to project the fields.
      */
     const val PROJECT_FUNCTION = "project"
+
+    /**
+     * The name of the function showing if the compiler plugin is applied.
+     */
+    const val IS_COMPILER_PLUGIN_APPLIED_FUNCTION = "isCompilerPluginApplied"
 }
