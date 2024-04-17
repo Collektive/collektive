@@ -1,3 +1,18 @@
+## [9.1.3](https://github.com/Collektive/collektive/compare/9.1.2...9.1.3) (2024-04-17)
+
+
+### Bug Fixes
+
+* change the return value via compiler plugin ([4d05e50](https://github.com/Collektive/collektive/commit/4d05e50ec1a3be6438ccc82413a6327558ff6850))
+* define a function to check if the compiler plugin is applied ([8fc65f6](https://github.com/Collektive/collektive/commit/8fc65f663b798cf65a2d4162de0b1b698abed5b4))
+* fail fast if the collektive compiler plugin is not applied ([76b7826](https://github.com/Collektive/collektive/commit/76b78263eb7bb44ed06f069dc27b78ef916eca11))
+
+
+### Style improvements
+
+* address [@danysk](https://github.com/danysk) comments ([ee056c0](https://github.com/Collektive/collektive/commit/ee056c0c7ad232f1bbe960328d06162373ed2596))
+* address style issue ([71aa949](https://github.com/Collektive/collektive/commit/71aa94958d87d24b7ca05b0ab2e2e098875989be))
+
 ## [9.1.2](https://github.com/Collektive/collektive/compare/9.1.1...9.1.2) (2024-04-17)
 
 
