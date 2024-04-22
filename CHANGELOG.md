@@ -1,3 +1,20 @@
+## [9.2.0](https://github.com/Collektive/collektive/compare/9.1.3...9.2.0) (2024-04-22)
+
+
+### Features
+
+* **incarnation:** support any kind of classes extending `NodeProperty` required by the context receiver entrypoint ([#317](https://github.com/Collektive/collektive/issues/317)) ([9e8b938](https://github.com/Collektive/collektive/commit/9e8b938582dc43f6519aeaadd3c41761c64bece1))
+
+
+### Dependency updates
+
+* **deps:** update alchemist to v33.0.8 ([7edbdfe](https://github.com/Collektive/collektive/commit/7edbdfeb98e93c10c6788079feb899648d8c7bf6))
+
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.16 ([57f9852](https://github.com/Collektive/collektive/commit/57f98526e9f1783efd4fb01c577dd1a72bbfef1a))
+
 ## [9.1.3](https://github.com/Collektive/collektive/compare/9.1.2...9.1.3) (2024-04-17)
 
 
