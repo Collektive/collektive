@@ -1,3 +1,10 @@
+## [9.2.1](https://github.com/Collektive/collektive/compare/9.2.0...9.2.1) (2024-04-22)
+
+
+### Bug Fixes
+
+* remove parameter in clone action that caused the wrong assignation of ids to new nodes ([#318](https://github.com/Collektive/collektive/issues/318)) ([99c64eb](https://github.com/Collektive/collektive/commit/99c64eb18bc95359e67b77bfc580c09cbe0fb498))
+
 ## [9.2.0](https://github.com/Collektive/collektive/compare/9.1.3...9.2.0) (2024-04-22)
 
 
