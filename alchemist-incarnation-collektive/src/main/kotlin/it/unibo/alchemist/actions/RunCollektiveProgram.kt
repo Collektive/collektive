@@ -101,7 +101,7 @@ class RunCollektiveProgram<P : Position<P>>(
                         it.type.isAssignableFrom(Aggregate::class.java) -> this
                         it.type.isAssignableFrom(CollektiveDevice::class.java) -> localDevice
                         it.type.isAssignableFrom(Node::class.java) -> localDevice.node
-                        node.hasPropertyCompatibleWith(it) -> node.getPropertyOfType(it)
+                        node.hasPropertyCompatibleWith(it) -> node.getPropertyCompatibleWith(it)
                         else -> error("Unsupported type ${it.type} in entrypoint ${ktfunction.name}")
                     }
                 }.toTypedArray()
@@ -111,7 +111,7 @@ class RunCollektiveProgram<P : Position<P>>(
         private fun Node<*>.hasPropertyCompatibleWith(parameter: Parameter): Boolean =
             properties.any { parameter.type.isAssignableFrom(it::class.java) }
 
-        private fun Node<*>.getPropertyOfType(property: Parameter): NodeProperty<*> =
+        private fun Node<*>.getPropertyCompatibleWith(property: Parameter): NodeProperty<*> =
             properties.first { property.type.isAssignableFrom(it::class.java) }
     }
 }
