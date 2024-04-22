@@ -5,6 +5,7 @@ import it.unibo.alchemist.model.Action
 import it.unibo.alchemist.model.Context
 import it.unibo.alchemist.model.Node
 import it.unibo.alchemist.model.Node.Companion.asProperty
+import it.unibo.alchemist.model.NodeProperty
 import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Reaction
 import it.unibo.alchemist.model.actions.AbstractAction
@@ -12,6 +13,7 @@ import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.collektive.Collektive
 import it.unibo.collektive.aggregate.api.Aggregate
 import java.lang.reflect.Method
+import java.lang.reflect.Parameter
 import kotlin.reflect.jvm.kotlinFunction
 
 /**
@@ -99,11 +101,17 @@ class RunCollektiveProgram<P : Position<P>>(
                         it.type.isAssignableFrom(Aggregate::class.java) -> this
                         it.type.isAssignableFrom(CollektiveDevice::class.java) -> localDevice
                         it.type.isAssignableFrom(Node::class.java) -> localDevice.node
+                        node.hasPropertyCompatibleWith(it) -> node.getPropertyCompatibleWith(it)
                         else -> error("Unsupported type ${it.type} in entrypoint ${ktfunction.name}")
                     }
                 }.toTypedArray()
                 ktfunction.call(*parameters)
             }
         }
+        private fun Node<*>.hasPropertyCompatibleWith(parameter: Parameter): Boolean =
+            properties.any { parameter.type.isAssignableFrom(it::class.java) }
+
+        private fun Node<*>.getPropertyCompatibleWith(property: Parameter): NodeProperty<*> =
+            properties.first { property.type.isAssignableFrom(it::class.java) }
     }
 }
