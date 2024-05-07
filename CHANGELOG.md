@@ -1,3 +1,23 @@
+## [9.2.2](https://github.com/Collektive/collektive/compare/9.2.1...9.2.2) (2024-05-07)
+
+
+### Dependency updates
+
+* **core-deps:** update kotlin monorepo to v1.9.24 ([05f8ad3](https://github.com/Collektive/collektive/commit/05f8ad39b90f9df237e41473c8c47c588c9b3e84))
+* **deps:** update alchemist to v33.1.0 ([674e227](https://github.com/Collektive/collektive/commit/674e2272fc21e420c4384d50dc5637bac3f609df))
+* **deps:** update alchemist to v33.1.1 ([d1b3778](https://github.com/Collektive/collektive/commit/d1b37788800638bb1cd5e02a5d4e519a5fa6581d))
+* **deps:** update alchemist to v33.1.2 ([54ea599](https://github.com/Collektive/collektive/commit/54ea59948da855e18f1a0b483622440916a5fe44))
+* **deps:** update alchemist to v34 ([53530f9](https://github.com/Collektive/collektive/commit/53530f9eb3af24c52f96c8d942accf615ddca8be))
+* **deps:** update dependency commons-codec:commons-codec to v1.17.0 ([8ef8539](https://github.com/Collektive/collektive/commit/8ef8539d60fe9b522dcaeec296612c549f30d0aa))
+
+
+### Build and continuous integration
+
+* **deps:** update actions/checkout action to v4.1.3 ([9328b39](https://github.com/Collektive/collektive/commit/9328b39cb94331cc479caa5340c71be1cc755e00))
+* **deps:** update actions/checkout action to v4.1.4 ([8d83710](https://github.com/Collektive/collektive/commit/8d83710cab5f6406be858e4902710bb086e931d6))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.17 ([3de5f7a](https://github.com/Collektive/collektive/commit/3de5f7a07d39e59ce8083f06c7db977a565f0e1d))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.18 ([65af96a](https://github.com/Collektive/collektive/commit/65af96aaf0de5aa7132330da515c002ca1927f5c))
+
 ## [9.2.1](https://github.com/Collektive/collektive/compare/9.2.0...9.2.1) (2024-04-22)
 
 
