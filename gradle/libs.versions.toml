@@ -3,7 +3,7 @@ alchemist = "34.0.3"
 build-config = "5.3.5"
 coroutines = "1.8.0"
 dokka = "1.9.20"
-kotest = "5.8.1"
+kotest = "5.9.0"
 kotlin = "1.9.24"
 
 [libraries]
