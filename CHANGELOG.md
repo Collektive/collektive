@@ -1,3 +1,25 @@
+## [9.2.3](https://github.com/Collektive/collektive/compare/9.2.2...9.2.3) (2024-05-10)
+
+
+### Dependency updates
+
+* **core-deps:** update dependency org.jetbrains.kotlinx:kotlinx-coroutines-core to v1.8.1 ([7cb770a](https://github.com/Collektive/collektive/commit/7cb770ae25611c982bf7829adcd6e99316a7bf8c))
+* **deps:** update alchemist to v34.0.2 ([a61a92d](https://github.com/Collektive/collektive/commit/a61a92dee031138e198b555205cb61459921c662))
+* **deps:** update dependency it.unibo.alchemist:alchemist-api to v34.0.3 ([76022f0](https://github.com/Collektive/collektive/commit/76022f04e1d5be76dacb78fd211bccea3e7c5cfd))
+* **deps:** update kotest to v5.9.0 ([a6a4816](https://github.com/Collektive/collektive/commit/a6a4816cba7e8718d1f842798461fae32f7d2488))
+* **deps:** update node.js to 20.13 ([f0d02a3](https://github.com/Collektive/collektive/commit/f0d02a35aa611bf9e73bbbfec579c57f189a99c8))
+* **deps:** update plugin com.gradle.enterprise to v3.17.3 ([b1922a5](https://github.com/Collektive/collektive/commit/b1922a52b0e29dfde76f3ae8554686764ccb5171))
+* **deps:** update plugin gitsemver to v3.1.5 ([f1cdef6](https://github.com/Collektive/collektive/commit/f1cdef6f471282032ce4322fe7a62befa8b3dd90))
+* **deps:** update plugin kotlin-qa to v0.61.1 ([aeb08c5](https://github.com/Collektive/collektive/commit/aeb08c5b9f9ec66741996f6cb2fa9b25949b0aa9))
+* **deps:** update plugin kotlin-qa to v0.62.0 ([29c4d9e](https://github.com/Collektive/collektive/commit/29c4d9e8ac123612bf95da072719ba32855a020e))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.5 ([8ddfbd5](https://github.com/Collektive/collektive/commit/8ddfbd5621ac47a494f8bac20f8903fc8ec91905))
+* **deps:** update plugin publishoncentral to v5.1.1 ([2165d14](https://github.com/Collektive/collektive/commit/2165d14888d50b6b49446a9a11dec82cd9332522))
+
+
+### Build and continuous integration
+
+* **deps:** update actions/checkout action to v4.1.5 ([1f02dcf](https://github.com/Collektive/collektive/commit/1f02dcf0f749f83dce17efab2c494b8fdbbbc196))
+
 ## [9.2.2](https://github.com/Collektive/collektive/compare/9.2.1...9.2.2) (2024-05-07)
 
 
