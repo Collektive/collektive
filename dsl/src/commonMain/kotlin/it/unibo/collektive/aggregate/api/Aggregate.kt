@@ -89,4 +89,14 @@ interface Aggregate<ID : Any> {
      * Returns the body's return element.
      */
     fun <R> alignedOn(pivot: Any?, body: () -> R): R
+
+    /**
+     * Pushes the pivot in the alignment stack.
+     */
+    fun alignRaw(pivot: Any?)
+
+    /**
+     * Pops the last element of the alignment stack.
+     */
+    fun dealign()
 }

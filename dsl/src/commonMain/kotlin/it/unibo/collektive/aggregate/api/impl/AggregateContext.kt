@@ -14,6 +14,7 @@ import it.unibo.collektive.networking.SingleOutboundMessage
 import it.unibo.collektive.path.Path
 import it.unibo.collektive.state.State
 import it.unibo.collektive.state.impl.getTyped
+
 /**
  * Context for managing aggregate computation.
  * It represents the [localId] of the device, the [messages] received from the neighbours,
@@ -97,6 +98,10 @@ internal class AggregateContext<ID : Any>(
         }
     }
 
+    override fun alignRaw(pivot: Any?) = stack.alignRaw(pivot)
+
+    override fun dealign() = stack.dealign()
+
     @Suppress("UNCHECKED_CAST")
     private fun <T> messagesAt(path: Path): Map<ID, T> = messages
         .mapNotNull { received ->
@@ -134,9 +139,3 @@ fun <ID : Any, T> Aggregate<ID>.project(field: Field<ID, T>): Field<ID, T> {
         )
     }
 }
-
-/**
- * This function returns true if the Collektive compiler plugin is applied to the current project.
- */
-@Suppress("FunctionOnlyReturningConstant")
-fun isCompilerPluginApplied(): Boolean = false
