@@ -77,9 +77,7 @@ class AlignmentTransformer(
             val alignmentTokenRepresentation = "$data$alignmentToken.$tokenCount"
             // Return the modified function body to have as a first statement the alignRaw function,
             // then the body of the function to align and finally the dealign function
-            val res =
-                generateAlignmentCode(context, functionToAlign, expression) { irString(alignmentTokenRepresentation) }
-            res
+            generateAlignmentCode(context, functionToAlign, expression) { irString(alignmentTokenRepresentation) }
         } ?: super.visitCall(expression, data)
     }
 
