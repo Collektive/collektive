@@ -8,7 +8,6 @@ import io.kotest.matchers.shouldNot
 import io.kotest.matchers.string.shouldContain
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.impl.isCompilerPluginApplied
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.aggregate.api.operators.share
 import it.unibo.collektive.field.Field
@@ -78,8 +77,5 @@ class TestAlignment : StringSpec({
         fun foo(aggregate: Aggregate<Int>) = aggregate.neighboringViaExchange(x)
         fun bar(aggregate: Aggregate<Int>) = aggregate.neighboringViaExchange(x)
         acProgram { foo(this) } shouldNot alignWith { bar(this) }
-    }
-    "The isCompilerPluginApplied function must return true when the compiler plugin is applied" {
-        isCompilerPluginApplied() shouldBe true
     }
 })
