@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.backend.js.utils.typeArguments
-import org.jetbrains.kotlin.ir.builders.IrSingleStatementBuilder
+import org.jetbrains.kotlin.ir.builders.IrBlockBodyBuilder
 import org.jetbrains.kotlin.ir.builders.Scope
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
@@ -64,12 +64,12 @@ internal fun IrCall.simpleFunctionName(): String = symbol.owner.name.asString()
 
 internal fun <T : IrElement> irStatement(
     pluginContext: IrPluginContext,
-    aggregateLambdaBody: IrFunction,
+    functionToAlign: IrFunction,
     expression: IrElement,
-    body: IrSingleStatementBuilder.() -> T,
-): T = IrSingleStatementBuilder(
+    body: IrBlockBodyBuilder.() -> T,
+): T = IrBlockBodyBuilder(
     pluginContext,
-    Scope(aggregateLambdaBody.symbol),
+    Scope(functionToAlign.symbol),
     expression.startOffset,
     expression.endOffset,
-).build(body)
+).body()
