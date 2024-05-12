@@ -19,7 +19,8 @@ class AggregateCallTransformer(
     private val pluginContext: IrPluginContext,
     private val logger: MessageCollector,
     private val aggregateClass: IrClass,
-    private val alignedOnFunction: IrFunction,
+    private val alignRawFunction: IrFunction,
+    private val dealignFunction: IrFunction,
     private val projectFunction: IrFunction,
 ) : IrElementTransformerVoid() {
 
@@ -41,10 +42,17 @@ class AggregateCallTransformer(
                 null,
             )
             /*
-             This transformation is needed to add the `alignOn` function call to the aggregate functions.
+             This transformation is needed to add the `alignRaw` and `dealign` function call to the aggregate functions.
              */
             declaration.transformChildren(
-                AlignmentTransformer(pluginContext, logger, aggregateClass, declaration, alignedOnFunction),
+                AlignmentTransformer(
+                    pluginContext,
+                    logger,
+                    aggregateClass,
+                    declaration,
+                    alignRawFunction,
+                    dealignFunction
+                ),
                 StackFunctionCall(),
             )
         }
