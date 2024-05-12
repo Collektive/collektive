@@ -3,7 +3,6 @@ package it.unibo.collektive
 import it.unibo.collektive.aggregate.AggregateResult
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.impl.AggregateContext
-import it.unibo.collektive.aggregate.api.impl.isCompilerPluginApplied
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.Network
 import it.unibo.collektive.state.State
@@ -60,7 +59,6 @@ class Collektive<ID : Any, R>(
             inbound: Iterable<InboundMessage<ID>> = emptySet(),
             compute: Aggregate<ID>.() -> R,
         ): AggregateResult<ID, R> {
-            checkCompilerPluginApplied()
             return AggregateContext(localId, inbound, previousState).run {
                 AggregateResult(localId, compute(), messagesToSend(), newState())
             }
@@ -77,23 +75,11 @@ class Collektive<ID : Any, R>(
             previousState: State = emptyMap(),
             compute: Aggregate<ID>.() -> R,
         ): AggregateResult<ID, R> {
-            checkCompilerPluginApplied()
             return with(AggregateContext(localId, network.read(), previousState)) {
                 AggregateResult(localId, compute(), messagesToSend(), newState()).also {
                     network.write(it.toSend)
                 }
             }
-        }
-
-        private fun checkCompilerPluginApplied() = require(isCompilerPluginApplied()) {
-            """
-                The collektive compiler plugin has not been applied.
-                Please add the following to your build.gradle.kts:
-                
-                plugins {
-                    id("it.unibo.collektive") version "<version>"
-                }
-            """.trimIndent()
         }
     }
 }
