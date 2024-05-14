@@ -50,7 +50,7 @@ class AggregateCallTransformer(
                     aggregateClass,
                     declaration,
                     alignRawFunction,
-                    dealignFunction
+                    dealignFunction,
                 ),
                 StackFunctionCall(),
             )

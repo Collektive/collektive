@@ -11,7 +11,6 @@ import it.unibo.collektive.utils.stack.StackFunctionCall
 import it.unibo.collektive.visitors.collectAggregateReference
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.jvm.ir.receiverAndArgs
-import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.builders.IrBlockBodyBuilder
 import org.jetbrains.kotlin.ir.builders.createTmpVariable
@@ -71,7 +70,7 @@ class AlignmentTransformer(
                 """
                     Unable to find the count for the token $alignmentToken.
                     This is may due to a bug in collektive compiler plugin.
-                    """.trimIndent(),
+                """.trimIndent(),
             )
             val alignmentTokenRepresentation = "$data$alignmentToken.$tokenCount"
             // Return the modified function body to have as a first statement the alignRaw function,
@@ -100,7 +99,7 @@ class AlignmentTransformer(
         context: IrExpression,
         function: IrFunction,
         expressionBody: IrExpression,
-        alignmentToken: IrBlockBodyBuilder.() -> IrConst<T>
+        alignmentToken: IrBlockBodyBuilder.() -> IrConst<T>,
     ): IrContainerExpression {
         return irStatement(pluginContext, function, expressionBody) {
             // Call the `alignRaw` function before the body of the function to align
