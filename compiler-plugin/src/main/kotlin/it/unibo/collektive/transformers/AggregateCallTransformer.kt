@@ -47,7 +47,6 @@ class AggregateCallTransformer(
             declaration.transformChildren(
                 AlignmentTransformer(
                     pluginContext,
-                    logger,
                     aggregateClass,
                     declaration,
                     alignRawFunction,

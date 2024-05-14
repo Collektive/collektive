@@ -39,7 +39,6 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
  */
 class AlignmentTransformer(
     private val pluginContext: IrPluginContext,
-    private val logger: MessageCollector,
     private val aggregateContextClass: IrClass,
     private val functionToAlign: IrFunction,
     private val alignRawFunction: IrFunction,
