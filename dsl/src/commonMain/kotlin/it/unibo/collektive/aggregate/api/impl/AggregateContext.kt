@@ -98,7 +98,7 @@ internal class AggregateContext<ID : Any>(
         }
     }
 
-    override fun alignRaw(pivot: Any?) = stack.alignRaw(pivot)
+    override fun align(pivot: Any?) = stack.alignRaw(pivot)
 
     override fun dealign() = stack.dealign()
 

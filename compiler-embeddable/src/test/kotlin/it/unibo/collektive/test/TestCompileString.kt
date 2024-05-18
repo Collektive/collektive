@@ -34,7 +34,7 @@ class TestCompileString : FreeSpec({
                 disassembled shouldNot beNull()
                 disassembled shouldNot beBlank()
                 val alignedOnCalls = disassembled.lines().filter {
-                    "// InterfaceMethod it/unibo/collektive/aggregate/api/Aggregate.alignRaw:" in it
+                    "// InterfaceMethod it/unibo/collektive/aggregate/api/Aggregate.align" in it
                 }
                 alignedOnCalls.size should beGreaterThan(1)
             }

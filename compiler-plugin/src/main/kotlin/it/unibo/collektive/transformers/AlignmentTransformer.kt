@@ -1,6 +1,6 @@
 package it.unibo.collektive.transformers
 
-import it.unibo.collektive.utils.common.AggregateFunctionNames.ALIGN_RAW_FUNCTION
+import it.unibo.collektive.utils.common.AggregateFunctionNames.ALIGN_FUNCTION
 import it.unibo.collektive.utils.common.AggregateFunctionNames.DEALIGN_RAW_FUNCTION
 import it.unibo.collektive.utils.common.findAggregateReference
 import it.unibo.collektive.utils.common.getAlignmentToken
@@ -58,7 +58,7 @@ class AlignmentTransformer(
         return contextReference?.let { context ->
             // We don't want to align the alignRaw and dealign functions :)
             val functionName = expression.simpleFunctionName()
-            if (functionName == ALIGN_RAW_FUNCTION || functionName == DEALIGN_RAW_FUNCTION) {
+            if (functionName == ALIGN_FUNCTION || functionName == DEALIGN_RAW_FUNCTION) {
                 return super.visitCall(expression, data)
             }
             // If no function, the first time the counter is 1

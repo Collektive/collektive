@@ -32,7 +32,7 @@ class FieldTransformer(
 ) : IrElementTransformerVoid() {
     override fun visitCall(expression: IrCall): IrExpression {
         val symbolName = expression.symbol.owner.name
-        val alignRawIdentifier = Name.identifier(AggregateFunctionNames.ALIGN_RAW_FUNCTION)
+        val alignRawIdentifier = Name.identifier(AggregateFunctionNames.ALIGN_FUNCTION)
         val alignedOnIdentifier = Name.identifier(AggregateFunctionNames.ALIGNED_ON_FUNCTION)
         if (symbolName == alignRawIdentifier || symbolName == alignedOnIdentifier) {
             logger.debug("Found alignedRaw function call: ${expression.dumpKotlinLike()}")

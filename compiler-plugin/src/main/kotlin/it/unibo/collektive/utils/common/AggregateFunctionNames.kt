@@ -12,7 +12,7 @@ object AggregateFunctionNames {
     /**
      * The name of the function that is used to align.
      */
-    const val ALIGN_RAW_FUNCTION = "alignRaw"
+    const val ALIGN_FUNCTION = "align"
 
     /**
      * The name of the function that is used to de-align.

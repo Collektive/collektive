@@ -93,7 +93,7 @@ interface Aggregate<ID : Any> {
     /**
      * Pushes the pivot in the alignment stack.
      */
-    fun alignRaw(pivot: Any?)
+    fun align(pivot: Any?)
 
     /**
      * Pops the last element of the alignment stack.
