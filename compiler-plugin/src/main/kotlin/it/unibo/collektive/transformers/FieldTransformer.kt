@@ -31,8 +31,11 @@ class FieldTransformer(
     private val projectFunction: IrFunction,
 ) : IrElementTransformerVoid() {
     override fun visitCall(expression: IrCall): IrExpression {
-        if (expression.symbol.owner.name == Name.identifier(AggregateFunctionNames.ALIGNED_ON_FUNCTION)) {
-            logger.debug("Found alignedOn function call: ${expression.dumpKotlinLike()}")
+        val symbolName = expression.symbol.owner.name
+        val alignRawIdentifier = Name.identifier(AggregateFunctionNames.ALIGN_FUNCTION)
+        val alignedOnIdentifier = Name.identifier(AggregateFunctionNames.ALIGNED_ON_FUNCTION)
+        if (symbolName == alignRawIdentifier || symbolName == alignedOnIdentifier) {
+            logger.debug("Found alignedRaw function call: ${expression.dumpKotlinLike()}")
             val contextReference = expression.receiverAndArgs()
                 .find { it.type.isAssignableFrom(aggregateClass.defaultType) }
                 ?: collectAggregateReference(aggregateClass, expression.symbol.owner)

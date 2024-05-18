@@ -1,34 +1,14 @@
-package it.unibo.collektive.utils.branch
+package it.unibo.collektive.utils.common
 
-import it.unibo.collektive.utils.common.irStatement
 import it.unibo.collektive.visitors.collectAggregateReference
-import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.declarations.IrClass
-import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.IrBlock
-import org.jetbrains.kotlin.ir.expressions.IrBranch
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.expressions.IrTypeOperatorCall
 import org.jetbrains.kotlin.ir.expressions.IrWhen
-
-context(MessageCollector)
-internal fun IrBranch.addBranchAlignment(
-    pluginContext: IrPluginContext,
-    aggregateContextClass: IrClass,
-    aggregateLambdaBody: IrFunction,
-    alignedOnFunction: IrFunction,
-    conditionValue: Boolean = true,
-) {
-    result.findAggregateReference(aggregateContextClass)?.let {
-        result = irStatement(pluginContext, aggregateLambdaBody, this) {
-            buildAlignedOn(pluginContext, it, alignedOnFunction, this@addBranchAlignment, conditionValue)
-        }
-    }
-}
 
 private fun IrBlock.findAggregateReference(aggregateContextClass: IrClass): IrExpression? =
     statements.firstNotNullOfOrNull {

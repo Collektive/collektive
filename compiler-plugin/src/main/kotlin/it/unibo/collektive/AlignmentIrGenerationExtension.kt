@@ -1,14 +1,19 @@
+@file:Suppress("ReturnCount")
+
 package it.unibo.collektive
 
 import it.unibo.collektive.transformers.AggregateCallTransformer
-import it.unibo.collektive.transformers.EnabledCompilerPluginTransformer
 import it.unibo.collektive.utils.common.AggregateFunctionNames
+import it.unibo.collektive.utils.common.AggregateFunctionNames.ALIGN_FUNCTION
+import it.unibo.collektive.utils.common.AggregateFunctionNames.DEALIGN_RAW_FUNCTION
 import it.unibo.collektive.utils.common.AggregateFunctionNames.PROJECT_FUNCTION
 import it.unibo.collektive.utils.logging.error
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
+import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
 import org.jetbrains.kotlin.ir.util.functions
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
@@ -19,13 +24,15 @@ import org.jetbrains.kotlin.name.Name
  * The generation extension is used to register the transformer plugin, which is going to modify
  * the IR using the function responsible for the alignment.
  */
-@Suppress("ReturnCount")
 class AlignmentIrGenerationExtension(private val logger: MessageCollector) : IrGenerationExtension {
     override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
         // Aggregate Context class that has the reference to the stack
         val aggregateClass = pluginContext.referenceClass(
             ClassId.topLevel(FqName(AggregateFunctionNames.AGGREGATE_CLASS)),
         )
+        if (aggregateClass == null) {
+            return logger.error("Unable to find the aggregate class")
+        }
 
         val projectFunction = pluginContext.referenceFunctions(
             CallableId(
@@ -35,49 +42,28 @@ class AlignmentIrGenerationExtension(private val logger: MessageCollector) : IrG
         ).firstOrNull() ?: return logger.error("Unable to find the 'project' function")
 
         // Function that handles the alignment
-        val alignedOnFunction = aggregateClass
-            ?.functions
-            ?.filter { it.owner.name == Name.identifier(AggregateFunctionNames.ALIGNED_ON_FUNCTION) }
-            ?.firstOrNull()
+        val alignRawFunction = aggregateClass.getFunctionReferenceWithName(ALIGN_FUNCTION)
+            ?: return logger.error("Unable to find the `$ALIGN_FUNCTION` function")
 
-        requireNotNull(alignedOnFunction) {
-            val error = """
-                Aggregate alignment requires function ${AggregateFunctionNames.ALIGNED_ON_FUNCTION} to be available.
-                Please, add the required library TODO TODO (gradle block):
-            """.trimIndent()
-            error.also(logger::error)
-        }
-        val (alignFunction, aggClass) = getBothOrNull(alignedOnFunction, aggregateClass)
-            ?: return logger.error(
-                "The function and the class used to handle the alignment have not been found.",
-            )
+        val dealignFunction = aggregateClass.getFunctionReferenceWithName(DEALIGN_RAW_FUNCTION)
+            ?: return logger.error("Unable to find the `$DEALIGN_RAW_FUNCTION` function")
 
-        val isCompilerPluginAppliedFunction = pluginContext.referenceFunctions(
-            CallableId(
-                FqName("it.unibo.collektive.aggregate.api.impl"),
-                Name.identifier(AggregateFunctionNames.IS_COMPILER_PLUGIN_APPLIED_FUNCTION),
-            ),
-        ).firstOrNull() ?: return logger.error("Unable to find the 'isCompilerPluginApplied' function")
-
+        /*
+         This applies the alignment call on all the aggregate functions
+         */
         moduleFragment.transform(
             AggregateCallTransformer(
                 pluginContext,
                 logger,
-                aggClass.owner,
-                alignFunction.owner,
+                aggregateClass.owner,
+                alignRawFunction.owner,
+                dealignFunction.owner,
                 projectFunction.owner,
             ),
             null,
         )
-        /*
-         This transformation changes the `isCompilerPluginApplied` function to return true.
-         */
-        moduleFragment.transform(
-            EnabledCompilerPluginTransformer(pluginContext, logger, isCompilerPluginAppliedFunction.owner),
-            null,
-        )
     }
 
-    private fun <F, S> getBothOrNull(first: F?, second: S?): Pair<F, S>? =
-        if (first != null && second != null) first to second else null
+    private fun IrClassSymbol.getFunctionReferenceWithName(functionName: String): IrFunctionSymbol? =
+        functions.firstOrNull { it.owner.name == Name.identifier(functionName) }
 }
