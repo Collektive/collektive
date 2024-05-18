@@ -7,9 +7,9 @@ import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.min
-import it.unibo.collektive.field.minus
-import it.unibo.collektive.field.plus
+import it.unibo.collektive.field.operations.min
+import it.unibo.collektive.field.operations.minus
+import it.unibo.collektive.field.operations.plus
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 
