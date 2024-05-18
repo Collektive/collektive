@@ -11,7 +11,7 @@ import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.aggregate.api.operators.share
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.plus
+import it.unibo.collektive.field.operations.plus
 import it.unibo.collektive.matchers.acProgram
 import it.unibo.collektive.matchers.alignWith
 

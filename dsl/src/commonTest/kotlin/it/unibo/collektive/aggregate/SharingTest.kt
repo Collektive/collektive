@@ -6,8 +6,8 @@ import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.operators.share
 import it.unibo.collektive.aggregate.api.operators.sharing
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.max
-import it.unibo.collektive.field.min
+import it.unibo.collektive.field.operations.max
+import it.unibo.collektive.field.operations.min
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 
