@@ -10,5 +10,7 @@ repositories {
 with(extensions.getByType<VersionCatalogsExtension>().named("libs")) {
     dependencies {
         implementation(findLibrary("kotlin-gradle-plugin").get())
+        implementation(findLibrary("kotlinpoet").get())
+        implementation(findLibrary("arrow").get())
     }
 }
