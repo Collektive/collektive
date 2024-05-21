@@ -4,6 +4,10 @@ apply(plugin = libs.plugins.kotlin.multiplatform.id)
 
 configureKotlinMultiplatform()
 
+collektive {
+    collektiveEnabled = true
+}
+
 val generateFieldFunctionsForTypes by tasks.registering(CollektiveCodegenTask::class) {
     group = "code generation"
     description = "Generates Collektive field functions for primitive types"
@@ -17,6 +21,14 @@ kotlinMultiplatform {
                 implementation(project(":dsl"))
             }
             kotlin.srcDirs(generateFieldFunctionsForTypes)
+        }
+    }
+}
+
+afterEvaluate {
+    listOf("uploadKotlinOSSRHToMavenCentralNexus").forEach {
+        tasks.named(it).configure {
+            enabled = false
         }
     }
 }
