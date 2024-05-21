@@ -75,7 +75,7 @@ sealed interface Field<ID : Any, out T> {
     companion object {
 
         /**
-         * Check if two fields are aligned, throws an IllegalStateException otherwise.
+         * Check if two or more fields are aligned, throwing an IllegalStateException otherwise.
          */
         fun checkAligned(field1: Field<*, *>, field2: Field<*, *>, vararg fields: Field<*, *>) {
             val ids: Collection<Any?> = field1.neighbors
