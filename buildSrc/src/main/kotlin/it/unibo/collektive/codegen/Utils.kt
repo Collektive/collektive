@@ -2,6 +2,7 @@ package it.unibo.collektive.codegen
 
 import arrow.core.tail
 import com.squareup.kotlinpoet.AnnotationSpec
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
@@ -17,8 +18,12 @@ import com.squareup.kotlinpoet.asTypeName
 import it.unibo.collektive.field.Field
 import kotlin.math.pow
 import kotlin.reflect.KCallable
+import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
+import kotlin.reflect.KParameter
 import kotlin.reflect.KProperty
+import kotlin.reflect.KType
+import kotlin.reflect.KTypeParameter
 
 private val FIELD_INTERFACE = Field::class.asClassName()
 private val FIELD_COMPANION = Field.Companion::class.asClassName()
@@ -197,10 +202,10 @@ internal fun generateFunction(callable: KCallable<*>, paramList: List<ParameterS
         // Add the JavaName annotation preventing JVM name clashes
         paramList.tail().find { it.isField() }?.let {
             val type = it.type as ParameterizedTypeName // Since it is a Field, it is always a ParameterizedTypeName
-            val typeRepr = type.typeArguments[1].toString().replace(".", "")
+            val typeRepr = type.typeArguments[1].toString().replace(".", "_")
             addAnnotation(
                 AnnotationSpec.builder(JvmName::class)
-                    .addMember("%S", "${callable.name}$typeRepr")
+                    .addMember("%S", "${callable.name}__$typeRepr")
                     .build(),
             )
         }
@@ -211,7 +216,7 @@ internal fun generateFunction(callable: KCallable<*>, paramList: List<ParameterS
             }
         }
         // Always return a Field parametrized by the ID type and the return type of the callable
-        returns(FIELD_INTERFACE.parameterizedBy(ID_BOUNDED_TYPE, callable.returnType.asTypeName()))
+        returns(FIELD_INTERFACE.parameterizedBy(ID_BOUNDED_TYPE, callable.returnType.toTypeNameWithRecurringGenericSupport()))
         when (paramList.size) {
             1 -> noArgumentFunction(callable)
             else -> when (paramList.first().isField()) {
@@ -222,15 +227,11 @@ internal fun generateFunction(callable: KCallable<*>, paramList: List<ParameterS
     }.build()
 
 internal fun generateFunctions(origin: KCallable<*>): List<FunSpec> {
-    if (origin.returnType.toString().contains("java") || origin.parameters.any {
-            it.type.toString().contains("java")
-        }) {
-        return emptyList()
+    println("Generating functions for ${origin}")
+    val functionArguments: List<ParameterSpec> = origin.parameters.map { parameter: KParameter ->
+        val typeName = parameter.type.toTypeNameWithRecurringGenericSupport()
+        ParameterSpec(parameter.name ?: "this", typeName.copy(annotations = emptyList()))
     }
-    val functionArguments = origin.parameters.map {
-        ParameterSpec(it.name ?: "this", it.type.asTypeName().copy(annotations = emptyList()))
-    }
-
     return parameterCombinations(functionArguments).map { paramList ->
         generateFunction(origin, paramList)
     }
@@ -255,4 +256,74 @@ internal fun generatePrimitivesFile(origin: List<KCallable<*>>, packageName: Str
         }.build()
         addType(objectContainer)
     }.build()
+}
+
+internal fun KType.generics(): List<KType> = when (classifier) {
+    is KTypeParameter -> listOf(this)
+    else -> arguments.mapNotNull { it.type }
+}
+
+internal fun KType.toTypeNameWithRecurringGenericSupport(): TypeName {
+    // For instance, in T : Comparable<T>...
+    val parameterTypeArgs = generics() // is [T]
+    val bounds = parameterTypeArgs.flatMap { // is [Comparable<T>]
+        when (val classifier = it.classifier) {
+            is KTypeParameter -> classifier.upperBounds
+            else -> emptyList()
+        }
+    }
+    val genericBounds = bounds.flatMap { bound -> bound.generics() } // is [T]
+    val isCuriouslyRecurringTemplatePattern = genericBounds.any { target ->
+        parameterTypeArgs.any {
+            fun KType.nameIgnoringNullability() = toString().removeSuffix("?")
+            target.nameIgnoringNullability() == it.nameIgnoringNullability()
+        }
+    }
+    return when {
+        isCuriouslyRecurringTemplatePattern -> {
+            when (val classifier = classifier) {
+                is KClass<*> -> {
+                    val qualifiedName = checkNotNull(classifier.qualifiedName) {
+                        "Cannot generate types for anonymous class $classifier"
+                    }
+                    val generics: List<TypeName> = parameterTypeArgs.map { typeArg: KType ->
+                        val typeArgBounds: List<TypeName> = when (val typeArgClassifier = typeArg.classifier) {
+                            is KTypeParameter -> {
+                                typeArgClassifier.upperBounds.mapNotNull { upperBound ->
+                                    when (val boundClassifier = upperBound.classifier) {
+                                        is KClass<*> -> {
+                                            val boundQN = checkNotNull(boundClassifier.qualifiedName) {
+                                                "Cannot generate types for anonymous class $boundClassifier"
+                                            }
+                                            val boundGenerics = upperBound.generics().map {
+                                                TypeVariableName(it.toString())
+                                            }
+                                            when {
+                                                boundGenerics.isEmpty() -> null
+                                                else -> ClassName.bestGuess(boundQN).parameterizedBy(boundGenerics)
+                                            }
+                                        }
+                                        is KTypeParameter -> TypeVariableName(boundClassifier.name)
+                                        else -> error("Unsupported bound $boundClassifier")
+                                    }
+                                }
+                            }
+                            is KClass<*> -> listOf(typeArg.asTypeName())
+                            else -> error(
+                                "Unsupported recursive type ${classifier.simpleName}<..., ${typeArg.classifier}, ...>"
+                            )
+                        }
+                        TypeVariableName(typeArg.toString(), bounds = typeArgBounds)
+                    }
+                    ClassName.bestGuess(qualifiedName).parameterizedBy(generics)
+                }
+                is KTypeParameter -> TypeVariableName(classifier.name)
+                else -> error("Unsupported type ${classifier}")
+            }
+        }
+        else -> {
+            // No recursive types
+            asTypeName()
+        }
+    }
 }
