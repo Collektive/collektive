@@ -1,4 +1,4 @@
-import it.unibo.collektive.CollektiveCodegenTask
+import it.unibo.collektive.codegen.CollektiveCodegenTask
 
 apply(plugin = libs.plugins.kotlin.multiplatform.id)
 
