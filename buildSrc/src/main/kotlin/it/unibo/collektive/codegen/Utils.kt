@@ -249,7 +249,9 @@ internal fun generatePrimitivesFile(origin: List<KCallable<*>>, packageName: Str
                 .build(),
         )
         val objectContainer = TypeSpec.objectBuilder(fileName).apply {
-            origin.flatMap { generateFunctions(it) }.forEach { addFunction(it) }
+            origin.flatMap { generateFunctions(it) }.forEach {
+                addFunction(it)
+            }
         }.build()
         addType(objectContainer)
     }.build()
