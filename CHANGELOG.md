@@ -1,3 +1,36 @@
+## [9.2.4](https://github.com/Collektive/collektive/compare/9.2.3...9.2.4) (2024-05-23)
+
+
+### Dependency updates
+
+* **core-deps:** update kotlin monorepo to v2 ([22d1dfc](https://github.com/Collektive/collektive/commit/22d1dfcf3b957963763db6195b20c77bb5e49218))
+* **deps:** update alchemist to v34.0.4 ([3960061](https://github.com/Collektive/collektive/commit/3960061695c78d026f49978fc53947d298d2bae0))
+* **deps:** update alchemist to v34.0.5 ([7e90764](https://github.com/Collektive/collektive/commit/7e9076481e68ce5d3fc9ab3dc3cd9eec0c8b82f5))
+* **deps:** update alchemist to v34.0.6 ([eee9298](https://github.com/Collektive/collektive/commit/eee9298b3c0130fae1caaae26891cb7ea758f109))
+* **deps:** update plugin com.gradle.develocity to v3.17.4 ([11eb4d5](https://github.com/Collektive/collektive/commit/11eb4d5533d36137b93fe349be7eda904a05296d))
+* **deps:** update plugin gitsemver to v3.1.6 ([26a963d](https://github.com/Collektive/collektive/commit/26a963da72181527b3c030ad352afe7c9ba955c5))
+
+
+### Build and continuous integration
+
+* add new kotlin 2.0 requirements ([bfd7032](https://github.com/Collektive/collektive/commit/bfd7032c796a38b6515387fab76241250f21354c))
+* **deps:** update actions/checkout action to v4.1.6 ([6dacf1d](https://github.com/Collektive/collektive/commit/6dacf1d7c6b6ec5c30fb1acf68754ffe9e617c70))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.19 ([a3f772e](https://github.com/Collektive/collektive/commit/a3f772e27362e14627d68155f7511ab6686b4cbc))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.20 ([f38c4ce](https://github.com/Collektive/collektive/commit/f38c4ceb70576412e417c12fd8b54bb015be31ee))
+* **deps:** update dependency macos github actions runner to v14 ([ae0e3f9](https://github.com/Collektive/collektive/commit/ae0e3f9619a68dfe0002ed4d2162b96e6b124adb))
+* **deps:** update dependency ubuntu github actions runner to v24 ([85e18d3](https://github.com/Collektive/collektive/commit/85e18d3b21b0d946e8e08dc2082473d4829bce25))
+* migrate to develocity plugin ([bbaf167](https://github.com/Collektive/collektive/commit/bbaf167fd95d66bf7066c6ba6ee6e7a1d3f958ce))
+
+
+### General maintenance
+
+* add opt-in ([4bd75e9](https://github.com/Collektive/collektive/commit/4bd75e95a89025e6a43e6b5315555808b19f3a23))
+
+
+### Refactoring
+
+* change alignment implementation via compiler plugin to be debug-friendly (issue [#337](https://github.com/Collektive/collektive/issues/337)) ([#347](https://github.com/Collektive/collektive/issues/347)) ([c4ac438](https://github.com/Collektive/collektive/commit/c4ac438ed4554a64eb677430c26d8b4aa70f30be))
+
 ## [9.2.3](https://github.com/Collektive/collektive/compare/9.2.2...9.2.3) (2024-05-10)
 
 
