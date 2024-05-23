@@ -87,6 +87,7 @@ object FieldedMembersGenerator {
         "clone",
         "dec",
         "filterIndexedTo",
+        "filterNotTo",
         "fold",
         "foldIndexed",
         "foldIndexedOrNull",
