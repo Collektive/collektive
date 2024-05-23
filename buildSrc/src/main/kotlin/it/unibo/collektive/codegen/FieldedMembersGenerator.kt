@@ -88,6 +88,7 @@ object FieldedMembersGenerator {
         "dec",
         "filterIndexedTo",
         "filterNotTo",
+        "filterTo",
         "fold",
         "foldIndexed",
         "foldIndexedOrNull",
