@@ -7,10 +7,15 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.internal.os.OperatingSystem
 import org.gradle.kotlin.dsl.*
 import org.gradle.plugin.use.PluginDependency
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 val Provider<PluginDependency>.id: String get() = get().pluginId
 
@@ -27,9 +32,6 @@ fun Project.configureKotlinMultiplatform() {
     with(extensions.getByType<KotlinMultiplatformExtension>()) {
         val kotlin = this
         jvm {
-            compilations.all {
-                kotlinOptions.jvmTarget = "1.8"
-            }
             testRuns.getByName("test").executionTask.configure {
                 useJUnitPlatform()
                 filter {
@@ -45,21 +47,12 @@ fun Project.configureKotlinMultiplatform() {
                 }
             }
         }
-        sourceSets.invoke {
-            val commonMain by getting
-            val commonTest by getting
-            val jvmTest by getting
-            val nativeMain by creating
-            val nativeTest by creating
-        }
         js(IR) {
             browser()
             nodejs()
             binaries.library()
         }
         val nativeSetup: KotlinNativeTarget.() -> Unit = {
-            compilations["main"].defaultSourceSet.dependsOn(kotlin.sourceSets.getByName("nativeMain"))
-            compilations["test"].defaultSourceSet.dependsOn(kotlin.sourceSets.getByName("nativeTest"))
             binaries {
                 sharedLib()
                 staticLib()
@@ -82,14 +75,14 @@ fun Project.configureKotlinMultiplatform() {
         tvosArm64(nativeSetup)
         tvosX64(nativeSetup)
         tvosSimulatorArm64(nativeSetup)
-        targets.all {
-            compilations.all {
-                // enable all warnings as errors
-                kotlinOptions {
-                    allWarningsAsErrors = true
-                }
+
+        tasks.withType<KotlinCompile>().configureEach {
+            compilerOptions {
+                allWarningsAsErrors = true
+                jvmTarget = JvmTarget.JVM_1_8
             }
         }
+
         // Disable cross compilation
         val excludeTargets = when {
             os.isLinux -> kotlin.targets.filterNot { "linux" in it.name }
