@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.ir.expressions.IrBranch
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrElseBranch
 import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
 import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.dumpKotlinLike
@@ -30,6 +31,7 @@ class FieldTransformer(
     private val aggregateClass: IrClass,
     private val projectFunction: IrFunction,
 ) : IrElementTransformerVoid() {
+    @OptIn(UnsafeDuringIrConstructionAPI::class)
     override fun visitCall(expression: IrCall): IrExpression {
         val symbolName = expression.symbol.owner.name
         val alignRawIdentifier = Name.identifier(AggregateFunctionNames.ALIGN_FUNCTION)

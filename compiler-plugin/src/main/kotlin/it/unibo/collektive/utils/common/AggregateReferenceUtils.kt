@@ -9,7 +9,9 @@ import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.expressions.IrTypeOperatorCall
 import org.jetbrains.kotlin.ir.expressions.IrWhen
+import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
 
+@OptIn(UnsafeDuringIrConstructionAPI::class)
 private fun IrBlock.findAggregateReference(aggregateContextClass: IrClass): IrExpression? =
     statements.firstNotNullOfOrNull {
         when (it) {
@@ -23,6 +25,7 @@ private fun IrBlock.findAggregateReference(aggregateContextClass: IrClass): IrEx
         }
     }
 
+@OptIn(UnsafeDuringIrConstructionAPI::class)
 internal fun IrExpression.findAggregateReference(aggregateContextClass: IrClass): IrExpression? = when (this) {
     is IrBlock -> findAggregateReference(aggregateContextClass)
 
