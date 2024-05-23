@@ -98,6 +98,7 @@ object FieldedMembersGenerator {
         "foldOrNull",
         "foldRight",
         "foldRightIndexed",
+        "groupByTo",
         "inc",
         "joinTo",
         "map",
