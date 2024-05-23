@@ -83,6 +83,7 @@ object FieldedMembersGenerator {
     val permanentlyExcludedMemberNames = listOf(
         "associateByTo",
         "associateTo",
+        "associateWithTo",
         "clone",
         "dec",
         "fold",
