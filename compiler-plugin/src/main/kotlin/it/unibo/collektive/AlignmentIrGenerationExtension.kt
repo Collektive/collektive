@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
+import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
 import org.jetbrains.kotlin.ir.util.functions
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
@@ -24,6 +25,7 @@ import org.jetbrains.kotlin.name.Name
  * The generation extension is used to register the transformer plugin, which is going to modify
  * the IR using the function responsible for the alignment.
  */
+@OptIn(UnsafeDuringIrConstructionAPI::class)
 class AlignmentIrGenerationExtension(private val logger: MessageCollector) : IrGenerationExtension {
     override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
         // Aggregate Context class that has the reference to the stack

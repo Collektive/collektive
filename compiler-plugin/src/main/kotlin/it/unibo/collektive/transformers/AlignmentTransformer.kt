@@ -28,6 +28,7 @@ import org.jetbrains.kotlin.ir.expressions.IrContainerExpression
 import org.jetbrains.kotlin.ir.expressions.IrElseBranch
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.putArgument
+import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 
@@ -45,6 +46,7 @@ class AlignmentTransformer(
 ) : IrElementTransformer<StackFunctionCall> {
     private var alignedFunctions = emptyMap<String, Int>()
 
+    @OptIn(UnsafeDuringIrConstructionAPI::class)
     override fun visitCall(expression: IrCall, data: StackFunctionCall): IrElement {
         val contextReference = expression.receiverAndArgs()
             .find { it.type.isAssignableFrom(aggregateContextClass.defaultType) }
