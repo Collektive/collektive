@@ -100,6 +100,8 @@ object FieldedMembersGenerator {
         "foldRightIndexed",
         "inc",
         "joinTo",
+        "map",
+        "mapTo",
         "reduce",
         "reduceIndexed",
         "reduceIndexedOrNull",
