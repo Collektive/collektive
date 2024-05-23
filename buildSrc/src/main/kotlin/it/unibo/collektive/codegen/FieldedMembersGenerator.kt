@@ -90,6 +90,7 @@ object FieldedMembersGenerator {
         "filterIndexedTo",
         "filterNotTo",
         "filterTo",
+        "flatMapTo",
         "fold",
         "foldIndexed",
         "foldIndexedOrNull",
