@@ -84,6 +84,7 @@ object FieldedMembersGenerator {
         "associateByTo",
         "associateTo",
         "associateWithTo",
+        "binarySearch",
         "clone",
         "dec",
         "filterIndexedTo",
