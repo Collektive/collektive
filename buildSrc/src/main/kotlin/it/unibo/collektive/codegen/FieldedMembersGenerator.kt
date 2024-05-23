@@ -101,6 +101,7 @@ object FieldedMembersGenerator {
         "inc",
         "joinTo",
         "map",
+        "mapIndexedTo",
         "mapNotNullTo",
         "mapTo",
         "reduce",
