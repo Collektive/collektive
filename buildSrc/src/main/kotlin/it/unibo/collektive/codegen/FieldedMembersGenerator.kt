@@ -81,6 +81,8 @@ object FieldedMembersGenerator {
     )
 
     val permanentlyExcludedMemberNames = listOf(
+        "associateByTo",
+        "associateTo",
         "clone",
         "dec",
         "fold",
@@ -142,17 +144,22 @@ object FieldedMembersGenerator {
                     forbiddenPrefixes.any { prefix ->  parameter.type.toString().startsWith(prefix) }
                 }
             }
-            val noConflictingMethods = parametersMeaningful.filterNot { callable ->
+            val genericBoundsMeaningful = parametersMeaningful.filterNot { method ->
+                method.typeParameters.any { typeParameter ->
+                    forbiddenPrefixes.any { prefix ->
+                        typeParameter.upperBounds.any { it.toString().startsWith(prefix) }
+                    }
+                }
+            }
+            val noConflictingMethods = genericBoundsMeaningful.filterNot { callable ->
                 callable.name to callable.paramTypes() in forbiddenMembers
             }
             val validMembers = noConflictingMethods
                 .filterNot { it.name in forbiddenMembersName }
                 .toList()
-                .dropWhile { it.name < "max" }
             val name = checkNotNull(clazz.simpleName) {
                 "Cannot generate field functions for anonymous class $clazz"
             }.removeSuffix("Kt")
-            println("Generating field functions for $name")
             generatePrimitivesFile(
                 validMembers,
                 "it.unibo.collektive.primitives",
