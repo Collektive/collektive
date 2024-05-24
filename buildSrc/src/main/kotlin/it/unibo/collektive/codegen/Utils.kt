@@ -10,6 +10,7 @@ import com.squareup.kotlinpoet.MemberName.Companion.member
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.STAR
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.TypeVariableName
@@ -284,7 +285,7 @@ internal fun KType?.toTypeNameWithRecurringGenericSupport(
     recurryingTypeArguments: Set<KTypeParameter> = emptySet()
 ): TypeName {
     if (this == null) {
-        return TypeVariableName("*")
+        return STAR
     }
     val classifier = classifier
     fun ClassName.parameterized(): TypeName = run {
