@@ -16,6 +16,7 @@ import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.TypeVariableName
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
+import com.squareup.kotlinpoet.asTypeVariableName
 import it.unibo.collektive.field.Field
 import kotlin.math.pow
 import kotlin.reflect.KCallable
@@ -25,6 +26,7 @@ import kotlin.reflect.KParameter
 import kotlin.reflect.KProperty
 import kotlin.reflect.KType
 import kotlin.reflect.KTypeParameter
+import kotlin.reflect.KVariance
 
 private val FIELD_INTERFACE = Field::class.asClassName()
 private val FIELD_COMPANION = Field.Companion::class.asClassName()
@@ -210,13 +212,20 @@ internal fun generateFunction(callable: KCallable<*>, paramList: List<ParameterS
                 // Retain inline
                 if (callable.isInline) {
                     addModifiers(KModifier.INLINE)
-                    // TODO: Add reified type parameters
                 }
             }
         }
         // Add type variables to the function definition by recursively getting all type variables from the parameters
         // The .toSet() call is to remove duplicates
-        addTypeVariables(paramList.map { it.type }.flatMap { it.getAllTypeVariables() }.toSet())
+        val declaredTypeVariables = callable.typeParameters.map { it.toTypeVariableName() }
+        addTypeVariables(declaredTypeVariables)
+        val declaredTypeVariableNames = declaredTypeVariables.map { it.name }
+        val typeVariablesInParameters = paramList
+            .map { it.type }
+            .flatMap { it.getAllTypeVariables() }
+            .distinct()
+            .filterNot { it.name in declaredTypeVariableNames }
+        addTypeVariables(typeVariablesInParameters)
         // Remove the `this` parameter since, when present, it is the extension receiver
         addParameters(paramList.filter { it.name != "this" })
         // Generate always function with extension receiver
@@ -296,6 +305,32 @@ val allowList = listOf(
     DoubleArray::class,
 )
 
+internal fun KTypeParameter.toTypeVariableName(
+    recurryingTypeArguments: Set<KTypeParameter> = emptySet()
+): TypeVariableName =
+    when {
+        this in recurryingTypeArguments -> TypeVariableName(
+            name = name,
+            variance = when (variance) {
+                KVariance.INVARIANT -> null
+                KVariance.IN -> KModifier.IN
+                KVariance.OUT -> KModifier.OUT
+            }
+        ).copy(reified = isReified)
+        else -> {
+            val unbound = TypeVariableName(name)
+            val upperBounds = upperBounds
+                .filterNot { it.isMarkedNullable && it.classifier == Any::class }
+                .map {
+                    it.toTypeNameWithRecurringGenericSupport(recurryingTypeArguments + this)
+                }
+            unbound.copy(
+                bounds = upperBounds,
+                reified = isReified
+            )
+        }
+    }
+
 internal fun KType?.toTypeNameWithRecurringGenericSupport(
     recurryingTypeArguments: Set<KTypeParameter> = emptySet()
 ): TypeName {
@@ -324,20 +359,7 @@ internal fun KType?.toTypeNameWithRecurringGenericSupport(
                 }
             }
         }
-        is KTypeParameter -> {
-            when {
-                classifier in recurryingTypeArguments -> TypeVariableName(classifier.name)
-                else -> {
-                    val unbound = TypeVariableName(classifier.name)
-                    val upperBounds = classifier.upperBounds
-                        .filterNot { it.isMarkedNullable && it.classifier == Any::class }
-                        .map {
-                            it.toTypeNameWithRecurringGenericSupport(recurryingTypeArguments + classifier)
-                        }
-                    unbound.copy(bounds = upperBounds, nullable = isMarkedNullable)
-                }
-            }
-        }
+        is KTypeParameter -> classifier.toTypeVariableName(recurryingTypeArguments).copy(nullable = isMarkedNullable)
         else -> asTypeName()
     }
 }
