@@ -193,6 +193,27 @@ internal fun TypeName.getAllTypeVariables(): List<TypeVariableName> {
 
 internal fun generateFunction(callable: KCallable<*>, paramList: List<ParameterSpec>): FunSpec =
     FunSpec.builder(callable.name).apply {
+        // Retain suspend
+        if (callable.isSuspend) {
+            addModifiers(KModifier.SUSPEND)
+        }
+        when (callable) {
+            is KFunction<*> -> {
+                // If the callable is an operator, add the operator modifier to the function
+                if (callable.isOperator && callable.name !in operatorNotReturningField) {
+                    addModifiers(KModifier.OPERATOR)
+                }
+                // Retain infix
+                if (callable.isInfix) {
+                    addModifiers(KModifier.INFIX)
+                }
+                // Retain inline
+                if (callable.isInline) {
+                    addModifiers(KModifier.INLINE)
+                    // TODO: Add reified type parameters
+                }
+            }
+        }
         // Add type variables to the function definition by recursively getting all type variables from the parameters
         // The .toSet() call is to remove duplicates
         addTypeVariables(paramList.map { it.type }.flatMap { it.getAllTypeVariables() }.toSet())
@@ -214,12 +235,6 @@ internal fun generateFunction(callable: KCallable<*>, paramList: List<ParameterS
                     .addMember("%S", "${callable.name}__$typeRepr")
                     .build(),
             )
-        }
-        // If the callable is an operator, add the operator modifier to the function
-        when (callable) {
-            is KFunction<*> -> if (callable.isOperator && callable.name !in operatorNotReturningField) {
-                addModifiers(KModifier.OPERATOR)
-            }
         }
         // Always return a Field parametrized by the ID type and the return type of the callable
         returns(FIELD_INTERFACE.parameterizedBy(ID_BOUNDED_TYPE, callable.returnType.toTypeNameWithRecurringGenericSupport()))
