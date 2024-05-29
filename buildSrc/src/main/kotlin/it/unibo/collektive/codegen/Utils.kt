@@ -17,6 +17,7 @@ import com.squareup.kotlinpoet.TypeVariableName
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.asTypeVariableName
+import com.sun.org.apache.xpath.internal.operations.Bool
 import it.unibo.collektive.field.Field
 import kotlin.math.pow
 import kotlin.reflect.KCallable
@@ -259,7 +260,18 @@ internal fun generateFunction(callable: KCallable<*>, paramList: List<ParameterS
 internal fun generateFunctions(origin: KCallable<*>): List<FunSpec> {
     val functionArguments: List<ParameterSpec> = origin.parameters.map { parameter: KParameter ->
         val typeName = parameter.type.toTypeNameWithRecurringGenericSupport()
-        ParameterSpec(parameter.name ?: "this", typeName.copy(annotations = emptyList()))
+        fun KParameter.isFunctionType(): Boolean = (parameter.type.classifier as? KClass<*>)?.qualifiedName
+            ?.startsWith("kotlin.Function")
+            ?: false
+        ParameterSpec(
+            name = parameter.name ?: "this",
+            type = typeName.copy(annotations = emptyList()),
+            modifiers = when {
+                origin is KFunction<*> && origin.isInline && parameter.isFunctionType() ->
+                    listOf(KModifier.CROSSINLINE)
+                else -> emptyList()
+            }
+        )
     }
     return parameterCombinations(functionArguments).map { paramList ->
         generateFunction(origin, paramList)
