@@ -49,7 +49,7 @@ alchemist = [
 [plugins]
 build-config = { id = "com.github.gmazzo.buildconfig", version.ref = "build-config" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-gitSemVer = "org.danilopianini.git-sensitive-semantic-versioning:3.1.6"
+gitSemVer = "org.danilopianini.git-sensitive-semantic-versioning:3.1.7"
 gradlePluginPublish = { id = "com.gradle.plugin-publish", version = "1.2.1" }
 kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
