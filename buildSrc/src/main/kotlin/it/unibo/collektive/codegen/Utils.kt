@@ -40,6 +40,17 @@ private val operatorNotReturningField = listOf("compareTo", "contains")
 internal fun ParameterSpec.isField() = type.toString().contains("Field")
 private fun KCallable<*>.isProperty() = this is KProperty<*>
 
+val specializedArrayTypes = setOf(
+    IntArray::class,
+    DoubleArray::class,
+    LongArray::class,
+    FloatArray::class,
+    ShortArray::class,
+    ByteArray::class,
+    CharArray::class,
+    BooleanArray::class
+)
+
 /**
  * Given a list of parameters, returns a list of all possible combinations of parameters where each parameter is
  * replaced by a `Field` of the same type.
@@ -139,9 +150,7 @@ internal fun FunSpec.Builder.addBodyForNonFieldReceiverFunction(
     val functionParameters = parameters.drop(1)
     val candidateParameter = functionParameters.first { it.isField() }
     val arguments = functionParameters.map {
-        if (it == candidateParameter) {
-            return@map "receiver"
-        }
+        if (it == candidateParameter) return@map "receiver"
         when (it.type.toString().contains("Field")) {
             true -> "${it.name}[id]"
             false -> it.name
@@ -353,6 +362,7 @@ internal fun KType?.toTypeNameWithRecurringGenericSupport(
     fun ClassName.parameterized(): TypeName = run {
         when {
             arguments.isEmpty() -> this
+            specializedArrayTypes.contains(classifier) -> this // No type arguments expected for class '*Array'.
             else -> parameterizedBy(
                 arguments.map { it.type.toTypeNameWithRecurringGenericSupport(recurryingTypeArguments) }
             )
