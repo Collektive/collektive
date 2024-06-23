@@ -89,6 +89,7 @@ object FieldedMembersGenerator {
         "dec",
         "filterIndexedTo",
         "filterIsInstanceTo",
+        "filterNotNullTo",
         "filterNotTo",
         "filterTo",
         "flatMapTo",
