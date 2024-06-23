@@ -88,6 +88,7 @@ object FieldedMembersGenerator {
         "clone",
         "dec",
         "filterIndexedTo",
+        "filterIsInstanceTo",
         "filterNotTo",
         "filterTo",
         "flatMapTo",
