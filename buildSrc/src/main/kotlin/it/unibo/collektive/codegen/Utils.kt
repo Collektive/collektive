@@ -251,7 +251,8 @@ internal fun generateFunction(callable: KCallable<*>, paramList: List<ParameterS
             .replace(".", "_")
             .replace("<", "_of_")
             .replace(">", "_end")
-            .replace(Regex(", "), "_and_")
+            .replace(", ", "_and_")
+            .replace("*", "wildcard")
             .replace("?", "wildcard")
             .replace("Field_of_ID_and_", "Field_of_")
         addAnnotation(
