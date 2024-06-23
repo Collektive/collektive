@@ -253,7 +253,7 @@ internal fun generateFunction(callable: KCallable<*>, paramList: List<ParameterS
             .replace(">", "_end")
             .replace(", ", "_and_")
             .replace("*", "wildcard")
-            .replace("?", "wildcard")
+            .replace("?", "_nullable")
             .replace("Field_of_ID_and_", "Field_of_")
         addAnnotation(
             AnnotationSpec.builder(JvmName::class)
