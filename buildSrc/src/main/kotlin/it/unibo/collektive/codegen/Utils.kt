@@ -80,11 +80,14 @@ internal fun parameterCombinations(parameters: List<ParameterSpec>): List<List<P
 /**
  * Generate the body for function where the extension receiver is a `Field` and the function has no arguments.
  */
-internal fun FunSpec.Builder.noArgumentFunction(callable: KCallable<*>) =
-    when (callable.isProperty()) {
-        true -> addStatement("return·%N·{·it.${callable.name}·}", FIELD_MAP)
-        else -> addStatement("return·%N·{·it.${callable.name}()·}", FIELD_MAP)
+internal fun FunSpec.Builder.noArgumentFunction(callable: KCallable<*>) {
+    val baseCall = "return·%N·{·it.${callable.name}"
+    when {
+        callable.isProperty() -> addStatement("$baseCall·}", FIELD_MAP)
+        callable.typeParameters.isEmpty() -> addStatement("$baseCall()·}", FIELD_MAP)
+        else -> addStatement("$baseCall<${callable.typeParameters.joinToString { it.name }}>()·}", FIELD_MAP)
     }
+}
 
 /**
  * Generate the body for function where the extension receiver is a `Field`.
@@ -342,7 +345,7 @@ internal fun KTypeParameter.toTypeVariableName(
     }
 
 internal fun KType?.toTypeNameWithRecurringGenericSupport(
-    recurryingTypeArguments: Set<KTypeParameter> = emptySet()
+    recurringTypeArguments: Set<KTypeParameter> = emptySet()
 ): TypeName {
     if (this == null) {
         return STAR
@@ -353,7 +356,7 @@ internal fun KType?.toTypeNameWithRecurringGenericSupport(
             arguments.isEmpty() -> this
             specializedArrayTypes.contains(classifier) -> this // No type arguments expected for class '*Array'.
             else -> parameterizedBy(
-                arguments.map { it.type.toTypeNameWithRecurringGenericSupport(recurryingTypeArguments) }
+                arguments.map { it.type.toTypeNameWithRecurringGenericSupport(recurringTypeArguments) }
             )
         }
     }
@@ -370,7 +373,7 @@ internal fun KType?.toTypeNameWithRecurringGenericSupport(
                 }
             }
         }
-        is KTypeParameter -> classifier.toTypeVariableName(recurryingTypeArguments).copy(nullable = isMarkedNullable)
+        is KTypeParameter -> classifier.toTypeVariableName(recurringTypeArguments).copy(nullable = isMarkedNullable)
         else -> asTypeName()
     }
 }
