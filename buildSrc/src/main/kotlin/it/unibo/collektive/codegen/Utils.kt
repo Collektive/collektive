@@ -1,6 +1,5 @@
 package it.unibo.collektive.codegen
 
-import arrow.core.tail
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
@@ -16,8 +15,6 @@ import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.TypeVariableName
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
-import com.squareup.kotlinpoet.asTypeVariableName
-import com.sun.org.apache.xpath.internal.operations.Bool
 import it.unibo.collektive.field.Field
 import kotlin.math.pow
 import kotlin.reflect.KCallable
@@ -241,20 +238,24 @@ internal fun generateFunction(callable: KCallable<*>, paramList: List<ParameterS
         // Generate always function with extension receiver
         receiver(paramList.first().type)
         // Add the JavaName annotation preventing JVM name clashes
-        paramList.tail().find { it.isField() }?.let {
-            val type = it.type as ParameterizedTypeName // Since it is a Field, it is always a ParameterizedTypeName
-            val typeRepr = type.typeArguments[1].toString()
-                .replace(".", "_")
-                .replace("<", "ͼ")
-                .replace(">", "ͽ")
-                .replace(", ", "_")
-                .replace("?", "Ɂ")
-            addAnnotation(
-                AnnotationSpec.builder(JvmName::class)
-                    .addMember("%S", "${callable.name}__$typeRepr")
-                    .build(),
-            )
-        }
+        val typesRepr = paramList
+            .joinToString("_and_") {
+                it.type.toString()
+                    .replace("kotlin.", "")
+                    .replace("kotlinx.", "")
+                    .replace("it.unibo.collektive.`field`.Field", "Field")
+            }
+            .replace(".", "_")
+            .replace("<", "_of_")
+            .replace(">", "_end")
+            .replace(Regex(", "), "_and_")
+            .replace("?", "wildcard")
+            .replace("Field_of_ID_and_", "Field_of_")
+        addAnnotation(
+            AnnotationSpec.builder(JvmName::class)
+                .addMember("%S", "${callable.name}_with_$typesRepr")
+                .build(),
+        )
         // Always return a Field parametrized by the ID type and the return type of the callable
         returns(FIELD_INTERFACE.parameterizedBy(ID_BOUNDED_TYPE, callable.returnType.toTypeNameWithRecurringGenericSupport()))
         when (paramList.size) {
@@ -269,7 +270,7 @@ internal fun generateFunction(callable: KCallable<*>, paramList: List<ParameterS
 internal fun generateFunctions(origin: KCallable<*>): List<FunSpec> {
     val functionArguments: List<ParameterSpec> = origin.parameters.map { parameter: KParameter ->
         val typeName = parameter.type.toTypeNameWithRecurringGenericSupport()
-        fun KParameter.isFunctionType(): Boolean = (parameter.type.classifier as? KClass<*>)?.qualifiedName
+        fun KParameter.isFunctionType(): Boolean = (type.classifier as? KClass<*>)?.qualifiedName
             ?.startsWith("kotlin.Function")
             ?: false
         ParameterSpec(
@@ -308,23 +309,11 @@ internal fun generatePrimitivesFile(origin: List<KCallable<*>>, packageName: Str
     }.build()
 }
 
-internal fun KType.generics(): List<KType> = when (classifier) {
-    is KTypeParameter -> listOf(this)
-    else -> arguments.mapNotNull { it.type }
-}
-
 val autoConversions = mapOf(
     "java.lang.Appendable" to "kotlin.text.Appendable",
     "java.util.Comparator" to "kotlin.Comparator",
     "java.util.HashSet" to "kotlin.collections.HashSet",
 ).mapValues { (_, kotlinClass) -> ClassName.bestGuess(kotlinClass) }
-
-val kotlinBaseTypeRegex = Regex("kotlin\\.(\\w+)")
-
-val allowList = listOf(
-    Any::class,
-    DoubleArray::class,
-)
 
 internal fun KTypeParameter.toTypeVariableName(
     recurryingTypeArguments: Set<KTypeParameter> = emptySet()

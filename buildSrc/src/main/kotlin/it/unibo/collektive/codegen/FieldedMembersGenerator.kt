@@ -1,6 +1,5 @@
 package it.unibo.collektive.codegen
 
-import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.FileSpec
 import it.unibo.collektive.field.Field
 import java.io.File
@@ -9,6 +8,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KClassifier
 import kotlin.reflect.KType
 import kotlin.reflect.KVisibility
+import kotlin.reflect.full.extensionReceiverParameter
 import kotlin.reflect.full.starProjectedType
 import kotlin.reflect.jvm.kotlinFunction
 
@@ -136,7 +136,7 @@ object FieldedMembersGenerator {
         val forbiddenMembers = Field::class.members.map { member -> member.name to member.paramTypes() }
         // "dec" and "inc" are excluded due to: KT-24800
         val forbiddenMembersName = permanentlyExcludedMemberNames + excludeMembers
-        return types.map { clazz ->
+        return types.flatMap { clazz ->
             val javaMethods: Collection<KCallable<*>> = clazz.java.methods.mapNotNull {
                 runCatching { it.kotlinFunction }.getOrNull()
             }
@@ -173,11 +173,19 @@ object FieldedMembersGenerator {
             val name = checkNotNull(clazz.simpleName) {
                 "Cannot generate field functions for anonymous class $clazz"
             }.removeSuffix("Kt")
-            generatePrimitivesFile(
-                validMembers,
-                "it.unibo.collektive.primitives",
-                "Fielded${name}${if (name.endsWith("s")) "Extensions" else 's'}",
-            )
+            val extensions = validMembers.groupBy {
+                it.extensionReceiverParameter?.type?.toString()
+                    ?.substringBefore('<')
+                    ?.substringAfterLast('.')
+                    ?: name
+            }
+            extensions.map { (receiver, members) ->
+                generatePrimitivesFile(
+                    members,
+                    "it.unibo.collektive.stdlib.${receiver.lowercase()}s",
+                    "Fielded${name}${if (name.endsWith("s")) "Extensions" else 's'}",
+                )
+            }.asSequence()
         }
     }
 
