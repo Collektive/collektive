@@ -5,18 +5,19 @@ import it.unibo.collektive.field.Field
 import java.io.File
 import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
-import kotlin.reflect.KClassifier
 import kotlin.reflect.KType
+import kotlin.reflect.KTypeParameter
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.extensionReceiverParameter
-import kotlin.reflect.full.starProjectedType
+import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.jvm.kotlinFunction
+import kotlin.reflect.typeOf
 
 
 object FieldedMembersGenerator {
 
     val baseExtensions = sequenceOf(
-        "Arrays"
+        "Arrays", "Collections", "Sets", "Maps"
     ).map {
         Class.forName("kotlin.collections.${it}Kt").kotlin
     }
@@ -44,17 +45,12 @@ object FieldedMembersGenerator {
         CharSequence::class,
         String::class,
         // Collections
-        Map::class,
-        List::class,
         Collection::class,
+        Iterable::class,
+        List::class,
+        Map::class,
+        Sequence::class,
         Set::class,
-        Array::class,
-        ByteArray::class,
-        ShortArray::class,
-        IntArray::class,
-        FloatArray::class,
-        DoubleArray::class,
-        LongArray::class,
         // Other types
         Comparator::class,
         Pair::class,
@@ -63,17 +59,27 @@ object FieldedMembersGenerator {
         // Function collections
     ) + baseExtensions
 
-    val forbiddenReturnTypes: List<KType> = listOf<KClassifier>(
-        Unit::class,
-        Nothing::class,
-        MutableList::class,
-        MutableMap::class,
-        MutableSet::class,
-        MutableCollection::class,
-        MutableIterator::class,
-        MutableIterable::class,
-        MutableListIterator::class,
-    ).map { it.starProjectedType }
+    val mutablesAndSideEffects: List<KType> = listOf(
+        typeOf<Array<*>>(),
+        typeOf<MutableCollection<*>>(),
+        typeOf<MutableCollection<*>>(),
+        typeOf<MutableIterable<*>>(),
+        typeOf<MutableIterator<*>>(),
+        typeOf<MutableList<*>>(),
+        typeOf<MutableListIterator<*>>(),
+        typeOf<MutableMap<*, *>>(),
+        typeOf<ShortArray>(),
+        typeOf<IntArray>(),
+        typeOf<FloatArray>(),
+        typeOf<DoubleArray>(),
+        typeOf<LongArray>(),
+        typeOf<MutableSet<*>>(),
+        typeOf<Unit>(),
+    )
+
+    fun KType.isMutable(): Boolean = mutablesAndSideEffects.any { isSubtypeOf(it) }
+
+    fun KTypeParameter.isMutable() = upperBounds.any { bound -> bound.isMutable() }
 
     val forbiddenPrefixes = listOf(
         "java",
@@ -86,6 +92,7 @@ object FieldedMembersGenerator {
         "associateWithTo",
         "binarySearch",
         "clone",
+        "copyInto",
         "dec",
         "filterIndexedTo",
         "filterIsInstanceTo",
@@ -104,10 +111,13 @@ object FieldedMembersGenerator {
         "groupByTo",
         "inc",
         "joinTo",
+        "listOf",
+        "listOfNotNull",
         "map",
         "mapIndexedNotNullTo",
         "mapIndexedTo",
         "mapNotNullTo",
+        "mapOf",
         "mapTo",
         "reduce",
         "reduceIndexed",
@@ -118,9 +128,21 @@ object FieldedMembersGenerator {
         "reduceRight",
         "reduceRightIndexed",
         "readObject",
+        "setOf",
+        "setOfNotNull",
+        "toBooleanArray",
+        "toByteArray",
+        "toCharArray",
+        "toCollection",
+        "toDoubleArray",
+        "toFloatArray",
+        "toIntArray",
+        "toLongArray",
+        "toShortArray",
         "toMutableMap",
         "toMutableList",
         "toMutableSet",
+        "toTypedArray",
         "writeObject",
     ) + listOf("fold", "reduce")
         .flatMap { listOf(it, "${it}Indexed", "${it}Left", "${it}Right", "${it}OrNull") }
@@ -148,15 +170,25 @@ object FieldedMembersGenerator {
                 .thenBy { it.parameters.size }
                 .thenBy { it.paramTypes().joinToString() }
             val sortedTargets = allTargets.sortedWith(order)
-            val notDeprecated = sortedTargets.filter { it.annotations.none { annotation -> annotation is Deprecated } }
-            val public = notDeprecated.filter { it.visibility == KVisibility.PUBLIC }
+            val withValidAnnotations = sortedTargets.filter { callable ->
+                callable.annotations.none {
+                    it is Deprecated || it.annotationClass.simpleName == "PlatformDependent"
+                }
+            }
+            val public = withValidAnnotations.filter { it.visibility == KVisibility.PUBLIC }
             val returnTypeMeaningful = public.filterNot {
                 forbiddenPrefixes.any { prefix -> it.returnType.toString().startsWith(prefix) } ||
-                it.returnType in forbiddenReturnTypes
+                    mutablesAndSideEffects.any { mutable -> it.returnType.isSubtypeOf(mutable) }
             }
             val parametersMeaningful = returnTypeMeaningful.filterNot { method ->
                 method.parameters.any { parameter ->
-                    forbiddenPrefixes.any { prefix ->  parameter.type.toString().startsWith(prefix) }
+                    forbiddenPrefixes.any { prefix -> parameter.type.toString().startsWith(prefix) } ||
+                        when (val classifier = parameter.type.classifier) {
+                            null -> error("Null classifier in $method")
+                            is KClass<*> -> parameter.type.isMutable()
+                            is KTypeParameter -> classifier.isMutable()
+                            else -> error("Unknown classifier type ${classifier::class}")
+                        }
                 }
             }
             val genericBoundsMeaningful = parametersMeaningful.filterNot { method ->
@@ -181,13 +213,15 @@ object FieldedMembersGenerator {
                     ?.substringAfterLast('.')
                     ?: name
             }
-            extensions.map { (receiver, members) ->
-                generatePrimitivesFile(
-                    members,
-                    "it.unibo.collektive.stdlib.${receiver.lowercase()}s",
-                    "Fielded${name}${if (name.endsWith("s")) "Extensions" else 's'}",
-                )
-            }.asSequence()
+            extensions.asSequence()
+                .filter { (_, members) -> members.isNotEmpty() }
+                .map { (receiver, members) ->
+                    generatePrimitivesFile(
+                        members,
+                        "it.unibo.collektive.stdlib.${receiver.lowercase()}s",
+                        "Fielded${name}${if (name.endsWith("s")) "Extensions" else 's'}",
+                    )
+                }
         }
     }
 

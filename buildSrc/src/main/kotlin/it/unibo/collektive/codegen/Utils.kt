@@ -237,7 +237,9 @@ internal fun generateFunction(callable: KCallable<*>, paramList: List<ParameterS
                             addModifiers(KModifier.INFIX)
                         }
                         // Retain inline
-                        if (callable.isInline) {
+                        fun hasCrossinlinedParameters() = paramList.any { it.modifiers.contains(KModifier.CROSSINLINE) }
+                        fun hasReifiedTypeParameters() = callable.typeParameters.any { it.isReified }
+                        if (callable.isInline && (hasCrossinlinedParameters() || hasReifiedTypeParameters())) {
                             addModifiers(KModifier.INLINE)
                         }
                     }
@@ -293,13 +295,16 @@ internal fun generateFunction(callable: KCallable<*>, paramList: List<ParameterS
     }
 }
 
+internal fun ParameterSpec.isFunctionTyoe(): Boolean = type.toString()
+    .matches(Regex("^(kotlin\\.)?Function\\d+.*"))
+
+internal fun KParameter.isFunctionType(): Boolean = (type.classifier as? KClass<*>)?.qualifiedName
+    ?.startsWith("kotlin.Function")
+    ?: false
 
 internal fun generateFunctions(origin: KCallable<*>): List<FunSpec> {
     val functionArguments: List<ParameterSpec> = origin.parameters.map { parameter: KParameter ->
         val typeName = parameter.type.toTypeNameWithRecurringGenericSupport()
-        fun KParameter.isFunctionType(): Boolean = (type.classifier as? KClass<*>)?.qualifiedName
-            ?.startsWith("kotlin.Function")
-            ?: false
         ParameterSpec(
             name = parameter.name ?: "this",
             type = typeName.copy(annotations = emptyList()),
