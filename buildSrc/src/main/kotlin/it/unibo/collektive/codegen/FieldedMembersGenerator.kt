@@ -207,11 +207,19 @@ object FieldedMembersGenerator {
             val name = checkNotNull(clazz.simpleName) {
                 "Cannot generate field functions for anonymous class $clazz"
             }.removeSuffix("Kt")
-            val extensions = validMembers.groupBy {
-                it.extensionReceiverParameter?.type?.toString()
-                    ?.substringBefore('<')
-                    ?.substringAfterLast('.')
-                    ?: name
+            val extensions: Map<String, List<KCallable<*>>> = validMembers.groupBy { callable ->
+                fun KType?.cleanString(): String = toString().substringBefore('<').substringAfterLast('.')
+                fun KTypeParameter.allUpperBounds(): List<KType> = upperBounds
+                    .flatMap { (it.classifier as? KTypeParameter)?.allUpperBounds() ?: listOf(it) }
+                val receiver = callable.extensionReceiverParameter?.type
+                when (val classifier = receiver?.classifier) {
+                    null -> name
+                    is KTypeParameter -> classifier.allUpperBounds()
+                        .map { it.cleanString() }
+                        .sorted()
+                        .joinToString(separator = "")
+                    else -> receiver.cleanString()
+                }
             }
             extensions.asSequence()
                 .filter { (_, members) -> members.isNotEmpty() }
