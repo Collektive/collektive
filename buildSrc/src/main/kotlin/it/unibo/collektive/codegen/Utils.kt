@@ -13,6 +13,7 @@ import com.squareup.kotlinpoet.STAR
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.TypeVariableName
+import com.squareup.kotlinpoet.WildcardTypeName
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
 import it.unibo.collektive.field.Field
@@ -204,99 +205,77 @@ internal fun TypeName.getAllTypeVariables(): List<TypeVariableName> {
     }
 }
 
-internal fun generateFunction(callable: KCallable<*>, paramList: List<ParameterSpec>): FunSpec? {
-    /*
-     * KotlinPoet does not include the variance on return types:
-     * if a variant type is returned, then omit the return type annotation;
-     * remove when https://github.com/square/kotlinpoet/issues/1933 is resolved.
-     */
-    val potentialBoundedTypeArguments = callable.returnType.arguments.toMutableList()
-    var thereIsNoVariantType = true
-    while (thereIsNoVariantType && potentialBoundedTypeArguments.isNotEmpty()) {
-        val typeProjection = potentialBoundedTypeArguments.removeLast()
-        if (typeProjection.variance != KVariance.INVARIANT) {
-            thereIsNoVariantType = false
+internal fun generateFunction(callable: KCallable<*>, paramList: List<ParameterSpec>): FunSpec {
+    return FunSpec.builder(callable.name).apply {
+        // Retain suspend
+        if (callable.isSuspend) {
+            addModifiers(KModifier.SUSPEND)
         }
-        potentialBoundedTypeArguments.addAll(typeProjection.type?.arguments.orEmpty())
-    }
-    return when {
-        thereIsNoVariantType -> {
-            FunSpec.builder(callable.name).apply {
-                // Retain suspend
-                if (callable.isSuspend) {
-                    addModifiers(KModifier.SUSPEND)
+        when (callable) {
+            is KFunction<*> -> {
+                // If the callable is an operator, add the operator modifier to the function
+                if (callable.isOperator && callable.name !in operatorNotReturningField) {
+                    addModifiers(KModifier.OPERATOR)
                 }
-                when (callable) {
-                    is KFunction<*> -> {
-                        // If the callable is an operator, add the operator modifier to the function
-                        if (callable.isOperator && callable.name !in operatorNotReturningField) {
-                            addModifiers(KModifier.OPERATOR)
-                        }
-                        // Retain infix
-                        if (callable.isInfix) {
-                            addModifiers(KModifier.INFIX)
-                        }
-                        // Retain inline
-                        fun hasCrossinlinedParameters() = paramList.any { it.modifiers.contains(KModifier.CROSSINLINE) }
-                        fun hasReifiedTypeParameters() = callable.typeParameters.any { it.isReified }
-                        if (callable.isInline && (hasCrossinlinedParameters() || hasReifiedTypeParameters())) {
-                            addModifiers(KModifier.INLINE)
-                        }
-                    }
+                // Retain infix
+                if (callable.isInfix) {
+                    addModifiers(KModifier.INFIX)
                 }
-                // Add type variables to the function definition by recursively getting all type variables from the parameters
-                // The .toSet() call is to remove duplicates
-                val declaredTypeVariables = callable.typeParameters.map { it.toTypeVariableName() }
-                addTypeVariables(declaredTypeVariables)
-                val declaredTypeVariableNames = declaredTypeVariables.map { it.name }
-                val typeVariablesInParameters = paramList
-                    .map { it.type }
-                    .flatMap { it.getAllTypeVariables() }
-                    .distinct()
-                    .filterNot { it.name in declaredTypeVariableNames }
-                addTypeVariables(typeVariablesInParameters)
-                // Remove the `this` parameter since, when present, it is the extension receiver
-                addParameters(paramList.filter { it.name != "this" })
-                // Generate always function with extension receiver
-                receiver(paramList.first().type)
-                // Add the JavaName annotation preventing JVM name clashes
-                val typesRepr = paramList
-                    .joinToString("_and_") {
-                        it.type.toString()
-                            .replace("kotlin.", "")
-                            .replace("kotlinx.", "")
-                            .replace("it.unibo.collektive.`field`.Field", "Field")
-                    }
-                    .replace(".", "_")
-                    .replace("<", "_of_")
-                    .replace(">", "_end")
-                    .replace(", ", "_and_")
-                    .replace("*", "wildcard")
-                    .replace("?", "_nullable")
-                    .replace("Field_of_ID_and_", "Field_of_")
-                addAnnotation(
-                    AnnotationSpec.builder(JvmName::class)
-                        .addMember("%S", "${callable.name}_with_$typesRepr")
-                        .build(),
-                )
-                // Always return a Field parametrized by the ID type and the return type of the callable
-                val returnType = callable.returnType.toTypeNameWithRecurringGenericSupport()
-                returns(FIELD_INTERFACE.parameterizedBy(ID_BOUNDED_TYPE, returnType))
-                when (paramList.size) {
-                    1 -> noArgumentFunction(callable)
-                    else -> when (paramList.first().isField()) {
-                        true -> addBodyForFieldReceiverFunction(callable, paramList)
-                        false -> addBodyForNonFieldReceiverFunction(callable, paramList)
-                    }
+                // Retain inline
+                fun hasCrossinlinedParameters() = paramList.any { it.modifiers.contains(KModifier.CROSSINLINE) }
+                fun hasReifiedTypeParameters() = callable.typeParameters.any { it.isReified }
+                if (callable.isInline && (hasCrossinlinedParameters() || hasReifiedTypeParameters())) {
+                    addModifiers(KModifier.INLINE)
                 }
-            }.build()
+            }
         }
-        else -> null
-    }
+        // Add type variables to the function definition by recursively getting all type variables from the parameters
+        // The .toSet() call is to remove duplicates
+        val declaredTypeVariables = callable.typeParameters.map { it.toTypeVariableName() }
+        addTypeVariables(declaredTypeVariables)
+        val declaredTypeVariableNames = declaredTypeVariables.map { it.name }
+        val typeVariablesInParameters = paramList
+            .map { it.type }
+            .flatMap { it.getAllTypeVariables() }
+            .distinct()
+            .filterNot { it.name in declaredTypeVariableNames }
+        addTypeVariables(typeVariablesInParameters)
+        // Remove the `this` parameter since, when present, it is the extension receiver
+        addParameters(paramList.filter { it.name != "this" })
+        // Generate always function with extension receiver
+        receiver(paramList.first().type)
+        // Add the JavaName annotation preventing JVM name clashes
+        val typesRepr = paramList
+            .joinToString("_and_") {
+                it.type.toString()
+                    .replace("kotlin.", "")
+                    .replace("kotlinx.", "")
+                    .replace("it.unibo.collektive.`field`.Field", "Field")
+            }
+            .replace(".", "_")
+            .replace("<", "_of_")
+            .replace(">", "_end")
+            .replace(", ", "_and_")
+            .replace("*", "wildcard")
+            .replace("?", "_nullable")
+            .replace("Field_of_ID_and_", "Field_of_")
+        addAnnotation(
+            AnnotationSpec.builder(JvmName::class)
+                .addMember("%S", "${callable.name}_with_$typesRepr")
+                .build(),
+        )
+        // Always return a Field parametrized by the ID type and the return type of the callable
+        val returnType = callable.returnType.toTypeNameWithRecurringGenericSupport()
+        returns(FIELD_INTERFACE.parameterizedBy(ID_BOUNDED_TYPE, returnType))
+        when (paramList.size) {
+            1 -> noArgumentFunction(callable)
+            else -> when (paramList.first().isField()) {
+                true -> addBodyForFieldReceiverFunction(callable, paramList)
+                false -> addBodyForNonFieldReceiverFunction(callable, paramList)
+            }
+        }
+    }.build()
 }
-
-internal fun ParameterSpec.isFunctionTyoe(): Boolean = type.toString()
-    .matches(Regex("^(kotlin\\.)?Function\\d+.*"))
 
 internal fun KParameter.isFunctionType(): Boolean = (type.classifier as? KClass<*>)?.qualifiedName
     ?.startsWith("kotlin.Function")
@@ -315,12 +294,19 @@ internal fun generateFunctions(origin: KCallable<*>): List<FunSpec> {
             }
         )
     }
-    return parameterCombinations(functionArguments).mapNotNull { paramList ->
+    return parameterCombinations(functionArguments).map { paramList ->
         generateFunction(origin, paramList)
     }
 }
 
-internal fun generatePrimitivesFile(origin: List<KCallable<*>>, packageName: String, fileName: String): FileSpec {
+internal fun generatePrimitivesFile(origin: List<KCallable<*>>, packageName: String, fileName: String): FileSpec? {
+    val functions = origin.flatMap { generateFunctions(it) }
+    if (functions.isEmpty()) return null
+    val objectContainer = TypeSpec.objectBuilder(fileName).apply {
+        functions .forEach {
+            addFunction(it)
+        }
+    }.build()
     return FileSpec.builder(packageName, fileName).apply {
         addFileComment("This file is auto-generated by the Collektive code generator. Do not edit it manually.")
         addAnnotation(
@@ -332,11 +318,6 @@ internal fun generatePrimitivesFile(origin: List<KCallable<*>>, packageName: Str
                 )
                 .build(),
         )
-        val objectContainer = TypeSpec.objectBuilder(fileName).apply {
-            origin.flatMap { generateFunctions(it) }.forEach {
-                addFunction(it)
-            }
-        }.build()
         addType(objectContainer)
     }.build()
 }
@@ -391,6 +372,17 @@ internal fun KTypeProjection.toTypeNameWithRecurringGenericSupport(
     }
 }
 
+fun TypeName.projected(): TypeName = when (this) {
+    is TypeVariableName -> {
+        when (variance) {
+            KModifier.IN -> WildcardTypeName.consumerOf(this)
+            KModifier.OUT -> WildcardTypeName.producerOf(this)
+            else -> this
+        }
+    }
+    else -> this
+}
+
 internal fun KType?.toTypeNameWithRecurringGenericSupport(
     recurringTypeArguments: Set<KTypeParameter> = emptySet()
 ): TypeName {
@@ -404,8 +396,7 @@ internal fun KType?.toTypeNameWithRecurringGenericSupport(
             specializedArrayTypes.contains(classifier) -> this // No type arguments expected for class '*Array'.
             else -> parameterizedBy(
                 arguments.map {
-                    it.toTypeNameWithRecurringGenericSupport(recurringTypeArguments)
-
+                    it.toTypeNameWithRecurringGenericSupport(recurringTypeArguments).projected()
                 }
             )
         }

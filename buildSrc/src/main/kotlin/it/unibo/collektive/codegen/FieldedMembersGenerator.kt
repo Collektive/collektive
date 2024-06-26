@@ -215,7 +215,7 @@ object FieldedMembersGenerator {
             }
             extensions.asSequence()
                 .filter { (_, members) -> members.isNotEmpty() }
-                .map { (receiver, members) ->
+                .mapNotNull { (receiver, members) ->
                     generatePrimitivesFile(
                         members,
                         "it.unibo.collektive.stdlib.${receiver.lowercase()}s",

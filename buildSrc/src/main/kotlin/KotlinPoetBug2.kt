@@ -1,9 +1,9 @@
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeVariableName
+import com.squareup.kotlinpoet.WildcardTypeName
 
 fun <T> foo(): Array<out T> = TODO()
 
@@ -12,7 +12,7 @@ fun main() {
         .addTypeVariable(TypeVariableName("T"))
         .returns(
             ClassName.bestGuess("kotlin.Array")
-                .parameterizedBy(TypeVariableName("T", variance = KModifier.OUT))
+                .parameterizedBy(WildcardTypeName.producerOf(TypeVariableName("T")))
         )
         .addStatement("TODO()")
         .build()
