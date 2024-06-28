@@ -1,6 +1,7 @@
 package it.unibo.collektive.codegen
 
 import com.squareup.kotlinpoet.FileSpec
+import it.unibo.collektive.codegen.utils.generatePrimitivesFile
 import it.unibo.collektive.field.Field
 import java.io.File
 import kotlin.reflect.KCallable
