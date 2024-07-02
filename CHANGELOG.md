@@ -1,3 +1,48 @@
+## [10.0.0](https://github.com/Collektive/collektive/compare/9.2.4...10.0.0) (2024-07-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* generate library code for field operations on kotlin standard library types (#273)
+
+### Features
+
+* generate library code for field operations on kotlin standard library types ([#273](https://github.com/Collektive/collektive/issues/273)) ([31545f2](https://github.com/Collektive/collektive/commit/31545f2e887bd1d9cb618fa973b27d99b4163b6a)), closes [square/kotlinpoet#1933](https://github.com/square/kotlinpoet/issues/1933) [square/kotlinpoet#1933](https://github.com/square/kotlinpoet/issues/1933)
+
+
+### Dependency updates
+
+* **deps:** update alchemist to v34.0.10 ([b666dc1](https://github.com/Collektive/collektive/commit/b666dc155c128d89d487ba3c90f4f7124955071a))
+* **deps:** update alchemist to v34.0.11 ([174eace](https://github.com/Collektive/collektive/commit/174eacedc08998eed111bd5a12403e9b2d6cc53c))
+* **deps:** update alchemist to v34.0.13 ([6890653](https://github.com/Collektive/collektive/commit/6890653812e76fb4b44bffba102fb720d657c828))
+* **deps:** update alchemist to v34.0.8 ([ad9b277](https://github.com/Collektive/collektive/commit/ad9b2777d8daa3d42a017775dcd923c01f2c82db))
+* **deps:** update alchemist to v34.0.9 ([871197f](https://github.com/Collektive/collektive/commit/871197ffc35c89820b1b2af6e46e351eed3b7da3))
+* **deps:** update dependency com.squareup:kotlinpoet to v1.17.0 ([8b27c9f](https://github.com/Collektive/collektive/commit/8b27c9fea6c0da5b021fe11de359229188ba83e7))
+* **deps:** update dependency gradle to v8.8 ([d29b256](https://github.com/Collektive/collektive/commit/d29b2568d4c9fc539a341b829e41215ca1d84553))
+* **deps:** update dependency io.kotest.multiplatform to v5.9.1 ([930081c](https://github.com/Collektive/collektive/commit/930081c474a447ea8e44b1a3cba4848898dce67d))
+* **deps:** update dependency it.unibo.alchemist:alchemist-api to v34.0.7 ([f183563](https://github.com/Collektive/collektive/commit/f183563f50d1a48cbde27e28cd4c522c014e0d9c))
+* **deps:** update node.js to 20.14 ([ecba005](https://github.com/Collektive/collektive/commit/ecba00566e6dbb7583f486e43bfdb7b3aff5852b))
+* **deps:** update node.js to 20.15 ([dc8d650](https://github.com/Collektive/collektive/commit/dc8d650d329e07c680079f38fe53dd7c337dd1c9))
+* **deps:** update plugin com.gradle.develocity to v3.17.5 ([ffe79c7](https://github.com/Collektive/collektive/commit/ffe79c7aec57e68bf4184aa5a3c9a2d55bab6abc))
+* **deps:** update plugin gitsemver to v3.1.7 ([bad3765](https://github.com/Collektive/collektive/commit/bad3765fa172e353371b615119e69017c5c4e346))
+* **deps:** update plugin kotlin-qa to v0.62.1 ([f43dc25](https://github.com/Collektive/collektive/commit/f43dc25a35974adbe04d880475abeca50d9f2610))
+* **deps:** update plugin kotlin-qa to v0.62.2 ([870a894](https://github.com/Collektive/collektive/commit/870a8943153d2cec671b2c5c59dc44405b7336e4))
+* **deps:** update plugin kotlin-qa to v0.62.3 ([1eceb1f](https://github.com/Collektive/collektive/commit/1eceb1f2b563f717386521d39d4c89faf20e128b))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.7 ([adb4c57](https://github.com/Collektive/collektive/commit/adb4c57f214aed942c76f87608984d285b1bb1c2))
+* **deps:** update plugin publishoncentral to v5.1.2 ([cccde5b](https://github.com/Collektive/collektive/commit/cccde5b48017fc54afc883e026f55c0f05fafe9c))
+* **deps:** update plugin publishoncentral to v5.1.3 ([9f3a73a](https://github.com/Collektive/collektive/commit/9f3a73a337830ca1632e493248993ded3cc7dc00))
+* **deps:** update plugin tasktree to v4 ([1ac746d](https://github.com/Collektive/collektive/commit/1ac746d0bd6e1ebf02ba2ac82186dafc06793fff))
+
+
+### Build and continuous integration
+
+* **deps:** update actions/checkout action to v4.1.7 ([7068f95](https://github.com/Collektive/collektive/commit/7068f9517b9249c712710cf39707e80b36ed88fd))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.21 ([4ad0f89](https://github.com/Collektive/collektive/commit/4ad0f89411d7ed981b0a9f59d449aca8a59bbce4))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.22 ([a3a46f3](https://github.com/Collektive/collektive/commit/a3a46f34ff64995a838ef1ad7da819c199a6784c))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.23 ([9aa3c31](https://github.com/Collektive/collektive/commit/9aa3c31da77551f0ae9ae5f2dac93fcb3c1cddd3))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.24 ([8489a81](https://github.com/Collektive/collektive/commit/8489a818c39c54d63cd4420a2f22898f4a0ba734))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3 ([a3fd0a7](https://github.com/Collektive/collektive/commit/a3fd0a74384714337dfed2557a6cfde4be989c85))
+
 ## [9.2.4](https://github.com/Collektive/collektive/compare/9.2.3...9.2.4) (2024-05-23)
 
 
