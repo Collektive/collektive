@@ -16,7 +16,7 @@ _pool: &program
         import it.unibo.alchemist.collektive.device.DistanceSensor
         import it.unibo.collektive.aggregate.api.Aggregate
         import it.unibo.collektive.aggregate.api.operators.share
-        import it.unibo.collektive.field.*
+        import it.unibo.collektive.field.operations.*
         import kotlin.Double.Companion.POSITIVE_INFINITY
         
         context(DistanceSensor)
