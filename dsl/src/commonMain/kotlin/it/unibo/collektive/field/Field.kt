@@ -67,20 +67,28 @@ sealed interface Field<ID : Any, out T> {
      */
     val neighborsCount: Int get() = excludeSelf().size
 
+    /**
+     * Returns the [ID]s of all neighbors in this field.
+     */
+    val neighbors: Collection<ID>
+
     companion object {
 
         /**
-         * Check if two fields are aligned, throws an IllegalStateException otherwise.
+         * Check if two or more fields are aligned, throwing an IllegalStateException otherwise.
          */
-        fun checkAligned(field1: Field<*, *>, field2: Field<*, *>) {
-            val ids1: Set<Any?> = field1.toMap().keys
-            val ids2: Set<Any?> = field2.toMap().keys
-            check(ids1 == ids2) {
-                """
-                Alignment issue between $field1 and $field2, the different ids are: ${ids1 - ids2 + (ids2 - ids1)}
-                This is most likely caused by a bug in Collektive, please report at
-                https://github.com/Collektive/collektive/issues/new/choose
-                """.trimIndent()
+        fun checkAligned(field1: Field<*, *>, field2: Field<*, *>, vararg fields: Field<*, *>) {
+            val ids: Collection<Any?> = field1.neighbors
+            sequenceOf(field2, *fields).map { it.neighbors }.forEach {
+                check(it.size == ids.size && it.containsAll(ids)) {
+                    """
+                    |Alignment issue among fields:
+                    | - ${listOf(field1, field2, *fields).joinToString(separator = "\n| - ")}
+                    |the different ids are: ${ids - it.toSet() + (it - ids.toSet())}
+                    |This is most likely caused by a bug in Collektive, please report at
+                    |https://github.com/Collektive/collektive/issues/new/choose
+                    """.trimMargin()
+                }
             }
         }
 
@@ -164,6 +172,7 @@ internal class ArrayBasedField<ID : Any, T>(
 ) : AbstractField<ID, T>(localId, localValue) {
 
     override val neighborsCount: Int get() = others.size
+    override val neighbors: Collection<ID> by lazy { others.map { it.first } }
 
     override fun neighborValueOf(id: ID): T = when {
         others.size <= MAP_OVER_LIST_PERFORMANCE_CROSSING_POINT -> others.first { it.first == id }.second
@@ -188,7 +197,9 @@ internal class SequenceBasedField<ID : Any, T>(
     private val others: Sequence<Pair<ID, T>>,
 ) : AbstractField<ID, T>(localId, localValue) {
 
-    override val neighborsCount by lazy { others.count() }
+    override val neighborsCount get() = neighbors.size
+
+    override val neighbors: Collection<ID> by lazy { others.map { it.first }.toList() }
 
     override fun asSequence(): Sequence<Pair<ID, T>> = others + (localId to localValue)
 
@@ -206,6 +217,8 @@ internal class ConstantField<ID : Any, T>(
     private val neighborsIds: Set<ID>,
 ) : AbstractField<ID, T>(localId, localValue) {
     override val neighborsCount: Int = neighborsIds.size
+
+    override val neighbors: Collection<ID> = neighborsIds
 
     private val reified by lazy {
         reifiedList.toMap()
