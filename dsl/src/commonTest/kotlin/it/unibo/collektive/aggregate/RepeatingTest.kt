@@ -7,7 +7,6 @@ import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
-import it.unibo.collektive.field.operations.plus
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 
@@ -68,7 +67,7 @@ class RepeatingTest : StringSpec({
         shouldThrow<IllegalStateException> {
             aggregate(id1) {
                 exchange(0) { field ->
-                    repeat(field) { it + 1 }
+                    repeat(field) { it.map { f -> f + 1 } }
                 }
             }
         }

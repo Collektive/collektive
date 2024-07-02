@@ -7,7 +7,6 @@ import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.operations.plus
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 
@@ -79,7 +78,7 @@ class ExchangeTest : StringSpec({
     "Exchange can yield a result but return a different value" {
         val result = aggregate(0) {
             val xcRes = exchanging(1) {
-                val fieldResult = it + 1
+                val fieldResult = it.map { f -> f + 1 }
                 fieldResult.yielding { fieldResult.map { value -> "return: $value" } }
             }
             xcRes.toMap() shouldBe mapOf(0 to "return: 2")
@@ -92,7 +91,7 @@ class ExchangeTest : StringSpec({
     "Exchange can yield a result of nullable values" {
         val result = aggregate(0) {
             val xcRes = exchanging(1) {
-                val fieldResult = it + 1
+                val fieldResult = it.map { f -> f + 1 }
                 fieldResult.yielding { fieldResult.map { value -> value.takeIf { value > 10 } } }
             }
             xcRes.toMap() shouldBe mapOf(0 to null)

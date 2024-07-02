@@ -8,8 +8,6 @@ import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.operations.min
-import it.unibo.collektive.field.operations.minus
-import it.unibo.collektive.field.operations.plus
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 
@@ -62,10 +60,10 @@ class TestBranchAlignment : StringSpec({
                     outerField.neighborsCount shouldBe id
                     if (id % 2 == 0) {
                         neighboringViaExchange(1).neighborsCount shouldBe id / 2
-                        neighboringViaExchange(1) + outerField
+                        neighboringViaExchange(1).alignedMap(outerField) { a, b -> a + b }
                     } else {
                         neighboringViaExchange(1).neighborsCount shouldBe (id - 1) / 2
-                        neighboringViaExchange(1) - outerField
+                        neighboringViaExchange(1).alignedMap(outerField) { a, b -> a - b }
                         outerField.min(Int.MAX_VALUE)
                     }
                 }
@@ -86,9 +84,9 @@ class TestBranchAlignment : StringSpec({
     "A field should be projected also when the field is referenced as lambda parameter (issue #171)" {
         exchangeWithThreeDevices {
             if (localId % 2 == 0) {
-                neighboringViaExchange(1) + it
+                neighboringViaExchange(1).alignedMap(it) { a, b -> a + b }
             } else {
-                neighboringViaExchange(1) - it
+                neighboringViaExchange(1).alignedMap(it) { a, b -> a - b }
             }
         }
     }
@@ -96,7 +94,7 @@ class TestBranchAlignment : StringSpec({
     fun manuallyAlignedExchangeWithThreeDevices(pivot: (Int) -> Any?) =
         exchangeWithThreeDevices { field ->
             alignedOn(pivot(localId)) {
-                neighboringViaExchange(1) + field
+                neighboringViaExchange(1).alignedMap(field) { a, b -> a + b }
             }
         }
     "A field should be projected whenever there is an alignment operation, not just on branches (issue #171)" {

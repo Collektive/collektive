@@ -11,7 +11,6 @@ import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.aggregate.api.operators.share
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.operations.plus
 import it.unibo.collektive.matchers.acProgram
 import it.unibo.collektive.matchers.alignWith
 
@@ -68,7 +67,7 @@ class TestAlignment : StringSpec({
     "Outer non-collektive function taking collective function as argument should align the non-collective function" {
         val x = 0
         fun foo(aggregate: Aggregate<Int>) = aggregate.neighboringViaExchange(x)
-        fun bar(f1: Field<Int, Int>, f2: Field<Int, Int>) = f1 + f2
+        fun bar(f1: Field<Int, Int>, f2: Field<Int, Int>) = f1.alignedMap(f2) { a, b -> a + b }
         acProgram { foo(this) to foo(this) } shouldNot alignWith { bar(foo(this), foo(this)) }
     }
 
