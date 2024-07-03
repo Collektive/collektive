@@ -4,7 +4,7 @@ import it.unibo.alchemist.collektive.device.DistanceSensor
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.operators.share
 import it.unibo.collektive.field.operations.min
-import it.unibo.collektive.field.operations.plus
+import it.unibo.collektive.stdlib.doubles.FieldedDoubles.plus
 import kotlin.Double.Companion.POSITIVE_INFINITY
 
 context(DistanceSensor)
