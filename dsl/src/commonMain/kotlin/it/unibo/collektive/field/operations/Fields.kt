@@ -2,35 +2,62 @@ package it.unibo.collektive.field.operations
 
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.Field.Companion.fold
+import kotlin.jvm.JvmOverloads
 
 /**
- * Count the number of elements in the field that satisfy the [predicate].
- * The [base] value is included in the count if it satisfies the [predicate].
- * If the [base] value is not provided, the [predicate] is applied to the neighbors only.
+ * Count the number of elements in the field that satisfy the [predicate],
+ * ignoring the local value.
  */
-fun <ID : Any, T> Field<ID, T>.count(base: T? = null, predicate: (T) -> Boolean = { true }): Int =
-    when {
-        base == null -> fold(0) { acc, value -> if (predicate(value)) acc + 1 else acc }
-        else -> fold(if (predicate(base)) 1 else 0) { acc, value -> if (predicate(value)) acc + 1 else acc }
-    }
+@JvmOverloads
+fun <ID : Any, T> Field<ID, T>.count(predicate: (T) -> Boolean = { true }): Int =
+    fold(0) { acc, value -> if (predicate(value)) acc + 1 else acc }
 
 /**
- * Check if all the elements in the field satisfy the [predicate].
- * The local value is not considered, unless explicitly passed as [base].
+ * Count the number of elements in the field that satisfy the [predicate],
+ * including the local value.
  */
-fun <ID : Any, T> Field<ID, T>.all(base: T, predicate: (T) -> Boolean): Boolean =
-    fold(predicate(base)) { acc, value -> acc && predicate(value) }
+@JvmOverloads
+fun <ID : Any, T> Field<ID, T>.countWithSelf(predicate: (T) -> Boolean = { true }): Int =
+    count(predicate) + if (predicate(localValue)) 1 else 0
 
 /**
- * Check if any of the elements in the field satisfy the [predicate].
- * The local value is not considered, unless explicitly passed as [base].
+ * Check if all the elements in the field satisfy the [predicate],
+ * ignoring the local value.
  */
-fun <ID : Any, T> Field<ID, T>.any(base: T, predicate: (T) -> Boolean): Boolean =
-    fold(predicate(base)) { acc, value -> acc || predicate(value) }
+fun <ID : Any, T> Field<ID, T>.all(predicate: (T) -> Boolean): Boolean =
+    fold(true) { acc, value -> acc && predicate(value) }
 
 /**
- * Check if none of the elements in the field satisfy the [predicate].
- * The local value is not considered, unless explicitly passed as [base].
+ * Check if all the elements in the field satisfy the [predicate],
+ * including the local value.
  */
-fun <ID : Any, T> Field<ID, T>.none(base: T, predicate: (T) -> Boolean): Boolean =
-    !all(base, predicate)
+fun <ID : Any, T> Field<ID, T>.allWithSelf(predicate: (T) -> Boolean): Boolean =
+    all(predicate) && predicate(localValue)
+
+/**
+ * Check if any of the elements in the field satisfy the [predicate],
+ * ignoring the local value.
+ */
+fun <ID : Any, T> Field<ID, T>.any(predicate: (T) -> Boolean): Boolean =
+    fold(false) { acc, value -> acc || predicate(value) }
+
+/**
+ * Check if any of the elements in the field satisfy the [predicate],
+ * including the local value.
+ */
+fun <ID : Any, T> Field<ID, T>.anyWithSelf(predicate: (T) -> Boolean): Boolean =
+    any(predicate) || predicate(localValue)
+
+/**
+ * Check if none of the elements in the field satisfy the [predicate],
+ * ignoring the local value.
+ */
+fun <ID : Any, T> Field<ID, T>.none(predicate: (T) -> Boolean): Boolean =
+    !all(predicate)
+
+/**
+ * Check if none of the elements in the field satisfy the [predicate],
+ * including the local value.
+ */
+fun <ID : Any, T> Field<ID, T>.noneWithSelf(predicate: (T) -> Boolean): Boolean =
+    !allWithSelf(predicate)
