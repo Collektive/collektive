@@ -9,6 +9,7 @@ import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
+import it.unibo.collektive.stdlib.ints.FieldedInts.plus
 
 class RepeatingTest : StringSpec({
     val id0 = 0
@@ -67,7 +68,7 @@ class RepeatingTest : StringSpec({
         shouldThrow<IllegalStateException> {
             aggregate(id1) {
                 exchange(0) { field ->
-                    repeat(field) { it.map { f -> f + 1 } }
+                    repeat(field) { it + 1 }
                 }
             }
         }

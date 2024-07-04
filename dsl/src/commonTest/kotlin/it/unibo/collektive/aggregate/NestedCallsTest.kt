@@ -9,6 +9,7 @@ import it.unibo.collektive.aggregate.api.operators.share
 import it.unibo.collektive.field.operations.min
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
+import it.unibo.collektive.stdlib.doubles.FieldedDoubles.plus
 
 class NestedCallsTest : StringSpec({
     fun Aggregate<Int>.foo(id: Int) = neighboringViaExchange(id.toDouble())
@@ -17,7 +18,7 @@ class NestedCallsTest : StringSpec({
         return share(Double.POSITIVE_INFINITY) { dist ->
             when (localId) {
                 0 -> 0.0
-                else -> (foo(localId).alignedMap(dist) { a, b -> a + b }).min(Double.POSITIVE_INFINITY)
+                else -> (foo(localId) + dist).min(Double.POSITIVE_INFINITY)
             }
         }
     }

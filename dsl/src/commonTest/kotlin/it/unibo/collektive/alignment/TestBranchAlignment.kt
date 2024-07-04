@@ -10,6 +10,8 @@ import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.operations.min
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
+import it.unibo.collektive.stdlib.ints.FieldedInts.minus
+import it.unibo.collektive.stdlib.ints.FieldedInts.plus
 
 class TestBranchAlignment : StringSpec({
     val id0 = 0
@@ -60,10 +62,10 @@ class TestBranchAlignment : StringSpec({
                     outerField.neighborsCount shouldBe id
                     if (id % 2 == 0) {
                         neighboringViaExchange(1).neighborsCount shouldBe id / 2
-                        neighboringViaExchange(1).alignedMap(outerField) { a, b -> a + b }
+                        neighboringViaExchange(1) + outerField
                     } else {
                         neighboringViaExchange(1).neighborsCount shouldBe (id - 1) / 2
-                        neighboringViaExchange(1).alignedMap(outerField) { a, b -> a - b }
+                        neighboringViaExchange(1) - outerField
                         outerField.min(Int.MAX_VALUE)
                     }
                 }
@@ -84,9 +86,9 @@ class TestBranchAlignment : StringSpec({
     "A field should be projected also when the field is referenced as lambda parameter (issue #171)" {
         exchangeWithThreeDevices {
             if (localId % 2 == 0) {
-                neighboringViaExchange(1).alignedMap(it) { a, b -> a + b }
+                neighboringViaExchange(1) + it
             } else {
-                neighboringViaExchange(1).alignedMap(it) { a, b -> a - b }
+                neighboringViaExchange(1) + it
             }
         }
     }
@@ -94,7 +96,7 @@ class TestBranchAlignment : StringSpec({
     fun manuallyAlignedExchangeWithThreeDevices(pivot: (Int) -> Any?) =
         exchangeWithThreeDevices { field ->
             alignedOn(pivot(localId)) {
-                neighboringViaExchange(1).alignedMap(field) { a, b -> a + b }
+                neighboringViaExchange(1) + field
             }
         }
     "A field should be projected whenever there is an alignment operation, not just on branches (issue #171)" {
