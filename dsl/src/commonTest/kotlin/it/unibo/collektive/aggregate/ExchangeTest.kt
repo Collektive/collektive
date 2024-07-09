@@ -7,9 +7,9 @@ import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.plus
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
+import it.unibo.collektive.stdlib.ints.FieldedInts.plus
 
 class ExchangeTest : StringSpec({
     val increaseOrDouble: (Field<Int, Int>) -> Field<Int, Int> = { f ->

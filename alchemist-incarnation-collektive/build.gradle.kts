@@ -24,6 +24,7 @@ kotlinJvm {
                 implementation("it.unibo.collektive:compiler-plugin")
                 implementation(project(":compiler-embeddable"))
                 implementation(project(":dsl"))
+                implementation(project(":stdlib"))
                 implementation(kotlin("reflect"))
                 implementation(libs.bundles.alchemist)
                 implementation(libs.bundles.kotlin.compiler)

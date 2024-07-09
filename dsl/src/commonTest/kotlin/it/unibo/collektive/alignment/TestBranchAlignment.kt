@@ -7,11 +7,11 @@ import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.min
-import it.unibo.collektive.field.minus
-import it.unibo.collektive.field.plus
+import it.unibo.collektive.field.operations.min
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
+import it.unibo.collektive.stdlib.ints.FieldedInts.minus
+import it.unibo.collektive.stdlib.ints.FieldedInts.plus
 
 class TestBranchAlignment : StringSpec({
     val id0 = 0
@@ -88,7 +88,7 @@ class TestBranchAlignment : StringSpec({
             if (localId % 2 == 0) {
                 neighboringViaExchange(1) + it
             } else {
-                neighboringViaExchange(1) - it
+                neighboringViaExchange(1) + it
             }
         }
     }
