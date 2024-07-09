@@ -1,3 +1,27 @@
+## [10.1.0](https://github.com/Collektive/collektive/compare/10.0.0...10.1.0) (2024-07-09)
+
+### Features
+
+* add `sum`, `count`, `all`, `any` and `none` field operations ([#346](https://github.com/Collektive/collektive/issues/346)) ([14c356f](https://github.com/Collektive/collektive/commit/14c356f3bce2e835936e35cdc795ed8d3a271a40))
+
+### Dependency updates
+
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5.4.0 ([4e2c2ba](https://github.com/Collektive/collektive/commit/4e2c2ba6f58cbb42829397fb9edf8ff6943c8501))
+* **deps:** update dependency com.github.tschuchortdev:kotlin-compile-testing to v1.6.0 ([7f3c620](https://github.com/Collektive/collektive/commit/7f3c620a82b80d492de2f544f9ceca690055250a))
+* **deps:** update dependency com.squareup:kotlinpoet to v1.18.0 ([71558e6](https://github.com/Collektive/collektive/commit/71558e69e42a53ac1495ebb7e1b47aa6d01caf16))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.86 ([bf2ba04](https://github.com/Collektive/collektive/commit/bf2ba04380cb33e9a4df2d5c3e4a9b3631f171a6))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.87 ([672a001](https://github.com/Collektive/collektive/commit/672a00144f283ac7f53a738f9ea8824c291d27dc))
+
+### Build and continuous integration
+
+* remove deprecated kotlin compilation task ([8cbef74](https://github.com/Collektive/collektive/commit/8cbef748f71d6680f06322e06518386cffa96af4))
+* update action to a fixed version ([b52caa6](https://github.com/Collektive/collektive/commit/b52caa69ec8406d1fc612e22399f3f6b62964086))
+
+### General maintenance
+
+* transform to mjs ([43a650f](https://github.com/Collektive/collektive/commit/43a650f4c49c32a898b38c8f318ea142cb361251))
+* update semantic release preconfigured version ([a1bb4d3](https://github.com/Collektive/collektive/commit/a1bb4d38e09f335ff95e3834b274a42ee24b3fc6))
+
 ## [10.0.0](https://github.com/Collektive/collektive/compare/9.2.4...10.0.0) (2024-07-02)
 
 
