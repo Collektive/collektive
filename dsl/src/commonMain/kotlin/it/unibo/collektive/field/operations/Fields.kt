@@ -53,11 +53,11 @@ fun <ID : Any, T> Field<ID, T>.anyWithSelf(predicate: (T) -> Boolean): Boolean =
  * ignoring the local value.
  */
 fun <ID : Any, T> Field<ID, T>.none(predicate: (T) -> Boolean): Boolean =
-    !all(predicate)
+    !any(predicate)
 
 /**
  * Check if none of the elements in the field satisfy the [predicate],
  * including the local value.
  */
 fun <ID : Any, T> Field<ID, T>.noneWithSelf(predicate: (T) -> Boolean): Boolean =
-    !allWithSelf(predicate)
+    !anyWithSelf(predicate)
