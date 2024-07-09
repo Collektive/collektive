@@ -125,14 +125,8 @@ allprojects {
 
 dependencies {
     kover(project(":dsl"))
+    kover(project(":stdlib"))
     kover(project(":alchemist-incarnation-collektive"))
-}
-
-koverReport {
-    defaults {
-        html { onCheck = true }
-        xml { onCheck = true }
-    }
 }
 
 tasks {
