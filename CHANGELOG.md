@@ -1,3 +1,14 @@
+## [10.1.1](https://github.com/Collektive/collektive/compare/10.1.0...10.1.1) (2024-07-09)
+
+### Dependency updates
+
+* **core-deps:** update plugin kover to v0.8.2 ([7131e63](https://github.com/Collektive/collektive/commit/7131e63c9c279c2a3cf552339bce16e7503a67a0))
+
+### Build and continuous integration
+
+* **deps:** update actions/setup-node action to v4.0.3 ([e285c05](https://github.com/Collektive/collektive/commit/e285c050260d1434bae176ce1059815d63b14020))
+* use new kover api ([ea335f7](https://github.com/Collektive/collektive/commit/ea335f7571cda9e86370d89fcee9bb5a60e9b283))
+
 ## [10.1.0](https://github.com/Collektive/collektive/compare/10.0.0...10.1.0) (2024-07-09)
 
 ### Features
