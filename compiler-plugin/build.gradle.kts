@@ -1,5 +1,5 @@
 import org.danilopianini.gradle.mavencentral.DocStyle
-import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
     alias(libs.plugins.build.config)
@@ -26,9 +26,9 @@ buildConfig {
     buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"$group.compiler-plugin\"")
 }
 
-tasks.withType<KotlinCompile<*>>().configureEach {
-    kotlinOptions {
-        freeCompilerArgs += listOf("-Xcontext-receivers")
+tasks.withType<KotlinCompilationTask<*>>().configureEach {
+    compilerOptions {
+        freeCompilerArgs.add("-Xcontext-receivers")
     }
 }
 
