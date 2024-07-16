@@ -7,15 +7,12 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.internal.os.OperatingSystem
 import org.gradle.kotlin.dsl.*
 import org.gradle.plugin.use.PluginDependency
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 val Provider<PluginDependency>.id: String get() = get().pluginId
 
@@ -76,9 +73,19 @@ fun Project.configureKotlinMultiplatform() {
         tvosX64(nativeSetup)
         tvosSimulatorArm64(nativeSetup)
 
+        targets.all {
+            compilations.all {
+                compileTaskProvider.configure {
+                    compilerOptions {
+                        allWarningsAsErrors = true
+                        freeCompilerArgs.addAll("-Xcontext-receivers")
+                    }
+                }
+            }
+        }
+
         tasks.withType<KotlinCompile>().configureEach {
             compilerOptions {
-                allWarningsAsErrors = true
                 jvmTarget = JvmTarget.JVM_1_8
             }
         }
