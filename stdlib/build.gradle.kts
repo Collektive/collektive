@@ -22,6 +22,17 @@ kotlinMultiplatform {
             }
             kotlin.srcDirs(generateFieldFunctionsForTypes)
         }
+        val commonTest by getting {
+            dependencies {
+                implementation(rootProject.libs.bundles.kotlin.testing.common)
+            }
+        }
+
+        val jvmTest by getting {
+            dependencies {
+                implementation(rootProject.libs.kotest.runner.junit5.jvm)
+            }
+        }
     }
 }
 
