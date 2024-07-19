@@ -1,3 +1,32 @@
+## [10.1.2](https://github.com/Collektive/collektive/compare/10.1.1...10.1.2) (2024-07-19)
+
+### Dependency updates
+
+* **core-deps:** update plugin kover to v0.8.3 ([800f33c](https://github.com/Collektive/collektive/commit/800f33ca05f641e35725bcdb1470f74431671c58))
+* **deps:** update dependency com.squareup:kotlinpoet to v1.18.1 ([196b0c9](https://github.com/Collektive/collektive/commit/196b0c9a26d1666f5a80404d72907a7e6db5c25a))
+* **deps:** update dependency commons-codec:commons-codec to v1.17.1 ([e189bbe](https://github.com/Collektive/collektive/commit/e189bbee0ab483b0d8831f542e8ad0fce43a54f1))
+* **deps:** update dependency gradle to v8.9 ([8d54347](https://github.com/Collektive/collektive/commit/8d54347287ab2001b778719c467c72c00bfb09ee))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.90 ([0fdc35b](https://github.com/Collektive/collektive/commit/0fdc35bf19601c27cd00de8b597378237b729354))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.91 ([beb4aa4](https://github.com/Collektive/collektive/commit/beb4aa4baf4681188276a6501616d6e27d553199))
+* **deps:** update plugin kotlin-qa to v0.62.4 ([998c6dd](https://github.com/Collektive/collektive/commit/998c6dde07fae4fbb8f49e0dd95c4e063e0363ef))
+* **deps:** update plugin multijvmtesting to v1 ([ff462e3](https://github.com/Collektive/collektive/commit/ff462e36a8dc76e73c2e744e983931a1625216a0))
+* **deps:** update plugin multijvmtesting to v1.0.1 ([f66751e](https://github.com/Collektive/collektive/commit/f66751e4f168e807777e433871e592b64c46798f))
+* **deps:** update plugin multijvmtesting to v1.0.3 ([47826e8](https://github.com/Collektive/collektive/commit/47826e89ccc653c46e630a29c89b7df9b12fbb6a))
+* **deps:** update plugin multijvmtesting to v1.0.4 ([a82332e](https://github.com/Collektive/collektive/commit/a82332ea4199a84e431f22767311f5adba9f00de))
+* **deps:** update plugin multijvmtesting to v1.1.0 ([760184c](https://github.com/Collektive/collektive/commit/760184cfb5a328c88a85132d535402c94a5c2704))
+* **deps:** update plugin multijvmtesting to v1.1.1 ([6308b89](https://github.com/Collektive/collektive/commit/6308b893acc19f72b4910db8beeb0e95f4cd8b6a))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.8 ([cafd016](https://github.com/Collektive/collektive/commit/cafd016fcec8a3c859d8dd4b6e363ee01f018a88))
+* **deps:** update plugin publishoncentral to v5.1.4 ([16343b5](https://github.com/Collektive/collektive/commit/16343b558a172112cb2e823c03424df2c94d0024))
+
+### Build and continuous integration
+
+* add explicit codecov token ([4aba5e2](https://github.com/Collektive/collektive/commit/4aba5e2d24ba155da7ac2af5a510422548e5d5bb))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.1.0 ([5e734ff](https://github.com/Collektive/collektive/commit/5e734fff5fcad2b86ed81db7f835fd89e96f7e24))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.1.1 ([87b78e9](https://github.com/Collektive/collektive/commit/87b78e9e1dd69dbda58ad6726e1fdebb46f58d29))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.3.0 ([07f8073](https://github.com/Collektive/collektive/commit/07f8073edd6a4839d5bbbe74270de976f72b9ecd))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.4.0 ([556d6b2](https://github.com/Collektive/collektive/commit/556d6b2a53a515c027359b95188d5cfc2055cbfc))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.0 ([4f35673](https://github.com/Collektive/collektive/commit/4f35673ae1122fad5dc3e4f45c95c74d6567d38a))
+
 ## [10.1.1](https://github.com/Collektive/collektive/compare/10.1.0...10.1.1) (2024-07-09)
 
 ### Dependency updates
