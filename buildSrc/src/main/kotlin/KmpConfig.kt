@@ -43,6 +43,13 @@ fun Project.configureKotlinMultiplatform() {
                     exceptionFormat = TestExceptionFormat.FULL
                 }
             }
+            compilations.all {
+                compileTaskProvider.configure {
+                    compilerOptions {
+                        jvmTarget = JvmTarget.JVM_1_8
+                    }
+                }
+            }
         }
         js(IR) {
             browser()
@@ -81,12 +88,6 @@ fun Project.configureKotlinMultiplatform() {
                         freeCompilerArgs.addAll("-Xcontext-receivers")
                     }
                 }
-            }
-        }
-
-        tasks.withType<KotlinCompile>().configureEach {
-            compilerOptions {
-                jvmTarget = JvmTarget.JVM_1_8
             }
         }
 
