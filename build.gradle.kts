@@ -1,3 +1,4 @@
+import de.aaschmid.gradle.plugins.cpd.Cpd
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektPlugin
 import io.gitlab.arturbosch.detekt.report.ReportMergeTask
@@ -115,6 +116,12 @@ allprojects {
     tasks.withType<Detekt>().configureEach { finalizedBy(reportMerge) }
     reportMerge {
         input.from(tasks.withType<Detekt>().map { it.sarifReportFile })
+    }
+
+    tasks.withType<Cpd>().configureEach {
+        exclude {
+            it.file.absolutePath.contains("generated", ignoreCase = true)
+        }
     }
 }
 
