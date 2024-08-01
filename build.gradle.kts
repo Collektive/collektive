@@ -1,3 +1,4 @@
+import de.aaschmid.gradle.plugins.cpd.Cpd
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektPlugin
 import io.gitlab.arturbosch.detekt.report.ReportMergeTask
@@ -117,9 +118,10 @@ allprojects {
         input.from(tasks.withType<Detekt>().map { it.sarifReportFile })
     }
 
-    // CPD is bugged, throws Lexical errors on perfectly sane Kotlin code
-    tasks.cpdCheck {
-        enabled = false
+    tasks.withType<Cpd>().configureEach {
+        exclude {
+            it.file.absolutePath.contains("generated", ignoreCase = true)
+        }
     }
 }
 
