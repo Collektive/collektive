@@ -1,3 +1,31 @@
+## [10.1.3](https://github.com/Collektive/collektive/compare/10.1.2...10.1.3) (2024-08-06)
+
+### Dependency updates
+
+* **core-deps:** update kotlin monorepo to v2.0.10 ([841aed9](https://github.com/Collektive/collektive/commit/841aed965be53210670a2735bc5c288c274f46f2))
+* **deps:** update alchemist to v34.0.14 ([140f667](https://github.com/Collektive/collektive/commit/140f667c96d321d93baf1ba92c7b9ae9be75cd7e))
+* **deps:** update alchemist to v34.0.15 ([482539e](https://github.com/Collektive/collektive/commit/482539e7e221afd7697b019d7bf23926403d1b84))
+* **deps:** update alchemist to v34.0.16 ([175458f](https://github.com/Collektive/collektive/commit/175458f8962536e68410b3a0acfea47800c03db3))
+* **deps:** update alchemist to v34.0.17 ([8b32537](https://github.com/Collektive/collektive/commit/8b32537e7b95a92967ae31fe98548119d6657a30))
+* **deps:** update alchemist to v34.0.18 ([3e66a86](https://github.com/Collektive/collektive/commit/3e66a86a438c6af74a1c2a7917bf66de26c28624))
+* **deps:** update alchemist to v34.0.19 ([46acbf2](https://github.com/Collektive/collektive/commit/46acbf2ccc8b2d495411d0884ef9a6d42d4b8f34))
+* **deps:** update alchemist to v34.0.20 ([4bb268d](https://github.com/Collektive/collektive/commit/4bb268d0ca86f282355a60cbedee5dd2e870dd36))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.92 ([204fa96](https://github.com/Collektive/collektive/commit/204fa963f3262a917d17bf7dfa72d9dcccb6af02))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.93 ([4e540cb](https://github.com/Collektive/collektive/commit/4e540cb284132526c7892d714b078ce72acb0042))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.94 ([3b7ac4b](https://github.com/Collektive/collektive/commit/3b7ac4b9d2551132f5b45f610cfc5fb665001d91))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.95 ([3bba9e2](https://github.com/Collektive/collektive/commit/3bba9e2eb46aef4dc4cf6420e839cb73d304b859))
+* **deps:** update node.js to 20.16 ([dcc3066](https://github.com/Collektive/collektive/commit/dcc30664a4382d25d2359aaa9594b48115d4338c))
+* **deps:** update plugin com.gradle.develocity to v3.17.6 ([ebfeb0b](https://github.com/Collektive/collektive/commit/ebfeb0b9feaa7da8ed8c62d8e60cffd79a745fec))
+* **deps:** update plugin kotlin-qa to v0.65.0 ([#408](https://github.com/Collektive/collektive/issues/408)) ([86e352f](https://github.com/Collektive/collektive/commit/86e352f13b408029888dfb55b5e0c75c296a56de))
+* **deps:** update plugin multijvmtesting to v1.2.0 ([daa8b04](https://github.com/Collektive/collektive/commit/daa8b042656e77846236ac1ea3be5460d82cbea9))
+* **deps:** update plugin multijvmtesting to v1.2.2 ([2b05672](https://github.com/Collektive/collektive/commit/2b0567209a009fd6fecdb87ae40411e8bb6c5c07))
+* **deps:** update plugin multijvmtesting to v1.2.3 ([0a5eb03](https://github.com/Collektive/collektive/commit/0a5eb035245c23c12b8def7b58ceb1553ae6e0ea))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.1 ([a010239](https://github.com/Collektive/collektive/commit/a010239b1864068fbfb19351af6f1c1c87591824))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.2 ([3129327](https://github.com/Collektive/collektive/commit/312932712bca41c0367741da5f869e07d470ffe5))
+
 ## [10.1.2](https://github.com/Collektive/collektive/compare/10.1.1...10.1.2) (2024-07-19)
 
 ### Dependency updates
