@@ -27,7 +27,7 @@ kotlin-test-annotations-common = { module = "org.jetbrains.kotlin:kotlin-test-an
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlinpoet = "com.squareup:kotlinpoet:1.18.1"
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
-slf4j = "org.slf4j:slf4j-api:2.0.15"
+slf4j = "org.slf4j:slf4j-api:2.0.16"
 
 [bundles]
 kotlin-compiler = [
