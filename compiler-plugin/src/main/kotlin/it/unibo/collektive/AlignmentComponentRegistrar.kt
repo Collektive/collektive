@@ -1,5 +1,6 @@
 package it.unibo.collektive
 
+import io.github.freshmag.collektiveplugin.AlignmentFrontendExtensionRegistrar
 import it.unibo.collektive.utils.logging.info
 import it.unibo.collektive.utils.logging.strongWarning
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
@@ -9,6 +10,7 @@ import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.JVMConfigurationKeys
+import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter
 
 /**
  * The component registrar registers the alignment generation extension if
@@ -48,6 +50,7 @@ class AlignmentComponentRegistrar : CompilerPluginRegistrar() {
         }
         if (configuration.get(AlignmentCommandLineProcessor.ARG_ENABLED) != false) {
             IrGenerationExtension.registerExtension(AlignmentIrGenerationExtension(logger))
+            FirExtensionRegistrarAdapter.registerExtension(AlignmentFrontendExtensionRegistrar())
         }
     }
 }

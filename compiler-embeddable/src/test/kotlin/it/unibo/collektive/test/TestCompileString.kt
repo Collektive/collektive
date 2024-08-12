@@ -8,10 +8,12 @@ import io.kotest.matchers.shouldNot
 import io.kotest.matchers.string.beBlank
 import it.unibo.collektive.compiler.CollektiveJVMCompiler
 import it.unibo.collektive.compiler.util.jvmOutputDirectory
+import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import java.io.ByteArrayOutputStream
 import java.io.PrintWriter
 import com.sun.tools.javap.Main as Javap
 
+@OptIn(ExperimentalCompilerApi::class)
 class TestCompileString : FreeSpec({
     "a simple aggregate function" - {
         val moduleName = "TestScript"
