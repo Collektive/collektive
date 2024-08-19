@@ -1,4 +1,4 @@
-package io.github.freshmag.collektiveplugin
+package it.unibo.collektive.frontend
 
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrar
 

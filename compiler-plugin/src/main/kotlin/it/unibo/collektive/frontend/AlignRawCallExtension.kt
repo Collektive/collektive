@@ -1,9 +1,8 @@
-package io.github.freshmag.collektiveplugin
+package it.unibo.collektive.frontend
 
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.SourceElementPositioningStrategies
-import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.diagnostics.warning1
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
@@ -41,7 +40,11 @@ object AlignRawCallChecker : FirFunctionCallChecker(MppCheckerKind.Common) {
         context: CheckerContext,
         reporter: DiagnosticReporter
     ) {
-        //val calleeName = expression.calleeReference.name.identifier
+        val calleeName = expression.calleeReference.name.identifier
+
+        if (calleeName == "exampleAggregate") {
+            throw IllegalArgumentException("CANT DO THIS BABY DOLL")
+        }
 
         if (expression.isAggregate(context)
             && !context.isInsideAlignDeclaration()) {

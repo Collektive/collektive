@@ -1,6 +1,6 @@
 package it.unibo.collektive
 
-import io.github.freshmag.collektiveplugin.AlignmentFrontendExtensionRegistrar
+import it.unibo.collektive.frontend.AlignmentFrontendExtensionRegistrar
 import it.unibo.collektive.utils.logging.info
 import it.unibo.collektive.utils.logging.strongWarning
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
