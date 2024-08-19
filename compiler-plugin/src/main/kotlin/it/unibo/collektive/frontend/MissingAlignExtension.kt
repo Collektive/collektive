@@ -19,14 +19,19 @@ import org.jetbrains.kotlin.fir.expressions.FirWhileLoop
 import org.jetbrains.kotlin.fir.expressions.toResolvedCallableSymbol
 
 /**
- * Object containing the types of errors/warnings reported by this extension
+ * Object containing the types of errors/warnings reported by this extension.
  */
 object PluginErrors {
-    val METHOD_CALLED by warning1<PsiElement, String>(SourceElementPositioningStrategies.CALL_ELEMENT_WITH_DOT)
+    /**
+     * Warning generated on a dot call.
+     */
+    val DOT_CALL_WARNING by warning1<PsiElement, String>(
+        SourceElementPositioningStrategies.CALL_ELEMENT_WITH_DOT
+    )
 }
 
 /**
- * Checker that looks for aggregate functions called inside a loop without an explicit align operation
+ * Checker that looks for aggregate functions called inside a loop without an explicit align operation.
  */
 object NoAlignInsideALoop : FirFunctionCallChecker(MppCheckerKind.Common) {
 
@@ -56,7 +61,7 @@ object NoAlignInsideALoop : FirFunctionCallChecker(MppCheckerKind.Common) {
             && !context.isInsideAlignDeclaration()) {
             reporter.reportOn(
                 expression.calleeReference.source,
-                PluginErrors.METHOD_CALLED,
+                PluginErrors.DOT_CALL_WARNING,
                 "Warning: aggregate function \"$calleeName\" called inside a loop with no manual alignment operation",
                 context
             )
@@ -65,7 +70,7 @@ object NoAlignInsideALoop : FirFunctionCallChecker(MppCheckerKind.Common) {
 }
 
 /**
- * Extension that adds a series of checkers that looks for missing align operations within the Collektive DSL
+ * Extension that adds a series of checkers that looks for missing align operations within the Collektive DSL.
  */
 class MissingAlignExtension(session: FirSession) : FirAdditionalCheckersExtension(session) {
     override val expressionCheckers: ExpressionCheckers = object : ExpressionCheckers() {
