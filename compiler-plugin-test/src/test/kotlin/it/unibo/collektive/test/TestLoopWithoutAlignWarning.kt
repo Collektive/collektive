@@ -9,7 +9,7 @@ import it.unibo.collektive.AlignmentComponentRegistrar
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 
 @OptIn(ExperimentalCompilerApi::class)
-class TestAlignRawWarning : FreeSpec({
+class TestLoopWithoutAlignWarning : FreeSpec({
     "A single aggregate function called inside another one" - {
         val fileName = "TestAggregateInLoop.kt"
         val program = checkNotNull(ClassLoader.getSystemClassLoader().getResource(fileName)).readText()
@@ -21,7 +21,7 @@ class TestAlignRawWarning : FreeSpec({
                 inheritClassPath = true
             }.compile()
             val expectedWarningMessage = "Warning: aggregate function \"exampleAggregate\" called inside a loop " +
-                    "with no manual alignment operation"
+                "with no manual alignment operation"
 
             result.exitCode shouldBe KotlinCompilation.ExitCode.OK
             result.messages shouldContain expectedWarningMessage
