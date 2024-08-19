@@ -26,7 +26,7 @@ object PluginErrors {
      * Warning generated on a dot call.
      */
     val DOT_CALL_WARNING by warning1<PsiElement, String>(
-        SourceElementPositioningStrategies.CALL_ELEMENT_WITH_DOT
+        SourceElementPositioningStrategies.CALL_ELEMENT_WITH_DOT,
     )
 }
 
@@ -52,18 +52,19 @@ object NoAlignInsideALoop : FirFunctionCallChecker(MppCheckerKind.Common) {
     override fun check(
         expression: FirFunctionCall,
         context: CheckerContext,
-        reporter: DiagnosticReporter
+        reporter: DiagnosticReporter,
     ) {
         val calleeName = expression.calleeReference.name.identifier
 
-        if (expression.isAggregate(context)
-            && context.isInsideALoop()
-            && !context.isInsideAlignDeclaration()) {
+        if (expression.isAggregate(context) &&
+            context.isInsideALoop() &&
+            !context.isInsideAlignDeclaration()
+        ) {
             reporter.reportOn(
                 expression.calleeReference.source,
                 PluginErrors.DOT_CALL_WARNING,
                 "Warning: aggregate function \"$calleeName\" called inside a loop with no manual alignment operation",
-                context
+                context,
             )
         }
     }
