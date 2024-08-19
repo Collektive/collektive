@@ -57,7 +57,6 @@ object CollektiveJVMCompiler {
         outputFolder: File = tempDir(moduleName),
         enableContextReceivers: Boolean = true,
         messageCollector: MessageCollector = SLF4JMessageCollector.default,
-        compilerPluginRegistrars: List<CompilerPluginRegistrar> = listOf(AlignmentComponentRegistrar()),
     ): GenerationState? {
         val configuration = CompilerConfiguration()
         // Input configuration
@@ -93,9 +92,7 @@ object CollektiveJVMCompiler {
         configuration.addJvmClasspathRoot(KotlinJars.stdlib)
         // Add the Collektive plugin
         configuration.add(CompilerPluginRegistrar.COMPILER_PLUGIN_REGISTRARS, ScriptingK2CompilerPluginRegistrar())
-        compilerPluginRegistrars.forEach {
-            configuration.add(CompilerPluginRegistrar.COMPILER_PLUGIN_REGISTRARS, it)
-        }
+        configuration.add(CompilerPluginRegistrar.COMPILER_PLUGIN_REGISTRARS, AlignmentComponentRegistrar())
         // Configure the Collektive plugin options available in the command line processor
         configuration.put(AlignmentCommandLineProcessor.ARG_ENABLED, true)
         val environment = KotlinCoreEnvironment.createForProduction(
@@ -119,7 +116,6 @@ object CollektiveJVMCompiler {
         outputFolder: File = tempDir(moduleName),
         enableContextReceivers: Boolean = true,
         messageCollector: MessageCollector = SLF4JMessageCollector.default,
-        compilerPluginRegistrars: List<CompilerPluginRegistrar> = listOf(AlignmentComponentRegistrar()),
     ): GenerationState? = compile(
         listOf(inputFile),
         jvmTarget,
@@ -127,7 +123,6 @@ object CollektiveJVMCompiler {
         outputFolder,
         enableContextReceivers,
         messageCollector,
-        compilerPluginRegistrars,
     )
 
     /**
@@ -143,7 +138,6 @@ object CollektiveJVMCompiler {
         temporaryFolder: File = tempDir(moduleName),
         enableContextReceivers: Boolean = true,
         messageCollector: MessageCollector = SLF4JMessageCollector.default,
-        compilerPluginRegistrars: List<CompilerPluginRegistrar> = listOf(AlignmentComponentRegistrar()),
     ) = compile(
         temporaryFolder
             .also { require(it.exists() && it.isDirectory) }
@@ -154,6 +148,5 @@ object CollektiveJVMCompiler {
         outputFolder,
         enableContextReceivers,
         messageCollector,
-        compilerPluginRegistrars,
     )
 }
