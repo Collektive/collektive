@@ -18,12 +18,17 @@ import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.FirWhileLoop
 import org.jetbrains.kotlin.fir.expressions.toResolvedCallableSymbol
 
-
+/**
+ * Object containing the types of errors/warnings reported by this extension
+ */
 object PluginErrors {
     val METHOD_CALLED by warning1<PsiElement, String>(SourceElementPositioningStrategies.CALL_ELEMENT_WITH_DOT)
 }
 
-object AlignRawCallChecker : FirFunctionCallChecker(MppCheckerKind.Common) {
+/**
+ * Checker that looks for aggregate functions called inside a loop without an explicit align operation
+ */
+object NoAlignInsideALoop : FirFunctionCallChecker(MppCheckerKind.Common) {
 
     private fun CheckerContext.isInsideAlignDeclaration(): Boolean {
         val wrapping = (closestNonLocal as? FirSimpleFunction)?.name?.asString()
@@ -49,15 +54,6 @@ object AlignRawCallChecker : FirFunctionCallChecker(MppCheckerKind.Common) {
         if (expression.isAggregate(context)
             && context.isInsideALoop()
             && !context.isInsideAlignDeclaration()) {
-//            if (calleeName == "exampleAggregate") {
-//                val message = context.containingElements.map(Any::toString).reduce { acc, s -> acc + s }
-//                reporter.reportOn(
-//                    expression.calleeReference.source,
-//                    PluginErrors.METHOD_CALLED,
-//                    message,
-//                    context
-//                )
-//            }
             reporter.reportOn(
                 expression.calleeReference.source,
                 PluginErrors.METHOD_CALLED,
@@ -68,9 +64,12 @@ object AlignRawCallChecker : FirFunctionCallChecker(MppCheckerKind.Common) {
     }
 }
 
-class AlignRawCallExtension(session: FirSession) : FirAdditionalCheckersExtension(session) {
+/**
+ * Extension that adds a series of checkers that looks for missing align operations within the Collektive DSL
+ */
+class MissingAlignExtension(session: FirSession) : FirAdditionalCheckersExtension(session) {
     override val expressionCheckers: ExpressionCheckers = object : ExpressionCheckers() {
         override val functionCallCheckers: Set<FirFunctionCallChecker>
-            get() = setOf(AlignRawCallChecker)
+            get() = setOf(NoAlignInsideALoop)
     }
 }
