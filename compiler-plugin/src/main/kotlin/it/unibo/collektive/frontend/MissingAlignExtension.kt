@@ -3,6 +3,7 @@ package it.unibo.collektive.frontend
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.SourceElementPositioningStrategies
+import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.diagnostics.warning1
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
@@ -14,6 +15,7 @@ import org.jetbrains.kotlin.fir.analysis.checkers.toClassLikeSymbol
 import org.jetbrains.kotlin.fir.analysis.extensions.FirAdditionalCheckersExtension
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
+import org.jetbrains.kotlin.fir.expressions.FirWhileLoop
 import org.jetbrains.kotlin.fir.expressions.toResolvedCallableSymbol
 
 
@@ -35,6 +37,8 @@ object AlignRawCallChecker : FirFunctionCallChecker(MppCheckerKind.Common) {
             ?.toClassLikeSymbol(context.session)
             ?.name?.asString() == "Aggregate"
 
+    private fun CheckerContext.isInsideALoop(): Boolean = containingElements.any { it is FirWhileLoop }
+
     override fun check(
         expression: FirFunctionCall,
         context: CheckerContext,
@@ -42,18 +46,24 @@ object AlignRawCallChecker : FirFunctionCallChecker(MppCheckerKind.Common) {
     ) {
         val calleeName = expression.calleeReference.name.identifier
 
-        if (calleeName == "exampleAggregate") {
-            throw IllegalArgumentException("CANT DO THIS BABY DOLL")
-        }
-
         if (expression.isAggregate(context)
+            && context.isInsideALoop()
             && !context.isInsideAlignDeclaration()) {
-//            reporter.reportOn(
-//                expression.calleeReference.source,
-//                PluginErrors.METHOD_CALLED,
-//                "Warning: aggregate function called inside a loop with no manual alignment operation",
-//                context
-//            )
+//            if (calleeName == "exampleAggregate") {
+//                val message = context.containingElements.map(Any::toString).reduce { acc, s -> acc + s }
+//                reporter.reportOn(
+//                    expression.calleeReference.source,
+//                    PluginErrors.METHOD_CALLED,
+//                    message,
+//                    context
+//                )
+//            }
+            reporter.reportOn(
+                expression.calleeReference.source,
+                PluginErrors.METHOD_CALLED,
+                "Warning: aggregate function \"$calleeName\" called inside a loop with no manual alignment operation",
+                context
+            )
         }
     }
 }
