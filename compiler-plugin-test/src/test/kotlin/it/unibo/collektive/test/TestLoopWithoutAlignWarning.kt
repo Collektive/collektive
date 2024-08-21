@@ -1,30 +1,41 @@
 package it.unibo.collektive.test
 
-import com.tschuchort.compiletesting.KotlinCompilation
-import com.tschuchort.compiletesting.SourceFile
 import io.kotest.core.spec.style.FreeSpec
-import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldContain
-import it.unibo.collektive.AlignmentComponentRegistrar
+import it.unibo.collektive.test.util.CompileUtils
+import it.unibo.collektive.test.util.CompileUtils.noWarning
+import it.unibo.collektive.test.util.CompileUtils.warning
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 
 @OptIn(ExperimentalCompilerApi::class)
 class TestLoopWithoutAlignWarning : FreeSpec({
-    "A single aggregate function called inside another one" - {
-        val fileName = "TestAggregateInLoop.kt"
-        val program = checkNotNull(ClassLoader.getSystemClassLoader().getResource(fileName)).readText()
-        val sourceFile = SourceFile.kotlin(fileName, program)
-        "should compile" - {
-            val result = KotlinCompilation().apply {
-                sources = listOf(sourceFile)
-                compilerPluginRegistrars = listOf(AlignmentComponentRegistrar())
-                inheritClassPath = true
-            }.compile()
-            val expectedWarningMessage = "Warning: aggregate function \"exampleAggregate\" called inside a loop " +
-                "with no manual alignment operation"
+    val expectedWarningMessage = "Warning: aggregate function \"exampleAggregate\" called inside a loop " +
+        "with no manual alignment operation"
 
-            result.exitCode shouldBe KotlinCompilation.ExitCode.OK
-            result.messages shouldContain expectedWarningMessage
+    "A single aggregate function called inside a loop" - {
+        val testingProgramTemplate = CompileUtils.testingProgramFromResource("TestAggregateInLoop.kt")
+        "without a specific alignedOn" - {
+            val testingProgram = testingProgramTemplate.formatCode("", "", "", "")
+            "should produce a warning" - {
+                testingProgram shouldCompileWith warning(expectedWarningMessage)
+            }
+        }
+        "with a specific alignedOn" - {
+            val testingProgram = testingProgramTemplate.formatCode("", "alignedOn(pivot(localId)) {", "}", "")
+            "should compile without any warning" - {
+                testingProgram shouldCompileWith noWarning
+            }
+        }
+        "with a specific alignedOn placed outside the loop" - {
+            val testingProgram = testingProgramTemplate.formatCode("alignedOn(pivot(localId)) {", "", "", "}")
+            "should produce a warning" - {
+                testingProgram shouldCompileWith warning(expectedWarningMessage)
+            }
+        }
+        "but wrapped inside another function declaration" - {
+            val testingProgram = testingProgramTemplate.formatCode("", "fun Aggregate<Int>.test() {", "}", "")
+            "should compile without any warning" - {
+                testingProgram shouldCompileWith noWarning
+            }
         }
     }
 })
