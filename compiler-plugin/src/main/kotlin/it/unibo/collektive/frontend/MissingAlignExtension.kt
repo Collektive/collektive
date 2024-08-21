@@ -7,12 +7,12 @@ import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.diagnostics.warning1
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
-import org.jetbrains.kotlin.fir.analysis.checkers.closestNonLocal
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.checkers.expression.ExpressionCheckers
 import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirFunctionCallChecker
 import org.jetbrains.kotlin.fir.analysis.checkers.toClassLikeSymbol
 import org.jetbrains.kotlin.fir.analysis.extensions.FirAdditionalCheckersExtension
+import org.jetbrains.kotlin.fir.declarations.FirReceiverParameter
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.FirWhileLoop
@@ -35,19 +35,28 @@ object PluginErrors {
  */
 object NoAlignInsideALoop : FirFunctionCallChecker(MppCheckerKind.Common) {
 
-    private fun CheckerContext.isInsideAlignDeclaration(): Boolean {
-        val wrapping = (closestNonLocal as? FirSimpleFunction)?.name?.asString()
-        return wrapping == "alignedOn" || wrapping == "align"
+    private fun FirReceiverParameter.isAggregate(session: FirSession): Boolean =
+        this.typeRef.toClassLikeSymbol(session)?.name?.asString() == "Aggregate"
+
+    private fun CheckerContext.isInsideALoopWithoutAlignedOn(session: FirSession): Boolean {
+        val loopElementIndex = containingElements.indexOfLast { it is FirWhileLoop }
+        val functionDeclarationIndex = containingElements.dropLast(1).indexOfLast {
+            (it as? FirSimpleFunction)?.receiverParameter?.isAggregate(session) == true
+        }
+        if (loopElementIndex == -1 || functionDeclarationIndex == -1) {
+            return false
+        }
+        return loopElementIndex > functionDeclarationIndex &&
+            containingElements
+                .drop(loopElementIndex)
+                .dropLast(1)
+                .filterIsInstance<FirFunctionCall>()
+                .map { it.calleeReference.name.asString() }
+                .none { it == "alignedOn" }
     }
 
-    private fun FirFunctionCall.isAggregate(context: CheckerContext): Boolean =
-        toResolvedCallableSymbol()
-            ?.receiverParameter
-            ?.typeRef
-            ?.toClassLikeSymbol(context.session)
-            ?.name?.asString() == "Aggregate"
-
-    private fun CheckerContext.isInsideALoop(): Boolean = containingElements.any { it is FirWhileLoop }
+    private fun FirFunctionCall.isAggregate(session: FirSession): Boolean =
+        toResolvedCallableSymbol()?.receiverParameter?.isAggregate(session) == true
 
     override fun check(
         expression: FirFunctionCall,
@@ -55,10 +64,8 @@ object NoAlignInsideALoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         reporter: DiagnosticReporter,
     ) {
         val calleeName = expression.calleeReference.name.identifier
-
-        if (expression.isAggregate(context) &&
-            context.isInsideALoop() &&
-            !context.isInsideAlignDeclaration()
+        if (expression.isAggregate(context.session) &&
+            context.isInsideALoopWithoutAlignedOn(context.session)
         ) {
             reporter.reportOn(
                 expression.calleeReference.source,
