@@ -23,7 +23,7 @@ import kotlin.reflect.jvm.kotlinFunction
 class RunCollektiveProgram<P : Position<P>>(
     node: Node<Any?>,
     val name: String,
-    val program: context(CollektiveDevice<P>) Aggregate<Int>.() -> Any?,
+    val program: Aggregate<Int>.(CollektiveDevice<P>) -> Any?,
 ) : AbstractAction<Any?>(node) {
 
     private val programIdentifier = SimpleMolecule(name)
@@ -41,7 +41,7 @@ class RunCollektiveProgram<P : Position<P>>(
     init {
         declareDependencyTo(programIdentifier)
         collektiveProgram = Collektive(localDevice.id, network = localDevice) {
-            program(localDevice, this)
+            program(localDevice)
         }
     }
 
@@ -79,7 +79,7 @@ class RunCollektiveProgram<P : Position<P>>(
         private fun <P : Position<P>> findEntrypoint(
             entrypoint: String,
             localDevice: CollektiveDevice<P>,
-        ): context(CollektiveDevice<P>) Aggregate<Int>.() -> Any? {
+        ): Aggregate<Int>.(CollektiveDevice<P>) -> Any? {
             val className = entrypoint.substringBeforeLast(".")
             val methodName = entrypoint.substringAfterLast(".")
             val clazz = Class.forName(className)
@@ -91,17 +91,17 @@ class RunCollektiveProgram<P : Position<P>>(
         private fun <P : Position<P>> buildEntryPoint(
             method: Method,
             localDevice: CollektiveDevice<P>,
-        ): context(CollektiveDevice<P>) Aggregate<Int>.() -> Any? {
+        ): Aggregate<Int>.(CollektiveDevice<P>) -> Any? {
             val ktfunction = checkNotNull(method.kotlinFunction) {
                 "Method ${method.name} in class ${method.declaringClass.name} cannot be converted to a Kotlin function"
             }
-            return {
+            return { device ->
                 val parameters = method.parameters.map {
                     when {
                         it.type.isAssignableFrom(Aggregate::class.java) -> this
                         it.type.isAssignableFrom(CollektiveDevice::class.java) -> localDevice
                         it.type.isAssignableFrom(Node::class.java) -> localDevice.node
-                        node.hasPropertyCompatibleWith(it) -> node.getPropertyCompatibleWith(it)
+                        device.node.hasPropertyCompatibleWith(it) -> device.node.getPropertyCompatibleWith(it)
                         else -> error("Unsupported type ${it.type} in entrypoint ${ktfunction.name}")
                     }
                 }.toTypedArray()

@@ -12,7 +12,7 @@ _pool: &program
         - src/test/resources/it/unibo/collektive/test/kotlin
       code: |
         import my.test.*
-      entrypoint: gradient(localId == 0)
+      entrypoint: gradient(device, localId == 0)
 
 deployments:
   - type: Rectangle

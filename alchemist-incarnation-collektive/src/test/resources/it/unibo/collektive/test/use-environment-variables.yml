@@ -13,7 +13,7 @@ _pool: &program
       code: |
         import my.test.*
         import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
-      entrypoint: gradient(get("source"))
+      entrypoint: gradient(device, device.get("source"))
 
 deployments:
   - type: Rectangle

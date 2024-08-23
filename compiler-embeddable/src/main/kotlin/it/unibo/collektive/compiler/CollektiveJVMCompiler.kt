@@ -3,7 +3,6 @@ package it.unibo.collektive.compiler
 import it.unibo.collektive.AlignmentCommandLineProcessor
 import it.unibo.collektive.AlignmentComponentRegistrar
 import it.unibo.collektive.compiler.logging.SLF4JMessageCollector
-import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
 import org.jetbrains.kotlin.cli.common.arguments.K2JVMCompilerArguments
 import org.jetbrains.kotlin.cli.common.config.addKotlinSourceRoot
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -77,7 +76,7 @@ object CollektiveJVMCompiler {
         configuration.put(JVMConfigurationKeys.NO_JDK, false)
         // Enable context-receivers
         if (enableContextReceivers) {
-            val config = K2JVMCompilerArguments().apply { contextReceivers = true }
+            val config = K2JVMCompilerArguments() // .apply { contextReceivers = true }
             configuration.setupCommonArguments(config)
         }
         // Enable the IR backend, or the Collektive plugin cannot be applied

@@ -241,8 +241,8 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
             val finalCode = """
                 |@file:JvmName("$className")
                 |${code.replace("\n", "\n|")}
-                |context(${CollektiveDevice::class.qualifiedName}<P>)
-                |fun <P : ${Position::class.qualifiedName}<P>> ${Aggregate::class.qualifiedName}<Int>.$methodName() =
+                |
+                |fun <P : ${Position::class.qualifiedName}<P>> ${Aggregate::class.qualifiedName}<Int>.$methodName(device: ${CollektiveDevice::class.qualifiedName}<P>) =
                 |   $entrypoint
             """.trimMargin()
             logger.info("Final code for Collektive program {}:\n{}", name, finalCode)

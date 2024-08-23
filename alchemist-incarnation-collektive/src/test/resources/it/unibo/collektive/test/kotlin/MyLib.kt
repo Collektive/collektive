@@ -7,12 +7,13 @@ import it.unibo.collektive.field.operations.min
 import it.unibo.collektive.stdlib.doubles.FieldedDoubles.plus
 import kotlin.Double.Companion.POSITIVE_INFINITY
 
-context(DistanceSensor)
-fun Aggregate<Int>.gradient(source: Boolean): Double =
+fun Aggregate<Int>.gradient(sensor: DistanceSensor, source: Boolean): Double =
     share(POSITIVE_INFINITY) {
-        val dist = distances()
-        when {
-            source -> 0.0
-            else -> (it + dist).min(POSITIVE_INFINITY)
+        sensor.run {
+            val dist = distances()
+            when {
+                source -> 0.0
+                else -> (it + dist).min(POSITIVE_INFINITY)
+            }
         }
     }
