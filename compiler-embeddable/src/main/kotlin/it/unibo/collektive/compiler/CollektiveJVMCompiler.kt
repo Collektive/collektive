@@ -67,7 +67,7 @@ object CollektiveJVMCompiler {
             }
         }
         // CLI compiler configuration
-        configuration.put(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, messageCollector)
+        configuration.put(CommonConfigurationKeys.MESSAGE_COLLECTOR_KEY, messageCollector)
         // Common Kotlin configuration
         configuration.put(CommonConfigurationKeys.MODULE_NAME, moduleName)
         // Kotlin-JVM specific configuration
