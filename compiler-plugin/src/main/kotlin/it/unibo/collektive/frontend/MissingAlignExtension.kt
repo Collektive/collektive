@@ -82,7 +82,7 @@ object NoAlignInsideALoop : FirFunctionCallChecker(MppCheckerKind.Common) {
 }
 
 /**
- * Checker that looks for usages of "align" and "dealign" methods inside Aggregate functions, generating a warning
+ * Checker that looks for usages of "align" and "dealign" methods inside Aggregate functions, generating a warning.
  */
 object NoAlignOrDealign : FirFunctionCallChecker(MppCheckerKind.Common) {
     override fun check(expression: FirFunctionCall, context: CheckerContext, reporter: DiagnosticReporter) {
