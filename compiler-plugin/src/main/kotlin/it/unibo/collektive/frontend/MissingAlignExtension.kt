@@ -30,15 +30,21 @@ object PluginErrors {
     )
 }
 
+private fun FirReceiverParameter.isAggregate(session: FirSession): Boolean =
+    this.typeRef.toClassLikeSymbol(session)?.name?.asString() == "Aggregate"
+
+private fun FirFunctionCall.isAggregate(session: FirSession): Boolean =
+    toResolvedCallableSymbol()?.receiverParameter?.isAggregate(session) == true
+
+private fun CheckerContext.isInsideAggregateFunction(): Boolean =
+    containingElements.any { (it as? FirSimpleFunction)?.receiverParameter?.isAggregate(session) == true }
+
 /**
  * Checker that looks for aggregate functions called inside a loop without an explicit align operation.
  */
 object NoAlignInsideALoop : FirFunctionCallChecker(MppCheckerKind.Common) {
 
-    private fun FirReceiverParameter.isAggregate(session: FirSession): Boolean =
-        this.typeRef.toClassLikeSymbol(session)?.name?.asString() == "Aggregate"
-
-    private fun CheckerContext.isInsideALoopWithoutAlignedOn(session: FirSession): Boolean {
+    private fun CheckerContext.isInsideALoopWithoutAlignedOn(): Boolean {
         val loopElementIndex = containingElements.indexOfLast { it is FirWhileLoop }
         val functionDeclarationIndex = containingElements.dropLast(1).indexOfLast {
             (it as? FirSimpleFunction)?.receiverParameter?.isAggregate(session) == true
@@ -55,8 +61,6 @@ object NoAlignInsideALoop : FirFunctionCallChecker(MppCheckerKind.Common) {
                 .none { it == "alignedOn" }
     }
 
-    private fun FirFunctionCall.isAggregate(session: FirSession): Boolean =
-        toResolvedCallableSymbol()?.receiverParameter?.isAggregate(session) == true
 
     override fun check(
         expression: FirFunctionCall,
@@ -65,7 +69,7 @@ object NoAlignInsideALoop : FirFunctionCallChecker(MppCheckerKind.Common) {
     ) {
         val calleeName = expression.calleeReference.name.identifier
         if (expression.isAggregate(context.session) &&
-            context.isInsideALoopWithoutAlignedOn(context.session)
+            context.isInsideALoopWithoutAlignedOn()
         ) {
             reporter.reportOn(
                 expression.calleeReference.source,
@@ -78,11 +82,29 @@ object NoAlignInsideALoop : FirFunctionCallChecker(MppCheckerKind.Common) {
 }
 
 /**
+ * Checker that looks for usages of "align" and "dealign" methods inside Aggregate functions, generating a warning
+ */
+object NoAlignOrDealign : FirFunctionCallChecker(MppCheckerKind.Common) {
+    override fun check(expression: FirFunctionCall, context: CheckerContext, reporter: DiagnosticReporter) {
+        val calleeName = expression.calleeReference.name.identifier
+        if ((calleeName == "align" || calleeName == "dealign") && context.isInsideAggregateFunction()) {
+            reporter.reportOn(
+                expression.calleeReference.source,
+                PluginErrors.DOT_CALL_WARNING,
+                "Warning: \"%s\" method should not be explicitly used".format(calleeName),
+                context,
+            )
+        }
+    }
+}
+
+
+/**
  * Extension that adds a series of checkers that looks for missing align operations within the Collektive DSL.
  */
 class MissingAlignExtension(session: FirSession) : FirAdditionalCheckersExtension(session) {
     override val expressionCheckers: ExpressionCheckers = object : ExpressionCheckers() {
         override val functionCallCheckers: Set<FirFunctionCallChecker>
-            get() = setOf(NoAlignInsideALoop)
+            get() = setOf(NoAlignInsideALoop, NoAlignOrDealign)
     }
 }
