@@ -61,7 +61,6 @@ object NoAlignInsideALoop : FirFunctionCallChecker(MppCheckerKind.Common) {
                 .none { it == "alignedOn" }
     }
 
-
     override fun check(
         expression: FirFunctionCall,
         context: CheckerContext,
@@ -97,7 +96,6 @@ object NoAlignOrDealign : FirFunctionCallChecker(MppCheckerKind.Common) {
         }
     }
 }
-
 
 /**
  * Extension that adds a series of checkers that looks for missing align operations within the Collektive DSL.
