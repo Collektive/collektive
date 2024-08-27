@@ -15,6 +15,8 @@ import org.jetbrains.kotlin.fir.expressions.FirWhileLoop
  */
 object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
 
+    private val safeOperators = listOf("alignedOn", "align", "dealign")
+
     private fun CheckerContext.isInsideALoopWithoutAlignedOn(): Boolean {
         val loopElementIndex = containingElements.indexOfLast { it is FirWhileLoop }
         val functionDeclarationIndex = containingElements.dropLast(1).indexOfLast {
@@ -38,7 +40,7 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         reporter: DiagnosticReporter,
     ) {
         val calleeName = expression.calleeReference.name.identifier
-        if (expression.isAggregate(context.session) &&
+        if (calleeName !in safeOperators && expression.isAggregate(context.session) &&
             context.isInsideALoopWithoutAlignedOn()
         ) {
             reporter.reportOn(

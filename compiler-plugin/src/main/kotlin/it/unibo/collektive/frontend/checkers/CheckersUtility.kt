@@ -5,6 +5,7 @@ import org.jetbrains.kotlin.diagnostics.SourceElementPositioningStrategies
 import org.jetbrains.kotlin.diagnostics.warning1
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
+import org.jetbrains.kotlin.fir.analysis.checkers.getContainingClassSymbol
 import org.jetbrains.kotlin.fir.analysis.checkers.toClassLikeSymbol
 import org.jetbrains.kotlin.fir.declarations.FirReceiverParameter
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
@@ -36,12 +37,16 @@ object CheckersUtility {
         this.typeRef.toClassLikeSymbol(session)?.name?.asString() == "Aggregate"
 
     /**
-     * Checks if the function that is called is an `Aggregate` one.
+     * Checks if the function that is called is an `Aggregate` one (i.e. is an extension of `Aggregate` or it's a
+     * method of the `Aggregate` class)
      * @param session [FirSession] session of the [CheckerContext].
      * @return [Boolean] **true** if it's an `Aggregate` function, **false** otherwise.
      */
-    fun FirFunctionCall.isAggregate(session: FirSession): Boolean =
-        toResolvedCallableSymbol()?.receiverParameter?.isAggregate(session) == true
+    fun FirFunctionCall.isAggregate(session: FirSession): Boolean {
+        val callableSymbol = toResolvedCallableSymbol()
+        return callableSymbol?.receiverParameter?.isAggregate(session) == true ||
+            callableSymbol?.getContainingClassSymbol(session)?.name?.asString() == "Aggregate"
+    }
 
     /**
      * Checks if the current [CheckerContext] is wrapped inside an `Aggregate` function.
