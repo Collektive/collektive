@@ -8,15 +8,12 @@ import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 
 @OptIn(ExperimentalCompilerApi::class)
 class TestLoopWithoutAlignWarning : FreeSpec({
-    val expectedWarningMessage = "Warning: aggregate function \"exampleAggregate\" called inside a loop " +
-        "with no manual alignment operation"
-
     "A single aggregate function called inside a loop" - {
         val testingProgramTemplate = CompileUtils.testingProgramFromResource("TestAggregateInLoop.kt")
         "without a specific alignedOn" - {
             val testingProgram = testingProgramTemplate.formatCode("", "", "", "")
             "should produce a warning" - {
-                testingProgram shouldCompileWith warning(expectedWarningMessage)
+                testingProgram shouldCompileWith warning(EXPECTED_WARNING_MESSAGE)
             }
         }
         "with a specific alignedOn" - {
@@ -28,7 +25,7 @@ class TestLoopWithoutAlignWarning : FreeSpec({
         "with a specific alignedOn placed outside the loop" - {
             val testingProgram = testingProgramTemplate.formatCode("alignedOn(pivot(localId)) {", "", "", "}")
             "should produce a warning" - {
-                testingProgram shouldCompileWith warning(expectedWarningMessage)
+                testingProgram shouldCompileWith warning(EXPECTED_WARNING_MESSAGE)
             }
         }
         "but wrapped inside another function declaration" - {
@@ -38,4 +35,9 @@ class TestLoopWithoutAlignWarning : FreeSpec({
             }
         }
     }
-})
+}) {
+    companion object {
+        const val EXPECTED_WARNING_MESSAGE = "Warning: aggregate function \"exampleAggregate\" called inside a loop " +
+                "with no manual alignment operation"
+    }
+}
