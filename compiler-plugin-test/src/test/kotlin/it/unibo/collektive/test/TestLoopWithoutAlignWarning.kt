@@ -38,6 +38,6 @@ class TestLoopWithoutAlignWarning : FreeSpec({
 }) {
     companion object {
         const val EXPECTED_WARNING_MESSAGE = "Warning: aggregate function \"exampleAggregate\" called inside a loop " +
-                "with no manual alignment operation"
+            "with no manual alignment operation"
     }
 }
