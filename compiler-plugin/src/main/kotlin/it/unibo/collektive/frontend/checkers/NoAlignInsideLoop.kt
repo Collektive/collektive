@@ -1,7 +1,6 @@
 package it.unibo.collektive.frontend.checkers
 
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isAggregate
-import it.unibo.collektive.frontend.checkers.CheckersUtility.PluginErrors
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
@@ -25,12 +24,12 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
             return false
         }
         return loopElementIndex > functionDeclarationIndex &&
-                containingElements
-                    .drop(loopElementIndex)
-                    .dropLast(1)
-                    .filterIsInstance<FirFunctionCall>()
-                    .map { it.calleeReference.name.asString() }
-                    .none { it == "alignedOn" }
+            containingElements
+                .drop(loopElementIndex)
+                .dropLast(1)
+                .filterIsInstance<FirFunctionCall>()
+                .map { it.calleeReference.name.asString() }
+                .none { it == "alignedOn" }
     }
 
     override fun check(
@@ -44,7 +43,7 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         ) {
             reporter.reportOn(
                 expression.calleeReference.source,
-                PluginErrors.DOT_CALL_WARNING,
+                CheckersUtility.PluginErrors.DOT_CALL_WARNING,
                 "Warning: aggregate function \"$calleeName\" called inside a loop with no manual alignment operation",
                 context,
             )

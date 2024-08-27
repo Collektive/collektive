@@ -49,5 +49,4 @@ object CheckersUtility {
      */
     fun CheckerContext.isInsideAggregateFunction(): Boolean =
         containingElements.any { (it as? FirSimpleFunction)?.receiverParameter?.isAggregate(session) == true }
-
 }
