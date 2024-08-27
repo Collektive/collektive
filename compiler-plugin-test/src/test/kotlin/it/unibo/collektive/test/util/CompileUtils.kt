@@ -43,6 +43,12 @@ object CompileUtils {
             )
         }
 
+        fun import(javaClass: Class<*>): KotlinTestingProgram =
+            put(
+                "imports",
+                properties["imports"] + "\nimport " + javaClass.name,
+            )
+
         infix fun shouldCompileWith(compilationCheck: (JvmCompilationResult) -> Unit) {
             println(program)
             println(properties)
