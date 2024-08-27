@@ -16,7 +16,7 @@ class TestLoopWithoutAlignWarning : FreeSpec({
         listOf(
             "exampleAggregate" to "exampleAggregate()",
             "neighboring" to "neighboring(0)",
-        ).forEach{
+        ).forEach {
             "${it.first} without a specific alignedOn" - {
                 "should produce a warning" - {
                     val testingProgram = testingProgramTemplate
@@ -39,7 +39,9 @@ class TestLoopWithoutAlignWarning : FreeSpec({
                 "should produce a warning" - {
                     val testingProgramWithCustomFunction = testingProgram
                         .put("aggregate", it.second)
-                    testingProgramWithCustomFunction shouldCompileWith warning(EXPECTED_WARNING_MESSAGE.format(it.first))
+                    testingProgramWithCustomFunction shouldCompileWith warning(
+                        EXPECTED_WARNING_MESSAGE.format(it.first),
+                    )
                 }
             }
             "${it.first} wrapped inside another function declaration" - {
@@ -51,7 +53,6 @@ class TestLoopWithoutAlignWarning : FreeSpec({
                 }
             }
         }
-
     }
 }) {
     companion object {
