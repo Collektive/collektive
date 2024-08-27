@@ -27,12 +27,26 @@ object CheckersUtility {
         )
     }
 
+    /**
+     * Checks is a specific receiver parameter is `Aggregate` (`Aggregate<ID>.example()`).
+     * @param session [FirSession] session of the [CheckerContext].
+     * @return [Boolean] **true** if it's an `Aggregate` function, **false** otherwise.
+     */
     fun FirReceiverParameter.isAggregate(session: FirSession): Boolean =
         this.typeRef.toClassLikeSymbol(session)?.name?.asString() == "Aggregate"
 
+    /**
+     * Checks if the function that is called is an `Aggregate` one.
+     * @param session [FirSession] session of the [CheckerContext].
+     * @return [Boolean] **true** if it's an `Aggregate` function, **false** otherwise.
+     */
     fun FirFunctionCall.isAggregate(session: FirSession): Boolean =
         toResolvedCallableSymbol()?.receiverParameter?.isAggregate(session) == true
 
+    /**
+     * Checks if the current [CheckerContext] is wrapped inside an `Aggregate` function.
+     * @return [Boolean] **true** if it is wrapped inside an `Aggregate` function, **false** otherwise.
+     */
     fun CheckerContext.isInsideAggregateFunction(): Boolean =
         containingElements.any { (it as? FirSimpleFunction)?.receiverParameter?.isAggregate(session) == true }
 
