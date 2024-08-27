@@ -23,10 +23,12 @@ object CompileUtils {
         }.compile()
     }
 
-    data class KotlinTestingProgram(val fileName: String,
-                                    private val template: String,
-                                    val program: String,
-                                    private val properties: Map<String, String>) {
+    data class KotlinTestingProgram(
+        val fileName: String,
+        private val template: String,
+        val program: String,
+        private val properties: Map<String, String>,
+    ) {
 
         fun formatCode(vararg args: Any?): KotlinTestingProgram =
             KotlinTestingProgram(fileName, template, program.format(*args), properties)
@@ -56,24 +58,30 @@ object CompileUtils {
 
     fun testingProgramFromResource(fileName: String): KotlinTestingProgram {
         val content: String = checkNotNull(ClassLoader.getSystemClassLoader().getResource(fileName)).readText()
-        return KotlinTestingProgram(
-            fileName,
-            content,
-            content,
-            HashMap(),
-        )
+        return KotlinTestingProgram(fileName, content, content, HashMap())
     }
 
     enum class ProgramTemplates(val fileName: String, val defaultProperties: Map<String, String>) {
-        SINGLE_AGGREGATE_LINE("SingleAggregateLine.template.kt",
-            mapOf("imports" to "", "code" to "",)),
-        SINGLE_AGGREGATE_IN_A_LOOP("SingleAggregateInLoop.template.kt",
-            mapOf("imports" to "", "beforeLoop" to "", "afterLoop" to "", "beforeAggregate" to "",
-                "afterAggregate" to "", "aggregate" to "exampleAggregate()",)
+        SINGLE_AGGREGATE_LINE(
+            "SingleAggregateLine.template.kt",
+            mapOf(
+                "imports" to "",
+                "code" to "",
+            ),
+        ),
+        SINGLE_AGGREGATE_IN_A_LOOP(
+            "SingleAggregateInLoop.template.kt",
+            mapOf(
+                "imports" to "",
+                "beforeLoop" to "",
+                "afterLoop" to "",
+                "beforeAggregate" to "",
+                "afterAggregate" to "",
+                "aggregate" to "exampleAggregate()",
+            ),
         ),
     }
 
     fun testingProgramFromTemplate(template: ProgramTemplates): KotlinTestingProgram =
         testingProgramFromResource(template.fileName).copy(properties = template.defaultProperties).put("", "")
-
 }

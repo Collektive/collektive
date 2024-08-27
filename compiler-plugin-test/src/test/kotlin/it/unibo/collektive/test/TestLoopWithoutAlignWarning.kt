@@ -10,7 +10,9 @@ import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 @OptIn(ExperimentalCompilerApi::class)
 class TestLoopWithoutAlignWarning : FreeSpec({
     "A single aggregate function called inside a loop" - {
-        val testingProgramTemplate = CompileUtils.testingProgramFromTemplate(ProgramTemplates.SINGLE_AGGREGATE_IN_A_LOOP)
+        val testingProgramTemplate = CompileUtils.testingProgramFromTemplate(
+            ProgramTemplates.SINGLE_AGGREGATE_IN_A_LOOP,
+        )
         "without a specific alignedOn" - {
             "should produce a warning" - {
                 testingProgramTemplate shouldCompileWith warning(EXPECTED_WARNING_MESSAGE)
