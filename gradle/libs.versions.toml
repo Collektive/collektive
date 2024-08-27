@@ -10,9 +10,11 @@ kotlin = "2.0.10"
 alchemist-api = { module = "it.unibo.alchemist:alchemist-api", version.ref = "alchemist" }
 alchemist = { module = "it.unibo.alchemist:alchemist", version.ref = "alchemist" }
 apache-commons-codec = "commons-codec:commons-codec:1.17.1"
+apache-commons-text = "org.apache.commons:commons-text:1.12.0"
 arrow = "io.arrow-kt:arrow-core:1.2.4"
 caffeine = "com.github.ben-manes.caffeine:caffeine:3.1.8"
 javap = "com.perfma.wrapped:com.sun.tools:1.8.0_jdk8u275-b01_linux_x64"
+kctfork = "dev.zacsweers.kctfork:core:0.5.1"
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-framework-datatest = { module = "io.kotest:kotest-framework-datatest", version.ref = "kotest" }
@@ -26,7 +28,6 @@ kotlin-test-annotations-common = { module = "org.jetbrains.kotlin:kotlin-test-an
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlinpoet = "com.squareup:kotlinpoet:1.18.1"
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
-kctfork = "dev.zacsweers.kctfork:core:0.5.1"
 slf4j = "org.slf4j:slf4j-api:2.0.16"
 
 [bundles]
