@@ -7,7 +7,9 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 import it.unibo.collektive.AlignmentComponentRegistrar
+import org.apache.commons.text.StringSubstitutor
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
+import java.util.HashMap
 
 @OptIn(ExperimentalCompilerApi::class)
 object CompileUtils {
@@ -21,12 +23,27 @@ object CompileUtils {
         }.compile()
     }
 
-    data class KotlinTestingProgram(val fileName: String, val program: String) {
+    data class KotlinTestingProgram(val fileName: String,
+                                    private val template: String,
+                                    val program: String,
+                                    private val properties: Map<String, String>) {
 
         fun formatCode(vararg args: Any?): KotlinTestingProgram =
-            KotlinTestingProgram(fileName, program.format(*args))
+            KotlinTestingProgram(fileName, template, program.format(*args), properties)
+
+        fun put(key: String, value: String): KotlinTestingProgram {
+            val updateProperties = properties + (key to value)
+            return KotlinTestingProgram(
+                fileName,
+                template,
+                StringSubstitutor.replace(template, updateProperties, "%(", ")"),
+                updateProperties,
+            )
+        }
 
         infix fun shouldCompileWith(compilationCheck: (JvmCompilationResult) -> Unit) {
+            println(program)
+            println(properties)
             val result = compile(fileName, program)
             result.exitCode shouldBe KotlinCompilation.ExitCode.OK
             compilationCheck(result)
@@ -37,9 +54,26 @@ object CompileUtils {
 
     fun warning(warningMessage: String): (JvmCompilationResult) -> Unit = { it.messages shouldContain warningMessage }
 
-    fun testingProgramFromResource(fileName: String): KotlinTestingProgram =
-        KotlinTestingProgram(
+    fun testingProgramFromResource(fileName: String): KotlinTestingProgram {
+        val content: String = checkNotNull(ClassLoader.getSystemClassLoader().getResource(fileName)).readText()
+        return KotlinTestingProgram(
             fileName,
-            checkNotNull(ClassLoader.getSystemClassLoader().getResource(fileName)).readText(),
+            content,
+            content,
+            HashMap(),
         )
+    }
+
+    enum class ProgramTemplates(val fileName: String, val defaultProperties: Map<String, String>) {
+        SINGLE_AGGREGATE_LINE("SingleAggregateLine.template.kt",
+            mapOf("imports" to "", "code" to "",)),
+        SINGLE_AGGREGATE_IN_A_LOOP("SingleAggregateInLoop.template.kt",
+            mapOf("imports" to "", "beforeLoop" to "", "afterLoop" to "", "beforeAggregate" to "",
+                "afterAggregate" to "", "aggregate" to "exampleAggregate()",)
+        ),
+    }
+
+    fun testingProgramFromTemplate(template: ProgramTemplates): KotlinTestingProgram =
+        testingProgramFromResource(template.fileName).copy(properties = template.defaultProperties).put("", "")
+
 }
