@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 
 @OptIn(ExperimentalCompilerApi::class)
 class TestExplicitAlign : FreeSpec({
-    val testingProgramTemplate = CompileUtils.testingProgramFromResource("SingleAggregateLine.kt")
+    val testingProgramTemplate = CompileUtils.testingProgramFromResource("SingleAggregateLine.template.kt")
 
     "An explicit align function should not be used" - {
         val testingProgram = testingProgramTemplate.formatCode("align(null)")
