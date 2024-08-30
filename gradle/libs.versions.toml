@@ -56,7 +56,7 @@ gradlePluginPublish = { id = "com.gradle.plugin-publish", version = "1.2.2" }
 kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.65.2"
+kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.66.0"
 kover = "org.jetbrains.kotlinx.kover:0.8.3"
 multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:1.2.5"
 publishOnCentral = "org.danilopianini.publish-on-central:5.1.6"
