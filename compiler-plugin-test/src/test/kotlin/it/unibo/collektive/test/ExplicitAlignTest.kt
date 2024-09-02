@@ -7,7 +7,7 @@ import it.unibo.collektive.test.util.CompileUtils.warning
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 
 @OptIn(ExperimentalCompilerApi::class)
-class TestExplicitAlign : FreeSpec({
+class ExplicitAlignTest : FreeSpec({
     val testingProgramTemplate = CompileUtils.testingProgramFromTemplate(ProgramTemplates.SINGLE_AGGREGATE_LINE)
 
     "The `align` function" - {

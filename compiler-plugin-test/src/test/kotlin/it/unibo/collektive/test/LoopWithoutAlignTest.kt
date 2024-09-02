@@ -8,7 +8,7 @@ import it.unibo.collektive.test.util.CompileUtils.warning
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 
 @OptIn(ExperimentalCompilerApi::class)
-class TestLoopWithoutAlignWarning : FreeSpec({
+class LoopWithoutAlignTest : FreeSpec({
     "When being inside a loop in an Aggregate function" - {
         val testingProgramTemplate = CompileUtils.testingProgramFromTemplate(
             ProgramTemplates.SINGLE_AGGREGATE_IN_A_LOOP,
