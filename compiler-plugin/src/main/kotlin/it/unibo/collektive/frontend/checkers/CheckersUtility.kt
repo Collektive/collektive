@@ -34,7 +34,7 @@ object CheckersUtility {
      * @return [Boolean] **true** if it's an `Aggregate` function, **false** otherwise.
      */
     fun FirReceiverParameter.isAggregate(session: FirSession): Boolean =
-        this.typeRef.toClassLikeSymbol(session)?.name?.asString() == "Aggregate"
+        typeRef.toClassLikeSymbol(session)?.name?.asString() == "Aggregate"
 
     /**
      * Checks if the function that is called is an `Aggregate` one (i.e. is an extension of `Aggregate` or it's a
