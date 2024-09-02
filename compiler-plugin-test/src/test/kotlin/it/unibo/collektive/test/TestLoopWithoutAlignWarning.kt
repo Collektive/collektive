@@ -9,22 +9,22 @@ import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 
 @OptIn(ExperimentalCompilerApi::class)
 class TestLoopWithoutAlignWarning : FreeSpec({
-    "A single aggregate function called inside a loop: " - {
+    "When being inside a loop in an Aggregate function" - {
         val testingProgramTemplate = CompileUtils.testingProgramFromTemplate(
             ProgramTemplates.SINGLE_AGGREGATE_IN_A_LOOP,
         )
         listOf(
             "exampleAggregate" to "exampleAggregate()",
             "neighboring" to "neighboring(0)",
-        ).forEach {
-            "${it.first} without a specific alignedOn" - {
+        ).forEach { (functionName, functionCall) ->
+            "using $functionName without a specific alignedOn" - {
                 "should produce a warning" - {
                     val testingProgram = testingProgramTemplate
-                        .put("aggregate", it.second)
-                    testingProgram shouldCompileWith warning(EXPECTED_WARNING_MESSAGE.format(it.first))
+                        .put("aggregate", functionCall)
+                    testingProgram shouldCompileWith warning(EXPECTED_WARNING_MESSAGE.format(functionName))
                 }
             }
-            "${it.first} with a specific alignedOn" - {
+            "using $functionName wrapped in a specific alignedOn" - {
                 val testingProgram = testingProgramTemplate
                     .put("beforeAggregate", "alignedOn(pivot(localId)) {")
                     .put("afterAggregate", "}")
@@ -32,19 +32,19 @@ class TestLoopWithoutAlignWarning : FreeSpec({
                     testingProgram shouldCompileWith noWarning
                 }
             }
-            "${it.first} with a specific alignedOn placed outside the loop" - {
+            "using $functionName wrapped in a specific alignedOn outside the loop" - {
                 val testingProgram = testingProgramTemplate
                     .put("beforeLoop", "alignedOn(pivot(localId)) {")
                     .put("afterLoop", "}")
                 "should produce a warning" - {
                     val testingProgramWithCustomFunction = testingProgram
-                        .put("aggregate", it.second)
+                        .put("aggregate", functionCall)
                     testingProgramWithCustomFunction shouldCompileWith warning(
-                        EXPECTED_WARNING_MESSAGE.format(it.first),
+                        EXPECTED_WARNING_MESSAGE.format(functionName),
                     )
                 }
             }
-            "${it.first} wrapped inside another function declaration" - {
+            "using $functionName wrapped inside another function declaration" - {
                 val testingProgram = testingProgramTemplate
                     .put("beforeAggregate", "fun Aggregate<Int>.test() {")
                     .put("afterAggregate", "}")

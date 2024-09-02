@@ -10,15 +10,15 @@ import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 class TestExplicitAlign : FreeSpec({
     val testingProgramTemplate = CompileUtils.testingProgramFromTemplate(ProgramTemplates.SINGLE_AGGREGATE_LINE)
 
-    "An explicit align function should not be used" - {
+    "The `align` function" - {
         val testingProgram = testingProgramTemplate.put("code", "align(null)")
-        "should produce a warning" - {
+        "should produce a warning when used explicitly" - {
             testingProgram shouldCompileWith warning(EXPECTED_WARNING_MESSAGE.format("align"))
         }
     }
-    "An explicit dealign function should not be used" - {
+    "The `dealign` function" - {
         val testingProgram = testingProgramTemplate.put("code", "dealign()")
-        "should produce a warning" - {
+        "should produce a warning when used explicitly" - {
             testingProgram shouldCompileWith warning(EXPECTED_WARNING_MESSAGE.format("dealign"))
         }
     }
