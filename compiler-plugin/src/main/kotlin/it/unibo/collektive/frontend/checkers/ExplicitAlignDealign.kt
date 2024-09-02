@@ -19,7 +19,7 @@ object ExplicitAlignDealign : FirFunctionCallChecker(MppCheckerKind.Common) {
             reporter.reportOn(
                 expression.calleeReference.source,
                 PluginErrors.DOT_CALL_WARNING,
-                "Warning: \"%s\" method should not be explicitly used".format(calleeName),
+                "Warning: $calleeName method should not be explicitly used",
                 context,
             )
         }
