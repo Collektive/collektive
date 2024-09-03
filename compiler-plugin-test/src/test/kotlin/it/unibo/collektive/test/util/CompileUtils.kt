@@ -7,7 +7,6 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 import it.unibo.collektive.AlignmentComponentRegistrar
-import org.apache.commons.text.StringSubstitutor
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import java.util.HashMap
 
@@ -38,7 +37,7 @@ object CompileUtils {
             return KotlinTestingProgram(
                 fileName,
                 template,
-                StringSubstitutor.replace(template, updateProperties, "%(", ")"),
+                StringSubstitutor.replace(template, updateProperties),
                 updateProperties,
             )
         }
@@ -50,8 +49,6 @@ object CompileUtils {
             )
 
         infix fun shouldCompileWith(compilationCheck: (JvmCompilationResult) -> Unit) {
-            println(program)
-            println(properties)
             val result = compile(fileName, program)
             result.exitCode shouldBe KotlinCompilation.ExitCode.OK
             compilationCheck(result)
@@ -70,19 +67,11 @@ object CompileUtils {
     enum class ProgramTemplates(val fileName: String, val defaultProperties: Map<String, String>) {
         SINGLE_AGGREGATE_LINE(
             "SingleAggregateLine.template.kt",
-            mapOf(
-                "imports" to "",
-                "code" to "",
-            ),
+            mapOf(),
         ),
         SINGLE_AGGREGATE_IN_A_LOOP(
             "SingleAggregateInLoop.template.kt",
             mapOf(
-                "imports" to "",
-                "beforeLoop" to "",
-                "afterLoop" to "",
-                "beforeAggregate" to "",
-                "afterAggregate" to "",
                 "aggregate" to "exampleAggregate()",
             ),
         ),
@@ -90,4 +79,16 @@ object CompileUtils {
 
     fun testingProgramFromTemplate(template: ProgramTemplates): KotlinTestingProgram =
         testingProgramFromResource(template.fileName).copy(properties = template.defaultProperties).put("", "")
+
+    object StringSubstitutor {
+        fun replace(
+            template: String,
+            properties: Map<String, String>,
+        ): String {
+            return template.replace(Regex("%\\(([^)]+)\\)")) { matchResult ->
+                val key = matchResult.groupValues[1]
+                properties[key].orEmpty()
+            }
+        }
+    }
 }
