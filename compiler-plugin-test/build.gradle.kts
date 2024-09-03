@@ -24,7 +24,6 @@ kotlinJvm {
             dependencies {
                 implementation("it.unibo.collektive:compiler-plugin")
                 implementation(libs.bundles.kotlin.compiler)
-                implementation(libs.apache.commons.codec)
                 implementation(libs.slf4j)
             }
         }
