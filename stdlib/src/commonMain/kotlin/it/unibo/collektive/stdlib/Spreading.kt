@@ -8,6 +8,54 @@ import kotlin.jvm.JvmName
 import kotlin.jvm.JvmOverloads
 
 /**
+ * Compute the [Distance] from the closest [source], starting from [bottom] and up to [top].
+ *
+ * the [Distance] between neighboring devices is computed using the [metric] function,
+ * the distance summation is governed by the [accumulateDistance] function.
+ */
+inline fun <ID : Any, Distance : Comparable<Distance>> Aggregate<ID>.distanceTo(
+    source: Boolean,
+    bottom: Distance,
+    top: Distance,
+    crossinline accumulateDistance: (Distance, Distance) -> Distance,
+    crossinline metric: () -> Field<ID, Distance>,
+): Distance = gradientCast(
+    source = source,
+    local = if (source) bottom else top,
+    bottom = bottom,
+    top = top,
+    accumulateData = { neighborToSource, hereToNeighbor, _ -> accumulateDistance(neighborToSource, hereToNeighbor) },
+    accumulateDistance,
+    metric,
+)
+
+/**
+ * Compute the distance from the closest [source], using [Int]egers.
+ *
+ * The distance between neighboring devices is computed using the [metric] function,
+ * and defaults to the hop distance.
+ */
+@JvmOverloads
+@JvmName("distanceToInt")
+inline fun <ID : Any> Aggregate<ID>.distanceTo(
+    source: Boolean,
+    crossinline metric: () -> Field<ID, Int> = { neighboring(1) },
+): Int = distanceTo(source, 0, Int.MAX_VALUE, Int::plus, metric)
+
+/**
+ * Compute the distance from the closest [source], using [Double]s.
+ *
+ * The distance between neighboring devices is computed using the [metric] function,
+ * and defaults to the hop distance.
+ */
+@JvmOverloads
+@JvmName("distanceToDouble")
+inline fun <ID : Any> Aggregate<ID>.distanceTo(
+    source: Boolean,
+    crossinline metric: () -> Field<ID, Double> = { neighboring(1.0) },
+): Double = distanceTo(source, 0.0, Double.POSITIVE_INFINITY, Double::plus, metric)
+
+/**
  * Propagate [local] values across a spanning tree starting from the closest [source].
  *
  * If there are no sources and no neighbors, default to [local] value.
