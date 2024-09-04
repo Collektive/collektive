@@ -14,6 +14,13 @@ val generateFieldFunctionsForTypes by tasks.registering(CollektiveCodegenTask::c
     outputDir = layout.buildDirectory.dir("generated/kotlin/collektive").get().asFile
 }
 
+// Avoid verification tasks to complain about being not dependent on the code generation tasks
+tasks.withType<SourceTask>().configureEach {
+    if (this is VerificationTask) {
+        dependsOn(generateFieldFunctionsForTypes)
+    }
+}
+
 kotlinMultiplatform {
     sourceSets {
         val commonMain by getting {
