@@ -12,9 +12,9 @@ fun Aggregate<Int>.exampleAggregate(): Int = 0
 fun Aggregate<Int>.x(pivot: (Int) -> Any?) {
     %(beforeLoop)
     for (j in listOf(1, 2, 3)) {
-        %(beforeAggregate)
-        %(aggregate)
-        %(afterAggregate)
+        %(beforeMainCode)
+        %(mainCode)
+        %(afterMainCode)
     }
     %(afterLoop)
 }

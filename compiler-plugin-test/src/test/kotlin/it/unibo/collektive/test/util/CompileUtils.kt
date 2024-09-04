@@ -32,8 +32,10 @@ object CompileUtils {
         fun formatCode(vararg args: Any?): KotlinTestingProgram =
             KotlinTestingProgram(fileName, template, program.format(*args), properties)
 
-        fun put(key: String, value: String): KotlinTestingProgram {
-            val updateProperties = properties + (key to value)
+        fun put(key: String, value: String): KotlinTestingProgram = putAll(mapOf(key to value))
+
+        fun putAll(newProperties: Map<String, String>): KotlinTestingProgram {
+            val updateProperties = properties + newProperties
             return KotlinTestingProgram(
                 fileName,
                 template,
@@ -72,7 +74,7 @@ object CompileUtils {
         SINGLE_AGGREGATE_IN_A_LOOP(
             "SingleAggregateInLoop.template.kt",
             mapOf(
-                "aggregate" to "exampleAggregate()",
+                "mainCode" to "exampleAggregate()",
             ),
         ),
     }

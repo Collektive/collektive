@@ -5,12 +5,13 @@ import it.unibo.collektive.test.util.CompileUtils
 import it.unibo.collektive.test.util.CompileUtils.ProgramTemplates
 import it.unibo.collektive.test.util.CompileUtils.noWarning
 import it.unibo.collektive.test.util.CompileUtils.warning
+import it.unibo.collektive.test.util.KotlinTestingProgramDsl.fillWith
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 
 @OptIn(ExperimentalCompilerApi::class)
 class LoopWithoutAlignTest : FreeSpec({
     "When being inside a loop in an Aggregate function" - {
-        val testingProgramTemplate = CompileUtils.testingProgramFromTemplate(
+        val template = CompileUtils.testingProgramFromTemplate(
             ProgramTemplates.SINGLE_AGGREGATE_IN_A_LOOP,
         )
         listOf(
@@ -19,37 +20,37 @@ class LoopWithoutAlignTest : FreeSpec({
         ).forEach { (functionName, functionCall) ->
             "using $functionName without a specific alignedOn" - {
                 "should produce a warning" - {
-                    val testingProgram = testingProgramTemplate
-                        .put("aggregate", functionCall)
-                    testingProgram shouldCompileWith warning(EXPECTED_WARNING_MESSAGE.format(functionName))
+                    template fillWith {
+                        functionCall inside "mainCode"
+                    } shouldCompileWith warning(EXPECTED_WARNING_MESSAGE.format(functionName))
                 }
             }
             "using $functionName wrapped in a specific alignedOn" - {
-                val testingProgram = testingProgramTemplate
-                    .put("beforeAggregate", "alignedOn(pivot(localId)) {")
-                    .put("afterAggregate", "}")
                 "should compile without any warning" - {
-                    testingProgram shouldCompileWith noWarning
+                    template fillWith {
+                        "alignedOn(pivot(localId))" wrapping {
+                            "mainCode"
+                        }
+                    } shouldCompileWith noWarning
                 }
             }
             "using $functionName wrapped in a specific alignedOn outside the loop" - {
-                val testingProgram = testingProgramTemplate
-                    .put("beforeLoop", "alignedOn(pivot(localId)) {")
-                    .put("afterLoop", "}")
-                "should produce a warning" - {
-                    val testingProgramWithCustomFunction = testingProgram
-                        .put("aggregate", functionCall)
-                    testingProgramWithCustomFunction shouldCompileWith warning(
-                        EXPECTED_WARNING_MESSAGE.format(functionName),
-                    )
-                }
+                template fillWith {
+                    "alignedOn(pivot(localId))" wrapping {
+                        "loop"
+                    }
+                    functionCall inside "mainCode"
+                } shouldCompileWith warning(
+                    EXPECTED_WARNING_MESSAGE.format(functionName),
+                )
             }
             "using $functionName wrapped inside another function declaration" - {
-                val testingProgram = testingProgramTemplate
-                    .put("beforeAggregate", "fun Aggregate<Int>.test() {")
-                    .put("afterAggregate", "}")
                 "should compile without any warning" - {
-                    testingProgram shouldCompileWith noWarning
+                    template fillWith {
+                        "fun Aggregate<Int>.test()" wrapping {
+                            "mainCode"
+                        }
+                    } shouldCompileWith noWarning
                 }
             }
         }

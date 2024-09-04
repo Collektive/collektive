@@ -7,5 +7,7 @@ import it.unibo.collektive.aggregate.api.Aggregate
     piece of code inside them (avoiding having to create multiple testing sources).
 */
 fun Aggregate<Int>.x() {
-    %(code)
+    %(beforeMainCode)
+    %(mainCode)
+    %(afterMainCode)
 }
