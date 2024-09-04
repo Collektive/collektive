@@ -16,15 +16,15 @@ import kotlin.jvm.JvmOverloads
  * [accumulateData] is used to modify data from neighbors on the fly, and defaults to the identity function.
  */
 @JvmOverloads
-inline fun <ID : Any, Type, Distance : Comparable<Distance>> Aggregate<ID>.gradientCast(
+inline fun <ID : Any, Value, Distance : Comparable<Distance>> Aggregate<ID>.gradientCast(
     source: Boolean,
-    local: Type,
+    local: Value,
     bottom: Distance,
     top: Distance,
-    crossinline accumulateData: (Distance, Distance, Type) -> Type = { _, _, data -> data },
+    crossinline accumulateData: (Distance, Distance, Value) -> Value = { _, _, data -> data },
     crossinline accumulateDistance: (Distance, Distance) -> Distance,
     crossinline metric: () -> Field<ID, Distance>,
-): Type {
+): Value {
     val topValue = top to local
     return share(topValue) { neighborData ->
         val paths = neighborData.alignedMap(metric()) { (fromSource, data), toNeighbor ->
@@ -34,9 +34,9 @@ inline fun <ID : Any, Type, Distance : Comparable<Distance>> Aggregate<ID>.gradi
         }
         when {
             source -> bottom to local
-            else -> paths.minBy(base = topValue) { it.first }
+            else -> paths.minBy(base = topValue) { it.first } // sort by distance from the nearest source
         }
-    }.second
+    }.second // return the data
 }
 
 /**
