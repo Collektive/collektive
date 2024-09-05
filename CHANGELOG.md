@@ -1,3 +1,64 @@
+## [10.2.0](https://github.com/Collektive/collektive/compare/10.1.3...10.2.0) (2024-09-05)
+
+### Features
+
+* introduce the gradientCast ([G operator](https://doi.org/10.1145/3177774)) ([cfa6d81](https://github.com/Collektive/collektive/commit/cfa6d8109c920ca3723f176ba5507ebcf46b1b7c))
+* **stdlib:** add `distanceTo` ([e797eb1](https://github.com/Collektive/collektive/commit/e797eb1c452001a6eb44ad34ce84800e011f6289))
+* **test-tooling:** create the test-tooling subproject ([21ae4ac](https://github.com/Collektive/collektive/commit/21ae4acbeac6a892f5f4a1962cb2e8fe29715675))
+
+### Dependency updates
+
+* **deps:** update alchemist to v34.1.0 ([a194b2c](https://github.com/Collektive/collektive/commit/a194b2cde6bb4f9672980cb423f1e06c907e069a))
+* **deps:** update alchemist to v34.1.1 ([7426995](https://github.com/Collektive/collektive/commit/7426995661e42b10ebf9531e3a8b646f31149d8f))
+* **deps:** update alchemist to v34.1.2 ([5fde81b](https://github.com/Collektive/collektive/commit/5fde81b131651384ead9e55ccdf42659c189ab03))
+* **deps:** update alchemist to v34.1.3 ([48d8275](https://github.com/Collektive/collektive/commit/48d8275ff385747e40350c52d95dc2655da153d7))
+* **deps:** update dependency gradle to v8.10 ([02ae6d6](https://github.com/Collektive/collektive/commit/02ae6d66998fe48ed243627ec1e40617694aa575))
+* **deps:** update dependency org.slf4j:slf4j-api to v2.0.14 ([9a5c95b](https://github.com/Collektive/collektive/commit/9a5c95b7bfd8e4a74e4adcdb85e208bdc51c3d27))
+* **deps:** update dependency org.slf4j:slf4j-api to v2.0.15 ([72d2922](https://github.com/Collektive/collektive/commit/72d2922c09837c73076aa375a4b2d2faf91af0af))
+* **deps:** update dependency org.slf4j:slf4j-api to v2.0.16 ([1b1a796](https://github.com/Collektive/collektive/commit/1b1a796547a5fb85a85ffba095484a94749be018))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.100 ([33e866e](https://github.com/Collektive/collektive/commit/33e866e019b5f2ce7ba0570497c0cbffa6f47835))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.101 ([dc48b96](https://github.com/Collektive/collektive/commit/dc48b96e3f7449cc430839d60641b556c5e154a1))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.96 ([edc1337](https://github.com/Collektive/collektive/commit/edc133760ab4502a286a4e0ff94c30dd2bec3cbb))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.97 ([21b96fb](https://github.com/Collektive/collektive/commit/21b96fb3a6fe9f1b82bacbe340dcb0c0db167acb))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.98 ([9ec46a6](https://github.com/Collektive/collektive/commit/9ec46a63e04d9aa20ae78192c8a3820a506d2cae))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.99 ([cad19f8](https://github.com/Collektive/collektive/commit/cad19f8ac41e646f157d2efc3640de1f5d97da3b))
+* **deps:** update node.js to 20.17 ([7424283](https://github.com/Collektive/collektive/commit/7424283553b3ffcd7f00003cd18cf27c836b4078))
+* **deps:** update plugin com.gradle.develocity to v3.18 ([6acaeca](https://github.com/Collektive/collektive/commit/6acaeca2898496b818b7e9a873aebf726fd22d67))
+* **deps:** update plugin gradlepluginpublish to v1.2.2 ([b9999ca](https://github.com/Collektive/collektive/commit/b9999caad79fa6b0bedece406ddf4d2f2c41d021))
+* **deps:** update plugin kotlin-qa to v0.65.1 ([f3fc463](https://github.com/Collektive/collektive/commit/f3fc46378bfd0e3a8511def90f7ad417f269b393))
+* **deps:** update plugin kotlin-qa to v0.65.2 ([c811253](https://github.com/Collektive/collektive/commit/c81125327baff436c26fd69a033aedf309a05a25))
+* **deps:** update plugin kotlin-qa to v0.66.0 ([c74023d](https://github.com/Collektive/collektive/commit/c74023d95f523611828c96bf59b3c043dbbc2faf))
+* **deps:** update plugin kotlin-qa to v0.66.1 ([828b1b6](https://github.com/Collektive/collektive/commit/828b1b65493f2f191d8577bf379c3ae0abb8f533))
+* **deps:** update plugin multijvmtesting to v1.2.4 ([67d8c51](https://github.com/Collektive/collektive/commit/67d8c510b30e2d82c2fbfe1ddb93ddc52bc595f8))
+* **deps:** update plugin multijvmtesting to v1.2.5 ([915e629](https://github.com/Collektive/collektive/commit/915e629158b67b1ce662c51faa01d9e39214b42e))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.9 ([fe92b05](https://github.com/Collektive/collektive/commit/fe92b05813b97216e8de5a417226c7fadd5c4340))
+* **deps:** update plugin publishoncentral to v5.1.5 ([e2490ca](https://github.com/Collektive/collektive/commit/e2490ca48c65187d538b5ded6a98acf121ad0725))
+* **deps:** update plugin publishoncentral to v5.1.6 ([4899cad](https://github.com/Collektive/collektive/commit/4899cad6efd02b710b2cb65efddfcd2ba4181d0f))
+
+### Bug Fixes
+
+* **test-tooling:** make the node program private ([eca4d00](https://github.com/Collektive/collektive/commit/eca4d00be340292a884dc6b12abe1cd134cceeef))
+
+### Tests
+
+* **stdlib:** clarify as per [@nicolasfara](https://github.com/nicolasfara)'s suggestion ([2e2c6f1](https://github.com/Collektive/collektive/commit/2e2c6f16259207ec285e21773f5efe04e45f5c6d))
+* **stdlib:** write a distanceTo test ([de77e97](https://github.com/Collektive/collektive/commit/de77e97639a06d629ddef00c708fcdc5a1237e18))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.3 ([1e79a59](https://github.com/Collektive/collektive/commit/1e79a590ec1fab78ec3ef5113c31e01cc6e3b14d))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.4 ([b52f6fc](https://github.com/Collektive/collektive/commit/b52f6fcddd88a7044d03fddfe682bc2d71f2e17a))
+* **dsl:** write projects first in the dependency list ([fb94f58](https://github.com/Collektive/collektive/commit/fb94f58304f2902a98827311c4cefd7593b92d99))
+* **stdlib:** import the kotest junit5 jvm runner for testing ([3a3f32f](https://github.com/Collektive/collektive/commit/3a3f32fe4b934fbed3c1025a0d95c66ac90f1b43))
+
+### General maintenance
+
+* setup the copyright header in Idea ([6e50d41](https://github.com/Collektive/collektive/commit/6e50d419d7c924e530f1c1c32854e1c54b34bf50))
+
+### Style improvements
+
+* **stdlib:** apply [@cric96](https://github.com/cric96)'s suggestions ([0f278f5](https://github.com/Collektive/collektive/commit/0f278f5722f730ee50814b040c13c3309ad8981b))
+
 ## [10.1.3](https://github.com/Collektive/collektive/compare/10.1.2...10.1.3) (2024-08-06)
 
 ### Dependency updates
