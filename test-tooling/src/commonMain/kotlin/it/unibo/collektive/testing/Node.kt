@@ -21,7 +21,7 @@ class Node<R>(
     val environment: Environment<R>,
     val id: Int,
     var value: R,
-    val program: Aggregate<Int>.(Environment<R>) -> R,
+    private val program: Aggregate<Int>.(Environment<R>) -> R,
 ) {
 
     private var network = NetworkDevice()
