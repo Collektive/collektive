@@ -29,6 +29,12 @@ kotlinMultiplatform {
             }
             kotlin.srcDirs(generateFieldFunctionsForTypes)
         }
+        val commonTest by getting {
+            dependencies {
+                implementation(project(":test-tooling"))
+                implementation(libs.bundles.kotlin.testing.common)
+            }
+        }
     }
 }
 
