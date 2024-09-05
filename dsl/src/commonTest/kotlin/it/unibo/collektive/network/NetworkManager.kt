@@ -4,7 +4,7 @@ import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.OutboundMessage
 
 /**
- * Implementation of the Network interface.
+ * A fully connected virtual network.
  */
 class NetworkManager {
     private var messageBuffer: Set<OutboundMessage<Int>> = emptySet()

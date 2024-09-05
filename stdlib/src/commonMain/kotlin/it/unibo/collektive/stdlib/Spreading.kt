@@ -36,8 +36,7 @@ inline fun <ID : Any, Distance : Comparable<Distance>> Aggregate<ID>.distanceTo(
  * and defaults to the hop distance.
  */
 @JvmOverloads
-@JvmName("distanceToInt")
-inline fun <ID : Any> Aggregate<ID>.distanceTo(
+inline fun <ID : Any> Aggregate<ID>.intDistanceTo(
     source: Boolean,
     crossinline metric: () -> Field<ID, Int> = { neighboring(1) },
 ): Int = distanceTo(source, 0, Int.MAX_VALUE, Int::plus, metric)
@@ -49,7 +48,6 @@ inline fun <ID : Any> Aggregate<ID>.distanceTo(
  * and defaults to the hop distance.
  */
 @JvmOverloads
-@JvmName("distanceToDouble")
 inline fun <ID : Any> Aggregate<ID>.distanceTo(
     source: Boolean,
     crossinline metric: () -> Field<ID, Double> = { neighboring(1.0) },
