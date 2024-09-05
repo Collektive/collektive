@@ -29,8 +29,8 @@ class TestDistanceTo : StringSpec({
         }
         abs(value - expected.toFloat()) < 1e-6
     }
-    fun mooreGridWithGradient() =
-        mooreGrid<Double>(10, 10, { _, _ -> Double.NaN }) { environment ->
+    fun mooreGridWithGradient(size: Int) =
+        mooreGrid<Double>(size, size, { _, _ -> Double.NaN }) { environment ->
             val localPosition = environment.positionOf(localId)
             distanceTo(localId == 0) { neighboring(localPosition).map { it.distanceTo(localPosition) } }
         }.apply {
@@ -42,12 +42,13 @@ class TestDistanceTo : StringSpec({
             }
         }
     "distanceTo in the luckiest case stabilizes in one cycle" {
-        val environment: Environment<Double> = mooreGridWithGradient()
+        val environment: Environment<Double> = mooreGridWithGradient(10)
         environment.cycleInOrder()
         environment.gradientIsStable(isMoore = true) shouldBe true
     }
     "distanceTo requires at most the longest path length cycles to stabilize" {
-        val environment: Environment<Double> = mooreGridWithGradient()
+        val size = 10
+        val environment: Environment<Double> = mooreGridWithGradient(size)
         environment.cycleInReverseOrder()
         val firstRound = environment.status()
         firstRound[0] shouldBe 0.0
@@ -57,7 +58,7 @@ class TestDistanceTo : StringSpec({
                 else -> value shouldBe Double.POSITIVE_INFINITY
             }
         }
-        repeat(times = 9) {
+        repeat(times = size - 1) { // One round per device has been executed already
             environment.gradientIsStable(isMoore = true) shouldBe false
             environment.cycleInReverseOrder()
         }
