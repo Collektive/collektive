@@ -26,7 +26,7 @@ class LoopWithoutAlignTest : FreeSpec({
             }
             "using $functionName wrapped in a specific alignedOn" - {
                 val testingProgram = testingProgramTemplate
-                    .put("beforeAggregate", "alignedOn(pivot(localId)) {")
+                    .put("beforeAggregate", "alignedOn(0) {")
                     .put("afterAggregate", "}")
                 "should compile without any warning" - {
                     testingProgram shouldCompileWith noWarning
@@ -34,7 +34,7 @@ class LoopWithoutAlignTest : FreeSpec({
             }
             "using $functionName wrapped in a specific alignedOn outside the loop" - {
                 val testingProgram = testingProgramTemplate
-                    .put("beforeLoop", "alignedOn(pivot(localId)) {")
+                    .put("beforeLoop", "alignedOn(0) {")
                     .put("afterLoop", "}")
                 "should produce a warning" - {
                     val testingProgramWithCustomFunction = testingProgram
