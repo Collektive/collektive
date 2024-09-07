@@ -11,8 +11,8 @@ kotlinMultiplatform {
         }
         val commonTest by getting {
             dependencies {
-                implementation(rootProject.libs.bundles.kotlin.testing.common)
                 implementation(project(":stdlib"))
+                implementation(rootProject.libs.bundles.kotlin.testing.common)
             }
         }
 

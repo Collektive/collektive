@@ -1,0 +1,6 @@
+<component name="CopyrightManager">
+  <copyright>
+    <option name="notice" value="Copyright (c) &amp;#36;originalComment.match(&quot;Copyright \(c\) (\d+)&quot;, 1, &quot;-&quot;, &quot;&amp;#36;today.year&quot;)&amp;#36;today.year, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,&#10;and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.&#10;&#10;This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,&#10;as described in the LICENSE file in this project's repository's top directory." />
+    <option name="myName" value="collektive" />
+  </copyright>
+</component>
