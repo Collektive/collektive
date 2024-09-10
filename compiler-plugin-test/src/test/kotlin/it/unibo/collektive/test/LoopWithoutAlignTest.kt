@@ -56,7 +56,7 @@ class LoopWithoutAlignTest : FreeSpec({
     }
 }) {
     companion object {
-        const val EXPECTED_WARNING_MESSAGE = "Warning: aggregate function \"%s\" called inside a loop " +
+        const val EXPECTED_WARNING_MESSAGE = "Warning: aggregate function '%s' called inside a loop " +
             "with no manual alignment operation"
     }
 }

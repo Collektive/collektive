@@ -46,7 +46,7 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
             reporter.reportOn(
                 expression.calleeReference.source,
                 CheckersUtility.PluginErrors.DOT_CALL_WARNING,
-                "Warning: aggregate function \"$calleeName\" called inside a loop with no manual alignment operation",
+                "Warning: aggregate function '$calleeName' called inside a loop with no manual alignment operation",
                 context,
             )
         }
