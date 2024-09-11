@@ -9,7 +9,7 @@ fun Aggregate<Int>.exampleAggregate(): Int = 0
     The parts after "%" are placeholders for string formatting that allow putting an arbitrary
     piece of code inside them (avoiding having to create multiple testing sources).
 */
-fun Aggregate<Int>.x(pivot: (Int) -> Any?) {
+fun Aggregate<Int>.x() {
     %(beforeLoop)
     for (j in listOf(1, 2, 3)) {
         %(beforeMainCode)

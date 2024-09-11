@@ -27,6 +27,6 @@ class ExplicitAlignTest : FreeSpec({
     }
 }) {
     companion object {
-        const val EXPECTED_WARNING_MESSAGE = "Warning: \"%s\" method should not be explicitly used"
+        const val EXPECTED_WARNING_MESSAGE = "Warning: '%s' method should not be explicitly used"
     }
 }
