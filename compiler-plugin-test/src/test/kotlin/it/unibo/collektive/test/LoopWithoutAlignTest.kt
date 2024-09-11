@@ -28,7 +28,7 @@ class LoopWithoutAlignTest : FreeSpec({
             "using $functionName wrapped in a specific alignedOn" - {
                 "should compile without any warning" - {
                     template fillWith {
-                        "alignedOn(pivot(localId))" wrapping {
+                        "alignedOn(0)" wrapping {
                             "mainCode"
                         }
                     } shouldCompileWith noWarning
@@ -36,7 +36,7 @@ class LoopWithoutAlignTest : FreeSpec({
             }
             "using $functionName wrapped in a specific alignedOn outside the loop" - {
                 template fillWith {
-                    "alignedOn(pivot(localId))" wrapping {
+                    "alignedOn(0)" wrapping {
                         "loop"
                     }
                     functionCall inside "mainCode"
@@ -57,7 +57,7 @@ class LoopWithoutAlignTest : FreeSpec({
     }
 }) {
     companion object {
-        const val EXPECTED_WARNING_MESSAGE = "Warning: aggregate function \"%s\" called inside a loop " +
+        const val EXPECTED_WARNING_MESSAGE = "Warning: aggregate function '%s' called inside a loop " +
             "with no manual alignment operation"
     }
 }
