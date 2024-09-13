@@ -1,3 +1,16 @@
+## [10.3.1](https://github.com/Collektive/collektive/compare/10.3.0...10.3.1) (2024-09-13)
+
+### Dependency updates
+
+* **core-deps:** update dependency org.jetbrains.kotlinx:kotlinx-coroutines-core to v1.9.0 ([d06b1a4](https://github.com/Collektive/collektive/commit/d06b1a42f9525a82ce4cc1a3f1b741bf33918e11))
+* **deps:** update alchemist to v34.1.4 ([485b86d](https://github.com/Collektive/collektive/commit/485b86d674566ae12a3cebdf579bb1e434b002e4))
+* **deps:** update plugin multijvmtesting to v1.2.7 ([7343e54](https://github.com/Collektive/collektive/commit/7343e545e7ed99f8c4ff2f62c21cdfbe1aaa19c3))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.12 ([ab28284](https://github.com/Collektive/collektive/commit/ab2828449e1b0fd55c478b6201d92861ef786e2e))
+
+### Build and continuous integration
+
+* do not cancel in-progress builds ([b151f47](https://github.com/Collektive/collektive/commit/b151f47d9a95007b9da44744f14a39cb125d3b85))
+
 ## [10.3.0](https://github.com/Collektive/collektive/compare/10.2.0...10.3.0) (2024-09-13)
 
 ### Features
