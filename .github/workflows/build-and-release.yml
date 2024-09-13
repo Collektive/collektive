@@ -25,7 +25,7 @@ jobs:
     needs:
       - check-secrets
     concurrency:
-      group: staging-repo
+      group: staging-repo-${{ github.workflow }}-${{ github.event.number || github.ref }}
     if: ${{ needs.check-secrets.outputs.run-with-secrets == 'true' }}
     outputs:
       maven-central-repo-id: ${{ steps.staging-repo.outputs.MavenCentral }}
