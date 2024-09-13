@@ -72,6 +72,9 @@ sealed interface Field<ID : Any, out T> {
      */
     val neighbors: Collection<ID>
 
+    /**
+     * Base operations on [Field]s.
+     */
     companion object {
 
         /**
@@ -186,7 +189,7 @@ internal class ArrayBasedField<ID : Any, T>(
 
     override fun asSequence(): Sequence<Pair<ID, T>> = others.asSequence() + (localId to localValue)
 
-    companion object {
+    private companion object {
         const val MAP_OVER_LIST_PERFORMANCE_CROSSING_POINT = 16
     }
 }

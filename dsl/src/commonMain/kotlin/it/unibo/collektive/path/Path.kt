@@ -12,6 +12,9 @@ interface Path {
      */
     fun tokens(): List<Any?>
 
+    /**
+     * Path factory.
+     */
     companion object {
         /**
          * Creates a path from the given [tokens].
