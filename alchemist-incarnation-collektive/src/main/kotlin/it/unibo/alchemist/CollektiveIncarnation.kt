@@ -192,7 +192,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         )
     }
 
-    companion object {
+    private companion object {
 
         private object ScriptEngine {
             operator fun getValue(thisRef: Any?, property: KProperty<*>) =
