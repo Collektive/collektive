@@ -47,6 +47,9 @@ class Collektive<ID : Any, R>(
         return result
     }
 
+    /**
+     * Global entry points.
+     */
     companion object {
         /**
          * Aggregate program entry point which computes an iteration of a device [localId], taking as parameters
