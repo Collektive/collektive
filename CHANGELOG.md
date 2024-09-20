@@ -1,3 +1,47 @@
+## [10.3.1](https://github.com/Collektive/collektive/compare/10.3.0...10.3.1) (2024-09-13)
+
+### Dependency updates
+
+* **core-deps:** update dependency org.jetbrains.kotlinx:kotlinx-coroutines-core to v1.9.0 ([d06b1a4](https://github.com/Collektive/collektive/commit/d06b1a42f9525a82ce4cc1a3f1b741bf33918e11))
+* **deps:** update alchemist to v34.1.4 ([485b86d](https://github.com/Collektive/collektive/commit/485b86d674566ae12a3cebdf579bb1e434b002e4))
+* **deps:** update plugin multijvmtesting to v1.2.7 ([7343e54](https://github.com/Collektive/collektive/commit/7343e545e7ed99f8c4ff2f62c21cdfbe1aaa19c3))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.12 ([ab28284](https://github.com/Collektive/collektive/commit/ab2828449e1b0fd55c478b6201d92861ef786e2e))
+
+### Build and continuous integration
+
+* do not cancel in-progress builds ([b151f47](https://github.com/Collektive/collektive/commit/b151f47d9a95007b9da44744f14a39cb125d3b85))
+
+## [10.3.0](https://github.com/Collektive/collektive/compare/10.2.0...10.3.0) (2024-09-13)
+
+### Features
+
+* **compiler-plugin:** add two simple checkers on the frontend part ([#454](https://github.com/Collektive/collektive/issues/454)) ([391b21e](https://github.com/Collektive/collektive/commit/391b21ec8927760fe2f9775c549eecd48b4c33a4))
+
+### Dependency updates
+
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.102 ([f9de327](https://github.com/Collektive/collektive/commit/f9de3273012938353e4ea5917898a38ecb78b6bf))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.103 ([14db92c](https://github.com/Collektive/collektive/commit/14db92c2ded079c3fd0bb08aece22cfc7b5b2c62))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.105 ([e1e3d0d](https://github.com/Collektive/collektive/commit/e1e3d0db317df33516486792d9573830345a1460))
+* **deps:** update plugin com.gradle.develocity to v3.18.1 ([45ecbd7](https://github.com/Collektive/collektive/commit/45ecbd7b05c36761a994a61c43c54624fe6739de))
+* **deps:** update plugin gradlepluginpublish to v1.3.0 ([da520f4](https://github.com/Collektive/collektive/commit/da520f4ebbdf78fc6be0b32ddc73e1006b44df70))
+* **deps:** update plugin multijvmtesting to v1.2.6 ([bd98504](https://github.com/Collektive/collektive/commit/bd98504b186481fc5d0efc9cfc3119c65e5bd656))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.10 ([ef72b03](https://github.com/Collektive/collektive/commit/ef72b034f525e151aad2187203db93b390ad5ba5))
+
+### Documentation
+
+* document public companions ([2421855](https://github.com/Collektive/collektive/commit/242185564a59646c2252cc75e46092fddc6e94b5))
+
+### Build and continuous integration
+
+* change the concurrency group of staging-repo to prevent interleaving across branches ([b9c99e8](https://github.com/Collektive/collektive/commit/b9c99e8c484aac9c558daf933ddd72449aa82b0f))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.5 ([12aa27b](https://github.com/Collektive/collektive/commit/12aa27b95c17fc0ffd0c221edb01182d9540be7a))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.6 ([9fcb40e](https://github.com/Collektive/collektive/commit/9fcb40ed60b4f45f40bef8b122540a9e9389915a))
+* **renovate:** disable automerge ([001ebbc](https://github.com/Collektive/collektive/commit/001ebbcd5d9a2032f86b3c707c03a3d0e3ff919e))
+
+### Refactoring
+
+* **alchemist-incarnation-collektive:** restrict the visibility of companion with private members only ([e4c1947](https://github.com/Collektive/collektive/commit/e4c19479d39cef0c19fc2d68275f6c807f5a6f45))
+
 ## [10.2.0](https://github.com/Collektive/collektive/compare/10.1.3...10.2.0) (2024-09-05)
 
 ### Features

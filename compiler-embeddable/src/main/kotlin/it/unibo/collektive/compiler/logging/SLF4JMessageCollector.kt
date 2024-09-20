@@ -33,6 +33,9 @@ class SLF4JMessageCollector(val logger: Logger) : MessageCollector {
         }
     }
 
+    /**
+     * Global defaults.
+     */
     companion object {
 
         /**
