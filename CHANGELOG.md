@@ -1,3 +1,19 @@
+## [10.3.2](https://github.com/Collektive/collektive/compare/10.3.1...10.3.2) (2024-09-20)
+
+### Dependency updates
+
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5.5.0 ([3a36dae](https://github.com/Collektive/collektive/commit/3a36dae868687d0fd193adb0efd6cb27242cfa41))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.106 ([ca1ff69](https://github.com/Collektive/collektive/commit/ca1ff69e1414beae2917d5e65e56edb4fa7a207d))
+* **deps:** update plugin publishoncentral to v5.1.7 ([5b7649d](https://github.com/Collektive/collektive/commit/5b7649d8ce7fbfcc86444a0cdf6e1aed4e29a157))
+
+### Documentation
+
+* add companion object kdoc ([53070fa](https://github.com/Collektive/collektive/commit/53070fa0f3920785c5cb230cf2beddcbe71e063c))
+
+### Build and continuous integration
+
+* **deps:** update actions/setup-node action to v4.0.4 ([53efd9f](https://github.com/Collektive/collektive/commit/53efd9ff3c1d2c96c0d4bae4484b7a4e8cffade8))
+
 ## [10.3.1](https://github.com/Collektive/collektive/compare/10.3.0...10.3.1) (2024-09-13)
 
 ### Dependency updates
