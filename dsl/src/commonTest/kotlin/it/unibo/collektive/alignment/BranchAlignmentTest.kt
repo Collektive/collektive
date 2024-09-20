@@ -13,7 +13,7 @@ import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.stdlib.ints.FieldedInts.minus
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
 
-class TestBranchAlignment : StringSpec({
+class BranchAlignmentTest : StringSpec({
     val id0 = 0
 
     "Branch alignment should work in nested functions" {
