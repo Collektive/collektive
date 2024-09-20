@@ -14,7 +14,7 @@ import com.sun.tools.javap.Main as Javap
 
 class CompileStringTest : FreeSpec({
     "a simple aggregate function" - {
-        val moduleName = "TestScript"
+        val moduleName = "ScriptTest"
         val program = checkNotNull(ClassLoader.getSystemClassLoader().getResource("ScriptTest.kt")).readText()
         "should compile" - {
             val result = CollektiveJVMCompiler.compileString(program, moduleName = moduleName)
