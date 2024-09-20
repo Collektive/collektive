@@ -12,10 +12,10 @@ import java.io.ByteArrayOutputStream
 import java.io.PrintWriter
 import com.sun.tools.javap.Main as Javap
 
-class TestCompileString : FreeSpec({
+class CompileStringTest : FreeSpec({
     "a simple aggregate function" - {
         val moduleName = "TestScript"
-        val program = checkNotNull(ClassLoader.getSystemClassLoader().getResource("TestScript.kt")).readText()
+        val program = checkNotNull(ClassLoader.getSystemClassLoader().getResource("ScriptTest.kt")).readText()
         "should compile" - {
             val result = CollektiveJVMCompiler.compileString(program, moduleName = moduleName)
             checkNotNull(result)

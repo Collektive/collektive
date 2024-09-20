@@ -15,7 +15,7 @@ import it.unibo.collektive.matchers.acProgram
 import it.unibo.collektive.matchers.alignWith
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
 
-class TestAlignment : StringSpec({
+class AlignmentTest : StringSpec({
 
     "The alignment should be performed also for the same aggregate operation called multiple times (issue #51)" {
         val result = aggregate(0) {
