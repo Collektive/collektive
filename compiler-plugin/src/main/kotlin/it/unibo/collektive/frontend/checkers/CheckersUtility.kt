@@ -3,6 +3,7 @@ package it.unibo.collektive.frontend.checkers
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.diagnostics.SourceElementPositioningStrategies
 import org.jetbrains.kotlin.diagnostics.warning1
+import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.checkers.getContainingClassSymbol
@@ -11,6 +12,7 @@ import org.jetbrains.kotlin.fir.declarations.FirReceiverParameter
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.toResolvedCallableSymbol
+import org.jetbrains.kotlin.fir.expressions.unwrapExpression
 
 /**
  * Collection of utilities for FIR checkers.
@@ -50,7 +52,7 @@ object CheckersUtility {
     fun FirFunctionCall.isAggregate(session: FirSession): Boolean {
         val callableSymbol = toResolvedCallableSymbol()
         return callableSymbol?.receiverParameter?.isAggregate(session) == true ||
-            callableSymbol?.getContainingClassSymbol(session)?.name?.asString() == "Aggregate"
+                callableSymbol?.getContainingClassSymbol(session)?.name?.asString() == "Aggregate"
     }
 
     /**
@@ -61,4 +63,38 @@ object CheckersUtility {
      */
     fun CheckerContext.isInsideAggregateFunction(): Boolean =
         containingElements.any { (it as? FirSimpleFunction)?.receiverParameter?.isAggregate(session) == true }
+
+    fun CheckerContext.wrappingElementsUntil(
+        excludeDotCall: Boolean = true,
+        predicate: (FirElement) -> Boolean
+    ): List<FirElement>? =
+    // these elements are the ones wrapping the context, between the context and the element that satisfies the
+    // predicate.
+        // The context's element is discarded
+        containingElements.takeIf { it.any(predicate) }
+            ?.let { firElements ->
+                if (excludeDotCall) {
+                    firElements.filterNot {
+                        (this.containingElements.last() as? FirFunctionCall)?.functionName() == it.receiverName()
+                    }
+                } else {
+                    firElements
+                }
+            }
+            ?.dropLast(1)
+            ?.takeLastWhile { !predicate(it) }
+
+
+    fun FirElement.receiverName(): String? =
+        ((this as? FirFunctionCall)?.explicitReceiver?.unwrapExpression() as? FirFunctionCall)?.functionName()
+
+    fun List<FirElement>.filterFunctionDeclarations(): List<FirElement>? =
+        takeIf { elements -> elements.none { it is FirSimpleFunction } }
+
+    fun isFunctionCallsWithName(name: String): ((FirElement) -> Boolean) = { el ->
+        el is FirFunctionCall && el.calleeReference.name.asString() == name
+    }
+
+    fun FirFunctionCall.functionName(): String =
+        calleeReference.name.asString()
 }
