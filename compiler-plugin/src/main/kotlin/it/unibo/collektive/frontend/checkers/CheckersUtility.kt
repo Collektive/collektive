@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.toResolvedCallableSymbol
 import org.jetbrains.kotlin.fir.expressions.unwrapExpression
+import org.jetbrains.kotlin.js.inline.clean.IfStatementReduction
 
 /**
  * Collection of utilities for FIR checkers.
@@ -64,18 +65,32 @@ object CheckersUtility {
     fun CheckerContext.isInsideAggregateFunction(): Boolean =
         containingElements.any { (it as? FirSimpleFunction)?.receiverParameter?.isAggregate(session) == true }
 
+    /**
+     * Returns wrapping [elements][FirElement] until it finds the element that satisfies the predicate (which is
+     * excluded from the result). The context's element is excluded.
+     *
+     * If [excludeDotCall] is set to *true*, elements that represent a dot call on the context's element are excluded
+     * as well. For example, in this code:
+     * ```kotlin
+     * for (...) {
+     *    for (...) {
+     *       <CONTEXT_ELEMENT>.map(...)
+     *    }
+     * }
+     * ```
+     * With [excludeDotCall] set to *false*, this method would return `List(FirFunctionCall("map"),
+     * FirWhileLoop("for"), FirWhileLoop("for"))`, instead with *true* the first `map` would be excluded.
+     */
     fun CheckerContext.wrappingElementsUntil(
         excludeDotCall: Boolean = true,
         predicate: (FirElement) -> Boolean
-    ): List<FirElement>? =
-    // these elements are the ones wrapping the context, between the context and the element that satisfies the
-    // predicate.
-        // The context's element is discarded
-        containingElements.takeIf { it.any(predicate) }
+    ): List<FirElement>? {
+        val calleeName = (containingElements.last() as? FirFunctionCall)?.functionName()
+        return containingElements.takeIf { it.any(predicate) }
             ?.let { firElements ->
                 if (excludeDotCall) {
                     firElements.filterNot {
-                        (this.containingElements.last() as? FirFunctionCall)?.functionName() == it.receiverName()
+                         calleeName == it.receiverName()
                     }
                 } else {
                     firElements
@@ -83,18 +98,53 @@ object CheckersUtility {
             }
             ?.dropLast(1)
             ?.takeLastWhile { !predicate(it) }
+    }
 
-
+    /**
+     * Gets the receiver's name of this element. For example, in this code:
+     * ```kotlin
+     * exampleFunction().map { ... }
+     * ```
+     * If we call this method on the `map` element, it returns `exampleFunction`.
+     * If, instead, we call this method on something that is not a function call or that has no receiver, it returns
+     * `null`.
+     */
     fun FirElement.receiverName(): String? =
         ((this as? FirFunctionCall)?.explicitReceiver?.unwrapExpression() as? FirFunctionCall)?.functionName()
 
-    fun List<FirElement>.filterFunctionDeclarations(): List<FirElement>? =
+    /**
+     * Returns the receiver [List] only if it doesn't contain any function declaration, or `null` otherwise.
+     */
+    fun List<FirElement>.discardIfFunctionDeclaration(): List<FirElement>? =
         takeIf { elements -> elements.none { it is FirSimpleFunction } }
 
-    fun isFunctionCallsWithName(name: String): ((FirElement) -> Boolean) = { el ->
-        el is FirFunctionCall && el.calleeReference.name.asString() == name
+    /**
+     * Returns the receiver [List] only if it doesn't contain any `aggregate` block.
+     * For example, if the List represents the containing elements, in this code:
+     * ```kotlin
+     * for(...) {
+     *    aggregate {
+     *       <CONTEXT_ELEMENT>
+     *    }
+     * }
+     * ```
+     * the List is *discarded* (i.e. it returns null) because a portion of the containing elements is _outside_ the
+     * `aggregate` block.
+     */
+    fun List<FirElement>.discardIfOutsideAggregateEntryPoint(): List<FirElement>? =
+        takeIf { it.none(isFunctionCallsWithName("aggregate")) }
+
+    /**
+     * Returns a predicate for a [FirElement] that is *true* when that element represents a function call that has the
+     * provided [name].
+     */
+    fun isFunctionCallsWithName(name: String): ((FirElement) -> Boolean) = {
+        it is FirFunctionCall && it.functionName() == name
     }
 
+    /**
+     * Returns the name of the called function in a [FirFunctionCall] element.
+     */
     fun FirFunctionCall.functionName(): String =
         calleeReference.name.asString()
 }

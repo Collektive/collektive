@@ -1,11 +1,11 @@
 package it.unibo.collektive.frontend.checkers
 
-import it.unibo.collektive.frontend.checkers.CheckersUtility.filterFunctionDeclarations
+import it.unibo.collektive.frontend.checkers.CheckersUtility.discardIfFunctionDeclaration
+import it.unibo.collektive.frontend.checkers.CheckersUtility.discardIfOutsideAggregateEntryPoint
 import it.unibo.collektive.frontend.checkers.CheckersUtility.functionName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isAggregate
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isFunctionCallsWithName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.wrappingElementsUntil
-import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
@@ -154,17 +154,15 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
     )
 
     private fun CheckerContext.isInsideALoopWithoutAlignedOn(): Boolean =
-        wrappingElementsUntil {
-            it is FirWhileLoop
-        }?.filterFunctionDeclarations()
-            ?.takeIf { it.none(isFunctionCallsWithName("aggregate")) }
+        wrappingElementsUntil { it is FirWhileLoop }
+            ?.discardIfFunctionDeclaration()
+            ?.discardIfOutsideAggregateEntryPoint()
             ?.none(isFunctionCallsWithName("alignedOn")) ?: false
 
     private fun CheckerContext.isInsideIteratedFunctionWithoutAlignedOn(): Boolean =
-        wrappingElementsUntil {
-            it is FirFunctionCall && it.functionName() in ITERATIVE_METHODS
-        }?.filterFunctionDeclarations()
-            ?.takeIf { it.none(isFunctionCallsWithName("aggregate")) }
+        wrappingElementsUntil { it is FirFunctionCall && it.functionName() in ITERATIVE_METHODS }
+            ?.discardIfFunctionDeclaration()
+            ?.discardIfOutsideAggregateEntryPoint()
             ?.none(isFunctionCallsWithName("alignedOn")) ?: false
 
     override fun check(
