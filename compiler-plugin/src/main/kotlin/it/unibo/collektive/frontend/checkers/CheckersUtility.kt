@@ -13,7 +13,6 @@ import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.toResolvedCallableSymbol
 import org.jetbrains.kotlin.fir.expressions.unwrapExpression
-import org.jetbrains.kotlin.js.inline.clean.IfStatementReduction
 
 /**
  * Collection of utilities for FIR checkers.
