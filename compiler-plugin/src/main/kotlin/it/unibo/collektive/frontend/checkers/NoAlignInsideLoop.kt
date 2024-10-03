@@ -21,6 +21,9 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
 
     private val SAFE_OPERATORS = listOf("alignedOn", "align", "dealign")
 
+    /**
+     * Methods used inside collections to iterate their elements.
+     */
     val ITERATIVE_METHODS = setOf(
         "forEach",
         "filter",
@@ -165,16 +168,18 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
             ?.discardIfOutsideAggregateEntryPoint()
             ?.none(isFunctionCallsWithName("alignedOn")) ?: false
 
+    private fun CheckerContext.isIteratedWithoutAlignedOn(): Boolean =
+        isInsideALoopWithoutAlignedOn() || isInsideIteratedFunctionWithoutAlignedOn()
+
     override fun check(
         expression: FirFunctionCall,
         context: CheckerContext,
         reporter: DiagnosticReporter,
     ) {
         val calleeName = expression.functionName()
-        if (calleeName !in SAFE_OPERATORS && expression.isAggregate(context.session) &&
-            (
-                context.isInsideALoopWithoutAlignedOn() || context.isInsideIteratedFunctionWithoutAlignedOn()
-                )
+        if (calleeName !in SAFE_OPERATORS &&
+            expression.isAggregate(context.session) &&
+            context.isIteratedWithoutAlignedOn()
         ) {
             reporter.reportOn(
                 expression.calleeReference.source,
