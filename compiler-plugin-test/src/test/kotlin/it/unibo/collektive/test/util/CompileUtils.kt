@@ -75,6 +75,13 @@ object CompileUtils {
                 "aggregate" to "exampleAggregate()",
             ),
         ),
+        SINGLE_AGGREGATE_IN_ITERATIVE_FUNCTION(
+            "SingleAggregateInIterativeFunction.template.kt",
+            mapOf(
+                "aggregate" to "exampleAggregate()",
+                "iterativeFunction" to "forEach",
+            ),
+        ),
     }
 
     fun testingProgramFromTemplate(template: ProgramTemplates): KotlinTestingProgram =

@@ -52,7 +52,7 @@ object CheckersUtility {
     fun FirFunctionCall.isAggregate(session: FirSession): Boolean {
         val callableSymbol = toResolvedCallableSymbol()
         return callableSymbol?.receiverParameter?.isAggregate(session) == true ||
-                callableSymbol?.getContainingClassSymbol(session)?.name?.asString() == "Aggregate"
+            callableSymbol?.getContainingClassSymbol(session)?.name?.asString() == "Aggregate"
     }
 
     /**
@@ -82,14 +82,14 @@ object CheckersUtility {
      */
     fun CheckerContext.wrappingElementsUntil(
         excludeDotCall: Boolean = true,
-        predicate: (FirElement) -> Boolean
+        predicate: (FirElement) -> Boolean,
     ): List<FirElement>? {
         val calleeName = (containingElements.last() as? FirFunctionCall)?.functionName()
         return containingElements.takeIf { it.any(predicate) }
             ?.let { firElements ->
                 if (excludeDotCall) {
                     firElements.filterNot {
-                         calleeName == it.receiverName()
+                        calleeName == it.receiverName()
                     }
                 } else {
                     firElements
