@@ -9,7 +9,6 @@ import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 import it.unibo.collektive.AlignmentComponentRegistrar
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
-import java.util.HashMap
 
 @OptIn(ExperimentalCompilerApi::class)
 object CompileUtils {
@@ -25,9 +24,7 @@ object CompileUtils {
 
     data class KotlinTestingProgram(
         val fileName: String,
-        private val template: String,
         val program: String,
-        private val properties: Map<String, String>,
     ) {
 
         infix fun shouldCompileWith(compilationCheck: (JvmCompilationResult) -> Unit) {
@@ -38,7 +35,7 @@ object CompileUtils {
     }
 
     infix fun FileSpec.shouldCompileWith(compilationCheck: (JvmCompilationResult) -> Unit) {
-        KotlinTestingProgram(this.name, this.toString(), toString(), mapOf()).shouldCompileWith(compilationCheck)
+        KotlinTestingProgram(this.name, this.toString()).shouldCompileWith(compilationCheck)
     }
 
     val noWarning: (JvmCompilationResult) -> Unit = { it.messages shouldNotContain "Warning" }
@@ -47,7 +44,7 @@ object CompileUtils {
 
     fun testingProgramFromResource(fileName: String): KotlinTestingProgram {
         val content: String = checkNotNull(ClassLoader.getSystemClassLoader().getResource(fileName)).readText()
-        return KotlinTestingProgram(fileName, content, content, HashMap())
+        return KotlinTestingProgram(fileName, content)
     }
 
     object StringSubstitutor {
