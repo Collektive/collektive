@@ -33,6 +33,7 @@ kotlinJvm {
                 implementation(rootProject.libs.kotest.runner.junit5.jvm)
                 implementation(libs.javap)
                 implementation(libs.kctfork)
+                implementation(libs.kotlinpoet)
             }
         }
     }
