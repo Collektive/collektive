@@ -28,56 +28,56 @@ class LoopWithoutAlignTest : FreeSpec({
             val functionName = functionCall.substringBefore("(")
 
             "using $functionName without a specific alignedOn" - {
-                "should compile producing a warning" - {
-                    val generated =
-                        startingFunction + {
-                            loopS {
-                                functionCall
-                            }
+                val generated =
+                    startingFunction + {
+                        loopS {
+                            functionCall
                         }
+                    }
+                "should compile producing a warning" - {
                     sourceFile withFunction generated shouldCompileWith warning(
                         EXPECTED_WARNING_MESSAGE.format(functionName),
                     )
                 }
             }
             "using $functionName wrapped in a specific alignedOn" - {
-                "should compile without any warning" - {
-                    val generated =
-                        startingFunction + {
-                            loop {
-                                alignedOnS("0") {
-                                    functionCall
-                                }
+                val generated =
+                    startingFunction + {
+                        loop {
+                            alignedOnS("0") {
+                                functionCall
                             }
                         }
+                    }
+                "should compile without any warning" - {
                     sourceFile withFunction generated shouldCompileWith noWarning
                 }
             }
             "using $functionName wrapped in a specific alignedOn outside the loop" - {
-                "should compile producing a warning" - {
-                    val generated =
-                        startingFunction + {
-                            alignedOn("0") {
-                                loopS {
-                                    functionCall
-                                }
+                val generated =
+                    startingFunction + {
+                        alignedOn("0") {
+                            loopS {
+                                functionCall
                             }
                         }
+                    }
+                "should compile producing a warning" - {
                     sourceFile withFunction generated shouldCompileWith warning(
                         EXPECTED_WARNING_MESSAGE.format(functionName),
                     )
                 }
             }
             "using $functionName wrapped inside another function declaration" - {
-                "should compile without any warning" - {
-                    val generated =
-                        startingFunction + {
-                            loop {
-                                nestedFunctionS("Aggregate<Int>.nested(): Unit") {
-                                    functionCall
-                                }
+                val generated =
+                    startingFunction + {
+                        loop {
+                            nestedFunctionS("Aggregate<Int>.nested(): Unit") {
+                                functionCall
                             }
                         }
+                    }
+                "should compile without any warning" - {
                     sourceFile withFunction generated shouldCompileWith noWarning
                 }
             }
