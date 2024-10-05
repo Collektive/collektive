@@ -4,11 +4,6 @@ configureKotlinMultiplatform()
 
 kotlinMultiplatform {
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(rootProject.libs.arrow)
-            }
-        }
         val commonTest by getting {
             dependencies {
                 implementation(project(":stdlib"))
