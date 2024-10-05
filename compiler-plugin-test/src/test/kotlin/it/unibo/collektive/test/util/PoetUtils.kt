@@ -54,4 +54,7 @@ object PoetUtils {
 
     fun FunSpec.Builder.alignedOn(pivot: String, loopContent: FunSpec.Builder.() -> FunSpec.Builder): FunSpec.Builder =
         wrapper("alignedOn($pivot)", loopContent)
+
+    fun FileSpec.Builder.function(function: () -> FunSpec): FileSpec.Builder =
+        addFunction(function())
 }

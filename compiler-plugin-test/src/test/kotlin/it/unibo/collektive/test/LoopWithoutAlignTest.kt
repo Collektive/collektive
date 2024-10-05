@@ -6,6 +6,7 @@ import it.unibo.collektive.test.util.CompileUtils.noWarning
 import it.unibo.collektive.test.util.CompileUtils.shouldCompileWith
 import it.unibo.collektive.test.util.CompileUtils.warning
 import it.unibo.collektive.test.util.PoetUtils.alignedOn
+import it.unibo.collektive.test.util.PoetUtils.function
 import it.unibo.collektive.test.util.PoetUtils.loop
 import it.unibo.collektive.test.util.PoetUtils.rem
 import it.unibo.collektive.test.util.PoetUtils.simpleAggregateFunction
@@ -25,42 +26,42 @@ class LoopWithoutAlignTest : FreeSpec({
             "using $functionName without a specific alignedOn" - {
                 "should produce a warning" - {
                     fileTemplate % {
-                        addFunction(
+                        function {
                             functionTemplate % {
                                 loop {
                                     addCode(functionCall)
                                 }
-                            },
-                        )
+                            }
+                        }
                     } shouldCompileWith warning(EXPECTED_WARNING_MESSAGE.format(functionName))
                 }
             }
             "using $functionName wrapped in a specific alignedOn" - {
                 "should compile without any warning" - {
                     fileTemplate % {
-                        addFunction(
+                        function {
                             functionTemplate % {
                                 loop {
                                     alignedOn("0") {
                                         addCode(functionCall)
                                     }
                                 }
-                            },
-                        )
+                            }
+                        }
                     } shouldCompileWith noWarning
                 }
             }
             "using $functionName wrapped in a specific alignedOn outside the loop" - {
                 fileTemplate % {
-                    addFunction(
+                    function {
                         functionTemplate % {
-                                    alignedOn("0") {
-                                        loop {
-                                            addCode(functionCall)
-                                        }
-                                    }
-                                },
-                    )
+                            alignedOn("0") {
+                                loop {
+                                    addCode(functionCall)
+                                }
+                            }
+                        }
+                    }
                 } shouldCompileWith warning(
                     EXPECTED_WARNING_MESSAGE.format(functionName),
                 )
@@ -68,15 +69,15 @@ class LoopWithoutAlignTest : FreeSpec({
             "using $functionName wrapped inside another function declaration" - {
                 "should compile without any warning" - {
                     fileTemplate % {
-                        addFunction(
+                        function {
                             functionTemplate % {
-                                        loop {
-                                            beginControlFlow("fun Aggregate<Int>.nested(): Unit")
-                                                .addCode(functionCall)
-                                            .endControlFlow()
-                                        }
-                                    },
-                        )
+                                loop {
+                                    beginControlFlow("fun Aggregate<Int>.nested(): Unit")
+                                        .addCode(functionCall)
+                                        .endControlFlow()
+                                }
+                            }
+                        }
                     } shouldCompileWith noWarning
                 }
             }

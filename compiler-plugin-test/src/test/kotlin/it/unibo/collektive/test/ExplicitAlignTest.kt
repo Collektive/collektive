@@ -4,6 +4,7 @@ import com.squareup.kotlinpoet.INT
 import io.kotest.core.spec.style.FreeSpec
 import it.unibo.collektive.test.util.CompileUtils.shouldCompileWith
 import it.unibo.collektive.test.util.CompileUtils.warning
+import it.unibo.collektive.test.util.PoetUtils.function
 import it.unibo.collektive.test.util.PoetUtils.rem
 import it.unibo.collektive.test.util.PoetUtils.simpleAggregateFunction
 import it.unibo.collektive.test.util.PoetUtils.simpleTestingFileWithAggregate
@@ -16,22 +17,18 @@ class ExplicitAlignTest : FreeSpec({
     "The `align` function" - {
         "should produce a warning when used explicitly" - {
             fileTemplate % {
-                addFunction(
-                    functionTemplate % {
-                                addCode("align(null)")
-                            },
-                )
+                function {
+                    functionTemplate % { addCode("align(null)") }
+                }
             } shouldCompileWith warning(EXPECTED_WARNING_MESSAGE.format("align"))
         }
     }
     "The `dealign` function" - {
         "should produce a warning when used explicitly" - {
             fileTemplate % {
-                addFunction(
-                    functionTemplate % {
-                        addCode("dealign()")
-                    },
-                )
+                function {
+                    functionTemplate % { addCode("dealign()") }
+                }
             } shouldCompileWith warning(EXPECTED_WARNING_MESSAGE.format("dealign"))
         }
     }
