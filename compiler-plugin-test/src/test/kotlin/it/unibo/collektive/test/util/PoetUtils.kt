@@ -52,9 +52,15 @@ object PoetUtils {
     ): FunSpec.Builder =
         wrapper("for($loopExpression)", loopContent)
 
-    fun FunSpec.Builder.alignedOn(pivot: String, loopContent: FunSpec.Builder.() -> FunSpec.Builder): FunSpec.Builder =
-        wrapper("alignedOn($pivot)", loopContent)
+    fun FunSpec.Builder.alignedOn(pivot: String, content: FunSpec.Builder.() -> FunSpec.Builder): FunSpec.Builder =
+        wrapper("alignedOn($pivot)", content)
 
     fun FileSpec.Builder.function(function: () -> FunSpec): FileSpec.Builder =
         addFunction(function())
+
+    fun FunSpec.Builder.nestedFunction(
+        header: String = "exampleName(): Unit",
+        content: FunSpec.Builder.() -> FunSpec.Builder,
+    ): FunSpec.Builder =
+        wrapper("fun $header", content)
 }

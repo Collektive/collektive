@@ -4,6 +4,9 @@ import com.squareup.kotlinpoet.FileSpec
 import com.tschuchort.compiletesting.JvmCompilationResult
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
+import io.kotest.data.headers
+import io.kotest.data.row
+import io.kotest.data.table
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
@@ -58,4 +61,12 @@ object CompileUtils {
             }
         }
     }
+
+    val testedAggregateFunctions = table(
+        headers("functionCall"),
+        row("exampleAggregate()"),
+        row("neighboring(0)"),
+        row("exchange(0) { it }"),
+        row("repeat(0) { it + 1 }"),
+    )
 }
