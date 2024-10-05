@@ -1,7 +1,7 @@
 [versions]
-alchemist = "34.1.3"
-build-config = "5.4.0"
-coroutines = "1.8.1"
+alchemist = "34.1.4"
+build-config = "5.5.0"
+coroutines = "1.9.0"
 dokka = "1.9.20"
 kotest = "5.9.1"
 kotlin = "2.0.10"
@@ -53,12 +53,12 @@ alchemist = [
 build-config = { id = "com.github.gmazzo.buildconfig", version.ref = "build-config" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 gitSemVer = "org.danilopianini.git-sensitive-semantic-versioning:3.1.7"
-gradlePluginPublish = { id = "com.gradle.plugin-publish", version = "1.2.2" }
+gradlePluginPublish = { id = "com.gradle.plugin-publish", version = "1.3.0" }
 kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.66.1"
+kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.68.0"
 kover = "org.jetbrains.kotlinx.kover:0.8.3"
-multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:1.2.6"
-publishOnCentral = "org.danilopianini.publish-on-central:5.1.6"
+multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:1.2.8"
+publishOnCentral = "org.danilopianini.publish-on-central:5.1.8"
 taskTree = "com.dorongold.task-tree:4.0.0"

@@ -1,6 +1,5 @@
 package it.unibo.collektive.test.util
 
-import com.squareup.kotlinpoet.FileSpec
 import com.tschuchort.compiletesting.JvmCompilationResult
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
@@ -35,10 +34,6 @@ object CompileUtils {
             result.exitCode shouldBe KotlinCompilation.ExitCode.OK
             compilationCheck(result)
         }
-    }
-
-    infix fun FileSpec.shouldCompileWith(compilationCheck: (JvmCompilationResult) -> Unit) {
-        KotlinTestingProgram(this.name, this.toString()).shouldCompileWith(compilationCheck)
     }
 
     val noWarning: (JvmCompilationResult) -> Unit = { it.messages shouldNotContain "Warning" }

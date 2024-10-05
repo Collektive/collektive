@@ -13,7 +13,7 @@ import kotlin.math.sqrt
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
-class TestDistanceTo : StringSpec({
+class DistanceToTest : StringSpec({
     fun Environment<Double>.gradientIsStable(isMoore: Boolean): Boolean = status().all { (id, value) ->
         val x = id % 10
         val y = id / 10

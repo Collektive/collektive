@@ -2,5 +2,6 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "local>Collektive/renovate-config:kotlin"
-  ]
+  ],
+  "automerge": false
 }

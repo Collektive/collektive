@@ -25,7 +25,7 @@ jobs:
     needs:
       - check-secrets
     concurrency:
-      group: staging-repo
+      group: staging-repo-${{ github.workflow }}-${{ github.event.number || github.ref }}
     if: ${{ needs.check-secrets.outputs.run-with-secrets == 'true' }}
     outputs:
       maven-central-repo-id: ${{ steps.staging-repo.outputs.MavenCentral }}
@@ -33,7 +33,7 @@ jobs:
       will-release: ${{ steps.compute-next-version.outputs.will-release }}
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v4.1.7
+        uses: actions/checkout@v4.2.0
         with:
           fetch-depth: 0
       - name: Compute next release version
@@ -41,7 +41,7 @@ jobs:
         uses: nicolasfara/precompute-semantic-release-version-action@2.0.1
         with:
           github-token: ${{ github.token }}
-      - uses: DanySK/build-check-deploy-gradle-action@3.5.5
+      - uses: DanySK/build-check-deploy-gradle-action@3.5.7
         with:
           maven-central-username: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
@@ -78,13 +78,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     concurrency:
       group: build-${{ github.workflow }}-${{ matrix.os }}-${{ github.event.number || github.ref }}
-      cancel-in-progress: true
+      cancel-in-progress: false
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v4.1.7
+        uses: actions/checkout@v4.2.0
         with:
           fetch-depth: 0
-      - uses: DanySK/build-check-deploy-gradle-action@3.5.5
+      - uses: DanySK/build-check-deploy-gradle-action@3.5.7
         with:
           # Dry-deployment
           check-command: |
@@ -139,8 +139,8 @@ jobs:
     if: ${{ needs.check-secrets.outputs.run-with-secrets == 'true' }}
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v4.1.7
-      - uses: DanySK/build-check-deploy-gradle-action@3.5.5
+        uses: actions/checkout@v4.2.0
+      - uses: DanySK/build-check-deploy-gradle-action@3.5.7
         with:
           maven-central-username: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
@@ -168,7 +168,7 @@ jobs:
     if: ${{ needs.check-secrets.outputs.run-with-secrets == 'true' }}
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v4.1.7
+        uses: actions/checkout@v4.2.0
         with:
           fetch-depth: 0
           token: ${{ secrets.PERSONAL_TOKEN }}
@@ -176,10 +176,10 @@ jobs:
         id: node-version
         run: echo "version=$(jq -r .engines.node package.json)" >> $GITHUB_OUTPUT
       - name: Install Node
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.0.4
         with:
           node-version: ${{ steps.node-version.outputs.version }}
-      - uses: DanySK/build-check-deploy-gradle-action@3.5.5
+      - uses: DanySK/build-check-deploy-gradle-action@3.5.7
         env:
           STAGING_REPO_ID: ${{ needs.staging-repo.outputs.maven-central-repo-id }}
           ORG_GRADLE_PROJECT_releaseStage: true

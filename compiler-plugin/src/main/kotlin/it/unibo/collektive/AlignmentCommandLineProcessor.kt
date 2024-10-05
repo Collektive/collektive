@@ -13,6 +13,10 @@ import org.jetbrains.kotlin.config.CompilerConfigurationKey
  */
 @OptIn(ExperimentalCompilerApi::class)
 class AlignmentCommandLineProcessor : CommandLineProcessor {
+    /**
+     * The companion object is used to define the keys used by the compiler
+     * to enable or disable the plugin, and other future options.
+     */
     companion object {
         private const val OPTION_ENABLED = "collektiveEnabled"
 

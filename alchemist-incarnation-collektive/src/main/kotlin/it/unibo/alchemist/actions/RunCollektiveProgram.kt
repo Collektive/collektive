@@ -74,7 +74,7 @@ class RunCollektiveProgram<P : Position<P>>(
 
     override fun getContext(): Context = Context.NEIGHBORHOOD
 
-    companion object {
+    private companion object {
 
         private fun <P : Position<P>> findEntrypoint(
             entrypoint: String,
