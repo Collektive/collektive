@@ -8,78 +8,112 @@
 
 package it.unibo.collektive.test
 
+import com.squareup.kotlinpoet.INT
 import io.kotest.core.spec.style.FreeSpec
+import io.kotest.data.forAll
+import io.kotest.data.headers
+import io.kotest.data.row
+import io.kotest.data.table
 import it.unibo.collektive.test.LoopWithoutAlignTest.Companion.EXPECTED_WARNING_MESSAGE
-import it.unibo.collektive.test.util.CompileUtils
-import it.unibo.collektive.test.util.CompileUtils.ProgramTemplates
 import it.unibo.collektive.test.util.CompileUtils.noWarning
+import it.unibo.collektive.test.util.CompileUtils.testedAggregateFunctions
 import it.unibo.collektive.test.util.CompileUtils.warning
+import it.unibo.collektive.test.util.PoetUtils.alignedOn
+import it.unibo.collektive.test.util.PoetUtils.alignedOnS
+import it.unibo.collektive.test.util.PoetUtils.block
+import it.unibo.collektive.test.util.PoetUtils.blockS
+import it.unibo.collektive.test.util.PoetUtils.nestedFunctionS
+import it.unibo.collektive.test.util.PoetUtils.plus
+import it.unibo.collektive.test.util.PoetUtils.shouldCompileWith
+import it.unibo.collektive.test.util.PoetUtils.simpleAggregateFunction
+import it.unibo.collektive.test.util.PoetUtils.simpleTestingFileWithAggregate
+import it.unibo.collektive.test.util.PoetUtils.withFunction
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 
 @OptIn(ExperimentalCompilerApi::class)
 class IterationWithoutAlignTest : FreeSpec({
     "When using an iterative function like 'forEach' and similar" - {
-        val testingProgramTemplate = CompileUtils.testingProgramFromTemplate(
-            ProgramTemplates.SINGLE_AGGREGATE_IN_ITERATIVE_FUNCTION,
+        val sourceFile = simpleTestingFileWithAggregate()
+        val startingFunction = simpleAggregateFunction(INT)
+
+        // Note: "recoveryCode" is a piece of code to make the program compile whatever it is returned by the code
+        // inside the anonymous function
+        val testedIterativeFunctions = table(
+            headers("function", "recoveryCode"),
+            row("forEach", ""),
+            row("filter", "false"),
+            row("map", ""),
+            row("flatMap", "listOf(null)"),
         )
-        listOf(
-            "exampleAggregate" to "exampleAggregate()",
-            "neighboring" to "neighboring(0)",
-            "exchange" to "exchange(0) { it }",
-        ).flatMap { aggregateFunctionPair ->
-            listOf(
-                "forEach" to "",
-                "filter" to "false",
-                "map" to "",
-                "flatMap" to "listOf(null)",
-            ).map {
-                aggregateFunctionPair to it
-            }
-        }
-            .forEach { (functionPair, iterativeMethodAndCode) ->
-                val (functionName, functionCall) = functionPair
-                val (iterativeMethod, recoveryCode) = iterativeMethodAndCode
+
+        forAll(testedAggregateFunctions) { aggregateFunctionCall ->
+            val functionName = aggregateFunctionCall.substringBefore("(")
+
+            forAll(testedIterativeFunctions) { iterativeFunction, recoveryCode ->
                 "using $functionName without a specific alignedOn" - {
-                    "should produce a warning" - {
-                        val testingProgram = testingProgramTemplate
-                            .put("aggregate", functionCall)
-                            .put("afterAggregate", recoveryCode)
-                            .put("iterativeFunction", iterativeMethod)
-                        testingProgram shouldCompileWith warning(EXPECTED_WARNING_MESSAGE.format(functionName))
+                    val generated =
+                        startingFunction + {
+                            blockS("listOf(1,2,3).$iterativeFunction") {
+                                """
+                                    $aggregateFunctionCall
+                                    $recoveryCode
+                                    """
+                            }
+                        }
+                    "should compile producing a warning" - {
+                        sourceFile withFunction generated shouldCompileWith warning(
+                            EXPECTED_WARNING_MESSAGE.format(functionName),
+                        )
                     }
                 }
                 "using $functionName wrapped in a specific alignedOn" - {
-                    val testingProgram = testingProgramTemplate
-                        .put("beforeAggregate", "alignedOn(0) {")
-                        .put("afterAggregate", "}\n$recoveryCode")
-                        .put("iterativeFunction", iterativeMethod)
+                    val generated =
+                        startingFunction + {
+                            block("listOf(1,2,3).$iterativeFunction") {
+                                alignedOnS("0") {
+                                    """
+                                        $aggregateFunctionCall
+                                        $recoveryCode
+                                        """
+                                }
+                            }
+                        }
                     "should compile without any warning" - {
-                        testingProgram shouldCompileWith noWarning
+                        sourceFile withFunction generated shouldCompileWith noWarning
                     }
                 }
                 "using $functionName wrapped in a specific alignedOn outside the loop" - {
-                    val testingProgram = testingProgramTemplate
-                        .put("beforeLoop", "alignedOn(0) {")
-                        .put("afterLoop", "}")
-                        .put("afterAggregate", recoveryCode)
-                        .put("iterativeFunction", iterativeMethod)
-                    "should produce a warning" - {
-                        val testingProgramWithCustomFunction = testingProgram
-                            .put("aggregate", functionCall)
-                        testingProgramWithCustomFunction shouldCompileWith warning(
+                    val generated =
+                        startingFunction + {
+                            alignedOn("0") {
+                                blockS("listOf(1,2,3).$iterativeFunction") {
+                                    """
+                                    $aggregateFunctionCall
+                                    $recoveryCode
+                                    """
+                                }
+                            }
+                        }
+                    "should compile producing a warning" - {
+                        sourceFile withFunction generated shouldCompileWith warning(
                             EXPECTED_WARNING_MESSAGE.format(functionName),
                         )
                     }
                 }
                 "using $functionName wrapped inside another function declaration" - {
-                    val testingProgram = testingProgramTemplate
-                        .put("beforeAggregate", "fun Aggregate<Int>.test() {")
-                        .put("afterAggregate", "}\n$recoveryCode")
-                        .put("iterativeFunction", iterativeMethod)
+                    val generated =
+                        startingFunction + {
+                            block("listOf(1,2,3).$iterativeFunction") {
+                                nestedFunctionS("Aggregate<Int>.nested(): Unit") {
+                                    aggregateFunctionCall
+                                }.addCode(recoveryCode)
+                            }
+                        }
                     "should compile without any warning" - {
-                        testingProgram shouldCompileWith noWarning
+                        sourceFile withFunction generated shouldCompileWith noWarning
                     }
                 }
             }
+        }
     }
 })
