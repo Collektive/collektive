@@ -13,7 +13,6 @@ with(extensions.getByType<VersionCatalogsExtension>().named("libs")) {
         implementation(kotlin("reflect"))
         implementation(findLibrary("kotlin-gradle-plugin").get())
         implementation(findLibrary("kotlinpoet").get())
-        implementation(findLibrary("arrow").get())
     }
 }
 

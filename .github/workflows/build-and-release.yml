@@ -33,7 +33,7 @@ jobs:
       will-release: ${{ steps.compute-next-version.outputs.will-release }}
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@v4.2.1
         with:
           fetch-depth: 0
       - name: Compute next release version
@@ -41,7 +41,7 @@ jobs:
         uses: nicolasfara/precompute-semantic-release-version-action@2.0.1
         with:
           github-token: ${{ github.token }}
-      - uses: DanySK/build-check-deploy-gradle-action@3.5.7
+      - uses: DanySK/build-check-deploy-gradle-action@3.5.9
         with:
           maven-central-username: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
@@ -81,10 +81,10 @@ jobs:
       cancel-in-progress: false
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@v4.2.1
         with:
           fetch-depth: 0
-      - uses: DanySK/build-check-deploy-gradle-action@3.5.7
+      - uses: DanySK/build-check-deploy-gradle-action@3.5.9
         with:
           # Dry-deployment
           check-command: |
@@ -139,8 +139,8 @@ jobs:
     if: ${{ needs.check-secrets.outputs.run-with-secrets == 'true' }}
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v4.2.0
-      - uses: DanySK/build-check-deploy-gradle-action@3.5.7
+        uses: actions/checkout@v4.2.1
+      - uses: DanySK/build-check-deploy-gradle-action@3.5.9
         with:
           maven-central-username: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
@@ -168,7 +168,7 @@ jobs:
     if: ${{ needs.check-secrets.outputs.run-with-secrets == 'true' }}
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@v4.2.1
         with:
           fetch-depth: 0
           token: ${{ secrets.PERSONAL_TOKEN }}
@@ -179,7 +179,7 @@ jobs:
         uses: actions/setup-node@v4.0.4
         with:
           node-version: ${{ steps.node-version.outputs.version }}
-      - uses: DanySK/build-check-deploy-gradle-action@3.5.7
+      - uses: DanySK/build-check-deploy-gradle-action@3.5.9
         env:
           STAGING_REPO_ID: ${{ needs.staging-repo.outputs.maven-central-repo-id }}
           ORG_GRADLE_PROJECT_releaseStage: true
