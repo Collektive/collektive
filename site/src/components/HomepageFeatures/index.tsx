@@ -1,67 +1,61 @@
 import clsx from 'clsx';
 import Heading from '@theme/Heading';
+import CodeBlock from '@theme/CodeBlock';
 import styles from './styles.module.css';
 
-type FeatureItem = {
-  title: string;
-  Svg: React.ComponentType<React.ComponentProps<'svg'>>;
-  description: JSX.Element;
-};
+const codeNeighbor = `fun Aggregate<Int>.neighborCounter(): Int =
+    neighboring(1).hood(0) { acc, _ ->
+        acc + 1
+    }
 
-const FeatureList: FeatureItem[] = [
-  {
-    title: 'Easy to Use',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
-    description: (
-      <>
-          TODO some gifs
-      </>
-    ),
-  },
-  {
-    title: 'Focus on What Matters',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
-    description: (
-      <>
-          Pros of using Collektive
-      </>
-    ),
-  },
-  {
-    title: 'Powered by Kotlin Multiplatform',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
-    description: (
-      <>
-            Kotlin Multiplatform is a great tool!!
-      </>
-    ),
-  },
-];
+context(Aggregate<Int>, DistanceSensor)
+fun gradient(source: Boolean): Double =
+    share(POSITIVE_INFINITY) {
+        val dist = distances()
+        when {
+            source -> 0.0
+            else -> (it + dist).min(100)
+        }
+    }
+`
 
-function Feature({title, Svg, description}: FeatureItem) {
-  return (
-    <div className={clsx('col col--4')}>
-      <div className="text--center">
-        <Svg className={styles.featureSvg} role="img" />
-      </div>
-      <div className="text--center padding-horiz--md">
-        <Heading as="h3">{title}</Heading>
-        <p>{description}</p>
-      </div>
-    </div>
-  );
-}
+const KotlinLogo = require('@site/static/img/KotlinLogo.svg').default
 
 export default function HomepageFeatures(): JSX.Element {
-  return (
-    <section className={styles.features}>
-      <div className="container">
-        <div className="row">
-          {FeatureList.map((props, idx) => (
-            <Feature key={idx} {...props} />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+    return (
+        <section className={styles.features}>
+            <div className="container">
+                <div className="row">
+                    <div className={clsx('col col--4')}>
+                        <CodeBlock language="kotlin">{codeNeighbor}</CodeBlock>
+                        <div className="text--center padding-horiz--md">
+                            <Heading as="h3">Practical Aggregate Language</Heading>
+                            <p>TODO</p>
+                        </div>
+                    </div>
+
+                    <div className={clsx('col col--4')}>
+                        <div className="text--center">
+                            <img src={String(require('@site/static/img/graftWithMoreLeaders.gif').default)} alt=""
+                                 className={styles.featureSvg}/>
+                        </div>
+                        <div className="text--center padding-horiz--md">
+                            <Heading as="h3">Large-scale Network Simulation</Heading>
+                            <p>TODO</p>
+                        </div>
+                    </div>
+
+                    <div className={clsx('col col--4')}>
+                        <div className="text--center">
+                            <KotlinLogo className={styles.featureSvg}/>
+                        </div>
+                        <div className="text--center padding-horiz--md">
+                            <Heading as="h3">Kotlin Multiplatform Enabled</Heading>
+                            <p>TODO</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
 }
