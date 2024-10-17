@@ -8,7 +8,7 @@ fun Aggregate<Int>.exampleAggregate() {}
 
 fun entry() {
   listOf(1,2,3).forEach {
-    aggregate {
+    aggregate(0) {
       neighboring(0)
     }
   }

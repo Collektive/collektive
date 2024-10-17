@@ -8,7 +8,7 @@ fun Aggregate<Int>.exampleAggregate() {}
 
 fun entry() {
   for(i in 1..3) {
-    aggregate {
+    aggregate(0) {
       neighboring(0)
     }
   }
