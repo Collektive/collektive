@@ -1,31 +1,31 @@
 package it.unibo.collektive.test
 
-import com.squareup.kotlinpoet.INT
 import io.kotest.core.spec.style.FreeSpec
+import it.unibo.collektive.test.util.CompileUtils.asTestingProgram
 import it.unibo.collektive.test.util.CompileUtils.warning
-import it.unibo.collektive.test.util.PoetUtils.plus
-import it.unibo.collektive.test.util.PoetUtils.shouldCompileWith
-import it.unibo.collektive.test.util.PoetUtils.simpleAggregateFunction
-import it.unibo.collektive.test.util.PoetUtils.simpleTestingFileWithAggregate
-import it.unibo.collektive.test.util.PoetUtils.withFunction
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 
 @OptIn(ExperimentalCompilerApi::class)
 class ExplicitAlignTest : FreeSpec({
-    val sourceFile = simpleTestingFileWithAggregate()
-    val startingFunction = simpleAggregateFunction(INT)
+    val codeTemplate = """
+        import it.unibo.collektive.aggregate.api.Aggregate
+        
+        fun Aggregate<Int>.entry() {
+            %s
+        }
+    """.trimIndent()
     "The `align` function" - {
-        val generated = startingFunction + { addCode("align(null)") }
+        val code = codeTemplate.format("align(null)").asTestingProgram("ExplicitAlign.kt")
         "should produce a warning when used explicitly" - {
-            sourceFile withFunction generated shouldCompileWith warning(
+            code shouldCompileWith warning(
                 EXPECTED_WARNING_MESSAGE.format("align"),
             )
         }
     }
     "The `dealign` function" - {
-        val generated = startingFunction + { addCode("dealign()") }
+        val code = codeTemplate.format("dealign()").asTestingProgram("ExplicitDeAlign.kt")
         "should produce a warning when used explicitly" - {
-            sourceFile withFunction generated shouldCompileWith warning(
+            code shouldCompileWith warning(
                 EXPECTED_WARNING_MESSAGE.format("dealign"),
             )
         }
