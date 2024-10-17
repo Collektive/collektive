@@ -5,6 +5,7 @@ import io.kotest.data.forAll
 import io.kotest.data.headers
 import io.kotest.data.row
 import io.kotest.data.table
+import it.unibo.collektive.test.util.CompileUtils
 import it.unibo.collektive.test.util.CompileUtils.asTestingProgram
 import it.unibo.collektive.test.util.CompileUtils.noWarning
 import it.unibo.collektive.test.util.CompileUtils.testedAggregateFunctions
@@ -14,7 +15,7 @@ import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 @OptIn(ExperimentalCompilerApi::class)
 class IterationWithoutAlignSpec : FreeSpec({
 
-    fun getTestingFile(case: String, iteration: String, aggregateFunction: String): String =
+    fun getTextFromResource(case: String, iteration: String, aggregateFunction: String): String =
         IterationWithoutAlignSpec::class.java
             .getResource("/kotlin/${case}_${iteration}_$aggregateFunction.kt")!!
             .readText()
@@ -30,13 +31,17 @@ class IterationWithoutAlignSpec : FreeSpec({
             val functionName = functionCall.substringBefore("(")
 
             forAll(formsOfIteration) { iteration, iterationDescription ->
-                "inside $iterationDescription and using $functionName without a specific alignedOn" - {
-                    val case = "SIMPLE_IT"
-                    val code = getTestingFile(
+
+                fun getTestingProgram(case: String): CompileUtils.KotlinTestingProgram =
+                    getTextFromResource(
                         case = case,
                         iteration = iteration,
                         aggregateFunction = functionName,
-                    ).asTestingProgram("$functionName-${case}_for.kt")
+                    ).asTestingProgram("$functionName-${case}_$iteration.kt")
+
+                "inside $iterationDescription and using $functionName without a specific alignedOn" - {
+                    val case = "SIMPLE_IT"
+                    val code = getTestingProgram(case)
 
                     "should compile producing a warning" - {
                         code shouldCompileWith warning(
@@ -46,11 +51,7 @@ class IterationWithoutAlignSpec : FreeSpec({
                 }
                 "inside $iterationDescription and using $functionName wrapped in a specific alignedOn" - {
                     val case = "SIMPLE_IT_ALGN"
-                    val code = getTestingFile(
-                        case = case,
-                        iteration = iteration,
-                        aggregateFunction = functionName,
-                    ).asTestingProgram("$functionName-${case}_for.kt")
+                    val code = getTestingProgram(case)
 
                     "should compile without any warning" - {
                         code shouldCompileWith noWarning
@@ -58,11 +59,7 @@ class IterationWithoutAlignSpec : FreeSpec({
                 }
                 "inside $iterationDescription and using $functionName wrapped in alignedOn outside the loop" - {
                     val case = "IT_EXT_ALGN"
-                    val code = getTestingFile(
-                        case = case,
-                        iteration = iteration,
-                        aggregateFunction = functionName,
-                    ).asTestingProgram("$functionName-${case}_for.kt")
+                    val code = getTestingProgram(case)
 
                     "should compile producing a warning" - {
                         code shouldCompileWith warning(
@@ -72,11 +69,7 @@ class IterationWithoutAlignSpec : FreeSpec({
                 }
                 "inside $iterationDescription and using $functionName wrapped inside another function declaration" - {
                     val case = "IT_NST_FUN"
-                    val code = getTestingFile(
-                        case = case,
-                        iteration = iteration,
-                        aggregateFunction = functionName,
-                    ).asTestingProgram("$functionName-${case}_for.kt")
+                    val code = getTestingProgram(case)
 
                     "should compile without any warning" - {
                         code shouldCompileWith noWarning
