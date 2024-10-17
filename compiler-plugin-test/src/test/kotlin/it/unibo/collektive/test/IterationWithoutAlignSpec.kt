@@ -75,6 +75,14 @@ class IterationWithoutAlignSpec : FreeSpec({
                         code shouldCompileWith noWarning
                     }
                 }
+                "inside $iterationDescription outside the 'aggregate' entry point while using $functionName" - {
+                    val case = "OUTSIDE_AGGREGATE"
+                    val code = getTestingProgram(case)
+
+                    "should compile without any warning" - {
+                        code shouldCompileWith noWarning
+                    }
+                }
             }
         }
     }
