@@ -4,6 +4,10 @@ on:
   workflow_call:
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: ${{ !contains(github.ref, 'master') }}
+
 jobs:
   check-secrets:
     runs-on: ubuntu-24.04
@@ -24,8 +28,6 @@ jobs:
     runs-on: ubuntu-24.04
     needs:
       - check-secrets
-    concurrency:
-      group: staging-repo-${{ github.workflow }}-${{ github.event.number || github.ref }}
     if: ${{ needs.check-secrets.outputs.run-with-secrets == 'true' }}
     outputs:
       maven-central-repo-id: ${{ steps.staging-repo.outputs.MavenCentral }}
@@ -76,9 +78,6 @@ jobs:
       matrix:
         os: [ windows-2022, macos-14, ubuntu-24.04 ]
     runs-on: ${{ matrix.os }}
-    concurrency:
-      group: build-${{ github.workflow }}-${{ matrix.os }}-${{ github.event.number || github.ref }}
-      cancel-in-progress: false
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v4.2.1
@@ -101,41 +100,36 @@ jobs:
           signing-key: ${{ secrets.GPG_PRIVATEKEY }}
           signing-password: ${{ secrets.GPG_PASSPHRASE }}
 
-  #  build-website:
-  #    runs-on: ubuntu-24.04
-  #    concurrency:
-  #      group: ${{ github.workflow }}-build-website-${{ github.event.number || github.ref }}
-  #      cancel-in-progress: true
-  #    steps:
-  #      - name: Checkout the repo
-  #        uses: actions/checkout@v3.5.3
-  #        with:
-  #          submodules: true
-  #          fetch-depth: 0
-  #      - uses: DanySK/build-check-deploy-gradle-action@2.2.8
-  #        with:
-  #          build-command: |
-  #            NEXT_VERSION="${{ needs.staging-repo.outputs.next-version }}"
-  #            OVERRIDE_VERSION=$([[ "$NEXT_VERSION" != "" ]] && echo "-PforceVersion=$(echo $NEXT_VERSION)" || echo "")
-  #            ./gradlew $OVERRIDE_VERSION hugoBuild --parallel
-  #          check-command: true
-  #          should-run-codecov: false
-  #          should-deploy: false
-  #          should-validate-wrapper: false
-  #      - name: Release website to Github Pages
-  #        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
-  #        uses: JamesIves/github-pages-deploy-action@v4.4.3
-  #        with:
-  #          BRANCH: gh-pages
-  #          FOLDER: build/website
+  build-website:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v3.5.3
+        with:
+          submodules: true
+          fetch-depth: 0
+      - name: Install Node
+        uses: actions/setup-node@v4.0.4
+        with:
+          node-version-file: site/package.json
+      - name: Build documentation website
+        working-directory: site
+        run: |
+          npm install
+          npm run build
+      - name: Tar files
+        run: tar -cvf website.tar site/build
+      - name: Upload website
+        uses: actions/upload-artifact@v4.4.3
+        with:
+          name: website-${{ github.sha }}
+          path: website.tar
 
   close-staging-repos:
     needs:
       - staging-repo
       - build
     runs-on: ubuntu-24.04
-    concurrency:
-      group: close-staging-repos
     if: ${{ needs.check-secrets.outputs.run-with-secrets == 'true' }}
     steps:
       - name: Checkout the repo
@@ -156,11 +150,12 @@ jobs:
 
   release:
     concurrency:
-      group: release
+      group: release-${{ github.workflow }}-${{ github.event.number || github.ref }}
+      cancel-in-progress: false
     needs:
       - check-secrets
       - staging-repo
-      #      - build-website
+      - build-website
       - build
       - close-staging-repos
     runs-on: ubuntu-24.04
@@ -172,6 +167,24 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.PERSONAL_TOKEN }}
+      - name: Checkout the docs
+        if: contains(github.repository, 'Collektive/collektive')
+        uses: actions/checkout@v4.2.1
+        with:
+          path: deployed-website
+          fetch-depth: 0
+          persist-credentials: true
+          repository: Collektive/collektive.github.io
+          token: ${{ secrets.DEPLOYMENT_TOKEN }}
+      - name: Download website artifact
+        uses: actions/download-artifact@v4.1.8
+        with:
+          name: website-${{ github.sha }}
+      - name: Unpack website
+        run: |
+          tar -xvf website.tar
+          mv deployed-website/.git site/build
+          git -C site/build status
       - name: Find the version of Node from package.json
         id: node-version
         run: echo "version=$(jq -r .engines.node package.json)" >> $GITHUB_OUTPUT
