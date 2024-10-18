@@ -175,7 +175,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
           repository: Collektive/collektive.github.io
-          token: ${{ secrets.DEPLOYMENT_TOKEN }}
+          token: ${{ secrets.PERSONAL_TOKEN }}
       - name: Download website artifact
         uses: actions/download-artifact@v4.1.8
         with:
