@@ -88,6 +88,12 @@ jobs:
           # Dry-deployment
           check-command: |
             ./gradlew check :compiler-plugin:check :gradle-plugin:check --parallel
+            # Stop the Gradle Daemon on windows to try to prevent
+            # "The process cannot access the file because it is being used by another process"
+            if ${{ runner.os == 'Windows' }}; then
+              ./gradlew --stop
+              # powershell kill-windows-processes.ps1
+            fi
           deploy-command: |
             NEXT_VERSION="${{ needs.staging-repo.outputs.next-version }}"
             OVERRIDE_VERSION=$([[ "$NEXT_VERSION" != "" ]] && echo "-PforceVersion=$(echo $NEXT_VERSION)" || echo "")
