@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.toResolvedCallableSymbol
 import org.jetbrains.kotlin.fir.expressions.unwrapExpression
+import org.jetbrains.kotlin.fir.references.toResolvedFunctionSymbol
 
 /**
  * Collection of utilities for FIR checkers.
@@ -65,7 +66,7 @@ object CheckersUtility {
         containingElements.any { (it as? FirSimpleFunction)?.receiverParameter?.isAggregate(session) == true }
 
     /**
-     * Returns wrapping [elements][FirElement] until it finds the element that satisfies the predicate (which is
+     * Returns wrapping [FirElement]s until it finds the element that satisfies the predicate (which is
      * excluded from the result). The context's element is excluded.
      *
      * If [excludeDotCall] is set to *true*, elements that represent a dot call on the context's element are excluded
@@ -79,6 +80,10 @@ object CheckersUtility {
      * ```
      * With [excludeDotCall] set to *false*, this method would return `List(FirFunctionCall("map"),
      * FirWhileLoop("for"), FirWhileLoop("for"))`, instead with *true* the first `map` would be excluded.
+     *
+     * An example of [predicate] is `{ it is FirWhileLoop }`, which makes this method return all the containing
+     * elements until it finds the first Kotlin `for (...)` that wraps the context's element. If there is no such loop,
+     * this method returns `null`.
      */
     fun CheckerContext.wrappingElementsUntil(
         excludeDotCall: Boolean = true,
@@ -112,13 +117,13 @@ object CheckersUtility {
         ((this as? FirFunctionCall)?.explicitReceiver?.unwrapExpression() as? FirFunctionCall)?.functionName()
 
     /**
-     * Returns the receiver [List] only if it doesn't contain any function declaration, or `null` otherwise.
+     * Returns the receiver list only if it doesn't contain any function declaration, or `null` otherwise.
      */
     fun List<FirElement>.discardIfFunctionDeclaration(): List<FirElement>? =
         takeIf { elements -> elements.none { it is FirSimpleFunction } }
 
     /**
-     * Returns the receiver [List] only if it doesn't contain any `aggregate` block.
+     * Returns the receiver list only if it doesn't contain any `aggregate` block.
      * For example, if the List represents the containing elements, in this code:
      * ```kotlin
      * for(...) {
@@ -127,7 +132,7 @@ object CheckersUtility {
      *    }
      * }
      * ```
-     * the List is *discarded* (i.e. it returns null) because a portion of the containing elements is _outside_ the
+     * the list is *discarded* (i.e. it returns null) because a portion of the containing elements is _outside_ the
      * `aggregate` block.
      */
     fun List<FirElement>.discardIfOutsideAggregateEntryPoint(): List<FirElement>? =
@@ -146,4 +151,20 @@ object CheckersUtility {
      */
     fun FirFunctionCall.functionName(): String =
         calleeReference.name.asString()
+
+    /**
+     * Returns the fully qualified name of this [FirFunctionCall].
+     */
+    fun FirFunctionCall.fqName(): String {
+        val callableId = calleeReference.toResolvedFunctionSymbol()?.callableId
+
+        val packageName = callableId?.packageName?.asString()
+        val className = callableId?.className?.asString()
+        val functionName = callableId?.callableName?.asString()
+        return if (className != null) {
+            "$packageName.$className.$functionName"
+        } else {
+            "$packageName.$functionName"
+        }
+    }
 }

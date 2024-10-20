@@ -3,6 +3,7 @@ package it.unibo.collektive.frontend.checkers
 import it.unibo.collektive.frontend.checkers.CheckersUtility.discardIfFunctionDeclaration
 import it.unibo.collektive.frontend.checkers.CheckersUtility.discardIfOutsideAggregateEntryPoint
 import it.unibo.collektive.frontend.checkers.CheckersUtility.functionName
+import it.unibo.collektive.frontend.checkers.CheckersUtility.fqName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isAggregate
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isFunctionCallsWithName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.wrappingElementsUntil
@@ -19,12 +20,16 @@ import org.jetbrains.kotlin.fir.expressions.FirWhileLoop
  */
 object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
 
-    private val SAFE_OPERATORS = listOf("alignedOn", "align", "dealign")
+    private val SAFE_OPERATORS = listOf(
+        "it.unibo.collektive.aggregate.api.Aggregate.alignedOn",
+        "it.unibo.collektive.aggregate.api.Aggregate.align",
+        "it.unibo.collektive.aggregate.api.Aggregate.dealign"
+    )
 
     /**
      * Methods used inside collections to iterate their elements.
      */
-    val ITERATIVE_METHODS = setOf(
+    private val ITERATIVE_METHODS = setOf(
         "forEach",
         "filter",
         "map",
@@ -177,14 +182,14 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         reporter: DiagnosticReporter,
     ) {
         val calleeName = expression.functionName()
-        if (calleeName !in SAFE_OPERATORS &&
+        if (expression.fqName() !in SAFE_OPERATORS &&
             expression.isAggregate(context.session) &&
             context.isIteratedWithoutAlignedOn()
         ) {
             reporter.reportOn(
                 expression.calleeReference.source,
                 CheckersUtility.PluginErrors.DOT_CALL_WARNING,
-                "Warning: aggregate function '$calleeName' called inside a loop with no manual alignment operation",
+                "Warning: aggregate function '$calleeName' called inside a loop without explicit alignment",
                 context,
             )
         }

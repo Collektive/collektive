@@ -63,7 +63,5 @@ object CompileUtils {
         headers("functionCall"),
         row("exampleAggregate()"),
         row("neighboring(0)"),
-//        row("exchange(0) { it }"),
-//        row("repeat(0) { it + 1 }"),
     )
 }
