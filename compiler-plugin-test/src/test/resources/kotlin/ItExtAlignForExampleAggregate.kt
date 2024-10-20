@@ -1,4 +1,5 @@
 import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.Collektive.Companion.aggregate
 
 fun Aggregate<Int>.exampleAggregate() {}
 
@@ -7,9 +8,9 @@ fun Aggregate<Int>.exampleAggregate() {}
 // ========= ========= ========= ========= ========= ========= ========= ========= ========= =========
 
 fun Aggregate<Int>.entry() {
-    for(i in 1..3) {
-        alignedOn(0) {
-            neighboring(0)
+    alignedOn(0) {
+        for(i in 1..3) {
+            exampleAggregate()
         }
     }
 }

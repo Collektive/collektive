@@ -88,7 +88,12 @@ class IterationWithoutAlignSpec : FreeSpec({
 
         fun getTextFromResource(case: String, iteration: String, aggregateFunction: String): String =
             IterationWithoutAlignSpec::class.java
-                .getResource("/kotlin/${case}_${iteration}_$aggregateFunction.kt")!!
+                .getResource(
+                    "/kotlin/" +
+                        case.replaceFirstChar(Char::titlecase) +
+                        iteration.replaceFirstChar(Char::titlecase) +
+                        "${aggregateFunction.replaceFirstChar(Char::titlecase)}.kt",
+                )!!
                 .readText()
 
         val formsOfIteration = table(
