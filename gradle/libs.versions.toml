@@ -3,8 +3,8 @@ alchemist = "34.1.5"
 build-config = "5.5.0"
 coroutines = "1.9.0"
 dokka = "1.9.20"
-kotest = "5.9.1"
-kotlin = "2.0.10"
+kotest = "6.0.0.M1"
+kotlin = "2.0.20"
 
 [libraries]
 alchemist-api = { module = "it.unibo.alchemist:alchemist-api", version.ref = "alchemist" }
@@ -16,7 +16,6 @@ javap = "com.perfma.wrapped:com.sun.tools:1.8.0_jdk8u275-b01_linux_x64"
 kctfork = "dev.zacsweers.kctfork:core:0.5.1"
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
-kotest-framework-datatest = { module = "io.kotest:kotest-framework-datatest", version.ref = "kotest" }
 kotest-runner-junit5-jvm = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }
 kotlin-compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin" }
 kotlin-scripting-compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable", version.ref = "kotlin" }
@@ -38,7 +37,6 @@ kotlin-compiler = [
 kotlin-testing-common = [
     "kotest-assertions-core",
     "kotest-framework-engine",
-    "kotest-framework-datatest",
     "kotlin-test",
     "kotlin-test-common",
     "kotlin-test-annotations-common",
