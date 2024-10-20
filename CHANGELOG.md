@@ -1,3 +1,9 @@
+## [10.5.0](https://github.com/Collektive/collektive/compare/10.4.0...10.5.0) (2024-10-20)
+
+### Dependency updates
+
+* **api-deps:** update kotlin to v2.0.20 and Kotest to v6.0.0.M1 ([#518](https://github.com/Collektive/collektive/issues/518)) ([629076b](https://github.com/Collektive/collektive/commit/629076b5bfb239f4f4ad2d23988f21dfc3351c1a))
+
 ## [10.4.0](https://github.com/Collektive/collektive/compare/10.3.2...10.4.0) (2024-10-19)
 
 ### Features
