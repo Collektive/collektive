@@ -1,3 +1,66 @@
+## [10.5.0](https://github.com/Collektive/collektive/compare/10.4.0...10.5.0) (2024-10-20)
+
+### Dependency updates
+
+* **api-deps:** update kotlin to v2.0.20 and Kotest to v6.0.0.M1 ([#518](https://github.com/Collektive/collektive/issues/518)) ([629076b](https://github.com/Collektive/collektive/commit/629076b5bfb239f4f4ad2d23988f21dfc3351c1a))
+
+## [10.4.0](https://github.com/Collektive/collektive/compare/10.3.2...10.4.0) (2024-10-19)
+
+### Features
+
+* create site for documentation ([f135443](https://github.com/Collektive/collektive/commit/f1354437ffac517d25f5dbfc7fb5de840680cedf))
+
+### Dependency updates
+
+* **deps:** update alchemist to v34.1.5 ([ae2ff42](https://github.com/Collektive/collektive/commit/ae2ff4260ab45d1171b72b7bc2b9d5ce32f791a6))
+* **deps:** update dependency gradle to v8.10.2 ([ddb55c2](https://github.com/Collektive/collektive/commit/ddb55c2eb17c1ef4657e9af560585af168a28cbe))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.107 ([1e7f015](https://github.com/Collektive/collektive/commit/1e7f01518e010feeb6654c871429f88e94d90f51))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.108 ([b7dc684](https://github.com/Collektive/collektive/commit/b7dc684438d53ce65b2bda2fd440b27aa4a6a590))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.109 ([657e09a](https://github.com/Collektive/collektive/commit/657e09a35f1b5539a9c6d33aa12e9fd628327f4d))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.110 ([9084d68](https://github.com/Collektive/collektive/commit/9084d68c93f97c214554cb7fe069f9f42704f1ce))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.111 ([aa03d44](https://github.com/Collektive/collektive/commit/aa03d4417cc51f765c4ce657f2a538a5251b26d0))
+* **deps:** update dependency typescript to ~5.6.0 ([6a936b6](https://github.com/Collektive/collektive/commit/6a936b635c59c487118362d35413eff1a812293b))
+* **deps:** update node.js to 20.18 ([70d78ef](https://github.com/Collektive/collektive/commit/70d78ef761e186f1e2af45af7c34774a16c231c6))
+* **deps:** update plugin kotlin-qa to v0.67.2 ([d8dee31](https://github.com/Collektive/collektive/commit/d8dee31c72d68b00206720ee49346eb60778663d))
+* **deps:** update plugin kotlin-qa to v0.67.3 ([4415f10](https://github.com/Collektive/collektive/commit/4415f1058f6efd9ce79ca1f72df426c872453ec8))
+* **deps:** update plugin kotlin-qa to v0.68.0 ([b4fce68](https://github.com/Collektive/collektive/commit/b4fce68628f9860e931d25d36aa31f904a53d5a0))
+* **deps:** update plugin multijvmtesting to v1.2.8 ([7d5985b](https://github.com/Collektive/collektive/commit/7d5985b06285ecfac4634e811d4561d736d72ef4))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.13 ([e8fb01d](https://github.com/Collektive/collektive/commit/e8fb01db30e6918b79e22ff424f44350bc9fdef4))
+* **deps:** update plugin publishoncentral to v5.1.8 ([8a7bd97](https://github.com/Collektive/collektive/commit/8a7bd97f0bfdd9c8acafcada0aefeb432fda6a5f))
+* **deps:** update plugin publishoncentral to v5.1.9 ([a9ddce6](https://github.com/Collektive/collektive/commit/a9ddce6a576234f7b82acbcb40aa12358e6882fa))
+
+### Documentation
+
+* **site:** revam frontpage ([2f1716b](https://github.com/Collektive/collektive/commit/2f1716b76faaa4074aca73a8a68ba0c62ae17e9e))
+* **website:** solved security warning ([80d149b](https://github.com/Collektive/collektive/commit/80d149b9df777a82500a79fe8d544cfe52fa1752))
+
+### Tests
+
+* using the same name convention for all test classes ([#489](https://github.com/Collektive/collektive/issues/489)) ([f72a900](https://github.com/Collektive/collektive/commit/f72a9009ac8aa00c1bbf1e3f8423c10b7666eba8))
+
+### Build and continuous integration
+
+* add command for website deployment ([5377d76](https://github.com/Collektive/collektive/commit/5377d76190a0ce5723b85a79ed3f34b2bfb5feca))
+* **deps:** remove arrow dependency ([e5bb75b](https://github.com/Collektive/collektive/commit/e5bb75b8d8c1cf76d9d88622d542917eca88c84f))
+* **deps:** update actions/checkout action to v4 ([947fbf4](https://github.com/Collektive/collektive/commit/947fbf4b74e694fccf61815debe4fe50655b52ee))
+* **deps:** update actions/checkout action to v4.2.0 ([ecac1eb](https://github.com/Collektive/collektive/commit/ecac1ebc48bae16ff0a100d22015a50d49510635))
+* **deps:** update actions/checkout action to v4.2.1 ([0ee79d2](https://github.com/Collektive/collektive/commit/0ee79d21afb3ca770cae3747174bed09418ac409))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.10 ([cc527e9](https://github.com/Collektive/collektive/commit/cc527e93dc025711eca40892c3d2c705b7c09606))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.7 ([1e43cb0](https://github.com/Collektive/collektive/commit/1e43cb0216cc0a7e5cf05018036d10a95d3f5925))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.8 ([358f8f0](https://github.com/Collektive/collektive/commit/358f8f03e4e6ea47b42134e3bbdd4451293250ff))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.9 ([05578a0](https://github.com/Collektive/collektive/commit/05578a08d0764f7c09320527062ed5711ec516cf))
+* enable website build and publish ([c120160](https://github.com/Collektive/collektive/commit/c12016022fa8e217265a8c0aa6fbc6b02d83e3f7))
+* fix token name ([5b5fcad](https://github.com/Collektive/collektive/commit/5b5fcadb1283791d9229818ec37da726f98baff0))
+* stop the Gradle Daemon on Windows before deployment to prevent "The process cannot access the file because it is being used by another process" ([a9a92e6](https://github.com/Collektive/collektive/commit/a9a92e6d2332502ecde13825af18db0771dc5d8b))
+
+### Style improvements
+
+* avoid star import ([cab883b](https://github.com/Collektive/collektive/commit/cab883bdb47ca34ae2aa1fed2ef6060e09c0d7e3))
+
+### Refactoring
+
+* **field:** change fold implementation to be not dependent from arrow ([52b7526](https://github.com/Collektive/collektive/commit/52b7526aa72d04305c4ab400f0c62ddb1b89509c))
+
 ## [10.3.2](https://github.com/Collektive/collektive/compare/10.3.1...10.3.2) (2024-09-20)
 
 ### Dependency updates
