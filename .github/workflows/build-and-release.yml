@@ -191,13 +191,10 @@ jobs:
           tar -xvf website.tar
           mv deployed-website/.git site/build
           git -C site/build status
-      - name: Find the version of Node from package.json
-        id: node-version
-        run: echo "version=$(jq -r .engines.node package.json)" >> $GITHUB_OUTPUT
       - name: Install Node
         uses: actions/setup-node@v4.0.4
         with:
-          node-version: ${{ steps.node-version.outputs.version }}
+          node-version-file: package.json
       - uses: DanySK/build-check-deploy-gradle-action@3.5.10
         env:
           STAGING_REPO_ID: ${{ needs.staging-repo.outputs.maven-central-repo-id }}
