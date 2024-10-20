@@ -7,13 +7,6 @@ import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 
 @OptIn(ExperimentalCompilerApi::class)
 class ExplicitAlignTest : FreeSpec({
-    val codeTemplate = """
-        import it.unibo.collektive.aggregate.api.Aggregate
-        
-        fun Aggregate<Int>.entry() {
-            %s
-        }
-    """.trimIndent()
     "The `align` function" - {
         val code = codeTemplate.format("align(null)").asTestingProgram("ExplicitAlign.kt")
         "should produce a warning when used explicitly" - {
@@ -33,5 +26,13 @@ class ExplicitAlignTest : FreeSpec({
 }) {
     companion object {
         const val EXPECTED_WARNING_MESSAGE = "Warning: '%s' method should not be explicitly used"
+
+        val codeTemplate = """
+        import it.unibo.collektive.aggregate.api.Aggregate
+        
+        fun Aggregate<Int>.entry() {
+            %s
+        }
+        """.trimIndent()
     }
 }
