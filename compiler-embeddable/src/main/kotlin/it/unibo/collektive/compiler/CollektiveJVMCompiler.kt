@@ -3,7 +3,6 @@ package it.unibo.collektive.compiler
 import it.unibo.collektive.AlignmentCommandLineProcessor
 import it.unibo.collektive.AlignmentComponentRegistrar
 import it.unibo.collektive.compiler.logging.SLF4JMessageCollector
-import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
 import org.jetbrains.kotlin.cli.common.arguments.K2JVMCompilerArguments
 import org.jetbrains.kotlin.cli.common.config.addKotlinSourceRoot
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -67,7 +66,7 @@ object CollektiveJVMCompiler {
             }
         }
         // CLI compiler configuration
-        configuration.put(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, messageCollector)
+        configuration.put(CommonConfigurationKeys.MESSAGE_COLLECTOR_KEY, messageCollector)
         // Common Kotlin configuration
         configuration.put(CommonConfigurationKeys.MODULE_NAME, moduleName)
         // Kotlin-JVM specific configuration
