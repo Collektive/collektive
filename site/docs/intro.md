@@ -2,6 +2,6 @@
 sidebar_position: 0
 ---
 
-# Collektive Intro
+# Collektive Introduction
 
 todo
