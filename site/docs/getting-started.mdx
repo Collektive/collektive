@@ -1,0 +1,79 @@
+---
+sidebar_position: 1
+sidebar_label: Getting Started
+id: gettingstarted
+title: Getting Started
+---
+
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+**Collektive** is composed of several independent components:
+
+- The core _DSL_ (Domain Specific Language) defining the language syntax and semantics.
+- The _compiler plugin_ used to automatically devise the communication protocol based on the program's structure.
+- The _stdlib_ (Standard Library) providing common functionalities and data structures.
+
+## Compiler plugin setup
+
+To use **Collektive** in your project, first add the **compiler plugin** to your `build.gradle.kts` file:
+
+```kotlin
+plugins {
+    kotlin("multiplatform") version "<kotlin_version>"
+    id("it.unibo.collektive.collektive-plugin") version "<latest version>"
+}
+```
+
+:::danger
+The **compiler plugin** it's a mandatory component of the **Collektive** ecosystem. It is used to automatically devise
+the
+communication protocol based on the program's structure.
+
+Without this plugin, the program will **NOT** run as expected at runtime.
+:::
+
+## Dependencies setup
+To start you app development, add the `dsl` and (optionally) the `stdlib` dependencies to your `build.gradle.kts` file:
+
+<Tabs>
+<TabItem value="multiplatform" label="Multiplatform">
+
+```kotlin
+kotlin {
+    jvm()
+    js()
+    ...
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                implementation("it.unibo.collektive:dsl:<latest version>")
+                implementation("it.unibo.collektive:stdlib:<latest version>")
+            }
+        }
+    }
+}
+```
+
+</TabItem>
+<TabItem value="jvm" label="JVM only">
+
+```kotlin
+dependencies {
+    implementation("it.unibo.collektive:dsl:<latest version>")
+    implementation("it.unibo.collektive:stdlib:<latest version>")
+}
+```
+
+</TabItem>
+</Tabs>
+
+:::tip[**Collektive** :heart: Kotlin Multiplatform]
+
+**Collektive** supports [KMP](https://kotlinlang.org/docs/multiplatform-intro.html) (Kotlin Multiplatform) projects, allowing you to use the DSL in Native, JS, and JVM environments.       
+Currently, the following platforms are supported:
+- **JVM**
+- **JS** (node.js and browser)
+- **Native** (iOS, macOS, Linux, Windows)
+:::
