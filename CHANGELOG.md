@@ -1,3 +1,19 @@
+## [10.5.0](https://github.com/Collektive/collektive/compare/10.4.0...10.5.0) (2024-10-21)
+
+### Dependency updates
+
+* **api-deps:** update kotlin to v2.0.20 and Kotest to v6.0.0.M1 ([#518](https://github.com/Collektive/collektive/issues/518)) ([629076b](https://github.com/Collektive/collektive/commit/629076b5bfb239f4f4ad2d23988f21dfc3351c1a))
+* **deps:** update alchemist to v34.1.6 ([6653b67](https://github.com/Collektive/collektive/commit/6653b67425564d19ac2349bf2a464df552554091))
+* **deps:** update dependency @mdx-js/react to v3.1.0 ([998bc35](https://github.com/Collektive/collektive/commit/998bc3539ad8f2ee4acff5785897b7769889747c))
+
+### Build and continuous integration
+
+* use the built-in feature of setup-node to install the correct node engine version ([#519](https://github.com/Collektive/collektive/issues/519)) ([3fdfa8b](https://github.com/Collektive/collektive/commit/3fdfa8b4a2d93b7f33bc6b1c033e46cffa2219bc))
+
+### General maintenance
+
+* **release:** 10.5.0 [skip ci] ([42b3f4b](https://github.com/Collektive/collektive/commit/42b3f4be23b08cbc8fa411b476141e173c49ca11)), closes [#518](https://github.com/Collektive/collektive/issues/518)
+
 ## [10.5.0](https://github.com/Collektive/collektive/compare/10.4.0...10.5.0) (2024-10-20)
 
 ### Dependency updates
