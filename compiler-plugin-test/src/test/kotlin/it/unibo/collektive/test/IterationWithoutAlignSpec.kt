@@ -11,6 +11,7 @@ import it.unibo.collektive.test.util.CompileUtils.noWarning
 import it.unibo.collektive.test.util.CompileUtils.testedAggregateFunctions
 import it.unibo.collektive.test.util.CompileUtils.warning
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
+import java.io.FileNotFoundException
 
 @OptIn(ExperimentalCompilerApi::class)
 class IterationWithoutAlignSpec : FreeSpec({
@@ -31,7 +32,7 @@ class IterationWithoutAlignSpec : FreeSpec({
                     ).asTestingProgram("$functionName-${caseName}_$iteration.kt")
 
                 "inside $iterationDescription and using $functionName without a specific alignedOn" - {
-                    val case = "SIMPLE_IT"
+                    val case = "It"
                     val code = getTestingProgram(case)
 
                     "should compile producing a warning" - {
@@ -42,7 +43,7 @@ class IterationWithoutAlignSpec : FreeSpec({
                 }
 
                 "inside $iterationDescription and using $functionName wrapped in a specific alignedOn" - {
-                    val case = "SIMPLE_IT_ALGN"
+                    val case = "ItAlign"
                     val code = getTestingProgram(case)
 
                     "should compile without any warning" - {
@@ -51,7 +52,7 @@ class IterationWithoutAlignSpec : FreeSpec({
                 }
 
                 "inside $iterationDescription and using $functionName wrapped in alignedOn outside the loop" - {
-                    val case = "IT_EXT_ALGN"
+                    val case = "ItExtAlign"
                     val code = getTestingProgram(case)
 
                     "should compile producing a warning" - {
@@ -62,7 +63,7 @@ class IterationWithoutAlignSpec : FreeSpec({
                 }
 
                 "inside $iterationDescription and using $functionName wrapped inside another function declaration" - {
-                    val case = "IT_NST_FUN"
+                    val case = "ItNstFun"
                     val code = getTestingProgram(case)
 
                     "should compile without any warning" - {
@@ -71,7 +72,7 @@ class IterationWithoutAlignSpec : FreeSpec({
                 }
 
                 "inside $iterationDescription outside the 'aggregate' entry point while using $functionName" - {
-                    val case = "OUTSIDE_AGGREGATE"
+                    val case = "OutsideAggregate"
                     val code = getTestingProgram(case)
 
                     "should compile without any warning" - {
@@ -93,13 +94,15 @@ class IterationWithoutAlignSpec : FreeSpec({
                         case.replaceFirstChar(Char::titlecase) +
                         iteration.replaceFirstChar(Char::titlecase) +
                         "${aggregateFunction.replaceFirstChar(Char::titlecase)}.kt",
-                )!!
-                .readText()
+                )?.readText()
+                ?: throw FileNotFoundException(
+                    "File not found for: case=$case, iteration=$iteration, aggregateFunction=$aggregateFunction",
+                )
 
         val formsOfIteration = table(
             headers("iteration", "iterationDescription"),
-            row("for", "a for loop"),
-            row("listOf_forEach", "a 'forEach' call"),
+            row("For", "a for loop"),
+            row("ListOfForEach", "a 'forEach' call"),
         )
     }
 }

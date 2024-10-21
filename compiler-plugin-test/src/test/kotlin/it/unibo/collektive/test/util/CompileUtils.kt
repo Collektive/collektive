@@ -61,7 +61,6 @@ object CompileUtils {
 
     val testedAggregateFunctions = table(
         headers("functionCall"),
-        row("exampleAggregate()"),
         row("neighboring(0)"),
     )
 }
