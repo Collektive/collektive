@@ -2,6 +2,8 @@ import clsx from 'clsx';
 import Heading from '@theme/Heading';
 import CodeBlock from '@theme/CodeBlock';
 import styles from './styles.module.css';
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from "@docusaurus/useBaseUrl";
 
 const codeNeighbor = `fun Aggregate<Int>.neighborCounter(): Int =
     neighboring(1).hood(0) { acc, _ ->
@@ -18,8 +20,6 @@ fun gradient(source: Boolean): Double =
         }
     }
 `
-
-const KotlinLogo = require('@site/static/img/KotlinLogo.svg').default
 
 export default function HomepageFeatures(): JSX.Element {
     return (
@@ -47,7 +47,13 @@ export default function HomepageFeatures(): JSX.Element {
 
                     <div className={clsx('col col--4')}>
                         <div className="text--center">
-                            <KotlinLogo className={styles.featureSvg}/>
+                            <ThemedImage
+                                alt="KMP logo"
+                                sources={{
+                                    light: useBaseUrl("/img/kmp.svg"),
+                                    dark: useBaseUrl("/img/kmp-dark.svg"),
+                                }}
+                            />
                         </div>
                         <div className="text--center padding-horiz--md">
                             <Heading as="h3">Kotlin Multiplatform Enabled</Heading>
