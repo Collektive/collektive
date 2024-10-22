@@ -1,3 +1,17 @@
+## [10.5.2](https://github.com/Collektive/collektive/compare/10.5.1...10.5.2) (2024-10-22)
+
+### Dependency updates
+
+* **deps:** update alchemist to v34.1.8 ([198c13c](https://github.com/Collektive/collektive/commit/198c13c388758157f16acbcb4aea59fa200952e9))
+
+### Documentation
+
+* **site:** update algolia api pointing to unlimited account ([1ed91ec](https://github.com/Collektive/collektive/commit/1ed91ec7cb05623c39998712d71a0b24c56572bc))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.11 ([041b0ff](https://github.com/Collektive/collektive/commit/041b0ffeded04beefa029956eb5ec77a4584a369))
+
 ## [10.5.1](https://github.com/Collektive/collektive/compare/10.5.0...10.5.1) (2024-10-22)
 
 ### Dependency updates
