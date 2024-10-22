@@ -38,3 +38,10 @@ fun <ID : Comparable<ID>, Value> Aggregate<ID>.gossip(
         }
     }.value
 }
+
+/**
+ * A gossip algorithm that computes whether any device has ever experienced a certain [condition] before.
+ */
+fun <ID : Comparable<ID>> Aggregate<ID>.everHappenedGossip(
+    condition: () -> Boolean,
+): Boolean = gossip(condition()) { _, _ -> condition() }
