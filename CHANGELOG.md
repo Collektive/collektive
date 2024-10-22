@@ -1,3 +1,13 @@
+## [10.5.1](https://github.com/Collektive/collektive/compare/10.5.0...10.5.1) (2024-10-22)
+
+### Dependency updates
+
+* **deps:** update dependency it.unibo.alchemist:alchemist-api to v34.1.7 ([0487e63](https://github.com/Collektive/collektive/commit/0487e63506f662a8228be087d16b7f5914815acc))
+
+### Documentation
+
+* **site:** setup getting started page and enable algola search ([0f8089d](https://github.com/Collektive/collektive/commit/0f8089d7645f01a2f214ebff24f4a89537922a80))
+
 ## [10.5.0](https://github.com/Collektive/collektive/compare/10.4.0...10.5.0) (2024-10-21)
 
 ### Dependency updates
