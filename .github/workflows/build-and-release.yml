@@ -172,7 +172,7 @@ jobs:
         uses: actions/checkout@v4.2.1
         with:
           fetch-depth: 0
-          token: ${{ secrets.PERSONAL_TOKEN }}
+          token: ${{ secrets.DEPLOYMENT_TOKEN }}
       - name: Checkout the docs
         if: contains(github.repository, 'Collektive/collektive')
         uses: actions/checkout@v4.2.1
@@ -181,7 +181,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
           repository: Collektive/collektive.github.io
-          token: ${{ secrets.PERSONAL_TOKEN }}
+          token: ${{ secrets.DEPLOYMENT_TOKEN }}
       - name: Download website artifact
         uses: actions/download-artifact@v4.1.8
         with:
