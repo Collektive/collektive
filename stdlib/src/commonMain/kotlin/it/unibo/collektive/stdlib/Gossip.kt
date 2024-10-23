@@ -16,17 +16,17 @@ import it.unibo.collektive.field.Field.Companion.fold
  * The [value] exchanged in the gossip algorithm.
  * It contains the [value] itself and the [path] of nodes through which it has passed.
  */
-private data class GossipValue<ID : Comparable<ID>, Value>(val value: Value, val path: List<ID>)
+private data class GossipValue<ID : Comparable<ID>, Type>(val value: Type, val path: List<ID>)
 
 /**
  * Gossip algorithm implementation.
  * Each node starts with an [initial] value, shares it with its neighbors,
  * and updates its value based on the best value received according to the [selector].
  */
-fun <ID : Comparable<ID>, Value> Aggregate<ID>.gossip(
-    initial: Value,
-    selector: (Value, Value) -> Boolean,
-): Value {
+fun <ID : Comparable<ID>, Type> Aggregate<ID>.gossip(
+    initial: Type,
+    selector: (Type, Type) -> Boolean,
+): Type {
     val local = GossipValue(initial, emptyList<ID>())
     return share(local) { gossip ->
         gossip.fold(local) { current, next ->
@@ -40,8 +40,8 @@ fun <ID : Comparable<ID>, Value> Aggregate<ID>.gossip(
 }
 
 /**
- * A gossip algorithm that computes whether any device has ever experienced a certain [condition] before.
+ * A gossip algorithm that computes whether any device is experiencing a certain [condition].
  */
-fun <ID : Comparable<ID>> Aggregate<ID>.everHappenedGossip(
+fun <ID : Comparable<ID>> Aggregate<ID>.isHappeningGossip(
     condition: () -> Boolean,
 ): Boolean = gossip(condition()) { _, _ -> condition() }
