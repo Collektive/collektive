@@ -27,7 +27,7 @@ fun <ID : Any, Type> Aggregate<ID>.nonSelfStabilizingGossip(
 /**
  * A "gossip" algorithm that computes whether any device has ever experienced a certain [condition] before.
  */
-fun <ID : Any> Aggregate<ID>.nonSelfStabilizingEverHappenedGossip(
+fun <ID : Any> Aggregate<ID>.everHappenedGossip(
     condition: () -> Boolean,
     default: Boolean = false,
 ): Boolean = share(default) {
