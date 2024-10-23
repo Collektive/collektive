@@ -42,6 +42,6 @@ fun <ID : Comparable<ID>, Type> Aggregate<ID>.gossip(
 /**
  * A gossip algorithm that computes whether any device is experiencing a certain [condition].
  */
-fun <ID : Comparable<ID>> Aggregate<ID>.isHappeningGossip(
+fun <ID : Comparable<ID>> Aggregate<ID>.isHappeningAnywhere(
     condition: () -> Boolean,
 ): Boolean = gossip(condition()) { _, _ -> condition() }
