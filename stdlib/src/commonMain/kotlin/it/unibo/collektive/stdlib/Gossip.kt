@@ -21,20 +21,19 @@ private data class GossipValue<ID : Comparable<ID>, Type>(val value: Type, val p
 /**
  * Gossip algorithm implementation.
  * Each node starts with an [initial] value, shares it with its neighbors,
- * and updates its value based on the best value received according to the [selector].
+ * and updates its value based on the best value received according to the [selector]. uik
  */
 fun <ID : Comparable<ID>, Type> Aggregate<ID>.gossip(
     initial: Type,
     selector: (Type, Type) -> Boolean,
 ): Type {
-    val local = GossipValue(initial, emptyList<ID>())
+    val local = GossipValue(initial, listOf(localId))
     return share(local) { gossip ->
         gossip.fold(local) { current, next ->
-            val selected = when {
+            when {
                 selector(current.value, next.value) || localId in next.path -> current
-                else -> next
+                else -> next.copy(path = next.path + localId)
             }
-            selected.copy(path = selected.path + localId)
         }
     }.value
 }
