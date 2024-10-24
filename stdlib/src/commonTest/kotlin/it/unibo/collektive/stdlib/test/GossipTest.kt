@@ -20,6 +20,9 @@ class GossipTest : StringSpec({
     fun Environment<Double>.gossipIsStable(): Boolean =
         status().values.distinct().size == 1
 
+    fun Environment<Double>.gossipResult(): Double =
+        status().values.distinct().first()
+
     fun squareMooreGridWithGossip(size: Int) =
         mooreGrid<Double>(size, size, { _, _ -> Double.NaN }) {
             gossip(localId.toDouble()) { a, b -> a >= b } // gossip the max localID in the network
@@ -61,6 +64,7 @@ class GossipTest : StringSpec({
 
         // status at second cycle
         environment.gossipIsStable() shouldBe true
+        environment.gossipResult() shouldBe 24.0
     }
 
     "gossip in the best case stabilizes in one cycle" {
@@ -69,6 +73,7 @@ class GossipTest : StringSpec({
 
         environment.cycleInReverseOrder()
         environment.gossipIsStable() shouldBe true
+        environment.gossipResult() shouldBe 24.0
     }
 
     "gossip in the worst case stabilizes in the network diameter cycles" {
@@ -81,5 +86,6 @@ class GossipTest : StringSpec({
         }
         environment.cycleInOrder()
         environment.gossipIsStable() shouldBe true
+        environment.gossipResult() shouldBe 9.0
     }
 })
