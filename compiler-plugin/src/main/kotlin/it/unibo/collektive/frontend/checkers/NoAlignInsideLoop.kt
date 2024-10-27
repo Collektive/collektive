@@ -14,13 +14,16 @@ import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirFunctionCallChecker
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.FirWhileLoop
+import kotlin.reflect.KClass
+import kotlin.reflect.KParameter
+import kotlin.reflect.jvm.kotlinFunction
 
 /**
  * Checker that looks for aggregate functions called inside a loop without an explicit align operation.
  */
 object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
 
-    private val SAFE_OPERATORS = listOf(
+    private val safeOperators = listOf(
         "it.unibo.collektive.aggregate.api.Aggregate.alignedOn",
         "it.unibo.collektive.aggregate.api.Aggregate.align",
         "it.unibo.collektive.aggregate.api.Aggregate.dealign"
@@ -29,137 +32,26 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
     /**
      * Methods used inside collections to iterate their elements.
      */
-    private val ITERATIVE_METHODS = setOf(
-        "forEach",
-        "filter",
-        "map",
-        "flatMap",
-        "joinToString",
-        "contains",
-        "last",
-        "binarySearch",
-        "dropLastWhile",
-        "findLast",
-        "find",
-        "first",
-        "foldRight",
-        "fold",
-        "foldRightIndexed",
-        "indexOfFirst",
-        "indexOfLast",
-        "lastOrNull",
-        "mapIndexed",
-        "all",
-        "any",
-        "mapNotNull",
-        "filterNot",
-        "filterIndexed",
-        "filterNotNull",
-        "none",
-        "forEachIndexed",
-        "reduce",
-        "reduceIndexed",
-        "foldIndexed",
-        "groupBy",
-        "associateBy",
-        "partition",
-        "takeWhile",
-        "dropWhile",
-        "sortedBy",
-        "sortedWith",
-        "associate",
-        "associateByTo",
-        "associateTo",
-        "associateWith",
-        "associateWithTo",
-        "chunked",
-        "containsAll",
-        "count",
-        "distinctBy",
-        "elementAtOrElse",
-        "filterNotTo",
-        "filterTo",
-        "firstNotNullOf",
-        "firstNotNullOfOrNull",
-        "firstOrNull",
-        "flatMapIndexed",
-        "flatMapIndexedTo",
-        "flatMapTo",
-        "groupByTo",
-        "lastIndexOf",
-        "mapIndexedNotNull",
-        "mapIndexedNotNullTo",
-        "mapIndexedTo",
-        "mapNotNullTo",
-        "mapTo",
-        "maxBy",
-        "maxByOrNull",
-        "maxOf",
-        "maxOfOrNull",
-        "maxOfWith",
-        "maxOfWithOrNull",
-        "maxWith",
-        "maxWithOrNull",
-        "maxOrNull",
-        "minBy",
-        "minByOrNull",
-        "minOf",
-        "minOfOrNull",
-        "minOfWith",
-        "minOfWithOrNull",
-        "minWith",
-        "minWithOrNull",
-        "minOrNull",
-        "reduceIndexedOrNull",
-        "reduceOrNull",
-        "runningFold",
-        "run",
-        "runningFoldIndexed",
-        "runningReduce",
-        "runningReduceIndexed",
-        "scan",
-        "scanIndexed",
-        "single",
-        "singleOrNull",
-        "sortedByDescending",
-        "sumOf",
-        "zip",
-        "zipWithNext",
-        "onEach",
-        "onEachIndexed",
-        "takeIf",
-        "takeUnless",
-        "closure",
-        "convert",
-        "filterIsInstanceAnd",
-        "filterIsInstanceAndTo",
-        "filterIsInstanceMapNotNull",
-        "filterIsInstanceMapNotNullTo",
-        "filterIsInstanceMapTo",
-        "filterIsInstanceWithChecker",
-        "filterToSetOrEmpty",
-        "findIsInstanceAnd",
-        "firstNotNullResult",
-        "flatMapToNullable",
-        "flatMapToNullableSet",
-        "foldMap",
-        "joinToWithBuffer",
-        "keysToMap",
-        "keysToMapExceptNulls",
-        "mapToSetOrEmpty",
-        "memoryOptimizedFilter",
-        "memoryOptimizedFilterIsInstance",
-        "memoryOptimizedFilterNot",
-        "memoryOptimizedFlatMap",
-        "memoryOptimizedMap",
-        "memoryOptimizedMapIndexed",
-        "memoryOptimizedMapNotNull ",
-        "memoryOptimizedZip",
-        "same",
-        "selectMostSpecificInEachOverridableGroup",
-        "sumByLong",
-        "sure",
+    private val collectionMembers = listOf(
+        Class.forName("kotlin.collections.CollectionsKt").kotlin,
+        Collection::class,
+        Iterable::class,
+        List::class,
+        Map::class,
+        Sequence::class,
+        Set::class,
     )
+        .flatMap { it.java.methods.mapNotNull { it.kotlinFunction } + it.members }
+        .filter {
+            fun KParameter.isFunctionType(): Boolean = (type.classifier as? KClass<*>)?.qualifiedName
+                ?.startsWith("kotlin.Function")
+                ?: false
+            it.parameters.any { parameter ->
+                parameter.isFunctionType()
+            }
+        }
+        .map { it.name }
+        .toSet()
 
     private fun CheckerContext.isInsideALoopWithoutAlignedOn(): Boolean =
         wrappingElementsUntil { it is FirWhileLoop }
@@ -168,7 +60,7 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
             ?.none(isFunctionCallsWithName("alignedOn")) ?: false
 
     private fun CheckerContext.isInsideIteratedFunctionWithoutAlignedOn(): Boolean =
-        wrappingElementsUntil { it is FirFunctionCall && it.functionName() in ITERATIVE_METHODS }
+        wrappingElementsUntil { it is FirFunctionCall && it.functionName() in collectionMembers }
             ?.discardIfFunctionDeclaration()
             ?.discardIfOutsideAggregateEntryPoint()
             ?.none(isFunctionCallsWithName("alignedOn")) ?: false
@@ -182,7 +74,7 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         reporter: DiagnosticReporter,
     ) {
         val calleeName = expression.functionName()
-        if (expression.fqName() !in SAFE_OPERATORS &&
+        if (expression.fqName() !in safeOperators &&
             expression.isAggregate(context.session) &&
             context.isIteratedWithoutAlignedOn()
         ) {
