@@ -200,6 +200,7 @@ jobs:
           STAGING_REPO_ID: ${{ needs.staging-repo.outputs.maven-central-repo-id }}
           ORG_GRADLE_PROJECT_releaseStage: true
         with:
+          retries-on-failure: 1 # Fail fast during release
           build-command: true
           check-command: true
           deploy-command: |
