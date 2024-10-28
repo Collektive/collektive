@@ -25,7 +25,7 @@ class GossipTest : StringSpec({
 
     fun squareMooreGridWithGossip(size: Int) =
         mooreGrid<Double>(size, size, { _, _ -> Double.NaN }) {
-            gossip(localId.toDouble()) { a, b -> a >= b } // gossip the max localID in the network
+            gossip(localId.toDouble()) { a, b -> a.compareTo(b) } // gossip the max localID in the network
         }.apply {
             nodes.size shouldBe (size * size)
             val initial = status().values.distinct()
@@ -37,7 +37,7 @@ class GossipTest : StringSpec({
 
     fun linearMooreGridWithGossip(size: Int) =
         mooreGrid<Double>(size, 1, { _, _ -> Double.NaN }) {
-            gossip(localId.toDouble()) { a, b -> a >= b } // gossip the max localID in the network
+            gossip(localId.toDouble()) { a, b -> a.compareTo(b) } // gossip the max localID in the network
         }.apply {
             nodes.size shouldBe size
             val initial = status().values.distinct()
