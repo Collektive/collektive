@@ -1,3 +1,27 @@
+## [10.5.3](https://github.com/Collektive/collektive/compare/10.5.2...10.5.3) (2024-10-28)
+
+### Dependency updates
+
+* **core-deps:** update kotlin monorepo to v2.0.21 ([4917030](https://github.com/Collektive/collektive/commit/49170309c5c21eea84290bdd2280e077185c94d8))
+* **deps:** update alchemist to v34.1.9 ([7e04f77](https://github.com/Collektive/collektive/commit/7e04f77f67942c3bcdfac246b498b4d28f20a49f))
+* **deps:** update dependency com.squareup:kotlinpoet to v2 ([27ea520](https://github.com/Collektive/collektive/commit/27ea520f0ac72eb3f355bce7f6162d966beecfb3))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.112 ([9afaa36](https://github.com/Collektive/collektive/commit/9afaa36d5d6eda344f51a5d79177e52ca90c9257))
+* **deps:** update plugin kotlin-qa to v0.69.0 ([2112b43](https://github.com/Collektive/collektive/commit/2112b436b956c44c7d9f8920792271c38a070b16))
+
+### Build and continuous integration
+
+* **deps:** update actions/checkout action to v4.2.2 ([45a9e38](https://github.com/Collektive/collektive/commit/45a9e38f0ba981d5d61c1e6188fffcf1f059c41d))
+* **deps:** update actions/setup-node action to v4.1.0 ([93acd3b](https://github.com/Collektive/collektive/commit/93acd3bae3dc624e3568810c9a79d705ea3d571a))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.12 ([6fdb751](https://github.com/Collektive/collektive/commit/6fdb751c1fa85e1b2e972c451085004c8a60e542))
+* fail fast during the release job ([f9c9e3b](https://github.com/Collektive/collektive/commit/f9c9e3b801047361ec9c8c4e5951267d1cc22bc7))
+* fix git status on documentation repository ([12d0f32](https://github.com/Collektive/collektive/commit/12d0f3256ff8e0a52e8ce9c4430dd8f40d616486))
+* properly manage site pubblication when no changes to the website are performed but a release is required ([e158bf4](https://github.com/Collektive/collektive/commit/e158bf40634fd16344fc1b057dd781de4f26697a))
+* use organisation secret ([45ec9d4](https://github.com/Collektive/collektive/commit/45ec9d41f40177ff3e081c28c669ba54ee9db636))
+
+### Style improvements
+
+* remove warning ([58805a4](https://github.com/Collektive/collektive/commit/58805a4c8392e8df8913633ff05730e6f293cf0e))
+
 ## [10.5.2](https://github.com/Collektive/collektive/compare/10.5.1...10.5.2) (2024-10-22)
 
 ### Dependency updates
