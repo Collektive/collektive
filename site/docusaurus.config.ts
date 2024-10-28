@@ -51,22 +51,15 @@ const config: Config = {
     themeConfig: {
         algolia: {
             // The application ID provided by Algolia
-            appId: 'O0DP3M3LFT',
+            appId: 'ZAL63W2HTE',
 
             // Public API key: it is safe to commit it
-            apiKey: 'f0a3080f40caf6df450ca01ffb60b601',
+            apiKey: '4e4fa4774ad84009710a988eaca80e45',
 
-            indexName: 'collektive',
+            indexName: 'collektiveio',
 
             // Optional: see doc section below
             contextualSearch: true,
-
-            // Optional: Replace parts of the item URLs from Algolia. Useful when using the same search index for multiple deployments using a different baseUrl. You can use regexp or string in the `from` param. For example: localhost:3000 vs myCompany.com/docs
-            replaceSearchResultPathname: {
-                from: '/docs/', // or as RegExp: /\/docs\//
-                to: '/',
-            },
-
         },
         // Replace with your project's social card
         image: 'img/collektive-logo.svg',

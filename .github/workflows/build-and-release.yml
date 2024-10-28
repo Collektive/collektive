@@ -35,7 +35,7 @@ jobs:
       will-release: ${{ steps.compute-next-version.outputs.will-release }}
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v4.2.1
+        uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
       - name: Compute next release version
@@ -43,7 +43,7 @@ jobs:
         uses: nicolasfara/precompute-semantic-release-version-action@2.0.1
         with:
           github-token: ${{ github.token }}
-      - uses: DanySK/build-check-deploy-gradle-action@3.5.10
+      - uses: DanySK/build-check-deploy-gradle-action@3.5.12
         with:
           maven-central-username: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
@@ -80,10 +80,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v4.2.1
+        uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
-      - uses: DanySK/build-check-deploy-gradle-action@3.5.10
+      - uses: DanySK/build-check-deploy-gradle-action@3.5.12
         with:
           # Dry-deployment
           check-command: |
@@ -110,12 +110,12 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v4.2.1
+        uses: actions/checkout@v4.2.2
         with:
           submodules: true
           fetch-depth: 0
       - name: Install Node
-        uses: actions/setup-node@v4.0.4
+        uses: actions/setup-node@v4.1.0
         with:
           node-version-file: site/package.json
       - name: Build documentation website
@@ -139,8 +139,8 @@ jobs:
     if: ${{ needs.check-secrets.outputs.run-with-secrets == 'true' }}
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v4.2.1
-      - uses: DanySK/build-check-deploy-gradle-action@3.5.10
+        uses: actions/checkout@v4.2.2
+      - uses: DanySK/build-check-deploy-gradle-action@3.5.12
         with:
           maven-central-username: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
@@ -169,19 +169,19 @@ jobs:
     if: ${{ needs.check-secrets.outputs.run-with-secrets == 'true' }}
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v4.2.1
+        uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
-          token: ${{ secrets.PERSONAL_TOKEN }}
+          token: ${{ secrets.DEPLOYMENT_TOKEN }}
       - name: Checkout the docs
         if: contains(github.repository, 'Collektive/collektive')
-        uses: actions/checkout@v4.2.1
+        uses: actions/checkout@v4.2.2
         with:
           path: deployed-website
           fetch-depth: 0
           persist-credentials: true
           repository: Collektive/collektive.github.io
-          token: ${{ secrets.PERSONAL_TOKEN }}
+          token: ${{ secrets.DEPLOYMENT_TOKEN }}
       - name: Download website artifact
         uses: actions/download-artifact@v4.1.8
         with:
@@ -192,14 +192,15 @@ jobs:
           mv deployed-website/.git site/build
           git -C site/build status
       - name: Install Node
-        uses: actions/setup-node@v4.0.4
+        uses: actions/setup-node@v4.1.0
         with:
           node-version-file: package.json
-      - uses: DanySK/build-check-deploy-gradle-action@3.5.10
+      - uses: DanySK/build-check-deploy-gradle-action@3.5.12
         env:
           STAGING_REPO_ID: ${{ needs.staging-repo.outputs.maven-central-repo-id }}
           ORG_GRADLE_PROJECT_releaseStage: true
         with:
+          retries-on-failure: 1 # Fail fast during release
           build-command: true
           check-command: true
           deploy-command: |
