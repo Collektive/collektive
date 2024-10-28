@@ -13,34 +13,47 @@ import it.unibo.collektive.aggregate.api.operators.share
 import it.unibo.collektive.field.Field.Companion.fold
 
 /**
- * The [value] exchanged in the gossip algorithm.
- * It contains the [value] itself and the [path] of nodes through which it has passed.
- */
-private data class GossipValue<ID : Comparable<ID>, Type>(val value: Type, val path: List<ID>)
-
-/**
  * Gossip algorithm implementation.
  * Each node starts with an [initial] value, shares it with its neighbors,
  * and updates its value based on the best value received according to the [selector]. uik
  */
-fun <ID : Comparable<ID>, Type> Aggregate<ID>.gossip(
-    initial: Type,
-    selector: (Type, Type) -> Boolean,
-): Type {
-    val local = GossipValue(initial, listOf(localId))
+fun <ID : Comparable<ID>, Value> Aggregate<ID>.gossip(
+    initial: Value,
+    selector: Comparator<Value>,
+): Value {
+    val local = GossipValue<ID, Value>(initial, initial)
     return share(local) { gossip ->
-        gossip.fold(local) { current, next ->
+        val result = gossip.fold(local) { current, next ->
+            val actualNext = if (localId in next.path) next.base() else next
+            val comparison = selector.compare(current.best, actualNext.best)
             when {
-                selector(current.value, next.value) || localId in next.path -> current
-                else -> next.copy(path = next.path + localId)
+                comparison > 0 -> current
+                comparison == 0 -> listOf(current, next).minBy { it.path.size }
+                else -> actualNext
             }
         }
-    }.value
+        result.copy(local = initial, path = result.path + localId)
+    }.best
 }
 
 /**
  * A gossip algorithm that computes whether any device is experiencing a certain [condition].
  */
-fun <ID : Comparable<ID>> Aggregate<ID>.isHappeningAnywhere(
+fun <ID : Comparable<ID>> Aggregate<ID>.isHappeningGossip(
     condition: () -> Boolean,
-): Boolean = gossip(condition()) { _, _ -> condition() }
+): Boolean = gossip(condition()) { first, second -> first.compareTo(second) }
+
+/**
+ * The best value exchanged in the gossip algorithm.
+ * It contains the [best] itself, the [local] value of the node and the [path] of nodes through which it has passed.
+ */
+data class GossipValue<ID : Comparable<ID>, Value>(
+    val best: Value,
+    val local: Value,
+    val path: List<ID> = emptyList(),
+) {
+    /**
+     * Returns the base node itself, with its own value set to best and local.
+     */
+    fun base() = GossipValue(local, local, listOf(path.last()))
+}
