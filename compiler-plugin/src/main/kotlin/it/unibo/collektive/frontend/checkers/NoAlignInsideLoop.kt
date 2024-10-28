@@ -2,8 +2,8 @@ package it.unibo.collektive.frontend.checkers
 
 import it.unibo.collektive.frontend.checkers.CheckersUtility.discardIfFunctionDeclaration
 import it.unibo.collektive.frontend.checkers.CheckersUtility.discardIfOutsideAggregateEntryPoint
-import it.unibo.collektive.frontend.checkers.CheckersUtility.functionName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.fqName
+import it.unibo.collektive.frontend.checkers.CheckersUtility.functionName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isAggregate
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isFunctionCallsWithName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.wrappingElementsUntil
@@ -14,9 +14,6 @@ import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirFunctionCallChecker
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.FirWhileLoop
-import kotlin.reflect.KClass
-import kotlin.reflect.KParameter
-import kotlin.reflect.jvm.kotlinFunction
 
 /**
  * Checker that looks for aggregate functions called inside a loop without an explicit align operation.
@@ -33,21 +30,19 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
      * Methods used inside collections to iterate their elements.
      */
     private val collectionMembers = listOf(
-        Class.forName("kotlin.collections.CollectionsKt").kotlin,
-        Collection::class,
-        Iterable::class,
-        List::class,
-        Map::class,
-        Sequence::class,
-        Set::class,
+        Class.forName("kotlin.collections.CollectionsKt"),
+        Collection::class.java,
+        Iterable::class.java,
+        List::class.java,
+        Map::class.java,
+        Sequence::class.java,
+        Set::class.java
     )
-        .flatMap { it.java.methods.mapNotNull { it.kotlinFunction } + it.members }
-        .filter {
-            fun KParameter.isFunctionType(): Boolean = (type.classifier as? KClass<*>)?.qualifiedName
-                ?.startsWith("kotlin.Function")
-                ?: false
-            it.parameters.any { parameter ->
-                parameter.isFunctionType()
+        .flatMap { it.methods.toList() }
+        .filter { method ->
+            method.parameters.any { parameter ->
+                parameter.parameterizedType.typeName.startsWith("kotlin.jvm.functions.Function") ||
+                        parameter.parameterizedType is Function<*>
             }
         }
         .map { it.name }
