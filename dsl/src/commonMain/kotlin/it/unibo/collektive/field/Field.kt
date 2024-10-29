@@ -104,24 +104,65 @@ sealed interface Field<ID : Any, out T> {
 
         /**
          * Reduce the elements of the field using the [transform] function.
-         * The local value is not considered, unless explicitly passed as [default].
+         * The local value is not considered.
+         * Returns the [default] if the field to transform is empty.
          */
-        fun <ID : Any, T> Field<ID, T>.hood(default: T, transform: (T, T) -> T): T {
+        inline fun <ID : Any, T> Field<ID, T>.hood(default: T, crossinline transform: (T, T) -> T): T =
+            hoodWithId(default) { (_, accumulator), (id, value) -> id to transform(accumulator, value) }
+
+        /**
+         * Reduce the elements of the field using the [transform] function that includes the [ID] of the element,
+         * to use it when it influences the decision of the [transform] function,
+         * and sit is unnecessary as return.
+         * The local value of the field is not considered.
+         * Returns the [default] if the field to transform is empty.
+         */
+        inline fun <ID : Any, T> Field<ID, T>.hoodWithId(
+            default: T,
+            crossinline transform: (Pair<ID, T>, Pair<ID, T>) -> Pair<ID, T>,
+        ): T {
             val neighbors = excludeSelf()
             return when {
                 neighbors.isEmpty() -> default
-                else -> neighbors.values.reduce(transform)
+                else -> {
+                    neighbors.entries
+                        .asSequence()
+                        .map { it.toPair() }
+                        .reduce { accumulator, value -> transform(accumulator, value) }
+                        .second
+                }
             }
         }
 
         /**
-         * Folds the elements of a field starting with an [initial] through a [transform] function.
-         * The local value is not considered, unless explicitly passed as [initial].
+         * Reduce the elements of the field using the [transform] function that includes the [ID] of the element,
+         * to use it when it influences the decision of the [transform] function,
+         * but it is unnecessary as return.
+         * The local value of the field is not considered.
+         * Returns the [default] if the field to transform is empty.
          */
-        fun <ID : Any, T, R> Field<ID, T>.fold(initial: R, transform: (R, T) -> R): R {
+        inline fun <ID : Any, T> Field<ID, T>.hoodWithId(default: T, crossinline transform: (T, ID, T) -> T): T =
+            hoodWithId(default) { (_, accumulator), (id, value) -> id to transform(accumulator, id, value) }
+
+        /**
+         * Accumulates the elements of a field starting from an [initial] through a [transform] function.
+         * The local value of the field is not considered.
+         */
+        inline fun <ID : Any, T, R> Field<ID, T>.fold(initial: R, crossinline transform: (R, T) -> R): R =
+            foldWithId(initial) { accumulator, (_, value) -> transform(accumulator, value) }
+
+        /**
+         * Accumulates the elements of a field starting from an [initial] through a
+         * [transform] function that includes the [ID] of the element.
+         * The local value of the field is not considered.
+         */
+        inline fun <ID : Any, T, R> Field<ID, T>.foldWithId(
+            initial: R,
+            crossinline transform: (R, Pair<ID, T>) -> R,
+        ): R {
             var accumulator = initial
             for (entry in excludeSelf()) {
-                accumulator = transform(accumulator, entry.value)
+                accumulator = transform(accumulator, entry.toPair())
             }
             return accumulator
         }
