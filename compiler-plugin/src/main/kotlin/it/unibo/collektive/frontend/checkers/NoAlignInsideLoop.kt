@@ -23,7 +23,7 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
     private val safeOperators = listOf(
         "it.unibo.collektive.aggregate.api.Aggregate.alignedOn",
         "it.unibo.collektive.aggregate.api.Aggregate.align",
-        "it.unibo.collektive.aggregate.api.Aggregate.dealign"
+        "it.unibo.collektive.aggregate.api.Aggregate.dealign",
     )
 
     /**
