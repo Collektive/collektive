@@ -15,7 +15,7 @@ import it.unibo.collektive.field.Field.Companion.fold
 /**
  * Gossip algorithm implementation.
  * Each node starts with an [initial] value, shares it with its neighbors,
- * and updates its value based on the best value received according to the [selector]. uik
+ * and updates its value based on the best value received according to the [selector].
  */
 fun <ID : Comparable<ID>, Value> Aggregate<ID>.gossip(
     initial: Value,
@@ -25,14 +25,14 @@ fun <ID : Comparable<ID>, Value> Aggregate<ID>.gossip(
     return share(local) { gossip ->
         val result = gossip.fold(local) { current, next ->
             val actualNext = if (localId in next.path) next.base() else next
-            val comparison = selector.compare(current.best, actualNext.best)
+            val candidateValue = selector.compare(current.best, actualNext.best)
             when {
-                comparison > 0 -> current
-                comparison == 0 -> listOf(current, next).minBy { it.path.size }
+                candidateValue > 0 -> current
+                candidateValue == 0 -> listOf(current, next).minBy { it.path.size }
                 else -> actualNext
             }
         }
-        result.copy(local = initial, path = result.path + localId)
+        GossipValue(result.best, initial, result.path + localId)
     }.best
 }
 
@@ -45,9 +45,10 @@ fun <ID : Comparable<ID>> Aggregate<ID>.isHappeningGossip(
 
 /**
  * The best value exchanged in the gossip algorithm.
- * It contains the [best] itself, the [local] value of the node and the [path] of nodes through which it has passed.
+ * It contains the [best] value evaluated yet,
+ * the [local] value of the node and the [path] of nodes through which it has passed.
  */
-data class GossipValue<ID : Comparable<ID>, Value>(
+private data class GossipValue<ID : Comparable<ID>, Value>(
     val best: Value,
     val local: Value,
     val path: List<ID> = emptyList(),
