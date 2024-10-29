@@ -1,5 +1,5 @@
 const publishCmd = `
-if [ -n "\$(git status --porcelain)" ]; then
+if [ -n "\$(git -C site/build status --porcelain)" ]; then
     echo "site directory changes detected, new site release..."
     git -C site/build add . || exit 1
     git -C site/build commit -m "chore: update website to version \${nextRelease.version}" || exit 2

@@ -14,6 +14,7 @@
 * **deps:** update actions/setup-node action to v4.1.0 ([93acd3b](https://github.com/Collektive/collektive/commit/93acd3bae3dc624e3568810c9a79d705ea3d571a))
 * **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.12 ([6fdb751](https://github.com/Collektive/collektive/commit/6fdb751c1fa85e1b2e972c451085004c8a60e542))
 * fail fast during the release job ([f9c9e3b](https://github.com/Collektive/collektive/commit/f9c9e3b801047361ec9c8c4e5951267d1cc22bc7))
+* fix git status on documentation repository ([12d0f32](https://github.com/Collektive/collektive/commit/12d0f3256ff8e0a52e8ce9c4430dd8f40d616486))
 * properly manage site pubblication when no changes to the website are performed but a release is required ([e158bf4](https://github.com/Collektive/collektive/commit/e158bf40634fd16344fc1b057dd781de4f26697a))
 * use organisation secret ([45ec9d4](https://github.com/Collektive/collektive/commit/45ec9d41f40177ff3e081c28c669ba54ee9db636))
 
