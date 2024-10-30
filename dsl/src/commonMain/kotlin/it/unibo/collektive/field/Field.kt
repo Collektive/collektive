@@ -103,16 +103,18 @@ sealed interface Field<ID : Any, out T> {
         ): Field<ID, T> = ArrayBasedField(localId, localValue, others.map { it.toPair() })
 
         /**
-         * Reduce the elements of the field using the [transform] function.
+         * Reduce the elements of the field using the [transform] function,
+         * returning the [default] value if the field to transform is empty.
          * The local value is not considered.
-         * Returns the [default] if the field to transform is empty.
          */
         inline fun <ID : Any, T> Field<ID, T>.hood(default: T, crossinline transform: (T, T) -> T): T =
             hoodWithId(default) { (_, accumulator), (id, value) -> id to transform(accumulator, value) }
 
         /**
          * Reduce the elements of the field using the [transform] function,
-         * if the (neighboring) field is empty the [default] value is returned.
+         * returning the [default] value if the field to transform is empty.
+         * The local value is not considered.
+         *
          * The [transform] function takes two pairs: the former represents the accumulated value (including the [ID]),
          * while the latter represents the current entry of the neighboring field that should be combined.
          *
@@ -149,23 +151,7 @@ sealed interface Field<ID : Any, out T> {
          * The local value of the field is not considered.
          */
         inline fun <ID : Any, T, R> Field<ID, T>.fold(initial: R, crossinline transform: (R, T) -> R): R =
-            foldWithId(initial) { accumulator, (_, value) -> transform(accumulator, value) }
-
-        /**
-         * Accumulates the elements of a field starting from an [initial] through a
-         * [transform] function that includes the [ID] of the element.
-         * The local value of the field is not considered.
-         */
-        inline fun <ID : Any, T, R> Field<ID, T>.foldWithId(
-            initial: R,
-            crossinline transform: (R, Pair<ID, T>) -> R,
-        ): R {
-            var accumulator = initial
-            for (entry in excludeSelf()) {
-                accumulator = transform(accumulator, entry.toPair())
-            }
-            return accumulator
-        }
+            foldWithId(initial) { accumulator, _, value -> transform(accumulator, value) }
 
         /**
          * Accumulates the elements of a field starting from an [initial] through a
@@ -175,7 +161,13 @@ sealed interface Field<ID : Any, out T> {
         inline fun <ID : Any, T, R> Field<ID, T>.foldWithId(
             initial: R,
             crossinline transform: (R, ID, T) -> R,
-        ): R = foldWithId(initial) { accumulator, (id, value) -> transform(accumulator, id, value) }
+        ): R {
+            var accumulator = initial
+            for (entry in excludeSelf()) {
+                accumulator = transform(accumulator, entry.key, entry.value)
+            }
+            return accumulator
+        }
     }
 }
 
