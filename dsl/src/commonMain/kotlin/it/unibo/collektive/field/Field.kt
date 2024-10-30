@@ -166,6 +166,16 @@ sealed interface Field<ID : Any, out T> {
             }
             return accumulator
         }
+
+        /**
+         * Accumulates the elements of a field starting from an [initial] through a
+         * [transform] function that includes the [ID] of the element.
+         * The local value of the field is not considered.
+         */
+        inline fun <ID : Any, T, R> Field<ID, T>.foldWithId(
+            initial: R,
+            crossinline transform: (R, ID, T) -> R,
+        ): R = foldWithId(initial) { accumulator, (id, value) -> transform(accumulator, id, value) }
     }
 }
 
