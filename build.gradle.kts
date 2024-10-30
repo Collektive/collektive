@@ -131,6 +131,16 @@ dependencies {
     kover(project(":alchemist-incarnation-collektive"))
 }
 
+kover {
+    reports {
+        filters {
+            excludes {
+                packages("it.unibo.collektive.stdlib.*")
+            }
+        }
+    }
+}
+
 tasks {
     // Prevent publishing the root project (since is empty)
     withType<AbstractPublishToMaven>().configureEach {
