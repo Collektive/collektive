@@ -87,7 +87,7 @@ jobs:
         with:
           # Dry-deployment
           check-command: |
-            ./gradlew check :compiler-plugin:check :gradle-plugin:check --parallel
+            ./gradlew check koverXmlReport :compiler-plugin:check :gradle-plugin:check --parallel
             # Stop the Gradle Daemon on windows to try to prevent
             # "The process cannot access the file because it is being used by another process"
             if ${{ runner.os == 'Windows' }}; then
@@ -99,6 +99,7 @@ jobs:
             OVERRIDE_VERSION=$([[ "$NEXT_VERSION" != "" ]] && echo "-PforceVersion=$(echo $NEXT_VERSION)" || echo "")
             ./gradlew $OVERRIDE_VERSION -PstagingRepositoryId=${{ needs.staging-repo.outputs.maven-central-repo-id }} uploadAll :compiler-plugin:uploadKotlinOSSRHToMavenCentralNexus :gradle-plugin:uploadKotlinOSSRHToMavenCentralNexus --parallel
           should-run-codecov: ${{ runner.os == 'Linux' }}
+          codecov-directory: build/reports/kover
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
           should-deploy: ${{ needs.check-secrets.outputs.run-with-secrets == 'true' }}
           maven-central-username: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
