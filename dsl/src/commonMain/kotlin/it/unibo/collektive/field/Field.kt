@@ -49,7 +49,7 @@ sealed interface Field<ID : Any, out T> {
     operator fun get(id: ID): T
 
     /**
-     * Transform the field into a map.
+     * Transform the field into a sequence of pairs containing the [ID] and the associated value.
      */
     fun asSequence(): Sequence<Pair<ID, T>>
 
@@ -111,11 +111,12 @@ sealed interface Field<ID : Any, out T> {
             hoodWithId(default) { (_, accumulator), (id, value) -> id to transform(accumulator, value) }
 
         /**
-         * Reduce the elements of the field using the [transform] function that includes the [ID] of the element,
-         * to use it when it influences the decision of the [transform] function,
-         * and sit is unnecessary as return.
-         * The local value of the field is not considered.
-         * Returns the [default] if the field to transform is empty.
+         * Reduce the elements of the field using the [transform] function,
+         * if the (neighboring) field is empty the [default] value is returned.
+         * The [transform] function takes two pairs: the former represents the accumulated value (including the [ID]),
+         * while the latter represents the current entry of the neighboring field that should be combined.
+         *
+         * Use this function when the [ID] should be propagated during the reduce operation.
          */
         inline fun <ID : Any, T> Field<ID, T>.hoodWithId(
             default: T,
@@ -124,20 +125,19 @@ sealed interface Field<ID : Any, out T> {
             val neighbors = excludeSelf()
             return when {
                 neighbors.isEmpty() -> default
-                else -> {
+                else ->
                     neighbors.entries
                         .asSequence()
                         .map { it.toPair() }
                         .reduce { accumulator, value -> transform(accumulator, value) }
                         .second
-                }
             }
         }
 
         /**
-         * Reduce the elements of the field using the [transform] function that includes the [ID] of the element,
-         * to use it when it influences the decision of the [transform] function,
-         * but it is unnecessary as return.
+         * Reduce the elements of the field using the [transform] function,
+         * it includes the [ID] of the element whenever it should be considered in the [transform] function,
+         * but the [ID] is not returned.
          * The local value of the field is not considered.
          * Returns the [default] if the field to transform is empty.
          */
