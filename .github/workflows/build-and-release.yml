@@ -87,7 +87,7 @@ jobs:
         with:
           # Dry-deployment
           check-command: |
-            ./gradlew check koverXmlReport :compiler-plugin:check :gradle-plugin:check --parallel
+            ./gradlew check koverXmlReportJvm :compiler-plugin:check :gradle-plugin:check --parallel
             # Stop the Gradle Daemon on windows to try to prevent
             # "The process cannot access the file because it is being used by another process"
             if ${{ runner.os == 'Windows' }}; then
