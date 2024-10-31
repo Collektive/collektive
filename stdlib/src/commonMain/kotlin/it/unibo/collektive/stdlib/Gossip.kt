@@ -10,7 +10,7 @@ package it.unibo.collektive.stdlib
 
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.operators.share
-import it.unibo.collektive.field.Field.Companion.fold
+import it.unibo.collektive.field.Field.Companion.foldWithId
 
 /**
  * Gossip algorithm implementation.
@@ -23,8 +23,8 @@ fun <ID : Comparable<ID>, Value> Aggregate<ID>.gossip(
 ): Value {
     val local = GossipValue<ID, Value>(initial, initial)
     return share(local) { gossip ->
-        val result = gossip.fold(local) { current, next ->
-            val actualNext = if (localId in next.path) next.base() else next
+        val result = gossip.foldWithId(local) { current, id, next ->
+            val actualNext = if (localId in next.path) next.base(id) else next
             val candidateValue = selector.compare(current.best, actualNext.best)
             when {
                 candidateValue > 0 -> current
@@ -53,8 +53,5 @@ private data class GossipValue<ID : Comparable<ID>, Value>(
     val local: Value,
     val path: List<ID> = emptyList(),
 ) {
-    /**
-     * Returns the base node itself, with its own value set to best and local.
-     */
-    fun base() = GossipValue(local, local, listOf(path.last()))
+    fun base(id: ID) = GossipValue(local, local, listOf(id))
 }
