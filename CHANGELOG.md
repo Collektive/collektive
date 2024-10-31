@@ -1,3 +1,14 @@
+## [10.6.0](https://github.com/Collektive/collektive/compare/10.5.3...10.6.0) (2024-10-31)
+
+### Features
+
+* **fields:** add hood and fold with IDs ([#536](https://github.com/Collektive/collektive/issues/536)) ([d60caa8](https://github.com/Collektive/collektive/commit/d60caa8a331dd2f2a243db9368017597029c882f))
+
+### Build and continuous integration
+
+* remove generated stdlib from coverage ([dceb268](https://github.com/Collektive/collektive/commit/dceb26837eb47e76fbc6e07cf8ff99818ff6df99))
+* set codecov folder pointing to kover output reports ([d9aade6](https://github.com/Collektive/collektive/commit/d9aade6e88b6ee25122e102ccde9214aa8ff1049))
+
 ## [10.5.3](https://github.com/Collektive/collektive/compare/10.5.2...10.5.3) (2024-10-28)
 
 ### Dependency updates
