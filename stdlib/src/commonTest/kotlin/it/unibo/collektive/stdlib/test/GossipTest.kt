@@ -10,7 +10,7 @@ package it.unibo.collektive.stdlib.test
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import it.unibo.collektive.stdlib.gossip
+import it.unibo.collektive.stdlib.gossipMax
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
 
@@ -25,7 +25,7 @@ class GossipTest : StringSpec({
 
     fun squareMooreGridWithGossip(size: Int) =
         mooreGrid<Double>(size, size, { _, _ -> Double.NaN }) {
-            gossip(localId.toDouble()) { a, b -> a.compareTo(b) } // gossip the max localID in the network
+            gossipMax(localId.toDouble()) { a, b -> a.compareTo(b) } // gossip the max localID in the network
         }.apply {
             nodes.size shouldBe (size * size)
             val initial = status().values.distinct()
@@ -37,7 +37,7 @@ class GossipTest : StringSpec({
 
     fun linearMooreGridWithGossip(size: Int) =
         mooreGrid<Double>(size, 1, { _, _ -> Double.NaN }) {
-            gossip(localId.toDouble()) { a, b -> a.compareTo(b) } // gossip the max localID in the network
+            gossipMax(localId.toDouble()) { a, b -> a.compareTo(b) } // gossip the max localID in the network
         }.apply {
             nodes.size shouldBe size
             val initial = status().values.distinct()
