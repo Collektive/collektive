@@ -21,10 +21,10 @@ fun <ID : Comparable<ID>, Value> Aggregate<ID>.gossipMax(
     local: Value,
     selector: Comparator<Value>,
 ): Value {
-    /**
+    /*
      * The best value exchanged in the gossip algorithm.
      * It contains the [best] value evaluated yet,
-     * the [local] value of the node and the [path] of nodes through which it has passed.
+     * the [local] value of the node, and the [path] of nodes through which it has passed.
      */
     data class GossipValue<ID : Comparable<ID>, Value>(
         val best: Value,
@@ -54,6 +54,6 @@ fun <ID : Comparable<ID>, Value> Aggregate<ID>.gossipMax(
 /**
  * A gossip algorithm that computes whether any device is experiencing a certain [condition].
  */
-fun <ID : Comparable<ID>> Aggregate<ID>.isHappeningGossip(
+fun <ID : Comparable<ID>> Aggregate<ID>.isHappeningAnywhere(
     condition: () -> Boolean,
 ): Boolean = gossipMax(condition()) { first, second -> first.compareTo(second) }
