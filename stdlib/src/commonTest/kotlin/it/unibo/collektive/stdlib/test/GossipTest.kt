@@ -50,18 +50,15 @@ class GossipTest : StringSpec({
     "gossip in a moore grid stabilizes after 2 reverse cycles" {
         val size = 5
         val environment: Environment<Double> = squareMooreGridWithGossip(size)
-
         environment.cycleInOrder()
         val firstRound = environment.status()
         // initially there should be different values as many are the devices in the network
         firstRound.values.distinct().size shouldBe (size * size)
         // in this implementation the initial value for each device is its own ID
         firstRound.forEach { (id, value) -> value shouldBe id.toDouble() }
-
         // status at first cycle
         environment.gossipIsStable() shouldBe false
         environment.cycleInReverseOrder()
-
         // status at second cycle
         environment.gossipIsStable() shouldBe true
         environment.gossipResult() shouldBe 24.0
@@ -70,7 +67,6 @@ class GossipTest : StringSpec({
     "gossip in the best case stabilizes in one cycle" {
         val size = 5
         val environment: Environment<Double> = squareMooreGridWithGossip(size)
-
         environment.cycleInReverseOrder()
         environment.gossipIsStable() shouldBe true
         environment.gossipResult() shouldBe 24.0
@@ -79,7 +75,6 @@ class GossipTest : StringSpec({
     "gossip in the worst case stabilizes in the network diameter cycles" {
         val size = 10
         val environment: Environment<Double> = linearMooreGridWithGossip(size)
-
         repeat(times = size - 1) {
             environment.cycleInOrder()
             environment.gossipIsStable() shouldBe false
