@@ -12,7 +12,7 @@ git -C site/build push || exit 4
 ./gradlew -PstagingRepositoryId=\${process.env.STAGING_REPO_ID} releaseStagingRepositoryOnMavenCentral || exit 6
 `;
 
-import config from 'semantic-release-preconfigured-conventional-commits' assert {type: 'json'}
+import config from 'semantic-release-preconfigured-conventional-commits' with {type: 'json'}
 
 config.plugins.push(
     [
