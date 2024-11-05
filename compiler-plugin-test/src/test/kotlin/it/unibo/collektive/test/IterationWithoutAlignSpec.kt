@@ -5,6 +5,7 @@ import io.kotest.data.forAll
 import io.kotest.data.headers
 import io.kotest.data.row
 import io.kotest.data.table
+import it.unibo.collektive.frontend.checkers.NoAlignInsideLoop
 import it.unibo.collektive.test.util.CompileUtils
 import it.unibo.collektive.test.util.CompileUtils.asTestingProgram
 import it.unibo.collektive.test.util.CompileUtils.noWarning
@@ -37,7 +38,7 @@ class IterationWithoutAlignSpec : FreeSpec({
 
                     "should compile producing a warning" - {
                         code shouldCompileWith warning(
-                            EXPECTED_WARNING_MESSAGE.format(functionName),
+                            NoAlignInsideLoop.createWarning(functionName),
                         )
                     }
                 }
@@ -57,7 +58,7 @@ class IterationWithoutAlignSpec : FreeSpec({
 
                     "should compile producing a warning" - {
                         code shouldCompileWith warning(
-                            EXPECTED_WARNING_MESSAGE.format(functionName),
+                            NoAlignInsideLoop.createWarning(functionName),
                         )
                     }
                 }
@@ -84,8 +85,6 @@ class IterationWithoutAlignSpec : FreeSpec({
     }
 }) {
     companion object {
-        const val EXPECTED_WARNING_MESSAGE = "Warning: aggregate function '%s' called inside a loop " +
-            "without explicit alignment"
 
         fun getTextFromResource(case: String, iteration: String, aggregateFunction: String): String =
             IterationWithoutAlignSpec::class.java

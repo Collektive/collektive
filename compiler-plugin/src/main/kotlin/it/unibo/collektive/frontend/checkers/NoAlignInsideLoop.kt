@@ -30,11 +30,29 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
     )
 
     /**
+     * Creates a warning for this checker, formatted with the [calleeName] that originated it.
+     */
+    fun createWarning(calleeName: String): String =
+        """
+        Warning: aggregate function '$calleeName' has been called inside a loop construct without explicit alignment.
+        The same path may generate interactions more than once, leading to ambiguous alignment.
+        for (element in collection) {
+            $calleeName(...) // Broken
+        }
+        for (element in collection) {
+            alignedOn(element) { // Manual alignment on element, assuming it is unique 
+                $calleeName(...)
+            }
+        }
+        """.trimIndent()
+
+
+    /**
      * Getter for all Collection members using Kotlin reflection, obtaining their names as a set.
      */
     @Deprecated("This method currently raises an exception. " +
             "See https://youtrack.jetbrains.com/issue/KT-16479 for more details.")
-    private fun getCollectionMembersKotlin(): Set<String> = listOf(
+    private fun getCollectionMembersKotlin(): Set<String> = sequenceOf(
         Class.forName("kotlin.collections.CollectionsKt").kotlin,
         Collection::class,
         Iterable::class,
@@ -58,7 +76,7 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
     /**
      * Getter for all Collection members using Java reflection, obtaining their names as a set.
      */
-    private fun getCollectionMembersJava(): Set<String> = listOf(
+    private fun getCollectionMembersJava(): Set<String> = sequenceOf(
         Class.forName("kotlin.collections.CollectionsKt"),
         Collection::class.java,
         Iterable::class.java,
@@ -66,8 +84,7 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         Map::class.java,
         Sequence::class.java,
         Set::class.java
-    )
-        .flatMap { it.methods.toList() }
+    ).flatMap { it.methods.asSequence() }
         .filter { method ->
             method.parameters.any { parameter ->
                 parameter.parameterizedType.typeName.startsWith("kotlin.jvm.functions.Function") ||
@@ -110,7 +127,7 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
             reporter.reportOn(
                 expression.calleeReference.source,
                 CheckersUtility.PluginErrors.DOT_CALL_WARNING,
-                "Warning: aggregate function '$calleeName' called inside a loop without explicit alignment",
+                createWarning(calleeName),
                 context,
             )
         }
