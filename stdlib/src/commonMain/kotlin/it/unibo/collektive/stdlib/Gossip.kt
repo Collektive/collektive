@@ -10,50 +10,93 @@ package it.unibo.collektive.stdlib
 
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.operators.share
+import it.unibo.collektive.field.Field.Companion.fold
 import it.unibo.collektive.field.Field.Companion.foldWithId
+import it.unibo.collektive.field.Field.Companion.hood
 
 /**
- * Self-stabilizing gossip-max.
- * Spreads across all (aligned) devices the current maximum [Value] of [local],
- * as computed by [selector].
+ * A collection of self-stabilizing gossip algorithms.
  */
-fun <ID : Comparable<ID>, Value> Aggregate<ID>.gossipMax(
-    local: Value,
-    selector: Comparator<Value>,
-): Value {
-    /*
-     * The best value exchanged in the gossip algorithm.
-     * It contains the [best] value evaluated yet,
-     * the [local] value of the node, and the [path] of nodes through which it has passed.
+object SelfStabilizingGossip {
+    /**
+     * Self-stabilizing gossip-max.
+     * Spreads across all (aligned) devices the current maximum [Value] of [local],
+     * as computed by [comparator].
      */
-    data class GossipValue<ID : Comparable<ID>, Value>(
-        val best: Value,
-        val local: Value,
-        val path: List<ID> = emptyList(),
-    ) {
-        fun base(id: ID) = GossipValue(local, local, listOf(id))
+    fun <ID : Comparable<ID>, Value> Aggregate<ID>.gossipMax(
+        local: Value,
+        comparator: Comparator<Value>,
+    ): Value {
+        /*
+         * The best value exchanged in the gossip algorithm.
+         * It contains the [best] value evaluated yet,
+         * the [local] value of the node, and the [path] of nodes through which it has passed.
+         */
+        data class GossipValue<ID : Comparable<ID>, Value>(
+            val best: Value,
+            val local: Value,
+            val path: List<ID> = emptyList(),
+        ) {
+            fun base(id: ID) = GossipValue(local, local, listOf(id))
+        }
+
+        val localGossip = GossipValue<ID, Value>(best = local, local = local)
+        return share(localGossip) { gossip ->
+            val neighbors = gossip.neighbors.toSet()
+            val result = gossip.foldWithId(localGossip) { current, id, next ->
+                val valid = next.path.asReversed().asSequence().drop(1).none { it == localId || it in neighbors }
+                val actualNext = if (valid) next else next.base(id)
+                val candidateValue = comparator.compare(current.best, actualNext.best)
+                when {
+                    candidateValue > 0 -> current
+                    candidateValue == 0 -> listOf(current, next).minBy { it.path.size }
+                    else -> actualNext
+                }
+            }
+            GossipValue(result.best, local, result.path + localId)
+        }.best
     }
 
-    val localGossip = GossipValue<ID, Value>(best = local, local = local)
-    return share(localGossip) { gossip ->
-        val neighbors = gossip.neighbors.toSet()
-        val result = gossip.foldWithId(localGossip) { current, id, next ->
-            val valid = next.path.asReversed().asSequence().drop(1).none { it == localId || it in neighbors }
-            val actualNext = if (valid) next else next.base(id)
-            val candidateValue = selector.compare(current.best, actualNext.best)
-            when {
-                candidateValue > 0 -> current
-                candidateValue == 0 -> listOf(current, next).minBy { it.path.size }
-                else -> actualNext
-            }
-        }
-        GossipValue(result.best, local, result.path + localId)
-    }.best
+    /**
+     * Self-stabilizing gossip-max.
+     * Spreads across all (aligned) devices the current minimum [Value] of [local],
+     * as computed by [comparator].
+     */
+    fun <ID : Comparable<ID>, Value> Aggregate<ID>.gossipMin(
+        local: Value,
+        comparator: Comparator<Value>,
+    ): Value = gossipMax(local, comparator.reversed())
+
+    /**
+     * A gossip algorithm that computes whether any device is experiencing a certain [condition].
+     */
+    fun <ID : Comparable<ID>> Aggregate<ID>.isHappeningAnywhere(
+        condition: () -> Boolean,
+    ): Boolean = gossipMax(condition()) { first, second -> first.compareTo(second) }
 }
 
 /**
- * A gossip algorithm that computes whether any device is experiencing a certain [condition].
+ * A collection of non-self-stabilizing gossip algorithms.
  */
-fun <ID : Comparable<ID>> Aggregate<ID>.isHappeningAnywhere(
-    condition: () -> Boolean,
-): Boolean = gossipMax(condition()) { first, second -> first.compareTo(second) }
+object NonSelfStabilizingGossip {
+    /**
+     * A non-self-stabilizing function for repeated propagation of a [value] and [aggregation]
+     * of state estimates between neighboring devices.
+     */
+    fun <ID : Any, Type> Aggregate<ID>.nonSelfStabilizingGossip(
+        value: Type,
+        aggregation: (Type, Type) -> Type,
+    ): Type = share(value) {
+        it.hood(value, aggregation)
+    }
+
+    /**
+     * A "gossip" algorithm that computes whether any device has ever experienced a certain [condition] before.
+     */
+    fun <ID : Any> Aggregate<ID>.everHappened(
+        condition: () -> Boolean,
+        default: Boolean = false,
+    ): Boolean = share(default) {
+        condition() || it.fold(default) { a, b -> a || b }
+    }
+}

@@ -10,7 +10,7 @@ package it.unibo.collektive.stdlib.test
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import it.unibo.collektive.stdlib.gossipMax
+import it.unibo.collektive.stdlib.SelfStabilizingGossip.gossipMax
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
 
