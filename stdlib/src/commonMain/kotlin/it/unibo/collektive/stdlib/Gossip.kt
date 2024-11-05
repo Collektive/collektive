@@ -58,6 +58,14 @@ object SelfStabilizingGossip {
     }
 
     /**
+     * [gossipMax] with a default comparator.
+     * Spreads across all (aligned) devices the current maximum [Value] of [local],
+     * as computed by first value compared to the second.
+     */
+    fun <ID : Comparable<ID>, Value : Comparable<Value>> Aggregate<ID>.gossipMax(local: Value): Value =
+        gossipMax(local) { first, second -> first.compareTo(second) }
+
+    /**
      * Self-stabilizing gossip-min.
      * Spreads across all (aligned) devices the current minimum [Value] of [local],
      * as computed by [comparator].
@@ -66,6 +74,15 @@ object SelfStabilizingGossip {
         local: Value,
         comparator: Comparator<Value>,
     ): Value = gossipMax(local, comparator.reversed())
+
+    /**
+     * [gossipMin] with a default comparator.
+     * Spreads across all (aligned) devices the current minimum [Value] of [local],
+     * as computed by first value compared to the second,
+     * and then reversed.
+     */
+    fun <ID : Comparable<ID>, Value : Comparable<Value>> Aggregate<ID>.gossipMin(local: Value): Value =
+        gossipMin(local) { first, second -> first.compareTo(second) }
 
     /**
      * A gossip algorithm that computes whether any device is experiencing a certain [condition].
