@@ -30,9 +30,11 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
     )
 
     /**
-     * Methods used inside collections to iterate their elements.
+     * Getter for all Collection members using Kotlin reflection, obtaining their names as a set.
      */
-    private val collectionMembers = listOf(
+    @Deprecated("This method currently raises an exception. " +
+            "See https://youtrack.jetbrains.com/issue/KT-16479 for more details.")
+    private fun getCollectionMembersKotlin(): Set<String> = listOf(
         Class.forName("kotlin.collections.CollectionsKt").kotlin,
         Collection::class,
         Iterable::class,
@@ -52,6 +54,33 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         }
         .map { it.name }
         .toSet()
+
+    /**
+     * Getter for all Collection members using Java reflection, obtaining their names as a set.
+     */
+    private fun getCollectionMembersJava(): Set<String> = listOf(
+        Class.forName("kotlin.collections.CollectionsKt"),
+        Collection::class.java,
+        Iterable::class.java,
+        List::class.java,
+        Map::class.java,
+        Sequence::class.java,
+        Set::class.java
+    )
+        .flatMap { it.methods.toList() }
+        .filter { method ->
+            method.parameters.any { parameter ->
+                parameter.parameterizedType.typeName.startsWith("kotlin.jvm.functions.Function") ||
+                        parameter.parameterizedType is Function<*>
+            }
+        }
+        .map { it.name }
+        .toSet()
+
+    /**
+     * Methods used inside collections to iterate their elements.
+     */
+    private val collectionMembers = getCollectionMembersJava()
 
     private fun CheckerContext.isInsideALoopWithoutAlignedOn(): Boolean =
         wrappingElementsUntil { it is FirWhileLoop }
