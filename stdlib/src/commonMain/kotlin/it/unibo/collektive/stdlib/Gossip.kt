@@ -58,7 +58,7 @@ object SelfStabilizingGossip {
     }
 
     /**
-     * Self-stabilizing gossip-max.
+     * Self-stabilizing gossip-min.
      * Spreads across all (aligned) devices the current minimum [Value] of [local],
      * as computed by [comparator].
      */
