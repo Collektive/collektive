@@ -87,9 +87,8 @@ object SelfStabilizingGossip {
     /**
      * A gossip algorithm that computes whether any device is experiencing a certain [condition].
      */
-    fun <ID : Comparable<ID>> Aggregate<ID>.isHappeningAnywhere(
-        condition: () -> Boolean,
-    ): Boolean = gossipMax(condition()) { first, second -> first.compareTo(second) }
+    fun <ID : Comparable<ID>> Aggregate<ID>.isHappeningAnywhere(condition: () -> Boolean): Boolean =
+        gossipMax(condition()) { first, second -> first.compareTo(second) }
 }
 
 /**
@@ -100,10 +99,10 @@ object NonSelfStabilizingGossip {
      * A non-self-stabilizing function for repeated propagation of a [value] and [aggregation]
      * of state estimates between neighboring devices.
      */
-    fun <ID : Any, Type> Aggregate<ID>.nonSelfStabilizingGossip(
-        value: Type,
-        aggregation: (Type, Type) -> Type,
-    ): Type = share(value) {
+    fun <ID : Any, Value> Aggregate<ID>.nonSelfStabilizingGossip(
+        value: Value,
+        aggregation: (Value, Value) -> Value,
+    ): Value = share(value) {
         it.hood(value, aggregation)
     }
 
