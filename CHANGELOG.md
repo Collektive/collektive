@@ -1,3 +1,59 @@
+## [10.7.0](https://github.com/Collektive/collektive/compare/10.6.0...10.7.0) (2024-11-06)
+
+### Features
+
+* add aggregate gossip algorithm ([85e9a70](https://github.com/Collektive/collektive/commit/85e9a70e7b4183397b9f8231142d1751b0f859c1))
+* add ever happened gossip algorithm ([16f9439](https://github.com/Collektive/collektive/commit/16f94390439950974d081fc4ec77e1dc48432d93))
+* add gossipMax and Min with default comparator ([e4fd957](https://github.com/Collektive/collektive/commit/e4fd957c94ac6185935eafc7299e3ef783cf7dd8))
+* add non-self-stabilizing gossip and gossip ever happened ([3140aa4](https://github.com/Collektive/collektive/commit/3140aa409a535ff633474d2e23a5413fd7a731c6))
+
+### Dependency updates
+
+* **deps:** update alchemist to v34.1.10 ([17dc503](https://github.com/Collektive/collektive/commit/17dc503ad975d2fa86bc6215eb2b98113f06ecea))
+* **deps:** update alchemist to v34.1.11 ([bef740d](https://github.com/Collektive/collektive/commit/bef740db5b695e64cd368eeb804f1b12483f587c))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.113 ([f0f60a2](https://github.com/Collektive/collektive/commit/f0f60a28205d0314d4e726411c9889c15e431317))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.114 ([b577726](https://github.com/Collektive/collektive/commit/b577726628ad8ff15cca0508c512ebaa998c02e8))
+* **deps:** update node.js to v22 ([c37ef8a](https://github.com/Collektive/collektive/commit/c37ef8a51962acd920b70765cb36d46cdfa0e5f2))
+
+### Documentation
+
+* add doc to gossip objects ([f140ad6](https://github.com/Collektive/collektive/commit/f140ad6af705cd255e7b0fcb1e974712bbdd47c0))
+* minor in gossipMin doc ([423f2dd](https://github.com/Collektive/collektive/commit/423f2ddd1885b6dce405f8369e90d7ecc211da6a))
+
+### Performance improvements
+
+* improve algorithm by checking the presence of more than one neighbor in the incoming path ([d37508a](https://github.com/Collektive/collektive/commit/d37508aa30adf414739bc6aeffd8d20beddb39dc))
+
+### Tests
+
+* add check on result of the computation ([636a4fc](https://github.com/Collektive/collektive/commit/636a4fcd309a506cf70a0adef20c6dfec5de0adf))
+* add test for gossipMin ([93b8652](https://github.com/Collektive/collektive/commit/93b8652c45a4794e7bc5ccc76d556e20205ca57b))
+* add test for stabilizing gossip ([39562f2](https://github.com/Collektive/collektive/commit/39562f2cd7a1906f0289d716588f3f21c239256d))
+* refactor gossipMax function as in stdlib ([d87ac21](https://github.com/Collektive/collektive/commit/d87ac210be17183733b8990173094883b2349fef))
+
+### Build and continuous integration
+
+* **deps:** update nicolasfara/precompute-semantic-release-version-action action to v2.0.2 ([c0de79b](https://github.com/Collektive/collektive/commit/c0de79b48ddaafcfe4b73e7bd525fc72d1aba041))
+* **renovate:**  use `with` when importing the configuration instead of `assert` ([dc63d13](https://github.com/Collektive/collektive/commit/dc63d1376175dfd5475c080db0652adc8f901cb5))
+
+### General maintenance
+
+* remove useless spacing ([cbefd9c](https://github.com/Collektive/collektive/commit/cbefd9cd1426772750fa3de5836a76dbe5e4c4a2))
+
+### Style improvements
+
+* unify generic type and change function indentation ([60ee490](https://github.com/Collektive/collektive/commit/60ee490efb3eaca3e0412b98c3ba626b70645302))
+
+### Refactoring
+
+* function names ([eb76a21](https://github.com/Collektive/collektive/commit/eb76a213f5cd36412d4819bef097e93c5d10d411))
+* keep track of neighbor's initial value to avoid losing rounds ([6882524](https://github.com/Collektive/collektive/commit/68825241e4bb9ca573975847185efb480c517fd3))
+* minors on val names and docs ([5f58744](https://github.com/Collektive/collektive/commit/5f58744399c3cae622e8eb517fc16d5e46914f71))
+* more idiomatic implementation ([45f518e](https://github.com/Collektive/collektive/commit/45f518edf67534896c4019c9248c2e5bfad2cc54))
+* rename function and generic types ([dad4673](https://github.com/Collektive/collektive/commit/dad46739112aceeb068bdf24c3a9cc9038f921c1))
+* rename function name as [@danysk](https://github.com/danysk) suggested ([9ce71c7](https://github.com/Collektive/collektive/commit/9ce71c74f67d2f35272a2f743025a330531829e5))
+* use foldWithID inside gossip function ([e30454c](https://github.com/Collektive/collektive/commit/e30454c88cbed6c8f9ee0f3f8924f0dbfeb0b3cd))
+
 ## [10.6.0](https://github.com/Collektive/collektive/compare/10.5.3...10.6.0) (2024-10-31)
 
 ### Features
