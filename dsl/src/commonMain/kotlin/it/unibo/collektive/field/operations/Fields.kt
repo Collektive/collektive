@@ -95,7 +95,15 @@ inline fun <ID : Any, T> Field<ID, T>.noneWithSelf(crossinline predicate: (T) ->
 /**
  * Returns a new field containing [replaceWith] for each element that satisfies the [predicate].
  */
+inline fun <ID : Any, T> Field<ID, T>.replaceMatchingWithId(
+    replaceWith: T,
+    crossinline predicate: (ID, T) -> Boolean,
+): Field<ID, T> = mapWithId { id, value -> if (predicate(id, value)) replaceWith else value }
+
+/**
+ * Returns a new field containing [replaceWith] for each element that satisfies the [predicate].
+ */
 inline fun <ID : Any, T> Field<ID, T>.replaceMatching(
     replaceWith: T,
     crossinline predicate: (T) -> Boolean,
-): Field<ID, T> = map { if (predicate(it)) replaceWith else it }
+): Field<ID, T> = replaceMatchingWithId(replaceWith) { _, value -> predicate(value) }
