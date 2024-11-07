@@ -8,6 +8,7 @@ import it.unibo.collektive.field.Field.Companion.fold
 import it.unibo.collektive.field.Field.Companion.foldWithId
 import it.unibo.collektive.field.Field.Companion.hood
 import it.unibo.collektive.field.Field.Companion.hoodWithId
+import it.unibo.collektive.field.operations.replaceMatching
 
 class FieldOpsTest : StringSpec({
     val emptyField = Field(0, "localVal")
@@ -70,5 +71,14 @@ class FieldOpsTest : StringSpec({
     "A field should return a sequence containing all the values" {
         field.asSequence().toList() shouldContainAll
             sequenceOf(0 to 0, 1 to 10, 2 to 20).toList()
+    }
+    "The replaceMatching on an empty field should return an empty field" {
+        emptyField.replaceMatching("replaced") { it == "no-data" } shouldBe emptyField
+    }
+    "The replaceMatching should return the same field if the predicate is not satisfied" {
+        field.replaceMatching(Int.MAX_VALUE) { it == 42 } shouldBe field
+    }
+    "The replaceMatching should return a field with the replaced values" {
+        field.replaceMatching(42) { it == 10 } shouldBe Field(0, 0, mapOf(1 to 42, 2 to 20))
     }
 })
