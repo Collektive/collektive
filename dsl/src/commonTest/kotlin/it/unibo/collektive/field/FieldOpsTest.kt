@@ -1,5 +1,6 @@
 package it.unibo.collektive.field
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.equals.shouldNotBeEqual
@@ -14,6 +15,7 @@ class FieldOpsTest : StringSpec({
     val emptyField = Field(0, "localVal")
     val field = Field(0, 0, mapOf(1 to 10, 2 to 20))
     val fulfilledField = Field(0, 0, mapOf(1 to 10, 2 to 20, 3 to 15))
+    val fulfilledCompatibleField = Field(0, 1, mapOf(1 to 1, 2 to 1, 3 to 1))
 
     "An empty field should return the default value value when is hooded" {
         emptyField.hood("default") { acc, elem -> acc + elem } shouldBe "default"
@@ -80,5 +82,24 @@ class FieldOpsTest : StringSpec({
     }
     "The replaceMatching should return a field with the replaced values" {
         field.replaceMatching(42) { it == 10 } shouldBe Field(0, 0, mapOf(1 to 42, 2 to 20))
+    }
+    "An IllegalStateException should be thrown when two fields are not aligned" {
+        shouldThrow<IllegalStateException> {
+            emptyField.alignedMapWithId(fulfilledField) { _, _, _ -> "no-data" }
+        }
+    }
+    "An empty field should return an empty field when aligned mapped with another empty field" {
+        emptyField.alignedMapWithId(emptyField) { _, _, _ -> "no-data" } shouldBe Field(
+            0,
+            "no-data",
+            emptyMap(),
+        )
+    }
+    "A field should return a field with the mapped values when aligned mapped with another field" {
+        fulfilledField.alignedMapWithId(fulfilledCompatibleField) { _, value, other -> value + other } shouldBe Field(
+            0,
+            1,
+            mapOf(1 to 11, 2 to 21, 3 to 16),
+        )
     }
 })
