@@ -1,3 +1,9 @@
+## [10.9.0](https://github.com/Collektive/collektive/compare/10.8.0...10.9.0) (2024-11-08)
+
+### Features
+
+* **compiler-plugin:** new checker for collections' methods, refactoring and new testing utility ([#508](https://github.com/Collektive/collektive/issues/508)) ([d9cd8b3](https://github.com/Collektive/collektive/commit/d9cd8b3e8a2582972415ad9dad76c26a90abad7c)), closes [#489](https://github.com/Collektive/collektive/issues/489)
+
 ## [10.8.0](https://github.com/Collektive/collektive/compare/10.7.0...10.8.0) (2024-11-07)
 
 ### Features
