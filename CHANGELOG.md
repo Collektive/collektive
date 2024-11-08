@@ -1,3 +1,18 @@
+## [10.8.0](https://github.com/Collektive/collektive/compare/10.7.0...10.8.0) (2024-11-07)
+
+### Features
+
+* **field:** add `replaceMatching` method replacing the values in a field matching a given predicate ([#550](https://github.com/Collektive/collektive/issues/550)) ([ca768d0](https://github.com/Collektive/collektive/commit/ca768d0c6e9182893ec4d4a94bea9049da306241))
+
+### Dependency updates
+
+* **deps:** update alchemist to v34.1.12 ([81f4d20](https://github.com/Collektive/collektive/commit/81f4d20f928320eb5abdf889cc25c591ae2b600e))
+* **deps:** update docusaurus monorepo to v3.6.0 ([c7e9243](https://github.com/Collektive/collektive/commit/c7e92432ed9dff67a2c3d5acc31aa997aeb24a7e))
+
+### General maintenance
+
+* add basic codecov configuration ([1f4a8c9](https://github.com/Collektive/collektive/commit/1f4a8c98380488c2d50b7deba59544d0bec93ec0))
+
 ## [10.7.0](https://github.com/Collektive/collektive/compare/10.6.0...10.7.0) (2024-11-06)
 
 ### Features
