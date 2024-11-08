@@ -217,7 +217,7 @@ internal abstract class AbstractField<ID : Any, T>(
 
     protected abstract fun <R> mapOthersAsSequence(transform: (ID, T) -> R): Sequence<Pair<ID, R>>
 
-    final override fun toString() = toMap().toString()
+    final override fun toString() = "ϕ(localId=$localId, localValue=$localValue, neighbors=${neighborsMap()})"
 }
 
 internal class ArrayBasedField<ID : Any, T>(
