@@ -2,6 +2,7 @@ package it.unibo.collektive.field
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.equals.shouldNotBeEqual
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.field.Field.Companion.fold
@@ -80,5 +81,15 @@ class FieldOpsTest : StringSpec({
     }
     "The replaceMatching should return a field with the replaced values" {
         field.replaceMatching(42) { it == 10 } shouldBe Field(0, 0, mapOf(1 to 42, 2 to 20))
+    }
+    "When an empty field is filtered, a map with only the local value should be returned" {
+        emptyField.filter { _ -> true } shouldBeEqual mapOf(0 to "localVal")
+    }
+    "When a field is filtered and no elements is filtered out, the map returned should be the same as call .toMap()" {
+        fulfilledField.filter { _ -> true } shouldBeEqual fulfilledField.toMap()
+    }
+    "When a field is filtered, a map with only the elements that satisfy the predicate should be returned" {
+        fulfilledField.filterWithId { id, _ -> id % 2 == 0 } shouldBeEqual mapOf(0 to 0, 2 to 20)
+        fulfilledField.filterWithId { _, value -> value > 10 } shouldBeEqual mapOf(2 to 20, 3 to 15)
     }
 })

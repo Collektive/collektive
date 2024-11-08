@@ -20,6 +20,20 @@ sealed interface Field<ID : Any, out T> {
     fun excludeSelf(): Map<ID, T>
 
     /**
+     * Returns a [Map] with the neighboring values of this field and the [localValue]
+     * matching the [predicate] considering also the [ID].
+     */
+    fun filterWithId(predicate: (ID, T) -> Boolean): Map<ID, T> = asSequence()
+        .filter { (id, value) -> predicate(id, value) }
+        .toMap()
+
+    /**
+     * Returns a [Map] with the neighboring values of this field and the [localValue]
+     * matching the [predicate].
+     */
+    fun filter(predicate: (T) -> Boolean): Map<ID, T> = filterWithId { _, value -> predicate(value) }
+
+    /**
      * Combines this field with another (aligned) one.
      */
     fun <B, R> alignedMap(other: Field<ID, B>, transform: (T, B) -> R): Field<ID, R> {
