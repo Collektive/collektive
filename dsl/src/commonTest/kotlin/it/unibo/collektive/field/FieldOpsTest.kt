@@ -89,11 +89,7 @@ class FieldOpsTest : StringSpec({
         }
     }
     "An empty field should return an empty field when aligned mapped with another empty field" {
-        emptyField.alignedMapWithId(emptyField) { _, _, _ -> "no-data" } shouldBe Field(
-            0,
-            "no-data",
-            emptyMap(),
-        )
+        emptyField.alignedMapWithId(emptyField) { _, _, _ -> "no-data" } shouldBe Field(0, "no-data", emptyMap())
     }
     "A field should return a field with the mapped values when aligned mapped with another field" {
         fulfilledField.alignedMapWithId(fulfilledCompatibleField) { _, value, other -> value + other } shouldBe Field(
