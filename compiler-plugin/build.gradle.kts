@@ -19,6 +19,7 @@ repositories {
 
 dependencies {
     compileOnly(libs.kotlin.compiler.embeddable)
+    implementation(libs.kotlin.reflect)
 }
 
 buildConfig {
