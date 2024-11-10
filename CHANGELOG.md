@@ -1,3 +1,15 @@
+## [10.10.0](https://github.com/Collektive/collektive/compare/10.9.0...10.10.0) (2024-11-10)
+
+### Features
+
+* **field:** add `alignedMapWithId` for consistency with `*WithId` functions ([#554](https://github.com/Collektive/collektive/issues/554)) ([201f1bf](https://github.com/Collektive/collektive/commit/201f1bf70b9f67267b979875843c6c9bfe8042da))
+
+### Dependency updates
+
+* **deps:** update alchemist to v34.1.13 ([92e45ef](https://github.com/Collektive/collektive/commit/92e45ef04c7e8a9626b61903c3a4640b15fc2ac6))
+* **deps:** update alchemist to v34.1.14 ([9906d63](https://github.com/Collektive/collektive/commit/9906d6398c98c9c8ab1c78f5b12f6e5725c09a86))
+* **deps:** update plugin multijvmtesting to v1.3.0 ([3f80fac](https://github.com/Collektive/collektive/commit/3f80fac61f0f3318f45dd1bb8ebb547b839f4c21))
+
 ## [10.9.0](https://github.com/Collektive/collektive/compare/10.8.0...10.9.0) (2024-11-08)
 
 ### Features
