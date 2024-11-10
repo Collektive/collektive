@@ -20,12 +20,18 @@ sealed interface Field<ID : Any, out T> {
     fun excludeSelf(): Map<ID, T>
 
     /**
+     * Combines this field with another (aligned) one considering the [ID] when combining the values.
+     */
+    fun <B, R> alignedMapWithId(other: Field<ID, B>, transform: (ID, T, B) -> R): Field<ID, R> {
+        checkAligned(this, other)
+        return mapWithId { id, value -> transform(id, value, other[id]) }
+    }
+
+    /**
      * Combines this field with another (aligned) one.
      */
-    fun <B, R> alignedMap(other: Field<ID, B>, transform: (T, B) -> R): Field<ID, R> {
-        checkAligned(this, other)
-        return mapWithId { id, value -> transform(value, other[id]) }
-    }
+    fun <B, R> alignedMap(other: Field<ID, B>, transform: (T, B) -> R): Field<ID, R> =
+        alignedMapWithId(other) { _, value, otherValue -> transform(value, otherValue) }
 
     /**
      * Map the field using the [transform] function.
