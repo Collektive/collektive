@@ -98,4 +98,9 @@ class FieldOpsTest : StringSpec({
             mapOf(1 to 11, 2 to 21, 3 to 16),
         )
     }
+    "The string representation of a field should contain the local id and the local value and the neighbors" {
+        emptyField.toString() shouldBe "ϕ(localId=0, localValue=localVal, neighbors={})"
+        field.toString() shouldBe "ϕ(localId=0, localValue=0, neighbors={1=10, 2=20})"
+        fulfilledField.toString() shouldBe "ϕ(localId=0, localValue=0, neighbors={1=10, 2=20, 3=15})"
+    }
 })
