@@ -4,16 +4,21 @@ import it.unibo.collektive.frontend.checkers.CheckersUtility.discardIfFunctionDe
 import it.unibo.collektive.frontend.checkers.CheckersUtility.discardIfOutsideAggregateEntryPoint
 import it.unibo.collektive.frontend.checkers.CheckersUtility.functionName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.fqName
+import it.unibo.collektive.frontend.checkers.CheckersUtility.hasAggregateArgument
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isAggregate
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isFunctionCallsWithName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.wrappingElementsUntil
+import it.unibo.collektive.frontend.visitors.FunctionCallWithAggregateParVisitor
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirFunctionCallChecker
+import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.FirWhileLoop
+import org.jetbrains.kotlin.fir.references.toResolvedFunctionSymbol
+import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 import kotlin.reflect.jvm.kotlinFunction
@@ -113,22 +118,37 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
     private fun CheckerContext.isIteratedWithoutAlignedOn(): Boolean =
         isInsideALoopWithoutAlignedOn() || isInsideIteratedFunctionWithoutAlignedOn()
 
+    @OptIn(SymbolInternals::class)
+    private fun isInvalidFunWithAggregateParameter(expression: FirFunctionCall, context: CheckerContext): Boolean {
+        val visitor = FunctionCallWithAggregateParVisitor(context)
+        (expression.calleeReference.toResolvedFunctionSymbol()?.fir as? FirSimpleFunction)?.accept(visitor) ?: false
+        return visitor.found
+    }
+
     override fun check(
         expression: FirFunctionCall,
         context: CheckerContext,
         reporter: DiagnosticReporter,
     ) {
         val calleeName = expression.functionName()
-        if (expression.fqName() !in safeOperators &&
-            expression.isAggregate(context.session) &&
-            context.isIteratedWithoutAlignedOn()
-        ) {
+        if (expression.fqName() in safeOperators) return
+        if (expression.isAggregate(context.session) && context.isIteratedWithoutAlignedOn()) {
             reporter.reportOn(
                 expression.calleeReference.source,
                 CheckersUtility.PluginErrors.DOT_CALL_WARNING,
                 createWarning(calleeName),
                 context,
             )
+        } else if (expression.hasAggregateArgument()) {
+            if (context.isIteratedWithoutAlignedOn() && isInvalidFunWithAggregateParameter(expression, context)) {
+                reporter.reportOn(
+                    expression.calleeReference.source,
+                    CheckersUtility.PluginErrors.DOT_CALL_WARNING,
+                    "Warning: suspicious call of function '$calleeName' with aggregate argument inside a loop with no " +
+                            "manual alignment operation",
+                    context,
+                )
+            }
         }
     }
 }
