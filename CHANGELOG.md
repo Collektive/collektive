@@ -1,3 +1,9 @@
+## [10.11.0](https://github.com/Collektive/collektive/compare/10.10.0...10.11.0) (2024-11-11)
+
+### Features
+
+* **field:** change `toString` representation for `Field` ([#558](https://github.com/Collektive/collektive/issues/558)) ([15b37a9](https://github.com/Collektive/collektive/commit/15b37a93a3d5a4ffcf47dbcd4bfe7df175ca7cc9))
+
 ## [10.10.0](https://github.com/Collektive/collektive/compare/10.9.0...10.10.0) (2024-11-10)
 
 ### Features
