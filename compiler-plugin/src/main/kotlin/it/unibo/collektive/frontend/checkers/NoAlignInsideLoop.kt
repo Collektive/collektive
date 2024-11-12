@@ -1,5 +1,6 @@
 package it.unibo.collektive.frontend.checkers
 
+import it.unibo.collektive.frontend.checkers.CheckersUtility.ALIGNED_ON_FQ_NAME
 import it.unibo.collektive.frontend.checkers.CheckersUtility.discardIfFunctionDeclaration
 import it.unibo.collektive.frontend.checkers.CheckersUtility.discardIfOutsideAggregateEntryPoint
 import it.unibo.collektive.frontend.checkers.CheckersUtility.functionName
@@ -29,7 +30,7 @@ import kotlin.reflect.jvm.kotlinFunction
 object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
 
     private val safeOperators = listOf(
-        "it.unibo.collektive.aggregate.api.Aggregate.alignedOn",
+        ALIGNED_ON_FQ_NAME,
         "it.unibo.collektive.aggregate.api.Aggregate.align",
         "it.unibo.collektive.aggregate.api.Aggregate.dealign",
     )

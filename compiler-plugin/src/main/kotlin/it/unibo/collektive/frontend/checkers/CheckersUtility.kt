@@ -42,6 +42,11 @@ object CheckersUtility {
     const val AGGREGATE_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate"
 
     /**
+     * Fully qualified name of the `alignedOn` method of the Aggregate interface.
+     */
+    const val ALIGNED_ON_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.alignedOn"
+
+    /**
      * Checks is a specific receiver parameter is [Aggregate][it.unibo.collektive.aggregate.api.Aggregate]
      * (`Aggregate<ID>.example()`).
      * It uses the [session] of the [CheckerContext] in which this check is performed to get the class symbol of the

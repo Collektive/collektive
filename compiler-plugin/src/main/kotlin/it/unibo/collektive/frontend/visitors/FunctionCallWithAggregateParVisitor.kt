@@ -8,16 +8,14 @@
 
 package it.unibo.collektive.frontend.visitors
 
-import it.unibo.collektive.frontend.checkers.CheckersUtility.AGGREGATE_FQ_NAME
-import it.unibo.collektive.frontend.checkers.CheckersUtility.functionName
+import it.unibo.collektive.frontend.checkers.CheckersUtility.ALIGNED_ON_FQ_NAME
+import it.unibo.collektive.frontend.checkers.CheckersUtility.fqName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isAggregate
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
-import org.jetbrains.kotlin.fir.analysis.checkers.toClassLikeSymbol
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
-import org.jetbrains.kotlin.fir.expressions.*
+import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
-import org.jetbrains.kotlin.name.ClassId
 
 class FunctionCallWithAggregateParVisitor(private val context: CheckerContext) : FirVisitorVoid() {
 
@@ -26,23 +24,21 @@ class FunctionCallWithAggregateParVisitor(private val context: CheckerContext) :
   private var functionCounter = 0
   private val insideNestedFun
     get() = functionCounter > 1
-  private var parameterName: String = ""
 
   override fun visitElement(element: FirElement) {
     element.acceptChildren(this)
   }
 
   private fun isInsideAlignedOnOrNestedFun(): Boolean =
-    !insideAlignedOn && !insideNestedFun
+    insideAlignedOn || insideNestedFun
 
   override fun visitFunctionCall(functionCall: FirFunctionCall) {
     if (functionCall.isAggregate(context.session)) {
-      if (functionCall.functionName() == "alignedOn") {
+      if (functionCall.fqName() == ALIGNED_ON_FQ_NAME) {
         insideAlignedOn = true
         functionCall.acceptChildren(this)
         insideAlignedOn = false
-      } else if (functionCall.explicitReceiver?.source?.getElementTextInContextForDebug() == parameterName
-        && isInsideAlignedOnOrNestedFun()) {
+      } else if (!isInsideAlignedOnOrNestedFun()) {
         found = true
         return
       }
@@ -51,9 +47,6 @@ class FunctionCallWithAggregateParVisitor(private val context: CheckerContext) :
   }
 
   override fun visitSimpleFunction(simpleFunction: FirSimpleFunction) {
-    parameterName = simpleFunction.valueParameters.firstOrNull {
-      it.returnTypeRef.toClassLikeSymbol(context.session)?.classId == ClassId.fromString(AGGREGATE_FQ_NAME)
-    }?.name?.asString() ?: return
     functionCounter++
     simpleFunction.body?.accept(this)
     functionCounter--
