@@ -33,6 +33,7 @@ kotlinMultiplatform {
             dependencies {
                 implementation(project(":test-tooling"))
                 implementation(rootProject.libs.bundles.kotlin.testing.common)
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
             }
         }
         val jvmTest by getting {
