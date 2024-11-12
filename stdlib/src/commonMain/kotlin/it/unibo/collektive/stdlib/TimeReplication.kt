@@ -13,7 +13,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
 
 /**
- * A periodic restart strategy for removing obsolete information of [process] replicated across devices.
+ * A periodic restart strategy for removing obsolete information of an [Aggregate] [process] replicated across devices.
  * The process has a time-to-live of [timeToLive] and is replicated up to [maxReplicas] times.
  * If the time elapsed without a new replica being created is greater than [timeToLive],
  * the oldest replica is killed and a new one is created,
@@ -23,14 +23,14 @@ import kotlin.time.Duration.Companion.ZERO
  */
 fun <ID : Comparable<ID>, Type : Any> Aggregate<ID>.timeReplicated(
 //    timeSensor: TimeSensor,
-    process: () -> Type,
+    process: Aggregate<ID>.() -> Type,
     default: Type,
     timeToLive: Duration,
     maxReplicas: Int,
 ): Type {
     // time elapsed without a new replica being created
     val timeElapsed = ZERO // sharedTimer(timeToLive, timeSensor.getDeltaTime())
-    val result = repeat(emptyList<Replica<Type>>()) { replicas ->
+    val result = repeat(emptyList<Replica<ID, Type>>()) { replicas ->
         // kill the oldest one if there are more than maxReplicas, or if enough time has passed
         val applyReplicas = when {
             replicas.isEmpty() -> listOf(Replica(0u, process, ZERO))
@@ -49,7 +49,9 @@ fun <ID : Comparable<ID>, Type : Any> Aggregate<ID>.timeReplicated(
             }
         }
         applyReplicas.forEach {
-            alignedOn(it.id) { it.process() }
+            alignedOn(it.id) {
+                it.process(this@timeReplicated)
+            }
         }
         applyReplicas
     }
@@ -61,4 +63,8 @@ fun <ID : Comparable<ID>, Type : Any> Aggregate<ID>.timeReplicated(
  * It is identified by an [id] and runs the [process] function.
  * The [process] function is executed while the replica is alive.
  */
-data class Replica<Type>(val id: ULong, val process: () -> Type, val timeAlive: Duration)
+data class Replica<ID : Comparable<ID>, Type>(
+    val id: ULong,
+    val process: Aggregate<ID>.() -> Type,
+    val timeAlive: Duration,
+)
