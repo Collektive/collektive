@@ -41,10 +41,8 @@ class SharedTimerTest : StringSpec({
         val size = 5
         val timeToLive: Duration = 5.toDuration(SECONDS)
         val environment: Environment<Duration> = squareMooreGridWithSharedTimer(size, timeToLive)
-        environment.nodes.forEach { n ->
-            for (i in 0..n.id) {
-                n.cycle()
-            }
+        generateSequence(0) { it + 1 }.take(environment.nodes.size).forEach { iteration ->
+            environment.nodes.drop(iteration).forEach { n -> n.cycle() }
         }
         environment.cycleInReverseOrder()
         environment.sharingIsStable() shouldBe true
