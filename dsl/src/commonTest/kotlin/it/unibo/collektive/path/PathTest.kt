@@ -12,11 +12,13 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.path.impl.PathImpl
 
+const val ONE_MILLION = 1_000_000
+
 class PathTest : StringSpec({
-    "A Path should be composed of 1 million different paths without running out of memory" {
-        val paths = generateSequence(1) { it + 1 }
-            .take(1_000_000)
+    "One million paths can be created" {
+        generateSequence(1) { it + 1 }
             .map { PathImpl.of(listOf(it)) }
-        paths.count() shouldBe 1_000_000
+            .take(ONE_MILLION)
+            .count() shouldBe ONE_MILLION
     }
 })
