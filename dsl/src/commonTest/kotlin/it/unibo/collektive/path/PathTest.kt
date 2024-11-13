@@ -13,10 +13,10 @@ import io.kotest.matchers.shouldBe
 import it.unibo.collektive.path.impl.PathImpl
 
 class PathTest : StringSpec({
-    "Should be able to generate 1 million different paths" {
-        val seq = generateSequence(1) { it + 1 }.take(1_000_000)
-        seq.count() shouldBe 1_000_000
-        val res = seq.map { PathImpl.of(listOf(it)) }
-        res.count() shouldBe 1_000_000
+    "Should be able to generate 1 million different paths without running out of memory" {
+        val paths = generateSequence(1) { it + 1 }
+            .take(1_000_000)
+            .map { PathImpl.of(listOf(it)) }
+        paths.count() shouldBe 1_000_000
     }
 })
