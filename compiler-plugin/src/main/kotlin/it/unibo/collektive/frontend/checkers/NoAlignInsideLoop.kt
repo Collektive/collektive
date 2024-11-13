@@ -50,8 +50,13 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
     /**
      * Getter for all Collection members using Kotlin reflection, obtaining their names as a set.
      */
-    @Deprecated("This method currently raises an exception. " +
-            "See https://youtrack.jetbrains.com/issue/KT-16479 for more details.")
+    @Deprecated(
+        """
+        This method currently raises an exception.
+        See https://youtrack.jetbrains.com/issue/KT-16479 for more details.
+        """,
+    )
+    @Suppress("UnusedPrivateMember")
     private fun getCollectionMembersKotlin(): Set<String> = sequenceOf(
         Class.forName("kotlin.collections.CollectionsKt").kotlin,
         Collection::class,
@@ -60,7 +65,7 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         Map::class,
         Sequence::class,
         Set::class,
-    ).flatMap { it.java.methods.mapNotNull { it.kotlinFunction } + it.members }
+    ).flatMap { clazz -> clazz.java.methods.mapNotNull { it.kotlinFunction } + clazz.members }
         .filter {
             fun KParameter.isFunctionType(): Boolean = (type.classifier as? KClass<*>)?.qualifiedName
                 ?.startsWith("kotlin.Function")
