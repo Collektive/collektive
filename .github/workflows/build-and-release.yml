@@ -88,13 +88,12 @@ jobs:
           # Dry-deployment
           check-command: |
             ./gradlew check koverXmlReport :compiler-plugin:check :gradle-plugin:check --parallel
+          deploy-command: |
             # Stop the Gradle Daemon on windows to try to prevent
             # "The process cannot access the file because it is being used by another process"
             if ${{ runner.os == 'Windows' }}; then
               ./gradlew --stop
-              # powershell kill-windows-processes.ps1
             fi
-          deploy-command: |
             NEXT_VERSION="${{ needs.staging-repo.outputs.next-version }}"
             OVERRIDE_VERSION=$([[ "$NEXT_VERSION" != "" ]] && echo "-PforceVersion=$(echo $NEXT_VERSION)" || echo "")
             ./gradlew $OVERRIDE_VERSION -PstagingRepositoryId=${{ needs.staging-repo.outputs.maven-central-repo-id }} uploadAll :compiler-plugin:uploadKotlinOSSRHToMavenCentralNexus :gradle-plugin:uploadKotlinOSSRHToMavenCentralNexus --parallel
