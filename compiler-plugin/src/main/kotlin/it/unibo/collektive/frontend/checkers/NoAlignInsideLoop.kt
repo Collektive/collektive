@@ -2,8 +2,8 @@ package it.unibo.collektive.frontend.checkers
 
 import it.unibo.collektive.frontend.checkers.CheckersUtility.discardIfFunctionDeclaration
 import it.unibo.collektive.frontend.checkers.CheckersUtility.discardIfOutsideAggregateEntryPoint
-import it.unibo.collektive.frontend.checkers.CheckersUtility.functionName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.fqName
+import it.unibo.collektive.frontend.checkers.CheckersUtility.functionName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isAggregate
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isFunctionCallsWithName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.wrappingElementsUntil
@@ -46,7 +46,6 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         }
         """.trimIndent()
 
-
     /**
      * Getter for all Collection members using Kotlin reflection, obtaining their names as a set.
      */
@@ -87,12 +86,12 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         List::class.java,
         Map::class.java,
         Sequence::class.java,
-        Set::class.java
+        Set::class.java,
     ).flatMap { it.methods.asSequence() }
         .filter { method ->
             method.parameters.any { parameter ->
                 parameter.parameterizedType.typeName.startsWith("kotlin.jvm.functions.Function") ||
-                        parameter.parameterizedType is Function<*>
+                    parameter.parameterizedType is Function<*>
             }
         }
         .map { it.name }
