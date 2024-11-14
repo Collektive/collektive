@@ -1,3 +1,13 @@
+## [11.0.0](https://github.com/Collektive/collektive/compare/10.11.1...11.0.0) (2024-11-14)
+
+### ⚠ BREAKING CHANGES
+
+* **dsl:** rename repeat/repeating functions into evolve/evolving (#577)
+
+### Refactoring
+
+* **dsl:** rename repeat/repeating functions into evolve/evolving ([#577](https://github.com/Collektive/collektive/issues/577)) ([b616ddb](https://github.com/Collektive/collektive/commit/b616ddbc2a1356a7277f2472559cfe40c3a778c5))
+
 ## [10.11.1](https://github.com/Collektive/collektive/compare/10.11.0...10.11.1) (2024-11-14)
 
 ### Dependency updates
