@@ -67,12 +67,12 @@ internal class AggregateContext<ID : Any>(
         }.toReturn
     }
 
-    override fun <Initial, Return> repeating(initial: Initial, transform: YieldingScope<Initial, Return>): Return {
+    override fun <Initial, Return> evolving(initial: Initial, transform: YieldingScope<Initial, Return>): Return {
         val path = stack.currentPath()
         return transform(YieldingContext(), stateAt(path, initial))
             .also {
                 check(it.toReturn !is Field<*, *>) {
-                    "repeating operations cannot return fields (guaranteed misalignment on every neighborhood change)"
+                    "evolving operations cannot return fields (guaranteed misalignment on every neighborhood change)"
                 }
                 state += path to it.toReturn
             }
@@ -86,7 +86,7 @@ internal class AggregateContext<ID : Any>(
         return newField(local, neighborValues)
     }
 
-    override fun <Initial> repeat(initial: Initial, transform: (Initial) -> Initial): Initial = repeating(initial) {
+    override fun <Initial> evolve(initial: Initial, transform: (Initial) -> Initial): Initial = evolving(initial) {
         val res = transform(it)
         YieldingResult(res, res)
     }
