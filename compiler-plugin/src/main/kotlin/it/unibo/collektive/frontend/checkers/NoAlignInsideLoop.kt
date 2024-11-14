@@ -30,23 +30,6 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         AggregateFunctionNames.DEALIGN_FUNCTION_FQ_NAME,
     )
 
-    //    /**
-    //     * Creates a warning for this checker, formatted with the [calleeName] that originated it.
-    //     */
-    //    fun createWarning(calleeName: String): String =
-    //        """
-    //        Warning: aggregate function '$calleeName' has been called inside a loop construct without explicit alignment.
-    //        The same path may generate interactions more than once, leading to ambiguous alignment.
-    //        for (element in collection) {
-    //            $calleeName(...) // Broken
-    //        }
-    //        for (element in collection) {
-    //            alignedOn(element) { // Manual alignment on element, assuming it is unique
-    //                $calleeName(...)
-    //            }
-    //        }
-    //        """.trimIndent()
-
     /**
      * Getter for all Collection members using Kotlin reflection, obtaining their names as a set.
      */

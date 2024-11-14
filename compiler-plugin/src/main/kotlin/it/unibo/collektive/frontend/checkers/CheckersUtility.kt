@@ -17,18 +17,6 @@ import org.jetbrains.kotlin.fir.references.toResolvedFunctionSymbol
  * Collection of utilities for FIR checkers.
  */
 object CheckersUtility {
-    //    /**
-    //     * Object containing the types of errors/warnings reported by this extension.
-    //     */
-    //    object PluginErrors {
-    //        /**
-    //         * Warning generated on a dot call.
-    //         */
-    //        val DOT_CALL_WARNING by warning1<PsiElement, String>(
-    //            SourceElementPositioningStrategies.CALL_ELEMENT_WITH_DOT,
-    //        )
-    //    }
-
     /**
      * Checks is a specific receiver parameter is [Aggregate][it.unibo.collektive.aggregate.api.Aggregate]
      * (`Aggregate<ID>.example()`).

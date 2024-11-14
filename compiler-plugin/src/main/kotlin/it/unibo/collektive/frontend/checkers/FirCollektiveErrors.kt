@@ -9,7 +9,7 @@
 package it.unibo.collektive.frontend.checkers
 
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
-import org.jetbrains.kotlin.diagnostics.SourceElementPositioningStrategies
+import org.jetbrains.kotlin.diagnostics.SourceElementPositioningStrategies.CALL_ELEMENT_WITH_DOT
 import org.jetbrains.kotlin.diagnostics.rendering.RootDiagnosticRendererFactory
 import org.jetbrains.kotlin.diagnostics.warning1
 
@@ -20,14 +20,12 @@ object FirCollektiveErrors {
     /**
      * Warning raised when a forbidden function is called.
      */
-    val FORBIDDEN_FUNCTION by warning1<PsiElement, String>(SourceElementPositioningStrategies.CALL_ELEMENT_WITH_DOT)
+    val FORBIDDEN_FUNCTION_CALL by warning1<PsiElement, String>(CALL_ELEMENT_WITH_DOT)
 
     /**
      * Warning raised when an aggregate function is called inside an iteration construct.
      */
-    val AGGREGATE_FUNCTION_INSIDE_ITERATION by warning1<PsiElement, String>(
-        SourceElementPositioningStrategies.CALL_ELEMENT_WITH_DOT,
-    )
+    val AGGREGATE_FUNCTION_INSIDE_ITERATION by warning1<PsiElement, String>(CALL_ELEMENT_WITH_DOT)
 
     init {
         RootDiagnosticRendererFactory.registerFactory(KtDefaultErrorMessagesCollektive)

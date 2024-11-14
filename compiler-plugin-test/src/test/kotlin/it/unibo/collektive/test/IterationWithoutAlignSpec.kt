@@ -15,7 +15,6 @@ import java.io.FileNotFoundException
 
 @OptIn(ExperimentalCompilerApi::class)
 class IterationWithoutAlignSpec : FreeSpec({
-
     fun expectedWarning(functionName: String): String =
         """
             Aggregate function '$functionName' has been called inside a loop construct without explicit alignment.

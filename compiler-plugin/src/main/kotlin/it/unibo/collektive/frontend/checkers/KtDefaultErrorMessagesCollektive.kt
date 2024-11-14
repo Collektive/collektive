@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.diagnostics.rendering.CommonRenderers
 object KtDefaultErrorMessagesCollektive : BaseDiagnosticRendererFactory() {
     override val MAP = KtDiagnosticFactoryToRendererMap("Collektive").apply {
         put(
-            FirCollektiveErrors.FORBIDDEN_FUNCTION,
+            FirCollektiveErrors.FORBIDDEN_FUNCTION_CALL,
             "The function ''{0}'' should not be called explicitly",
             CommonRenderers.STRING,
         )

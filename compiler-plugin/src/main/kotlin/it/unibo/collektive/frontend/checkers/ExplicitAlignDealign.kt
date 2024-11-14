@@ -19,7 +19,7 @@ object ExplicitAlignDealign : FirFunctionCallChecker(MppCheckerKind.Common) {
         if (fqnCalleeName in FORBIDDEN_FUNCTIONS && context.isInsideAggregateFunction()) {
             reporter.reportOn(
                 expression.calleeReference.source,
-                FirCollektiveErrors.FORBIDDEN_FUNCTION,
+                FirCollektiveErrors.FORBIDDEN_FUNCTION_CALL,
                 fqnCalleeName,
                 context,
             )
@@ -27,7 +27,7 @@ object ExplicitAlignDealign : FirFunctionCallChecker(MppCheckerKind.Common) {
     }
 
     private val FORBIDDEN_FUNCTIONS = listOf(
-        AggregateFunctionNames.ALIGNED_ON_FUNCTION_FQ_NAME,
+        AggregateFunctionNames.ALIGN_FUNCTION_FQ_NAME,
         AggregateFunctionNames.DEALIGN_FUNCTION_FQ_NAME,
     )
 }
