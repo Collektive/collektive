@@ -13,7 +13,6 @@ import io.kotest.matchers.shouldBe
 import it.unibo.collektive.stdlib.NonSelfStabilizingGossip.nonSelfStabilizingGossip
 import it.unibo.collektive.stdlib.SelfStabilizingGossip.gossipMax
 import it.unibo.collektive.stdlib.SelfStabilizingGossip.gossipMin
-import it.unibo.collektive.stdlib.iterables.FieldedCollectionsExtensions.drop
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
 
@@ -149,10 +148,18 @@ class GossipTest : StringSpec({
     "non-self-stabilizing gossip should not update the best value when it drops from the network" {
         val size = 5
         val environment: Environment<Int> = squareMooreGridWithNonSelfStabilizingGossip(size)
-        environment.cycleInReverseOrder()
+        for (i in 0 until size) {
+            environment.cycleInReverseOrder()
+        }
+        // The devices gossip is the maxID in the network
         val maxId = environment.nodes.maxBy { it.id }.id
+        // Check that all devices agree on the maxID
         environment.status().forEach { (_, value) -> value shouldBe maxId }
-        environment.nodes.drop(maxId).forEach { n -> n.cycle() }
+        // Drop the node with the max value from the network and let the others gossip
+        for (i in 0 until size) {
+            environment.nodes.drop(maxId).forEach { n -> n.cycle() }
+        }
+        // The devices should still agree on the old maxID
         environment.status().forEach { (_, value) -> value shouldBe maxId }
     }
 })
