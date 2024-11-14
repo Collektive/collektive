@@ -151,12 +151,8 @@ class GossipTest : StringSpec({
         val environment: Environment<Int> = squareMooreGridWithNonSelfStabilizingGossip(size)
         environment.cycleInReverseOrder()
         val maxId = environment.nodes.maxBy { it.id }.id
-        println(environment.status())
-        println(maxId)
         environment.status().forEach { (_, value) -> value shouldBe maxId }
         environment.nodes.drop(maxId).forEach { n -> n.cycle() }
-        println(environment.status())
         environment.status().forEach { (_, value) -> value shouldBe maxId }
-        println(environment.status())
     }
 })
