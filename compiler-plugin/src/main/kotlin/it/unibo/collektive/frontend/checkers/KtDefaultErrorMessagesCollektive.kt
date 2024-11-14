@@ -12,6 +12,9 @@ import org.jetbrains.kotlin.diagnostics.KtDiagnosticFactoryToRendererMap
 import org.jetbrains.kotlin.diagnostics.rendering.BaseDiagnosticRendererFactory
 import org.jetbrains.kotlin.diagnostics.rendering.CommonRenderers
 
+/**
+ * Mapping between the errors and warnings defined in [FirCollektiveErrors] and their respective error messages.
+ */
 object KtDefaultErrorMessagesCollektive : BaseDiagnosticRendererFactory() {
     override val MAP = KtDiagnosticFactoryToRendererMap("Collektive").apply {
         put(

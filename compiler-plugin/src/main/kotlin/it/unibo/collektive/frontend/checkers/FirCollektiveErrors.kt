@@ -13,8 +13,18 @@ import org.jetbrains.kotlin.diagnostics.SourceElementPositioningStrategies
 import org.jetbrains.kotlin.diagnostics.rendering.RootDiagnosticRendererFactory
 import org.jetbrains.kotlin.diagnostics.warning1
 
+/**
+ * Error messages for the Collektive compiler plugin.
+ */
 object FirCollektiveErrors {
+    /**
+     * Warning raised when a forbidden function is called.
+     */
     val FORBIDDEN_FUNCTION by warning1<PsiElement, String>(SourceElementPositioningStrategies.CALL_ELEMENT_WITH_DOT)
+
+    /**
+     * Warning raised when an aggregate function is called inside an iteration construct.
+     */
     val AGGREGATE_FUNCTION_INSIDE_ITERATION by warning1<PsiElement, String>(
         SourceElementPositioningStrategies.CALL_ELEMENT_WITH_DOT,
     )
