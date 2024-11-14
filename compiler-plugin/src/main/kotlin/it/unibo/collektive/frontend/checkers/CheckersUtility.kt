@@ -1,6 +1,8 @@
 package it.unibo.collektive.frontend.checkers
 
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.diagnostics.KtDiagnosticFactory1
+import org.jetbrains.kotlin.diagnostics.Severity
 import org.jetbrains.kotlin.diagnostics.SourceElementPositioningStrategies
 import org.jetbrains.kotlin.diagnostics.warning1
 import org.jetbrains.kotlin.fir.FirElement
@@ -14,22 +16,25 @@ import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.toResolvedCallableSymbol
 import org.jetbrains.kotlin.fir.expressions.unwrapExpression
 import org.jetbrains.kotlin.fir.references.toResolvedFunctionSymbol
+import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirCallableSymbol
+import org.jetbrains.kotlin.psi.KtFunction
 
 /**
  * Collection of utilities for FIR checkers.
  */
 object CheckersUtility {
-    /**
-     * Object containing the types of errors/warnings reported by this extension.
-     */
-    object PluginErrors {
-        /**
-         * Warning generated on a dot call.
-         */
-        val DOT_CALL_WARNING by warning1<PsiElement, String>(
-            SourceElementPositioningStrategies.CALL_ELEMENT_WITH_DOT,
-        )
-    }
+//    /**
+//     * Object containing the types of errors/warnings reported by this extension.
+//     */
+//    object PluginErrors {
+//        /**
+//         * Warning generated on a dot call.
+//         */
+//        val DOT_CALL_WARNING by warning1<PsiElement, String>(
+//            SourceElementPositioningStrategies.CALL_ELEMENT_WITH_DOT,
+//        )
+//    }
 
     /**
      * Checks is a specific receiver parameter is [Aggregate][it.unibo.collektive.aggregate.api.Aggregate]

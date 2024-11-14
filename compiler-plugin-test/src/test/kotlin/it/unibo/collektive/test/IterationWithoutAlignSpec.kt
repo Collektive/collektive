@@ -5,7 +5,6 @@ import io.kotest.data.forAll
 import io.kotest.data.headers
 import io.kotest.data.row
 import io.kotest.data.table
-import it.unibo.collektive.frontend.checkers.NoAlignInsideLoop
 import it.unibo.collektive.test.util.CompileUtils
 import it.unibo.collektive.test.util.CompileUtils.asTestingProgram
 import it.unibo.collektive.test.util.CompileUtils.noWarning
@@ -16,6 +15,14 @@ import java.io.FileNotFoundException
 
 @OptIn(ExperimentalCompilerApi::class)
 class IterationWithoutAlignSpec : FreeSpec({
+
+    fun expectedWarning(functionName: String): String =
+        """
+            Aggregate function '$functionName' has been called inside a loop construct without explicit alignment.
+            The same path may generate interactions more than once, leading to ambiguous alignment.
+            
+            Consider to wrap the function into the 'alignedOn' method with a unique element.
+        """.trimIndent()
 
     "When iterating an Aggregate function" - {
         forAll(testedAggregateFunctions) { functionCall ->
@@ -38,7 +45,7 @@ class IterationWithoutAlignSpec : FreeSpec({
 
                     "should compile producing a warning" - {
                         code shouldCompileWith warning(
-                            NoAlignInsideLoop.createWarning(functionName),
+                            expectedWarning(functionName),
                         )
                     }
                 }
@@ -58,7 +65,7 @@ class IterationWithoutAlignSpec : FreeSpec({
 
                     "should compile producing a warning" - {
                         code shouldCompileWith warning(
-                            NoAlignInsideLoop.createWarning(functionName),
+                            expectedWarning(functionName),
                         )
                     }
                 }

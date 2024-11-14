@@ -29,22 +29,22 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         "it.unibo.collektive.aggregate.api.Aggregate.dealign",
     )
 
-    /**
-     * Creates a warning for this checker, formatted with the [calleeName] that originated it.
-     */
-    fun createWarning(calleeName: String): String =
-        """
-        Warning: aggregate function '$calleeName' has been called inside a loop construct without explicit alignment.
-        The same path may generate interactions more than once, leading to ambiguous alignment.
-        for (element in collection) {
-            $calleeName(...) // Broken
-        }
-        for (element in collection) {
-            alignedOn(element) { // Manual alignment on element, assuming it is unique 
-                $calleeName(...)
-            }
-        }
-        """.trimIndent()
+//    /**
+//     * Creates a warning for this checker, formatted with the [calleeName] that originated it.
+//     */
+//    fun createWarning(calleeName: String): String =
+//        """
+//        Warning: aggregate function '$calleeName' has been called inside a loop construct without explicit alignment.
+//        The same path may generate interactions more than once, leading to ambiguous alignment.
+//        for (element in collection) {
+//            $calleeName(...) // Broken
+//        }
+//        for (element in collection) {
+//            alignedOn(element) { // Manual alignment on element, assuming it is unique
+//                $calleeName(...)
+//            }
+//        }
+//        """.trimIndent()
 
     /**
      * Getter for all Collection members using Kotlin reflection, obtaining their names as a set.
@@ -117,11 +117,7 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
     private fun CheckerContext.isIteratedWithoutAlignedOn(): Boolean =
         isInsideALoopWithoutAlignedOn() || isInsideIteratedFunctionWithoutAlignedOn()
 
-    override fun check(
-        expression: FirFunctionCall,
-        context: CheckerContext,
-        reporter: DiagnosticReporter,
-    ) {
+    override fun check(expression: FirFunctionCall, context: CheckerContext, reporter: DiagnosticReporter) {
         val calleeName = expression.functionName()
         if (expression.fqName() !in safeOperators &&
             expression.isAggregate(context.session) &&
@@ -129,8 +125,8 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         ) {
             reporter.reportOn(
                 expression.calleeReference.source,
-                CheckersUtility.PluginErrors.DOT_CALL_WARNING,
-                createWarning(calleeName),
+                FirCollektiveErrors.AGGREGATE_FUNCTION_INSIDE_ITERATION,
+                calleeName,
                 context,
             )
         }
