@@ -10,8 +10,10 @@ package it.unibo.collektive.stdlib.test
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import it.unibo.collektive.stdlib.NonSelfStabilizingGossip.nonSelfStabilizingGossip
 import it.unibo.collektive.stdlib.SelfStabilizingGossip.gossipMax
 import it.unibo.collektive.stdlib.SelfStabilizingGossip.gossipMin
+import it.unibo.collektive.stdlib.iterables.FieldedCollectionsExtensions.drop
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
 
@@ -57,6 +59,18 @@ class GossipTest : StringSpec({
             "Initial status is not `Int.MAX_VALUE`, but it is $initial (${initial::class.simpleName})"
         }
     }
+
+    fun squareMooreGridWithNonSelfStabilizingGossip(size: Int) =
+        mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }) {
+            nonSelfStabilizingGossip(localId) { first, second -> if (first >= second) first else second }
+        }.apply {
+            nodes.size shouldBe size * size
+            val initial = status().values.distinct()
+            initial.size shouldBe 1
+            check(initial.first() == Int.MAX_VALUE) {
+                "Initial status is not `Int.MAX_VALUE`, but it is $initial (${initial::class.simpleName})"
+            }
+        }
 
     "gossipMax in a square moore grid stabilizes after 2 reverse cycles" {
         val size = 5
@@ -130,5 +144,19 @@ class GossipTest : StringSpec({
         // status at second cycle
         environment.gossipIsStable() shouldBe true
         environment.gossipResult() shouldBe 0
+    }
+
+    "non-self-stabilizing gossip should not update the best value when it drops from the network" {
+        val size = 5
+        val environment: Environment<Int> = squareMooreGridWithNonSelfStabilizingGossip(size)
+        environment.cycleInReverseOrder()
+        val maxId = environment.nodes.maxBy { it.id }.id
+        println(environment.status())
+        println(maxId)
+        environment.status().forEach { (_, value) -> value shouldBe maxId }
+        environment.nodes.drop(maxId).forEach { n -> n.cycle() }
+        println(environment.status())
+        environment.status().forEach { (_, value) -> value shouldBe maxId }
+        println(environment.status())
     }
 })
