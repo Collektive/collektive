@@ -10,7 +10,7 @@ package it.unibo.collektive.stdlib.test
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import it.unibo.collektive.stdlib.NonSelfStabilizingGossip.nonSelfStabilizingGossip
+import it.unibo.collektive.stdlib.NonSelfStabilizingGossip.gossip
 import it.unibo.collektive.stdlib.SelfStabilizingGossip.gossipMax
 import it.unibo.collektive.stdlib.SelfStabilizingGossip.gossipMin
 import it.unibo.collektive.testing.Environment
@@ -61,7 +61,7 @@ class GossipTest : StringSpec({
 
     fun squareMooreGridWithNonSelfStabilizingGossip(size: Int) =
         mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }) {
-            nonSelfStabilizingGossip(localId) { first, second -> if (first >= second) first else second }
+            gossip(localId) { first, second -> if (first >= second) first else second }
         }.apply {
             nodes.size shouldBe size * size
             val initial = status().values.distinct()

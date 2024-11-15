@@ -98,7 +98,7 @@ object NonSelfStabilizingGossip {
      * A non-self-stabilizing function for repeated propagation of a [value] and [aggregation]
      * of state estimates between neighboring devices.
      */
-    fun <ID : Any, Value> Aggregate<ID>.nonSelfStabilizingGossip(
+    fun <ID : Any, Value> Aggregate<ID>.gossip(
         value: Value,
         aggregation: (Value, Value) -> Value,
     ): Value = share(value) {
@@ -110,8 +110,5 @@ object NonSelfStabilizingGossip {
      */
     fun <ID : Any> Aggregate<ID>.everHappened(
         condition: () -> Boolean,
-        default: Boolean = false,
-    ): Boolean = share(default) {
-        condition() || it.fold(default) { a, b -> a || b }
-    }
+    ): Boolean = gossip(condition()) { a, b -> a || b }
 }
