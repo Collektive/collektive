@@ -19,12 +19,13 @@ internal data class PathImpl(private val path: List<Any?>) : Path {
     companion object {
         private val cache = mutableMapOf<List<Any?>, Path>()
         private const val MAX_CACHE_SIZE = 10_000
-        private const val CACHE_CLEANUP_SIZE = 500
+        private const val CACHE_CLEANUP_SIZE = 1000
 
         fun of(path: List<Any?>): Path = cache.getOrPut(path) { PathImpl(path) }.also {
             if (cache.size >= MAX_CACHE_SIZE) {
                 val iterator = cache.iterator()
                 repeat(CACHE_CLEANUP_SIZE) {
+                    iterator.next()
                     iterator.remove()
                 }
             }

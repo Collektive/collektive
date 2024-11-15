@@ -1,3 +1,62 @@
+## [11.0.0](https://github.com/Collektive/collektive/compare/10.11.1...11.0.0) (2024-11-14)
+
+### ⚠ BREAKING CHANGES
+
+* **dsl:** rename repeat/repeating functions into evolve/evolving (#577)
+
+### Refactoring
+
+* **dsl:** rename repeat/repeating functions into evolve/evolving ([#577](https://github.com/Collektive/collektive/issues/577)) ([b616ddb](https://github.com/Collektive/collektive/commit/b616ddbc2a1356a7277f2472559cfe40c3a778c5))
+
+## [10.11.1](https://github.com/Collektive/collektive/compare/10.11.0...10.11.1) (2024-11-14)
+
+### Dependency updates
+
+* **deps:** update alchemist to v35 ([97f03c9](https://github.com/Collektive/collektive/commit/97f03c9630c73cec754cd2d3974089d596a0a056))
+* **deps:** update dependency dev.zacsweers.kctfork:core to v0.6.0 ([8952271](https://github.com/Collektive/collektive/commit/89522714accbc8e8f2fe1c7905b6c0faedd8e2f9))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.115 ([a01b8d6](https://github.com/Collektive/collektive/commit/a01b8d643c04b16c8a39e79c61a2a3f7f668c3cf))
+* **deps:** update docusaurus monorepo to v3.6.1 ([4a6015d](https://github.com/Collektive/collektive/commit/4a6015da313b0afb8bbc7e8d547f7f9e032e528f))
+* **deps:** update plugin com.gradle.develocity to v3.18.2 ([1bc080b](https://github.com/Collektive/collektive/commit/1bc080ba9a2baacc16b870cd71c89243664d660c))
+
+### Bug Fixes
+
+* **dsl:** add regression test for Path cache IllegalStateException ([#567](https://github.com/Collektive/collektive/issues/567)) ([dae88e2](https://github.com/Collektive/collektive/commit/dae88e23c0383f76dcba7aad1c1869f3bced7fe6))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.13 ([28c0929](https://github.com/Collektive/collektive/commit/28c0929d51b169389e78f37f589c7be73702c3a9))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.14 ([f49c78f](https://github.com/Collektive/collektive/commit/f49c78fa53da8bb21fd9af6e57360bbc1c6f6d02))
+* move stop gradle on windows before the deploy step preventing failing silently the CI ([8e1f0e4](https://github.com/Collektive/collektive/commit/8e1f0e4d4908ebecb98bbd0b0ee0692e5913a690))
+
+### Style improvements
+
+* explicit name in outer lambda ([3502860](https://github.com/Collektive/collektive/commit/3502860e396cfe00064f03f206847558882b6142))
+* reformat file according to ktlin ([3481efd](https://github.com/Collektive/collektive/commit/3481efdd027081a5f4c23648aa53a1967e909a6a))
+
+## [10.11.0](https://github.com/Collektive/collektive/compare/10.10.0...10.11.0) (2024-11-11)
+
+### Features
+
+* **field:** change `toString` representation for `Field` ([#558](https://github.com/Collektive/collektive/issues/558)) ([15b37a9](https://github.com/Collektive/collektive/commit/15b37a93a3d5a4ffcf47dbcd4bfe7df175ca7cc9))
+
+## [10.10.0](https://github.com/Collektive/collektive/compare/10.9.0...10.10.0) (2024-11-10)
+
+### Features
+
+* **field:** add `alignedMapWithId` for consistency with `*WithId` functions ([#554](https://github.com/Collektive/collektive/issues/554)) ([201f1bf](https://github.com/Collektive/collektive/commit/201f1bf70b9f67267b979875843c6c9bfe8042da))
+
+### Dependency updates
+
+* **deps:** update alchemist to v34.1.13 ([92e45ef](https://github.com/Collektive/collektive/commit/92e45ef04c7e8a9626b61903c3a4640b15fc2ac6))
+* **deps:** update alchemist to v34.1.14 ([9906d63](https://github.com/Collektive/collektive/commit/9906d6398c98c9c8ab1c78f5b12f6e5725c09a86))
+* **deps:** update plugin multijvmtesting to v1.3.0 ([3f80fac](https://github.com/Collektive/collektive/commit/3f80fac61f0f3318f45dd1bb8ebb547b839f4c21))
+
+## [10.9.0](https://github.com/Collektive/collektive/compare/10.8.0...10.9.0) (2024-11-08)
+
+### Features
+
+* **compiler-plugin:** new checker for collections' methods, refactoring and new testing utility ([#508](https://github.com/Collektive/collektive/issues/508)) ([d9cd8b3](https://github.com/Collektive/collektive/commit/d9cd8b3e8a2582972415ad9dad76c26a90abad7c)), closes [#489](https://github.com/Collektive/collektive/issues/489)
+
 ## [10.8.0](https://github.com/Collektive/collektive/compare/10.7.0...10.8.0) (2024-11-07)
 
 ### Features

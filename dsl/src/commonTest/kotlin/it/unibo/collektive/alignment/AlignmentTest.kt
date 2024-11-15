@@ -36,7 +36,7 @@ class AlignmentTest : StringSpec({
     "Alignment must fail clearly when entries try to override each other" {
         val exception = shouldThrowUnit<IllegalStateException> {
             aggregate(0) {
-                kotlin.repeat(2) {
+                repeat(2) {
                     neighboringViaExchange(0)
                 }
             }
