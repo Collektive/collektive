@@ -33,7 +33,7 @@ class IterationWithoutAlignSpec : FreeSpec({
                     ).asTestingProgram("$functionName-${caseName}_$iteration.kt")
 
                 "inside $iterationDescription and using $functionName without a specific alignedOn" - {
-                    val case = "It"
+                    val case = "Iteration"
                     val code = getTestingProgram(case)
 
                     "should compile producing a warning" - {
@@ -44,7 +44,7 @@ class IterationWithoutAlignSpec : FreeSpec({
                 }
 
                 "inside $iterationDescription and using $functionName wrapped in a specific alignedOn" - {
-                    val case = "ItAlign"
+                    val case = "IterationAlign"
                     val code = getTestingProgram(case)
 
                     "should compile without any warning" - {
@@ -53,7 +53,7 @@ class IterationWithoutAlignSpec : FreeSpec({
                 }
 
                 "inside $iterationDescription and using $functionName wrapped in alignedOn outside the loop" - {
-                    val case = "ItExtAlign"
+                    val case = "IterationExtAlign"
                     val code = getTestingProgram(case)
 
                     "should compile producing a warning" - {
@@ -64,7 +64,7 @@ class IterationWithoutAlignSpec : FreeSpec({
                 }
 
                 "inside $iterationDescription and using $functionName wrapped inside another function declaration" - {
-                    val case = "ItNstFun"
+                    val case = "IterationWithNestedFun"
                     val code = getTestingProgram(case)
 
                     "should compile without any warning" - {
@@ -80,6 +80,39 @@ class IterationWithoutAlignSpec : FreeSpec({
                         code shouldCompileWith noWarning
                     }
                 }
+
+                "inside $iterationDescription and using a function that takes an Aggregate argument" - {
+                    val case = "IterationDelegate"
+                    val code = getTestingProgram(case)
+
+                    "should compile without any warning" - {
+                        code shouldCompileWith noWarning
+                        /*warning(
+                            "Warning: suspicious call of function '$functionName' with aggregate argument " +
+                            "inside a loop with no manual alignment operation"
+                        )*/
+                    }
+                }
+
+                "inside $iterationDescription and using a function that takes an Aggregate argument " +
+                    "wrapped in a specific alignedOn" - {
+                        val case = "IterationAlignDelegate"
+                        val code = getTestingProgram(case)
+
+                        "should compile without any warning" - {
+                            code shouldCompileWith noWarning
+                        }
+                    }
+
+                "inside $iterationDescription and using a function that takes an Aggregate argument " +
+                    "with a specific alignedOn inside the called function" - {
+                        val case = "IterationDelegateAlign"
+                        val code = getTestingProgram(case)
+
+                        "should compile without any warning" - {
+                            code shouldCompileWith noWarning
+                        }
+                    }
             }
         }
     }
@@ -91,8 +124,8 @@ class IterationWithoutAlignSpec : FreeSpec({
                 .getResource(
                     "/kotlin/" +
                         case.replaceFirstChar(Char::titlecase) +
-                        iteration.replaceFirstChar(Char::titlecase) +
-                        "${aggregateFunction.replaceFirstChar(Char::titlecase)}.kt",
+                        aggregateFunction.replaceFirstChar(Char::titlecase) +
+                        "${iteration.replaceFirstChar(Char::titlecase)}.kt",
                 )?.readText()
                 ?: throw FileNotFoundException(
                     "File not found for: case=$case, iteration=$iteration, aggregateFunction=$aggregateFunction",
@@ -101,7 +134,7 @@ class IterationWithoutAlignSpec : FreeSpec({
         val formsOfIteration = table(
             headers("iteration", "iterationDescription"),
             row("For", "a for loop"),
-            row("ListOfForEach", "a 'forEach' call"),
+            row("ForEach", "a 'forEach' call"),
         )
     }
 }
