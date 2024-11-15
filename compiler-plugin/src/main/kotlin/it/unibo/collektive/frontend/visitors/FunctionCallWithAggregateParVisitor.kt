@@ -8,9 +8,9 @@
 
 package it.unibo.collektive.frontend.visitors
 
-import it.unibo.collektive.frontend.checkers.CheckersUtility.ALIGNED_ON_FQ_NAME
 import it.unibo.collektive.frontend.checkers.CheckersUtility.fqName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isAggregate
+import it.unibo.collektive.utils.common.AggregateFunctionNames.ALIGNED_ON_FUNCTION_FQ_NAME
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
@@ -34,7 +34,7 @@ class FunctionCallWithAggregateParVisitor(private val context: CheckerContext) :
 
   override fun visitFunctionCall(functionCall: FirFunctionCall) {
     if (functionCall.isAggregate(context.session)) {
-      if (functionCall.fqName() == ALIGNED_ON_FQ_NAME) {
+      if (functionCall.fqName() == ALIGNED_ON_FUNCTION_FQ_NAME) {
         insideAlignedOn = true
         functionCall.acceptChildren(this)
         insideAlignedOn = false

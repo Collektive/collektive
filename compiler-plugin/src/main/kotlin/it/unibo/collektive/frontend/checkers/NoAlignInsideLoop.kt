@@ -1,14 +1,14 @@
 package it.unibo.collektive.frontend.checkers
 
-import it.unibo.collektive.frontend.checkers.CheckersUtility.ALIGNED_ON_FQ_NAME
 import it.unibo.collektive.frontend.checkers.CheckersUtility.discardIfFunctionDeclaration
 import it.unibo.collektive.frontend.checkers.CheckersUtility.discardIfOutsideAggregateEntryPoint
-import it.unibo.collektive.frontend.checkers.CheckersUtility.functionName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.fqName
+import it.unibo.collektive.frontend.checkers.CheckersUtility.functionName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.hasAggregateArgument
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isAggregate
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isFunctionCallsWithName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.wrappingElementsUntil
+import it.unibo.collektive.utils.common.AggregateFunctionNames
 import it.unibo.collektive.frontend.visitors.FunctionCallWithAggregateParVisitor
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
@@ -30,34 +30,21 @@ import kotlin.reflect.jvm.kotlinFunction
 object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
 
     private val safeOperators = listOf(
-        ALIGNED_ON_FQ_NAME,
-        "it.unibo.collektive.aggregate.api.Aggregate.align",
-        "it.unibo.collektive.aggregate.api.Aggregate.dealign",
+        AggregateFunctionNames.ALIGNED_ON_FUNCTION_FQ_NAME,
+        AggregateFunctionNames.ALIGN_FUNCTION_FQ_NAME,
+        AggregateFunctionNames.DEALIGN_FUNCTION_FQ_NAME,
     )
-
-    /**
-     * Creates a warning for this checker, formatted with the [calleeName] that originated it.
-     */
-    fun createWarning(calleeName: String): String =
-        """
-        Warning: aggregate function '$calleeName' has been called inside a loop construct without explicit alignment.
-        The same path may generate interactions more than once, leading to ambiguous alignment.
-        for (element in collection) {
-            $calleeName(...) // Broken
-        }
-        for (element in collection) {
-            alignedOn(element) { // Manual alignment on element, assuming it is unique 
-                $calleeName(...)
-            }
-        }
-        """.trimIndent()
-
 
     /**
      * Getter for all Collection members using Kotlin reflection, obtaining their names as a set.
      */
-    @Deprecated("This method currently raises an exception. " +
-            "See https://youtrack.jetbrains.com/issue/KT-16479 for more details.")
+    @Deprecated(
+        """
+        This method currently raises an exception.
+        See https://youtrack.jetbrains.com/issue/KT-16479 for more details.
+        """,
+    )
+    @Suppress("UnusedPrivateMember")
     private fun getCollectionMembersKotlin(): Set<String> = sequenceOf(
         Class.forName("kotlin.collections.CollectionsKt").kotlin,
         Collection::class,
@@ -66,7 +53,7 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         Map::class,
         Sequence::class,
         Set::class,
-    ).flatMap { it.java.methods.mapNotNull { it.kotlinFunction } + it.members }
+    ).flatMap { clazz -> clazz.java.methods.mapNotNull { it.kotlinFunction } + clazz.members }
         .filter {
             fun KParameter.isFunctionType(): Boolean = (type.classifier as? KClass<*>)?.qualifiedName
                 ?.startsWith("kotlin.Function")
@@ -88,12 +75,12 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         List::class.java,
         Map::class.java,
         Sequence::class.java,
-        Set::class.java
+        Set::class.java,
     ).flatMap { it.methods.asSequence() }
         .filter { method ->
             method.parameters.any { parameter ->
                 parameter.parameterizedType.typeName.startsWith("kotlin.jvm.functions.Function") ||
-                        parameter.parameterizedType is Function<*>
+                    parameter.parameterizedType is Function<*>
             }
         }
         .map { it.name }
@@ -108,13 +95,13 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         wrappingElementsUntil { it is FirWhileLoop }
             ?.discardIfFunctionDeclaration()
             ?.discardIfOutsideAggregateEntryPoint()
-            ?.none(isFunctionCallsWithName("alignedOn")) ?: false
+            ?.none(isFunctionCallsWithName(AggregateFunctionNames.ALIGNED_ON_FUNCTION_NAME)) ?: false
 
     private fun CheckerContext.isInsideIteratedFunctionWithoutAlignedOn(): Boolean =
         wrappingElementsUntil { it is FirFunctionCall && it.functionName() in collectionMembers }
             ?.discardIfFunctionDeclaration()
             ?.discardIfOutsideAggregateEntryPoint()
-            ?.none(isFunctionCallsWithName("alignedOn")) ?: false
+            ?.none(isFunctionCallsWithName(AggregateFunctionNames.ALIGNED_ON_FUNCTION_NAME)) ?: false
 
     private fun CheckerContext.isIteratedWithoutAlignedOn(): Boolean =
         isInsideALoopWithoutAlignedOn() || isInsideIteratedFunctionWithoutAlignedOn()
@@ -126,27 +113,22 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         return visitor.found
     }
 
-    override fun check(
-        expression: FirFunctionCall,
-        context: CheckerContext,
-        reporter: DiagnosticReporter,
-    ) {
+    override fun check(expression: FirFunctionCall, context: CheckerContext, reporter: DiagnosticReporter) {
         val calleeName = expression.functionName()
         if (expression.fqName() in safeOperators) return
         if (expression.isAggregate(context.session) && context.isIteratedWithoutAlignedOn()) {
             reporter.reportOn(
                 expression.calleeReference.source,
-                CheckersUtility.PluginErrors.DOT_CALL_WARNING,
-                createWarning(calleeName),
+                FirCollektiveErrors.AGGREGATE_FUNCTION_INSIDE_ITERATION,
+                calleeName,
                 context,
             )
         } else if (expression.hasAggregateArgument()) {
             if (context.isIteratedWithoutAlignedOn() && isInvalidFunWithAggregateParameter(expression, context)) {
                 reporter.reportOn(
                     expression.calleeReference.source,
-                    CheckersUtility.PluginErrors.DOT_CALL_WARNING,
-                    "Warning: suspicious call of function '$calleeName' with aggregate argument inside a loop with no " +
-                            "manual alignment operation",
+                    FirCollektiveErrors.AGGREGATE_FUNCTION_INSIDE_ITERATION,
+                    calleeName,
                     context,
                 )
             }

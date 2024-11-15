@@ -1,8 +1,7 @@
 package it.unibo.collektive.frontend.checkers
 
-import org.jetbrains.kotlin.com.intellij.psi.PsiElement
-import org.jetbrains.kotlin.diagnostics.SourceElementPositioningStrategies
-import org.jetbrains.kotlin.diagnostics.warning1
+import it.unibo.collektive.utils.common.AggregateFunctionNames.AGGREGATE_CLASS_FQ_NAME
+import it.unibo.collektive.utils.common.AggregateFunctionNames.AGGREGATE_CLASS_NAME
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
@@ -25,28 +24,6 @@ import org.jetbrains.kotlin.name.ClassId
  */
 object CheckersUtility {
     /**
-     * Object containing the types of errors/warnings reported by this extension.
-     */
-    object PluginErrors {
-        /**
-         * Warning generated on a dot call.
-         */
-        val DOT_CALL_WARNING by warning1<PsiElement, String>(
-            SourceElementPositioningStrategies.CALL_ELEMENT_WITH_DOT,
-        )
-    }
-
-    /**
-     * Fully qualified name of the Aggregate class
-     */
-    const val AGGREGATE_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate"
-
-    /**
-     * Fully qualified name of the `alignedOn` method of the Aggregate interface.
-     */
-    const val ALIGNED_ON_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.alignedOn"
-
-    /**
      * Checks is a specific receiver parameter is [Aggregate][it.unibo.collektive.aggregate.api.Aggregate]
      * (`Aggregate<ID>.example()`).
      * It uses the [session] of the [CheckerContext] in which this check is performed to get the class symbol of the
@@ -55,7 +32,7 @@ object CheckersUtility {
      * It returns **true** if it's an `Aggregate` function, **false** otherwise.
      */
     fun FirReceiverParameter.isAggregate(session: FirSession): Boolean =
-        typeRef.toClassLikeSymbol(session)?.name?.asString() == "Aggregate"
+        typeRef.toClassLikeSymbol(session)?.name?.asString() == AGGREGATE_CLASS_NAME
 
     /**
      * Checks if the function that is called is an [Aggregate][it.unibo.collektive.aggregate.api.Aggregate] one
@@ -68,7 +45,7 @@ object CheckersUtility {
     fun FirFunctionCall.isAggregate(session: FirSession): Boolean {
         val callableSymbol = toResolvedCallableSymbol()
         return callableSymbol?.receiverParameter?.isAggregate(session) == true ||
-            callableSymbol?.getContainingClassSymbol(session)?.name?.asString() == "Aggregate"
+            callableSymbol?.getContainingClassSymbol(session)?.name?.asString() == AGGREGATE_CLASS_NAME
     }
 
     /**
@@ -199,7 +176,7 @@ object CheckersUtility {
      */
     fun FirFunctionCall.hasAggregateArgument(): Boolean =
         getArgumentsTypes()?.any {
-            it.classId == ClassId.fromString(AGGREGATE_FQ_NAME)
+            it.classId == ClassId.fromString(AGGREGATE_CLASS_FQ_NAME)
         } ?: false
 
 }
