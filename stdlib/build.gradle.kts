@@ -26,6 +26,7 @@ kotlinMultiplatform {
         val commonMain by getting {
             dependencies {
                 implementation(project(":dsl"))
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
             }
             kotlin.srcDirs(generateFieldFunctionsForTypes)
         }
