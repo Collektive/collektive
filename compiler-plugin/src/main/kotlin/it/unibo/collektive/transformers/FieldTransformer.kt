@@ -34,8 +34,8 @@ class FieldTransformer(
     @OptIn(UnsafeDuringIrConstructionAPI::class)
     override fun visitCall(expression: IrCall): IrExpression {
         val symbolName = expression.symbol.owner.name
-        val alignRawIdentifier = Name.identifier(AggregateFunctionNames.ALIGN_FUNCTION)
-        val alignedOnIdentifier = Name.identifier(AggregateFunctionNames.ALIGNED_ON_FUNCTION)
+        val alignRawIdentifier = Name.identifier(AggregateFunctionNames.ALIGN_FUNCTION_NAME)
+        val alignedOnIdentifier = Name.identifier(AggregateFunctionNames.ALIGNED_ON_FUNCTION_NAME)
         if (symbolName == alignRawIdentifier || symbolName == alignedOnIdentifier) {
             logger.debug("Found alignedRaw function call: ${expression.dumpKotlinLike()}")
             val contextReference = expression.receiverAndArgs()
