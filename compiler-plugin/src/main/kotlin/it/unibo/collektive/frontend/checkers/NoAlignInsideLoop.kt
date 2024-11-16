@@ -56,8 +56,7 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
     ).flatMap { clazz -> clazz.java.methods.mapNotNull { it.kotlinFunction } + clazz.members }
         .filter {
             fun KParameter.isFunctionType(): Boolean = (type.classifier as? KClass<*>)?.qualifiedName
-                ?.startsWith("kotlin.Function")
-                ?: false
+                ?.startsWith("kotlin.Function") == true
             it.parameters.any { parameter ->
                 parameter.isFunctionType()
             }

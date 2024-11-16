@@ -176,7 +176,7 @@ object CheckersUtility {
      */
     fun FirFunctionCall.hasAggregateArgument(): Boolean =
         getArgumentsTypes()?.any {
-            it.classId == ClassId.fromString(AGGREGATE_CLASS_FQ_NAME)
-        } ?: false
+            it.classId == ClassId.fromString(AGGREGATE_CLASS_FQ_NAME.replace(".", "/"))
+        } == true
 
 }
