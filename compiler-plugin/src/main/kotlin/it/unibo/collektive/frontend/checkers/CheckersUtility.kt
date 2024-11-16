@@ -178,5 +178,4 @@ object CheckersUtility {
         getArgumentsTypes()?.any {
             it.classId == ClassId.fromString(AGGREGATE_CLASS_FQ_NAME.replace(".", "/"))
         } == true
-
 }

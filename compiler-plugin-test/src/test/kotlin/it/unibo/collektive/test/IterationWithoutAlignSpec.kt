@@ -102,7 +102,7 @@ class IterationWithoutAlignSpec : FreeSpec({
                     val code = getTestingProgram(case)
                     val functionWithAggregateArgumentName = "delegate"
 
-                    "should compile without any warning" - {
+                    "should compile producing a warning" - {
                         code shouldCompileWith warning(
                             expectedWarningAggregateParameter(functionWithAggregateArgumentName),
                         )
@@ -128,6 +128,43 @@ class IterationWithoutAlignSpec : FreeSpec({
                             code shouldCompileWith noWarning
                         }
                     }
+
+                "inside $iterationDescription and using a function that takes an Aggregate argument " +
+                    "but with aggregate calls within a nested function" - {
+                        val case = "IterationDelegateWithNestedFun"
+                        val code = getTestingProgram(case)
+
+                        "should compile without any warning" - {
+                            code shouldCompileWith noWarning
+                        }
+                    }
+
+                "inside $iterationDescription and using a function that takes an Aggregate argument " +
+                    "that recursively calls another function with an Aggregate argument" - {
+                        val case = "IterationRecursiveDelegate"
+                        val code = getTestingProgram(case)
+                        val functionWithAggregateArgumentName = "delegate"
+
+                        "should compile producing a warning" - {
+                            code shouldCompileWith warning(
+                                expectedWarningAggregateParameter(functionWithAggregateArgumentName),
+                            )
+                        }
+                    }
+
+// CURRENTLY NOT CAPTURED
+//                "inside $iterationDescription and using a function that takes an Aggregate argument, " +
+//                        "calling it by a nested function" - {
+//                    val case = "IterationDelegatedNestedFun"
+//                    val code = getTestingProgram(case)
+//                    val functionWithAggregateArgumentName = "delegate"
+//
+//                    "should compile producing a warning" - {
+//                        code shouldCompileWith warning(
+//                            expectedWarningAggregateParameter(functionWithAggregateArgumentName),
+//                        )
+//                    }
+//                }
             }
         }
     }

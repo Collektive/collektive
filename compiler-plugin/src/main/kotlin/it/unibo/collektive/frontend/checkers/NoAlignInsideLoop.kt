@@ -8,17 +8,15 @@ import it.unibo.collektive.frontend.checkers.CheckersUtility.hasAggregateArgumen
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isAggregate
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isFunctionCallsWithName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.wrappingElementsUntil
-import it.unibo.collektive.utils.common.AggregateFunctionNames
 import it.unibo.collektive.frontend.visitors.FunctionCallWithAggregateParVisitor
+import it.unibo.collektive.utils.common.AggregateFunctionNames
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirFunctionCallChecker
-import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.FirWhileLoop
-import org.jetbrains.kotlin.fir.references.toResolvedFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
@@ -108,8 +106,7 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
     @OptIn(SymbolInternals::class)
     private fun isInvalidFunWithAggregateParameter(expression: FirFunctionCall, context: CheckerContext): Boolean {
         val visitor = FunctionCallWithAggregateParVisitor(context)
-        (expression.calleeReference.toResolvedFunctionSymbol()?.fir as? FirSimpleFunction)?.accept(visitor) ?: false
-        return visitor.found
+        return visitor.visitSuspiciousFunctionCallDeclaration(expression)
     }
 
     override fun check(expression: FirFunctionCall, context: CheckerContext, reporter: DiagnosticReporter) {
