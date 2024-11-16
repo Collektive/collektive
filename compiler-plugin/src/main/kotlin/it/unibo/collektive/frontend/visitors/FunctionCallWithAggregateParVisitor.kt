@@ -20,9 +20,13 @@ import org.jetbrains.kotlin.fir.references.toResolvedFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
 
+/**
+ * This visitor is used for functions that takes an aggregate argument, checking whether any aggregate call inside that
+ * function's body is used without a wrapping `alignedOn` call.
+ */
 class FunctionCallWithAggregateParVisitor(private val context: CheckerContext) : FirVisitorVoid() {
 
-    var found = false
+    private var found = false
     private var insideAlignedOn = false
     private var functionCounter = 0
     private val insideNestedFun
@@ -45,7 +49,7 @@ class FunctionCallWithAggregateParVisitor(private val context: CheckerContext) :
                 found = true
                 return
             }
-        } else if (functionCall.hasAggregateArgument()) {
+        } else if (functionCall.hasAggregateArgument() && !isInsideAlignedOnOrNestedFun()) {
             val visitor = FunctionCallWithAggregateParVisitor(context)
             found = visitor.visitSuspiciousFunctionCallDeclaration(functionCall)
         }
@@ -59,6 +63,12 @@ class FunctionCallWithAggregateParVisitor(private val context: CheckerContext) :
         return
     }
 
+    /**
+     * Checks whether the body of the function declaration associated to [call] contains any aggregate call without a
+     * wrapping `alignedOn` call.
+     *
+     * It can be used, for example, to check calls within loops of functions that takes an aggregate argument.
+     */
     @OptIn(SymbolInternals::class)
     fun visitSuspiciousFunctionCallDeclaration(call: FirFunctionCall): Boolean {
         (call.calleeReference.toResolvedFunctionSymbol()?.fir as? FirSimpleFunction)?.accept(this)

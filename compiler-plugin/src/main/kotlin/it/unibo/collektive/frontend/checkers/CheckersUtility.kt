@@ -172,7 +172,7 @@ object CheckersUtility {
 
     /**
      * Checks whether if the called function accepts at least on argument of type
-     * [it.unibo.collektive.aggregate.api.Aggregate]
+     * [it.unibo.collektive.aggregate.api.Aggregate].
      */
     fun FirFunctionCall.hasAggregateArgument(): Boolean =
         getArgumentsTypes()?.any {
