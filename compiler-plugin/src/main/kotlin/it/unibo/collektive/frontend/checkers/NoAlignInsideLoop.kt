@@ -126,7 +126,7 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
             if (context.isIteratedWithoutAlignedOn() && isInvalidFunWithAggregateParameter(expression, context)) {
                 reporter.reportOn(
                     expression.calleeReference.source,
-                    FirCollektiveErrors.AGGREGATE_FUNCTION_INSIDE_ITERATION,
+                    FirCollektiveErrors.FUNCTION_WITH_AGGREGATE_PARAMETER_INSIDE_ITERATION,
                     calleeName,
                     context,
                 )
