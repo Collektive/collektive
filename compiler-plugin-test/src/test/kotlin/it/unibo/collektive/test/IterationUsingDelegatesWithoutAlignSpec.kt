@@ -103,17 +103,59 @@ class IterationUsingDelegatesWithoutAlignSpec : FreeSpec({
                         }
                     }
 
+                "inside $iterationDescription and using a function 'delegate' that takes an Aggregate argument " +
+                    "that recursively calls another function 'delegate2' with an Aggregate argument" +
+                    "wrapped inside a specific alignedOn inside the 'delegate' body" - {
+                        val case = "IterationAlignRecursiveDelegate"
+                        val code = getTestingProgram(case)
+
+                        "should compile producing a warning" - {
+                            code shouldCompileWith noWarning
+                        }
+                    }
+
+                "inside $iterationDescription and using a function 'delegate' that takes an Aggregate argument " +
+                    "that recursively calls another function 'delegate2' with an Aggregate argument" +
+                    "wrapped inside a specific alignedOn inside the 'delegate2' body" - {
+                        val case = "IterationRecursiveDelegateAlign"
+                        val code = getTestingProgram(case)
+
+                        "should compile producing a warning" - {
+                            code shouldCompileWith noWarning
+                        }
+                    }
+
 // CURRENTLY NOT CAPTURED
 //                "inside $iterationDescription and using a function that takes an Aggregate argument, " +
-//                        "calling it by a nested function" - {
+//                        "using it inside a called nested function" - {
 //                    val case = "IterationDelegatedNestedFun"
 //                    val code = getTestingProgram(case)
 //                    val functionWithAggregateArgumentName = "delegate"
 //
 //                    "should compile producing a warning" - {
 //                        code shouldCompileWith warning(
-//                            expectedWarningAggregateParameter(functionWithAggregateArgumentName),
+//                            expectedWarning(functionWithAggregateArgumentName),
 //                        )
+//                    }
+//                }
+//
+//                "inside $iterationDescription and using a function that takes an Aggregate argument, " +
+//                        "using it inside a nested function, called by wrapping it with a specific alignedOn" - {
+//                    val case = "IterationAlignDelegatedNestedFun"
+//                    val code = getTestingProgram(case)
+//
+//                    "should compile producing a warning" - {
+//                        code shouldCompileWith noWarning
+//                    }
+//                }
+//
+//                "inside $iterationDescription and using a function that takes an Aggregate argument, " +
+//                        "using it with a specific alignedOn, inside a called nested function" - {
+//                    val case = "IterationDelegatedNestedFunAlign"
+//                    val code = getTestingProgram(case)
+//
+//                    "should compile producing a warning" - {
+//                        code shouldCompileWith noWarning
 //                    }
 //                }
             }
