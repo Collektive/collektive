@@ -9,6 +9,8 @@
 package it.unibo.collektive.stdlib.test
 
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.booleans.shouldBeFalse
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.stdlib.NonSelfStabilizingGossip.gossip
 import it.unibo.collektive.stdlib.SelfStabilizingGossip.gossipMax
@@ -81,10 +83,10 @@ class GossipTest : StringSpec({
         // in this implementation the initial value for each device is its own ID
         firstRound.forEach { (id, value) -> value shouldBe id.toDouble() }
         // status at first cycle
-        environment.gossipIsStable() shouldBe false
+        environment.gossipIsStable().shouldBeFalse()
         environment.cycleInReverseOrder()
         // status at second cycle
-        environment.gossipIsStable() shouldBe true
+        environment.gossipIsStable().shouldBeTrue()
         environment.gossipResult() shouldBe 24
     }
 
@@ -92,7 +94,7 @@ class GossipTest : StringSpec({
         val size = 5
         val environment: Environment<Int> = squareMooreGridWithGossip(size)
         environment.cycleInReverseOrder()
-        environment.gossipIsStable() shouldBe true
+        environment.gossipIsStable().shouldBeTrue()
         environment.gossipResult() shouldBe 24
     }
 
@@ -101,10 +103,10 @@ class GossipTest : StringSpec({
         val environment: Environment<Int> = linearMooreGridWithGossip(size)
         repeat(times = size - 1) {
             environment.cycleInOrder()
-            environment.gossipIsStable() shouldBe false
+            environment.gossipIsStable().shouldBeFalse()
         }
         environment.cycleInOrder()
-        environment.gossipIsStable() shouldBe true
+        environment.gossipIsStable().shouldBeTrue()
         environment.gossipResult() shouldBe 9
     }
 
@@ -112,7 +114,7 @@ class GossipTest : StringSpec({
         val size = 5
         val environment: Environment<Int> = squareMooreGridWithGossip(size, max = false)
         environment.cycleInOrder()
-        environment.gossipIsStable() shouldBe true
+        environment.gossipIsStable().shouldBeTrue()
         environment.gossipResult() shouldBe 0
     }
 
@@ -121,10 +123,10 @@ class GossipTest : StringSpec({
         val environment: Environment<Int> = linearMooreGridWithGossip(size, max = false)
         repeat(times = size - 1) {
             environment.cycleInReverseOrder()
-            environment.gossipIsStable() shouldBe false
+            environment.gossipIsStable().shouldBeFalse()
         }
         environment.cycleInOrder()
-        environment.gossipIsStable() shouldBe true
+        environment.gossipIsStable().shouldBeTrue()
         environment.gossipResult() shouldBe 0
     }
 
@@ -138,17 +140,17 @@ class GossipTest : StringSpec({
         // in this implementation the initial value for each device is its own ID
         firstRound.forEach { (id, value) -> value shouldBe id.toDouble() }
         // status at first cycle
-        environment.gossipIsStable() shouldBe false
+        environment.gossipIsStable().shouldBeFalse()
         environment.cycleInOrder()
         // status at second cycle
-        environment.gossipIsStable() shouldBe true
+        environment.gossipIsStable().shouldBeTrue()
         environment.gossipResult() shouldBe 0
     }
 
     "non-self-stabilizing gossip should not update the best value when it drops from the network" {
         val size = 5
         val environment: Environment<Int> = squareMooreGridWithNonSelfStabilizingGossip(size)
-        for (i in 0 until size) {
+        repeat(size) {
             environment.cycleInReverseOrder()
         }
         // The devices gossip is the maxID in the network
@@ -156,7 +158,7 @@ class GossipTest : StringSpec({
         // Check that all devices agree on the maxID
         environment.status().forEach { (_, value) -> value shouldBe maxId }
         // Drop the node with the max value from the network and let the others gossip
-        for (i in 0 until size) {
+        repeat(size) {
             environment.nodes.drop(maxId).forEach { n -> n.cycle() }
         }
         // The devices should still agree on the old maxID
