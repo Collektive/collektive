@@ -11,13 +11,9 @@ package it.unibo.collektive.stdlib
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.operators.share
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.Field.Companion.hood
 import it.unibo.collektive.field.operations.max
 import kotlinx.datetime.Clock
-import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
-import kotlinx.datetime.Instant.Companion.DISTANT_PAST
-import kotlinx.datetime.plus
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.DurationUnit.SECONDS
@@ -64,19 +60,27 @@ private fun <ID : Comparable<ID>> Aggregate<ID>.cyclicTimerWithDecay(timeout: Du
 fun <ID : Comparable<ID>> Aggregate<ID>.countDownWithDecay(timeout: Duration, decayRate: Duration): Duration =
     timer(timeout, ZERO) { time -> time - decayRate }
 
-// shared clock -> Instant -> il device piu veloce sta a T
-// sharedTimeelapsed -> Duration -> sono passati deltaT secondi dal momento x
 
 /**
  * A shared clock across a network at the pace set by the fastest device.
- * Returns the Instant of the fastest device.
+ * Starts from an initial value that is the [current] time of execution of the device
+ * and returns the [Instant] of the fastest device.
  */
-fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(): Instant = share(Clock.System.now()) { clock ->
-    clock.max(base = DISTANT_PAST)
-}
+fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(current: Instant = Clock.System.now()): Instant =
+    share(current) { clock -> clock.max(base = current) }
+// shared clock -> Instant -> il device piu veloce sta a T
 
 /**
- *
+ * Returns the amount of time, expressed in [Duration], that has elapsed since [deltaTime].
  */
+fun <ID : Comparable<ID>> Aggregate<ID>.timeElapsed(deltaTime: Instant): Duration =
+    sharedClock() - deltaTime
+
+// sharedTimeElapsed -> Duration -> sono passati deltaT secondi dal momento x
 //fun <ID : Comparable<ID>> Aggregate<ID>.sharedTimeElapsed(deltaTime: Instant): Duration =
-//    TODO("It has passed deltaT seconds from time x")
+//    share(deltaTime) { time ->
+////        time.map { timeElapsed(it) }.max(base = ZERO)
+//    }
+
+fun <ID : Comparable<ID>> Aggregate<ID>.deltaTime(now: Instant): Duration =
+    evolving(now) { previousTime -> now.yielding { now - previousTime } }

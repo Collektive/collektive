@@ -31,7 +31,7 @@ fun <ID : Comparable<ID>, Type : Any> Aggregate<ID>.timeReplicated(
     process: Aggregate<ID>.() -> Type,
 ): Type {
     // time elapsed without a new replica being created
-    val deltaTime: Duration = evolving(now) { previousTime -> now.yielding { now - previousTime } }
+    val deltaTime: Duration = deltaTime(now)
     val timeElapsed = sharedTimer(timeToLive, deltaTime)
     val result = evolve(emptyList<Replica<ID, Type>>()) { replicas ->
         // kill the oldest one if there are more than maxReplicas, or if enough time has passed
