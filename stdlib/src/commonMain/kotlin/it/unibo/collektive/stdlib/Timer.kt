@@ -14,19 +14,13 @@ import kotlin.time.Duration
 /**
  * A timer that decays over time.
  * The timer starts at [initial] and decays at a rate determined by the [decayRate] function,
- * never going below a [lower bound].
+ * never going below a [lowerBound].
  */
 fun <ID : Comparable<ID>> Aggregate<ID>.timer(
     initial: Duration,
-    lowerBound: Duration,
-    decayRate: (Duration) -> Duration,
-): Duration =
-    repeat(initial) { time ->
-        min(initial, max(lowerBound, decayRate(time)))
-    }
-
-private fun max(first: Duration, second: Duration): Duration =
-    min(second, first)
-
-private fun min(first: Duration, second: Duration): Duration =
-    if (first <= second) first else second
+    decay: Duration,
+    lowerBound: Duration = Duration.ZERO,
+    decayRate: (timeLeft: Duration) -> Duration = { it - decay },
+): Duration = evolve(initial) { timeLeft ->
+    decayRate(timeLeft).coerceIn(lowerBound, initial)
+}
