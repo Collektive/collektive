@@ -9,11 +9,13 @@
 package it.unibo.collektive.stdlib
 
 import it.unibo.collektive.aggregate.api.Aggregate
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
 
 /**
- * A periodic restart strategy for removing obsolete information of an [Aggregate] [process] replicated across devices.
+ * A periodic restart strategy for removing obsolete information of [process] replicated across devices.
  * The process has a time-to-live of [timeToLive] and is replicated up to [maxReplicas] times.
  * If the time elapsed without a new replica being created is greater than [timeToLive],
  * the oldest replica is killed and a new one is created,
@@ -22,15 +24,16 @@ import kotlin.time.Duration.Companion.ZERO
  * The [default] value is returned if no replica is alive.
  */
 fun <ID : Comparable<ID>, Type : Any> Aggregate<ID>.timeReplicated(
-//    timeSensor: TimeSensor,
-    process: Aggregate<ID>.() -> Type,
     default: Type,
+    now: Instant = Clock.System.now(),
     timeToLive: Duration,
     maxReplicas: Int,
+    process: Aggregate<ID>.() -> Type,
 ): Type {
     // time elapsed without a new replica being created
-    val timeElapsed = ZERO // sharedTimer(timeToLive, timeSensor.getDeltaTime())
-    val result = repeat(emptyList<Replica<ID, Type>>()) { replicas ->
+    val deltaTime: Duration = evolving(now) { previousTime -> now.yielding { now - previousTime } }
+    val timeElapsed = sharedTimer(timeToLive, deltaTime)
+    val result = evolve(emptyList<Replica<ID, Type>>()) { replicas ->
         // kill the oldest one if there are more than maxReplicas, or if enough time has passed
         val applyReplicas = when {
             replicas.isEmpty() -> listOf(Replica(0u, process, ZERO))
