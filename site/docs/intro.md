@@ -9,6 +9,5 @@ sidebar_position: 0
 
 2. [Introduction](/docs/category/introduction/)
     - [Aggregate Programming](../introduction/aggregate-programming/)
-    - [Field Calculus](../introduction/field-calculus/)
     - [What is Collektive](../introduction/what-is-collektive/)
    
