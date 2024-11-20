@@ -55,13 +55,13 @@ interface Aggregate<ID : Any> {
      * Iteratively updates the value computing the [transform] expression at each device using the last
      * computed value or the [initial].
      */
-    fun <Initial> repeat(initial: Initial, transform: (Initial) -> Initial): Initial
+    fun <Initial> evolve(initial: Initial, transform: (Initial) -> Initial): Initial
 
     /**
      * Iteratively updates the value computing the [transform] expression from a [YieldingContext]
      * at each device using the last computed value or the [initial].
      */
-    fun <Initial, Return> repeating(initial: Initial, transform: YieldingScope<Initial, Return>): Return
+    fun <Initial, Return> evolving(initial: Initial, transform: YieldingScope<Initial, Return>): Return
 
     /**
      * Observes the value of an expression [local] across neighbours.

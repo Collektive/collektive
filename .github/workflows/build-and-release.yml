@@ -43,7 +43,7 @@ jobs:
         uses: nicolasfara/precompute-semantic-release-version-action@2.0.2
         with:
           github-token: ${{ github.token }}
-      - uses: DanySK/build-check-deploy-gradle-action@3.5.12
+      - uses: DanySK/build-check-deploy-gradle-action@3.5.20
         with:
           maven-central-username: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
@@ -83,18 +83,17 @@ jobs:
         uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
-      - uses: DanySK/build-check-deploy-gradle-action@3.5.12
+      - uses: DanySK/build-check-deploy-gradle-action@3.5.20
         with:
           # Dry-deployment
           check-command: |
             ./gradlew check koverXmlReport :compiler-plugin:check :gradle-plugin:check --parallel
+          deploy-command: |
             # Stop the Gradle Daemon on windows to try to prevent
             # "The process cannot access the file because it is being used by another process"
             if ${{ runner.os == 'Windows' }}; then
               ./gradlew --stop
-              # powershell kill-windows-processes.ps1
             fi
-          deploy-command: |
             NEXT_VERSION="${{ needs.staging-repo.outputs.next-version }}"
             OVERRIDE_VERSION=$([[ "$NEXT_VERSION" != "" ]] && echo "-PforceVersion=$(echo $NEXT_VERSION)" || echo "")
             ./gradlew $OVERRIDE_VERSION -PstagingRepositoryId=${{ needs.staging-repo.outputs.maven-central-repo-id }} uploadAll :compiler-plugin:uploadKotlinOSSRHToMavenCentralNexus :gradle-plugin:uploadKotlinOSSRHToMavenCentralNexus --parallel
@@ -141,7 +140,7 @@ jobs:
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v4.2.2
-      - uses: DanySK/build-check-deploy-gradle-action@3.5.12
+      - uses: DanySK/build-check-deploy-gradle-action@3.5.20
         with:
           maven-central-username: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
@@ -196,7 +195,7 @@ jobs:
         uses: actions/setup-node@v4.1.0
         with:
           node-version-file: package.json
-      - uses: DanySK/build-check-deploy-gradle-action@3.5.12
+      - uses: DanySK/build-check-deploy-gradle-action@3.5.20
         env:
           STAGING_REPO_ID: ${{ needs.staging-repo.outputs.maven-central-repo-id }}
           ORG_GRADLE_PROJECT_releaseStage: true
