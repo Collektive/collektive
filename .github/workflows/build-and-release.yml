@@ -235,3 +235,22 @@ jobs:
     steps:
       - name: Verify that there were no failures
         run: ${{ !contains(join(needs.*.result, ','), 'failure') }}
+
+  drop-staging-repos:
+    needs:
+      - staging-repo
+      - success
+    runs-on: ubuntu-24.04
+    if: always()
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v4.2.2
+      - uses: DanySK/build-check-deploy-gradle-action@3.5.22
+        with:
+          maven-central-username: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          should-run-codecov: false
+          should-deploy: true
+          build-command: true
+          check-command: true
+          deploy-command: ./gradlew -PstagingRepositoryId=${{ needs.staging-repo.outputs.maven-central-repo-id }} drop
