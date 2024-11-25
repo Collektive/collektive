@@ -10,9 +10,11 @@ package it.unibo.collektive.stdlib.test
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import it.unibo.collektive.stdlib.deltaTime
 import it.unibo.collektive.stdlib.sharedTimer
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
+import kotlinx.datetime.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.DurationUnit.SECONDS
@@ -20,14 +22,12 @@ import kotlin.time.toDuration
 
 class SharedTimerTest : StringSpec({
 
-    val timer = TimeUtils
-
     fun <Value> Environment<Value>.sharingIsStable(): Boolean =
         status().values.distinct().size == 1
 
     fun squareMooreGridWithSharedTimer(size: Int, timeToLive: Duration) =
         mooreGrid<Duration>(size, size, { _, _ -> INFINITE }) {
-            sharedTimer(timeToLive, processTime = timer.getDeltaTime())
+            sharedTimer(timeToLive, processTime = deltaTime(Clock.System.now()))
         }.apply {
             nodes.size shouldBe size * size
             val initial = status().values.distinct()

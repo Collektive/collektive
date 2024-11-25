@@ -38,10 +38,11 @@ fun <ID : Comparable<ID>, Type : Any> Aggregate<ID>.timeReplicated(
         val applyReplicas = when {
             replicas.isEmpty() -> listOf(Replica(0u, process, ZERO))
             else -> {
-                val maxID = replicas.maxBy { it.id }.id
-                val oldest = replicas.maxBy { r -> r.timeAlive }
+                val maxID = replicas.maxBy { it.id }.id // TODO maybe in this way I have only the max from my neighborhood?
+                val oldest = replicas.minBy { r -> r.creationTime }
+                val oldestDT = deltaTime(oldest.creationTime)
                 when {
-                    oldest.timeAlive >= timeToLive || replicas.size == maxReplicas ->
+                    oldestDT >= timeToLive || replicas.size == maxReplicas ->
                         replicas.filter { it.id == oldest.id } + Replica(maxID + 1u, process, timeElapsed)
                     else ->
                         when {
@@ -62,12 +63,12 @@ fun <ID : Comparable<ID>, Type : Any> Aggregate<ID>.timeReplicated(
 }
 
 /**
- * A replica of a process that is alive for a certain amount of time [timeAlive].
+ * A replica of a process that is alive for a certain amount of time [creationTime].
  * It is identified by an [id] and runs the [process] function.
  * The [process] function is executed while the replica is alive.
  */
 data class Replica<ID : Comparable<ID>, Type>(
     val id: ULong,
     val process: Aggregate<ID>.() -> Type,
-    val timeAlive: Duration,
+    val creationTime: Instant,
 )
