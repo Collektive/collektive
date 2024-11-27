@@ -45,18 +45,20 @@ class FieldOpsTest : StringSpec({
         emptyField.map { "$it-mapped" } shouldBe Field(0, "localVal-mapped", mapOf())
     }
     "A field can be mapped on its values with a given function" {
-        field.map { it + 3 } shouldBe Field(
-            0,
-            3,
-            mapOf(1 to 13, 2 to 23),
-        )
+        field.map { it + 3 } shouldBe
+            Field(
+                0,
+                3,
+                mapOf(1 to 13, 2 to 23),
+            )
     }
     "A field can be mapped on its values with a given function and the id" {
-        field.mapWithId { id, value -> "$id-$value" } shouldBe Field(
-            0,
-            "0-0",
-            mapOf(1 to "1-10", 2 to "2-20"),
-        )
+        field.mapWithId { id, value -> "$id-$value" } shouldBe
+            Field(
+                0,
+                "0-0",
+                mapOf(1 to "1-10", 2 to "2-20"),
+            )
     }
     "Two fields are equals if they are the same instance" {
         field shouldBe field
@@ -92,11 +94,12 @@ class FieldOpsTest : StringSpec({
         emptyField.alignedMapWithId(emptyField) { _, _, _ -> "no-data" } shouldBe Field(0, "no-data", emptyMap())
     }
     "A field should return a field with the mapped values when aligned mapped with another field" {
-        fulfilledField.alignedMapWithId(fulfilledCompatibleField) { _, value, other -> value + other } shouldBe Field(
-            0,
-            1,
-            mapOf(1 to 11, 2 to 21, 3 to 16),
-        )
+        fulfilledField.alignedMapWithId(fulfilledCompatibleField) { _, value, other -> value + other } shouldBe
+            Field(
+                0,
+                1,
+                mapOf(1 to 11, 2 to 21, 3 to 16),
+            )
     }
     "The string representation of a field should contain the local id and the local value and the neighbors" {
         emptyField.toString() shouldBe "ϕ(localId=0, localValue=localVal, neighbors={})"

@@ -23,7 +23,6 @@ class Node<R>(
     var value: R,
     private val program: Aggregate<Int>.(Environment<R>) -> R,
 ) {
-
     private var network = NetworkDevice()
 
     /**
@@ -48,7 +47,6 @@ class Node<R>(
      * A network device that can send and receive messages.
      */
     private inner class NetworkDevice : Network<Int> {
-
         private var messageBuffer: Set<InboundMessage<Int>> = emptySet()
 
         override fun write(message: OutboundMessage<Int>) {

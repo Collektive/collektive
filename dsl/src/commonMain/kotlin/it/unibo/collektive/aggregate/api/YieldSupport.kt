@@ -6,7 +6,6 @@ package it.unibo.collektive.aggregate.api
  * but return a possibly different value [Return] to the caller.
  */
 class YieldingContext<Initial, Return> {
-
     /**
      * Computes [toReturn] after the data exchange operation is complete.
      * ## Example
@@ -27,8 +26,7 @@ class YieldingContext<Initial, Return> {
      * preparing the local [Initial] value (from the extension receiver) to be sent away,
      * but returns the value produced by [toReturn].
      */
-    fun Initial.yielding(toReturn: () -> Return): YieldingResult<Initial, Return> =
-        YieldingResult(this, toReturn())
+    fun Initial.yielding(toReturn: () -> Return): YieldingResult<Initial, Return> = YieldingResult(this, toReturn())
 }
 
 /**

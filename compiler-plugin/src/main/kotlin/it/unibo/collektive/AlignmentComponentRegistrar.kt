@@ -18,31 +18,33 @@ import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter
  */
 @OptIn(ExperimentalCompilerApi::class)
 class AlignmentComponentRegistrar : CompilerPluginRegistrar() {
-
     override val supportsK2: Boolean = true
 
     override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
         val logger = configuration.get(CommonConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE)
         when (configuration.get(JVMConfigurationKeys.IR)) {
-            false -> error(
-                "The Kotlin-JVM IR backend has been explicitly disabled," +
-                    " but the Collektive compiler plugin requires it",
-            )
+            false ->
+                error(
+                    "The Kotlin-JVM IR backend has been explicitly disabled," +
+                        " but the Collektive compiler plugin requires it",
+                )
 
             null -> {
                 when {
-                    configuration.isReadOnly -> logger.strongWarning(
-                        "The Kotlin-JVM IR backend has not been explicitly enabled and the compiler configuration has" +
-                            "been finalized. The Collektive compiler plugin requires the IR generation," +
-                            "the plugin may not be able to apply its transformations correctly",
-                    )
-
-                    else -> configuration.put(JVMConfigurationKeys.IR, true).also {
-                        logger.info(
-                            "Implicitly enabling the Kotlin-JVM IR backend," +
-                                "it is required by the Collektive compiler plugin",
+                    configuration.isReadOnly ->
+                        logger.strongWarning(
+                            "The Kotlin-JVM IR backend has not been explicitly enabled and the compiler configuration" +
+                                "has been finalized. The Collektive compiler plugin requires the IR generation," +
+                                "the plugin may not be able to apply its transformations correctly",
                         )
-                    }
+
+                    else ->
+                        configuration.put(JVMConfigurationKeys.IR, true).also {
+                            logger.info(
+                                "Implicitly enabling the Kotlin-JVM IR backend," +
+                                    "it is required by the Collektive compiler plugin",
+                            )
+                        }
                 }
             }
 

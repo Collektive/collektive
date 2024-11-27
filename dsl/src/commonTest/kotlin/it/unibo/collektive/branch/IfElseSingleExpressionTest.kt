@@ -11,9 +11,10 @@ class IfElseSingleExpressionTest : StringSpec({
 
     "True condition in if else block" {
         val customCondition = true
-        val result = aggregate(id0) {
-            if (customCondition) neighboringViaExchange("test-true") else neighboringViaExchange("test-false")
-        }
+        val result =
+            aggregate(id0) {
+                if (customCondition) neighboringViaExchange("test-true") else neighboringViaExchange("test-false")
+            }
         val messageFor0 = result.toSend.messagesFor(id0)
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test-true")
@@ -21,9 +22,10 @@ class IfElseSingleExpressionTest : StringSpec({
 
     "False condition in if else block" {
         val customCondition = false
-        val result = aggregate(id0) {
-            if (customCondition) neighboringViaExchange("test-true") else neighboringViaExchange("test-false")
-        }
+        val result =
+            aggregate(id0) {
+                if (customCondition) neighboringViaExchange("test-true") else neighboringViaExchange("test-false")
+            }
         val messageFor0 = result.toSend.messagesFor(id0)
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test-false")

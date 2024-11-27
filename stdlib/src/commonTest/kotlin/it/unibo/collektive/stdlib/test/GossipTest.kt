@@ -18,43 +18,45 @@ import it.unibo.collektive.testing.mooreGrid
 class GossipTest : StringSpec({
 
     // A stable gossip means that every device of the network has the same value
-    fun <Value> Environment<Value>.gossipIsStable(): Boolean =
-        status().values.distinct().size == 1
+    fun <Value> Environment<Value>.gossipIsStable(): Boolean = status().values.distinct().size == 1
 
-    fun <Value> Environment<Value>.gossipResult(): Value =
-        status().values.distinct().first()
+    fun <Value> Environment<Value>.gossipResult(): Value = status().values.distinct().first()
 
-    fun squareMooreGridWithGossip(size: Int, max: Boolean = true) =
-        mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }) {
-            if (max) {
-                gossipMax(localId) // gossip the max localID in the network
-            } else {
-                gossipMin(localId) // gossip the min localID in the network
-            }
-        }.apply {
-            nodes.size shouldBe size * size
-            val initial = status().values.distinct()
-            initial.size shouldBe 1
-            check(initial.first() == Int.MAX_VALUE) {
-                "Initial status is not `Int.MAX_VALUE`, but it is $initial (${initial::class.simpleName})"
-            }
+    fun squareMooreGridWithGossip(
+        size: Int,
+        max: Boolean = true,
+    ) = mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }) {
+        if (max) {
+            gossipMax(localId) // gossip the max localID in the network
+        } else {
+            gossipMin(localId) // gossip the min localID in the network
         }
-
-    fun linearMooreGridWithGossip(size: Int, max: Boolean = true) =
-        mooreGrid<Int>(size, 1, { _, _ -> Int.MAX_VALUE }) {
-            if (max) {
-                gossipMax(localId) // gossip the max localID in the network
-            } else {
-                gossipMin(localId) // gossip the min localID in the network
-            }
-        }.apply {
-            nodes.size shouldBe size
-            val initial = status().values.distinct()
-            initial.size shouldBe 1
-            check(initial.first() == Int.MAX_VALUE) {
-                "Initial status is not `Int.MAX_VALUE`, but it is $initial (${initial::class.simpleName})"
-            }
+    }.apply {
+        nodes.size shouldBe size * size
+        val initial = status().values.distinct()
+        initial.size shouldBe 1
+        check(initial.first() == Int.MAX_VALUE) {
+            "Initial status is not `Int.MAX_VALUE`, but it is $initial (${initial::class.simpleName})"
         }
+    }
+
+    fun linearMooreGridWithGossip(
+        size: Int,
+        max: Boolean = true,
+    ) = mooreGrid<Int>(size, 1, { _, _ -> Int.MAX_VALUE }) {
+        if (max) {
+            gossipMax(localId) // gossip the max localID in the network
+        } else {
+            gossipMin(localId) // gossip the min localID in the network
+        }
+    }.apply {
+        nodes.size shouldBe size
+        val initial = status().values.distinct()
+        initial.size shouldBe 1
+        check(initial.first() == Int.MAX_VALUE) {
+            "Initial status is not `Int.MAX_VALUE`, but it is $initial (${initial::class.simpleName})"
+        }
+    }
 
     "gossipMax in a square moore grid stabilizes after 2 reverse cycles" {
         val size = 5

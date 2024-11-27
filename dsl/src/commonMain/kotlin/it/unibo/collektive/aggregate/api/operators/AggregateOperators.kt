@@ -57,14 +57,15 @@ fun <ID : Any, Scalar> Aggregate<ID>.neighboringViaExchange(local: Scalar): Fiel
 fun <ID : Any, Initial, Return> Aggregate<ID>.sharing(
     initial: Initial,
     transform: YieldingContext<Initial, Return>.(Field<ID, Initial>) -> YieldingResult<Initial, Return>,
-): Return = exchanging(initial) { field: Field<ID, Initial> ->
-    with(YieldingContext<Initial, Return>()) {
-        val result: YieldingResult<Initial, Return> = transform(field)
-        field.map { result.toSend }.yielding {
-            field.map { result.toReturn }
+): Return =
+    exchanging(initial) { field: Field<ID, Initial> ->
+        with(YieldingContext<Initial, Return>()) {
+            val result: YieldingResult<Initial, Return> = transform(field)
+            field.map { result.toSend }.yielding {
+                field.map { result.toReturn }
+            }
         }
-    }
-}.localValue
+    }.localValue
 
 /**
  * [share] captures the space-time nature of field computation through observation of neighbours' values, starting
@@ -78,5 +79,7 @@ fun <ID : Any, Initial, Return> Aggregate<ID>.sharing(
  * ```
  * In the example above, the function [share] wil return a value that is the max found in the field.
  **/
-fun <ID : Any, Initial> Aggregate<ID>.share(initial: Initial, transform: (Field<ID, Initial>) -> Initial): Initial =
-    sharing(initial) { field -> transform(field).run { yielding { this } } }
+fun <ID : Any, Initial> Aggregate<ID>.share(
+    initial: Initial,
+    transform: (Field<ID, Initial>) -> Initial,
+): Initial = sharing(initial) { field -> transform(field).run { yielding { this } } }

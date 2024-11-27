@@ -25,7 +25,6 @@ internal class AggregateContext<ID : Any>(
     private val messages: Iterable<InboundMessage<ID>>,
     private val previousState: State,
 ) : Aggregate<ID> {
-
     private val stack = Stack()
     private var state: MutableMap<Path, Any?> = mutableMapOf()
     private val toBeSent = OutboundMessage(messages.count(), localId)
@@ -40,10 +39,15 @@ internal class AggregateContext<ID : Any>(
      */
     fun newState(): State = state
 
-    private fun <T> newField(localValue: T, others: Map<ID, T>): Field<ID, T> = Field(localId, localValue, others)
+    private fun <T> newField(
+        localValue: T,
+        others: Map<ID, T>,
+    ): Field<ID, T> = Field(localId, localValue, others)
 
-    override fun <X> exchange(initial: X, body: (Field<ID, X>) -> Field<ID, X>): Field<ID, X> =
-        exchanging(initial) { field -> body(field).run { yielding { this } } }
+    override fun <X> exchange(
+        initial: X,
+        body: (Field<ID, X>) -> Field<ID, X>,
+    ): Field<ID, X> = exchanging(initial) { field -> body(field).run { yielding { this } } }
 
     override fun <Init, Ret> exchanging(
         initial: Init,
@@ -55,19 +59,23 @@ internal class AggregateContext<ID : Any>(
         val subject = newField(previous, messages)
         val context = YieldingContext<Field<ID, Init>, Field<ID, Ret>>()
         return body(context, subject).also {
-            val message = SingleOutboundMessage(
-                it.toSend.localValue,
-                when (it.toSend) {
-                    is ConstantField<ID, Init> -> emptyMap()
-                    else -> it.toSend.excludeSelf()
-                },
-            )
+            val message =
+                SingleOutboundMessage(
+                    it.toSend.localValue,
+                    when (it.toSend) {
+                        is ConstantField<ID, Init> -> emptyMap()
+                        else -> it.toSend.excludeSelf()
+                    },
+                )
             toBeSent.addMessage(path, message)
             state += path to it.toSend.localValue
         }.toReturn
     }
 
-    override fun <Initial, Return> evolving(initial: Initial, transform: YieldingScope<Initial, Return>): Return {
+    override fun <Initial, Return> evolving(
+        initial: Initial,
+        transform: YieldingScope<Initial, Return>,
+    ): Return {
         val path = stack.currentPath()
         return transform(YieldingContext(), stateAt(path, initial))
             .also {
@@ -86,12 +94,19 @@ internal class AggregateContext<ID : Any>(
         return newField(local, neighborValues)
     }
 
-    override fun <Initial> evolve(initial: Initial, transform: (Initial) -> Initial): Initial = evolving(initial) {
-        val res = transform(it)
-        YieldingResult(res, res)
-    }
+    override fun <Initial> evolve(
+        initial: Initial,
+        transform: (Initial) -> Initial,
+    ): Initial =
+        evolving(initial) {
+            val res = transform(it)
+            YieldingResult(res, res)
+        }
 
-    override fun <R> alignedOn(pivot: Any?, body: () -> R): R {
+    override fun <R> alignedOn(
+        pivot: Any?,
+        body: () -> R,
+    ): R {
         stack.alignRaw(pivot)
         return body().also {
             stack.dealign()
@@ -103,17 +118,21 @@ internal class AggregateContext<ID : Any>(
     override fun dealign() = stack.dealign()
 
     @Suppress("UNCHECKED_CAST")
-    private fun <T> messagesAt(path: Path): Map<ID, T> = messages
-        .mapNotNull { received ->
-            received.messages.getOrElse(path) { NoEntry }
-                .takeIf { it != NoEntry }
-                ?.let { received.senderId to it as T }
-        }
-        .associate { it }
+    private fun <T> messagesAt(path: Path): Map<ID, T> =
+        messages
+            .mapNotNull { received ->
+                received.messages.getOrElse(path) { NoEntry }
+                    .takeIf { it != NoEntry }
+                    ?.let { received.senderId to it as T }
+            }
+            .associate { it }
 
     private object NoEntry
 
-    private fun <T> stateAt(path: Path, default: T): T = previousState.getTyped(path, default)
+    private fun <T> stateAt(
+        path: Path,
+        default: T,
+    ): T = previousState.getTyped(path, default)
 }
 
 /**
@@ -130,12 +149,13 @@ fun <ID : Any, T> Aggregate<ID>.project(field: Field<ID, T>): Field<ID, T> {
     return when {
         field.neighborsCount == others.neighborsCount -> field
         field.neighborsCount > others.neighborsCount -> others.mapWithId { id, _ -> field[id] }
-        else -> error(
-            """
+        else ->
+            error(
+                """
                 Collektive is in an inconsistent state, this is most likely a bug in the implementation.
                 Field $field with ${field.neighborsCount} neighbors has been projected into a context
                 with more neighbors, ${others.neighborsCount}: ${others.excludeSelf().keys}.
-            """.trimIndent().replace(Regex("'\\R"), " "),
-        )
+                """.trimIndent().replace(Regex("'\\R"), " "),
+            )
     }
 }

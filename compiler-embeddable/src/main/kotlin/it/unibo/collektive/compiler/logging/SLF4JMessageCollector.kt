@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory
  * A message collector that logs messages using a SLF4J [logger].
  */
 class SLF4JMessageCollector(val logger: Logger) : MessageCollector {
-
     override fun clear() = Unit
 
     override fun hasErrors(): Boolean = false
@@ -20,13 +19,14 @@ class SLF4JMessageCollector(val logger: Logger) : MessageCollector {
         message: String,
         location: CompilerMessageSourceLocation?,
     ) {
-        val logOperation: (String, Array<Any?>) -> Unit = when (severity) {
-            CompilerMessageSeverity.ERROR, CompilerMessageSeverity.EXCEPTION -> logger::error
-            CompilerMessageSeverity.STRONG_WARNING -> logger::warn
-            CompilerMessageSeverity.WARNING -> logger::warn
-            CompilerMessageSeverity.OUTPUT, CompilerMessageSeverity.INFO -> logger::info
-            CompilerMessageSeverity.LOGGING -> logger::debug
-        }
+        val logOperation: (String, Array<Any?>) -> Unit =
+            when (severity) {
+                CompilerMessageSeverity.ERROR, CompilerMessageSeverity.EXCEPTION -> logger::error
+                CompilerMessageSeverity.STRONG_WARNING -> logger::warn
+                CompilerMessageSeverity.WARNING -> logger::warn
+                CompilerMessageSeverity.OUTPUT, CompilerMessageSeverity.INFO -> logger::info
+                CompilerMessageSeverity.LOGGING -> logger::debug
+            }
         when (location) {
             null -> logOperation("{} {}", arrayOf(severity, message))
             else -> logOperation("{} {} at {}", arrayOf(severity, message, location))
@@ -37,7 +37,6 @@ class SLF4JMessageCollector(val logger: Logger) : MessageCollector {
      * Global defaults.
      */
     companion object {
-
         /**
          * A default message collector that logs messages to the "Collektive Compiler" SLF4J logger.
          */
