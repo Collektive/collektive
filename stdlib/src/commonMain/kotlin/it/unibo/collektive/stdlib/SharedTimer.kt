@@ -9,11 +9,11 @@
 package it.unibo.collektive.stdlib
 
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.operators.share
+import it.unibo.collektive.aggregate.api.operators.sharing
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.operations.max
+import it.unibo.collektive.field.operations.maxBy
+import it.unibo.collektive.field.operations.minBy
 import kotlinx.datetime.Instant
-import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
 
@@ -89,13 +89,23 @@ fun <ID : Comparable<ID>> Aggregate<ID>.countDownWithDecay(timeout: Duration, de
 fun <ID : Comparable<ID>> Aggregate<ID>.deltaTime(now: Instant): Duration =
     evolving(now) { previousTime -> max(now, previousTime).yielding { (now - previousTime).coerceAtLeast(ZERO) } }
 
-
-fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(now: Instant): Instant = share(now) { clocksAround: Field<ID, Instant> ->
-//    val timeLocal = deltaTime()
-    val deltaTimes = clocksAround.map { (now - it).coerceAtLeast(ZERO) }
-    val referenceTime: Instant = (clocksAround.alignedMap(deltaTimes) { base, dt -> base + dt }).max(clocksAround.localValue)
-    referenceTime + deltaTime
+fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(now: Instant): Instant {
+    val localDelta = deltaTime(now)
+    if (localDelta == ZERO) throw IllegalStateException("Time is not moving forward")
+    return sharing(now to localDelta) { deltaAround: Field<ID, Pair<Instant, Duration>> ->
+        // take the minimum delta, i.e., the fastest device
+        val minDelta = deltaAround.minBy(deltaAround.localValue) { it.second }.second
+        // take the biggest time, i.e., the device most ahead
+        val fastestTime = deltaAround.maxBy(deltaAround.localValue) { it.first }.first
+        (fastestTime to minDelta).yielding { fastestTime + minDelta }
+    }
 }
+//    share(now) { clocksAround: Field<ID, Instant> ->
+//        val deltaTimes = clocksAround.map { (now - it).coerceAtLeast(ZERO) }
+//        val referenceTime: Instant =
+//            (clocksAround.alignedMap(deltaTimes) { base, dt -> base + dt }).max(clocksAround.localValue)
+//        referenceTime + deltaTime
+//    }
 
 // shared clock -> Instant -> il device piu veloce sta a T
 

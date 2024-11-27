@@ -14,6 +14,8 @@ import io.kotest.matchers.shouldBe
 import it.unibo.collektive.stdlib.sharedClock
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
 import kotlinx.datetime.Instant.Companion.DISTANT_PAST
 
@@ -24,7 +26,7 @@ class SharedClockTest : StringSpec({
 
     fun squareMooreGridWithSharedClock(size: Int) =
         mooreGrid<Instant>(size, size, { _, _ -> DISTANT_PAST }) {
-            sharedClock()
+            sharedClock(Clock.System.now())
         }.apply {
             nodes.size shouldBe size * size
             val initial = status().values.distinct()
