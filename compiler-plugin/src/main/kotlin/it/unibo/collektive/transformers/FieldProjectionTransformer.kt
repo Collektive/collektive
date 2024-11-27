@@ -16,7 +16,6 @@ internal class FieldProjectionTransformer(
     private val projectFunction: IrFunction,
     private val aggregateReference: IrExpression,
 ) : IrElementTransformerVoid() {
-
     override fun visitGetValue(expression: IrGetValue): IrExpression {
         if (expression.type.classFqName == FqName(FIELD_CLASS)) {
             return wrapInProjectFunction(expression, projectFunction, aggregateReference)

@@ -16,7 +16,6 @@ class Collektive<ID : Any, R>(
     private val network: Network<ID>,
     private val computeFunction: Aggregate<ID>.() -> R,
 ) {
-
     /**
      * The [State] of the Collektive device.
      */

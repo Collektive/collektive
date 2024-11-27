@@ -26,16 +26,18 @@ class CompileStringTest : FreeSpec({
             }
             val compiledFile = files.first { it.name == "$moduleName.class" }
             "bytecode with calls to the alignment method" {
-                val disassembled = ByteArrayOutputStream().use { outputStream ->
-                    val writer = PrintWriter(outputStream)
-                    Javap.run(arrayOf("-c", compiledFile.absolutePath), writer)
-                    outputStream.toString()
-                }
+                val disassembled =
+                    ByteArrayOutputStream().use { outputStream ->
+                        val writer = PrintWriter(outputStream)
+                        Javap.run(arrayOf("-c", compiledFile.absolutePath), writer)
+                        outputStream.toString()
+                    }
                 disassembled shouldNot beNull()
                 disassembled shouldNot beBlank()
-                val alignedOnCalls = disassembled.lines().filter {
-                    "// InterfaceMethod it/unibo/collektive/aggregate/api/Aggregate.align" in it
-                }
+                val alignedOnCalls =
+                    disassembled.lines().filter {
+                        "// InterfaceMethod it/unibo/collektive/aggregate/api/Aggregate.align" in it
+                    }
                 alignedOnCalls.size should beGreaterThan(1)
             }
         }

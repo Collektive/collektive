@@ -19,15 +19,22 @@ inline fun <ID : Any, Distance : Comparable<Distance>> Aggregate<ID>.distanceTo(
     top: Distance,
     crossinline accumulateDistance: (Distance, Distance) -> Distance,
     crossinline metric: () -> Field<ID, Distance>,
-): Distance = gradientCast(
-    source = source,
-    local = if (source) bottom else top,
-    bottom = bottom,
-    top = top,
-    accumulateData = { neighborToSource, hereToNeighbor, _ -> accumulateDistance(neighborToSource, hereToNeighbor) },
-    accumulateDistance,
-    metric,
-)
+): Distance =
+    gradientCast(
+        source = source,
+        local = if (source) bottom else top,
+        bottom = bottom,
+        top = top,
+        accumulateData = {
+                neighborToSource,
+                hereToNeighbor,
+                _,
+            ->
+            accumulateDistance(neighborToSource, hereToNeighbor)
+        },
+        accumulateDistance,
+        metric,
+    )
 
 /**
  * Compute the distance from the closest [source], using [Int]egers.
@@ -73,11 +80,12 @@ inline fun <ID : Any, Value, Distance : Comparable<Distance>> Aggregate<ID>.grad
 ): Value {
     val topValue = top to local
     return share(topValue) { neighborData ->
-        val paths = neighborData.alignedMap(metric()) { (fromSource, data), toNeighbor ->
-            val totalDistance = accumulateDistance(fromSource, toNeighbor)
-            val newData = accumulateData(fromSource, toNeighbor, data)
-            totalDistance to newData
-        }
+        val paths =
+            neighborData.alignedMap(metric()) { (fromSource, data), toNeighbor ->
+                val totalDistance = accumulateDistance(fromSource, toNeighbor)
+                val newData = accumulateData(fromSource, toNeighbor, data)
+                totalDistance to newData
+            }
         when {
             source -> bottom to local
             else -> paths.minBy(base = topValue) { it.first } // sort by distance from the nearest source

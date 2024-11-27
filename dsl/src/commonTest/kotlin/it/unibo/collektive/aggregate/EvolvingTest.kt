@@ -43,12 +43,13 @@ class EvolvingTest : StringSpec({
     }
 
     "Evolving should return the value passed in the yielding function" {
-        val result = aggregate(id1) {
-            evolving(initV1) {
-                val nbr = neighboringViaExchange(it * 2).localValue
-                nbr.yielding { "A string" }
-            } shouldBe "A string"
-        }
+        val result =
+            aggregate(id1) {
+                evolving(initV1) {
+                    val nbr = neighboringViaExchange(it * 2).localValue
+                    nbr.yielding { "A string" }
+                } shouldBe "A string"
+            }
         val messages = result.toSend.messagesFor(id1)
         messages shouldHaveSize 1
         messages.values shouldContainAll listOf(2)

@@ -38,9 +38,10 @@ class FieldTransformer(
         val alignedOnIdentifier = Name.identifier(AggregateFunctionNames.ALIGNED_ON_FUNCTION_NAME)
         if (symbolName == alignRawIdentifier || symbolName == alignedOnIdentifier) {
             logger.debug("Found alignedRaw function call: ${expression.dumpKotlinLike()}")
-            val contextReference = expression.receiverAndArgs()
-                .find { it.type.isAssignableFrom(aggregateClass.defaultType) }
-                ?: collectAggregateReference(aggregateClass, expression.symbol.owner)
+            val contextReference =
+                expression.receiverAndArgs()
+                    .find { it.type.isAssignableFrom(aggregateClass.defaultType) }
+                    ?: collectAggregateReference(aggregateClass, expression.symbol.owner)
             contextReference?.let {
                 // If the expression contains a lambda, this recursion is necessary to visit the children
                 expression.transformChildren(this, null)
