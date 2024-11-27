@@ -26,7 +26,7 @@ object SelfStabilizingGossip {
         local: Value,
         comparator: Comparator<Value>,
     ): Value {
-        /*
+        /**
          * The best value exchanged in the gossip algorithm.
          * It contains the [best] value evaluated yet,
          * the [local] value of the node, and the [path] of nodes through which it has passed.
