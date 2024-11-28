@@ -63,4 +63,10 @@ object CompileUtils {
         headers("functionCall"),
         row("neighboring(0)"),
     )
+
+    val formsOfIteration = table(
+        headers("iteration", "iterationDescription"),
+        row("For", "a for loop"),
+        row("ForEach", "a 'forEach' call"),
+    )
 }

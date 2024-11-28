@@ -1,5 +1,6 @@
 package it.unibo.collektive.frontend.checkers
 
+import it.unibo.collektive.utils.common.AggregateFunctionNames.AGGREGATE_CLASS_FQ_NAME
 import it.unibo.collektive.utils.common.AggregateFunctionNames.AGGREGATE_CLASS_NAME
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
@@ -12,6 +13,11 @@ import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.toResolvedCallableSymbol
 import org.jetbrains.kotlin.fir.expressions.unwrapExpression
 import org.jetbrains.kotlin.fir.references.toResolvedFunctionSymbol
+import org.jetbrains.kotlin.fir.references.toResolvedNamedFunctionSymbol
+import org.jetbrains.kotlin.fir.types.ConeKotlinType
+import org.jetbrains.kotlin.fir.types.classId
+import org.jetbrains.kotlin.fir.types.coneType
+import org.jetbrains.kotlin.name.ClassId
 
 /**
  * Collection of utilities for FIR checkers.
@@ -153,4 +159,23 @@ object CheckersUtility {
             "$packageName.$functionName"
         }
     }
+
+    /**
+     * Returns a list of the arguments' types (in the form of [ConeKotlinType]) of the related function.
+     */
+    fun FirFunctionCall.getArgumentsTypes(): List<ConeKotlinType>? =
+        calleeReference.toResolvedNamedFunctionSymbol()
+            ?.valueParameterSymbols
+            ?.map { parameter ->
+                parameter.resolvedReturnTypeRef.coneType
+            }
+
+    /**
+     * Checks whether if the called function accepts at least on argument of type
+     * [it.unibo.collektive.aggregate.api.Aggregate].
+     */
+    fun FirFunctionCall.hasAggregateArgument(): Boolean =
+        getArgumentsTypes()?.any {
+            it.classId == ClassId.fromString(AGGREGATE_CLASS_FQ_NAME.replace(".", "/"))
+        } == true
 }

@@ -27,6 +27,12 @@ object FirCollektiveErrors {
      */
     val AGGREGATE_FUNCTION_INSIDE_ITERATION by warning1<PsiElement, String>(CALL_ELEMENT_WITH_DOT)
 
+    /**
+     * Warning raised when a function that has an aggregate parameter and uses it for making aggregate calls
+     * is called inside an iteration construct.
+     */
+    val FUNCTION_WITH_AGGREGATE_PARAMETER_INSIDE_ITERATION by warning1<PsiElement, String>(CALL_ELEMENT_WITH_DOT)
+
     init {
         RootDiagnosticRendererFactory.registerFactory(KtDefaultErrorMessagesCollektive)
     }

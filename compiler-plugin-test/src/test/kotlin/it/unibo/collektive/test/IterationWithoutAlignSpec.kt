@@ -2,11 +2,9 @@ package it.unibo.collektive.test
 
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.data.forAll
-import io.kotest.data.headers
-import io.kotest.data.row
-import io.kotest.data.table
 import it.unibo.collektive.test.util.CompileUtils
 import it.unibo.collektive.test.util.CompileUtils.asTestingProgram
+import it.unibo.collektive.test.util.CompileUtils.formsOfIteration
 import it.unibo.collektive.test.util.CompileUtils.noWarning
 import it.unibo.collektive.test.util.CompileUtils.testedAggregateFunctions
 import it.unibo.collektive.test.util.CompileUtils.warning
@@ -36,10 +34,11 @@ class IterationWithoutAlignSpec : FreeSpec({
                         case = caseName,
                         iteration = iteration,
                         aggregateFunction = functionName,
+                        subdirectory = "simpleIterations/",
                     ).asTestingProgram("$functionName-${caseName}_$iteration.kt")
 
                 "inside $iterationDescription and using $functionName without a specific alignedOn" - {
-                    val case = "It"
+                    val case = "Iteration"
                     val code = getTestingProgram(case)
 
                     "should compile producing a warning" - {
@@ -50,7 +49,7 @@ class IterationWithoutAlignSpec : FreeSpec({
                 }
 
                 "inside $iterationDescription and using $functionName wrapped in a specific alignedOn" - {
-                    val case = "ItAlign"
+                    val case = "IterationAlign"
                     val code = getTestingProgram(case)
 
                     "should compile without any warning" - {
@@ -59,7 +58,7 @@ class IterationWithoutAlignSpec : FreeSpec({
                 }
 
                 "inside $iterationDescription and using $functionName wrapped in alignedOn outside the loop" - {
-                    val case = "ItExtAlign"
+                    val case = "IterationExtAlign"
                     val code = getTestingProgram(case)
 
                     "should compile producing a warning" - {
@@ -70,7 +69,7 @@ class IterationWithoutAlignSpec : FreeSpec({
                 }
 
                 "inside $iterationDescription and using $functionName wrapped inside another function declaration" - {
-                    val case = "ItNstFun"
+                    val case = "IterationWithNestedFun"
                     val code = getTestingProgram(case)
 
                     "should compile without any warning" - {
@@ -92,22 +91,22 @@ class IterationWithoutAlignSpec : FreeSpec({
 }) {
     companion object {
 
-        fun getTextFromResource(case: String, iteration: String, aggregateFunction: String): String =
+        fun getTextFromResource(
+            case: String,
+            iteration: String,
+            aggregateFunction: String,
+            subdirectory: String = "",
+        ): String =
             IterationWithoutAlignSpec::class.java
                 .getResource(
                     "/kotlin/" +
+                        subdirectory +
                         case.replaceFirstChar(Char::titlecase) +
-                        iteration.replaceFirstChar(Char::titlecase) +
-                        "${aggregateFunction.replaceFirstChar(Char::titlecase)}.kt",
+                        aggregateFunction.replaceFirstChar(Char::titlecase) +
+                        "${iteration.replaceFirstChar(Char::titlecase)}.kt",
                 )?.readText()
                 ?: throw FileNotFoundException(
                     "File not found for: case=$case, iteration=$iteration, aggregateFunction=$aggregateFunction",
                 )
-
-        val formsOfIteration = table(
-            headers("iteration", "iterationDescription"),
-            row("For", "a for loop"),
-            row("ListOfForEach", "a 'forEach' call"),
-        )
     }
 }

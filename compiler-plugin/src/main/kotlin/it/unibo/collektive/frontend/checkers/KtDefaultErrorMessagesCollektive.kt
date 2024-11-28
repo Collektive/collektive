@@ -32,5 +32,17 @@ object KtDefaultErrorMessagesCollektive : BaseDiagnosticRendererFactory() {
             """.trimIndent(),
             CommonRenderers.STRING,
         )
+        put(
+            FirCollektiveErrors.FUNCTION_WITH_AGGREGATE_PARAMETER_INSIDE_ITERATION,
+            """
+            Function ''{0}'', that accepts and uses an aggregate argument, has been called inside a loop construct 
+            without explicit alignment.
+            The same path may generate interactions more than once, leading to ambiguous alignment.
+            
+            Consider to wrap the function into the ''alignedOn'' method with a unique element, either at the call site
+            or inside the ''{0}'' function declaration, wrapping the involved aggregate calls.
+            """.trimIndent(),
+            CommonRenderers.STRING,
+        )
     }
 }
