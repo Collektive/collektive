@@ -82,7 +82,7 @@ internal class AggregateContext<ID : Any>(
                 check(it.toReturn !is Field<*, *>) {
                     "evolving operations cannot return fields (guaranteed misalignment on every neighborhood change)"
                 }
-                state += path to it.toReturn
+                state += path to it.toSend
             }
             .toReturn
     }

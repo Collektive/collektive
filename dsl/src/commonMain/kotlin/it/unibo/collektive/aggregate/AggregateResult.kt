@@ -13,4 +13,17 @@ data class AggregateResult<ID : Any, R>(
     val result: R,
     val toSend: OutboundMessage<ID>,
     val newState: State,
-)
+) {
+    /**
+     * Utilities for the [newState] of the device.
+     */
+    companion object {
+        /**
+         * Create an empty [AggregateResult] with the [localId] of the device, the [baseResult] of the computation.
+         */
+        fun <ID : Any, R> empty(
+            localId: ID,
+            baseResult: R,
+        ): AggregateResult<ID, R> = AggregateResult(localId, baseResult, OutboundMessage(0, localId), emptyMap())
+    }
+}
