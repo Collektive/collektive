@@ -1,12 +1,12 @@
 package it.unibo.collektive.visitors
 
 import it.unibo.collektive.utils.common.isAssignableFrom
-import org.jetbrains.kotlin.backend.jvm.ir.receiverAndArgs
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.util.defaultType
+import org.jetbrains.kotlin.ir.util.receiverAndArgs
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 
 /**
