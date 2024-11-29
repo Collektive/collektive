@@ -10,7 +10,6 @@ import it.unibo.collektive.utils.common.simpleFunctionName
 import it.unibo.collektive.utils.stack.StackFunctionCall
 import it.unibo.collektive.visitors.collectAggregateReference
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.backend.jvm.ir.receiverAndArgs
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.builders.IrBlockBodyBuilder
 import org.jetbrains.kotlin.ir.builders.createTmpVariable
@@ -30,6 +29,7 @@ import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.putArgument
 import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
 import org.jetbrains.kotlin.ir.util.defaultType
+import org.jetbrains.kotlin.ir.util.receiverAndArgs
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 
 /**
@@ -109,11 +109,11 @@ class AlignmentTransformer(
         }
     }
 
-    private fun <T> generateAlignmentCode(
+    private fun generateAlignmentCode(
         context: IrExpression,
         function: IrFunction,
         expressionBody: IrExpression,
-        alignmentToken: IrBlockBodyBuilder.() -> IrConst<T>,
+        alignmentToken: IrBlockBodyBuilder.() -> IrConst,
     ): IrContainerExpression =
         irStatement(pluginContext, function, expressionBody) {
             // Call the `alignRaw` function before the body of the function to align
