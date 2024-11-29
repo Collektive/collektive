@@ -9,9 +9,12 @@
 package it.unibo.collektive.stdlib
 
 import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.operators.share
 import it.unibo.collektive.aggregate.api.operators.sharing
 import it.unibo.collektive.field.Field
+import it.unibo.collektive.field.operations.max
 import it.unibo.collektive.field.operations.maxBy
+import it.unibo.collektive.field.operations.min
 import it.unibo.collektive.field.operations.minBy
 import kotlinx.datetime.Instant
 import kotlinx.datetime.Instant.Companion.DISTANT_PAST
@@ -70,14 +73,7 @@ private fun <ID : Comparable<ID>> Aggregate<ID>.cyclicTimerWithDecay(timeout: Du
 fun <ID : Comparable<ID>> Aggregate<ID>.countDownWithDecay(timeout: Duration, decayRate: Duration): Duration =
     timer(timeout, ZERO) { time -> time - decayRate }
 
-/**
- * A shared clock across a network at the pace set by the fastest device.
- * Starts from an initial value that is the [current] time of execution of the device
- * and returns the [Instant] of the fastest device.
- *
- * **N.B.**: [current] is set as default to the current system time,
- * but it is recommended to change it according to the requirements to achieve accurate and non-astonishing results.
- */
+
 //fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(current: Instant = Clock.System.now(), interval: Duration): Instant =
 //    share(current) { clock ->
 //        val dt = deltaTime(current)
@@ -90,29 +86,37 @@ fun <ID : Comparable<ID>> Aggregate<ID>.countDownWithDecay(timeout: Duration, de
 fun <ID : Comparable<ID>> Aggregate<ID>.deltaTime(now: Instant): Duration =
     evolving(DISTANT_PAST) { previousTime ->
         val yield = if (previousTime == DISTANT_PAST) now else previousTime
-        now.yielding {
-            println("now = $now - yield = $yield")
-            println("n - p = ${now - yield}")
-            (now - yield).coerceAtLeast(ZERO)
-        }
+        now.yielding { (now - yield).coerceAtLeast(ZERO) }
     }
 
+/**
+ * A shared clock across a network at the pace set by the fastest device.
+ * Starts from an initial value that is the [current] time of execution of the device
+ * and returns the [Instant] of the fastest device.
+ *
+ * **N.B.**: [current] is set as default to the current system time,
+ * but it is recommended to change it according to the requirements to achieve accurate and non-astonishing results.
+ */
 fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(now: Instant): Instant {
-    val localDelta = deltaTime(now)
 //    if (localDelta == ZERO) throw IllegalStateException("Time is not moving forward")
-    return sharing(now to localDelta) { deltaAround: Field<ID, Pair<Instant, Duration>> ->
-        // take the minimum delta, i.e., the fastest device
-        val minDelta = deltaAround.minBy(deltaAround.localValue) { it.second }.second
-        // take the biggest time, i.e., the device most ahead
-        val fastestTime = deltaAround.maxBy(deltaAround.localValue) { it.first }.first
-        (fastestTime to minDelta).yielding { fastestTime + minDelta }
+    return share(now) { clocksAround: Field<ID, Instant> ->
+        val localDelta = deltaTime(now)
+        val deltaTimes = clocksAround.map { (now - it).coerceAtLeast(ZERO) }
+        val minDelta = deltaTimes.min(localDelta)
+        val referenceTime: Instant =
+            (clocksAround.alignedMap(deltaTimes) { base, dt -> base + dt }).max(clocksAround.localValue) //max(clocksAround.localValue)
+        referenceTime + minDelta
     }
 }
-//    share(now) { clocksAround: Field<ID, Instant> ->
-//        val deltaTimes = clocksAround.map { (now - it).coerceAtLeast(ZERO) }
-//        val referenceTime: Instant =
-//            (clocksAround.alignedMap(deltaTimes) { base, dt -> base + dt }).max(clocksAround.localValue)
-//        referenceTime + deltaTime
+
+//    return sharing(now to localDelta) { deltaAround: Field<ID, Pair<Instant, Duration>> ->
+//        // take the minimum delta, i.e., the fastest device
+//        val minDelta = deltaAround.minBy(deltaAround.localValue) { it.second }.second
+//        // take the biggest time, i.e., the device most ahead
+//        val fastestTime = deltaAround.maxBy(deltaAround.localValue) { it.first }.first
+//        val newTime = fastestTime + minDelta
+//        println("localDelta: $localDelta - minDelta: $minDelta - fastestTime: $fastestTime - newTime: $newTime")
+//        (newTime to minDelta).yielding { newTime }
 //    }
 
 // shared clock -> Instant -> il device piu veloce sta a T
