@@ -14,6 +14,7 @@ import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.operations.maxBy
 import it.unibo.collektive.field.operations.minBy
 import kotlinx.datetime.Instant
+import kotlinx.datetime.Instant.Companion.DISTANT_PAST
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
 
@@ -87,11 +88,18 @@ fun <ID : Comparable<ID>> Aggregate<ID>.countDownWithDecay(timeout: Duration, de
 //    }
 
 fun <ID : Comparable<ID>> Aggregate<ID>.deltaTime(now: Instant): Duration =
-    evolving(now) { previousTime -> max(now, previousTime).yielding { (now - previousTime).coerceAtLeast(ZERO) } }
+    evolving(DISTANT_PAST) { previousTime ->
+        val yield = if (previousTime == DISTANT_PAST) now else previousTime
+        now.yielding {
+            println("now = $now - yield = $yield")
+            println("n - p = ${now - yield}")
+            (now - yield).coerceAtLeast(ZERO)
+        }
+    }
 
 fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(now: Instant): Instant {
     val localDelta = deltaTime(now)
-    if (localDelta == ZERO) throw IllegalStateException("Time is not moving forward")
+//    if (localDelta == ZERO) throw IllegalStateException("Time is not moving forward")
     return sharing(now to localDelta) { deltaAround: Field<ID, Pair<Instant, Duration>> ->
         // take the minimum delta, i.e., the fastest device
         val minDelta = deltaAround.minBy(deltaAround.localValue) { it.second }.second

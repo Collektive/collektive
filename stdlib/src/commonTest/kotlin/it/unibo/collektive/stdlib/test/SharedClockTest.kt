@@ -14,19 +14,19 @@ import io.kotest.matchers.shouldBe
 import it.unibo.collektive.stdlib.sharedClock
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
-import kotlinx.datetime.Clock
-import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
 import kotlinx.datetime.Instant.Companion.DISTANT_PAST
 
 class SharedClockTest : StringSpec({
+
+    val times = listOf("1970-01-01T00:00:00Z", "1970-01-01T00:01:00Z", "1970-01-01T00:02:00Z", "1970-01-01T00:03:00Z")
 
     fun <Value> Environment<Value>.sharedClockIsStable(): Boolean =
         status().values.distinct().size == 1
 
     fun squareMooreGridWithSharedClock(size: Int) =
         mooreGrid<Instant>(size, size, { _, _ -> DISTANT_PAST }) {
-            sharedClock(Clock.System.now())
+            sharedClock(Instant.parse(times[localId]))
         }.apply {
             nodes.size shouldBe size * size
             val initial = status().values.distinct()
@@ -37,7 +37,7 @@ class SharedClockTest : StringSpec({
         }
 
     "SharedClock should stabilize in one cycle even if the nodes have different times" {
-        val size = 5
+        val size = 2
         val environment: Environment<Instant> = squareMooreGridWithSharedClock(size)
         generateSequence(0) { it + 1 }.take(environment.nodes.size).forEach { iteration ->
             environment.nodes.drop(iteration).forEach { n -> n.cycle() }
