@@ -40,8 +40,10 @@ buildConfig {
 }
 
 val pluginName = "collektive-plugin"
-val pluginDescription = "Gradle support for the Collektive Kotlin compiler plugin," +
-    " performing automatic aggregate alignment of Kotlin sources ."
+val pluginDescription =
+    """
+    Gradle support for the Collektive Kotlin compiler plugin performing automatic aggregate alignment of Kotlin sources
+    """
 
 // Defines a gradle plugin that can be used from other projects
 gradlePlugin {
