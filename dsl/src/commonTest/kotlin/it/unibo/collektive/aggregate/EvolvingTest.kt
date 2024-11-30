@@ -8,7 +8,7 @@ import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
-import it.unibo.collektive.utils.CollektiveTestUtils.roundFor
+import it.unibo.collektive.testing.Round.roundFor
 
 class EvolvingTest : StringSpec({
     val id0 = 0
