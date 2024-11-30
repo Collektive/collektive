@@ -17,17 +17,18 @@ import it.unibo.collektive.aggregate.api.Aggregate
  */
 object Round {
     /**
-     * Performs [steps] rounds of the computation defined by [block], starting from [initial].
+     * Simulates a round-based computation for [steps] rounds for the given [deviceId]
+     * executing the [computation] function.
      */
     fun <ID : Any, Result> roundFor(
         steps: Int = 10,
         deviceId: ID,
-        block: Aggregate<ID>.() -> Result,
+        computation: Aggregate<ID>.() -> Result,
     ): AggregateResult<ID, Result> {
         require(steps > 0) { "Unable to perform '$steps' rounds. At least 1 round is required" }
-        val firstRoundResult = aggregate(deviceId, compute = block)
+        val firstRoundResult = aggregate(deviceId, compute = computation)
         return (1 until steps).fold(firstRoundResult) { previousResult, _ ->
-            aggregate(deviceId, previousResult.newState, emptySet(), block)
+            aggregate(deviceId, previousResult.newState, emptySet(), computation)
         }
     }
 }
