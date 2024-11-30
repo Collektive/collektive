@@ -1,3 +1,59 @@
+## [11.0.1](https://github.com/Collektive/collektive/compare/11.0.0...11.0.1) (2024-11-30)
+
+### Dependency updates
+
+* **deps:** update alchemist to v35.0.1 ([72ff9bc](https://github.com/Collektive/collektive/commit/72ff9bcf72ff184b55338458a428815bc61cfe45))
+* **deps:** update alchemist to v35.0.2 ([636e97e](https://github.com/Collektive/collektive/commit/636e97ebaf08513ec59aeec5b5c5713c14bfe86a))
+* **deps:** update alchemist to v35.0.3 ([0cabf44](https://github.com/Collektive/collektive/commit/0cabf4463ca228c6a5a9e83b5e43b37815d43e40))
+* **deps:** update alchemist to v36 ([2998725](https://github.com/Collektive/collektive/commit/2998725a7b7b5b9ff3c792bbd8de098ed3a12eeb))
+* **deps:** update alchemist to v36.0.1 ([c8282c4](https://github.com/Collektive/collektive/commit/c8282c4f99ebfcf7be5a27cbf5b527a8bc314fa5))
+* **deps:** update alchemist to v36.0.2 ([8aea0ff](https://github.com/Collektive/collektive/commit/8aea0ffff752776410666493ce55d6f26c00d606))
+* **deps:** update alchemist to v36.0.3 ([dc3d28e](https://github.com/Collektive/collektive/commit/dc3d28efba1e59166ac703d034ac0666bc187501))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5.5.1 ([92e1bd6](https://github.com/Collektive/collektive/commit/92e1bd640ba1c8a42bc14027149837ebacb549fb))
+* **deps:** update dependency gradle to v8.11 ([6635b68](https://github.com/Collektive/collektive/commit/6635b682340f71f510767f426b1ba42ebd1e1012))
+* **deps:** update dependency gradle to v8.11.1 ([3c3104c](https://github.com/Collektive/collektive/commit/3c3104cccaa9864b09ba9128bf593215b090f4f1))
+* **deps:** update dependency typescript to ~5.7.0 ([c27b791](https://github.com/Collektive/collektive/commit/c27b791857657df7ba0725a1cb75d485728ca95f))
+* **deps:** update docusaurus monorepo to v3.6.2 ([0ec0b9b](https://github.com/Collektive/collektive/commit/0ec0b9bca33c2d2afed50d0740e795051f99b756))
+* **deps:** update docusaurus monorepo to v3.6.3 ([dbbf757](https://github.com/Collektive/collektive/commit/dbbf75728213f50ed882469bc4987898b06899ba))
+* **deps:** update plugin kotlin-qa to v0.70.0 ([d26972d](https://github.com/Collektive/collektive/commit/d26972d61cdc35e29bc5eed25fea3dbaef8611ae))
+* **deps:** update plugin kotlin-qa to v0.70.1 ([c09c666](https://github.com/Collektive/collektive/commit/c09c666c96c566c54edc38242d21bb829c339e9b))
+* **deps:** update plugin kotlin-qa to v0.70.2 ([a1e533e](https://github.com/Collektive/collektive/commit/a1e533e73f8e8d957401da1ea32c0222693ddf19))
+* **deps:** update plugin kotlin-qa to v0.74.0 ([3b0e1a0](https://github.com/Collektive/collektive/commit/3b0e1a02220e1e7c8cf74b07b22917c07afa529d))
+* **deps:** update plugin kotlin-qa to v0.75.0 ([dc1911b](https://github.com/Collektive/collektive/commit/dc1911bb8851edf292368c8098a552163602244d))
+* **deps:** update plugin multijvmtesting to v1.3.1 ([bb08140](https://github.com/Collektive/collektive/commit/bb081404a271d5bf78b29f25062bbb7a75588f51))
+* **deps:** update plugin multijvmtesting to v1.3.2 ([abd3512](https://github.com/Collektive/collektive/commit/abd3512bc0803ca10db95283972f1d7399137aaa))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.14 ([1486f09](https://github.com/Collektive/collektive/commit/1486f09095d08e94f2a467ac8a200f18c8ce4749))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.15 ([0f611b0](https://github.com/Collektive/collektive/commit/0f611b032eaa3bd3d9e22cf3f921c3710808d8df))
+* **deps:** update plugin publishoncentral to v5.1.10 ([830240f](https://github.com/Collektive/collektive/commit/830240f6f6441cb598701d09628683fad60add6f))
+* **deps:** update plugin publishoncentral to v5.1.11 ([08f1df4](https://github.com/Collektive/collektive/commit/08f1df4887a3e539913d86065f32ebc4178ab402))
+
+### Bug Fixes
+
+* fix bug with yielding-based functions causing a ClassCastException ([#616](https://github.com/Collektive/collektive/issues/616)) ([39cd80a](https://github.com/Collektive/collektive/commit/39cd80ad2a0cd53f8c5e7adc56ced251c6cb3223))
+
+### Build and continuous integration
+
+* add a forced cleanup job to keep OSSRH clean ([bca17dc](https://github.com/Collektive/collektive/commit/bca17dc1c0d5c0d31c35c1c5936f6dae0b93816e))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.15 ([9ec3864](https://github.com/Collektive/collektive/commit/9ec3864d2976050f3d8d7653cf9721e047e79dbd))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.16 ([373b0d2](https://github.com/Collektive/collektive/commit/373b0d22eacab53d0166c1228a02b4ec44941327))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.17 ([d8c3e17](https://github.com/Collektive/collektive/commit/d8c3e17566cac5d13e69575da18d39925dc3b114))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.18 ([95fc1c7](https://github.com/Collektive/collektive/commit/95fc1c76f2313f955165af2eff027586ca97d490))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.19 ([c903733](https://github.com/Collektive/collektive/commit/c903733c069b02c3c1ffecf9410fbbce076a1f2d))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.20 ([799e74d](https://github.com/Collektive/collektive/commit/799e74d957dac6c7d8866704cf72fe3c906e3060))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.21 ([4e158cb](https://github.com/Collektive/collektive/commit/4e158cb054bb6a3dee87c6aa83b1a2f822d5163e))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.22 ([715993c](https://github.com/Collektive/collektive/commit/715993c4b34e41eadf427bd1743d02ba7974ce42))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.23 ([ed915ad](https://github.com/Collektive/collektive/commit/ed915ad07602bb4181fcc60c5674de8b8f52ff89))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.23 ([f969aa8](https://github.com/Collektive/collektive/commit/f969aa8fd4e05a928bbc607a895f22094642177a))
+
+### Style improvements
+
+* reformat style according to new style configuration ([142aa89](https://github.com/Collektive/collektive/commit/142aa894d46f1337619fa05ea4ff25babf07beb9))
+* reformat style according to new style configuration ([dcfb568](https://github.com/Collektive/collektive/commit/dcfb5683c6f5c7678151dcdbcf57ee25afc04a75))
+
+### Refactoring
+
+* move warnings and error in appropriate objects following the jetbrains convention ([#578](https://github.com/Collektive/collektive/issues/578)) ([a8ffc16](https://github.com/Collektive/collektive/commit/a8ffc1658ecb2d539cce437592f05875e7e8f2e9))
+
 ## [11.0.0](https://github.com/Collektive/collektive/compare/10.11.1...11.0.0) (2024-11-14)
 
 ### ⚠ BREAKING CHANGES
