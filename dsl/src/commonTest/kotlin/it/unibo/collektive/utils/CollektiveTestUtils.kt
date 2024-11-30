@@ -8,6 +8,10 @@
 
 package it.unibo.collektive.utils
 
+import it.unibo.collektive.Collektive.Companion.aggregate
+import it.unibo.collektive.aggregate.AggregateResult
+import it.unibo.collektive.aggregate.api.Aggregate
+
 /**
  * Utilities for testing Collektive.
  */
@@ -15,9 +19,15 @@ object CollektiveTestUtils {
     /**
      * Performs [steps] rounds of the computation defined by [block], starting from [initial].
      */
-    fun <Result> roundFor(
+    fun <ID : Any, Result> roundFor(
         steps: Int = 10,
-        initial: Result,
-        block: (Result) -> Result,
-    ): Result = (0 until steps).fold(initial) { acc, _ -> block(acc) }
+        deviceId: ID,
+        block: Aggregate<ID>.() -> Result,
+    ): AggregateResult<ID, Result> {
+        require(steps > 0) { "Unable to perform '$steps' rounds. At least 1 round is required" }
+        val firstRoundResult = aggregate(deviceId, compute = block)
+        return (1 until steps).fold(firstRoundResult) { previousResult, _ ->
+            aggregate(deviceId, previousResult.newState, emptySet(), block)
+        }
+    }
 }

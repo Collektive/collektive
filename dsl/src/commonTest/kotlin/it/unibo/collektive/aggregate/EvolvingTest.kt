@@ -5,7 +5,6 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
-import it.unibo.collektive.aggregate.AggregateResult.Companion.empty
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
@@ -43,18 +42,15 @@ class EvolvingTest : StringSpec({
     }
 
     "Evolving should return the value passed in the yielding function" {
-        val startResult = empty(id1, "")
         val steps = 10
         val producedResult =
-            roundFor(steps, startResult) { previousResult ->
-                aggregate(id1, previousResult.newState) {
-                    val evolvingRes =
-                        evolving(0) {
-                            (it + 1).yielding { "A string" }
-                        }
-                    evolvingRes shouldBe "A string"
-                    evolvingRes
-                }
+            roundFor(steps, deviceId = 0) {
+                val evolvingRes =
+                    evolving(0) {
+                        (it + 1).yielding { "A string" }
+                    }
+                evolvingRes shouldBe "A string"
+                evolvingRes
             }
         producedResult.newState.values.size shouldBe 1
         producedResult.newState.values shouldContain steps
