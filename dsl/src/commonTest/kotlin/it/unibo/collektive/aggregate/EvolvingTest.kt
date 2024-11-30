@@ -2,14 +2,13 @@ package it.unibo.collektive.aggregate
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.collections.shouldContainAll
-import io.kotest.matchers.maps.shouldHaveSize
+import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
-import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
+import it.unibo.collektive.testing.Round.roundFor
 
 class EvolvingTest : StringSpec({
     val id0 = 0
@@ -43,16 +42,18 @@ class EvolvingTest : StringSpec({
     }
 
     "Evolving should return the value passed in the yielding function" {
-        val result =
-            aggregate(id1) {
-                evolving(initV1) {
-                    val nbr = neighboringViaExchange(it * 2).localValue
-                    nbr.yielding { "A string" }
-                } shouldBe "A string"
+        val steps = 10
+        val producedResult =
+            roundFor(steps, deviceId = 0) {
+                val evolvingRes =
+                    evolving(0) {
+                        (it + 1).yielding { "A string" }
+                    }
+                evolvingRes shouldBe "A string"
+                evolvingRes
             }
-        val messages = result.toSend.messagesFor(id1)
-        messages shouldHaveSize 1
-        messages.values shouldContainAll listOf(2)
+        producedResult.newState.values.size shouldBe 1
+        producedResult.newState.values shouldContain steps
     }
 
     "Evolving should work fine even with null as value" {
