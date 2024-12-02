@@ -101,14 +101,11 @@ object NonSelfStabilizingGossip {
     fun <ID : Any, Value> Aggregate<ID>.gossip(
         value: Value,
         aggregation: (Value, Value) -> Value,
-    ): Value = share(value) {
-        it.fold(value, aggregation)
-    }
+    ): Value = share(value) { it.fold(value, aggregation) }
 
     /**
      * A "gossip" algorithm that computes whether any device has ever experienced a certain [condition] before.
      */
-    fun <ID : Any> Aggregate<ID>.everHappened(
-        condition: () -> Boolean,
-    ): Boolean = gossip(condition()) { a, b -> a || b }
+    fun <ID : Any> Aggregate<ID>.everHappened(condition: () -> Boolean): Boolean =
+        gossip(condition()) { a, b -> a || b }
 }
