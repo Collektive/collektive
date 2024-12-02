@@ -42,16 +42,17 @@ object SelfStabilizingGossip {
         val localGossip = GossipValue<ID, Value>(best = local, local = local)
         return share(localGossip) { gossip ->
             val neighbors = gossip.neighbors.toSet()
-            val result = gossip.foldWithId(localGossip) { current, id, next ->
-                val valid = next.path.asReversed().asSequence().drop(1).none { it == localId || it in neighbors }
-                val actualNext = if (valid) next else next.base(id)
-                val candidateValue = comparator.compare(current.best, actualNext.best)
-                when {
-                    candidateValue > 0 -> current
-                    candidateValue == 0 -> listOf(current, next).minBy { it.path.size }
-                    else -> actualNext
+            val result =
+                gossip.foldWithId(localGossip) { current, id, next ->
+                    val valid = next.path.asReversed().asSequence().drop(1).none { it == localId || it in neighbors }
+                    val actualNext = if (valid) next else next.base(id)
+                    val candidateValue = comparator.compare(current.best, actualNext.best)
+                    when {
+                        candidateValue > 0 -> current
+                        candidateValue == 0 -> listOf(current, next).minBy { it.path.size }
+                        else -> actualNext
+                    }
                 }
-            }
             GossipValue(result.best, local, result.path + localId)
         }.best
     }
