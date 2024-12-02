@@ -1,3 +1,13 @@
+## [11.0.2](https://github.com/Collektive/collektive/compare/11.0.1...11.0.2) (2024-12-02)
+
+### Dependency updates
+
+* **deps:** update plugin org.gradle.toolchains.foojay-resolver-convention to v0.9.0 ([95a2724](https://github.com/Collektive/collektive/commit/95a2724547620b5151322d2f0d6fe8def5d9efe6))
+
+### Bug Fixes
+
+* **stdlib:** non-self-stabilizing gossip implemented with fold instead of hood ([#579](https://github.com/Collektive/collektive/issues/579)) ([3de2401](https://github.com/Collektive/collektive/commit/3de24014235dad3b4f2de6697c37428e4ff2e550))
+
 ## [11.0.1](https://github.com/Collektive/collektive/compare/11.0.0...11.0.1) (2024-11-30)
 
 ### Dependency updates
