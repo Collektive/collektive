@@ -12,7 +12,6 @@ import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.operators.share
 import it.unibo.collektive.field.Field.Companion.fold
 import it.unibo.collektive.field.Field.Companion.foldWithId
-import it.unibo.collektive.field.Field.Companion.hood
 
 /**
  * A collection of self-stabilizing gossip algorithms.
@@ -100,22 +99,14 @@ object NonSelfStabilizingGossip {
      * A non-self-stabilizing function for repeated propagation of a [value] and [aggregation]
      * of state estimates between neighboring devices.
      */
-    fun <ID : Any, Value> Aggregate<ID>.nonSelfStabilizingGossip(
+    fun <ID : Any, Value> Aggregate<ID>.gossip(
         value: Value,
         aggregation: (Value, Value) -> Value,
-    ): Value =
-        share(value) {
-            it.hood(value, aggregation)
-        }
+    ): Value = share(value) { it.fold(value, aggregation) }
 
     /**
      * A "gossip" algorithm that computes whether any device has ever experienced a certain [condition] before.
      */
-    fun <ID : Any> Aggregate<ID>.everHappened(
-        condition: () -> Boolean,
-        default: Boolean = false,
-    ): Boolean =
-        share(default) {
-            condition() || it.fold(default) { a, b -> a || b }
-        }
+    fun <ID : Any> Aggregate<ID>.everHappened(condition: () -> Boolean): Boolean =
+        gossip(condition()) { a, b -> a || b }
 }
