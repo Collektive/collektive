@@ -17,6 +17,7 @@ import it.unibo.collektive.field.operations.replaceMatching
 import kotlinx.datetime.Instant
 import kotlinx.datetime.Instant.Companion.DISTANT_PAST
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.ZERO
 
 /**
@@ -74,7 +75,7 @@ fun <ID : Comparable<ID>> Aggregate<ID>.countDownWithDecay(timeout: Duration, de
 
 //fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(current: Instant = Clock.System.now(), interval: Duration): Instant =
 //    share(current) { clock ->
-//        val dt = deltaTime(current)
+//        val dt = deltaTime(current)è an
 //        when {
 //            dt >= interval -> clock.max(base = clock.localValue)
 //            else -> clock.localValue
@@ -97,23 +98,28 @@ fun <ID : Comparable<ID>> Aggregate<ID>.deltaTime(now: Instant): Duration =
  */
 fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(now: Instant): Instant {
     return share(now) { clocksAround: Field<ID, Instant> ->
+        println("NOW FOR $localId is $now")
+        println("CLOCKSAROUND: $clocksAround")
         val localDelta = deltaTime(now)
 //    if (localDelta == ZERO) throw IllegalStateException("Time is not moving forward")
-        val deltaTimes = clocksAround.map { now - it } // passarlo a infinito
-        val deltaReplaced = deltaTimes.replaceMatching(Duration.INFINITE) { it <= ZERO }
+        val deltaTimes = clocksAround.map { it - now } // passarlo a infinito
+//        val deltaTimes = clocksAround.map { now - it } // passarlo a infinito
+        val deltaReplaced = deltaTimes.replaceMatching(INFINITE) { it <= ZERO }
         println("deltaTimes: $deltaTimes")
+        println("deltaReplaced: $deltaReplaced")
         val minDelta = deltaReplaced.min(localDelta)
         val deltamins = deltaTimes.map {it.coerceAtLeast(minDelta)}
+        println("DELTAMINS: $deltamins")
         val referenceTime: Instant =
-            (clocksAround.alignedMap(deltamins) { base, dt -> base + dt }).max(clocksAround.localValue) //max(clocksAround.localValue)
-        println("localDelta: $localDelta - minDelta: $minDelta - referenceTime: $referenceTime" )
-        referenceTime + minDelta
+            (clocksAround.alignedMap(deltamins) { base, dt -> base + dt }).max(clocksAround.localValue + minDelta)
+        println("REFERENCE TIME FOR DEVICE $localId: $referenceTime" )
+        referenceTime //+ minDelta
     }
 }
 
 //    return sharing(now to localDelta) { deltaAround: Field<ID, Pair<Instant, Duration>> ->
 //        // take the minimum delta, i.e., the fastest device
-//        val minDelta = deltaAround.minBy(deltaAround.localValue) { it.second }.second
+//        val minDelta = deltaAround.minBy(deltaAround.localValue) { it.second }.secondà
 //        // take the biggest time, i.e., the device most ahead
 //        val fastestTime = deltaAround.maxBy(deltaAround.localValue) { it.first }.first
 //        val newTime = fastestTime + minDelta
