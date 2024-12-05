@@ -149,16 +149,18 @@ internal fun KParameter.isFunctionType(): Boolean = (type.classifier as? KClass<
     ?.startsWith("kotlin.Function")
     ?: false
 
-/**
- * This function returns true if given a list of parameters of a [KCallable],
- * the receiver parameter is of the same type of given [callable] callable.
- *
- * For example: given a list of [ParameterSpec] composed of [String, Any?] and the [KCallable]
- * `fun String.plus(other: Any?): String`, the function will return true since the receiver
- * is of type [String] (the same as the first parameter of the [ParameterSpec] list).
- */
-internal fun List<ParameterSpec>.isReceiverTheBaseClass(callable: KCallable<*>): Boolean =
-    this.firstOrNull()?.type == callable.parameters.firstOrNull()?.type?.asTypeName()
+internal fun willBeShadowed(callable: KCallable<*>, paramList: List<ParameterSpec>): Boolean {
+    val willShadowFieldedVersion = callable.parameters.any { it.type.isSupertypeOf(typeOf<Field<*, *>>()) }
+    val generatedReceiverType =
+        requireNotNull(paramList.firstOrNull()?.type) {
+            "The generated receiver must not be null"
+        }
+    val originalReceiverType =
+        requireNotNull(callable.parameters.firstOrNull()?.type?.toTypeNameWithRecurringGenericSupport()) {
+            "The original receiver must not be null"
+        }
+    return willShadowFieldedVersion && (generatedReceiverType == originalReceiverType)
+}
 
 /**
  * This function generates all the possible functions for a given [origin] callable.
@@ -184,11 +186,10 @@ internal fun generateFunctions(origin: KCallable<*>): List<FunSpec> {
             }
         )
     }
-    val willShadowFieldedVersion = origin.parameters.any { it.type.isSupertypeOf(typeOf<Field<*, *>>()) }
     return parameterCombinations(functionArguments)
         // The shadow occurs if willShadow is true and the first argument of the generated function is the same as the
         // original callable receiver.
-        .filterNot { willShadowFieldedVersion && it.isReceiverTheBaseClass(origin) }
+        .filterNot { willBeShadowed(origin, it) }
         .map { paramList -> generateFunction(origin, paramList) }
 }
 
