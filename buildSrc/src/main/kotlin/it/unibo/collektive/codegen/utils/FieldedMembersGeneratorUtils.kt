@@ -23,6 +23,8 @@ import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
+import kotlin.reflect.full.isSupertypeOf
+import kotlin.reflect.typeOf
 
 internal val FIELD_INTERFACE = Field::class.asClassName()
 internal val FIELD_COMPANION = Field.Companion::class.asClassName()
@@ -147,7 +149,29 @@ internal fun KParameter.isFunctionType(): Boolean = (type.classifier as? KClass<
     ?.startsWith("kotlin.Function")
     ?: false
 
-internal fun generateFunctions(origin: KCallable<*>): List<FunSpec> {
+/**
+ * This function returns true if given a list of parameters of a [KCallable],
+ * the receiver parameter is of the same type of given [callable] callable.
+ *
+ * For example: given a list of [ParameterSpec] composed of [String, Any?] and the [KCallable]
+ * `fun String.plus(other: Any?): String`, the function will return true since the receiver
+ * is of type [String] (the same as the first parameter of the [ParameterSpec] list).
+ */
+internal fun List<ParameterSpec>.isReceiverTheBaseClass(callable: KCallable<*>): Boolean =
+    this.firstOrNull()?.type == callable.parameters.firstOrNull()?.type?.asTypeName()
+
+/**
+ * This function generates all the possible functions for a given [origin] callable.
+ * The function will generate all the possible combinations of parameters where each parameter is replaced by a `Field`
+ * of the same type.
+ *
+ * This function takes a [willShadowFieldedVersion] parameter that will exclude the generation of the function
+ * having the non-fielded version as receiver since it will be shadowed by the original version of the function.
+ *
+ * For example: `fun String.plus(other: Any?): String` will not generate the function
+ * `fun String.plus(other: Field<ID, Any?>): Field<ID, String>` since it will be shadowed by the original version.
+ */
+internal fun generateFunctions(origin: KCallable<*>, willShadowFieldedVersion: Boolean): List<FunSpec> {
     val functionArguments: List<ParameterSpec> = origin.parameters.map { parameter: KParameter ->
         val typeName = parameter.type.toTypeNameWithRecurringGenericSupport()
         ParameterSpec(
@@ -160,13 +184,22 @@ internal fun generateFunctions(origin: KCallable<*>): List<FunSpec> {
             }
         )
     }
-    return parameterCombinations(functionArguments).map { paramList ->
+    return parameterCombinations(functionArguments)
+        // The shadow occurs if willShadow is true and the first argument of the generated function is the same as the
+        // original callable receiver.
+        .filterNot { willShadowFieldedVersion && it.isReceiverTheBaseClass(origin) }
+        .map { paramList ->
         generateFunction(origin, paramList)
     }
 }
 
+internal fun willShadowTheFieldedVersion(callable: KCallable<*>): Boolean =
+    callable.parameters.any { it.type.isSupertypeOf(typeOf<Field<*, *>>()) }
+
 internal fun generatePrimitivesFile(origin: List<KCallable<*>>, packageName: String, fileName: String): FileSpec? {
-    val functions = origin.flatMap { generateFunctions(it) }
+    // If one of the KCallable is a potential supertype of the corresponding "fielded version" should be excluded
+    // since it will be shadowed by the non-fielded version.
+    val functions = origin.flatMap { generateFunctions(it, willShadowTheFieldedVersion(it)) }
     if (functions.isEmpty()) return null
     val objectContainer = TypeSpec.objectBuilder(fileName).apply {
         functions.forEach {
