@@ -149,6 +149,9 @@ internal fun KParameter.isFunctionType(): Boolean = (type.classifier as? KClass<
     ?.startsWith("kotlin.Function")
     ?: false
 
+/**
+ * Checks if the generated function with [paramList] will be shadowed by the original [callable].
+ */
 internal fun willBeShadowed(callable: KCallable<*>, paramList: List<ParameterSpec>): Boolean {
     val willShadowFieldedVersion = callable.parameters.any { it.type.isSupertypeOf(typeOf<Field<*, *>>()) }
     val generatedReceiverType =
