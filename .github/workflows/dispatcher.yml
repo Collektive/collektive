@@ -15,14 +15,24 @@ on:
   workflow_dispatch:
 
 jobs:
+#  debug:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - run: |
+#          echo "github.event_name=${{github.event_name}}"
+#          echo "github.event.pull_request.head.repo.full_name=${{github.event.pull_request.head.repo.full_name}}"
+#          echo "github.repository=${{github.repository}}"
+#          echo "github.head_ref=${{github.head_ref}}"
   dispatcher:
+#    needs:
+#      - debug
     runs-on: ubuntu-latest
     # For PRs execute only on commit since the branch protection require the branch to be up-to-date (optimize the workflow).
     # Triggers the executions if an external PR is opened.
     if: >-
       github.event_name != 'pull_request'
       || github.event.pull_request.head.repo.full_name != github.repository
-      || startsWith(github.head_ref, 'refs/heads/dependabot/')
+      || startsWith(github.head_ref, 'dependabot/')
     steps:
       - run: 'true'
   ci-cd:
