@@ -193,8 +193,6 @@ internal fun generateFunctions(origin: KCallable<*>): List<FunSpec> {
 }
 
 internal fun generatePrimitivesFile(origin: List<KCallable<*>>, packageName: String, fileName: String): FileSpec? {
-    // If one of the KCallable is a potential supertype of the corresponding "fielded version" should be excluded
-    // since it will be shadowed by the non-fielded version.
     val functions = origin.flatMap { generateFunctions(it) }
     if (functions.isEmpty()) return null
     val objectContainer = TypeSpec.objectBuilder(fileName).apply {
