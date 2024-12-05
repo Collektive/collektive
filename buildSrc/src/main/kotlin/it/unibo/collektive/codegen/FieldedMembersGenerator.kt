@@ -87,10 +87,6 @@ object FieldedMembersGenerator {
         "javax",
     )
 
-    val forbiddenMembersForType = mapOf(
-        String::class to listOf("plus")
-    )
-
     val permanentlyExcludedMemberNames = listOf(
         "associateByTo",
         "associateTo",
@@ -208,7 +204,6 @@ object FieldedMembersGenerator {
             }
             val validMembers = noConflictingMethods
                 .filterNot { it.name in forbiddenMembersName }
-                .filterNot { forbiddenMembersForType[clazz]?.contains(it.name) == true }
                 .toList()
             val name = checkNotNull(clazz.simpleName) {
                 "Cannot generate field functions for anonymous class $clazz"
