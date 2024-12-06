@@ -20,6 +20,7 @@ plugins {
 }
 val reportMerge by tasks.registering(ReportMergeTask::class) {
     output = project.layout.buildDirectory.file("reports/detekt/deteket-merge.sarif")
+    input.from(tasks.withType<Detekt>().map { it.sarifReportFile })
 }
 
 allprojects {
@@ -129,9 +130,6 @@ allprojects {
     }
 
     tasks.withType<Detekt>().configureEach { finalizedBy(reportMerge) }
-    reportMerge {
-        input.from(tasks.withType<Detekt>().map { it.sarifReportFile })
-    }
 
     tasks.withType<Cpd>().configureEach {
         exclude {
