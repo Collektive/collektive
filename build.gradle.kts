@@ -161,7 +161,4 @@ tasks {
     withType<GenerateModuleMetadata>().configureEach {
         enabled = false
     }
-    withType<GenerateReportsTask> {
-        reportsOutputDirectory = layout.buildDirectory.dir("reports/ktlint/$name")
-    }
 }
