@@ -20,7 +20,6 @@ plugins {
 }
 val reportMerge by tasks.registering(ReportMergeTask::class) {
     output = project.layout.buildDirectory.file("reports/detekt/deteket-merge.sarif")
-    input.from(tasks.withType<Detekt>().map { it.sarifReportFile })
 }
 
 allprojects {
@@ -99,9 +98,6 @@ allprojects {
                 reporter(ReporterType.SARIF)
             }
         }
-        tasks.withType<GenerateReportsTask> {
-            reportsOutputDirectory = rootProject.layout.buildDirectory.dir("reports/ktlint/$name")
-        }
     }
 
     plugins.withType<DetektPlugin> {
@@ -130,6 +126,9 @@ allprojects {
     }
 
     tasks.withType<Detekt>().configureEach { finalizedBy(reportMerge) }
+    reportMerge {
+        input.from(tasks.withType<Detekt>().map { it.sarifReportFile })
+    }
 
     tasks.withType<Cpd>().configureEach {
         exclude {
@@ -161,5 +160,8 @@ tasks {
     }
     withType<GenerateModuleMetadata>().configureEach {
         enabled = false
+    }
+    withType<GenerateReportsTask> {
+        reportsOutputDirectory = layout.buildDirectory.dir("reports/ktlint/$name")
     }
 }
