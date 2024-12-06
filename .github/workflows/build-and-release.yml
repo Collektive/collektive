@@ -71,7 +71,7 @@ jobs:
           signing-key: ${{ secrets.GPG_PRIVATEKEY }}
           signing-password: ${{ secrets.GPG_PASSPHRASE }}
       - uses: github/codeql-action/upload-sarif@v3
-        if: ${{ runner.os == 'Linux' }}
+        if: ${{ always() && runner.os == 'Linux' }}
         with:
           sarif_file: build/reports
       - name: Upload Staging Repo IDs
@@ -92,7 +92,6 @@ jobs:
     steps:
       - name: Restore staging repository ID
         uses: actions/download-artifact@v4
-        with:
           name: staging-repo-ids
           path: build/
       - name: Set staging repository ID
