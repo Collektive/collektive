@@ -108,6 +108,8 @@ jobs:
       - name: Upload Detekt SARIF
         uses: github/codeql-action/upload-sarif@v3.27.6
         if: ${{ always() && runner.os == 'Linux' }}
+        with:
+          sarif_file: './'
 
   build-website:
     runs-on: ubuntu-24.04
