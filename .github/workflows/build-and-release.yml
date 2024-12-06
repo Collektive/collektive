@@ -107,13 +107,13 @@ jobs:
           signing-password: ${{ secrets.GPG_PASSPHRASE }}
       - name: Upload Detekt SARIF
         uses: github/codeql-action/upload-sarif@v3.27.6
-        if: ${{ runner.os == 'Linux' }}
+        if: ${{ always() && runner.os == 'Linux' }}
         with:
           sarif_file: build/reports/detekt
           category: 'detekt'
       - name: Upload Ktlint SARIF
         uses: github/codeql-action/upload-sarif@v3.27.6
-        if: ${{ runner.os == 'Linux' }}
+        if: ${{ always() && runner.os == 'Linux' }}
         with:
           sarif_file: build/reports/ktlint
           category: 'ktlint'
