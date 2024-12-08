@@ -17,38 +17,40 @@ class BranchAlignmentTest : StringSpec({
     val id0 = 0
 
     "Branch alignment should work in nested functions" {
-        val result = aggregate(id0) {
-            val condition = true
+        val result =
+            aggregate(id0) {
+                val condition = true
 
-            fun test() {
-                neighboringViaExchange("test")
-            }
+                fun test() {
+                    neighboringViaExchange("test")
+                }
 
-            fun test2() {
-                test()
+                fun test2() {
+                    test()
+                }
+                if (condition) {
+                    test2()
+                }
             }
-            if (condition) {
-                test2()
-            }
-        }
         val messageFor1 = result.toSend.messagesFor(id0)
         messageFor1 shouldHaveSize 1 // 1 path of alignment
         messageFor1.values.toList() shouldBe listOf("test")
     }
 
     "Branch alignment should not occur in non aggregate context" {
-        val result = aggregate(id0) {
-            val condition = true
+        val result =
+            aggregate(id0) {
+                val condition = true
 
-            fun test(): String = "hello"
+                fun test(): String = "hello"
 
-            fun test2() {
-                test()
+                fun test2() {
+                    test()
+                }
+                if (condition) {
+                    test2()
+                }
             }
-            if (condition) {
-                test2()
-            }
-        }
         result.toSend.messagesFor(id0) shouldHaveSize 0 // 0 path of alignment
     }
 

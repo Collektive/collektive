@@ -15,8 +15,9 @@ import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
 private fun IrBlock.findAggregateReference(aggregateContextClass: IrClass): IrExpression? =
     statements.firstNotNullOfOrNull {
         when (it) {
-            is IrCall -> collectAggregateReference(aggregateContextClass, it)
-                ?: collectAggregateReference(aggregateContextClass, it.symbol.owner)
+            is IrCall ->
+                collectAggregateReference(aggregateContextClass, it)
+                    ?: collectAggregateReference(aggregateContextClass, it.symbol.owner)
 
             is IrVariable -> collectAggregateReference(aggregateContextClass, it)
             is IrTypeOperatorCall -> collectAggregateReference(aggregateContextClass, it)
@@ -26,14 +27,17 @@ private fun IrBlock.findAggregateReference(aggregateContextClass: IrClass): IrEx
     }
 
 @OptIn(UnsafeDuringIrConstructionAPI::class)
-internal fun IrExpression.findAggregateReference(aggregateContextClass: IrClass): IrExpression? = when (this) {
-    is IrBlock -> findAggregateReference(aggregateContextClass)
+internal fun IrExpression.findAggregateReference(aggregateContextClass: IrClass): IrExpression? =
+    when (this) {
+        is IrBlock -> findAggregateReference(aggregateContextClass)
 
-    is IrGetValue -> collectAggregateReference(aggregateContextClass, this)
-        ?: collectAggregateReference(aggregateContextClass, symbol.owner)
+        is IrGetValue ->
+            collectAggregateReference(aggregateContextClass, this)
+                ?: collectAggregateReference(aggregateContextClass, symbol.owner)
 
-    is IrCall -> collectAggregateReference(aggregateContextClass, this)
-        ?: collectAggregateReference(aggregateContextClass, symbol.owner)
+        is IrCall ->
+            collectAggregateReference(aggregateContextClass, this)
+                ?: collectAggregateReference(aggregateContextClass, symbol.owner)
 
-    else -> collectAggregateReference(aggregateContextClass, this)
-}
+        else -> collectAggregateReference(aggregateContextClass, this)
+    }

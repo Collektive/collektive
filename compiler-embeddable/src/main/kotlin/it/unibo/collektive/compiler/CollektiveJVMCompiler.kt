@@ -30,14 +30,14 @@ import kotlin.script.experimental.jvm.util.classpathFromClassloader
  */
 @OptIn(ExperimentalCompilerApi::class)
 object CollektiveJVMCompiler {
-
     private fun tempDir(module: String) = createTempDirectory(module).toFile()
-    private const val firstJavaVersionWithModuleSystem = 9
+
+    private const val FIRST_JAVA_VERSION_WITH_MODULE_SYSTEM = 9
 
     private val defaultJvmTarget =
         System.getProperty("java.version").substringBefore('.').toInt().let { version ->
             when {
-                version < firstJavaVersionWithModuleSystem -> JvmTarget.JVM_1_8
+                version < FIRST_JAVA_VERSION_WITH_MODULE_SYSTEM -> JvmTarget.JVM_1_8
                 else -> JvmTarget.fromString(version.toString()) ?: JvmTarget.DEFAULT
             }
         }
@@ -82,10 +82,11 @@ object CollektiveJVMCompiler {
         // Enable the IR backend, or the Collektive plugin cannot be applied
         configuration.put(JVMConfigurationKeys.IR, true)
         // Classpath configuration
-        val classpath = checkNotNull(classpathFromClassloader(Thread.currentThread().contextClassLoader)) {
-            "Empty classpath from current classloader." +
-                "Likely a bug in alchemist-incarnation-collective's Kotlin compiler facade"
-        }
+        val classpath =
+            checkNotNull(classpathFromClassloader(Thread.currentThread().contextClassLoader)) {
+                "Empty classpath from current classloader." +
+                    "Likely a bug in alchemist-incarnation-collective's Kotlin compiler facade"
+            }
         configuration.addJvmClasspathRoots(classpath)
         configuration.addJvmClasspathRoots(KotlinJars.compilerClasspath)
         configuration.addJvmClasspathRoot(KotlinJars.stdlib)
@@ -94,11 +95,12 @@ object CollektiveJVMCompiler {
         configuration.add(CompilerPluginRegistrar.COMPILER_PLUGIN_REGISTRARS, AlignmentComponentRegistrar())
         // Configure the Collektive plugin options available in the command line processor
         configuration.put(AlignmentCommandLineProcessor.ARG_ENABLED, true)
-        val environment = KotlinCoreEnvironment.createForProduction(
-            { },
-            configuration,
-            EnvironmentConfigFiles.JVM_CONFIG_FILES,
-        )
+        val environment =
+            KotlinCoreEnvironment.createForProduction(
+                { },
+                configuration,
+                EnvironmentConfigFiles.JVM_CONFIG_FILES,
+            )
         return KotlinToJVMBytecodeCompiler.analyzeAndGenerate(environment)
     }
 
@@ -115,14 +117,15 @@ object CollektiveJVMCompiler {
         outputFolder: File = tempDir(moduleName),
         enableContextReceivers: Boolean = true,
         messageCollector: MessageCollector = SLF4JMessageCollector.default,
-    ): GenerationState? = compile(
-        listOf(inputFile),
-        jvmTarget,
-        moduleName,
-        outputFolder,
-        enableContextReceivers,
-        messageCollector,
-    )
+    ): GenerationState? =
+        compile(
+            listOf(inputFile),
+            jvmTarget,
+            moduleName,
+            outputFolder,
+            enableContextReceivers,
+            messageCollector,
+        )
 
     /**
      * Compiles the [input] string as a Kotlin-JVM file using the Collektive plugin.

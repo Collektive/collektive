@@ -14,7 +14,10 @@ import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 
 @OptIn(ExperimentalCompilerApi::class)
 object CompileUtils {
-    fun compile(fileName: String, program: String): JvmCompilationResult {
+    fun compile(
+        fileName: String,
+        program: String,
+    ): JvmCompilationResult {
         val sourceFile = SourceFile.kotlin(fileName, program)
 
         return KotlinCompilation().apply {
@@ -28,7 +31,6 @@ object CompileUtils {
         val fileName: String,
         val program: String,
     ) {
-
         infix fun shouldCompileWith(compilationCheck: (JvmCompilationResult) -> Unit) {
             val result = compile(fileName, program)
             result.exitCode shouldBe KotlinCompilation.ExitCode.OK
@@ -59,8 +61,9 @@ object CompileUtils {
 
     fun String.asTestingProgram(fileName: String): KotlinTestingProgram = KotlinTestingProgram(fileName, this)
 
-    val testedAggregateFunctions = table(
-        headers("functionCall"),
-        row("neighboring(0)"),
-    )
+    val testedAggregateFunctions =
+        table(
+            headers("functionCall"),
+            row("neighboring(0)"),
+        )
 }

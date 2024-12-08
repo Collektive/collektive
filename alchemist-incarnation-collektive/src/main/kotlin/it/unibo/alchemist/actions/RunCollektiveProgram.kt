@@ -25,7 +25,6 @@ class RunCollektiveProgram<P : Position<P>>(
     val name: String,
     val program: Aggregate<Int>.(CollektiveDevice<P>) -> Any?,
 ) : AbstractAction<Any?>(node) {
-
     private val programIdentifier = SimpleMolecule(name)
 
     /**
@@ -40,9 +39,10 @@ class RunCollektiveProgram<P : Position<P>>(
 
     init {
         declareDependencyTo(programIdentifier)
-        collektiveProgram = Collektive(localDevice.id, network = localDevice) {
-            program(localDevice)
-        }
+        collektiveProgram =
+            Collektive(localDevice.id, network = localDevice) {
+                program(localDevice)
+            }
     }
 
     /**
@@ -63,8 +63,10 @@ class RunCollektiveProgram<P : Position<P>>(
         name: String = entrypoint.name,
     ) : this(node, name, buildEntryPoint(entrypoint))
 
-    override fun cloneAction(node: Node<Any?>, reaction: Reaction<Any?>): Action<Any?> =
-        RunCollektiveProgram(node, name)
+    override fun cloneAction(
+        node: Node<Any?>,
+        reaction: Reaction<Any?>,
+    ): Action<Any?> = RunCollektiveProgram(node, name)
 
     override fun execute() {
         collektiveProgram.cycle().also {
@@ -75,38 +77,40 @@ class RunCollektiveProgram<P : Position<P>>(
     override fun getContext(): Context = Context.NEIGHBORHOOD
 
     private companion object {
-
         private fun <P : Position<P>> findEntrypoint(
             entrypoint: String,
         ): Aggregate<Int>.(CollektiveDevice<P>) -> Any? {
             val className = entrypoint.substringBeforeLast(".")
             val methodName = entrypoint.substringAfterLast(".")
             val clazz = Class.forName(className)
-            val method = clazz.methods.find { it.name == methodName }
-                ?: error("Entrypoint $entrypoint not found, no method $methodName found in class $className")
+            val method =
+                clazz.methods.find { it.name == methodName }
+                    ?: error("Entrypoint $entrypoint not found, no method $methodName found in class $className")
             return buildEntryPoint(method)
         }
 
-        private fun <P : Position<P>> buildEntryPoint(
-            method: Method,
-        ): Aggregate<Int>.(CollektiveDevice<P>) -> Any? {
-            val ktfunction = checkNotNull(method.kotlinFunction) {
-                "Method ${method.name} in class ${method.declaringClass.name} cannot be converted to a Kotlin function"
-            }
+        private fun <P : Position<P>> buildEntryPoint(method: Method): Aggregate<Int>.(CollektiveDevice<P>) -> Any? {
+            val ktFunction =
+                checkNotNull(method.kotlinFunction) {
+                    "Method ${method.name} in class ${method.declaringClass.name}" +
+                        " cannot be converted to a Kotlin function"
+                }
             // Build the lambda function to be executed
             return { device: CollektiveDevice<P> ->
-                val parameters = method.parameters.map {
-                    when {
-                        it.type.isAssignableFrom(Aggregate::class.java) -> this
-                        it.type.isAssignableFrom(CollektiveDevice::class.java) -> device
-                        it.type.isAssignableFrom(Node::class.java) -> device.node
-                        device.node.hasPropertyCompatibleWith(it) -> device.node.getPropertyCompatibleWith(it)
-                        else -> error("Unsupported type ${it.type} in entrypoint ${ktfunction.name}")
-                    }
-                }.toTypedArray()
-                ktfunction.call(*parameters)
+                val parameters =
+                    method.parameters.map {
+                        when {
+                            it.type.isAssignableFrom(Aggregate::class.java) -> this
+                            it.type.isAssignableFrom(CollektiveDevice::class.java) -> device
+                            it.type.isAssignableFrom(Node::class.java) -> device.node
+                            device.node.hasPropertyCompatibleWith(it) -> device.node.getPropertyCompatibleWith(it)
+                            else -> error("Unsupported type ${it.type} in entrypoint ${ktFunction.name}")
+                        }
+                    }.toTypedArray()
+                ktFunction.call(*parameters)
             }
         }
+
         private fun Node<*>.hasPropertyCompatibleWith(parameter: Parameter): Boolean =
             properties.any { parameter.type.isAssignableFrom(it::class.java) }
 

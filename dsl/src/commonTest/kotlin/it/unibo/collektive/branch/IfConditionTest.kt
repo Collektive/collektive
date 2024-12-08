@@ -9,9 +9,10 @@ import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 class IfConditionTest : StringSpec({
     val id0 = 0
     "Branches with constant conditions should get aligned" {
-        val result = aggregate(id0) {
-            if (true) neighboringViaExchange("test")
-        }
+        val result =
+            aggregate(id0) {
+                if (true) neighboringViaExchange("test")
+            }
         val messageFor0 = result.toSend.messagesFor(id0)
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test")
@@ -19,9 +20,10 @@ class IfConditionTest : StringSpec({
 
     "Branches with conditions read from variables should get aligned" {
         val customCondition = true
-        val result = aggregate(id0) {
-            if (customCondition) neighboringViaExchange("test")
-        }
+        val result =
+            aggregate(id0) {
+                if (customCondition) neighboringViaExchange("test")
+            }
         val messageFor0 = result.toSend.messagesFor(id0)
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test")
@@ -29,9 +31,10 @@ class IfConditionTest : StringSpec({
 
     "Function condition if" {
         fun customFunction() = true
-        val result = aggregate(id0) {
-            if (customFunction()) neighboringViaExchange("test")
-        }
+        val result =
+            aggregate(id0) {
+                if (customFunction()) neighboringViaExchange("test")
+            }
         val messageFor0 = result.toSend.messagesFor(id0)
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test")
@@ -40,9 +43,10 @@ class IfConditionTest : StringSpec({
     "Function and condition if" {
         val customCondition1 = true
         val customCondition2 = true
-        val result = aggregate(id0) {
-            if (customCondition1 && customCondition2) neighboringViaExchange("test")
-        }
+        val result =
+            aggregate(id0) {
+                if (customCondition1 && customCondition2) neighboringViaExchange("test")
+            }
         val messageFor0 = result.toSend.messagesFor(id0)
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test")
@@ -51,9 +55,10 @@ class IfConditionTest : StringSpec({
     "Function or condition if" {
         val customCondition1 = true
         val customCondition2 = true
-        val result = aggregate(id0) {
-            if (customCondition1 || customCondition2) neighboringViaExchange("test")
-        }
+        val result =
+            aggregate(id0) {
+                if (customCondition1 || customCondition2) neighboringViaExchange("test")
+            }
         val messageFor0 = result.toSend.messagesFor(id0)
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test")
@@ -62,9 +67,10 @@ class IfConditionTest : StringSpec({
     "Function not condition if" {
         val customCondition1 = true
         val customCondition2 = false
-        val result = aggregate(id0) {
-            if (customCondition1 && !customCondition2) neighboringViaExchange("test")
-        }
+        val result =
+            aggregate(id0) {
+                if (customCondition1 && !customCondition2) neighboringViaExchange("test")
+            }
         val messageFor0 = result.toSend.messagesFor(id0)
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test")

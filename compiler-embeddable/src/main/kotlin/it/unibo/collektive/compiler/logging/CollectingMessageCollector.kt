@@ -10,7 +10,6 @@ import org.jetbrains.kotlin.cli.common.messages.MessageCollector
  * A message collector collecting messages for later programmatic use.
  */
 class CollectingMessageCollector : MessageCollector {
-
     private val timeline: MutableList<CompilerMessage> = mutableListOf()
 
     /**
@@ -31,9 +30,10 @@ class CollectingMessageCollector : MessageCollector {
 
     override fun clear() = timeline.clear()
 
-    override fun hasErrors(): Boolean = listOf(ERROR, EXCEPTION).let { errors ->
-        messages.any { it.severity in errors }
-    }
+    override fun hasErrors(): Boolean =
+        listOf(ERROR, EXCEPTION).let { errors ->
+            messages.any { it.severity in errors }
+        }
 
     override fun report(
         severity: CompilerMessageSeverity,

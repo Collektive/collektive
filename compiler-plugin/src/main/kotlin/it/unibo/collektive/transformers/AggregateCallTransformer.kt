@@ -23,13 +23,13 @@ class AggregateCallTransformer(
     private val dealignFunction: IrFunction,
     private val projectFunction: IrFunction,
 ) : IrElementTransformerVoid() {
-
     private val aggregateContext = aggregateClass.defaultType
 
     override fun visitFunction(declaration: IrFunction): IrStatement {
-        val isAggregateFunction = declaration.extensionReceiverParameter?.type?.isAssignableFrom(aggregateContext)
-            ?: declaration.dispatchReceiverParameter?.type?.isAssignableFrom(aggregateClass.defaultType)
-            ?: false
+        val isAggregateFunction =
+            declaration.extensionReceiverParameter?.type?.isAssignableFrom(aggregateContext)
+                ?: declaration.dispatchReceiverParameter?.type?.isAssignableFrom(aggregateClass.defaultType)
+                ?: false
         if (isAggregateFunction || hasAggregateInArguments(declaration)) {
             /*
              This transformation is needed to project field inside the `alignOn` function called directly by the user.

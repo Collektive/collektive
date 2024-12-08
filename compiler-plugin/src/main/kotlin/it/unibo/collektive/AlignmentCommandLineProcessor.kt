@@ -33,14 +33,15 @@ class AlignmentCommandLineProcessor : CommandLineProcessor {
 
     override val pluginId: String = PLUGIN_ID
 
-    override val pluginOptions: Collection<CliOption> = listOf(
-        CliOption(
-            optionName = OPTION_ENABLED,
-            valueDescription = "bool <true | false>",
-            description = "If the alignment plugin should be applied",
-            required = false,
-        ),
-    )
+    override val pluginOptions: Collection<CliOption> =
+        listOf(
+            CliOption(
+                optionName = OPTION_ENABLED,
+                valueDescription = "bool <true | false>",
+                description = "If the alignment plugin should be applied",
+                required = false,
+            ),
+        )
 
     override fun processOption(
         option: AbstractCliOption,
