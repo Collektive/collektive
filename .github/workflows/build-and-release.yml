@@ -105,10 +105,11 @@ jobs:
           maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
           signing-key: ${{ secrets.GPG_PRIVATEKEY }}
           signing-password: ${{ secrets.GPG_PASSPHRASE }}
-      - uses: github/codeql-action/upload-sarif@v3
-        if: ${{ runner.os == 'Linux' }}
+      - name: Upload Detekt SARIF
+        uses: github/codeql-action/upload-sarif@v3.27.6
+        if: ${{ always() && runner.os == 'Linux' }}
         with:
-          sarif_file: build/reports
+          sarif_file: './'
 
   build-website:
     runs-on: ubuntu-24.04
