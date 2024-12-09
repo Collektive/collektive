@@ -3,6 +3,10 @@ import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektPlugin
 import io.gitlab.arturbosch.detekt.report.ReportMergeTask
 import org.danilopianini.gradle.mavencentral.DocStyle
+import org.jlleitschuh.gradle.ktlint.KtlintExtension
+import org.jlleitschuh.gradle.ktlint.KtlintPlugin
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
 
 plugins {
     alias(libs.plugins.dokka)
@@ -15,7 +19,7 @@ plugins {
     id("it.unibo.collektive.collektive-plugin")
 }
 val reportMerge by tasks.registering(ReportMergeTask::class) {
-    output = project.layout.buildDirectory.file("reports/detekt/merge.sarif")
+    output = project.layout.buildDirectory.file("reports/detekt/deteket-merge.sarif")
 }
 
 allprojects {
@@ -84,6 +88,14 @@ allprojects {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    plugins.withType<KtlintPlugin> {
+        configure<KtlintExtension> {
+            reporters {
+                reporter(ReporterType.SARIF)
             }
         }
     }
