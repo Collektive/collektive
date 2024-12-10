@@ -226,7 +226,7 @@ jobs:
       - check-secrets
       - staging-repo
       - close-staging-repos
-      #      - build-website
+      - build-website
       - release
       - build
     if: >-
