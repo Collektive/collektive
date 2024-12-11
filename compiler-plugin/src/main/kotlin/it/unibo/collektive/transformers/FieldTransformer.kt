@@ -39,7 +39,8 @@ class FieldTransformer(
         if (symbolName == alignRawIdentifier || symbolName == alignedOnIdentifier) {
             logger.debug("Found alignedRaw function call: ${expression.dumpKotlinLike()}")
             val contextReference =
-                expression.receiverAndArgs()
+                expression
+                    .receiverAndArgs()
                     .find { it.type.isAssignableFrom(aggregateClass.defaultType) }
                     ?: collectAggregateReference(aggregateClass, expression.symbol.owner)
             contextReference?.let {

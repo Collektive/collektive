@@ -27,8 +27,8 @@ internal class FieldProjectionTransformer(
         fieldExpression: IrExpression,
         projectFunction: IrFunction,
         dispatchReceiver: IrExpression,
-    ): IrExpression {
-        return irStatement(pluginContext, projectFunction, fieldExpression) {
+    ): IrExpression =
+        irStatement(pluginContext, projectFunction, fieldExpression) {
             irCall(projectFunction).apply {
                 // Set the return type
                 type = fieldExpression.type
@@ -40,5 +40,4 @@ internal class FieldProjectionTransformer(
                 putValueArgument(0, fieldExpression)
             }
         }
-    }
 }
