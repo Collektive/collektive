@@ -25,7 +25,6 @@ import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
  * function's body is used without a wrapping `alignedOn` call.
  */
 class FunctionCallWithAggregateParVisitor(private val context: CheckerContext) : FirVisitorVoid() {
-
     private var found = false
     private var insideAlignedOn = false
     private var functionCounter = 0
@@ -36,8 +35,7 @@ class FunctionCallWithAggregateParVisitor(private val context: CheckerContext) :
         element.acceptChildren(this)
     }
 
-    private fun isInsideAlignedOnOrNestedFun(): Boolean =
-        insideAlignedOn || insideNestedFun
+    private fun isInsideAlignedOnOrNestedFun(): Boolean = insideAlignedOn || insideNestedFun
 
     override fun visitFunctionCall(functionCall: FirFunctionCall) {
         if (functionCall.isAggregate(context.session)) {

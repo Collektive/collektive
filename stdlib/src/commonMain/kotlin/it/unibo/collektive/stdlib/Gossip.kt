@@ -12,7 +12,6 @@ import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.operators.share
 import it.unibo.collektive.field.Field.Companion.fold
 import it.unibo.collektive.field.Field.Companion.foldWithId
-import it.unibo.collektive.field.Field.Companion.hood
 
 /**
  * A collection of self-stabilizing gossip algorithms.
@@ -43,16 +42,17 @@ object SelfStabilizingGossip {
         val localGossip = GossipValue<ID, Value>(best = local, local = local)
         return share(localGossip) { gossip ->
             val neighbors = gossip.neighbors.toSet()
-            val result = gossip.foldWithId(localGossip) { current, id, next ->
-                val valid = next.path.asReversed().asSequence().drop(1).none { it == localId || it in neighbors }
-                val actualNext = if (valid) next else next.base(id)
-                val candidateValue = comparator.compare(current.best, actualNext.best)
-                when {
-                    candidateValue > 0 -> current
-                    candidateValue == 0 -> listOf(current, next).minBy { it.path.size }
-                    else -> actualNext
+            val result =
+                gossip.foldWithId(localGossip) { current, id, next ->
+                    val valid = next.path.asReversed().asSequence().drop(1).none { it == localId || it in neighbors }
+                    val actualNext = if (valid) next else next.base(id)
+                    val candidateValue = comparator.compare(current.best, actualNext.best)
+                    when {
+                        candidateValue > 0 -> current
+                        candidateValue == 0 -> listOf(current, next).minBy { it.path.size }
+                        else -> actualNext
+                    }
                 }
-            }
             GossipValue(result.best, local, result.path + localId)
         }.best
     }
@@ -99,20 +99,14 @@ object NonSelfStabilizingGossip {
      * A non-self-stabilizing function for repeated propagation of a [value] and [aggregation]
      * of state estimates between neighboring devices.
      */
-    fun <ID : Any, Value> Aggregate<ID>.nonSelfStabilizingGossip(
+    fun <ID : Any, Value> Aggregate<ID>.gossip(
         value: Value,
         aggregation: (Value, Value) -> Value,
-    ): Value = share(value) {
-        it.hood(value, aggregation)
-    }
+    ): Value = share(value) { it.fold(value, aggregation) }
 
     /**
      * A "gossip" algorithm that computes whether any device has ever experienced a certain [condition] before.
      */
-    fun <ID : Any> Aggregate<ID>.everHappened(
-        condition: () -> Boolean,
-        default: Boolean = false,
-    ): Boolean = share(default) {
-        condition() || it.fold(default) { a, b -> a || b }
-    }
+    fun <ID : Any> Aggregate<ID>.everHappened(condition: () -> Boolean): Boolean =
+        gossip(condition()) { a, b -> a || b }
 }

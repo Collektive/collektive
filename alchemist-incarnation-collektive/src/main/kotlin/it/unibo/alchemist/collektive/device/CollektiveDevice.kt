@@ -39,7 +39,10 @@ class CollektiveDevice<P>(
 
     private val validMessages: MutableList<TimedMessage> = mutableListOf()
 
-    private fun receiveMessage(time: Time, message: InboundMessage<Int>) {
+    private fun receiveMessage(
+        time: Time,
+        message: InboundMessage<Int>,
+    ) {
         validMessages += TimedMessage(time, message)
     }
 
@@ -66,10 +69,11 @@ class CollektiveDevice<P>(
         if (message.isNotEmpty()) {
             val neighboringNodes = environment.getNeighborhood(node)
             if (!neighboringNodes.isEmpty) {
-                val neighborhood = neighboringNodes.mapNotNull { node ->
-                    @Suppress("UNCHECKED_CAST")
-                    node.properties.firstOrNull { it is CollektiveDevice<*> } as? CollektiveDevice<P>
-                }
+                val neighborhood =
+                    neighboringNodes.mapNotNull { node ->
+                        @Suppress("UNCHECKED_CAST")
+                        node.properties.firstOrNull { it is CollektiveDevice<*> } as? CollektiveDevice<P>
+                    }
                 neighborhood.forEach { neighbor ->
                     neighbor.receiveMessage(
                         currentTime,
@@ -90,9 +94,15 @@ class CollektiveDevice<P>(
             null
         }
 
-    override fun <T> getOrDefault(name: String, default: T): T = getOrNull(name) ?: default
+    override fun <T> getOrDefault(
+        name: String,
+        default: T,
+    ): T = getOrNull(name) ?: default
 
     override fun isDefined(name: String): Boolean = node.contains(SimpleMolecule(name))
 
-    override fun <T> set(name: String, value: T): T = value.also { node.setConcentration(SimpleMolecule(name), it) }
+    override fun <T> set(
+        name: String,
+        value: T,
+    ): T = value.also { node.setConcentration(SimpleMolecule(name), it) }
 }

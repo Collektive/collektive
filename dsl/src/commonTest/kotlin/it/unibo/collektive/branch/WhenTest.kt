@@ -42,19 +42,20 @@ class WhenTest : StringSpec({
     "When with nested function" {
         val condition = true
         val x = if (condition) "hello" else 123
-        val result = aggregate(id0) {
-            fun test() {
-                neighboringViaExchange("test")
-            }
+        val result =
+            aggregate(id0) {
+                fun test() {
+                    neighboringViaExchange("test")
+                }
 
-            fun test2() {
-                neighboringViaExchange("test2")
+                fun test2() {
+                    neighboringViaExchange("test2")
+                }
+                when (x) {
+                    is String -> test2()
+                    else -> test()
+                }
             }
-            when (x) {
-                is String -> test2()
-                else -> test()
-            }
-        }
         val messageFor0 = result.toSend.messagesFor(id0)
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test2")
@@ -63,15 +64,17 @@ class WhenTest : StringSpec({
     "Nested when condition must be aligned" {
         val condition1 = false
         val condition2 = true
-        val result = aggregate(0) {
-            when {
-                condition1 -> neighboringViaExchange("test")
-                else -> when {
-                    condition2 -> neighboringViaExchange("test2")
-                    else -> neighboringViaExchange("test3")
+        val result =
+            aggregate(0) {
+                when {
+                    condition1 -> neighboringViaExchange("test")
+                    else ->
+                        when {
+                            condition2 -> neighboringViaExchange("test2")
+                            else -> neighboringViaExchange("test3")
+                        }
                 }
             }
-        }
         val messageFor0 = result.toSend.messagesFor(id0)
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test2")

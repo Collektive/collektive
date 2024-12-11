@@ -24,12 +24,12 @@ import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 class IterationUsingDelegatesWithoutAlignSpec : FreeSpec({
     fun expectedWarning(functionName: String): String =
         """
-            Function '$functionName', that accepts and uses an aggregate argument, has been called inside a loop construct 
-            without explicit alignment.
-            The same path may generate interactions more than once, leading to ambiguous alignment.
-            
-            Consider to wrap the function into the 'alignedOn' method with a unique element, either at the call site
-            or inside the '$functionName' function declaration, wrapping the involved aggregate calls.
+        Function '$functionName', that accepts and uses an aggregate argument, has been called inside a loop construct 
+        without explicit alignment.
+        The same path may generate interactions more than once, leading to ambiguous alignment.
+        
+        Consider to wrap the function into the 'alignedOn' method with a unique element, either at the call site
+        or inside the '$functionName' function declaration, wrapping the involved aggregate calls.
         """.trimIndent()
 
     "When iterating a function that takes an aggregate argument" - {
@@ -54,9 +54,10 @@ class IterationUsingDelegatesWithoutAlignSpec : FreeSpec({
                     val functionWithAggregateArgumentName = "delegate"
 
                     "should compile producing a warning" - {
-                        code shouldCompileWith warning(
-                            expectedWarning(functionWithAggregateArgumentName),
-                        )
+                        code shouldCompileWith
+                            warning(
+                                expectedWarning(functionWithAggregateArgumentName),
+                            )
                     }
                 }
 
@@ -97,9 +98,10 @@ class IterationUsingDelegatesWithoutAlignSpec : FreeSpec({
                         val functionWithAggregateArgumentName = "delegate"
 
                         "should compile producing a warning" - {
-                            code shouldCompileWith warning(
-                                expectedWarning(functionWithAggregateArgumentName),
-                            )
+                            code shouldCompileWith
+                                warning(
+                                    expectedWarning(functionWithAggregateArgumentName),
+                                )
                         }
                     }
 

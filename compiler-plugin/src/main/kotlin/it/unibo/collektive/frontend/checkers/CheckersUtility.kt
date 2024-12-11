@@ -134,15 +134,15 @@ object CheckersUtility {
      * Returns a predicate for a [FirElement] that is *true* when that element represents a function call that has the
      * provided [name].
      */
-    fun isFunctionCallsWithName(name: String): ((FirElement) -> Boolean) = {
-        it is FirFunctionCall && it.functionName() == name
-    }
+    fun isFunctionCallsWithName(name: String): ((FirElement) -> Boolean) =
+        {
+            it is FirFunctionCall && it.functionName() == name
+        }
 
     /**
      * Returns the name of the called function in a [FirFunctionCall] element.
      */
-    fun FirFunctionCall.functionName(): String =
-        calleeReference.name.asString()
+    fun FirFunctionCall.functionName(): String = calleeReference.name.asString()
 
     /**
      * Returns the fully qualified name of this [FirFunctionCall].

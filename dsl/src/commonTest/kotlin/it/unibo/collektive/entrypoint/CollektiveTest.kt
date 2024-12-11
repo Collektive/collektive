@@ -30,9 +30,10 @@ class CollektiveTest : StringSpec({
     "One Collektive device with cycle() as entrypoint should work fine" {
         val networkManager = NetworkManager()
         val network0 = NetworkImplTest(networkManager, id0)
-        val collectiveDevice = Collektive(id0, network0) {
-            exchange(initV1, increaseOrDouble).localValue
-        }
+        val collectiveDevice =
+            Collektive(id0, network0) {
+                exchange(initV1, increaseOrDouble).localValue
+            }
 
         val result = collectiveDevice.cycle()
         result shouldBe 2
@@ -41,9 +42,10 @@ class CollektiveTest : StringSpec({
     "One Collektive device with cycleWhile() as entrypoint should return the cycled result" {
         val networkManager = NetworkManager()
         val network0 = NetworkImplTest(networkManager, id0)
-        val collectiveDevice = Collektive(id0, network0) {
-            exchange(initV1, increaseOrDouble).localValue
-        }
+        val collectiveDevice =
+            Collektive(id0, network0) {
+                exchange(initV1, increaseOrDouble).localValue
+            }
 
         val result = collectiveDevice.cycleWhile { it.result < 10 }
         result shouldBe 14
@@ -97,12 +99,14 @@ class CollektiveTest : StringSpec({
         val networkManager = NetworkManager()
         val network0 = NetworkImplTest(networkManager, id0)
         val network1 = NetworkImplTest(networkManager, id1)
-        val collektiveDevice0 = Collektive(id0, network0) {
-            exchange(1, increaseOrDouble).localValue
-        }
-        val collektiveDevice1 = Collektive(id1, network1) {
-            exchange(2, increaseOrDouble).localValue
-        }
+        val collektiveDevice0 =
+            Collektive(id0, network0) {
+                exchange(1, increaseOrDouble).localValue
+            }
+        val collektiveDevice1 =
+            Collektive(id1, network1) {
+                exchange(2, increaseOrDouble).localValue
+            }
         // from its initial value 1, apply increaseOrDouble, then sends to device1
         collektiveDevice0.cycle() shouldBe 2
         // from its initial value 2, apply increaseOrDouble, then sends to device0

@@ -15,10 +15,10 @@ import java.io.FileNotFoundException
 class IterationWithoutAlignSpec : FreeSpec({
     fun expectedWarning(functionName: String): String =
         """
-            Aggregate function '$functionName' has been called inside a loop construct without explicit alignment.
-            The same path may generate interactions more than once, leading to ambiguous alignment.
-            
-            Consider to wrap the function into the 'alignedOn' method with a unique element.
+        Aggregate function '$functionName' has been called inside a loop construct without explicit alignment.
+        The same path may generate interactions more than once, leading to ambiguous alignment.
+        
+        Consider to wrap the function into the 'alignedOn' method with a unique element.
         """.trimIndent()
 
     "When iterating an Aggregate function" - {
@@ -42,9 +42,10 @@ class IterationWithoutAlignSpec : FreeSpec({
                     val code = getTestingProgram(case)
 
                     "should compile producing a warning" - {
-                        code shouldCompileWith warning(
-                            expectedWarning(functionName),
-                        )
+                        code shouldCompileWith
+                            warning(
+                                expectedWarning(functionName),
+                            )
                     }
                 }
 
@@ -62,9 +63,10 @@ class IterationWithoutAlignSpec : FreeSpec({
                     val code = getTestingProgram(case)
 
                     "should compile producing a warning" - {
-                        code shouldCompileWith warning(
-                            expectedWarning(functionName),
-                        )
+                        code shouldCompileWith
+                            warning(
+                                expectedWarning(functionName),
+                            )
                     }
                 }
 
@@ -90,7 +92,6 @@ class IterationWithoutAlignSpec : FreeSpec({
     }
 }) {
     companion object {
-
         fun getTextFromResource(
             case: String,
             iteration: String,

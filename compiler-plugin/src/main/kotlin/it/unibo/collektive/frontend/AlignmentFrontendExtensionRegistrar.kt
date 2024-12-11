@@ -7,7 +7,6 @@ import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrar
  * written using the Collektive DSL
  */
 class AlignmentFrontendExtensionRegistrar : FirExtensionRegistrar() {
-
     override fun ExtensionRegistrarContext.configurePlugin() {
         +::MissingAlignExtension
     }
