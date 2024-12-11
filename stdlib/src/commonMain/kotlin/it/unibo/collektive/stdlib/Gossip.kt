@@ -44,7 +44,12 @@ object SelfStabilizingGossip {
             val neighbors = gossip.neighbors.toSet()
             val result =
                 gossip.foldWithId(localGossip) { current, id, next ->
-                    val valid = next.path.asReversed().asSequence().drop(1).none { it == localId || it in neighbors }
+                    val valid =
+                        next.path
+                            .asReversed()
+                            .asSequence()
+                            .drop(1)
+                            .none { it == localId || it in neighbors }
                     val actualNext = if (valid) next else next.base(id)
                     val candidateValue = comparator.compare(current.best, actualNext.best)
                     when {
