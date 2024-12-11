@@ -60,11 +60,10 @@ class Collektive<ID : Any, R>(
             previousState: State = emptyMap(),
             inbound: Iterable<InboundMessage<ID>> = emptySet(),
             compute: Aggregate<ID>.() -> R,
-        ): AggregateResult<ID, R> {
-            return AggregateContext(localId, inbound, previousState).run {
+        ): AggregateResult<ID, R> =
+            AggregateContext(localId, inbound, previousState).run {
                 AggregateResult(localId, compute(), messagesToSend(), newState())
             }
-        }
 
         /**
          * Aggregate program entry point which computes an iteration of a device [localId],
@@ -76,12 +75,11 @@ class Collektive<ID : Any, R>(
             network: Network<ID>,
             previousState: State = emptyMap(),
             compute: Aggregate<ID>.() -> R,
-        ): AggregateResult<ID, R> {
-            return with(AggregateContext(localId, network.read(), previousState)) {
+        ): AggregateResult<ID, R> =
+            with(AggregateContext(localId, network.read(), previousState)) {
                 AggregateResult(localId, compute(), messagesToSend(), newState()).also {
                     network.write(it.toSend)
                 }
             }
-        }
     }
 }
