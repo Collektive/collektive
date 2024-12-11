@@ -20,11 +20,12 @@ object CompileUtils {
     ): JvmCompilationResult {
         val sourceFile = SourceFile.kotlin(fileName, program)
 
-        return KotlinCompilation().apply {
-            sources = listOf(sourceFile)
-            compilerPluginRegistrars = listOf(AlignmentComponentRegistrar())
-            inheritClassPath = true
-        }.compile()
+        return KotlinCompilation()
+            .apply {
+                sources = listOf(sourceFile)
+                compilerPluginRegistrars = listOf(AlignmentComponentRegistrar())
+                inheritClassPath = true
+            }.compile()
     }
 
     data class KotlinTestingProgram(
@@ -51,12 +52,11 @@ object CompileUtils {
         fun replace(
             template: String,
             properties: Map<String, String>,
-        ): String {
-            return template.replace(Regex("%\\(([^)]+)\\)")) { matchResult ->
+        ): String =
+            template.replace(Regex("%\\(([^)]+)\\)")) { matchResult ->
                 val key = matchResult.groupValues[1]
                 properties[key].orEmpty()
             }
-        }
     }
 
     fun String.asTestingProgram(fileName: String): KotlinTestingProgram = KotlinTestingProgram(fileName, this)

@@ -221,9 +221,8 @@ internal abstract class AbstractField<ID : Any, T>(
             else -> neighborValueOf(id)
         }
 
-    final override fun <B> mapWithId(transform: (ID, T) -> B): Field<ID, B> {
-        return SequenceBasedField(localId, transform(localId, localValue), mapOthersAsSequence(transform))
-    }
+    final override fun <B> mapWithId(transform: (ID, T) -> B): Field<ID, B> =
+        SequenceBasedField(localId, transform(localId, localValue), mapOthersAsSequence(transform))
 
     protected abstract fun neighborsMap(): Map<ID, T>
 

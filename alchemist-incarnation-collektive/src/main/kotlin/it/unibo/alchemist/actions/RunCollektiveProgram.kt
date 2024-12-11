@@ -98,15 +98,16 @@ class RunCollektiveProgram<P : Position<P>>(
             // Build the lambda function to be executed
             return { device: CollektiveDevice<P> ->
                 val parameters =
-                    method.parameters.map {
-                        when {
-                            it.type.isAssignableFrom(Aggregate::class.java) -> this
-                            it.type.isAssignableFrom(CollektiveDevice::class.java) -> device
-                            it.type.isAssignableFrom(Node::class.java) -> device.node
-                            device.node.hasPropertyCompatibleWith(it) -> device.node.getPropertyCompatibleWith(it)
-                            else -> error("Unsupported type ${it.type} in entrypoint ${ktFunction.name}")
-                        }
-                    }.toTypedArray()
+                    method.parameters
+                        .map {
+                            when {
+                                it.type.isAssignableFrom(Aggregate::class.java) -> this
+                                it.type.isAssignableFrom(CollektiveDevice::class.java) -> device
+                                it.type.isAssignableFrom(Node::class.java) -> device.node
+                                device.node.hasPropertyCompatibleWith(it) -> device.node.getPropertyCompatibleWith(it)
+                                else -> error("Unsupported type ${it.type} in entrypoint ${ktFunction.name}")
+                            }
+                        }.toTypedArray()
                 ktFunction.call(*parameters)
             }
         }

@@ -11,7 +11,11 @@ collektive {
 val generateFieldFunctionsForTypes by tasks.registering(CollektiveCodegenTask::class) {
     group = "code generation"
     description = "Generates Collektive field functions for primitive types"
-    outputDir = layout.buildDirectory.dir("generated/kotlin/collektive").get().asFile
+    outputDir =
+        layout.buildDirectory
+            .dir("generated/kotlin/collektive")
+            .get()
+            .asFile
 }
 
 // Avoid verification tasks to complain about being not dependent on the code generation tasks
