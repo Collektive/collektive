@@ -52,7 +52,8 @@ class AlignmentTransformer(
         data: StackFunctionCall,
     ): IrElement {
         val contextReference =
-            expression.receiverAndArgs()
+            expression
+                .receiverAndArgs()
                 .find { it.type.isAssignableFrom(aggregateContextClass.defaultType) }
                 ?: collectAggregateReference(aggregateContextClass, expression.symbol.owner)
 
@@ -113,8 +114,8 @@ class AlignmentTransformer(
         function: IrFunction,
         expressionBody: IrExpression,
         alignmentToken: IrBlockBodyBuilder.() -> IrConst<T>,
-    ): IrContainerExpression {
-        return irStatement(pluginContext, function, expressionBody) {
+    ): IrContainerExpression =
+        irStatement(pluginContext, function, expressionBody) {
             // Call the `alignRaw` function before the body of the function to align
             irBlock {
                 // Call the alignRaw function
@@ -142,5 +143,4 @@ class AlignmentTransformer(
                 +irGet(tmpVar)
             }
         }
-    }
 }

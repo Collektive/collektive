@@ -32,7 +32,8 @@ private class AggregateRefChildrenVisitor(
         data: Nothing?,
     ) {
         val aggregateContextRef =
-            expression.receiverAndArgs()
+            expression
+                .receiverAndArgs()
                 .find { it.type.isAssignableFrom(aggregateContextClass.defaultType) }
         aggregateContextRef?.let { elements.add(it) } ?: super.visitCall(expression, data)
     }

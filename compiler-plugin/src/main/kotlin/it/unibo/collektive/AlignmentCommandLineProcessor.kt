@@ -47,10 +47,8 @@ class AlignmentCommandLineProcessor : CommandLineProcessor {
         option: AbstractCliOption,
         value: String,
         configuration: CompilerConfiguration,
-    ) {
-        return when (option.optionName) {
-            OPTION_ENABLED -> configuration.put(ARG_ENABLED, value.toBoolean())
-            else -> throw IllegalArgumentException("Unexpected config option ${option.optionName}")
-        }
+    ) = when (option.optionName) {
+        OPTION_ENABLED -> configuration.put(ARG_ENABLED, value.toBoolean())
+        else -> throw IllegalArgumentException("Unexpected config option ${option.optionName}")
     }
 }
