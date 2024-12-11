@@ -41,12 +41,13 @@ class AlignmentIrGenerationExtension(private val logger: MessageCollector) : IrG
         }
 
         val projectFunction =
-            pluginContext.referenceFunctions(
-                CallableId(
-                    FqName("it.unibo.collektive.aggregate.api.impl"),
-                    Name.identifier(PROJECT_FUNCTION),
-                ),
-            ).firstOrNull() ?: return logger.error("Unable to find the 'project' function")
+            pluginContext
+                .referenceFunctions(
+                    CallableId(
+                        FqName("it.unibo.collektive.aggregate.api.impl"),
+                        Name.identifier(PROJECT_FUNCTION),
+                    ),
+                ).firstOrNull() ?: return logger.error("Unable to find the 'project' function")
 
         // Function that handles the alignment
         val alignRawFunction =

@@ -76,7 +76,8 @@ object CheckersUtility {
         predicate: (FirElement) -> Boolean,
     ): List<FirElement>? {
         val calleeName = (containingElements.last() as? FirFunctionCall)?.functionName()
-        return containingElements.takeIf { it.any(predicate) }
+        return containingElements
+            .takeIf { it.any(predicate) }
             ?.let { firElements ->
                 if (excludeDotCall) {
                     firElements.filterNot {
@@ -85,8 +86,7 @@ object CheckersUtility {
                 } else {
                     firElements
                 }
-            }
-            ?.dropLast(1)
+            }?.dropLast(1)
             ?.takeLastWhile { !predicate(it) }
     }
 
