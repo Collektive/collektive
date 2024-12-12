@@ -164,7 +164,8 @@ object CheckersUtility {
      * Returns a list of the arguments' types (in the form of [ConeKotlinType]) of the related function.
      */
     fun FirFunctionCall.getArgumentsTypes(): List<ConeKotlinType>? =
-        calleeReference.toResolvedNamedFunctionSymbol()
+        calleeReference
+            .toResolvedNamedFunctionSymbol()
             ?.valueParameterSymbols
             ?.map { parameter ->
                 parameter.resolvedReturnTypeRef.coneType
