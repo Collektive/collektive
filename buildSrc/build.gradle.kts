@@ -9,7 +9,7 @@ repositories {
 }
 
 multiJvm {
-    jvmVersionForCompilation = latestJavaSupportedByGradle
+    jvmVersionForCompilation = 8
 }
 
 with(extensions.getByType<VersionCatalogsExtension>().named("libs")) {
