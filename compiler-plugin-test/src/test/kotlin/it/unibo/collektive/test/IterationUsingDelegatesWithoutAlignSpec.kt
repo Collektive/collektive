@@ -8,17 +8,19 @@
 
 package it.unibo.collektive.test
 
+import io.github.subjekt.Subjekt.subjekt
+import io.github.subjekt.generators.FilesGenerator.toTempFiles
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.data.forAll
-import it.unibo.collektive.test.IterationWithoutAlignSpec.Companion.getTextFromResource
-import it.unibo.collektive.test.util.CompileUtils
 import it.unibo.collektive.test.util.CompileUtils.KotlinTestingProgram
 import it.unibo.collektive.test.util.CompileUtils.asTestingProgram
 import it.unibo.collektive.test.util.CompileUtils.formsOfIteration
 import it.unibo.collektive.test.util.CompileUtils.noWarning
+import it.unibo.collektive.test.util.CompileUtils.pascalCase
 import it.unibo.collektive.test.util.CompileUtils.testedAggregateFunctions
 import it.unibo.collektive.test.util.CompileUtils.warning
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
+import java.io.FileNotFoundException
 
 @OptIn(ExperimentalCompilerApi::class)
 class IterationUsingDelegatesWithoutAlignSpec : FreeSpec({
@@ -33,20 +35,25 @@ class IterationUsingDelegatesWithoutAlignSpec : FreeSpec({
         """.trimIndent()
 
     "When iterating a function that takes an aggregate argument" - {
+        val testSubjects =
+            subjekt {
+                addSource("src/test/resources/subjekt/IterationWithAggregate.yaml")
+            }.toTempFiles()
+
         forAll(testedAggregateFunctions) { functionCall ->
             val functionName = functionCall.substringBefore("(")
             forAll(formsOfIteration) { iteration, iterationDescription ->
                 /**
-                 * Gets the text of a testing resource, given its [caseName], and converts it to a
-                 * [CompileUtils.KotlinTestingProgram].
+                 * Gets the text from a map of files, given its [caseName], and converts it to a
+                 * [KotlinTestingProgram].
                  */
                 fun getTestingProgram(caseName: String): KotlinTestingProgram =
-                    getTextFromResource(
-                        case = caseName,
-                        iteration = iteration,
-                        aggregateFunction = functionName,
-                        subdirectory = "delegates/",
-                    ).asTestingProgram("$functionName-${caseName}_$iteration.kt")
+                    testSubjects[pascalCase(caseName, functionName, iteration)]
+                        ?.readText()
+                        ?.asTestingProgram("$functionName-${caseName}_$iteration.kt")
+                        ?: throw FileNotFoundException(
+                            "Program not found: ${pascalCase(caseName, functionName, iteration)}",
+                        )
 
                 "inside $iterationDescription and using a function that takes an Aggregate argument" - {
                     val case = "IterationDelegate"

@@ -61,6 +61,8 @@ object CompileUtils {
 
     fun String.asTestingProgram(fileName: String): KotlinTestingProgram = KotlinTestingProgram(fileName, this)
 
+    fun pascalCase(vararg words: String): String = words.joinToString("") { it.replaceFirstChar(Char::titlecase) }
+
     val testedAggregateFunctions =
         table(
             headers("functionCall"),

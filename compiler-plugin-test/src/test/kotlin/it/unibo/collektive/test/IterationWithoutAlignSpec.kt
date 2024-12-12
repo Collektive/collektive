@@ -1,19 +1,18 @@
 package it.unibo.collektive.test
 
 import io.github.subjekt.Subjekt.subjekt
-import io.github.subjekt.generators.FilesGenerator.toFiles
+import io.github.subjekt.generators.FilesGenerator.toTempFiles
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.data.forAll
 import it.unibo.collektive.test.util.CompileUtils
 import it.unibo.collektive.test.util.CompileUtils.asTestingProgram
 import it.unibo.collektive.test.util.CompileUtils.formsOfIteration
 import it.unibo.collektive.test.util.CompileUtils.noWarning
+import it.unibo.collektive.test.util.CompileUtils.pascalCase
 import it.unibo.collektive.test.util.CompileUtils.testedAggregateFunctions
 import it.unibo.collektive.test.util.CompileUtils.warning
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import java.io.FileNotFoundException
-import io.kotest.core.spec.style.AnnotationSpec
-import org.junit.jupiter.api.BeforeAll
 
 @OptIn(ExperimentalCompilerApi::class)
 class IterationWithoutAlignSpec : FreeSpec({
@@ -25,27 +24,26 @@ class IterationWithoutAlignSpec : FreeSpec({
         Consider to wrap the function into the 'alignedOn' method with a unique element.
         """.trimIndent()
 
-    beforeSpec {
-        subjekt {
-            addSource("src/test/resources/subjekt/IterationWithAggregate.yaml")
-        }.toFiles("./toDelete", "kt")
-    }
-
     "When iterating an Aggregate function" - {
+        val testSubjects =
+            subjekt {
+                addSource("src/test/resources/subjekt/IterationWithAggregate.yaml")
+            }.toTempFiles()
+
         forAll(testedAggregateFunctions) { functionCall ->
             val functionName = functionCall.substringBefore("(")
             forAll(formsOfIteration) { iteration, iterationDescription ->
                 /**
-                 * Gets the text of a testing resource, given its [caseName], and converts it to a
+                 * Gets the text from a map of files, given its [caseName], and converts it to a
                  * [CompileUtils.KotlinTestingProgram].
                  */
                 fun getTestingProgram(caseName: String): CompileUtils.KotlinTestingProgram =
-                    getTextFromResource(
-                        case = caseName,
-                        iteration = iteration,
-                        aggregateFunction = functionName,
-                        subdirectory = "simpleIterations/",
-                    ).asTestingProgram("$functionName-${caseName}_$iteration.kt")
+                    testSubjects[pascalCase(caseName, functionName, iteration)]
+                        ?.readText()
+                        ?.asTestingProgram("$functionName-${caseName}_$iteration.kt")
+                        ?: throw FileNotFoundException(
+                            "Program not found: ${pascalCase(caseName, functionName, iteration)}",
+                        )
 
                 "inside $iterationDescription and using $functionName without a specific alignedOn" - {
                     val case = "Iteration"
@@ -100,24 +98,4 @@ class IterationWithoutAlignSpec : FreeSpec({
             }
         }
     }
-}) {
-    companion object {
-        fun getTextFromResource(
-            case: String,
-            iteration: String,
-            aggregateFunction: String,
-            subdirectory: String = "",
-        ): String =
-            IterationWithoutAlignSpec::class.java
-                .getResource(
-                    "/kotlin/" +
-                        subdirectory +
-                        case.replaceFirstChar(Char::titlecase) +
-                        aggregateFunction.replaceFirstChar(Char::titlecase) +
-                        "${iteration.replaceFirstChar(Char::titlecase)}.kt",
-                )?.readText()
-                ?: throw FileNotFoundException(
-                    "File not found for: case=$case, iteration=$iteration, aggregateFunction=$aggregateFunction",
-                )
-    }
-}
+})
