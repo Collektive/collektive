@@ -78,14 +78,8 @@ jobs:
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
           maven-central-username: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
-          signing-key: ${{ secrets.SIGNING_KEY }}
-          signing-password: ${{ secrets.SIGNING_PASSWORD }}
-      - name: Upload staging repository file
-        uses: actions/upload-artifact@v4
-        if: ${{ runner.os == 'macOS' && needs.check-secrets.outputs.run-with-secrets == 'true' }}
-        with:
-          name: staging-repo-ids
-          path: build/staging-repo-ids.properties
+          signing-key: ${{ secrets.GPG_PRIVATEKEY }}
+          signing-password: ${{ secrets.GPG_PASSPHRASE }}
 
   build-website:
     runs-on: ubuntu-24.04
