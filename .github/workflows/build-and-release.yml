@@ -154,9 +154,6 @@ jobs:
           check-command: true
           deploy-command: |
             ./gradlew -PstagingRepositoryId=${{ needs.staging-repo.outputs.maven-central-repo-id }} close --parallel
-            if [[ "${{ needs.staging-repo.outputs.will-release }}" == "false" ]]; then
-              ./gradlew -PstagingRepositoryId=${{ needs.staging-repo.outputs.maven-central-repo-id }} drop
-            fi
 
   release:
     concurrency:
