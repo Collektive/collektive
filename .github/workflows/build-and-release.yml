@@ -4,10 +4,6 @@ on:
   workflow_call:
   workflow_dispatch:
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
-  cancel-in-progress: ${{ !contains(github.ref, 'master') }}
-
 jobs:
   check-secrets:
     runs-on: ubuntu-24.04
@@ -107,9 +103,6 @@ jobs:
           path: website.tar
 
   release:
-    concurrency:
-      group: release-${{ github.workflow }}-${{ github.event.number || github.ref }}
-      cancel-in-progress: false
     needs:
       - check-secrets
       - precompute-next-version
