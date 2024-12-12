@@ -1,5 +1,7 @@
 package it.unibo.collektive.test
 
+import io.github.subjekt.Subjekt.subjekt
+import io.github.subjekt.generators.FilesGenerator.toFiles
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.data.forAll
 import it.unibo.collektive.test.util.CompileUtils
@@ -10,6 +12,8 @@ import it.unibo.collektive.test.util.CompileUtils.testedAggregateFunctions
 import it.unibo.collektive.test.util.CompileUtils.warning
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import java.io.FileNotFoundException
+import io.kotest.core.spec.style.AnnotationSpec
+import org.junit.jupiter.api.BeforeAll
 
 @OptIn(ExperimentalCompilerApi::class)
 class IterationWithoutAlignSpec : FreeSpec({
@@ -20,6 +24,12 @@ class IterationWithoutAlignSpec : FreeSpec({
         
         Consider to wrap the function into the 'alignedOn' method with a unique element.
         """.trimIndent()
+
+    beforeSpec {
+        subjekt {
+            addSource("src/test/resources/subjekt/IterationWithAggregate.yaml")
+        }.toFiles("./toDelete", "kt")
+    }
 
     "When iterating an Aggregate function" - {
         forAll(testedAggregateFunctions) { functionCall ->
