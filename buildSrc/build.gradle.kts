@@ -8,10 +8,6 @@ repositories {
     mavenCentral()
 }
 
-multiJvm {
-    jvmVersionForCompilation = 8
-}
-
 with(extensions.getByType<VersionCatalogsExtension>().named("libs")) {
     dependencies {
         implementation(kotlin("reflect"))
