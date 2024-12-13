@@ -192,6 +192,7 @@ jobs:
       - check-secrets
       - release
       - build
+      - build-website
     if: >-
       ${{
         always() && (
