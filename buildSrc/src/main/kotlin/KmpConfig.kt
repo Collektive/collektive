@@ -19,8 +19,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val Provider<PluginDependency>.id: String get() = get().pluginId
 
-val os: OperatingSystem = OperatingSystem.current()
-
 inline fun <reified ProjectType : KotlinProjectExtension> Project.kotlin(configuration: ProjectType.() -> Unit) =
     extensions.getByType<ProjectType>().configuration()
 
@@ -80,33 +78,6 @@ fun Project.configureKotlinMultiplatform() {
             compilerOptions {
                 allWarningsAsErrors = true
                 jvmTarget = JvmTarget.JVM_1_8
-            }
-        }
-
-        // Disable cross compilation
-        val excludeTargets = when {
-            os.isLinux -> kotlin.targets.filterNot { "linux" in it.name }
-            os.isWindows -> kotlin.targets.filterNot { "mingw" in it.name }
-            os.isMacOsX -> kotlin.targets.filter { "linux" in it.name || "mingw" in it.name }
-            else -> emptyList()
-        }.mapNotNull { it as? KotlinNativeTarget }
-        configure(excludeTargets) {
-            compilations.configureEach {
-                cinterops.configureEach { tasks[interopProcessingTaskName].enabled = false }
-                compileTaskProvider.get().enabled = false
-                tasks[processResourcesTaskName].enabled = false
-            }
-            binaries.configureEach {
-                linkTaskProvider.configure {
-                    enabled = false
-                }
-            }
-
-            mavenPublication {
-                tasks.withType<AbstractPublishToMaven>()
-                    .configureEach { onlyIf { publication != this@mavenPublication } }
-                tasks.withType<GenerateModuleMetadata>()
-                    .configureEach { onlyIf { publication.get() != this@mavenPublication } }
             }
         }
     }
