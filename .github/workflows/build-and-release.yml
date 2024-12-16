@@ -57,8 +57,9 @@ jobs:
           deploy-command: |
             NEXT_VERSION="${{ needs.precompute-next-version.outputs.next-version }}"
             OVERRIDE_VERSION=$([[ "$NEXT_VERSION" != "" ]] && echo "-PforceVersion=$(echo $NEXT_VERSION)" || echo "")
-            ./gradlew $OVERRIDE_VERSION uploadAll close --parallel
+            ./gradlew $OVERRIDE_VERSION uploadAll :compiler-plugin:uploadKotlinOSSRHToMavenCentralNexus :gradle-plugin:uploadKotlinOSSRHToMavenCentralNexus close --parallel
           should-run-codecov: ${{ runner.os == 'Linux' }}
+          codecov-directory: build/reports/kover
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
           maven-central-username: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
@@ -75,8 +76,10 @@ jobs:
     runs-on: ubuntu-24.04
     needs:
       - build
+      - check-secrets
     outputs:
       staging-repo-id: ${{ steps.set-staging-repo-id.outputs.MavenCentral }}
+    if: ${{ needs.check-secrets.outputs.run-with-secrets == 'true' }}
     steps:
       - name: Restore staging repository ID
         uses: actions/download-artifact@v4
