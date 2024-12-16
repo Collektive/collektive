@@ -53,6 +53,8 @@ jobs:
       - uses: DanySK/build-check-deploy-gradle-action@3.5.25
         id: staging-repo
         with:
+          check-command: |
+            ./gradlew check koverXmlReport :compiler-plugin:check :gradle-plugin:check --parallel
           should-deploy: ${{ runner.os == 'macOS' && needs.check-secrets.outputs.run-with-secrets == 'true' }} # Deploy from macOS since it supports all the platforms
           deploy-command: |
             NEXT_VERSION="${{ needs.precompute-next-version.outputs.next-version }}"
