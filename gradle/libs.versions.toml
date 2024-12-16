@@ -2,7 +2,7 @@
 alchemist = "36.0.6"
 build-config = "5.5.1"
 coroutines = "1.9.0"
-dokka = "1.9.20"
+dokka = "2.0.0"
 kotest = "6.0.0.M1"
 kotlin = "2.0.21"
 
