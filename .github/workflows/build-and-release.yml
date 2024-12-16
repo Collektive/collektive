@@ -76,8 +76,10 @@ jobs:
     runs-on: ubuntu-24.04
     needs:
       - build
+      - check-secrets
     outputs:
       staging-repo-id: ${{ steps.set-staging-repo-id.outputs.MavenCentral }}
+    if: ${{ needs.check-secrets.outputs.run-with-secrets == 'true' }}
     steps:
       - name: Restore staging repository ID
         uses: actions/download-artifact@v4
