@@ -10,4 +10,8 @@ sidebar_position: 0
 2. [Introduction](/docs/category/introduction/)
     - [Aggregate Programming](../introduction/aggregate-programming/)
     - [What is Collektive](../introduction/what-is-collektive/)
-   
+
+3. [Tutorial](/docs/category/tutorial/)
+    - [Basic Usage](../tutorials/basic-usage/)
+    - [Functions and Features](../tutorials/functions-and-features/)
+    - [Simple Aggregate Behavior](../tutorials/simple-aggregate-behavior/)
