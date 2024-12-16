@@ -57,7 +57,7 @@ jobs:
           deploy-command: |
             NEXT_VERSION="${{ needs.precompute-next-version.outputs.next-version }}"
             OVERRIDE_VERSION=$([[ "$NEXT_VERSION" != "" ]] && echo "-PforceVersion=$(echo $NEXT_VERSION)" || echo "")
-            ./gradlew $OVERRIDE_VERSION uploadAll close --parallel
+            ./gradlew $OVERRIDE_VERSION uploadAll :compiler-plugin:uploadKotlinOSSRHToMavenCentralNexus :gradle-plugin:uploadKotlinOSSRHToMavenCentralNexus close --parallel
           should-run-codecov: ${{ runner.os == 'Linux' }}
           codecov-directory: build/reports/kover
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
