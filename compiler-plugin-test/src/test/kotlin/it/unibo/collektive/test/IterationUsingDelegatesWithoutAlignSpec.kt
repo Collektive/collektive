@@ -37,7 +37,7 @@ class IterationUsingDelegatesWithoutAlignSpec : FreeSpec({
     "When iterating a function that takes an aggregate argument" - {
         val testSubjects =
             subjekt {
-                addSource("src/test/resources/subjekt/IterationWithAggregate.yaml")
+                addSource("src/test/resources/subjekt/IterationWithDelegatedAggregate.yaml")
             }.toTempFiles()
 
         forAll(testedAggregateFunctions) { functionCall ->
