@@ -4,7 +4,7 @@ import io.github.subjekt.Subjekt.subjekt
 import io.github.subjekt.generators.FilesGenerator.toTempFiles
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.data.forAll
-import it.unibo.collektive.test.util.CompileUtils
+import it.unibo.collektive.test.util.CompileUtils.KotlinTestingProgram
 import it.unibo.collektive.test.util.CompileUtils.asTestingProgram
 import it.unibo.collektive.test.util.CompileUtils.formsOfIteration
 import it.unibo.collektive.test.util.CompileUtils.noWarning
@@ -35,15 +35,17 @@ class IterationWithoutAlignSpec : FreeSpec({
             forAll(formsOfIteration) { iteration, iterationDescription ->
                 /**
                  * Gets the text from a map of files, given its [caseName], and converts it to a
-                 * [CompileUtils.KotlinTestingProgram].
+                 * [KotlinTestingProgram].
                  */
-                fun getTestingProgram(caseName: String): CompileUtils.KotlinTestingProgram =
-                    testSubjects[pascalCase(caseName, functionName, iteration)]
+                fun getTestingProgram(caseName: String): KotlinTestingProgram {
+                    val subject = pascalCase(caseName, functionName, iteration)
+                    return testSubjects[subject]
                         ?.readText()
                         ?.asTestingProgram("$functionName-${caseName}_$iteration.kt")
                         ?: throw FileNotFoundException(
-                            "Program not found: ${pascalCase(caseName, functionName, iteration)}",
+                            "Program not found: $subject",
                         )
+                }
 
                 "inside $iterationDescription and using $functionName without a specific alignedOn" - {
                     val case = "Iteration"

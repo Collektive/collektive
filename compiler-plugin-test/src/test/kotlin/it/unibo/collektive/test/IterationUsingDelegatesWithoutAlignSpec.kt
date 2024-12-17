@@ -47,13 +47,15 @@ class IterationUsingDelegatesWithoutAlignSpec : FreeSpec({
                  * Gets the text from a map of files, given its [caseName], and converts it to a
                  * [KotlinTestingProgram].
                  */
-                fun getTestingProgram(caseName: String): KotlinTestingProgram =
-                    testSubjects[pascalCase(caseName, functionName, iteration)]
+                fun getTestingProgram(caseName: String): KotlinTestingProgram {
+                    val subject = pascalCase(caseName, functionName, iteration)
+                    return testSubjects[subject]
                         ?.readText()
                         ?.asTestingProgram("$functionName-${caseName}_$iteration.kt")
                         ?: throw FileNotFoundException(
-                            "Program not found: ${pascalCase(caseName, functionName, iteration)}",
+                            "Program not found: $subject",
                         )
+                }
 
                 "inside $iterationDescription and using a function that takes an Aggregate argument" - {
                     val case = "IterationDelegate"
@@ -134,39 +136,39 @@ class IterationUsingDelegatesWithoutAlignSpec : FreeSpec({
                         }
                     }
 
-// CURRENTLY NOT CAPTURED
-//                "inside $iterationDescription and using a function that takes an Aggregate argument, " +
-//                        "using it inside a called nested function" - {
-//                    val case = "IterationDelegatedNestedFun"
-//                    val code = getTestingProgram(case)
-//                    val functionWithAggregateArgumentName = "delegate"
-//
-//                    "should compile producing a warning" - {
-//                        code shouldCompileWith warning(
-//                            expectedWarning(functionWithAggregateArgumentName),
-//                        )
-//                    }
-//                }
-//
-//                "inside $iterationDescription and using a function that takes an Aggregate argument, " +
-//                        "using it inside a nested function, called by wrapping it with a specific alignedOn" - {
-//                    val case = "IterationAlignDelegatedNestedFun"
-//                    val code = getTestingProgram(case)
-//
-//                    "should compile producing a warning" - {
-//                        code shouldCompileWith noWarning
-//                    }
-//                }
-//
-//                "inside $iterationDescription and using a function that takes an Aggregate argument, " +
-//                        "using it with a specific alignedOn, inside a called nested function" - {
-//                    val case = "IterationDelegatedNestedFunAlign"
-//                    val code = getTestingProgram(case)
-//
-//                    "should compile producing a warning" - {
-//                        code shouldCompileWith noWarning
-//                    }
-//                }
+                "inside $iterationDescription and using a function that takes an Aggregate argument, " +
+                    "using it inside a called nested function" - {
+                        val case = "IterationDelegatedNestedFun"
+                        val code = getTestingProgram(case)
+                        val functionWithAggregateArgumentName = "delegate"
+
+                        "should compile producing a warning".config(enabled = false) - {
+                            code shouldCompileWith
+                                warning(
+                                    expectedWarning(functionWithAggregateArgumentName),
+                                )
+                        }
+                    }
+
+                "inside $iterationDescription and using a function that takes an Aggregate argument, " +
+                    "using it inside a nested function, called by wrapping it with a specific alignedOn" - {
+                        val case = "IterationAlignDelegatedNestedFun"
+                        val code = getTestingProgram(case)
+
+                        "should compile producing a warning".config(enabled = false) - {
+                            code shouldCompileWith noWarning
+                        }
+                    }
+
+                "inside $iterationDescription and using a function that takes an Aggregate argument, " +
+                    "using it with a specific alignedOn, inside a called nested function" - {
+                        val case = "IterationDelegatedNestedFunAlign"
+                        val code = getTestingProgram(case)
+
+                        "should compile producing a warning".config(enabled = false) - {
+                            code shouldCompileWith noWarning
+                        }
+                    }
             }
         }
     }
