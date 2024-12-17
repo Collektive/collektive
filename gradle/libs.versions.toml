@@ -1,8 +1,8 @@
 [versions]
-alchemist = "36.0.6"
+alchemist = "36.0.7"
 build-config = "5.5.1"
 coroutines = "1.9.0"
-dokka = "1.9.20"
+dokka = "2.0.0"
 kotest = "6.0.0.M1"
 kotlin = "2.0.21"
 
@@ -58,6 +58,6 @@ kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref 
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.78.0"
 kover = "org.jetbrains.kotlinx.kover:0.8.3"
-multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:3.0.0"
-publishOnCentral = "org.danilopianini.publish-on-central:7.0.0"
+multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:3.0.1"
+publishOnCentral = "org.danilopianini.publish-on-central:7.0.1"
 taskTree = "com.dorongold.task-tree:4.0.0"
