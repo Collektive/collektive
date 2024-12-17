@@ -81,7 +81,7 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
             .filter { method ->
                 method.parameters.any { parameter ->
                     parameter.parameterizedType.typeName.startsWith("kotlin.jvm.functions.Function") ||
-                            parameter.parameterizedType is Function<*>
+                        parameter.parameterizedType is Function<*>
                 }
             }.map { it.name }
             .toSet()
@@ -122,16 +122,18 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
     ) {
         val calleeName = expression.functionName()
         if (expression.fqName() in safeOperators) return
-        val error = when {
-            expression.isAggregate(context.session) && context.isIteratedWithoutAlignedOn() ->
-                FirCollektiveErrors.AGGREGATE_FUNCTION_INSIDE_ITERATION
+        val error =
+            when {
+                expression.isAggregate(context.session) && context.isIteratedWithoutAlignedOn() ->
+                    FirCollektiveErrors.AGGREGATE_FUNCTION_INSIDE_ITERATION
 
-            expression.hasAggregateArgument() && context.isIteratedWithoutAlignedOn()
-                    && isInvalidFunWithAggregateParameter(expression, context) ->
-                FirCollektiveErrors.FUNCTION_WITH_AGGREGATE_PARAMETER_INSIDE_ITERATION
+                expression.hasAggregateArgument() &&
+                    context.isIteratedWithoutAlignedOn() &&
+                    isInvalidFunWithAggregateParameter(expression, context) ->
+                    FirCollektiveErrors.FUNCTION_WITH_AGGREGATE_PARAMETER_INSIDE_ITERATION
 
-            else -> null
-        }
+                else -> null
+            }
         error?.let {
             reporter.reportOn(
                 expression.calleeReference.source,
