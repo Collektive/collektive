@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.fir.types.classId
 import org.jetbrains.kotlin.fir.types.coneType
 import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.name.FqName
 
 /**
  * Collection of utilities for FIR checkers.
@@ -172,11 +173,17 @@ object CheckersUtility {
             }
 
     /**
+     * Converts a string representing a fully-qualified name (e.g. `it.unibo.collektive.aggregate.api.Aggregate`)
+     * into a [FqName] object.
+     */
+    fun String.toFqNameUnsafe(): FqName = FqName(this)
+
+    /**
      * Checks whether if the called function accepts at least on argument of type
      * [it.unibo.collektive.aggregate.api.Aggregate].
      */
     fun FirFunctionCall.hasAggregateArgument(): Boolean =
         getArgumentsTypes()?.any {
-            it.classId == ClassId.fromString(AGGREGATE_CLASS_FQ_NAME.replace(".", "/"))
+            it.classId == ClassId.topLevel(AGGREGATE_CLASS_FQ_NAME.toFqNameUnsafe())
         } == true
 }
