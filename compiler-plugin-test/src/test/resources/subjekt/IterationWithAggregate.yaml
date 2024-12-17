@@ -11,8 +11,8 @@ import:
   "src/test/resources/subjekt/Macros.yaml"
 
 parameters:
-  - name: AGGREGATE
-    value: neighboring(0)
+  name: AGGREGATE
+  value: neighboring(0)
 
 # SUBJECTS
 subjects:

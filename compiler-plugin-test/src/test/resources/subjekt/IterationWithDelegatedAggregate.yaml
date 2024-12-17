@@ -10,8 +10,8 @@ import:
   "src/test/resources/subjekt/Macros.yaml"
 
 parameters:
-  - name: "AGGREGATE"
-    value: neighboring(0)
+  name: "AGGREGATE"
+  value: neighboring(0)
 
 subjects:
   - name: IterationAlignDelegate${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
