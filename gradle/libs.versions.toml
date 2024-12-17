@@ -28,7 +28,7 @@ kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", v
 kotlinpoet = "com.squareup:kotlinpoet:2.0.0"
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 slf4j = "org.slf4j:slf4j-api:2.0.16"
-subjekt = "io.github.freshmag:subjekt-api:1.1.3"
+subjekt = "io.github.freshmag:subjekt-api:1.1.4"
 
 [bundles]
 kotlin-compiler = [
