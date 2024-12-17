@@ -8,13 +8,13 @@ Collektive is an open-source library designed to simplify the development of res
 
 ---
 
-## What is the purpose of Collektive?
+## What is the Purpose of Collektive?
 
 The primary purpose of Collektive is to provide developers with a robust framework to design and implement self-organizing collective behaviors in dynamic and distributed environments. It abstracts away the complexities of low-level device interactions and communication, allowing users to focus on high-level coordination logic.
 
 ---
 
-## What problems does Collektive solve?
+## What Problems does Collektive solve?
 
 ### Complex Coordination
 
@@ -30,7 +30,7 @@ Collektive provides mechanisms to maintain system stability and adapt to changes
 
 ---
 
-## What are the advantages of using Collektive?
+## What are the Advantages of Using Collektive?
 
 ### High-Level Abstraction
 
