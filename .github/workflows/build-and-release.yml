@@ -114,7 +114,7 @@ jobs:
       - name: Tar files
         run: tar -cvf website.tar site/build
       - name: Upload website
-        uses: actions/upload-artifact@v4.4.3
+        uses: actions/upload-artifact@v4.5.0
         with:
           name: website-${{ github.sha }}
           path: website.tar
