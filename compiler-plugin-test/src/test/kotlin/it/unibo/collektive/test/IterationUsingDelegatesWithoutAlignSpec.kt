@@ -13,14 +13,13 @@ import io.github.subjekt.generators.FilesGenerator.toTempFiles
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.data.forAll
 import it.unibo.collektive.test.util.CompileUtils.KotlinTestingProgram
-import it.unibo.collektive.test.util.CompileUtils.asTestingProgram
 import it.unibo.collektive.test.util.CompileUtils.formsOfIteration
+import it.unibo.collektive.test.util.CompileUtils.getTestingProgram
 import it.unibo.collektive.test.util.CompileUtils.noWarning
 import it.unibo.collektive.test.util.CompileUtils.pascalCase
 import it.unibo.collektive.test.util.CompileUtils.testedAggregateFunctions
 import it.unibo.collektive.test.util.CompileUtils.warning
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
-import java.io.FileNotFoundException
 
 @OptIn(ExperimentalCompilerApi::class)
 class IterationUsingDelegatesWithoutAlignSpec : FreeSpec({
@@ -44,22 +43,14 @@ class IterationUsingDelegatesWithoutAlignSpec : FreeSpec({
             val functionName = functionCall.substringBefore("(")
             forAll(formsOfIteration) { iteration, iterationDescription ->
                 /**
-                 * Gets the text from a map of files, given its [caseName], and converts it to a
-                 * [KotlinTestingProgram].
+                 * Gets the [KotlinTestingProgram] corresponding to a specific [case].
                  */
-                fun getTestingProgram(caseName: String): KotlinTestingProgram {
-                    val subject = pascalCase(caseName, functionName, iteration)
-                    return testSubjects[subject]
-                        ?.readText()
-                        ?.asTestingProgram("$functionName-${caseName}_$iteration.kt")
-                        ?: throw FileNotFoundException(
-                            "Program not found: $subject",
-                        )
-                }
+                fun getProgramFromCase(case: String): KotlinTestingProgram =
+                    testSubjects.getTestingProgram(pascalCase(case, functionName, iteration))
 
                 "inside $iterationDescription and using a function that takes an Aggregate argument" - {
                     val case = "IterationDelegate"
-                    val code = getTestingProgram(case)
+                    val code = getProgramFromCase(case)
                     val functionWithAggregateArgumentName = "delegate"
 
                     "should compile producing a warning" - {
@@ -73,7 +64,7 @@ class IterationUsingDelegatesWithoutAlignSpec : FreeSpec({
                 "inside $iterationDescription and using a function that takes an Aggregate argument " +
                     "wrapped in a specific alignedOn" - {
                         val case = "IterationAlignDelegate"
-                        val code = getTestingProgram(case)
+                        val code = getProgramFromCase(case)
 
                         "should compile without any warning" - {
                             code shouldCompileWith noWarning
@@ -83,7 +74,7 @@ class IterationUsingDelegatesWithoutAlignSpec : FreeSpec({
                 "inside $iterationDescription and using a function that takes an Aggregate argument " +
                     "with a specific alignedOn inside the called function" - {
                         val case = "IterationDelegateAlign"
-                        val code = getTestingProgram(case)
+                        val code = getProgramFromCase(case)
 
                         "should compile without any warning" - {
                             code shouldCompileWith noWarning
@@ -93,7 +84,7 @@ class IterationUsingDelegatesWithoutAlignSpec : FreeSpec({
                 "inside $iterationDescription and using a function that takes an Aggregate argument " +
                     "but with aggregate calls within a nested function" - {
                         val case = "IterationDelegateWithNestedFun"
-                        val code = getTestingProgram(case)
+                        val code = getProgramFromCase(case)
 
                         "should compile without any warning" - {
                             code shouldCompileWith noWarning
@@ -103,7 +94,7 @@ class IterationUsingDelegatesWithoutAlignSpec : FreeSpec({
                 "inside $iterationDescription and using a function that takes an Aggregate argument " +
                     "that recursively calls another function with an Aggregate argument" - {
                         val case = "IterationRecursiveDelegate"
-                        val code = getTestingProgram(case)
+                        val code = getProgramFromCase(case)
                         val functionWithAggregateArgumentName = "delegate"
 
                         "should compile producing a warning" - {
@@ -118,7 +109,7 @@ class IterationUsingDelegatesWithoutAlignSpec : FreeSpec({
                     "that recursively calls another function 'delegate2' with an Aggregate argument" +
                     "wrapped inside a specific alignedOn inside the 'delegate' body" - {
                         val case = "IterationAlignRecursiveDelegate"
-                        val code = getTestingProgram(case)
+                        val code = getProgramFromCase(case)
 
                         "should compile producing a warning" - {
                             code shouldCompileWith noWarning
@@ -129,7 +120,7 @@ class IterationUsingDelegatesWithoutAlignSpec : FreeSpec({
                     "that recursively calls another function 'delegate2' with an Aggregate argument" +
                     "wrapped inside a specific alignedOn inside the 'delegate2' body" - {
                         val case = "IterationRecursiveDelegateAlign"
-                        val code = getTestingProgram(case)
+                        val code = getProgramFromCase(case)
 
                         "should compile producing a warning" - {
                             code shouldCompileWith noWarning
@@ -139,7 +130,7 @@ class IterationUsingDelegatesWithoutAlignSpec : FreeSpec({
                 "inside $iterationDescription and using a function that takes an Aggregate argument, " +
                     "using it inside a called nested function" - {
                         val case = "IterationDelegatedNestedFun"
-                        val code = getTestingProgram(case)
+                        val code = getProgramFromCase(case)
                         val functionWithAggregateArgumentName = "delegate"
 
                         "should compile producing a warning".config(enabled = false) - {
@@ -153,7 +144,7 @@ class IterationUsingDelegatesWithoutAlignSpec : FreeSpec({
                 "inside $iterationDescription and using a function that takes an Aggregate argument, " +
                     "using it inside a nested function, called by wrapping it with a specific alignedOn" - {
                         val case = "IterationAlignDelegatedNestedFun"
-                        val code = getTestingProgram(case)
+                        val code = getProgramFromCase(case)
 
                         "should compile producing a warning".config(enabled = false) - {
                             code shouldCompileWith noWarning
@@ -163,7 +154,7 @@ class IterationUsingDelegatesWithoutAlignSpec : FreeSpec({
                 "inside $iterationDescription and using a function that takes an Aggregate argument, " +
                     "using it with a specific alignedOn, inside a called nested function" - {
                         val case = "IterationDelegatedNestedFunAlign"
-                        val code = getTestingProgram(case)
+                        val code = getProgramFromCase(case)
 
                         "should compile producing a warning".config(enabled = false) - {
                             code shouldCompileWith noWarning

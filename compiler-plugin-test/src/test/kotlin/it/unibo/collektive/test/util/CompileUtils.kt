@@ -11,6 +11,8 @@ import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 import it.unibo.collektive.AlignmentComponentRegistrar
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
+import java.io.File
+import java.io.FileNotFoundException
 
 @OptIn(ExperimentalCompilerApi::class)
 object CompileUtils {
@@ -62,6 +64,18 @@ object CompileUtils {
     fun String.asTestingProgram(fileName: String): KotlinTestingProgram = KotlinTestingProgram(fileName, this)
 
     fun pascalCase(vararg words: String): String = words.joinToString("") { it.replaceFirstChar(Char::titlecase) }
+
+    /**
+     * Gets the text from a map of files, given its [name], and converts it to a
+     * [KotlinTestingProgram].
+     */
+    fun Map<String, File>.getTestingProgram(name: String): KotlinTestingProgram =
+        this[name]
+            ?.readText()
+            ?.asTestingProgram("$name.kt")
+            ?: throw FileNotFoundException(
+                "Program not found: $name",
+            )
 
     val testedAggregateFunctions =
         table(
