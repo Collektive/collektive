@@ -1,4 +1,4 @@
-name: IterationWithDelegatedAggregate
+name: "Invalid iteration of aggregate calls when using delegated functions"
 config:
   codePreamble: |-
     /**
