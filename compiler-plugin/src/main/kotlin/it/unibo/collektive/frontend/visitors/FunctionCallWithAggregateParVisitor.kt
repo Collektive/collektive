@@ -45,20 +45,17 @@ class FunctionCallWithAggregateParVisitor(private val context: CheckerContext) :
                 insideAlignedOn = false
             } else if (!isInsideAlignedOnOrNestedFun()) {
                 found = true
-                return
             }
         } else if (functionCall.hasAggregateArgument() && !isInsideAlignedOnOrNestedFun()) {
             val visitor = FunctionCallWithAggregateParVisitor(context)
             found = visitor.visitSuspiciousFunctionCallDeclaration(functionCall)
         }
-        return
     }
 
     override fun visitSimpleFunction(simpleFunction: FirSimpleFunction) {
         functionCounter++
         simpleFunction.body?.accept(this)
         functionCounter--
-        return
     }
 
     /**
