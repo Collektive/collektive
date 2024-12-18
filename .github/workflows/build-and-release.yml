@@ -57,9 +57,12 @@ jobs:
             ./gradlew check koverXmlReport :compiler-plugin:check :gradle-plugin:check --parallel
           should-deploy: ${{ runner.os == 'macOS' && needs.check-secrets.outputs.run-with-secrets == 'true' }} # Deploy from macOS since it supports all the platforms
           deploy-command: |
+            ./gradlew createStagingRepositoryOnMavenCentral --parallel
             NEXT_VERSION="${{ needs.precompute-next-version.outputs.next-version }}"
             OVERRIDE_VERSION=$([[ "$NEXT_VERSION" != "" ]] && echo "-PforceVersion=$(echo $NEXT_VERSION)" || echo "")
-            ./gradlew $OVERRIDE_VERSION uploadAll :compiler-plugin:uploadKotlinOSSRHToMavenCentralNexus :gradle-plugin:uploadKotlinOSSRHToMavenCentralNexus close --parallel
+            REPO_IDS=$(cat build/staging-repo-ids.properties)
+            MAVEN_CENTRAL_ID=${REPO_IDS#MavenCentral=}
+            ./gradlew $OVERRIDE_VERSION -PstagingRepositoryId=$MAVEN_CENTRAL_ID uploadAll :compiler-plugin:uploadKotlinOSSRHToMavenCentralNexus :gradle-plugin:uploadKotlinOSSRHToMavenCentralNexus close --parallel
           should-run-codecov: ${{ runner.os == 'Linux' }}
           codecov-directory: build/reports/kover
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
