@@ -1,3 +1,9 @@
+## [11.1.1](https://github.com/Collektive/collektive/compare/11.1.0...11.1.1) (2024-12-18)
+
+### Bug Fixes
+
+* solve a publication problem preventing the upload of compiler-plugin and gradle-plugin into the same staging repository ([a87ec30](https://github.com/Collektive/collektive/commit/a87ec3087db6de38745b428c73e5b88d466f578b))
+
 ## [11.1.0](https://github.com/Collektive/collektive/compare/11.0.2...11.1.0) (2024-12-18)
 
 ### Features
