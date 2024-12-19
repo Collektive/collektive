@@ -1,0 +1,92 @@
+name: "Unnecessary use of constructs"
+
+config:
+  codePreamble: |-
+    /**
+      * This file has been auto-generated with Subjekt (https://github.com/FreshMag/subjekt).
+    */
+    import it.unibo.collektive.aggregate.api.Aggregate
+
+parameters:
+  - name: UNUSED_CONSTRUCT
+    values:
+      - |-
+        repeat(initial) {
+        
+        }
+      - |-
+        exchange(initial) {
+          neighboring(initial)
+        }
+      - |-
+        neighboring {
+        
+        }
+      # currently not being resolved
+      #- |-
+      #  share(initial) {
+      #    initial
+      #  }
+  - name: CONSTRUCT_IMPLICIT
+    values:
+      - |-
+        repeat(0) {
+          it + 1
+        }
+      - |-
+        exchange(initial) {
+          it.map { it + 1 }
+        }
+      - |-
+        neighboring {
+          initial
+        }
+      # currently not being resolved
+      #- |-
+      #  share(initial) {
+      #    it.maxBy(0) { it }
+      #  }
+  - name: CONSTRUCT_EXPLICIT
+    values:
+      - |-
+        repeat(0) { value ->
+          value + 1
+        }
+      - |-
+        exchange(initial) { field ->
+          field.map { it + 1 }
+        }
+      - |- 
+        neighboring {
+          initial
+        }
+      # currently not being resolved
+      #- |-
+      #  share(initial) { field ->
+      #    field.maxBy(0) { it }
+      #  }
+
+subjects:
+  - name: "UnnecessaryUse${{ prettify(UNUSED_CONSTRUCT) }}"
+    code: |-
+      fun Aggregate<Int>.entry() {
+          val initial = 0
+          ${{ UNUSED_CONSTRUCT }}
+      }
+    outcomes:
+      warning: |-
+        The '${{ UNUSED_CONSTRUCT }}' construct is not necessary for the given use case.
+
+  - name: "NecessaryUseImplicitParameter${{ prettify(CONSTRUCT_IMPLICIT) }}"
+    code: |-
+      fun Aggregate<Int>.entry() {
+          val initial = 0
+          ${{ CONSTRUCT_IMPLICIT }}
+      }
+
+  - name: "NecessaryUseExplicitParameter${{ prettify(CONSTRUCT_EXPLICIT) }}"
+    code: |-
+      fun Aggregate<Int>.entry() {
+          val initial = 0
+          ${{ CONSTRUCT_EXPLICIT }}
+      }
