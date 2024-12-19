@@ -179,6 +179,13 @@ jobs:
           gradle-publish-key: ${{ secrets.GRADLE_PUBLISH_KEY }}
           signing-key: ${{ secrets.GPG_PRIVATEKEY }}
           signing-password: ${{ secrets.GPG_PASSPHRASE }}
+
+  drop-staging-repo:
+    runs-on: ubuntu-24.04
+    needs:
+      - set-staging-repo-id
+      - release
+    steps:
       - name: Drop staging repositories
         if: ${{ always() }}
         env:
