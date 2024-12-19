@@ -1,3 +1,15 @@
+## [11.1.2](https://github.com/Collektive/collektive/compare/11.1.1...11.1.2) (2024-12-19)
+
+### Dependency updates
+
+* **core-deps:** update plugin kover to v0.9.0 ([da5014c](https://github.com/Collektive/collektive/commit/da5014c3acc866b7c84e0d75c8de1d33b55103c0))
+* **deps:** update alchemist to v36.0.10 ([f9faf24](https://github.com/Collektive/collektive/commit/f9faf247cbd71899c1d55e0c01ac083965a4860e))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.28 ([cc122f3](https://github.com/Collektive/collektive/commit/cc122f3e2701ce7136aba70c6b6134e141dfa4ff))
+* drop repository after the releasy always ([3fd6781](https://github.com/Collektive/collektive/commit/3fd67810d3f91f3b5306f548ffe17285e64d105a))
+
 ## [11.1.1](https://github.com/Collektive/collektive/compare/11.1.0...11.1.1) (2024-12-18)
 
 ### Bug Fixes
