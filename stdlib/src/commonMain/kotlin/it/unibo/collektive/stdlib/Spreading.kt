@@ -26,9 +26,9 @@ inline fun <ID : Any, Distance : Comparable<Distance>> Aggregate<ID>.distanceTo(
         bottom = bottom,
         top = top,
         accumulateData = {
-                neighborToSource,
-                hereToNeighbor,
-                _,
+            neighborToSource,
+            hereToNeighbor,
+            _,
             ->
             accumulateDistance(neighborToSource, hereToNeighbor)
         },

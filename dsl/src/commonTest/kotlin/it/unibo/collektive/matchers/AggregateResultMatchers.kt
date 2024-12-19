@@ -63,10 +63,9 @@ fun <R> acProgram(aggregateProgram: Aggregate<Int>.() -> R): Aggregate<Int>.() -
 private fun aggregateMatcher(
     expected: Set<Path>,
     actual: Set<Path>,
-): MatcherResult {
-    return MatcherResult(
+): MatcherResult =
+    MatcherResult(
         actual == expected,
         { "Expected the following paths: $expected, but got: $actual" },
         { "Got the following paths: $actual, while expecting: $expected" },
     )
-}

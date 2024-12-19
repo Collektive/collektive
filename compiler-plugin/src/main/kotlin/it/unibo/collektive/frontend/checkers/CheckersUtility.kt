@@ -1,5 +1,6 @@
 package it.unibo.collektive.frontend.checkers
 
+import it.unibo.collektive.utils.common.AggregateFunctionNames.AGGREGATE_CLASS_FQ_NAME
 import it.unibo.collektive.utils.common.AggregateFunctionNames.AGGREGATE_CLASS_NAME
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
@@ -12,6 +13,12 @@ import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.toResolvedCallableSymbol
 import org.jetbrains.kotlin.fir.expressions.unwrapExpression
 import org.jetbrains.kotlin.fir.references.toResolvedFunctionSymbol
+import org.jetbrains.kotlin.fir.references.toResolvedNamedFunctionSymbol
+import org.jetbrains.kotlin.fir.types.ConeKotlinType
+import org.jetbrains.kotlin.fir.types.classId
+import org.jetbrains.kotlin.fir.types.coneType
+import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.name.FqName
 
 /**
  * Collection of utilities for FIR checkers.
@@ -76,7 +83,8 @@ object CheckersUtility {
         predicate: (FirElement) -> Boolean,
     ): List<FirElement>? {
         val calleeName = (containingElements.last() as? FirFunctionCall)?.functionName()
-        return containingElements.takeIf { it.any(predicate) }
+        return containingElements
+            .takeIf { it.any(predicate) }
             ?.let { firElements ->
                 if (excludeDotCall) {
                     firElements.filterNot {
@@ -85,8 +93,7 @@ object CheckersUtility {
                 } else {
                     firElements
                 }
-            }
-            ?.dropLast(1)
+            }?.dropLast(1)
             ?.takeLastWhile { !predicate(it) }
     }
 
@@ -153,4 +160,30 @@ object CheckersUtility {
             "$packageName.$functionName"
         }
     }
+
+    /**
+     * Returns a list of the arguments' types (in the form of [ConeKotlinType]) of the related function.
+     */
+    fun FirFunctionCall.getArgumentsTypes(): List<ConeKotlinType>? =
+        calleeReference
+            .toResolvedNamedFunctionSymbol()
+            ?.valueParameterSymbols
+            ?.map { parameter ->
+                parameter.resolvedReturnTypeRef.coneType
+            }
+
+    /**
+     * Converts a string representing a fully-qualified name (e.g. `it.unibo.collektive.aggregate.api.Aggregate`)
+     * into a [FqName] object.
+     */
+    fun String.toFqNameUnsafe(): FqName = FqName(this)
+
+    /**
+     * Checks whether if the called function accepts at least on argument of type
+     * [it.unibo.collektive.aggregate.api.Aggregate].
+     */
+    fun FirFunctionCall.hasAggregateArgument(): Boolean =
+        getArgumentsTypes()?.any {
+            it.classId == ClassId.topLevel(AGGREGATE_CLASS_FQ_NAME.toFqNameUnsafe())
+        } == true
 }

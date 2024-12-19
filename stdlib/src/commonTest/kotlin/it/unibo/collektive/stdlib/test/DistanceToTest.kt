@@ -61,7 +61,8 @@ class DistanceToTest : StringSpec({
                 else -> value shouldBe Double.POSITIVE_INFINITY
             }
         }
-        repeat(times = size - 1) { // One round per device has been executed already
+        repeat(times = size - 1) {
+            // One round per device has been executed already
             environment.gradientIsStable(isMoore = true) shouldBe false
             environment.cycleInReverseOrder()
         }

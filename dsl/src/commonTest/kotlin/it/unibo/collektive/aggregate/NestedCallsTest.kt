@@ -14,14 +14,13 @@ import it.unibo.collektive.stdlib.doubles.FieldedDoubles.plus
 class NestedCallsTest : StringSpec({
     fun Aggregate<Int>.foo(id: Int) = neighboringViaExchange(id.toDouble())
 
-    fun Aggregate<Int>.bar(): Double {
-        return share(Double.POSITIVE_INFINITY) { dist ->
+    fun Aggregate<Int>.bar(): Double =
+        share(Double.POSITIVE_INFINITY) { dist ->
             when (localId) {
                 0 -> 0.0
                 else -> (foo(localId) + dist).min(Double.POSITIVE_INFINITY)
             }
         }
-    }
 
     "This is a regression test for the issue #207" {
         val networkManager = NetworkManager()

@@ -39,7 +39,14 @@ tasks.generateBuildConfig.configure {
 
 ktlint {
     filter {
-        exclude { it.file.path.contains(layout.buildDirectory.dir("generated").get().toString()) }
+        exclude {
+            it.file.path.contains(
+                layout.buildDirectory
+                    .dir("generated")
+                    .get()
+                    .toString(),
+            )
+        }
     }
 }
 

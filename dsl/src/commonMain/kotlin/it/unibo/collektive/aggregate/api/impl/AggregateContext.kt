@@ -58,18 +58,19 @@ internal class AggregateContext<ID : Any>(
         val previous = stateAt(path, initial)
         val subject = newField(previous, messages)
         val context = YieldingContext<Field<ID, Init>, Field<ID, Ret>>()
-        return body(context, subject).also {
-            val message =
-                SingleOutboundMessage(
-                    it.toSend.localValue,
-                    when (it.toSend) {
-                        is ConstantField<ID, Init> -> emptyMap()
-                        else -> it.toSend.excludeSelf()
-                    },
-                )
-            toBeSent.addMessage(path, message)
-            state += path to it.toSend.localValue
-        }.toReturn
+        return body(context, subject)
+            .also {
+                val message =
+                    SingleOutboundMessage(
+                        it.toSend.localValue,
+                        when (it.toSend) {
+                            is ConstantField<ID, Init> -> emptyMap()
+                            else -> it.toSend.excludeSelf()
+                        },
+                    )
+                toBeSent.addMessage(path, message)
+                state += path to it.toSend.localValue
+            }.toReturn
     }
 
     override fun <Initial, Return> evolving(
@@ -83,8 +84,7 @@ internal class AggregateContext<ID : Any>(
                     "evolving operations cannot return fields (guaranteed misalignment on every neighborhood change)"
                 }
                 state += path to it.toSend
-            }
-            .toReturn
+            }.toReturn
     }
 
     override fun <Scalar> neighboring(local: Scalar): Field<ID, Scalar> {
@@ -121,11 +121,11 @@ internal class AggregateContext<ID : Any>(
     private fun <T> messagesAt(path: Path): Map<ID, T> =
         messages
             .mapNotNull { received ->
-                received.messages.getOrElse(path) { NoEntry }
+                received.messages
+                    .getOrElse(path) { NoEntry }
                     .takeIf { it != NoEntry }
                     ?.let { received.senderId to it as T }
-            }
-            .associate { it }
+            }.associate { it }
 
     private object NoEntry
 
