@@ -113,7 +113,7 @@ class AlignmentTransformer(
         context: IrExpression,
         function: IrFunction,
         expressionBody: IrExpression,
-        alignmentToken: IrBlockBodyBuilder.() -> IrConst<T>,
+        alignmentToken: IrBlockBodyBuilder.() -> IrConst,
     ): IrContainerExpression =
         irStatement(pluginContext, function, expressionBody) {
             // Call the `alignRaw` function before the body of the function to align
