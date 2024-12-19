@@ -33,6 +33,12 @@ object FirCollektiveErrors {
      */
     val FUNCTION_WITH_AGGREGATE_PARAMETER_INSIDE_ITERATION by warning1<PsiElement, String>(CALL_ELEMENT_WITH_DOT)
 
+    /**
+     * Warning raised when an aggregate call like `share`, `exchange`, `neighboring` or `repeat` is called without
+     * using parameters inside the anonymous function, resulting in an unnecessary call.
+     */
+    val UNNECESSARY_CONSTRUCT_CALL_CHECKER by warning1<PsiElement, String>(CALL_ELEMENT_WITH_DOT)
+
     init {
         RootDiagnosticRendererFactory.registerFactory(KtDefaultErrorMessagesCollektive)
     }
