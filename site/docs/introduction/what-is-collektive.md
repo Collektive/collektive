@@ -1,0 +1,61 @@
+---
+title: What is Collektive?
+---
+
+# What is Collektive?
+
+Collektive is an open-source library designed to simplify the development of resilient and scalable distributed systems through the principles of Aggregate Programming.
+
+---
+
+## What is the Purpose of Collektive?
+
+The primary purpose of Collektive is to provide developers with a robust framework to design and implement self-organizing collective behaviors in dynamic and distributed environments. It abstracts away the complexities of low-level device interactions and communication, allowing users to focus on high-level coordination logic.
+
+---
+
+## What Problems does Collektive solve?
+
+### Complex Coordination
+
+Collektive addresses the challenge of coordinating large-scale systems, such as sensor networks, drone swarms, or IoT devices, where nodes operate autonomously but must collectively achieve global objectives.
+
+### Scalability
+
+By leveraging Aggregate Programming, Collektive ensures that applications scale seamlessly as the number of devices increases.
+
+### Resilience
+
+Collektive provides mechanisms to maintain system stability and adapt to changes, such as node failures, communication delays, or environmental variability.
+
+---
+
+## What are the Advantages of Using Collektive?
+
+### High-Level Abstraction
+
+Collektive simplifies the implementation of distributed behaviors, allowing developers to express coordination logic concisely without managing individual device states.
+
+### Declarative Programming
+
+The library promotes a declarative approach, enabling developers to describe what the system should achieve, while Collektive handles the how at runtime.
+
+### Dynamic Adaptation
+
+Applications built with Collektive can react dynamically to network changes or external inputs, ensuring robustness in unpredictable environments.
+
+---
+
+## Potential Applications of Collektive
+
+The Collektive library is particularly well-suited for addressing challenges in the following domains:
+
+- **Internet of Things Systems Management**
+- **Swarm Robotics**
+- **Crowd Management**
+- **Self-Healing Distributed Systems**
+- **Simulation of Natural and Biological Processes**
+
+### Proven Applications
+
+Collektive has already been applied successfully in domains vascular morphogenesis, demonstrating its utility in modeling self-organizing biological processes.
