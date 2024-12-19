@@ -27,28 +27,36 @@ import org.jetbrains.kotlin.name.Name
  */
 @OptIn(UnsafeDuringIrConstructionAPI::class)
 class AlignmentIrGenerationExtension(private val logger: MessageCollector) : IrGenerationExtension {
-    override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
+    override fun generate(
+        moduleFragment: IrModuleFragment,
+        pluginContext: IrPluginContext,
+    ) {
         // Aggregate Context class that has the reference to the stack
-        val aggregateClass = pluginContext.referenceClass(
-            ClassId.topLevel(FqName(AggregateFunctionNames.AGGREGATE_CLASS_FQ_NAME)),
-        )
+        val aggregateClass =
+            pluginContext.referenceClass(
+                ClassId.topLevel(FqName(AggregateFunctionNames.AGGREGATE_CLASS_FQ_NAME)),
+            )
         if (aggregateClass == null) {
             return logger.error("Unable to find the aggregate class")
         }
 
-        val projectFunction = pluginContext.referenceFunctions(
-            CallableId(
-                FqName("it.unibo.collektive.aggregate.api.impl"),
-                Name.identifier(PROJECT_FUNCTION),
-            ),
-        ).firstOrNull() ?: return logger.error("Unable to find the 'project' function")
+        val projectFunction =
+            pluginContext
+                .referenceFunctions(
+                    CallableId(
+                        FqName("it.unibo.collektive.aggregate.api.impl"),
+                        Name.identifier(PROJECT_FUNCTION),
+                    ),
+                ).firstOrNull() ?: return logger.error("Unable to find the 'project' function")
 
         // Function that handles the alignment
-        val alignRawFunction = aggregateClass.getFunctionReferenceWithName(ALIGN_FUNCTION_NAME)
-            ?: return logger.error("Unable to find the '$ALIGN_FUNCTION_NAME' function")
+        val alignRawFunction =
+            aggregateClass.getFunctionReferenceWithName(ALIGN_FUNCTION_NAME)
+                ?: return logger.error("Unable to find the '$ALIGN_FUNCTION_NAME' function")
 
-        val dealignFunction = aggregateClass.getFunctionReferenceWithName(DEALIGN_FUNCTION_NAME)
-            ?: return logger.error("Unable to find the '$DEALIGN_FUNCTION_NAME' function")
+        val dealignFunction =
+            aggregateClass.getFunctionReferenceWithName(DEALIGN_FUNCTION_NAME)
+                ?: return logger.error("Unable to find the '$DEALIGN_FUNCTION_NAME' function")
 
         /*
          This applies the alignment call on all the aggregate functions

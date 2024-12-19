@@ -47,10 +47,15 @@ class AlignmentTransformer(
     private var alignedFunctions = emptyMap<String, Int>()
 
     @OptIn(UnsafeDuringIrConstructionAPI::class)
-    override fun visitCall(expression: IrCall, data: StackFunctionCall): IrElement {
-        val contextReference = expression.receiverAndArgs()
-            .find { it.type.isAssignableFrom(aggregateContextClass.defaultType) }
-            ?: collectAggregateReference(aggregateContextClass, expression.symbol.owner)
+    override fun visitCall(
+        expression: IrCall,
+        data: StackFunctionCall,
+    ): IrElement {
+        val contextReference =
+            expression
+                .receiverAndArgs()
+                .find { it.type.isAssignableFrom(aggregateContextClass.defaultType) }
+                ?: collectAggregateReference(aggregateContextClass, expression.symbol.owner)
 
         val alignmentToken = expression.getAlignmentToken()
         // If the context is null, this means that the function is not an aggregate function
@@ -68,12 +73,13 @@ class AlignmentTransformer(
             alignedFunctions += alignmentToken to actualCounter
             // If the expression contains a lambda, this recursion is necessary to visit the children
             expression.transformChildren(this, StackFunctionCall())
-            val tokenCount = alignedFunctions[alignmentToken] ?: error(
-                """
+            val tokenCount =
+                alignedFunctions[alignmentToken] ?: error(
+                    """
                     Unable to find the count for the token $alignmentToken.
                     This is may due to a bug in collektive compiler plugin.
-                """.trimIndent(),
-            )
+                    """.trimIndent(),
+                )
             val alignmentTokenRepresentation = "$data$alignmentToken.$tokenCount"
             // Return the modified function body to have as a first statement the alignRaw function,
             // then the body of the function to align and finally the dealign function
@@ -81,12 +87,18 @@ class AlignmentTransformer(
         } ?: super.visitCall(expression, data)
     }
 
-    override fun visitBranch(branch: IrBranch, data: StackFunctionCall): IrBranch {
+    override fun visitBranch(
+        branch: IrBranch,
+        data: StackFunctionCall,
+    ): IrBranch {
         branch.generateBranchAlignmentCode(true)
         return super.visitBranch(branch, data)
     }
 
-    override fun visitElseBranch(branch: IrElseBranch, data: StackFunctionCall): IrElseBranch {
+    override fun visitElseBranch(
+        branch: IrElseBranch,
+        data: StackFunctionCall,
+    ): IrElseBranch {
         branch.generateBranchAlignmentCode(false)
         return super.visitElseBranch(branch, data)
     }
@@ -102,8 +114,8 @@ class AlignmentTransformer(
         function: IrFunction,
         expressionBody: IrExpression,
         alignmentToken: IrBlockBodyBuilder.() -> IrConst<T>,
-    ): IrContainerExpression {
-        return irStatement(pluginContext, function, expressionBody) {
+    ): IrContainerExpression =
+        irStatement(pluginContext, function, expressionBody) {
             // Call the `alignRaw` function before the body of the function to align
             irBlock {
                 // Call the alignRaw function
@@ -131,5 +143,4 @@ class AlignmentTransformer(
                 +irGet(tmpVar)
             }
         }
-    }
 }

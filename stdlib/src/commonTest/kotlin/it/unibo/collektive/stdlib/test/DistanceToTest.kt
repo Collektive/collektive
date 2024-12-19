@@ -14,21 +14,24 @@ import kotlin.math.sqrt
  */
 
 class DistanceToTest : StringSpec({
-    fun Environment<Double>.gradientIsStable(isMoore: Boolean): Boolean = status().all { (id, value) ->
-        val x = id % 10
-        val y = id / 10
-        val steps = x + y
-        val expected = when {
-            isMoore -> {
-                val manhattanSteps = abs(x - y)
-                check((steps - manhattanSteps) % 2 == 0)
-                val diagonalSteps = (steps - manhattanSteps) / 2
-                sqrt(2.0) * diagonalSteps + manhattanSteps
-            }
-            else -> steps
+    fun Environment<Double>.gradientIsStable(isMoore: Boolean): Boolean =
+        status().all { (id, value) ->
+            val x = id % 10
+            val y = id / 10
+            val steps = x + y
+            val expected =
+                when {
+                    isMoore -> {
+                        val manhattanSteps = abs(x - y)
+                        check((steps - manhattanSteps) % 2 == 0)
+                        val diagonalSteps = (steps - manhattanSteps) / 2
+                        sqrt(2.0) * diagonalSteps + manhattanSteps
+                    }
+                    else -> steps
+                }
+            abs(value - expected.toFloat()) < 1e-6
         }
-        abs(value - expected.toFloat()) < 1e-6
-    }
+
     fun mooreGridWithGradient(size: Int) =
         mooreGrid<Double>(size, size, { _, _ -> Double.NaN }) { environment ->
             val localPosition = environment.positionOf(localId)
@@ -58,7 +61,8 @@ class DistanceToTest : StringSpec({
                 else -> value shouldBe Double.POSITIVE_INFINITY
             }
         }
-        repeat(times = size - 1) { // One round per device has been executed already
+        repeat(times = size - 1) {
+            // One round per device has been executed already
             environment.gradientIsStable(isMoore = true) shouldBe false
             environment.cycleInReverseOrder()
         }

@@ -31,8 +31,10 @@ fun String.md2(): ByteArray = DigestUtils(MessageDigestAlgorithms.MD2).digest(th
 /**
  * Encodes a byte array in base N String.
  */
-fun ByteArray.toBaseString(encoder: BaseNCodec, preservePadding: Boolean = false): String =
-    encoder.encodeAsString(this).let { if (preservePadding) it else it.trimEnd('=') }
+fun ByteArray.toBaseString(
+    encoder: BaseNCodec,
+    preservePadding: Boolean = false,
+): String = encoder.encodeAsString(this).let { if (preservePadding) it else it.trimEnd('=') }
 
 /**
  * Interprets a byte array in base 32.

@@ -38,9 +38,10 @@ fun <R> mooreGrid(
     sizeY: Int,
     initial: (Environment<R>, Position) -> R,
     program: Aggregate<Int>.(Environment<R>) -> R,
-): EnvironmentWithMeshNetwork<R> = EnvironmentWithMeshNetwork<R>(
-    SAFE_MOORE_DISTANCE,
-).grid(sizeX, sizeY, initial, program)
+): EnvironmentWithMeshNetwork<R> =
+    EnvironmentWithMeshNetwork<R>(
+        SAFE_MOORE_DISTANCE,
+    ).grid(sizeX, sizeY, initial, program)
 
 /**
  * Creates a grid environment with Von Neumann connections between nodes.

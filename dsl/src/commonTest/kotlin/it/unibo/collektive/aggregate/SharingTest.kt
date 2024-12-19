@@ -62,9 +62,10 @@ class SharingTest : StringSpec({
         val testNetwork = NetworkImplTest(NetworkManager(), 1)
 
         aggregate(1, testNetwork) {
-            val res = share(1) {
-                it.max(it.localValue)
-            }
+            val res =
+                share(1) {
+                    it.max(it.localValue)
+                }
             res shouldBe 1
         }
     }
@@ -73,10 +74,11 @@ class SharingTest : StringSpec({
         val testNetwork = NetworkImplTest(NetworkManager(), 1)
 
         aggregate(1, testNetwork) {
-            val res = sharing(1) {
-                val min = it.max(it.localValue)
-                min.yielding { "A string" }
-            }
+            val res =
+                sharing(1) {
+                    val min = it.max(it.localValue)
+                    min.yielding { "A string" }
+                }
             res shouldBe "A string"
         }
     }
@@ -85,10 +87,11 @@ class SharingTest : StringSpec({
         val testNetwork = NetworkImplTest(NetworkManager(), 1)
 
         aggregate(1, testNetwork) {
-            val res = sharing(1) {
-                val min = it.min(it.localValue)
-                min.yielding { "Hello".takeIf { min > 1 } }
-            }
+            val res =
+                sharing(1) {
+                    val min = it.min(it.localValue)
+                    min.yielding { "Hello".takeIf { min > 1 } }
+                }
             res shouldBe null
         }
     }

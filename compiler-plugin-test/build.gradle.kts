@@ -3,7 +3,6 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-
 plugins {
     java
 }
@@ -34,6 +33,7 @@ kotlinJvm {
                 implementation(libs.javap)
                 implementation(libs.kctfork)
                 implementation(libs.kotlinpoet)
+                implementation(libs.subjekt)
             }
         }
     }
@@ -44,10 +44,11 @@ kotlinJvm {
         useJUnitPlatform()
         testLogging {
             showExceptions = true
-            events = setOf(
-                TestLogEvent.FAILED,
-                TestLogEvent.PASSED,
-            )
+            events =
+                setOf(
+                    TestLogEvent.FAILED,
+                    TestLogEvent.PASSED,
+                )
             exceptionFormat = TestExceptionFormat.FULL
         }
     }

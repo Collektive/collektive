@@ -42,10 +42,7 @@ kotlinJvm {
         useJUnitPlatform()
         testLogging {
             showExceptions = true
-            events = setOf(
-                TestLogEvent.FAILED,
-                TestLogEvent.PASSED,
-            )
+            events = setOf(TestLogEvent.FAILED, TestLogEvent.PASSED)
             exceptionFormat = TestExceptionFormat.FULL
         }
     }
@@ -54,5 +51,15 @@ kotlinJvm {
 tasks.withType<KotlinCompile>().configureEach {
     compilerOptions {
         freeCompilerArgs = listOf("-Xcontext-receivers")
+    }
+}
+
+tasks {
+    // Prevent publishing this module since it is a test-only module
+    withType<AbstractPublishToMaven>().configureEach {
+        enabled = false
+    }
+    withType<GenerateModuleMetadata>().configureEach {
+        enabled = false
     }
 }
