@@ -6,6 +6,8 @@ config:
       * This file has been auto-generated with Subjekt (https://github.com/FreshMag/subjekt).
     */
     import it.unibo.collektive.aggregate.api.Aggregate
+    import it.unibo.collektive.aggregate.api.operators.share
+    import it.unibo.collektive.field.operations.maxBy
 
 parameters:
   - name: UNUSED_CONSTRUCT
@@ -22,11 +24,10 @@ parameters:
         neighboring {
         
         }
-      # currently not being resolved
-      #- |-
-      #  share(initial) {
-      #    initial
-      #  }
+      - |-
+        share(initial) {
+          initial
+        }
   - name: CONSTRUCT_IMPLICIT
     values:
       - |-
@@ -41,11 +42,10 @@ parameters:
         neighboring {
           initial
         }
-      # currently not being resolved
-      #- |-
-      #  share(initial) {
-      #    it.maxBy(0) { it }
-      #  }
+      - |-
+        share(initial) {
+          it.maxBy(0) { it }
+        }
   - name: CONSTRUCT_EXPLICIT
     values:
       - |-
@@ -60,11 +60,10 @@ parameters:
         neighboring {
           initial
         }
-      # currently not being resolved
-      #- |-
-      #  share(initial) { field ->
-      #    field.maxBy(0) { it }
-      #  }
+      - |-
+        share(initial) { field ->
+          field.maxBy(0) { it }
+        }
 
 subjects:
   - name: "UnnecessaryUse${{ prettify(UNUSED_CONSTRUCT) }}"
