@@ -92,6 +92,7 @@ jobs:
     steps:
       - name: Restore staging repository ID
         uses: actions/download-artifact@v4
+        with:
           name: staging-repo-ids
           path: build/
       - name: Set staging repository ID
