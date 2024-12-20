@@ -24,8 +24,14 @@ class CollektiveDevice<P>(
     private val environment: Environment<Any?, P>,
     override val node: Node<Any?>,
     private val retainMessagesFor: Time? = null,
-) : NodeProperty<Any?>, Network<Int>, EnvironmentVariables, DistanceSensor where P : Position<P> {
-    private data class TimedMessage(val receivedAt: Time, val payload: InboundMessage<Int>)
+) : NodeProperty<Any?>,
+    Network<Int>,
+    EnvironmentVariables,
+    DistanceSensor where P : Position<P> {
+    private data class TimedMessage(
+        val receivedAt: Time,
+        val payload: InboundMessage<Int>,
+    )
 
     /**
      * The current time.

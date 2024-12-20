@@ -32,4 +32,7 @@ class YieldingContext<Initial, Return> {
 /**
  * Specifies the value [toSend] and the value [toReturn] of a yielding operator.
  */
-data class YieldingResult<Initial, Return>(val toSend: Initial, val toReturn: Return)
+data class YieldingResult<Initial, Return>(
+    val toSend: Initial,
+    val toReturn: Return,
+)
