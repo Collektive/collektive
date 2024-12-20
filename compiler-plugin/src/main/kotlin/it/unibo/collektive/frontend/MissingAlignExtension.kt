@@ -10,7 +10,9 @@ import org.jetbrains.kotlin.fir.analysis.extensions.FirAdditionalCheckersExtensi
 /**
  * Extension that adds a series of checkers that looks for missing align operations within the Collektive DSL.
  */
-class MissingAlignExtension(session: FirSession) : FirAdditionalCheckersExtension(session) {
+class MissingAlignExtension(
+    session: FirSession,
+) : FirAdditionalCheckersExtension(session) {
     override val expressionCheckers: ExpressionCheckers =
         object : ExpressionCheckers() {
             override val functionCallCheckers: Set<FirFunctionCallChecker>
