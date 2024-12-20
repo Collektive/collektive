@@ -2,6 +2,7 @@ import de.aaschmid.gradle.plugins.cpd.Cpd
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektPlugin
 import io.gitlab.arturbosch.detekt.report.ReportMergeTask
+import java.time.LocalDate
 import org.danilopianini.gradle.mavencentral.DocStyle
 
 plugins {
@@ -88,10 +89,19 @@ allprojects {
         }
     }
 
+    dokka {
+        pluginsConfiguration.html {
+            customStyleSheets.from("${rootDir}/assets/collektive.css")
+            customAssets.from("${rootDir}/assets/logo.svg")
+            footerMessage.set("&copy; ${LocalDate.now().year} Collektive")
+        }
+    }
+
     plugins.withType<DetektPlugin> {
         val detektTasks = tasks.withType<Detekt>()
             .matching { task ->
-                task.name.let { it.endsWith("Main") || it.endsWith("Test") } && !task.name.contains("Baseline")
+                task.name.let { it.endsWith("Main") || it.endsWith("Test") } &&
+                    !task.name.contains("Baseline")
             }
         val check by tasks.getting
         val detektAll by tasks.registering {
@@ -123,9 +133,14 @@ allprojects {
 }
 
 dependencies {
-    kover(project(":dsl"))
-    kover(project(":stdlib"))
-    kover(project(":alchemist-incarnation-collektive"))
+    listOf(
+        project(":dsl"),
+        project(":stdlib"),
+        project(":alchemist-incarnation-collektive"),
+    ).forEach {
+        kover(it)
+        dokka(it)
+    }
 }
 
 kover {
