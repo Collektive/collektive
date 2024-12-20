@@ -1,3 +1,14 @@
+## [11.1.3](https://github.com/Collektive/collektive/compare/11.1.2...11.1.3) (2024-12-20)
+
+### Dependency updates
+
+* **deps:** update alchemist to v36.0.11 ([6a600bd](https://github.com/Collektive/collektive/commit/6a600bd00fda954bda57c2fbf5a034bae738b55d))
+* **deps:** update plugin publishoncentral to v7.0.2 ([6cdeb35](https://github.com/Collektive/collektive/commit/6cdeb354cf74a396b84591da28efd5011ad56205))
+
+### Bug Fixes
+
+* **build:** re-enabled publishing task for compiler embeddable sub-project ([#659](https://github.com/Collektive/collektive/issues/659)) ([9cdb6c2](https://github.com/Collektive/collektive/commit/9cdb6c2f1a0ac066c01b08b7040cd533776656df))
+
 ## [11.1.2](https://github.com/Collektive/collektive/compare/11.1.1...11.1.2) (2024-12-19)
 
 ### Dependency updates
