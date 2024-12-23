@@ -37,7 +37,7 @@ class UnnecessaryUseOfConstructsSpec : FreeSpec({
         val constructs =
             table(
                 headers("construct"),
-                row("repeat"),
+                row("evolve"),
                 row("exchange"),
                 row("share"),
                 row("neighboring"),

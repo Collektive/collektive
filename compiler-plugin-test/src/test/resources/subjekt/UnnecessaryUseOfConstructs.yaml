@@ -13,8 +13,8 @@ parameters:
   - name: UNUSED_CONSTRUCT
     values:
       - |-
-        repeat(initial) {
-        
+        evolve(initial) {
+          initial
         }
       - |-
         exchange(initial) {
@@ -31,7 +31,7 @@ parameters:
   - name: CONSTRUCT_IMPLICIT
     values:
       - |-
-        repeat(0) {
+        evolve(0) {
           it + 1
         }
       - |-
@@ -49,7 +49,7 @@ parameters:
   - name: CONSTRUCT_EXPLICIT
     values:
       - |-
-        repeat(0) { value ->
+        evolve(0) { value ->
           value + 1
         }
       - |-
