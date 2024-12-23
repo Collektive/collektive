@@ -1,3 +1,89 @@
+## [11.1.3](https://github.com/Collektive/collektive/compare/11.1.2...11.1.3) (2024-12-20)
+
+### Dependency updates
+
+* **deps:** update alchemist to v36.0.11 ([6a600bd](https://github.com/Collektive/collektive/commit/6a600bd00fda954bda57c2fbf5a034bae738b55d))
+* **deps:** update plugin publishoncentral to v7.0.2 ([6cdeb35](https://github.com/Collektive/collektive/commit/6cdeb354cf74a396b84591da28efd5011ad56205))
+
+### Bug Fixes
+
+* **build:** re-enabled publishing task for compiler embeddable sub-project ([#659](https://github.com/Collektive/collektive/issues/659)) ([9cdb6c2](https://github.com/Collektive/collektive/commit/9cdb6c2f1a0ac066c01b08b7040cd533776656df))
+
+## [11.1.2](https://github.com/Collektive/collektive/compare/11.1.1...11.1.2) (2024-12-19)
+
+### Dependency updates
+
+* **core-deps:** update plugin kover to v0.9.0 ([da5014c](https://github.com/Collektive/collektive/commit/da5014c3acc866b7c84e0d75c8de1d33b55103c0))
+* **deps:** update alchemist to v36.0.10 ([f9faf24](https://github.com/Collektive/collektive/commit/f9faf247cbd71899c1d55e0c01ac083965a4860e))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.28 ([cc122f3](https://github.com/Collektive/collektive/commit/cc122f3e2701ce7136aba70c6b6134e141dfa4ff))
+* drop repository after the releasy always ([3fd6781](https://github.com/Collektive/collektive/commit/3fd67810d3f91f3b5306f548ffe17285e64d105a))
+
+## [11.1.1](https://github.com/Collektive/collektive/compare/11.1.0...11.1.1) (2024-12-18)
+
+### Bug Fixes
+
+* solve a publication problem preventing the upload of compiler-plugin and gradle-plugin into the same staging repository ([a87ec30](https://github.com/Collektive/collektive/commit/a87ec3087db6de38745b428c73e5b88d466f578b))
+
+## [11.1.0](https://github.com/Collektive/collektive/compare/11.0.2...11.1.0) (2024-12-18)
+
+### Features
+
+* improve checker functionality when `Aggregate` is used as a parameter ([#582](https://github.com/Collektive/collektive/issues/582)) ([323a756](https://github.com/Collektive/collektive/commit/323a756a9a424b2b79b5a57f16e2d534c6fee252))
+
+### Dependency updates
+
+* **deps:** update alchemist to v36.0.4 ([47f9bd7](https://github.com/Collektive/collektive/commit/47f9bd7ef47d3911b849547f54e11f42636705cb))
+* **deps:** update alchemist to v36.0.5 ([b38539b](https://github.com/Collektive/collektive/commit/b38539b7e70b306211b3127ec329cb37ac03aa2b))
+* **deps:** update alchemist to v36.0.6 ([2303b53](https://github.com/Collektive/collektive/commit/2303b53bd84ebf6bb54cf8bd18c6905f229ca117))
+* **deps:** update alchemist to v36.0.7 ([1a0f96d](https://github.com/Collektive/collektive/commit/1a0f96dde2284fc6079a412dda7ec0295eaeaecd))
+* **deps:** update alchemist to v36.0.9 ([4aafea7](https://github.com/Collektive/collektive/commit/4aafea7f2514b671f28d9e8ba06bf75b411e3846))
+* **deps:** update dependency org.apache.commons:commons-text to v1.13.0 ([7abc326](https://github.com/Collektive/collektive/commit/7abc3266dfd757f660e7ff213432f24bf5db0bdb))
+* **deps:** update dependency org.jetbrains.dokka to v2 ([c81d71d](https://github.com/Collektive/collektive/commit/c81d71d7e1626defdf595bfedf3caa7be56b056e))
+* **deps:** update dependency prism-react-renderer to v2.4.1 ([6a76c61](https://github.com/Collektive/collektive/commit/6a76c6184f18efbe5c791302a0ccaed3481da4d4))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.116 ([dde7590](https://github.com/Collektive/collektive/commit/dde75903178ff1aa8f0b859b592c021df84bb914))
+* **deps:** update node.js to 22.12 ([90c731e](https://github.com/Collektive/collektive/commit/90c731ebe9eeb1cd271fe39f029ebc2b4927e3b0))
+* **deps:** update plugin com.gradle.develocity to v3.19 ([a84b652](https://github.com/Collektive/collektive/commit/a84b652de6265baa069e5f15d9eb0319c467697e))
+* **deps:** update plugin kotlin-qa to v0.78.0 ([8d155e5](https://github.com/Collektive/collektive/commit/8d155e5d8473a061fc8bcd64ce2fe87d18be6dab))
+* **deps:** update plugin multijvmtesting to v2 ([1bbd415](https://github.com/Collektive/collektive/commit/1bbd415458556734062c5d9e65474846e4b74cae))
+* **deps:** update plugin multijvmtesting to v2.0.1 ([1cc5ad9](https://github.com/Collektive/collektive/commit/1cc5ad986e2a2e0b5b16370ccc20ea9314dd7070))
+* **deps:** update plugin multijvmtesting to v3 ([f1df575](https://github.com/Collektive/collektive/commit/f1df5755a0dc8e22d05e29ae1c17d4f57132c861))
+* **deps:** update plugin multijvmtesting to v3.0.1 ([8f9a9bd](https://github.com/Collektive/collektive/commit/8f9a9bd9ead6dfe4a8c8d2b3e1b4f190ec3d01db))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.16 ([793e4b1](https://github.com/Collektive/collektive/commit/793e4b1b3e3afce262e18a901c269758ee62ef7d))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.17 ([4e56dcb](https://github.com/Collektive/collektive/commit/4e56dcbf46e361ea135583a76fc026e1c2ae10d4))
+* **deps:** update plugin publishoncentral to v6 ([0944a0b](https://github.com/Collektive/collektive/commit/0944a0bc8412a24eb72bfe60c5e782eace87d8a0))
+* **deps:** update plugin publishoncentral to v6.0.1 ([a3a230e](https://github.com/Collektive/collektive/commit/a3a230edb20b7ffddbbeead814fa179813d28c4a))
+* **deps:** update plugin publishoncentral to v7 ([c7be422](https://github.com/Collektive/collektive/commit/c7be4227c7af49d8266aec6264d143870a7b4573))
+* **deps:** update plugin publishoncentral to v7.0.1 ([ff9cf11](https://github.com/Collektive/collektive/commit/ff9cf11613c830ba11ab5fd90ed938a2eb4e6e92))
+
+### Build and continuous integration
+
+* **deps:** bump cross-spawn from 7.0.3 to 7.0.5 in /site ([#589](https://github.com/Collektive/collektive/issues/589)) ([f15653d](https://github.com/Collektive/collektive/commit/f15653d4559d318d3a1b8032a66718788795e898))
+* **deps:** update actions/upload-artifact action to v4.5.0 ([a47b83f](https://github.com/Collektive/collektive/commit/a47b83f38543b2535db205dc1ba47b01d64ac5e9))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.24 ([31e3060](https://github.com/Collektive/collektive/commit/31e30603b4ff819eb5ef0a877b7a290b756ca4f3))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.25 ([66195cf](https://github.com/Collektive/collektive/commit/66195cf8742a6229cca4f44d64df195f6e354875))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.26 ([3371402](https://github.com/Collektive/collektive/commit/33714028869ec9bb90078e0ba33a4acb6725e4e6))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.5.27 ([b5de070](https://github.com/Collektive/collektive/commit/b5de07026251554187b18b01f4949767a2172ad3))
+* do not restore stagin repo ids in PRs ([01d77b1](https://github.com/Collektive/collektive/commit/01d77b15461238c8e95e1ce3845301543cc9477a))
+* enable caching and incremental compilation for speedup the build process ([ec08b9d](https://github.com/Collektive/collektive/commit/ec08b9d393e722cec4eca40a9a4fa5db4b365c77))
+* enable SARIF reports upload ([#626](https://github.com/Collektive/collektive/issues/626)) ([b263637](https://github.com/Collektive/collektive/commit/b263637b29ae63173732d292292014fd9fb5cd92))
+* optimized build leveraging macos runner for publishing ([#639](https://github.com/Collektive/collektive/issues/639)) ([36b6330](https://github.com/Collektive/collektive/commit/36b633092e1662aeaee06338404238a0cd439168))
+* override check command to upload code coverage ([4ea18c8](https://github.com/Collektive/collektive/commit/4ea18c81f6581d7337f9030b77a11e6491c781ef))
+* prevent supertypes on new line formatting (ktlint) ([fb06406](https://github.com/Collektive/collektive/commit/fb064067f34a8f647f02fdbadb2e7152e59aefc3))
+* remove uneeded drop since it will be performed always at the end ([5a33374](https://github.com/Collektive/collektive/commit/5a333746aa317575cb0c2950759b8e05458c0037))
+* set kover path explicit for codecov ([6c85264](https://github.com/Collektive/collektive/commit/6c852645a2a4d7ab2bec0c16be36c83c79a22dfc))
+* success depends also on website build ([ba4a7b6](https://github.com/Collektive/collektive/commit/ba4a7b62965b161b01272719561c9fca1868a1a7))
+* success task depend on build-website ([7d341f2](https://github.com/Collektive/collektive/commit/7d341f2e9e1a60346aa00e3047a5c05e7df187fa))
+* upload also gradle plugin and compiler plugin ([b8a4852](https://github.com/Collektive/collektive/commit/b8a4852f1483abc821d8bca480891f721359f1e9))
+* use curl for last step closing repository ([f3ba554](https://github.com/Collektive/collektive/commit/f3ba554c806f0dec5d84db1ebf40fb48f4fa3060))
+
+### Style improvements
+
+* new formatting according to new styling rules ([760ef8a](https://github.com/Collektive/collektive/commit/760ef8a7400bcdf49ad72471146f54bf41b64d0b))
+* new formatting according to new styling rules ([2bd2bb8](https://github.com/Collektive/collektive/commit/2bd2bb8d5412a985d19f57c4c398b76eafe0cc78))
+
 ## [11.0.2](https://github.com/Collektive/collektive/compare/11.0.1...11.0.2) (2024-12-02)
 
 ### Dependency updates

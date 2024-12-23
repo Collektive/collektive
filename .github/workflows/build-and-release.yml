@@ -50,16 +50,19 @@ jobs:
         uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
-      - uses: DanySK/build-check-deploy-gradle-action@3.5.27
+      - uses: DanySK/build-check-deploy-gradle-action@3.5.28
         id: staging-repo
         with:
           check-command: |
             ./gradlew check koverXmlReport :compiler-plugin:check :gradle-plugin:check --parallel
           should-deploy: ${{ runner.os == 'macOS' && needs.check-secrets.outputs.run-with-secrets == 'true' }} # Deploy from macOS since it supports all the platforms
           deploy-command: |
+            ./gradlew createStagingRepositoryOnMavenCentral --parallel
             NEXT_VERSION="${{ needs.precompute-next-version.outputs.next-version }}"
             OVERRIDE_VERSION=$([[ "$NEXT_VERSION" != "" ]] && echo "-PforceVersion=$(echo $NEXT_VERSION)" || echo "")
-            ./gradlew $OVERRIDE_VERSION uploadAll :compiler-plugin:uploadKotlinOSSRHToMavenCentralNexus :gradle-plugin:uploadKotlinOSSRHToMavenCentralNexus close --parallel
+            REPO_IDS=$(cat build/staging-repo-ids.properties)
+            MAVEN_CENTRAL_ID=${REPO_IDS#MavenCentral=}
+            ./gradlew $OVERRIDE_VERSION -PstagingRepositoryId=$MAVEN_CENTRAL_ID uploadAll :compiler-plugin:uploadKotlinOSSRHToMavenCentralNexus :gradle-plugin:uploadKotlinOSSRHToMavenCentralNexus close --parallel
           should-run-codecov: ${{ runner.os == 'Linux' }}
           codecov-directory: build/reports/kover
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
@@ -156,7 +159,7 @@ jobs:
         uses: actions/setup-node@v4.1.0
         with:
           node-version-file: package.json
-      - uses: DanySK/build-check-deploy-gradle-action@3.5.27
+      - uses: DanySK/build-check-deploy-gradle-action@3.5.28
         env:
           STAGING_REPO_ID: ${{ needs.set-staging-repo-id.outputs.staging-repo-id }}
           ORG_GRADLE_PROJECT_releaseStage: true
@@ -176,6 +179,13 @@ jobs:
           gradle-publish-key: ${{ secrets.GRADLE_PUBLISH_KEY }}
           signing-key: ${{ secrets.GPG_PRIVATEKEY }}
           signing-password: ${{ secrets.GPG_PASSPHRASE }}
+
+  drop-staging-repo:
+    runs-on: ubuntu-24.04
+    needs:
+      - set-staging-repo-id
+      - release
+    steps:
       - name: Drop staging repositories
         if: ${{ always() }}
         env:

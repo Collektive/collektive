@@ -38,7 +38,7 @@ object FirCollektiveErrors {
      * using parameters inside the anonymous function, resulting in an unnecessary call.
      */
     val UNNECESSARY_CONSTRUCT_CALL by warning1<PsiElement, String>(CALL_ELEMENT_WITH_DOT)
-
+    
     init {
         RootDiagnosticRendererFactory.registerFactory(KtDefaultErrorMessagesCollektive)
     }

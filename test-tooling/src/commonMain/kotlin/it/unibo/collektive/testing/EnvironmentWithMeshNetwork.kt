@@ -11,8 +11,10 @@ package it.unibo.collektive.testing
 /**
  * An environment where nodes are connected if they are within [connectDistance] from each other.
  */
-class EnvironmentWithMeshNetwork<R>(val connectDistance: Double) : Environment<R>(
-    { thisEnv, a, b -> thisEnv.positionOf(a).distanceTo(thisEnv.positionOf(b)) <= connectDistance },
-) {
-    override fun toString() = "Enviroment(connection=$connectDistance, nodes=$nodes)"
+class EnvironmentWithMeshNetwork<R>(
+    val connectDistance: Double,
+) : Environment<R>(
+        { thisEnv, a, b -> thisEnv.positionOf(a).distanceTo(thisEnv.positionOf(b)) <= connectDistance },
+    ) {
+    override fun toString() = "Environment(connection=$connectDistance, nodes=$nodes)"
 }
