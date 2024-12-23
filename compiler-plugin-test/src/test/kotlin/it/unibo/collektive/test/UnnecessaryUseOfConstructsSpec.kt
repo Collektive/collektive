@@ -45,7 +45,7 @@ class UnnecessaryUseOfConstructsSpec : FreeSpec({
 
         forAll(constructs) { construct ->
 
-            "an unused parameter inside a construct call".config(enabled = false) - {
+            "an unused parameter inside a construct call" - {
                 val subjectName = "UnnecessaryUse${construct.replaceFirstChar(Char::uppercase)}"
                 val code = testSubjects.getTestingProgram(subjectName)
 
