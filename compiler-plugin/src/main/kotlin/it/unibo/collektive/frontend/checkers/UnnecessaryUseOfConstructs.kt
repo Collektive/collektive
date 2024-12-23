@@ -37,9 +37,9 @@ import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 object UnnecessaryUseOfConstructs : FirFunctionCallChecker(MppCheckerKind.Common) {
     private val constructs =
         listOf(
-            // "it.unibo.collektive.aggregate.api.Aggregate.neighboring",
+            "it.unibo.collektive.aggregate.api.Aggregate.neighboring",
             "it.unibo.collektive.aggregate.api.Aggregate.exchange",
-            "it.unibo.collektive.aggregate.api.operators.share",
+            //"it.unibo.collektive.aggregate.api.operators.share",
             "it.unibo.collektive.aggregate.api.Aggregate.evolve",
         )
 
