@@ -39,7 +39,7 @@ object UnnecessaryUseOfConstructs : FirFunctionCallChecker(MppCheckerKind.Common
         listOf(
             "it.unibo.collektive.aggregate.api.Aggregate.neighboring",
             "it.unibo.collektive.aggregate.api.Aggregate.exchange",
-            //"it.unibo.collektive.aggregate.api.operators.share",
+            // "it.unibo.collektive.aggregate.api.operators.share",
             "it.unibo.collektive.aggregate.api.Aggregate.evolve",
         )
 
