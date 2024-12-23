@@ -35,6 +35,7 @@ class ConstructCallVisitor : FirVisitorVoid() {
     }
 
     override fun visitAnonymousFunctionExpression(anonymousFunctionExpression: FirAnonymousFunctionExpression) {
+        found = false
         val anonymousFunction = anonymousFunctionExpression.anonymousFunction
         val parameters = anonymousFunction.valueParameters
         checkedParametersNames = parameters.map { it.name.asString() }
