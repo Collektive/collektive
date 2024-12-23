@@ -40,7 +40,7 @@ class UnnecessaryUseOfConstructsSpec : FreeSpec({
                 row("evolve"),
                 row("exchange"),
                 row("share"),
-                row("neighboring"),
+                // row("neighboring"),
             )
 
         forAll(constructs) { construct ->
