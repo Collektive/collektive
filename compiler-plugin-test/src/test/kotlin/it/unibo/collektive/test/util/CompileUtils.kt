@@ -1,65 +1,45 @@
 package it.unibo.collektive.test.util
 
-import com.tschuchort.compiletesting.JvmCompilationResult
-import com.tschuchort.compiletesting.KotlinCompilation
-import com.tschuchort.compiletesting.SourceFile
 import io.kotest.data.headers
 import io.kotest.data.row
 import io.kotest.data.table
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldContain
-import io.kotest.matchers.string.shouldNotContain
-import it.unibo.collektive.AlignmentComponentRegistrar
+import it.unibo.collektive.compiler.CollektiveK2JVMCompiler
+import it.unibo.collektive.compiler.logging.CollectingMessageCollector
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import java.io.File
 import java.io.FileNotFoundException
+import kotlin.io.path.createTempDirectory
 
 @OptIn(ExperimentalCompilerApi::class)
 object CompileUtils {
-    fun compile(
-        fileName: String,
-        program: String,
-    ): JvmCompilationResult {
-        val sourceFile = SourceFile.kotlin(fileName, program)
-
-        return KotlinCompilation()
-            .apply {
-                sources = listOf(sourceFile)
-                compilerPluginRegistrars = listOf(AlignmentComponentRegistrar())
-                inheritClassPath = true
-            }.compile()
-    }
-
     data class KotlinTestingProgram(
         val fileName: String,
         val program: String,
     ) {
-        infix fun shouldCompileWith(compilationCheck: (JvmCompilationResult) -> Unit) {
-            val result = compile(fileName, program)
-            result.exitCode shouldBe KotlinCompilation.ExitCode.OK
-            compilationCheck(result)
+        infix fun shouldCompileWith(compilationCheck: (CollectingMessageCollector) -> Unit) {
+            val collector = CollectingMessageCollector()
+            val program =
+                createTempDirectory("collektive-test")
+                    .toFile()
+                    .also { require(it.exists() && it.isDirectory) }
+                    .resolve(fileName)
+                    .also { it.writeText(program) }
+            CollektiveK2JVMCompiler.compile(listOf(program), collector)
+            compilationCheck(collector)
         }
     }
 
-    val noWarning: (JvmCompilationResult) -> Unit = { it.messages shouldNotContain "Warning" }
+    val noWarning: (CollectingMessageCollector) -> Unit = { it[CompilerMessageSeverity.WARNING].shouldBeEmpty() }
 
-    fun warning(warningMessage: String): (JvmCompilationResult) -> Unit = { it.messages shouldContain warningMessage }
-
-    fun testingProgramFromResource(fileName: String): KotlinTestingProgram {
-        val content: String = checkNotNull(ClassLoader.getSystemClassLoader().getResource(fileName)).readText()
-        return KotlinTestingProgram(fileName, content)
-    }
-
-    object StringSubstitutor {
-        fun replace(
-            template: String,
-            properties: Map<String, String>,
-        ): String =
-            template.replace(Regex("%\\(([^)]+)\\)")) { matchResult ->
-                val key = matchResult.groupValues[1]
-                properties[key].orEmpty()
-            }
-    }
+    fun warning(warningMessage: String): (CollectingMessageCollector) -> Unit =
+        { collector ->
+            collector[CompilerMessageSeverity.WARNING]
+                .map { it.message }
+                .any { it.contains(warningMessage) } shouldBe true
+        }
 
     fun String.asTestingProgram(fileName: String): KotlinTestingProgram = KotlinTestingProgram(fileName, this)
 

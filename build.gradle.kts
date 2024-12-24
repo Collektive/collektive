@@ -107,9 +107,6 @@ allprojects {
             if (requested.group == "org.jetbrains.kotlin") {
                 useVersion(rootProject.libs.versions.kotlin.get())
             }
-            if (requested.group == "org.jetbrains.kotlinx" && requested.name == "kotlinx-coroutines-core") {
-                useVersion(rootProject.libs.versions.coroutines.get())
-            }
         }
     }
 
