@@ -55,7 +55,10 @@ object CollektiveK2JVMCompiler {
                         "Empty classpath from current classloader." +
                             "Likely a bug in alchemist-incarnation-collective's Kotlin compiler facade"
                     }
-                val pluginClasspath = classpath.filter { it.absolutePath.contains("/compiler-plugin/") }
+                val pluginClasspath =
+                    classpath.filter {
+                        it.absolutePath.contains("compiler-plugin${File.separator}")
+                    }
                 classpathAsList = classpath
                 noStdlib = true
                 noReflect = true

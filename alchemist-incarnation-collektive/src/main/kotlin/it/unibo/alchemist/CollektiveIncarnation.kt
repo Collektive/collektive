@@ -43,7 +43,6 @@ import java.io.File
 import java.lang.reflect.Method
 import java.net.URLClassLoader
 import javax.script.ScriptEngineManager
-import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.exists
@@ -274,7 +273,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
                 """.trimMargin()
             logger.info("Final code for Collektive program {}:\n{}", name, finalCode)
             inputFolder.resolve("$className.kt").writeText(finalCode)
-            val outputFolder = Path(classLoader.urLs.first().file)
+            val outputFolder = File(classLoader.urLs.first().file).toPath()
             check(outputFolder.exists() && outputFolder.isDirectory()) {
                 "Output folder ${outputFolder.absolutePathString()} does not exist or is not a directory"
             }
