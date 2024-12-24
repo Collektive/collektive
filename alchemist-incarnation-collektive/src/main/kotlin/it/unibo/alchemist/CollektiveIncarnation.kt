@@ -285,12 +285,6 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
                     destinationFolder = outputFolder,
                     messageCollector = messages,
                 )
-            //                CollektiveJVMCompiler.compile(
-            //                    sourceSets + inputFolder,
-            //                    moduleName = name,
-            //                    outputFolder = outputFolder,
-            //                    messageCollector = messages,
-            //                )
             messages.messages.forEach { (severity, message) ->
                 when (severity) {
                     ERROR, EXCEPTION -> logger.error(message)
