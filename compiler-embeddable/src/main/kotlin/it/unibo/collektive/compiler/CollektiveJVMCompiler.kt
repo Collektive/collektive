@@ -29,6 +29,11 @@ import kotlin.script.experimental.jvm.util.classpathFromClassloader
  * A facade for the Kotlin-JVM compiler with the Collektive plugin.
  */
 @OptIn(ExperimentalCompilerApi::class)
+@Deprecated(
+    "This facade is deprecated since it does not execute the Collektive frontend compiler plugin," +
+        " and uses unstable compiler APIs",
+    ReplaceWith("CollektiveK2JVMCompiler.compile"),
+)
 object CollektiveJVMCompiler {
     private fun tempDir(module: String) = createTempDirectory(module).toFile()
 

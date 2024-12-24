@@ -1,7 +1,6 @@
 [versions]
 alchemist = "36.0.12"
 build-config = "5.5.1"
-coroutines = "1.9.0"
 dokka = "2.0.0"
 kotest = "6.0.0.M1"
 kotlin = "2.0.21"
@@ -10,10 +9,8 @@ kotlin = "2.0.21"
 alchemist-api = { module = "it.unibo.alchemist:alchemist-api", version.ref = "alchemist" }
 alchemist = { module = "it.unibo.alchemist:alchemist", version.ref = "alchemist" }
 apache-commons-codec = "commons-codec:commons-codec:1.17.1"
-apache-commons-text = "org.apache.commons:commons-text:1.13.0"
 caffeine = "com.github.ben-manes.caffeine:caffeine:3.1.8"
 javap = "com.perfma.wrapped:com.sun.tools:1.8.0_jdk8u275-b01_linux_x64"
-kctfork = "dev.zacsweers.kctfork:core:0.6.0"
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-runner-junit5-jvm = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }
@@ -26,7 +23,6 @@ kotlin-test-common = { module = "org.jetbrains.kotlin:kotlin-test-common", versi
 kotlin-test-annotations-common = { module = "org.jetbrains.kotlin:kotlin-test-annotations-common", version.ref = "kotlin" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlinpoet = "com.squareup:kotlinpoet:2.0.0"
-kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 slf4j = "org.slf4j:slf4j-api:2.0.16"
 subjekt = "io.github.freshmag:subjekt-api:1.1.4"
 

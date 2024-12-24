@@ -29,9 +29,9 @@ kotlinJvm {
         val test by getting {
             dependencies {
                 implementation(project(":dsl"))
+                implementation(project(":compiler-embeddable"))
                 implementation(rootProject.libs.kotest.runner.junit5.jvm)
                 implementation(libs.javap)
-                implementation(libs.kctfork)
                 implementation(libs.kotlinpoet)
                 implementation(libs.subjekt)
             }
