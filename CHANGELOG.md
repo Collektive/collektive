@@ -1,3 +1,28 @@
+## [11.2.0](https://github.com/Collektive/collektive/compare/11.1.3...11.2.0) (2024-12-24)
+
+### Features
+
+* drop `com.tschuchort` library using new compiler embeddable library for testing the frontend compiler plugin ([#670](https://github.com/Collektive/collektive/issues/670)) ([74022bf](https://github.com/Collektive/collektive/commit/74022bfff4e86d9850d4a2ab02e653220e4d0a86))
+
+### Dependency updates
+
+* **deps:** update alchemist to v36.0.12 ([2efa4d6](https://github.com/Collektive/collektive/commit/2efa4d6f7b3ce5103a1d81676bb88c9fd3eb2e32))
+* **deps:** update dependency gradle to v8.12 ([59608bf](https://github.com/Collektive/collektive/commit/59608bf791d23833d22edf0f2aa7d257e4c637c5))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.117 ([2cce4cc](https://github.com/Collektive/collektive/commit/2cce4ccb12a7168e9d68db0b3b4904c69be70474))
+* **deps:** update plugin multijvmtesting to v3.0.2 ([b145993](https://github.com/Collektive/collektive/commit/b14599343b2df9f5661664ddf5e2b62a8919544a))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.18 ([83284ca](https://github.com/Collektive/collektive/commit/83284ca16c8038f199c96a07557502517eba3696))
+* **deps:** update plugin publishoncentral to v7.0.3 ([96a8de3](https://github.com/Collektive/collektive/commit/96a8de3625af96da781cb1ae252a10e293f37dc3))
+* **deps:** update plugin publishoncentral to v7.0.4 ([cfa2d26](https://github.com/Collektive/collektive/commit/cfa2d26ed72be20f012aa4c33049de3dc478c2c5))
+
+### Build and continuous integration
+
+* change deprecated methods and unused variables ([#666](https://github.com/Collektive/collektive/issues/666)) ([b528e14](https://github.com/Collektive/collektive/commit/b528e14b2ab204faee652261ffdfb7b55228168a))
+* remove ps script ([b0661da](https://github.com/Collektive/collektive/commit/b0661daac51b699d4f822a5d6c847c145a72269c))
+
+### Style improvements
+
+* disable standard class signature for tests only ([1603348](https://github.com/Collektive/collektive/commit/160334810f739836abaa0de6aab9e4a40e8dca22))
+
 ## [11.1.3](https://github.com/Collektive/collektive/compare/11.1.2...11.1.3) (2024-12-20)
 
 ### Dependency updates
