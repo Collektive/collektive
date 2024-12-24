@@ -2,6 +2,7 @@ package it.unibo.alchemist
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.LoadingCache
+import it.unibo.alchemist.CollektiveIncarnation.Companion.ScriptEngine.getValue
 import it.unibo.alchemist.actions.RunCollektiveProgram
 import it.unibo.alchemist.collektive.device.CollektiveDevice
 import it.unibo.alchemist.model.Action
@@ -23,12 +24,13 @@ import it.unibo.alchemist.model.timedistributions.DiracComb
 import it.unibo.alchemist.model.times.DoubleTime
 import it.unibo.alchemist.util.RandomGenerators.nextDouble
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.compiler.CollektiveJVMCompiler
+import it.unibo.collektive.compiler.CollektiveK2JVMCompiler
 import it.unibo.collektive.compiler.logging.CollectingMessageCollector
 import it.unibo.collektive.compiler.util.md5
 import it.unibo.collektive.compiler.util.toBase32
 import org.apache.commons.math3.random.RandomGenerator
 import org.danilopianini.util.ListSet
+import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.ERROR
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.EXCEPTION
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.INFO
@@ -36,13 +38,16 @@ import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.LOGGING
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.OUTPUT
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.STRONG_WARNING
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.WARNING
-import org.jetbrains.kotlin.codegen.state.GenerationState
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.lang.reflect.Method
 import java.net.URLClassLoader
 import javax.script.ScriptEngineManager
+import kotlin.io.path.Path
+import kotlin.io.path.absolutePathString
 import kotlin.io.path.createTempDirectory
+import kotlin.io.path.exists
+import kotlin.io.path.isDirectory
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.starProjectedType
 
@@ -247,7 +252,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         private fun classFqNameFrom(
             packageName: String?,
             className: String,
-        ) = "${packageName?.takeUnless { it.isEmpty() }?.let { "$it." }.orEmpty() }$className"
+        ) = "${packageName?.takeUnless { it.isEmpty() }?.let { "$it." }.orEmpty()}$className"
 
         private fun compileCollektive(
             name: String,
@@ -257,31 +262,35 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
             code: String,
             entrypoint: String,
             classLoader: URLClassLoader,
-        ): Pair<CollectingMessageCollector, GenerationState?> {
+        ): Pair<CollectingMessageCollector, ExitCode> {
             val inputFolder = createTempDirectory("collektive").toFile()
             logger.info("Compiling Collektive program {} in folder {}", name, inputFolder.absolutePath)
             val finalCode =
                 """
                 |@file:JvmName("$className")
                 |${code.replace("\n", "\n|")}
-                |context(${CollektiveDevice::class.qualifiedName}<P>)
-                |fun <P : ${Position::class.qualifiedName}<P>> ${Aggregate::class.qualifiedName}<Int>.$methodName() =
+                |fun <P : ${Position::class.qualifiedName}<P>> ${Aggregate::class.qualifiedName}<Int>.$methodName(device: ${CollektiveDevice::class.qualifiedName}<P>) =
                 |   $entrypoint
                 """.trimMargin()
             logger.info("Final code for Collektive program {}:\n{}", name, finalCode)
             inputFolder.resolve("$className.kt").writeText(finalCode)
-            val outputFolder = File(classLoader.urLs.first().file)
-            check(outputFolder.exists() && outputFolder.isDirectory) {
-                "Output folder ${outputFolder.absolutePath} does not exist or is not a directory"
+            val outputFolder = Path(classLoader.urLs.first().file)
+            check(outputFolder.exists() && outputFolder.isDirectory()) {
+                "Output folder ${outputFolder.absolutePathString()} does not exist or is not a directory"
             }
             val messages = CollectingMessageCollector()
-            val result: GenerationState? =
-                CollektiveJVMCompiler.compile(
+            val result: ExitCode =
+                CollektiveK2JVMCompiler.compile(
                     sourceSets + inputFolder,
-                    moduleName = name,
-                    outputFolder = outputFolder,
+                    destinationFolder = outputFolder,
                     messageCollector = messages,
                 )
+            //                CollektiveJVMCompiler.compile(
+            //                    sourceSets + inputFolder,
+            //                    moduleName = name,
+            //                    outputFolder = outputFolder,
+            //                    messageCollector = messages,
+            //                )
             messages.messages.forEach { (severity, message) ->
                 when (severity) {
                     ERROR, EXCEPTION -> logger.error(message)
@@ -290,7 +299,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
                     LOGGING -> logger.debug(message)
                 }
             }
-            check(!messages.hasErrors() && result != null) {
+            check(!messages.hasErrors() && result == ExitCode.OK) {
                 "Compilation of Collektive program $name failed:\n$finalCode"
             }
             return messages to result
