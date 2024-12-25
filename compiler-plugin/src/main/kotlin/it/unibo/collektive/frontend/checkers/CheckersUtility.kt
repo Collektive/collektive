@@ -46,7 +46,7 @@ object CheckersUtility {
     fun FirFunctionCall.isAggregate(session: FirSession): Boolean {
         val callableSymbol = toResolvedCallableSymbol()
         return callableSymbol?.receiverParameter?.isAggregate(session) == true ||
-            callableSymbol?.getContainingClassSymbol()?.name?.asString() == AGGREGATE_CLASS_NAME
+            callableSymbol?.getContainingClassSymbol(session)?.name?.asString() == AGGREGATE_CLASS_NAME
     }
 
     /**
