@@ -2,7 +2,6 @@ import de.aaschmid.gradle.plugins.cpd.Cpd
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektPlugin
 import io.gitlab.arturbosch.detekt.report.ReportMergeTask
-import java.time.LocalDate
 import org.danilopianini.gradle.mavencentral.DocStyle
 
 plugins {
@@ -89,14 +88,6 @@ allprojects {
         }
     }
 
-    dokka {
-        pluginsConfiguration.html {
-            customStyleSheets.from("${rootDir}/assets/collektive.css")
-            customAssets.from("${rootDir}/assets/logo.svg")
-            footerMessage.set("&copy; ${LocalDate.now().year} Collektive")
-        }
-    }
-
     plugins.withType<DetektPlugin> {
         val detektTasks = tasks.withType<Detekt>()
             .matching { task ->
@@ -139,7 +130,6 @@ dependencies {
         project(":alchemist-incarnation-collektive"),
     ).forEach {
         kover(it)
-        dokka(it)
     }
 }
 
