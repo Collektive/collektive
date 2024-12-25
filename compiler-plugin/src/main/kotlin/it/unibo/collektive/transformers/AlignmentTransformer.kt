@@ -143,4 +143,4 @@ class AlignmentTransformer(
                 +irGet(tmpVar)
             }
         }
-    }
+}
