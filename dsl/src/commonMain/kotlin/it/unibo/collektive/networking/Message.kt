@@ -10,7 +10,10 @@ sealed interface Message
 /**
  * [messages] received by a node from [senderId].
  */
-data class InboundMessage<ID : Any>(val senderId: ID, val messages: Map<Path, *>) : Message
+data class InboundMessage<ID : Any>(
+    val senderId: ID,
+    val messages: Map<Path, *>,
+) : Message
 
 /**
  * An [OutboundMessage] are messages that a device [senderId] sends to all other neighbours.
@@ -76,4 +79,7 @@ class OutboundMessage<ID : Any>(
  * Has a [default] value that is sent regardless the awareness the device's neighbours, [overrides] specifies the
  * payload depending on the neighbours' values.
  */
-data class SingleOutboundMessage<ID : Any, Payload>(val default: Payload, val overrides: Map<ID, Payload> = emptyMap())
+data class SingleOutboundMessage<ID : Any, Payload>(
+    val default: Payload,
+    val overrides: Map<ID, Payload> = emptyMap(),
+)

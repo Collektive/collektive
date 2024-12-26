@@ -89,16 +89,16 @@ allprojects {
     }
 
     plugins.withType<DetektPlugin> {
-        val check by tasks.getting
-        val detektAll by tasks.creating { group = "verification" }
-        tasks.withType<Detekt>()
+        val detektTasks = tasks.withType<Detekt>()
             .matching { task ->
                 task.name.let { it.endsWith("Main") || it.endsWith("Test") } && !task.name.contains("Baseline")
             }
-            .all {
-                check.dependsOn(this)
-                detektAll.dependsOn(this)
-            }
+        val check by tasks.getting
+        val detektAll by tasks.registering {
+            group = "verification"
+            check.dependsOn(this)
+            dependsOn(detektTasks)
+        }
     }
 
     // Enforce the use of the Kotlin version in all subprojects
@@ -106,9 +106,6 @@ allprojects {
         resolutionStrategy.eachDependency {
             if (requested.group == "org.jetbrains.kotlin") {
                 useVersion(rootProject.libs.versions.kotlin.get())
-            }
-            if (requested.group == "org.jetbrains.kotlinx" && requested.name == "kotlinx-coroutines-core") {
-                useVersion(rootProject.libs.versions.coroutines.get())
             }
         }
     }

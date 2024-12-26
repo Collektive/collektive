@@ -9,7 +9,9 @@ import org.slf4j.LoggerFactory
 /**
  * A message collector that logs messages using a SLF4J [logger].
  */
-class SLF4JMessageCollector(val logger: Logger) : MessageCollector {
+class SLF4JMessageCollector(
+    val logger: Logger,
+) : MessageCollector {
     override fun clear() = Unit
 
     override fun hasErrors(): Boolean = false
