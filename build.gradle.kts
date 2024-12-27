@@ -125,11 +125,11 @@ allprojects {
 
 dependencies {
     listOf(
-        project(":dsl"),
-        project(":stdlib"),
-        project(":alchemist-incarnation-collektive"),
+        "dsl",
+        "stdlib",
+        "alchemist-incarnation-collektive",
     ).forEach {
-        kover(it)
+        kover(project(":$it"))
     }
 }
 
