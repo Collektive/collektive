@@ -91,7 +91,8 @@ allprojects {
     plugins.withType<DetektPlugin> {
         val detektTasks = tasks.withType<Detekt>()
             .matching { task ->
-                task.name.let { it.endsWith("Main") || it.endsWith("Test") } && !task.name.contains("Baseline")
+                task.name.let { it.endsWith("Main") || it.endsWith("Test") } &&
+                    !task.name.contains("Baseline")
             }
         val check by tasks.getting
         val detektAll by tasks.registering {
@@ -123,9 +124,13 @@ allprojects {
 }
 
 dependencies {
-    kover(project(":dsl"))
-    kover(project(":stdlib"))
-    kover(project(":alchemist-incarnation-collektive"))
+    listOf(
+        "dsl",
+        "stdlib",
+        "alchemist-incarnation-collektive",
+    ).forEach {
+        kover(project(":$it"))
+    }
 }
 
 kover {
