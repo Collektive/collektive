@@ -1,3 +1,18 @@
+## [12.0.0](https://github.com/Collektive/collektive/compare/11.2.0...12.0.0) (2024-12-28)
+
+### ⚠ BREAKING CHANGES
+
+* **code-gen:** remove `plus` operators for `String` type since a more generic version in the kotlin stdlib shadows our generations (#620)
+
+### Dependency updates
+
+* **deps:** update plugin multijvmtesting to v3.1.1 ([f000068](https://github.com/Collektive/collektive/commit/f000068e1a8be3411c5ef43014c273ade3362b20))
+* **deps:** update plugin multijvmtesting to v3.1.2 ([37bf7ad](https://github.com/Collektive/collektive/commit/37bf7ad04a3c424fb0c8c953f693c7687ec6e27d))
+
+### Bug Fixes
+
+* **code-gen:** remove `plus` operators for `String` type since a more generic version in the kotlin stdlib shadows our generations ([#620](https://github.com/Collektive/collektive/issues/620)) ([989649b](https://github.com/Collektive/collektive/commit/989649b88ecd421db7747bf67c16869ccf4e5280))
+
 ## [11.2.0](https://github.com/Collektive/collektive/compare/11.1.3...11.2.0) (2024-12-24)
 
 ### Features
