@@ -15,6 +15,7 @@ import it.unibo.collektive.field.operations.max
 import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
 
 /**
+ * First example - Tutorial:
  * 1. Identify the maximum value among the neighboring nodes.
  * 2. Assign a distinct color to the nodes with the identified maximum values.
 */
@@ -42,10 +43,6 @@ fun Aggregate<Int>.searchMaxNeighborIDValue(environment: EnvironmentVariables): 
 
 ```
 
-```bash
-./gradlew runMaxIDGraphic
-```
-
 <div style={{ textAlign: 'center' }}>
   <img src="/img/basic-usage-first-example-1.png" style={{ maxWidth: '70%' }} />
 </div>
@@ -63,3 +60,169 @@ fun Aggregate<Int>.searchMaxNeighborIDValue(environment: EnvironmentVariables): 
 </div>
 
 ## Second example
+
+```kotlin
+package it.unibo.collektive.examples.maxID
+
+import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
+import it.unibo.collektive.field.operations.max
+import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
+
+/**
+ * First example - Tutorial:
+ * 1. Identify the maximum value among the neighboring nodes.
+ * 2. Assign a distinct color to the nodes with the identified maximum values.
+ * Second example - Tutorial:
+ * 3. Identify the maximum value in the network.
+ * 4. Assign a distinct color to the nodes with the identified maximum values.
+*/
+
+fun Aggregate<Int>.maxID(environment: EnvironmentVariables) =
+    when (environment.get<Boolean>("isMaxID")) {
+        true -> searchMaxNetworkIDValue(environment)
+        false -> environment.get<Int>("maxNetworkID")
+    }
+
+fun Aggregate<Int>.searchMaxNeighborIDValue(environment: EnvironmentVariables): Int {
+    // Step 1: Exchange the localId with neighbors and obtain a field of values
+    val neighborValues = neighboringViaExchange(local = localId)
+
+    // Step 2: Find the maximum value among neighbors (including self)
+    val maxValue = neighborValues.max(base = localId)
+
+    // Step 3: Assign the result to a molecule
+    environment.set<Boolean>("isMaxLocalID", localId == maxValue)
+    environment.set<Int>("maxNeighborID", maxValue)
+
+    return maxValue
+}
+
+fun Aggregate<Int>.searchMaxNetworkIDValue(environment: EnvironmentVariables): Int {
+    environment.set<Int>("localID", localId)
+
+    when (environment.get<Boolean>("isMaxLocalID")) {
+        true -> searchMaxNeighborIDValue(environment)
+        false -> environment.get<Int>("maxNeighborID")
+    }
+
+    // Step 1: Exchange the maxNeighborID with neighbors and obtain a field of values
+    val neighborValues = neighboringViaExchange(local = environment.get<Int>("maxNeighborID"))
+
+    // Step 2: Find the maximum value among neighbors (including self)
+    val maxValue = neighborValues.max(base = environment.get<Int>("maxNeighborID"))
+
+    // Step 3: Assign the result to a molecule
+    environment.set<Boolean>("isMaxID", localId == maxValue)
+    environment.set<Int>("maxNetworkID", maxValue)
+    
+    return maxValue
+}
+
+```
+
+<div style={{ textAlign: 'center' }}>
+  <img src="/img/basic-usage-second-example-1.png" style={{ maxWidth: '70%' }} />
+</div>
+
+<div style={{ textAlign: 'center' }}>
+  <img src="/img/basic-usage-second-example-2.png" style={{ maxWidth: '70%' }} />
+</div>
+
+## Third example
+
+```kotlin
+package it.unibo.collektive.examples.channel
+
+import it.unibo.alchemist.collektive.device.DistanceSensor
+import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.operators.share
+import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
+import it.unibo.collektive.examples.gradient.gradient
+import it.unibo.collektive.field.Field.Companion.fold
+import kotlin.Double.Companion.POSITIVE_INFINITY
+
+/**
+ * Compute the channel between the source and the target with obstacles.
+ */
+fun Aggregate<Int>.channelWithObstacles(
+    environment: EnvironmentVariables,
+    distanceSensor: DistanceSensor,
+): Boolean = when (environment.get<Boolean>("obstacle")) {
+    true -> false
+    false -> channel(
+        distanceSensor,
+        environment["source"],
+        environment["target"],
+        channelWidth = 0.5
+    )
+}
+
+/**
+ * Compute the channel between the [source] and the [target] with a specific [channelWidth].
+ */
+fun Aggregate<Int>.channel(
+    distanceSensor: DistanceSensor,
+    source: Boolean,
+    destination: Boolean,
+    channelWidth: Double
+): Boolean {
+    require(channelWidth.isFinite() && channelWidth > 0)
+    val toSource = gradient(distanceSensor, source)
+    val toDestination = gradient(distanceSensor, destination)
+    val sourceToDestination = broadcast(distanceSensor, from = source, payload = toDestination)
+    val channel = toSource + toDestination - sourceToDestination
+    return if (channel.isFinite()) channel <= channelWidth else false
+}
+
+/**
+ * Computes the [gradientCast] from the [source] with the [value] that is the distance from the [source] to the target.
+ */
+fun Aggregate<Int>.broadcast(distanceSensor: DistanceSensor, from: Boolean, payload: Double): Double =
+    gradientCast(distanceSensor, from, payload) { it }
+
+/**
+ * Compute the gradient of the aggregate from the [source] to the [target].
+ * The [accumulate] function is used to accumulate the value of the aggregate.
+ */
+fun Aggregate<Int>.gradientCast(
+    distanceSensor: DistanceSensor,
+    source: Boolean,
+    initial: Double,
+    accumulate: (Double) -> Double
+): Double = share(POSITIVE_INFINITY to initial) { field ->
+    val dist = with(distanceSensor) { distances() }
+    when {
+        source -> 0.0 to initial
+        else -> {
+            val resultField = dist.alignedMap(field) { distField, (currentDist, value) ->
+                distField + currentDist to accumulate(value)
+            }
+            resultField.fold(POSITIVE_INFINITY to POSITIVE_INFINITY) { acc, value ->
+                if (value.first < acc.first) value else acc
+            }
+        }
+    }
+}.second
+
+```
+
+<div style={{ textAlign: 'center' }}>
+  <img src="/img/basic-usage-third-example-1.png" style={{ maxWidth: '70%' }} />
+</div>
+
+<div style={{ textAlign: 'center' }}>
+  <img src="/img/basic-usage-third-example-2.png" style={{ maxWidth: '70%' }} />
+</div>
+
+<div style={{ textAlign: 'center' }}>
+  <img src="/img/basic-usage-third-example-3.png" style={{ maxWidth: '70%' }} />
+</div>
+
+<div style={{ textAlign: 'center' }}>
+  <img src="/img/basic-usage-third-example-4.png" style={{ maxWidth: '70%' }} />
+</div>
+
+<div style={{ textAlign: 'center' }}>
+  <img src="/img/basic-usage-third-example-5.png" style={{ maxWidth: '70%' }} />
+</div>
