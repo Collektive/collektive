@@ -1,8 +1,10 @@
 import de.aaschmid.gradle.plugins.cpd.Cpd
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektPlugin
-import io.gitlab.arturbosch.detekt.report.ReportMergeTask
 import org.danilopianini.gradle.mavencentral.DocStyle
+import org.jlleitschuh.gradle.ktlint.KtlintExtension
+import org.jlleitschuh.gradle.ktlint.KtlintPlugin
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
     alias(libs.plugins.dokka)
@@ -13,9 +15,6 @@ plugins {
     alias(libs.plugins.publishOnCentral)
     alias(libs.plugins.taskTree)
     id("it.unibo.collektive.collektive-plugin")
-}
-val reportMerge by tasks.registering(ReportMergeTask::class) {
-    output = project.layout.buildDirectory.file("reports/detekt/merge.sarif")
 }
 
 allprojects {
@@ -109,11 +108,6 @@ allprojects {
                 useVersion(rootProject.libs.versions.kotlin.get())
             }
         }
-    }
-
-    tasks.withType<Detekt>().configureEach { finalizedBy(reportMerge) }
-    reportMerge {
-        input.from(tasks.withType<Detekt>().map { it.sarifReportFile })
     }
 
     tasks.withType<Cpd>().configureEach {
