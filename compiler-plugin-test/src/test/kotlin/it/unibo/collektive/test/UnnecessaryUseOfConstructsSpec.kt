@@ -45,7 +45,7 @@ class UnnecessaryUseOfConstructsSpec : FreeSpec({
 
         forAll(constructs) { construct ->
 
-            "an unused parameter inside a construct call" - {
+            "an unused parameter inside a '$construct' construct call" - {
                 val subjectName = "UnnecessaryUse${construct.replaceFirstChar(Char::uppercase)}"
                 val code = testSubjects.getTestingProgram(subjectName)
 
@@ -57,7 +57,7 @@ class UnnecessaryUseOfConstructsSpec : FreeSpec({
                 }
             }
 
-            "an implicit parameter used inside a construct call" - {
+            "an implicit parameter used inside a '$construct' construct call" - {
                 val subjectName = "NecessaryUseImplicitParameter${construct.replaceFirstChar(Char::uppercase)}"
                 val code = testSubjects.getTestingProgram(subjectName)
 
@@ -66,7 +66,7 @@ class UnnecessaryUseOfConstructsSpec : FreeSpec({
                 }
             }
 
-            "an explicit parameter used inside a construct call" - {
+            "an explicit parameter used inside a '$construct' construct call" - {
                 val subjectName = "NecessaryUseExplicitParameter${construct.replaceFirstChar(Char::uppercase)}"
                 val code = testSubjects.getTestingProgram(subjectName)
 
