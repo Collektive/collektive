@@ -44,7 +44,7 @@ parameters:
         }
       - |-
         share(initial) {
-          it.maxBy(0) { it }
+          it.maxBy { v -> v. value }.value
         }
   - name: CONSTRUCT_EXPLICIT
     values:
@@ -62,7 +62,7 @@ parameters:
         }
       - |-
         share(initial) { field ->
-          field.maxBy(0) { it }
+          field.maxBy { v -> v. value }.value
         }
 
 subjects:
