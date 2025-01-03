@@ -4,7 +4,7 @@ import io.kotest.data.headers
 import io.kotest.data.row
 import io.kotest.data.table
 import io.kotest.matchers.collections.shouldBeEmpty
-import io.kotest.matchers.shouldBe
+import io.kotest.matchers.collections.shouldContain
 import it.unibo.collektive.compiler.CollektiveK2JVMCompiler
 import it.unibo.collektive.compiler.logging.CollectingMessageCollector
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
@@ -36,9 +36,7 @@ object CompileUtils {
 
     fun warning(warningMessage: String): (CollectingMessageCollector) -> Unit =
         { collector ->
-            collector[CompilerMessageSeverity.WARNING]
-                .map { it.message }
-                .any { it.contains(warningMessage) } shouldBe true
+            collector[CompilerMessageSeverity.WARNING].map { it.message } shouldContain warningMessage
         }
 
     fun String.asTestingProgram(fileName: String): KotlinTestingProgram = KotlinTestingProgram(fileName, this)

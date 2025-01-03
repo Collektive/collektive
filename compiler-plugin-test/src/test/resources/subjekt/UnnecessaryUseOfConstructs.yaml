@@ -1,0 +1,91 @@
+name: "Unnecessary use of constructs"
+
+config:
+  codePreamble: |-
+    /**
+      * This file has been auto-generated with Subjekt (https://github.com/FreshMag/subjekt).
+    */
+    import it.unibo.collektive.aggregate.api.Aggregate
+    import it.unibo.collektive.aggregate.api.operators.share
+    import it.unibo.collektive.field.operations.maxBy
+
+parameters:
+  - name: UNUSED_CONSTRUCT
+    values:
+      - |-
+        evolve(initial) {
+          initial
+        }
+      - |-
+        exchange(initial) {
+          neighboring(initial)
+        }
+      - |-
+        neighboring {
+        
+        }
+      - |-
+        share(initial) {
+          initial
+        }
+  - name: CONSTRUCT_IMPLICIT
+    values:
+      - |-
+        evolve(0) {
+          it + 1
+        }
+      - |-
+        exchange(initial) {
+          it.map { it + 1 }
+        }
+      - |-
+        neighboring {
+          initial
+        }
+      - |-
+        share(initial) {
+          it.maxBy { v -> v. value }.value
+        }
+  - name: CONSTRUCT_EXPLICIT
+    values:
+      - |-
+        evolve(0) { value ->
+          value + 1
+        }
+      - |-
+        exchange(initial) { field ->
+          field.map { it + 1 }
+        }
+      - |- 
+        neighboring {
+          initial
+        }
+      - |-
+        share(initial) { field ->
+          field.maxBy { v -> v. value }.value
+        }
+
+subjects:
+  - name: "UnnecessaryUse${{ prettify(UNUSED_CONSTRUCT) }}"
+    code: |-
+      fun Aggregate<Int>.entry() {
+          val initial = 0
+          ${{ UNUSED_CONSTRUCT }}
+      }
+    outcomes:
+      warning: |-
+        The '${{ UNUSED_CONSTRUCT }}' construct is not necessary for the given use case.
+
+  - name: "NecessaryUseImplicitParameter${{ prettify(CONSTRUCT_IMPLICIT) }}"
+    code: |-
+      fun Aggregate<Int>.entry() {
+          val initial = 0
+          ${{ CONSTRUCT_IMPLICIT }}
+      }
+
+  - name: "NecessaryUseExplicitParameter${{ prettify(CONSTRUCT_EXPLICIT) }}"
+    code: |-
+      fun Aggregate<Int>.entry() {
+          val initial = 0
+          ${{ CONSTRUCT_EXPLICIT }}
+      }

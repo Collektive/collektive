@@ -46,5 +46,12 @@ object KtDefaultErrorMessagesCollektive : BaseDiagnosticRendererFactory() {
                 """.trimIndent(),
                 CommonRenderers.STRING,
             )
+            put(
+                FirCollektiveErrors.UNNECESSARY_CONSTRUCT_CALL,
+                """
+                The ''{0}'' construct is not necessary for the given use case.
+                """.trimIndent(),
+                CommonRenderers.STRING,
+            )
         }
 }
