@@ -23,17 +23,17 @@ import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
  * Checker for unnecessary use of constructs.
  *
  * This checker is responsible for detecting unnecessary calls to constructs like `share`, `exchange`, `neighboring`
- * or `repeat`.
+ * or `evolve`.
  *
  * For example:
  *
  * ```kotlin
- * repeat(initial) { it ->
+ * evolve(initial) { it ->
  *    // but `it` is not used inside the body
  * }
  * ```
  *
- * Should generate a warning indicating the unnecessary use of the `repeat` construct.
+ * Should generate a warning indicating the unnecessary use of the `evolve` construct.
  */
 object UnnecessaryUseOfConstructs : FirFunctionCallChecker(MppCheckerKind.Common) {
     private const val NEIGHBORING_FQN = "it.unibo.collektive.aggregate.api.Aggregate.neighboring"
