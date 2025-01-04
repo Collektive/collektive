@@ -15,6 +15,10 @@ import org.jetbrains.kotlin.fir.expressions.FirReturnExpression
 import org.jetbrains.kotlin.fir.expressions.impl.FirUnitExpression
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
+/**
+ * A visitor that checks if a function call has an empty return (i.e., no return statement,
+ * resulting into a [FirUnitExpression] as return expression).
+ */
 class EmptyReturnVisitor : FirVisitor<Unit, Boolean>() {
     private var hasReturn = true
 
