@@ -35,9 +35,12 @@ import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
  * Should generate a warning indicating the unnecessary use of the `repeat` construct.
  */
 object UnnecessaryUseOfConstructs : FirFunctionCallChecker(MppCheckerKind.Common) {
+
+    private const val NEIGHBORING_FQN = "it.unibo.collektive.aggregate.api.Aggregate.neighboring"
+
     private val constructs =
         listOf(
-            "it.unibo.collektive.aggregate.api.Aggregate.neighboring",
+            NEIGHBORING_FQN,
             "it.unibo.collektive.aggregate.api.Aggregate.exchange",
             // "it.unibo.collektive.aggregate.api.operators.share",
             "it.unibo.collektive.aggregate.api.Aggregate.evolve",
@@ -47,7 +50,7 @@ object UnnecessaryUseOfConstructs : FirFunctionCallChecker(MppCheckerKind.Common
 
     private fun FirFunctionCall.doesNotUseParameter(): Boolean {
         val visitor = ConstructCallVisitor()
-        return !visitor.checkValueParameterUsagesInsideAnonymousFunctionCall(this)
+        return !visitor.containsValueParameterUsagesInsideAnonymousFunctionCall(this)
     }
 
     override fun check(
