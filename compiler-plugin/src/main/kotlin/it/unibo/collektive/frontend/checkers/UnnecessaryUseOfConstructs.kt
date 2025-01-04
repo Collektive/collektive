@@ -11,6 +11,7 @@ package it.unibo.collektive.frontend.checkers
 import it.unibo.collektive.frontend.checkers.CheckersUtility.fqName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.functionName
 import it.unibo.collektive.frontend.visitors.ConstructCallVisitor
+import it.unibo.collektive.frontend.visitors.EmptyReturnVisitor
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
@@ -35,7 +36,6 @@ import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
  * Should generate a warning indicating the unnecessary use of the `repeat` construct.
  */
 object UnnecessaryUseOfConstructs : FirFunctionCallChecker(MppCheckerKind.Common) {
-
     private const val NEIGHBORING_FQN = "it.unibo.collektive.aggregate.api.Aggregate.neighboring"
 
     private val constructs =
@@ -48,10 +48,16 @@ object UnnecessaryUseOfConstructs : FirFunctionCallChecker(MppCheckerKind.Common
 
     private fun FirFunctionCall.isConstructToCheck() = fqName() in constructs
 
-    private fun FirFunctionCall.doesNotUseParameter(): Boolean {
-        val visitor = ConstructCallVisitor()
-        return !visitor.containsValueParameterUsagesInsideAnonymousFunctionCall(this)
-    }
+    private fun FirFunctionCall.doesNotUseParameter(): Boolean =
+        if (fqName() == NEIGHBORING_FQN) {
+            with(EmptyReturnVisitor()) {
+                hasEmptyReturn()
+            }
+        } else {
+            with(ConstructCallVisitor()) {
+                doesNotContainValueParameterUsagesInAnonymousFunctionCall()
+            }
+        }
 
     override fun check(
         expression: FirFunctionCall,

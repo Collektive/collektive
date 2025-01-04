@@ -50,8 +50,8 @@ class ConstructCallVisitor : FirVisitorVoid() {
      * Checks for usages, inside an anonymous function call block, of its value parameters. This includes
      * implicit parameters (i.e. `it`). Returns `true` if any of the value parameters is used, `false` otherwise.
      */
-    fun containsValueParameterUsagesInsideAnonymousFunctionCall(functionCall: FirFunctionCall): Boolean {
-        visitElement(functionCall)
-        return found
+    fun FirFunctionCall.doesNotContainValueParameterUsagesInAnonymousFunctionCall(): Boolean {
+        visitElement(this)
+        return !found
     }
 }
