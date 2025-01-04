@@ -21,9 +21,9 @@ class AlignmentTest : StringSpec({
         val result =
             aggregate(0) {
                 neighboringViaExchange(10) // path -> [neighboring.1] = 10
-                share(0) {
+                share(5) {
                     requireNotNull(neighboringViaExchange(20).localValue) // path -> [share.1, neighboring.2] = 20
-                    5
+                    it.localValue
                 } // path -> [sharing.1] = 5
                 neighboringViaExchange(30) // path -> [neighboring.3] = 30
                 5
