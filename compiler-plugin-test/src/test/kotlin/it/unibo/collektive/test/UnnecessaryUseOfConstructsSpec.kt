@@ -43,7 +43,7 @@ class UnnecessaryUseOfConstructsSpec : FreeSpec({
                 row("neighboring"),
                 row("evolving"),
                 row("exchanging"),
-                // row("neighboringViaExchange"),
+                row("neighboringViaExchange"),
                 row("sharing"),
             )
 

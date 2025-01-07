@@ -46,7 +46,7 @@ object UnnecessaryUseOfConstructs : FirFunctionCallChecker(MppCheckerKind.Common
             "it.unibo.collektive.aggregate.api.Aggregate.exchange",
             "it.unibo.collektive.aggregate.api.operators.share",
             "it.unibo.collektive.aggregate.api.Aggregate.evolve",
-            // NEIGHBORING_VIA_EXCHANGE_FQN,
+            NEIGHBORING_VIA_EXCHANGE_FQN,
             "it.unibo.collektive.aggregate.api.Aggregate.exchanging",
             "it.unibo.collektive.aggregate.api.operators.sharing",
             "it.unibo.collektive.aggregate.api.Aggregate.evolving",
