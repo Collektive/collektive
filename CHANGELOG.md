@@ -1,3 +1,32 @@
+## [12.0.1](https://github.com/Collektive/collektive/compare/12.0.0...12.0.1) (2025-01-07)
+
+### Dependency updates
+
+* **core-deps:** update kotlin monorepo to v2.1.0 ([4514503](https://github.com/Collektive/collektive/commit/4514503a2828ea957c51bf52bd3461243c29e908))
+* **deps:** update dependency commons-codec:commons-codec to v1.17.2 ([82108a8](https://github.com/Collektive/collektive/commit/82108a84b0d748b897a79708885d2916dd21c1fa))
+* **deps:** update dependency io.github.freshmag:subjekt-api to v1.1.5 ([04f06d6](https://github.com/Collektive/collektive/commit/04f06d63f38783b555da44967170a2412d2ca0c1))
+
+### Tests
+
+* **dsl:** changed test with 'share' construct using the implicit parameter ([#674](https://github.com/Collektive/collektive/issues/674)) ([d270349](https://github.com/Collektive/collektive/commit/d27034912ffc21ec7c51bfc9385f04e60bdc4151))
+
+### Build and continuous integration
+
+* disable `allWarningsAsErrors` because of a bug in kotest https://github.com/kotest/kotest/pull/4598 ([98ab83d](https://github.com/Collektive/collektive/commit/98ab83d11ddab6a679fe72199d304ad2b3e9bee1))
+* disable dokka 2 ([30e4083](https://github.com/Collektive/collektive/commit/30e40830ac299ce66bd5025cb122e83755f4020f))
+* enable dokka 2.0.0 ([085b79c](https://github.com/Collektive/collektive/commit/085b79c50c26eb377cf7eadcfc6bdcd5899ad1b5))
+* setup dokka with new logo ([2cc3b5d](https://github.com/Collektive/collektive/commit/2cc3b5d461236a14d33647e449de7ce305494211))
+* use new API for setting compiler options ([1b2d262](https://github.com/Collektive/collektive/commit/1b2d262a7b1a5e7c5e1ad7b3db39320958c5ba68))
+
+### General maintenance
+
+* remove assets ([dcb022c](https://github.com/Collektive/collektive/commit/dcb022cbbe870178be76ee5e3a79a36012431ebb))
+
+### Refactoring
+
+* use kotlin 2.1.0 compiler api ([cd469ed](https://github.com/Collektive/collektive/commit/cd469ed0434fb3405295f8dd434911e4a42c9966))
+* use new kotlin compiler api ([e631cfd](https://github.com/Collektive/collektive/commit/e631cfda68b22efc904b213de87377c91a82d8c2))
+
 ## [12.0.0](https://github.com/Collektive/collektive/compare/11.2.0...12.0.0) (2024-12-28)
 
 ### ⚠ BREAKING CHANGES
