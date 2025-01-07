@@ -6,6 +6,7 @@ import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugin.use.PluginDependency
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -22,9 +23,16 @@ fun Project.kotlinJvm(configuration: KotlinJvmProjectExtension.() -> Unit) = kot
 
 fun Project.kotlinMultiplatform(configuration: KotlinMultiplatformExtension.() -> Unit) = kotlin(configuration)
 
+@OptIn(ExperimentalKotlinGradlePluginApi::class)
 fun Project.configureKotlinMultiplatform() {
     with(extensions.getByType<KotlinMultiplatformExtension>()) {
+        compilerOptions {
+            allWarningsAsErrors = true
+        }
         jvm {
+            compilerOptions {
+                jvmTarget = JvmTarget.JVM_1_8
+            }
             testRuns.getByName("test").executionTask.configure {
                 useJUnitPlatform()
                 filter {
