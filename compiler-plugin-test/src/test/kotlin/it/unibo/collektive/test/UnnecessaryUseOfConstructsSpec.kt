@@ -70,6 +70,19 @@ class UnnecessaryUseOfConstructsSpec : FreeSpec({
                 }
             }
 
+            "a shadowed implicit parameter used inside a '$construct' construct call" - {
+                val subjectName =
+                    "UnnecessaryUseShadowedImplicitParameter${construct.replaceFirstChar(Char::uppercase)}"
+                val code = testSubjects.getTestingProgram(subjectName)
+
+                "should compile producing a warning" - {
+                    code shouldCompileWith
+                        warning(
+                            expectedWarning(construct),
+                        )
+                }
+            }
+
             "an explicit parameter used inside a '$construct' construct call" - {
                 val subjectName = "NecessaryUseExplicitParameter${construct.replaceFirstChar(Char::uppercase)}"
                 val code = testSubjects.getTestingProgram(subjectName)

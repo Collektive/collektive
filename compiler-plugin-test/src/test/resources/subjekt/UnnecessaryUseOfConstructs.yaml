@@ -48,6 +48,7 @@ parameters:
         sharing(initial) {
           initial.yielding { "Test" }
         }
+
   - name: CONSTRUCT_IMPLICIT
     values:
       - |-
@@ -83,6 +84,46 @@ parameters:
           it.max(it.localValue).yielding { "Test" }
         }
 
+  - name: CONSTRUCT_IMPLICIT_SHADOWED
+    values:
+      - |-
+        evolve(initial) {
+          listOf<Int>(initial).map { it }[0]
+        }
+      - |-
+        exchange(initial) { 
+          val field = neighboring(0)
+          field.map { it + 1 }
+        }
+      - |-
+        neighboring {
+
+        }
+      - |-
+        share(initial) {
+          val field = neighboring(0)
+          field.map { it }.localValue
+        }
+      - |-
+        evolving(initial) {
+          val field = neighboring(0)
+          field.map { it }.localValue.yielding { 0 }
+        }
+      - |-
+        neighboringViaExchange {
+        
+        }
+      - |-
+        exchanging(initial) {
+          val field = neighboringViaExchange(0)
+          field.map { it }.yielding { field }
+        }
+      - |-
+        sharing(initial) {
+          val field = neighboring(0)
+          field.map { it }.localValue.yielding { "Test" }
+        }
+
   - name: CONSTRUCT_EXPLICIT
     values:
       - |-
@@ -93,7 +134,7 @@ parameters:
         exchange(initial) { field ->
           field.map { it + 1 }
         }
-      - |- 
+      - |-
         neighboring {
           initial
         }
@@ -135,6 +176,16 @@ subjects:
           val initial = 0
           ${{ CONSTRUCT_IMPLICIT }}
       }
+
+  - name: "UnnecessaryUseShadowedImplicitParameter${{ prettify(CONSTRUCT_IMPLICIT_SHADOWED) }}"
+    code: |-
+      fun Aggregate<Int>.entry() {
+          val initial = 0
+          ${{ CONSTRUCT_IMPLICIT_SHADOWED }}
+      }
+    outcomes:
+      warning: |-
+        The '${{ CONSTRUCT_IMPLICIT_SHADOWED }}' construct is not necessary for the given use case.
 
   - name: "NecessaryUseExplicitParameter${{ prettify(CONSTRUCT_EXPLICIT) }}"
     code: |-
