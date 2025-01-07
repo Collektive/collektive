@@ -6,8 +6,11 @@ config:
       * This file has been auto-generated with Subjekt (https://github.com/FreshMag/subjekt).
     */
     import it.unibo.collektive.aggregate.api.Aggregate
-    import it.unibo.collektive.aggregate.api.operators.share
+    import it.unibo.collektive.field.operations.max
     import it.unibo.collektive.field.operations.maxBy
+    import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
+    import it.unibo.collektive.aggregate.api.operators.share
+    import it.unibo.collektive.aggregate.api.operators.sharing
 
 parameters:
   - name: UNUSED_CONSTRUCT
@@ -28,6 +31,23 @@ parameters:
         share(initial) {
           initial
         }
+      - |-
+        evolving(initial) {
+          initial.yielding { 0 }
+        }
+      - |-
+        neighboringViaExchange {
+
+        }
+      - |-
+        exchanging(0) { 
+          val field = neighboringViaExchange(0)
+          field.yielding { field }
+        }
+      - |-
+        sharing(initial) {
+          initial.yielding { "Test" }
+        }
   - name: CONSTRUCT_IMPLICIT
     values:
       - |-
@@ -46,6 +66,23 @@ parameters:
         share(initial) {
           it.maxBy { v -> v. value }.value
         }
+      - |-
+        evolving(initial) {
+          it.yielding { 0 }
+        }
+      - |-
+        neighboringViaExchange {
+          initial
+        }
+      - |-
+        exchanging(initial) {
+          it.yielding { it }
+        }
+      - |-
+        sharing(initial) {
+          it.max(it.localValue).yielding { "Test" }
+        }
+
   - name: CONSTRUCT_EXPLICIT
     values:
       - |-
@@ -63,6 +100,22 @@ parameters:
       - |-
         share(initial) { field ->
           field.maxBy { v -> v. value }.value
+        }
+      - |-
+        evolving(initial) { field ->
+          field.yielding { 0 }
+        }
+      - |-
+        exchanging(0) { field ->
+            field.yielding { field }
+        }
+      - |-
+        neighboringViaExchange {
+            initial
+        }
+      - |-
+        sharing(initial) { field ->
+            field.max(field.localValue).yielding { "Test" }
         }
 
 subjects:

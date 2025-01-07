@@ -37,6 +37,8 @@ import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
  */
 object UnnecessaryUseOfConstructs : FirFunctionCallChecker(MppCheckerKind.Common) {
     private const val NEIGHBORING_FQN = "it.unibo.collektive.aggregate.api.Aggregate.neighboring"
+    private const val NEIGHBORING_VIA_EXCHANGE_FQN =
+        "it.unibo.collektive.aggregate.api.operators.neighboringViaExchange"
 
     private val constructs =
         listOf(
@@ -44,12 +46,16 @@ object UnnecessaryUseOfConstructs : FirFunctionCallChecker(MppCheckerKind.Common
             "it.unibo.collektive.aggregate.api.Aggregate.exchange",
             "it.unibo.collektive.aggregate.api.operators.share",
             "it.unibo.collektive.aggregate.api.Aggregate.evolve",
+            // NEIGHBORING_VIA_EXCHANGE_FQN,
+            "it.unibo.collektive.aggregate.api.Aggregate.exchanging",
+            "it.unibo.collektive.aggregate.api.operators.sharing",
+            "it.unibo.collektive.aggregate.api.Aggregate.evolving",
         )
 
     private fun FirFunctionCall.isConstructToCheck() = fqName() in constructs
 
     private fun FirFunctionCall.doesNotUseParameter(): Boolean =
-        if (fqName() == NEIGHBORING_FQN) {
+        if (fqName().run { this == NEIGHBORING_FQN || this == NEIGHBORING_VIA_EXCHANGE_FQN }) {
             with(EmptyReturnVisitor()) {
                 hasEmptyReturn()
             }

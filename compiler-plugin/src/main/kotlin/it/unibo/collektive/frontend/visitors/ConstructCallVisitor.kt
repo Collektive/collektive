@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
 class ConstructCallVisitor : FirVisitorVoid() {
     private var checkedParametersNames = listOf<String>()
     private var found = true
+    private var nestedAnonymousFunction = false
 
     override fun visitElement(element: FirElement) {
         element.acceptChildren(this)
@@ -35,13 +36,16 @@ class ConstructCallVisitor : FirVisitorVoid() {
     }
 
     override fun visitAnonymousFunctionExpression(anonymousFunctionExpression: FirAnonymousFunctionExpression) {
-        found = false
-        val anonymousFunction = anonymousFunctionExpression.anonymousFunction
-        val parameters = anonymousFunction.valueParameters
-        checkedParametersNames = parameters.map { it.name.asString() }
-        if (checkedParametersNames.isEmpty()) {
-            found = true
-            return
+        if (!nestedAnonymousFunction) {
+            found = false
+            val anonymousFunction = anonymousFunctionExpression.anonymousFunction
+            val parameters = anonymousFunction.valueParameters
+            checkedParametersNames = parameters.map { it.name.asString() }
+            if (checkedParametersNames.isEmpty()) {
+                found = true
+                return
+            }
+            nestedAnonymousFunction = true
         }
         super.visitAnonymousFunctionExpression(anonymousFunctionExpression)
     }
