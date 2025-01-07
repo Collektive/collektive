@@ -9,16 +9,19 @@
 package it.unibo.collektive.frontend.visitors
 
 import org.jetbrains.kotlin.fir.FirElement
+import org.jetbrains.kotlin.fir.declarations.FirDeclarationOrigin
 import org.jetbrains.kotlin.fir.expressions.FirAnonymousFunctionExpression
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.references.FirResolvedNamedReference
+import org.jetbrains.kotlin.fir.references.resolved
+import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
 
 /**
  * Visitor that checks for usages of value parameters inside an anonymous function call block.
  */
 class ConstructCallVisitor : FirVisitorVoid() {
-    private var checkedParametersNames = listOf<String>()
+    private var checkedParametersDeclarations = listOf<FirValueParameterSymbol>()
     private var found = true
     private var nestedAnonymousFunction = false
 
@@ -27,9 +30,10 @@ class ConstructCallVisitor : FirVisitorVoid() {
     }
 
     override fun visitResolvedNamedReference(resolvedNamedReference: FirResolvedNamedReference) {
-        if (resolvedNamedReference.name.asString() in checkedParametersNames) {
-            checkedParametersNames = checkedParametersNames.filter { it != resolvedNamedReference.name.asString() }
-            if (checkedParametersNames.isEmpty()) {
+        if (resolvedNamedReference.resolvedSymbol in checkedParametersDeclarations) {
+            checkedParametersDeclarations =
+                checkedParametersDeclarations.filter { it != resolvedNamedReference.resolvedSymbol }
+            if (checkedParametersDeclarations.isEmpty()) {
                 found = true
             }
         }
@@ -40,8 +44,8 @@ class ConstructCallVisitor : FirVisitorVoid() {
             found = false
             val anonymousFunction = anonymousFunctionExpression.anonymousFunction
             val parameters = anonymousFunction.valueParameters
-            checkedParametersNames = parameters.map { it.name.asString() }
-            if (checkedParametersNames.isEmpty()) {
+            checkedParametersDeclarations = parameters.map { it.symbol }
+            if (checkedParametersDeclarations.isEmpty()) {
                 found = true
                 return
             }
