@@ -18,9 +18,7 @@ import io.kotest.data.table
 import it.unibo.collektive.test.util.CompileUtils.getTestingProgram
 import it.unibo.collektive.test.util.CompileUtils.noWarning
 import it.unibo.collektive.test.util.CompileUtils.warning
-import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 
-@OptIn(ExperimentalCompilerApi::class)
 class UnnecessaryUseOfConstructsSpec : FreeSpec({
 
     fun expectedWarning(construct: String): String =
