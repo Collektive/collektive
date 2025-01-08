@@ -12,6 +12,7 @@ import it.unibo.collektive.frontend.checkers.CheckersUtility.fqName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.functionName
 import it.unibo.collektive.frontend.visitors.ConstructCallVisitor
 import it.unibo.collektive.frontend.visitors.EmptyReturnVisitor
+import it.unibo.collektive.utils.common.AggregateFunctionNames
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
@@ -36,26 +37,26 @@ import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
  * Should generate a warning indicating the unnecessary use of the `evolve` construct.
  */
 object UnnecessaryUseOfConstructs : FirFunctionCallChecker(MppCheckerKind.Common) {
-    private const val NEIGHBORING_FQN = "it.unibo.collektive.aggregate.api.Aggregate.neighboring"
-    private const val NEIGHBORING_VIA_EXCHANGE_FQN =
-        "it.unibo.collektive.aggregate.api.operators.neighboringViaExchange"
-
     private val constructs =
         listOf(
-            NEIGHBORING_FQN,
-            "it.unibo.collektive.aggregate.api.Aggregate.exchange",
-            "it.unibo.collektive.aggregate.api.operators.share",
-            "it.unibo.collektive.aggregate.api.Aggregate.evolve",
-            NEIGHBORING_VIA_EXCHANGE_FQN,
-            "it.unibo.collektive.aggregate.api.Aggregate.exchanging",
-            "it.unibo.collektive.aggregate.api.operators.sharing",
-            "it.unibo.collektive.aggregate.api.Aggregate.evolving",
+            AggregateFunctionNames.NEIGHBORING_FUNCTION_FQ_NAME,
+            AggregateFunctionNames.EXCHANGE_FUNCTION_FQ_NAME,
+            AggregateFunctionNames.SHARE_FUNCTION_FQ_NAME,
+            AggregateFunctionNames.EVOLVE_FUNCTION_FQ_NAME,
+            AggregateFunctionNames.NEIGHBORING_VIA_EXCHANGE_FUNCTION_FQ_NAME,
+            AggregateFunctionNames.EXCHANGING_FUNCTION_FQ_NAME,
+            AggregateFunctionNames.SHARING_FUNCTION_FQ_NAME,
+            AggregateFunctionNames.EVOLVING_FUNCTION_FQ_NAME,
         )
 
     private fun FirFunctionCall.isConstructToCheck() = fqName() in constructs
 
     private fun FirFunctionCall.doesNotUseParameter(): Boolean =
-        if (fqName().run { this == NEIGHBORING_FQN || this == NEIGHBORING_VIA_EXCHANGE_FQN }) {
+        if (fqName().run {
+                this == AggregateFunctionNames.NEIGHBORING_FUNCTION_FQ_NAME ||
+                    this == AggregateFunctionNames.NEIGHBORING_VIA_EXCHANGE_FUNCTION_FQ_NAME
+            }
+        ) {
             with(EmptyReturnVisitor()) {
                 hasEmptyReturn()
             }
