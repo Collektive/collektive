@@ -1,3 +1,15 @@
+## [12.0.2](https://github.com/Collektive/collektive/compare/12.0.1...12.0.2) (2025-01-08)
+
+### Dependency updates
+
+* **core-deps:** update plugin kover to v0.9.1 ([3848660](https://github.com/Collektive/collektive/commit/3848660ce5d50df5419647c46affd155f2e097bb))
+* **deps:** update docusaurus monorepo to v3.7.0 ([fc8a898](https://github.com/Collektive/collektive/commit/fc8a898ad5a9baf9f98c07f94550a4feb372128b))
+
+### Build and continuous integration
+
+* enable SARIF reports for ktlint ([#627](https://github.com/Collektive/collektive/issues/627)) ([ff660d3](https://github.com/Collektive/collektive/commit/ff660d3b696706063785da2b17159a8675e9dd64))
+* merge sarif reports (detekt and ktlint) ([10dd234](https://github.com/Collektive/collektive/commit/10dd2340651eb7258f843e242bebc0f855a2d44f))
+
 ## [12.0.1](https://github.com/Collektive/collektive/compare/12.0.0...12.0.1) (2025-01-07)
 
 ### Dependency updates
