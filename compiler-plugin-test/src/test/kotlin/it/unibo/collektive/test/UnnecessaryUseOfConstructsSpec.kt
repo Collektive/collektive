@@ -23,7 +23,10 @@ class UnnecessaryUseOfConstructsSpec : FreeSpec({
 
     fun expectedWarning(construct: String): String =
         """
-        The '$construct' construct is not necessary for the given use case.
+        The '$construct' construct may not be necessary for this use case, as the parameter of the provided anonymous 
+        function is unused within its body.
+        
+        Consider using a different construct or eliminating the call altogether.
         """.trimIndent()
 
     "When using an Aggregate construct" - {
