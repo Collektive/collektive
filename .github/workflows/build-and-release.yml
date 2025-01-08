@@ -73,7 +73,7 @@ jobs:
       - uses: github/codeql-action/upload-sarif@v3
         if: ${{ always() && runner.os == 'Linux' }}
         with:
-          sarif_file: build/reports
+          sarif_file: build/reports/merge.sarif
       - name: Upload Staging Repo IDs
         uses: actions/upload-artifact@v4
         if: ${{ runner.os == 'macOS' && needs.check-secrets.outputs.run-with-secrets == 'true' }}
