@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-24.04
     needs:
       - check-secrets
-    if: ${{ needs.check-secrets.outputs.run-with-secrets == 'true' }}
+    if: needs.check-secrets.outputs.run-with-secrets == 'true'
     outputs:
       staging-repo-id: ${{ steps.create-staging-repo.outputs.staging-repo-id }}
     steps:
