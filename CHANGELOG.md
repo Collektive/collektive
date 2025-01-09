@@ -1,3 +1,17 @@
+## [12.0.4](https://github.com/Collektive/collektive/compare/12.0.3...12.0.4) (2025-01-09)
+
+### Dependency updates
+
+* **deps:** update plugin publishoncentral to v8.0.1 ([45ea178](https://github.com/Collektive/collektive/commit/45ea178597fb47e475dfcc4f62e8aca448ba97aa))
+
+### Bug Fixes
+
+* release all gradle plugins on Maven Central ([ddedfe4](https://github.com/Collektive/collektive/commit/ddedfe45b2054d5df9156110cf27c3e20537cad0))
+
+### Build and continuous integration
+
+* **deps:** update danysk/action-create-ossrh-staging-repo action to v1.1.0 ([b281640](https://github.com/Collektive/collektive/commit/b281640f237bb8c1c97e5673a81798b7d0c2e70f))
+
 ## [12.0.3](https://github.com/Collektive/collektive/compare/12.0.2...12.0.3) (2025-01-09)
 
 ### Dependency updates
