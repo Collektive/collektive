@@ -48,11 +48,3 @@ kotlinMultiplatform {
         }
     }
 }
-
-afterEvaluate {
-    listOf("uploadKotlinOSSRHToMavenCentralNexus").forEach {
-        tasks.named(it).configure {
-            enabled = false
-        }
-    }
-}

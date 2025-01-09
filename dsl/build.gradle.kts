@@ -25,11 +25,3 @@ kotlinMultiplatform {
 collektive {
     collektiveEnabled = true
 }
-
-afterEvaluate {
-    listOf("uploadKotlinOSSRHToMavenCentralNexus").forEach {
-        tasks.named(it).configure {
-            enabled = false
-        }
-    }
-}
