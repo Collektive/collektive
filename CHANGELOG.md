@@ -1,3 +1,9 @@
+## [12.0.5](https://github.com/Collektive/collektive/compare/12.0.4...12.0.5) (2025-01-09)
+
+### Documentation
+
+* enable dokka v2 ([#685](https://github.com/Collektive/collektive/issues/685)) ([18d758a](https://github.com/Collektive/collektive/commit/18d758a3c099cd3e667cac7c23be78760cf14474))
+
 ## [12.0.4](https://github.com/Collektive/collektive/compare/12.0.3...12.0.4) (2025-01-09)
 
 ### Dependency updates
