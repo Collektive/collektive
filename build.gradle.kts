@@ -2,7 +2,6 @@ import de.aaschmid.gradle.plugins.cpd.Cpd
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektPlugin
 import io.gitlab.arturbosch.detekt.report.ReportMergeTask
-import org.danilopianini.gradle.mavencentral.DocStyle
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
 
 plugins {
@@ -46,20 +45,14 @@ allprojects {
     }
 
     publishOnCentral {
-        projectUrl = "https://github.com/Collektive/${rootProject.name}"
+        repoOwner = "Collektive"
         projectLongName = "collektive"
-        projectDescription = "DSL for Aggregate Computing in Kotlin"
+        projectDescription = "Aggregate Computing in Kotlin"
         licenseName = "Apache License 2.0"
         licenseUrl = "https://opensource.org/license/Apache-2.0/"
-        docStyle = DocStyle.HTML
         publishing {
             publications {
                 withType<MavenPublication>().configureEach {
-                    if ("OSSRH" !in name) {
-                        artifact(tasks.javadocJar)
-                    }
-                    scmConnection = "git:git@github.com:Collektive/${rootProject.name}"
-                    projectUrl = "https://github.com/Collektive/${rootProject.name}"
                     pom {
                         developers {
                             developer {

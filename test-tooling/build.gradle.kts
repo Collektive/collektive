@@ -12,21 +12,3 @@ kotlinMultiplatform {
         }
     }
 }
-
-afterEvaluate {
-    listOf("uploadKotlinOSSRHToMavenCentralNexus").forEach {
-        tasks.named(it).configure {
-            enabled = false
-        }
-    }
-}
-
-tasks {
-    // Prevent publishing this module since it is a test-only module
-    withType<AbstractPublishToMaven>().configureEach {
-        enabled = false
-    }
-    withType<GenerateModuleMetadata>().configureEach {
-        enabled = false
-    }
-}
