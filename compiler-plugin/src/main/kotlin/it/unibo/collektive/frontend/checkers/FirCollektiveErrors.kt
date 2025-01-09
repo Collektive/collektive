@@ -36,7 +36,7 @@ object FirCollektiveErrors {
      * Warning raised when an aggregate call like `share`, `exchange`, `neighboring` or `evolve` is called without
      * using parameters inside the anonymous function, resulting in an unnecessary call.
      */
-    val UNNECESSARY_CONSTRUCT_CALL by warning1<PsiElement, String>(CALL_ELEMENT_WITH_DOT)
+    val UNNECESSARY_CONSTRUCT_CALL by warning1<KtNameReferenceExpression, String>()
 
     init {
         RootDiagnosticRendererFactory.registerFactory(KtDefaultErrorMessagesCollektive)
