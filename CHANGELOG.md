@@ -1,3 +1,14 @@
+## [12.0.3](https://github.com/Collektive/collektive/compare/12.0.2...12.0.3) (2025-01-09)
+
+### Dependency updates
+
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.118 ([bc01d18](https://github.com/Collektive/collektive/commit/bc01d18878dc83c7480601bb897e32a7fe244e86))
+* **deps:** update node.js to 22.13 ([4291385](https://github.com/Collektive/collektive/commit/4291385203e87b636245136456be954c2b4eadbc))
+
+### Bug Fixes
+
+* use appropriate warning type preventing error inside Intellij `java.lang.NoClassDefFoundError: org/jetbrains/kotlin/com/intellij/psi/PsiElement` ([#684](https://github.com/Collektive/collektive/issues/684)) ([86ece5e](https://github.com/Collektive/collektive/commit/86ece5e40e071596881b68674d1e01d3d40dc7fc))
+
 ## [12.0.2](https://github.com/Collektive/collektive/compare/12.0.1...12.0.2) (2025-01-08)
 
 ### Dependency updates
