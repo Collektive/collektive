@@ -8,10 +8,9 @@
 
 package it.unibo.collektive.frontend.checkers
 
-import org.jetbrains.kotlin.com.intellij.psi.PsiElement
-import org.jetbrains.kotlin.diagnostics.SourceElementPositioningStrategies.CALL_ELEMENT_WITH_DOT
 import org.jetbrains.kotlin.diagnostics.rendering.RootDiagnosticRendererFactory
 import org.jetbrains.kotlin.diagnostics.warning1
+import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 
 /**
  * Error messages for the Collektive compiler plugin.
@@ -20,18 +19,18 @@ object FirCollektiveErrors {
     /**
      * Warning raised when a forbidden function is called.
      */
-    val FORBIDDEN_FUNCTION_CALL by warning1<PsiElement, String>(CALL_ELEMENT_WITH_DOT)
+    val FORBIDDEN_FUNCTION_CALL by warning1<KtNameReferenceExpression, String>()
 
     /**
      * Warning raised when an aggregate function is called inside an iteration construct.
      */
-    val AGGREGATE_FUNCTION_INSIDE_ITERATION by warning1<PsiElement, String>(CALL_ELEMENT_WITH_DOT)
+    val AGGREGATE_FUNCTION_INSIDE_ITERATION by warning1<KtNameReferenceExpression, String>()
 
     /**
      * Warning raised when a function that has an aggregate parameter and uses it for making aggregate calls
      * is called inside an iteration construct.
      */
-    val FUNCTION_WITH_AGGREGATE_PARAMETER_INSIDE_ITERATION by warning1<PsiElement, String>(CALL_ELEMENT_WITH_DOT)
+    val FUNCTION_WITH_AGGREGATE_PARAMETER_INSIDE_ITERATION by warning1<KtNameReferenceExpression, String>()
 
     /**
      * Warning raised when an aggregate call like `share`, `exchange`, `neighboring` or `evolve` is called without
