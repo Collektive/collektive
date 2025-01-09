@@ -35,10 +35,27 @@ jobs:
         with:
           github-token: ${{ github.token }}
 
+  staging-repo:
+    runs-on: ubuntu-24.04
+    needs:
+      - check-secrets
+    if: needs.check-secrets.outputs.run-with-secrets == 'true'
+    outputs:
+      staging-repo-id: ${{ steps.create-staging-repo.outputs.staging-repo-id }}
+    steps:
+      - id: create-staging-repo
+        name: Create a staging repository
+        uses: danysk/action-create-ossrh-staging-repo@1.0.1
+        with:
+          group-id: "it.unibo.collektive"
+          maven-central-username: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+
   build:
     needs:
       - check-secrets
       - precompute-next-version
+      - staging-repo
     if: always() && !contains(needs.precompute-next-version.result, 'failure')
     strategy:
       fail-fast: false
@@ -51,18 +68,23 @@ jobs:
         with:
           fetch-depth: 0
       - uses: DanySK/build-check-deploy-gradle-action@3.5.28
-        id: staging-repo
         with:
           check-command: |
             ./gradlew check koverXmlReport :compiler-plugin:check :gradle-plugin:check --parallel
           should-deploy: ${{ runner.os == 'macOS' && needs.check-secrets.outputs.run-with-secrets == 'true' }} # Deploy from macOS since it supports all the platforms
           deploy-command: |
-            ./gradlew createStagingRepositoryOnMavenCentral --parallel
             NEXT_VERSION="${{ needs.precompute-next-version.outputs.next-version }}"
             OVERRIDE_VERSION=$([[ "$NEXT_VERSION" != "" ]] && echo "-PforceVersion=$(echo $NEXT_VERSION)" || echo "")
-            REPO_IDS=$(cat build/staging-repo-ids.properties)
-            MAVEN_CENTRAL_ID=${REPO_IDS#MavenCentral=}
-            ./gradlew $OVERRIDE_VERSION -PstagingRepositoryId=$MAVEN_CENTRAL_ID uploadAll :compiler-plugin:uploadKotlinOSSRHToMavenCentralNexus :gradle-plugin:uploadKotlinOSSRHToMavenCentralNexus close --parallel
+            # Compute all tasks to be executed
+            projects=( "" ":compiler-plugin" ":gradle-plugin" )
+            tasks=( ":uploadAllToMavenCentralNexus" )
+            GRADLE_TASKS=()
+            for p in "${projects[@]}"; do
+              for t in "${tasks[@]}"; do
+                GRADLE_TASKS+=( "$p$t" )
+              done
+            done
+            ./gradlew $OVERRIDE_VERSION -PstagingRepositoryId=${{ needs.staging-repo.outputs.staging-repo-id }} "${GRADLE_TASKS[@]}" --parallel && ./gradlew closeStaging --parallel
           should-run-codecov: ${{ runner.os == 'Linux' }}
           codecov-directory: build/reports/kover
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
@@ -70,36 +92,10 @@ jobs:
           maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
           signing-key: ${{ secrets.GPG_PRIVATEKEY }}
           signing-password: ${{ secrets.GPG_PASSPHRASE }}
-      - uses: github/codeql-action/upload-sarif@v3
+      - uses: github/codeql-action/upload-sarif@v3.28.0
         if: ${{ always() && runner.os == 'Linux' }}
         with:
           sarif_file: build/reports/merge.sarif
-      - name: Upload Staging Repo IDs
-        uses: actions/upload-artifact@v4
-        if: ${{ runner.os == 'macOS' && needs.check-secrets.outputs.run-with-secrets == 'true' }}
-        with:
-          name: staging-repo-ids
-          path: build/staging-repo-ids.properties
-
-  set-staging-repo-id:
-    runs-on: ubuntu-24.04
-    needs:
-      - build
-      - check-secrets
-    outputs:
-      staging-repo-id: ${{ steps.set-staging-repo-id.outputs.MavenCentral }}
-    if: ${{ needs.check-secrets.outputs.run-with-secrets == 'true' }}
-    steps:
-      - name: Restore staging repository ID
-        uses: actions/download-artifact@v4
-        with:
-          name: staging-repo-ids
-          path: build/
-      - name: Set staging repository ID
-        id: set-staging-repo-id
-        run: |
-          REPO_IDS=$(cat build/staging-repo-ids.properties)       
-          echo "$REPO_IDS" >> $GITHUB_OUTPUT
 
   build-website:
     runs-on: ubuntu-24.04
@@ -129,7 +125,7 @@ jobs:
   release:
     needs:
       - check-secrets
-      - set-staging-repo-id
+      - staging-repo
       - build-website
       - build
     runs-on: ubuntu-24.04
@@ -165,7 +161,7 @@ jobs:
           node-version-file: package.json
       - uses: DanySK/build-check-deploy-gradle-action@3.5.28
         env:
-          STAGING_REPO_ID: ${{ needs.set-staging-repo-id.outputs.staging-repo-id }}
+          STAGING_REPO_ID: ${{ needs.staging-repo.outputs.staging-repo-id }}
           ORG_GRADLE_PROJECT_releaseStage: true
         with:
           retries-on-failure: 1 # Fail fast during release
@@ -185,25 +181,18 @@ jobs:
           signing-password: ${{ secrets.GPG_PASSPHRASE }}
 
   drop-staging-repo:
-    runs-on: ubuntu-24.04
     needs:
-      - set-staging-repo-id
+      - staging-repo
       - release
+    runs-on: ubuntu-24.04
+    if: always() && !(contains(needs.staging-repo.result, 'failure') || contains(needs.staging-repo.result, 'cancelled'))
     steps:
-      - name: Drop staging repositories
-        if: ${{ always() }}
-        env:
-          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
-          MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
-        run: >
-          curl
-          --request POST
-          --url "https://s01.oss.sonatype.org/service/local/staging/bulk/drop"
-          --header "Accept: application/json"
-          --header "Content-Type: application/json"
-          --data '{"data":{"stagedRepositoryIds":["${{ needs.set-staging-repo-id.outputs.staging-repo-id }}"]}}'
-          --user "$MAVEN_CENTRAL_USERNAME:$MAVEN_CENTRAL_PASSWORD"
-          --verbose
+      - name: Drop staging repository
+        uses: danysk/action-drop-ossrh-staging-repo@1.0.3
+        with:
+          repo-id: ${{ needs.staging-repo.outputs.staging-repo-id }}
+          maven-central-username: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
 
   success:
     runs-on: ubuntu-latest
