@@ -1,3 +1,17 @@
+## [12.1.0](https://github.com/Collektive/collektive/compare/12.0.5...12.1.0) (2025-01-10)
+
+### Features
+
+* intercept unnecessary use of aggregate constructs ([#668](https://github.com/Collektive/collektive/issues/668)) ([00f3d05](https://github.com/Collektive/collektive/commit/00f3d05c302f1ef12d1047692a06f1861253953f))
+
+### Dependency updates
+
+* **deps:** update alchemist ([6e0bae9](https://github.com/Collektive/collektive/commit/6e0bae99f7cf9a047c5ecf6f1bc8bc404705ea65))
+
+### Build and continuous integration
+
+* pin the version of ubuntu in the dispatcher workflow ([#688](https://github.com/Collektive/collektive/issues/688)) ([6d44278](https://github.com/Collektive/collektive/commit/6d44278404ec3fbc8e29991614f7bc05dc0b38e4))
+
 ## [12.0.5](https://github.com/Collektive/collektive/compare/12.0.4...12.0.5) (2025-01-09)
 
 ### Documentation
