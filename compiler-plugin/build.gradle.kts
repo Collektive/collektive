@@ -1,7 +1,7 @@
-import org.danilopianini.gradle.mavencentral.DocStyle
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
+    alias(libs.plugins.dokka)
     alias(libs.plugins.build.config)
     alias(libs.plugins.gitSemVer)
     alias(libs.plugins.kotlin.jvm)
@@ -65,13 +65,9 @@ publishOnCentral {
     licenseName = "Apache License 2.0"
     projectLongName = "Collektive kotlin compiler plugin"
     licenseUrl = "https://opensource.org/license/Apache-2.0/"
-    docStyle = DocStyle.HTML
     publishing {
         publications {
             withType<MavenPublication>().configureEach {
-                if ("OSSRH" !in name) {
-                    artifact(tasks.javadocJar)
-                }
                 scmConnection = "git:git@github.com:$githubSlug"
                 projectUrl = "https://github.com/$githubSlug"
                 pom {

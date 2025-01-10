@@ -6,12 +6,13 @@ import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugin.use.PluginDependency
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 val Provider<PluginDependency>.id: String get() = get().pluginId
 
@@ -22,9 +23,16 @@ fun Project.kotlinJvm(configuration: KotlinJvmProjectExtension.() -> Unit) = kot
 
 fun Project.kotlinMultiplatform(configuration: KotlinMultiplatformExtension.() -> Unit) = kotlin(configuration)
 
+@OptIn(ExperimentalKotlinGradlePluginApi::class)
 fun Project.configureKotlinMultiplatform() {
     with(extensions.getByType<KotlinMultiplatformExtension>()) {
+        compilerOptions {
+            allWarningsAsErrors = true
+        }
         jvm {
+            compilerOptions {
+                jvmTarget = JvmTarget.JVM_1_8
+            }
             testRuns.getByName("test").executionTask.configure {
                 useJUnitPlatform()
                 filter {
@@ -69,11 +77,12 @@ fun Project.configureKotlinMultiplatform() {
         tvosX64(nativeSetup)
         tvosSimulatorArm64(nativeSetup)
 
-        tasks.withType<KotlinCompile>().configureEach {
-            compilerOptions {
-                allWarningsAsErrors = true
-                jvmTarget = JvmTarget.JVM_1_8
+        // Workaround for https://github.com/kotest/kotest/pull/4598 (merged but not released)
+        tasks.withType<KotlinCompilationTask<*>>()
+            .configureEach {
+                compilerOptions {
+                    allWarningsAsErrors = !name.contains("test", ignoreCase = true)
+                }
             }
-        }
     }
 }

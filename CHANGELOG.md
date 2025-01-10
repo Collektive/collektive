@@ -1,3 +1,89 @@
+## [12.1.0](https://github.com/Collektive/collektive/compare/12.0.5...12.1.0) (2025-01-10)
+
+### Features
+
+* intercept unnecessary use of aggregate constructs ([#668](https://github.com/Collektive/collektive/issues/668)) ([00f3d05](https://github.com/Collektive/collektive/commit/00f3d05c302f1ef12d1047692a06f1861253953f))
+
+### Dependency updates
+
+* **deps:** update alchemist ([6e0bae9](https://github.com/Collektive/collektive/commit/6e0bae99f7cf9a047c5ecf6f1bc8bc404705ea65))
+
+### Build and continuous integration
+
+* pin the version of ubuntu in the dispatcher workflow ([#688](https://github.com/Collektive/collektive/issues/688)) ([6d44278](https://github.com/Collektive/collektive/commit/6d44278404ec3fbc8e29991614f7bc05dc0b38e4))
+
+## [12.0.5](https://github.com/Collektive/collektive/compare/12.0.4...12.0.5) (2025-01-09)
+
+### Documentation
+
+* enable dokka v2 ([#685](https://github.com/Collektive/collektive/issues/685)) ([18d758a](https://github.com/Collektive/collektive/commit/18d758a3c099cd3e667cac7c23be78760cf14474))
+
+## [12.0.4](https://github.com/Collektive/collektive/compare/12.0.3...12.0.4) (2025-01-09)
+
+### Dependency updates
+
+* **deps:** update plugin publishoncentral to v8.0.1 ([45ea178](https://github.com/Collektive/collektive/commit/45ea178597fb47e475dfcc4f62e8aca448ba97aa))
+
+### Bug Fixes
+
+* release all gradle plugins on Maven Central ([ddedfe4](https://github.com/Collektive/collektive/commit/ddedfe45b2054d5df9156110cf27c3e20537cad0))
+
+### Build and continuous integration
+
+* **deps:** update danysk/action-create-ossrh-staging-repo action to v1.1.0 ([b281640](https://github.com/Collektive/collektive/commit/b281640f237bb8c1c97e5673a81798b7d0c2e70f))
+
+## [12.0.3](https://github.com/Collektive/collektive/compare/12.0.2...12.0.3) (2025-01-09)
+
+### Dependency updates
+
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.118 ([bc01d18](https://github.com/Collektive/collektive/commit/bc01d18878dc83c7480601bb897e32a7fe244e86))
+* **deps:** update node.js to 22.13 ([4291385](https://github.com/Collektive/collektive/commit/4291385203e87b636245136456be954c2b4eadbc))
+
+### Bug Fixes
+
+* use appropriate warning type preventing error inside Intellij `java.lang.NoClassDefFoundError: org/jetbrains/kotlin/com/intellij/psi/PsiElement` ([#684](https://github.com/Collektive/collektive/issues/684)) ([86ece5e](https://github.com/Collektive/collektive/commit/86ece5e40e071596881b68674d1e01d3d40dc7fc))
+
+## [12.0.2](https://github.com/Collektive/collektive/compare/12.0.1...12.0.2) (2025-01-08)
+
+### Dependency updates
+
+* **core-deps:** update plugin kover to v0.9.1 ([3848660](https://github.com/Collektive/collektive/commit/3848660ce5d50df5419647c46affd155f2e097bb))
+* **deps:** update docusaurus monorepo to v3.7.0 ([fc8a898](https://github.com/Collektive/collektive/commit/fc8a898ad5a9baf9f98c07f94550a4feb372128b))
+
+### Build and continuous integration
+
+* enable SARIF reports for ktlint ([#627](https://github.com/Collektive/collektive/issues/627)) ([ff660d3](https://github.com/Collektive/collektive/commit/ff660d3b696706063785da2b17159a8675e9dd64))
+* merge sarif reports (detekt and ktlint) ([10dd234](https://github.com/Collektive/collektive/commit/10dd2340651eb7258f843e242bebc0f855a2d44f))
+
+## [12.0.1](https://github.com/Collektive/collektive/compare/12.0.0...12.0.1) (2025-01-07)
+
+### Dependency updates
+
+* **core-deps:** update kotlin monorepo to v2.1.0 ([4514503](https://github.com/Collektive/collektive/commit/4514503a2828ea957c51bf52bd3461243c29e908))
+* **deps:** update dependency commons-codec:commons-codec to v1.17.2 ([82108a8](https://github.com/Collektive/collektive/commit/82108a84b0d748b897a79708885d2916dd21c1fa))
+* **deps:** update dependency io.github.freshmag:subjekt-api to v1.1.5 ([04f06d6](https://github.com/Collektive/collektive/commit/04f06d63f38783b555da44967170a2412d2ca0c1))
+
+### Tests
+
+* **dsl:** changed test with 'share' construct using the implicit parameter ([#674](https://github.com/Collektive/collektive/issues/674)) ([d270349](https://github.com/Collektive/collektive/commit/d27034912ffc21ec7c51bfc9385f04e60bdc4151))
+
+### Build and continuous integration
+
+* disable `allWarningsAsErrors` because of a bug in kotest https://github.com/kotest/kotest/pull/4598 ([98ab83d](https://github.com/Collektive/collektive/commit/98ab83d11ddab6a679fe72199d304ad2b3e9bee1))
+* disable dokka 2 ([30e4083](https://github.com/Collektive/collektive/commit/30e40830ac299ce66bd5025cb122e83755f4020f))
+* enable dokka 2.0.0 ([085b79c](https://github.com/Collektive/collektive/commit/085b79c50c26eb377cf7eadcfc6bdcd5899ad1b5))
+* setup dokka with new logo ([2cc3b5d](https://github.com/Collektive/collektive/commit/2cc3b5d461236a14d33647e449de7ce305494211))
+* use new API for setting compiler options ([1b2d262](https://github.com/Collektive/collektive/commit/1b2d262a7b1a5e7c5e1ad7b3db39320958c5ba68))
+
+### General maintenance
+
+* remove assets ([dcb022c](https://github.com/Collektive/collektive/commit/dcb022cbbe870178be76ee5e3a79a36012431ebb))
+
+### Refactoring
+
+* use kotlin 2.1.0 compiler api ([cd469ed](https://github.com/Collektive/collektive/commit/cd469ed0434fb3405295f8dd434911e4a42c9966))
+* use new kotlin compiler api ([e631cfd](https://github.com/Collektive/collektive/commit/e631cfda68b22efc904b213de87377c91a82d8c2))
+
 ## [12.0.0](https://github.com/Collektive/collektive/compare/11.2.0...12.0.0) (2024-12-28)
 
 ### ⚠ BREAKING CHANGES

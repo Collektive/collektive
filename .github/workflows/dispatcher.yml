@@ -30,7 +30,7 @@ jobs:
   dispatcher:
 #    needs:
 #      - debug
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # For PRs execute only on commit since the branch protection require the branch to be up-to-date (optimize the workflow).
     # Triggers the executions if an external PR is opened.
     if: >-
