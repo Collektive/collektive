@@ -6,6 +6,8 @@ title: Basic Usage
 
 ## First example
 
+A preliminary code example demonstrates how devices, through mutual communication, are able to identify the maximum ID among the neighboring nodes within their local network area (neighborhood):
+
 ```kotlin
 package it.unibo.collektive.examples.maxID
 
@@ -42,24 +44,46 @@ fun Aggregate<Int>.searchMaxNeighborIDValue(environment: EnvironmentVariables): 
 }
 
 ```
+The library function `neighboringViaExchange(local)` is a **aggregate operator** and is used to observe the value of an expression [local] across neighboring nodes.
 
-<div style={{ textAlign: 'center' }}>
-  <img src="/img/basic-usage-first-example-1.png" style={{ maxWidth: '70%' }} />
-</div>
+#### Example
 
-<div style={{ textAlign: 'center' }}>
-  <img src="/img/basic-usage-first-example-2.png" style={{ maxWidth: '70%' }} />
-</div>
+```kotlin
+val field = neighboring(0)
+```
 
-<div style={{ textAlign: 'center' }}>
-  <img src="/img/basic-usage-first-example-3.png" style={{ maxWidth: '70%' }} />
-</div>
+The returned field has as its local value the value passed as input (0 in this example).
 
-<div style={{ textAlign: 'center' }}>
-  <img src="/img/basic-usage-first-example-4.png" style={{ maxWidth: '70%' }} />
-</div>
+**Note**: the scenario in which the functions are applied is modeled using the [Alchemist simulator](https://alchemistsimulator.github.io/), enabling a precise and controlled representation of network dynamics.
+
+<details>
+  <summary>Click to view images</summary>
+  <div style={{ textAlign: 'center' }}>
+    <img src="/img/basic-usage-first-example-1.png" style={{ maxWidth: '70%' }} />
+  </div>
+
+  <div style={{ textAlign: 'center' }}>
+    <img src="/img/basic-usage-first-example-2.png" style={{ maxWidth: '70%' }} />
+  </div>
+
+  <div style={{ textAlign: 'center' }}>
+    <img src="/img/basic-usage-first-example-3.png" style={{ maxWidth: '70%' }} />
+  </div>
+
+  <div style={{ textAlign: 'center' }}>
+    <img src="/img/basic-usage-first-example-4.png" style={{ maxWidth: '70%' }} />
+  </div>
+
+  In the third step of the code from the first example, the computed values are assigned to molecules. These molecules can be inspected within the data of a selected device, thereby simplifying the debugging process and enabling a more effective analysis of the system's behavior.
+</details>
+
+The example we have seen represents a straightforward instance of aggregated behavior.
 
 ## Second example
+
+This second example represents a variation of the previous one. Building upon the local maximum computation introduced in the first example, the code presented here extends the process through a second layer of communication among nodes, enabling convergence toward the global maximum of the network. 
+
+**Note**: the global maximum is visually represented in green, while the local maximum is consistently indicated in red.
 
 ```kotlin
 package it.unibo.collektive.examples.maxID
@@ -120,109 +144,19 @@ fun Aggregate<Int>.searchMaxNetworkIDValue(environment: EnvironmentVariables): I
 }
 
 ```
+<details>
+  <summary>Click to view images</summary>
+  <div style={{ textAlign: 'center' }}>
+    <img src="/img/basic-usage-second-example-1.png" style={{ maxWidth: '70%' }} />
+  </div>
 
-<div style={{ textAlign: 'center' }}>
-  <img src="/img/basic-usage-second-example-1.png" style={{ maxWidth: '70%' }} />
-</div>
+  The network remains unchanged from the first example, except for the interconnection radius between devices. A poorly connected network would result in the presence of multiple global maxima within the network.
 
-<div style={{ textAlign: 'center' }}>
-  <img src="/img/basic-usage-second-example-2.png" style={{ maxWidth: '70%' }} />
-</div>
+  <div style={{ textAlign: 'center' }}>
+    <img src="/img/basic-usage-second-example-2.png" style={{ maxWidth: '70%' }} />
+  </div>
 
-## Third example
+  This second example represents a highly simplified demonstration of leader election using the Collektive library.
+</details>
 
-```kotlin
-package it.unibo.collektive.examples.channel
-
-import it.unibo.alchemist.collektive.device.DistanceSensor
-import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.operators.share
-import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
-import it.unibo.collektive.examples.gradient.gradient
-import it.unibo.collektive.field.Field.Companion.fold
-import kotlin.Double.Companion.POSITIVE_INFINITY
-
-/**
- * Compute the channel between the source and the target with obstacles.
- */
-fun Aggregate<Int>.channelWithObstacles(
-    environment: EnvironmentVariables,
-    distanceSensor: DistanceSensor,
-): Boolean = when (environment.get<Boolean>("obstacle")) {
-    true -> false
-    false -> channel(
-        distanceSensor,
-        environment["source"],
-        environment["target"],
-        channelWidth = 0.5
-    )
-}
-
-/**
- * Compute the channel between the [source] and the [target] with a specific [channelWidth].
- */
-fun Aggregate<Int>.channel(
-    distanceSensor: DistanceSensor,
-    source: Boolean,
-    destination: Boolean,
-    channelWidth: Double
-): Boolean {
-    require(channelWidth.isFinite() && channelWidth > 0)
-    val toSource = gradient(distanceSensor, source)
-    val toDestination = gradient(distanceSensor, destination)
-    val sourceToDestination = broadcast(distanceSensor, from = source, payload = toDestination)
-    val channel = toSource + toDestination - sourceToDestination
-    return if (channel.isFinite()) channel <= channelWidth else false
-}
-
-/**
- * Computes the [gradientCast] from the [source] with the [value] that is the distance from the [source] to the target.
- */
-fun Aggregate<Int>.broadcast(distanceSensor: DistanceSensor, from: Boolean, payload: Double): Double =
-    gradientCast(distanceSensor, from, payload) { it }
-
-/**
- * Compute the gradient of the aggregate from the [source] to the [target].
- * The [accumulate] function is used to accumulate the value of the aggregate.
- */
-fun Aggregate<Int>.gradientCast(
-    distanceSensor: DistanceSensor,
-    source: Boolean,
-    initial: Double,
-    accumulate: (Double) -> Double
-): Double = share(POSITIVE_INFINITY to initial) { field ->
-    val dist = with(distanceSensor) { distances() }
-    when {
-        source -> 0.0 to initial
-        else -> {
-            val resultField = dist.alignedMap(field) { distField, (currentDist, value) ->
-                distField + currentDist to accumulate(value)
-            }
-            resultField.fold(POSITIVE_INFINITY to POSITIVE_INFINITY) { acc, value ->
-                if (value.first < acc.first) value else acc
-            }
-        }
-    }
-}.second
-
-```
-
-<div style={{ textAlign: 'center' }}>
-  <img src="/img/basic-usage-third-example-1.png" style={{ maxWidth: '70%' }} />
-</div>
-
-<div style={{ textAlign: 'center' }}>
-  <img src="/img/basic-usage-third-example-2.png" style={{ maxWidth: '70%' }} />
-</div>
-
-<div style={{ textAlign: 'center' }}>
-  <img src="/img/basic-usage-third-example-3.png" style={{ maxWidth: '70%' }} />
-</div>
-
-<div style={{ textAlign: 'center' }}>
-  <img src="/img/basic-usage-third-example-4.png" style={{ maxWidth: '70%' }} />
-</div>
-
-<div style={{ textAlign: 'center' }}>
-  <img src="/img/basic-usage-third-example-5.png" style={{ maxWidth: '70%' }} />
-</div>
+More examples can be found in the following repository: [Collektive Examples Repository](https://github.com/Collektive/collektive-examples).
