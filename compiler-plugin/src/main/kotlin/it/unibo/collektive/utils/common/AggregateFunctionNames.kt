@@ -53,4 +53,45 @@ object AggregateFunctionNames {
      * The name of the function that is used to project the fields.
      */
     const val PROJECT_FUNCTION = "project"
+
+    /**
+     * The FQ name of the `neighboring` function.
+     */
+    const val NEIGHBORING_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.neighboring"
+
+    /**
+     * The FQ name of the `neighboringViaExchange` function.
+     */
+    const val NEIGHBORING_VIA_EXCHANGE_FUNCTION_FQ_NAME =
+        "it.unibo.collektive.aggregate.api.operators.neighboringViaExchange"
+
+    /**
+     * The FQ name of the `exchange` function.
+     */
+    const val EXCHANGE_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.exchange"
+
+    /**
+     * The FQ name of the `share` function.
+     */
+    const val SHARE_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.operators.share"
+
+    /**
+     * The FQ name of the `evolve` function.
+     */
+    const val EVOLVE_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.evolve"
+
+    /**
+     * The FQ name of the `exchanging` function.
+     */
+    const val EXCHANGING_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.exchanging"
+
+    /**
+     * The FQ name of the `sharing` function.
+     */
+    const val SHARING_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.operators.sharing"
+
+    /**
+     * The FQ name of the `evolving` function.
+     */
+    const val EVOLVING_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.evolving"
 }

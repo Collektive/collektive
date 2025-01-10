@@ -46,5 +46,15 @@ object KtDefaultErrorMessagesCollektive : BaseDiagnosticRendererFactory() {
                 """.trimIndent(),
                 CommonRenderers.STRING,
             )
+            put(
+                FirCollektiveErrors.UNNECESSARY_CONSTRUCT_CALL,
+                """
+                The ''{0}'' construct may not be necessary for this use case, as the parameter of the provided anonymous 
+                function is unused within its body.
+                
+                Consider using a different construct or eliminating the call altogether.
+                """.trimIndent(),
+                CommonRenderers.STRING,
+            )
         }
 }

@@ -32,6 +32,12 @@ object FirCollektiveErrors {
      */
     val FUNCTION_WITH_AGGREGATE_PARAMETER_INSIDE_ITERATION by warning1<KtNameReferenceExpression, String>()
 
+    /**
+     * Warning raised when an aggregate call like `share`, `exchange`, `neighboring` or `evolve` is called without
+     * using parameters inside the anonymous function, resulting in an unnecessary call.
+     */
+    val UNNECESSARY_CONSTRUCT_CALL by warning1<KtNameReferenceExpression, String>()
+
     init {
         RootDiagnosticRendererFactory.registerFactory(KtDefaultErrorMessagesCollektive)
     }
