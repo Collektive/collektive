@@ -56,7 +56,7 @@ jobs:
       - check-secrets
       - precompute-next-version
       - staging-repo
-    if: always() && !contains(needs.precompute-next-version.result, 'failure')
+    if: "!cancelled() && !contains(needs.precompute-next-version.result, 'failure')"
     strategy:
       fail-fast: false
       matrix:
@@ -67,7 +67,7 @@ jobs:
         uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
-      - uses: DanySK/build-check-deploy-gradle-action@3.5.28
+      - uses: DanySK/build-check-deploy-gradle-action@3.7.0
         with:
           check-command: |
             ./gradlew check koverXmlReport :compiler-plugin:check :gradle-plugin:check --parallel
@@ -76,15 +76,16 @@ jobs:
             NEXT_VERSION="${{ needs.precompute-next-version.outputs.next-version }}"
             OVERRIDE_VERSION=$([[ "$NEXT_VERSION" != "" ]] && echo "-PforceVersion=$(echo $NEXT_VERSION)" || echo "")
             # Compute all tasks to be executed
-            projects=( "" ":compiler-plugin" ":gradle-plugin" )
-            tasks=( ":uploadAllToMavenCentralNexus" )
+            projects=( "" ":compiler-plugin:" ":gradle-plugin:" )
+            tasks=( "uploadAllToMavenCentralNexus" )
             GRADLE_TASKS=()
             for p in "${projects[@]}"; do
               for t in "${tasks[@]}"; do
                 GRADLE_TASKS+=( "$p$t" )
               done
             done
-            ./gradlew $OVERRIDE_VERSION -PstagingRepositoryId=${{ needs.staging-repo.outputs.staging-repo-id }} "${GRADLE_TASKS[@]}" --parallel && ./gradlew closeStaging --parallel
+            ./gradlew $OVERRIDE_VERSION -PstagingRepositoryId=${{ needs.staging-repo.outputs.staging-repo-id }} "${GRADLE_TASKS[@]}"
+            ./gradlew -PstagingRepositoryId=${{ needs.staging-repo.outputs.staging-repo-id }} closeStaging
           should-run-codecov: ${{ runner.os == 'Linux' }}
           codecov-directory: build/reports/kover
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
@@ -93,7 +94,7 @@ jobs:
           signing-key: ${{ secrets.GPG_PRIVATEKEY }}
           signing-password: ${{ secrets.GPG_PASSPHRASE }}
       - uses: github/codeql-action/upload-sarif@v3.28.0
-        if: ${{ always() && runner.os == 'Linux' }}
+        if: always() && runner.os == 'Linux'
         with:
           sarif_file: build/reports/merge.sarif
 
@@ -159,7 +160,7 @@ jobs:
         uses: actions/setup-node@v4.1.0
         with:
           node-version-file: package.json
-      - uses: DanySK/build-check-deploy-gradle-action@3.5.28
+      - uses: DanySK/build-check-deploy-gradle-action@3.7.0
         env:
           STAGING_REPO_ID: ${{ needs.staging-repo.outputs.staging-repo-id }}
           ORG_GRADLE_PROJECT_releaseStage: true
