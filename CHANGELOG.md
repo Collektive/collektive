@@ -1,3 +1,13 @@
+## [12.1.1](https://github.com/Collektive/collektive/compare/12.1.0...12.1.1) (2025-01-10)
+
+### Bug Fixes
+
+* recover the release of all the main artifacts ([a696227](https://github.com/Collektive/collektive/commit/a6962274d2572bb0486829fcf49042c3eeb62a37))
+
+### Build and continuous integration
+
+* don't run build on cancellation ([6714ba2](https://github.com/Collektive/collektive/commit/6714ba22489ffece27759fecb9c4a692bef535af))
+
 ## [12.1.0](https://github.com/Collektive/collektive/compare/12.0.5...12.1.0) (2025-01-10)
 
 ### Features
