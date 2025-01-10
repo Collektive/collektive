@@ -76,7 +76,7 @@ jobs:
             NEXT_VERSION="${{ needs.precompute-next-version.outputs.next-version }}"
             OVERRIDE_VERSION=$([[ "$NEXT_VERSION" != "" ]] && echo "-PforceVersion=$(echo $NEXT_VERSION)" || echo "")
             # Compute all tasks to be executed
-            projects=( ":" ":compiler-plugin:" ":gradle-plugin:" )
+            projects=( "" ":compiler-plugin:" ":gradle-plugin:" )
             tasks=( "uploadAllToMavenCentralNexus" )
             GRADLE_TASKS=()
             for p in "${projects[@]}"; do
@@ -84,7 +84,8 @@ jobs:
                 GRADLE_TASKS+=( "$p$t" )
               done
             done
-            ./gradlew $OVERRIDE_VERSION -PstagingRepositoryId=${{ needs.staging-repo.outputs.staging-repo-id }} "${GRADLE_TASKS[@]}" --parallel && ./gradlew closeStaging --parallel
+            ./gradlew $OVERRIDE_VERSION -PstagingRepositoryId=${{ needs.staging-repo.outputs.staging-repo-id }} "${GRADLE_TASKS[@]}"
+            ./gradlew -PstagingRepositoryId=${{ needs.staging-repo.outputs.staging-repo-id }} closeStaging
           should-run-codecov: ${{ runner.os == 'Linux' }}
           codecov-directory: build/reports/kover
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
