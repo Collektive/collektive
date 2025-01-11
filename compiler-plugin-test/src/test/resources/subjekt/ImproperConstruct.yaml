@@ -6,60 +6,130 @@ config:
       * This file has been auto-generated with Subjekt (https://github.com/mini-roostico/subjekt).
     */
     import it.unibo.collektive.aggregate.api.Aggregate
+    import it.unibo.collektive.field.operations.max
 
-subjects:
-  - name: ImproperUseEvolveImplicit
-    code: |-
-      fun Aggregate<Int>.entry() {
-          evolve(0) {
-            neighboring(it).max(0)
-          }
-      }
-    outcomes:
-      warning: |-
-        The 'evolve' construct is not necessary for the given use case.
-
-  - name: ImproperUseEvolveExplicit
-    code: |-
-      fun Aggregate<Int>.entry() {
-          evolve(0) { value ->
+parameters:
+  - name: IMPROPER_CONSTRUCT_EXPLICIT
+    values:
+      - |-
+        evolve(0) { value ->
             neighboring(value).max(0)
-          }
-      }
-    outcomes:
-      warning: |-
-        The 'evolve' construct is not necessary for the given use case.
-
-  - name: ImproperUseEvolveDelegatedField
-    code: |-
-      fun Aggregate<Int>.entry() {
-          evolve(0) { value ->
+        }
+      - |-
+        evolving(0) { value ->
+            neighboring(value).max(0).yielding { "test" }
+        }
+  - name: IMPROPER_CONSTRUCT_IMPLICIT
+    values:
+      - |-
+        evolve(0) {
+            neighboring(it).max(0)
+        }
+      - |-
+        evolving(0) {
+            neighboring(it).max(0).yielding { "test" }
+        }
+  - name: IMPROPER_CONSTRUCT_DELEGATED_FIELD_EXPLICIT
+    values:
+      - |-
+        evolve(0) { value ->
             val newValue = value + 1
             neighboring(newValue).max(0)
-          }
+        }
+      - |-
+        evolving(0) { value ->
+            val newValue = value + 1
+            neighboring(newValue).max(0).yielding { "test" }
+        }
+  - name: IMPROPER_CONSTRUCT_DELEGATED_FIELD_IMPLICIT
+    values:
+      - |-
+        evolve(0) {
+            val newValue = it + 1
+            neighboring(newValue).max(0)
+        }
+      - |-
+        evolving(0) { 
+            val newValue = it + 1
+            neighboring(newValue).max(0).yielding { "test" }
+        }
+  - name: PROPER_CONSTRUCT_EXPLICIT
+    values:
+      - |-
+        evolve(0) { value ->
+            val newValue = value + 1
+            neighboring(otherValue)
+            newValue
+        }
+      - |-
+        evolving(0) { value ->
+            val newValue = value + 1
+            neighboring(otherValue)
+            newValue.yielding { "test" }
+        }
+
+  - name: PROPER_CONSTRUCT_IMPLICIT
+    values:
+      - |-
+        evolve(0) {
+            val newValue = it + 1
+            neighboring(otherValue)
+            newValue
+        }
+      - |-
+        evolving(0) { 
+            val newValue = it + 1
+            neighboring(otherValue)
+            newValue.yielding { "test" }
+        }
+
+subjects:
+  - name: ImproperUse${{ prettify(IMPROPER_CONSTRUCT_IMPLICIT) }}Implicit
+    code: |-
+      fun Aggregate<Int>.entry() {
+          ${{ IMPROPER_CONSTRUCT_IMPLICIT }}
       }
     outcomes:
       warning: |-
         The 'evolve' construct is not necessary for the given use case.
 
-  - name: ProperUseEvolveImplicit
+  - name: ImproperUse${{ prettify(IMPROPER_CONSTRUCT_EXPLICIT) }}Explicit
+    code: |-
+      fun Aggregate<Int>.entry() {
+          ${{ IMPROPER_CONSTRUCT_EXPLICIT }}
+      }
+    outcomes:
+      warning: |-
+        The 'evolve' construct is not necessary for the given use case.
+
+  - name: ImproperUse${{ prettify(IMPROPER_CONSTRUCT_DELEGATED_FIELD_IMPLICIT) }}DelegatedFieldImplicit
+    code: |-
+      fun Aggregate<Int>.entry() {
+          ${{ IMPROPER_CONSTRUCT_DELEGATED_FIELD_IMPLICIT }}
+      }
+    outcomes:
+      warning: |-
+        The 'evolve' construct is not necessary for the given use case.
+
+  - name: ImproperUse${{ prettify(IMPROPER_CONSTRUCT_DELEGATED_FIELD_EXPLICIT) }}DelegatedFieldExplicit
+    code: |-
+      fun Aggregate<Int>.entry() {
+          ${{ IMPROPER_CONSTRUCT_DELEGATED_FIELD_EXPLICIT }}
+      }
+    outcomes:
+      warning: |-
+        The 'evolve' construct is not necessary for the given use case.
+
+  - name: ProperUse${{ prettify(PROPER_CONSTRUCT_EXPLICIT) }}Explicit
     code: |-
       fun Aggregate<Int>.entry() {
           val otherValue = 5
-          evolve(0){ 
-              val newValue = it
-              neighboring(otherValue)
-              newValue
-          }
+          ${{ PROPER_CONSTRUCT_EXPLICIT }}
       }
 
-  - name: ProperUseEvolveExplicit
+  - name: ProperUse${{ prettify(PROPER_CONSTRUCT_IMPLICIT) }}Implicit
     code: |-
       fun Aggregate<Int>.entry() {
           val otherValue = 5
-          evolve(0){ value ->
-              val newValue = value
-              neighboring(otherValue)
-              newValue
-          }
+          ${{ PROPER_CONSTRUCT_IMPLICIT }}
       }

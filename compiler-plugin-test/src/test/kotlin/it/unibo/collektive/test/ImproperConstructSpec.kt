@@ -11,6 +11,10 @@ package it.unibo.collektive.test
 import io.github.subjekt.Subjekt.subjekt
 import io.github.subjekt.generators.FilesGenerator.toTempFiles
 import io.kotest.core.spec.style.FreeSpec
+import io.kotest.data.forAll
+import io.kotest.data.headers
+import io.kotest.data.row
+import io.kotest.data.table
 import it.unibo.collektive.test.util.CompileUtils.getTestingProgram
 import it.unibo.collektive.test.util.CompileUtils.noWarning
 import it.unibo.collektive.test.util.CompileUtils.warning
@@ -28,45 +32,84 @@ class ImproperConstructSpec : FreeSpec({
                 addSource("src/test/resources/subjekt/ImproperConstruct.yaml")
             }.toTempFiles()
 
-        "an improper use of the 'evolve' construct with implicit parameter".config(enabled = false) - {
-            val subjectName = "ImproperUseEvolveImplicit"
-            val code = testSubjects.getTestingProgram(subjectName)
+        val constructs =
+            table(
+                headers("construct"),
+                row("evolve"),
+                row("evolving"),
+            )
 
-            "should compile producing a warning" - {
-                code shouldCompileWith
-                    warning(
-                        expectedWarning("evolve"),
-                    )
+        forAll(constructs) { construct ->
+            "an improper use of the '$construct' construct with implicit parameter".config(enabled = false) - {
+                val subjectName = "ImproperUse${construct.replaceFirstChar(Char::uppercase)}Implicit"
+                val code = testSubjects.getTestingProgram(subjectName)
+
+                "should compile producing a warning" - {
+                    code shouldCompileWith
+                        warning(
+                            expectedWarning(construct),
+                        )
+                }
             }
-        }
 
-        "an improper use of the 'evolve' construct with explicit parameter".config(enabled = false) - {
-            val subjectName = "ImproperUseEvolveExplicit"
-            val code = testSubjects.getTestingProgram(subjectName)
+            "an improper use of the '$construct' construct with explicit parameter".config(enabled = false) - {
+                val subjectName = "ImproperUse${construct.replaceFirstChar(Char::uppercase)}Explicit"
+                val code = testSubjects.getTestingProgram(subjectName)
 
-            "should compile producing a warning" - {
-                code shouldCompileWith
-                    warning(
-                        expectedWarning("evolve"),
-                    )
+                "should compile producing a warning" - {
+                    code shouldCompileWith
+                        warning(
+                            expectedWarning(construct),
+                        )
+                }
             }
-        }
 
-        "a proper use of the 'evolve' construct with implicit parameter" - {
-            val subjectName = "ProperUseEvolveImplicit"
-            val code = testSubjects.getTestingProgram(subjectName)
+            "an improper use of the '$construct' construct with implicit parameter and delegated field".config(
+                enabled = false,
+            ) -
+                {
+                    val subjectName = "ImproperUse${construct.replaceFirstChar(Char::uppercase)}DelegatedFieldImplicit"
+                    val code = testSubjects.getTestingProgram(subjectName)
 
-            "should compile without warnings" - {
-                code shouldCompileWith noWarning
+                    "should compile producing a warning" - {
+                        code shouldCompileWith
+                            warning(
+                                expectedWarning(construct),
+                            )
+                    }
+                }
+
+            "an improper use of the '$construct' construct with explicit parameter and delegated field".config(
+                enabled = false,
+            ) -
+                {
+                    val subjectName = "ImproperUse${construct.replaceFirstChar(Char::uppercase)}DelegatedFieldExplicit"
+                    val code = testSubjects.getTestingProgram(subjectName)
+
+                    "should compile producing a warning" - {
+                        code shouldCompileWith
+                            warning(
+                                expectedWarning(construct),
+                            )
+                    }
+                }
+
+            "a proper use of the '$construct' construct with implicit parameter" - {
+                val subjectName = "ProperUse${construct.replaceFirstChar(Char::uppercase)}Implicit"
+                val code = testSubjects.getTestingProgram(subjectName)
+
+                "should compile without warnings" - {
+                    code shouldCompileWith noWarning
+                }
             }
-        }
 
-        "a proper use of the 'evolve' construct with explicit parameter" - {
-            val subjectName = "ProperUseEvolveExplicit"
-            val code = testSubjects.getTestingProgram(subjectName)
+            "a proper use of the '$construct' construct with explicit parameter" - {
+                val subjectName = "ProperUse${construct.replaceFirstChar(Char::uppercase)}Explicit"
+                val code = testSubjects.getTestingProgram(subjectName)
 
-            "should compile without warnings" - {
-                code shouldCompileWith noWarning
+                "should compile without warnings" - {
+                    code shouldCompileWith noWarning
+                }
             }
         }
     }
