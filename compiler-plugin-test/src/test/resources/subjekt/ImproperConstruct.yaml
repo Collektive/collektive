@@ -1,0 +1,65 @@
+name: "Unnecessary use of constructs"
+
+config:
+  codePreamble: |-
+    /**
+      * This file has been auto-generated with Subjekt (https://github.com/mini-roostico/subjekt).
+    */
+    import it.unibo.collektive.aggregate.api.Aggregate
+
+subjects:
+  - name: ImproperUseEvolveImplicit
+    code: |-
+      fun Aggregate<Int>.entry() {
+          evolve(0) {
+            neighboring(it).max(0)
+          }
+      }
+    outcomes:
+      warning: |-
+        The 'evolve' construct is not necessary for the given use case.
+
+  - name: ImproperUseEvolveExplicit
+    code: |-
+      fun Aggregate<Int>.entry() {
+          evolve(0) { value ->
+            neighboring(value).max(0)
+          }
+      }
+    outcomes:
+      warning: |-
+        The 'evolve' construct is not necessary for the given use case.
+
+  - name: ImproperUseEvolveDelegatedField
+    code: |-
+      fun Aggregate<Int>.entry() {
+          evolve(0) { value ->
+            val newValue = value + 1
+            neighboring(newValue).max(0)
+          }
+      }
+    outcomes:
+      warning: |-
+        The 'evolve' construct is not necessary for the given use case.
+
+  - name: ProperUseEvolveImplicit
+    code: |-
+      fun Aggregate<Int>.entry() {
+          val otherValue = 5
+          evolve(0){ 
+              val newValue = it
+              neighboring(otherValue)
+              newValue
+          }
+      }
+
+  - name: ProperUseEvolveExplicit
+    code: |-
+      fun Aggregate<Int>.entry() {
+          val otherValue = 5
+          evolve(0){ value ->
+              val newValue = value
+              neighboring(otherValue)
+              newValue
+          }
+      }
