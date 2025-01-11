@@ -10,6 +10,7 @@ package it.unibo.collektive.frontend.checkers
 
 import it.unibo.collektive.frontend.checkers.CheckersUtility.fqName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.functionName
+import it.unibo.collektive.frontend.visitors.ImproperConstructVisitor
 import it.unibo.collektive.utils.common.AggregateFunctionNames.EVOLVE_FUNCTION_FQ_NAME
 import it.unibo.collektive.utils.common.AggregateFunctionNames.EVOLVING_FUNCTION_FQ_NAME
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
@@ -32,9 +33,10 @@ import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
  * The checker raises a warning because this operation can be replaced by using the more appropriate `share` construct.
  */
 object ImproperConstruct : FirFunctionCallChecker(MppCheckerKind.Common) {
-    private fun FirFunctionCall.isImproperEvolve(): Boolean {
-        TODO()
-    }
+    private fun FirFunctionCall.isImproperEvolve(): Boolean =
+        with(ImproperConstructVisitor()) {
+            isReplaceableWithShare()
+        }
 
     override fun check(
         expression: FirFunctionCall,

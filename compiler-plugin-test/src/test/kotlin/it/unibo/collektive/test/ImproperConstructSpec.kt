@@ -23,7 +23,7 @@ class ImproperConstructSpec : FreeSpec({
 
     fun expectedWarning(construct: String): String =
         """
-        The '$construct' can be replaced by using the more appropriate 'share' construct for this use case.
+        The '$construct' construct can be replaced with a simpler `share` construct call. 
         """.trimIndent()
 
     "When using an Aggregate construct" - {
@@ -40,7 +40,7 @@ class ImproperConstructSpec : FreeSpec({
             )
 
         forAll(constructs) { construct ->
-            "an improper use of the '$construct' construct with implicit parameter".config(enabled = false) - {
+            "an improper use of the '$construct' construct with implicit parameter" - {
                 val subjectName = "ImproperUse${construct.replaceFirstChar(Char::uppercase)}Implicit"
                 val code = testSubjects.getTestingProgram(subjectName)
 
@@ -52,7 +52,7 @@ class ImproperConstructSpec : FreeSpec({
                 }
             }
 
-            "an improper use of the '$construct' construct with explicit parameter".config(enabled = false) - {
+            "an improper use of the '$construct' construct with explicit parameter" - {
                 val subjectName = "ImproperUse${construct.replaceFirstChar(Char::uppercase)}Explicit"
                 val code = testSubjects.getTestingProgram(subjectName)
 
@@ -64,35 +64,29 @@ class ImproperConstructSpec : FreeSpec({
                 }
             }
 
-            "an improper use of the '$construct' construct with implicit parameter and delegated field".config(
-                enabled = false,
-            ) -
-                {
-                    val subjectName = "ImproperUse${construct.replaceFirstChar(Char::uppercase)}DelegatedFieldImplicit"
-                    val code = testSubjects.getTestingProgram(subjectName)
+            "an improper use of the '$construct' construct with implicit parameter and delegated field" - {
+                val subjectName = "ImproperUse${construct.replaceFirstChar(Char::uppercase)}DelegatedFieldImplicit"
+                val code = testSubjects.getTestingProgram(subjectName)
 
-                    "should compile producing a warning" - {
-                        code shouldCompileWith
-                            warning(
-                                expectedWarning(construct),
-                            )
-                    }
+                "should compile producing a warning" - {
+                    code shouldCompileWith
+                        warning(
+                            expectedWarning(construct),
+                        )
                 }
+            }
 
-            "an improper use of the '$construct' construct with explicit parameter and delegated field".config(
-                enabled = false,
-            ) -
-                {
-                    val subjectName = "ImproperUse${construct.replaceFirstChar(Char::uppercase)}DelegatedFieldExplicit"
-                    val code = testSubjects.getTestingProgram(subjectName)
+            "an improper use of the '$construct' construct with explicit parameter and delegated field" - {
+                val subjectName = "ImproperUse${construct.replaceFirstChar(Char::uppercase)}DelegatedFieldExplicit"
+                val code = testSubjects.getTestingProgram(subjectName)
 
-                    "should compile producing a warning" - {
-                        code shouldCompileWith
-                            warning(
-                                expectedWarning(construct),
-                            )
-                    }
+                "should compile producing a warning" - {
+                    code shouldCompileWith
+                        warning(
+                            expectedWarning(construct),
+                        )
                 }
+            }
 
             "a proper use of the '$construct' construct with implicit parameter" - {
                 val subjectName = "ProperUse${construct.replaceFirstChar(Char::uppercase)}Implicit"
