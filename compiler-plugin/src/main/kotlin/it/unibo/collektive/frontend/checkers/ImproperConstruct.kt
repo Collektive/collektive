@@ -34,7 +34,7 @@ import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
  */
 object ImproperConstruct : FirFunctionCallChecker(MppCheckerKind.Common) {
     private fun FirFunctionCall.isImproperEvolve(): Boolean =
-        with(ImproperConstructVisitor()) {
+        with(ImproperConstructVisitor(fqName())) {
             isReplaceableWithShare()
         }
 
