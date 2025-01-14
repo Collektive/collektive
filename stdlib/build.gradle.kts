@@ -34,6 +34,7 @@ kotlinMultiplatform {
         val commonMain by getting {
             dependencies {
                 implementation(project(":dsl"))
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
             }
             kotlin.srcDirs(collektivizeKotlinStdlibTask)
         }
@@ -41,6 +42,7 @@ kotlinMultiplatform {
             dependencies {
                 implementation(project(":test-tooling"))
                 implementation(rootProject.libs.bundles.kotlin.testing.common)
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
             }
         }
         val jvmTest by getting {

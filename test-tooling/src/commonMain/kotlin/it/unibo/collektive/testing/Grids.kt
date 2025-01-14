@@ -52,3 +52,9 @@ fun <R> vonNeumannGrid(
     initial: (Environment<R>, Position) -> R,
     program: Aggregate<Int>.(Environment<R>) -> R,
 ) = EnvironmentWithMeshNetwork<R>(1.0).grid(sizeX, sizeY, initial, program)
+
+fun <R> linearGrid(
+    size: Int,
+    initial: (Environment<R>, Position) -> R,
+    program: Aggregate<Int>.(Environment<R>) -> R,
+) = EnvironmentWithMeshNetwork<R>(1.0).grid(size, 1, initial, program)
