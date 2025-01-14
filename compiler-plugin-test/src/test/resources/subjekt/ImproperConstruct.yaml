@@ -83,6 +83,19 @@ parameters:
             newValue.yielding { "test" }
         }
 
+  - name: PROPER_USE_SAME_RETURN
+    values:
+      - |-
+        evolve(0) { value ->
+            neighboring(value)
+            value
+        }
+      - |-
+        evolving(0) { value ->
+            neighboring(value)
+            value.yielding { value }
+        }
+
 subjects:
   - name: ImproperUse${{ prettify(IMPROPER_CONSTRUCT_IMPLICIT) }}Implicit
     code: |-
@@ -132,4 +145,10 @@ subjects:
       fun Aggregate<Int>.entry() {
           val otherValue = 5
           ${{ PROPER_CONSTRUCT_IMPLICIT }}
+      }
+
+  - name: ProperUse${{ prettify(PROPER_USE_SAME_RETURN) }}SameReturn
+    code: |-
+      fun Aggregate<Int>.entry() {
+          ${{ PROPER_USE_SAME_RETURN }}
       }

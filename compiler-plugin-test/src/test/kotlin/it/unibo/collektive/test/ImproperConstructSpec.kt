@@ -105,6 +105,18 @@ class ImproperConstructSpec : FreeSpec({
                     code shouldCompileWith noWarning
                 }
             }
+
+            "a proper use of the '$construct' construct where neighboring and evolve return the same value".config(
+                enabled = false,
+            ) -
+                {
+                    val subjectName = "ProperUse${construct.replaceFirstChar(Char::uppercase)}SameReturn"
+                    val code = testSubjects.getTestingProgram(subjectName)
+
+                    "should compile without warnings" - {
+                        code shouldCompileWith noWarning
+                    }
+                }
         }
     }
 })
