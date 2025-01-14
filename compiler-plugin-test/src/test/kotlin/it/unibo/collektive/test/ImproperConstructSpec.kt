@@ -106,9 +106,7 @@ class ImproperConstructSpec : FreeSpec({
                 }
             }
 
-            "a proper use of the '$construct' construct where neighboring and evolve return the same value".config(
-                enabled = false,
-            ) -
+            "a proper use of the '$construct' construct where neighboring and evolve return the same value" -
                 {
                     val subjectName = "ProperUse${construct.replaceFirstChar(Char::uppercase)}SameReturn"
                     val code = testSubjects.getTestingProgram(subjectName)
