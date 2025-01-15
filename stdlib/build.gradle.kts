@@ -1,4 +1,8 @@
-import it.unibo.collektive.codegen.CollektiveCodegenTask
+import it.unibo.collektive.collektivize.CollektivizeTask
+
+plugins {
+    alias(libs.plugins.collektivize)
+}
 
 apply(plugin = libs.plugins.kotlin.multiplatform.id)
 
@@ -8,20 +12,20 @@ collektive {
     collektiveEnabled = true
 }
 
-val generateFieldFunctionsForTypes by tasks.registering(CollektiveCodegenTask::class) {
-    group = "code generation"
-    description = "Generates Collektive field functions for primitive types"
-    outputDir =
+collektivize {
+    outputDirectory =
         layout.buildDirectory
             .dir("generated/kotlin/collektive")
             .get()
             .asFile
 }
 
+val collektivizeKotlinStdlibTask = tasks.named<CollektivizeTask>("collektivizeKotlinStdlib")
+
 // Avoid verification tasks to complain about being not dependent on the code generation tasks
 tasks.withType<SourceTask>().configureEach {
     if (this is VerificationTask) {
-        dependsOn(generateFieldFunctionsForTypes)
+        dependsOn(collektivizeKotlinStdlibTask)
     }
 }
 
@@ -31,7 +35,7 @@ kotlinMultiplatform {
             dependencies {
                 implementation(project(":dsl"))
             }
-            kotlin.srcDirs(generateFieldFunctionsForTypes)
+            kotlin.srcDirs(collektivizeKotlinStdlibTask)
         }
         val commonTest by getting {
             dependencies {
