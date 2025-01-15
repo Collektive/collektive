@@ -106,16 +106,23 @@ class ImproperConstructVisitor(
 
     override fun visitFunctionCall(functionCall: FirFunctionCall) {
         isInsideNeighboring = functionCall.fqName() == NEIGHBORING_FUNCTION_FQ_NAME
-        super.visitFunctionCall(functionCall)
-        if (isInsideNeighboring && markExpression) {
-            markExpression = false
-            neighboringExpression = functionCall.argumentList.arguments.first()
-            if (neighboringExpression is FirAnonymousFunctionExpression) {
-                neighboringExpression =
-                    (neighboringExpression as FirAnonymousFunctionExpression).extractReturnExpression()
+        val firstArgument = functionCall.argumentList.arguments.firstOrNull()
+        if (isInsideNeighboring && firstArgument is FirAnonymousFunctionExpression) {
+            // case in which the neighboring construct is used with an anonymous function as parameter
+            val neighboringReturn = firstArgument.extractReturnExpression()?.also { visitElement(it) }
+            if (markExpression) {
+                markExpression = false
+                neighboringExpression = neighboringReturn
+            }
+        } else {
+            super.visitFunctionCall(functionCall)
+            if (isInsideNeighboring && markExpression) {
+                // case in which the neighboring construct is used with a simple expression as parameter
+                markExpression = false
+                neighboringExpression = firstArgument
             }
         }
-        isInsideNeighboring = isInsideNeighboring && functionCall.fqName() != NEIGHBORING_FUNCTION_FQ_NAME
+        isInsideNeighboring = false
     }
 
     override fun visitReturnExpression(returnExpression: FirReturnExpression) {
