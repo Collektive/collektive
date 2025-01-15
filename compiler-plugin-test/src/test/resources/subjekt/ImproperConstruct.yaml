@@ -93,7 +93,7 @@ parameters:
       - |-
         evolving(0) { value ->
             neighboring(value)
-            value.yielding { value }
+            value.yielding { "example" }
         }
 
 subjects:
