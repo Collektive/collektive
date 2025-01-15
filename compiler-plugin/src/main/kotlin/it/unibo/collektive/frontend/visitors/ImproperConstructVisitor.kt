@@ -8,6 +8,7 @@
 
 package it.unibo.collektive.frontend.visitors
 
+import it.unibo.collektive.frontend.checkers.CheckersUtility.extractReturnExpression
 import it.unibo.collektive.frontend.checkers.CheckersUtility.fqName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isStructurallyEquivalentTo
 import it.unibo.collektive.utils.common.AggregateFunctionNames.EVOLVING_FUNCTION_FQ_NAME
@@ -38,11 +39,10 @@ class ImproperConstructVisitor(
     private var tracedDependentSymbols = emptyList<FirBasedSymbol<*>>()
 
     /**
-     * Simple visitor that returns the yielding expression of a return statement, or `null` if it is not found.
+     * Simple visitor that returns the explicit receiver expression of a `yielding` call, or `null` if it is not found.
      */
-    private class YieldingCallVisitor : FirVisitorVoid() {
+    private class YieldingReceiverVisitor : FirVisitorVoid() {
         private var returnExpression: FirExpression? = null
-        private var insideYielding = false
 
         override fun visitElement(element: FirElement) {
             element.acceptChildren(this)
@@ -50,28 +50,20 @@ class ImproperConstructVisitor(
 
         override fun visitFunctionCall(functionCall: FirFunctionCall) {
             if (functionCall.fqName() == YIELDING_FUNCTION_FQ_NAME) {
-                insideYielding = true
-                super.visitFunctionCall(functionCall)
-                insideYielding = false
-            }
-        }
-
-        override fun visitReturnExpression(returnExpression: FirReturnExpression) {
-            if (insideYielding) {
-                this.returnExpression = returnExpression.result
+                returnExpression = functionCall.explicitReceiver
             }
         }
 
         /**
-         * Returns the yielding expression of a return statement, or `null` if it is not found.
+         * Returns the yielding receiver of a return statement, or `null` if it is not found.
          *
          * Example:
          * ```kotlin
-         * return value.yielding { "example" }
+         * return value.max(0).yielding { "example" }
          * ```
-         * In this case, the yielding expression is `"example"`.
+         * In this case, the yielding receiver is `value.max(0)`.
          */
-        fun FirReturnExpression.getYieldingExpression(): FirExpression? {
+        fun FirReturnExpression.getYieldingReceiver(): FirExpression? {
             visitElement(this)
             return returnExpression
         }
@@ -83,6 +75,7 @@ class ImproperConstructVisitor(
 
     override fun visitProperty(property: FirProperty) {
         super.visitProperty(property)
+        // trace the symbols that depends on the parameters of the construct
         if (markExpression) {
             tracedDependentSymbols += property.symbol
             markExpression = false
@@ -90,6 +83,7 @@ class ImproperConstructVisitor(
     }
 
     override fun visitResolvedNamedReference(resolvedNamedReference: FirResolvedNamedReference) {
+        // mark the expression if it uses the parameters of the construct or the traced dependent symbols
         if (resolvedNamedReference.resolvedSymbol in parametersDeclarations ||
             resolvedNamedReference.resolvedSymbol in tracedDependentSymbols
         ) {
@@ -99,6 +93,7 @@ class ImproperConstructVisitor(
     }
 
     override fun visitAnonymousFunctionExpression(anonymousFunctionExpression: FirAnonymousFunctionExpression) {
+        // extract the parameters only of the top construct call (not the nested anonymous functions)
         if (nestingLevel == 0) {
             val anonymousFunction = anonymousFunctionExpression.anonymousFunction
             val parameters = anonymousFunction.valueParameters
@@ -115,23 +110,29 @@ class ImproperConstructVisitor(
         if (isInsideNeighboring && markExpression) {
             markExpression = false
             neighboringExpression = functionCall.argumentList.arguments.first()
+            if (neighboringExpression is FirAnonymousFunctionExpression) {
+                neighboringExpression =
+                    (neighboringExpression as FirAnonymousFunctionExpression).extractReturnExpression()
+            }
         }
-        isInsideNeighboring = functionCall.fqName() != NEIGHBORING_FUNCTION_FQ_NAME
+        isInsideNeighboring = isInsideNeighboring && functionCall.fqName() != NEIGHBORING_FUNCTION_FQ_NAME
     }
 
     override fun visitReturnExpression(returnExpression: FirReturnExpression) {
         super.visitReturnExpression(returnExpression)
         if (neighboringExpression != null && nestingLevel == 1) {
+            val expressionToCheck = neighboringExpression as FirExpression // needed for null safety
             if (constructNameFQName == EVOLVING_FUNCTION_FQ_NAME) {
-                // if the construct is the `evolving` one we check if the yielding expression is different from the
+                // if the construct is the `evolving` one we check if the yielding receiver is different from the
                 // neighboring one
-                val yieldingExpression =
-                    with(YieldingCallVisitor()) {
-                        returnExpression.getYieldingExpression()
+                val yieldingReceiver =
+                    with(YieldingReceiverVisitor()) {
+                        returnExpression.getYieldingReceiver()
                     }
-                isReplaceable = yieldingExpression?.isStructurallyEquivalentTo(neighboringExpression!!) == false
+
+                isReplaceable = yieldingReceiver?.isStructurallyEquivalentTo(expressionToCheck) == false
             } else {
-                isReplaceable = returnExpression.result.isStructurallyEquivalentTo(neighboringExpression!!) == false
+                isReplaceable = returnExpression.result.isStructurallyEquivalentTo(expressionToCheck) == false
             }
             return
         }

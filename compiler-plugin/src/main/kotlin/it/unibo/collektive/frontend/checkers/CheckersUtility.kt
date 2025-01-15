@@ -9,8 +9,10 @@ import org.jetbrains.kotlin.fir.analysis.checkers.getContainingClassSymbol
 import org.jetbrains.kotlin.fir.analysis.checkers.toClassLikeSymbol
 import org.jetbrains.kotlin.fir.declarations.FirReceiverParameter
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
+import org.jetbrains.kotlin.fir.expressions.FirAnonymousFunctionExpression
 import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
+import org.jetbrains.kotlin.fir.expressions.FirReturnExpression
 import org.jetbrains.kotlin.fir.expressions.toResolvedCallableSymbol
 import org.jetbrains.kotlin.fir.expressions.unwrapExpression
 import org.jetbrains.kotlin.fir.references.toResolvedFunctionSymbol
@@ -18,7 +20,7 @@ import org.jetbrains.kotlin.fir.references.toResolvedNamedFunctionSymbol
 import org.jetbrains.kotlin.fir.render
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.fir.types.classId
-import org.jetbrains.kotlin.fir.types.coneType
+import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 
@@ -193,4 +195,28 @@ object CheckersUtility {
      * Checks if the [FirExpression] is structurally equivalent to another [FirExpression].
      */
     fun FirExpression.isStructurallyEquivalentTo(other: FirExpression): Boolean = render() == other.render()
+
+    /**
+     * Extracts the return expression from an anonymous function, or `null` if it is not found.
+     */
+    fun FirAnonymousFunctionExpression.extractReturnExpression(): FirExpression? =
+        object : FirVisitorVoid() {
+            private var returnExpression: FirExpression? = null
+
+            override fun visitElement(element: FirElement) {
+                element.acceptChildren(this)
+            }
+
+            override fun visitReturnExpression(expression: FirReturnExpression) {
+                returnExpression = expression.result
+            }
+
+            /**
+             * Extracts the return expression from the anonymous function.
+             */
+            fun extractReturnExpression(): FirExpression? {
+                visitElement(this@extractReturnExpression)
+                return returnExpression
+            }
+        }.extractReturnExpression()
 }
