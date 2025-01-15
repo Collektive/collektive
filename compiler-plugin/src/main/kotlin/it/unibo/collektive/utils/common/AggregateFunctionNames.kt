@@ -94,4 +94,9 @@ object AggregateFunctionNames {
      * The FQ name of the `evolving` function.
      */
     const val EVOLVING_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.evolving"
+
+    /**
+     * The FQ name of the `yielding` function.
+     */
+    const val YIELDING_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.YieldingContext.yielding"
 }
