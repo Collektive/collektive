@@ -10,6 +10,7 @@ package it.unibo.collektive.frontend.checkers
 
 import it.unibo.collektive.frontend.checkers.CheckersUtility.fqName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.functionName
+import it.unibo.collektive.frontend.visitors.YieldingUnnecessaryUsageVisitor
 import it.unibo.collektive.utils.common.AggregateFunctionNames.EVOLVING_FUNCTION_FQ_NAME
 import it.unibo.collektive.utils.common.AggregateFunctionNames.EXCHANGING_FUNCTION_FQ_NAME
 import it.unibo.collektive.utils.common.AggregateFunctionNames.SHARING_FUNCTION_FQ_NAME
@@ -52,14 +53,17 @@ object UnnecessaryYielding : FirFunctionCallChecker(MppCheckerKind.Common) {
             SHARING_FUNCTION_FQ_NAME,
         )
 
-    private fun FirFunctionCall.useAnUnnecessaryYieldingContext(): Boolean = true
+    private fun FirFunctionCall.usesAnUnnecessaryYieldingContext(): Boolean =
+        with(YieldingUnnecessaryUsageVisitor()) {
+            containsUnnecessaryYielding()
+        }
 
     override fun check(
         expression: FirFunctionCall,
         context: CheckerContext,
         reporter: DiagnosticReporter,
     ) {
-        if (expression.fqName() in constructs && expression.useAnUnnecessaryYieldingContext()) {
+        if (expression.fqName() in constructs && expression.usesAnUnnecessaryYieldingContext()) {
             reporter.reportOn(
                 expression.calleeReference.source,
                 FirCollektiveErrors.UNNECESSARY_YIELDING_CONTEXT,
