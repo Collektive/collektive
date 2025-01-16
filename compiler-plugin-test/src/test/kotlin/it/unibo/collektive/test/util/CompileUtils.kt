@@ -28,6 +28,9 @@ object CompileUtils {
                     .resolve(fileName)
                     .also { it.writeText(program) }
             CollektiveK2JVMCompiler.compile(listOf(program), collector)
+            // we check that there are no compilation errors, and then we run the custom check.
+            // The message containing "-Werror" is ignored because it is a warning that is treated as an error.
+            collector[CompilerMessageSeverity.ERROR].filterNot { it.message.contains("-Werror") }.shouldBeEmpty()
             compilationCheck(collector)
         }
     }
