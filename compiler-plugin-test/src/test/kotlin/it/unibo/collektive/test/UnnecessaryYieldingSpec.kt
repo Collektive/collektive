@@ -23,7 +23,11 @@ class UnnecessaryYieldingSpec : FreeSpec({
 
     fun expectedWarning(construct: String): String =
         """
-        $construct
+        The yielding block inside the '$construct' construct may not be necessary for this use case, as the 
+        expression that is exchanged is the same as the one yielded inside the 'yielding' block.
+        
+        Consider switching to the same construct without the 'yielding' block ('evolve', 'exchange' or
+        'share').
         """.trimIndent()
 
     "When using a construct with yielding" - {
@@ -42,9 +46,8 @@ class UnnecessaryYieldingSpec : FreeSpec({
 
         forAll(constructs) { construct ->
 
-            "performing a data exchange inside the '$construct' construct and yielding the same value".config(
-                enabled = false,
-            ) -
+            "performing a data exchange inside the '$construct' construct and yielding the same value"
+                .config(enabled = false) -
                 {
 
                     "with a simple expression" - {
