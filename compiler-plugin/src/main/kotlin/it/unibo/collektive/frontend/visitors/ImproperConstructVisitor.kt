@@ -135,11 +135,11 @@ class ImproperConstructVisitor(
                 val yieldingReceiver =
                     with(YieldingReceiverVisitor()) {
                         returnExpression.getYieldingReceiver()
-                    }
+                    } ?: return
 
-                isReplaceable = yieldingReceiver?.isStructurallyEquivalentTo(expressionToCheck) == false
+                isReplaceable = !yieldingReceiver.isStructurallyEquivalentTo(expressionToCheck)
             } else {
-                isReplaceable = returnExpression.result.isStructurallyEquivalentTo(expressionToCheck) == false
+                isReplaceable = !returnExpression.result.isStructurallyEquivalentTo(expressionToCheck)
             }
             return
         }
