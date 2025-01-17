@@ -87,13 +87,13 @@ parameters:
     values:
       - |-
         evolve(0) { value ->
-            neighboring(value)
-            value
+            neighboring(value + 1)
+            value + 1
         }
       - |-
         evolving(0) { value ->
-            neighboring(value)
-            value.yielding { "example" }
+            neighboring(value + 1)
+            (value + 1).yielding { "example" }
         }
 
 subjects:
