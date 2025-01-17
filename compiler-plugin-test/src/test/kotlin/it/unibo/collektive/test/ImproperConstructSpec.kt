@@ -23,7 +23,7 @@ class ImproperConstructSpec : FreeSpec({
 
     fun expectedWarning(construct: String): String =
         """
-        The '$construct' construct can be replaced with a simpler `share` construct call. 
+        The '$construct' construct can be replaced with the `share` construct call. 
         """.trimIndent()
 
     "When using an Aggregate construct" - {
