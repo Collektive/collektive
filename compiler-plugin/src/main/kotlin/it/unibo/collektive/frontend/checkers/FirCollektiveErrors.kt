@@ -46,6 +46,16 @@ object FirCollektiveErrors {
      */
     val UNNECESSARY_YIELDING_CONTEXT by warning1<KtNameReferenceExpression, String>()
 
+    /**
+     * Warning raised when a construct is used improperly (i.e., another more appropriate construct should be used
+     * instead).
+     *
+     * For example, when using an `evolve` construct with a nested `neighboring`:
+     * if what you share with your neighbours through `neighboring` depends on the state of the repeat but is different
+     * from what you return as the last value of the `evolve`, then the entire block can be replaced with a `share`.
+     */
+    val IMPROPER_EVOLVE_CONSTRUCT by warning1<KtNameReferenceExpression, String>()
+
     init {
         RootDiagnosticRendererFactory.registerFactory(KtDefaultErrorMessagesCollektive)
     }

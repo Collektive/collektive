@@ -67,5 +67,12 @@ object KtDefaultErrorMessagesCollektive : BaseDiagnosticRendererFactory() {
                 """.trimIndent(),
                 CommonRenderers.STRING,
             )
+            put(
+                FirCollektiveErrors.IMPROPER_EVOLVE_CONSTRUCT,
+                """
+                The ''{0}'' construct can be replaced with the `share` construct call. 
+                """.trimIndent(),
+                CommonRenderers.STRING,
+            )
         }
 }
