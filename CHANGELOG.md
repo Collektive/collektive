@@ -1,3 +1,22 @@
+## [12.2.0](https://github.com/Collektive/collektive/compare/12.1.1...12.2.0) (2025-01-17)
+
+### Features
+
+* **frontend-compiler-plugin:** identify wrong use of pattern `evolve` + `neighboring` instead of using `share` ([#693](https://github.com/Collektive/collektive/issues/693)) ([fbb0337](https://github.com/Collektive/collektive/commit/fbb0337cdaee87a0857954268e975dbf5f78cf0b))
+
+### Dependency updates
+
+* **deps:** add collektivize gradle plugin ([22364c8](https://github.com/Collektive/collektive/commit/22364c80e1e2f895e458b25a065facdd0943b1cd))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.119 ([90195bd](https://github.com/Collektive/collektive/commit/90195bd99cc4b6ea68d636a327d0f1464e976d75))
+* **deps:** update dependency typescript to v5.7.3 ([d41db26](https://github.com/Collektive/collektive/commit/d41db26efd474174e555024d7a3eb6d3e9296a94))
+
+### Build and continuous integration
+
+* **deps:** update actions/upload-artifact action to v4.6.0 ([8808143](https://github.com/Collektive/collektive/commit/8808143fa6fab0a2e7431b427e8a49fbffe1878f))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.0 ([d59005d](https://github.com/Collektive/collektive/commit/d59005d166245197514a3c35ad17fc10bb385ad0))
+* **deps:** update github/codeql-action action to v3.28.1 ([fb4efc0](https://github.com/Collektive/collektive/commit/fb4efc06b6c9e194d6b8fd143122a4e1e343346e))
+* generate collektivized stdlib via gradle plugin ([fcb0da7](https://github.com/Collektive/collektive/commit/fcb0da7fc912bf8920c0a45266dd3f5b6535db7a))
+
 ## [12.1.1](https://github.com/Collektive/collektive/compare/12.1.0...12.1.1) (2025-01-10)
 
 ### Bug Fixes
