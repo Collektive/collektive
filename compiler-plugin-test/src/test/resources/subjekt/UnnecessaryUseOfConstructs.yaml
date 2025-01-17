@@ -65,7 +65,7 @@ parameters:
         }
       - |-
         share(initial) {
-          it.maxBy { v -> v. value }.value
+          it.maxBy(0) { v -> v }
         }
       - |-
         evolving(initial) {
@@ -140,7 +140,7 @@ parameters:
         }
       - |-
         share(initial) { field ->
-          field.maxBy { v -> v. value }.value
+          field.maxBy(0) { v -> v }
         }
       - |-
         evolving(initial) { field ->
