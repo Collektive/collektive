@@ -1,3 +1,12 @@
+## [12.2.1](https://github.com/Collektive/collektive/compare/12.2.0...12.2.1) (2025-01-18)
+
+### Dependency updates
+
+* **core-deps:** update plugin collektivize to v1.0.3 ([b68ba51](https://github.com/Collektive/collektive/commit/b68ba5132947b9b0c0e341b6e6ce7de24cf087e2))
+* **deps:** update alchemist to v37 ([82ad709](https://github.com/Collektive/collektive/commit/82ad709c1542633ca78dc6e5dc95efb3b1e023ee))
+* **deps:** update alchemist to v37.0.1 ([1faa052](https://github.com/Collektive/collektive/commit/1faa05218063c9496fd9050081145ef7cddf34c4))
+* **deps:** update dependency com.github.ben-manes.caffeine:caffeine to v3.2.0 ([93f8476](https://github.com/Collektive/collektive/commit/93f847648d5dc7361dd3731c8c000d86fcb54704))
+
 ## [12.2.0](https://github.com/Collektive/collektive/compare/12.1.1...12.2.0) (2025-01-17)
 
 ### Features
