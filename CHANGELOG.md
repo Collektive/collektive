@@ -1,3 +1,9 @@
+## [12.2.2](https://github.com/Collektive/collektive/compare/12.2.1...12.2.2) (2025-01-18)
+
+### Dependency updates
+
+* **core-deps:** update plugin collektivize to v1.0.4 ([2f3d3e1](https://github.com/Collektive/collektive/commit/2f3d3e13f21f9344513656d0f061738f61f26ace))
+
 ## [12.2.1](https://github.com/Collektive/collektive/compare/12.2.0...12.2.1) (2025-01-18)
 
 ### Dependency updates
