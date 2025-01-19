@@ -8,12 +8,15 @@ kotlin = "2.1.0"
 [libraries]
 alchemist-api = { module = "it.unibo.alchemist:alchemist-api", version.ref = "alchemist" }
 alchemist = { module = "it.unibo.alchemist:alchemist", version.ref = "alchemist" }
-apache-commons-codec = "commons-codec:commons-codec:1.17.2"
+
 caffeine = "com.github.ben-manes.caffeine:caffeine:3.2.0"
+
 javap = "com.perfma.wrapped:com.sun.tools:1.8.0_jdk8u275-b01_linux_x64"
+
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-runner-junit5-jvm = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }
+
 kotlin-compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-scripting-compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable", version.ref = "kotlin" }
@@ -22,6 +25,7 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotl
 kotlin-test-common = { module = "org.jetbrains.kotlin:kotlin-test-common", version.ref = "kotlin" }
 kotlin-test-annotations-common = { module = "org.jetbrains.kotlin:kotlin-test-annotations-common", version.ref = "kotlin" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+
 kotlinpoet = "com.squareup:kotlinpoet:2.0.0"
 slf4j = "org.slf4j:slf4j-api:2.0.16"
 subjekt = "io.github.freshmag:subjekt-api:1.1.5"
