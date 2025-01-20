@@ -1,3 +1,18 @@
+## [12.3.0](https://github.com/Collektive/collektive/compare/12.2.2...12.3.0) (2025-01-20)
+
+### Features
+
+* **frontend-compiler-plugin:** check whether using a `YieldingContext` when not necessary ([#698](https://github.com/Collektive/collektive/issues/698)) ([95232f9](https://github.com/Collektive/collektive/commit/95232f9dd6d83d3d758469d2f05be8f514dc0209))
+
+### Build and continuous integration
+
+* prevent kotest classpath scan ([5befb2f](https://github.com/Collektive/collektive/commit/5befb2f607c367be736b81c7742f8e1cacbab4ed))
+* use direct access syntax for source sets ([5f82f3f](https://github.com/Collektive/collektive/commit/5f82f3f00a956f9108220c00cdf6df07d508b7aa))
+
+### Refactoring
+
+* use jdk md5 hashing removing apache commons from dependencies ([9602772](https://github.com/Collektive/collektive/commit/960277242147da6637c49c6c394d6b437b0ade70))
+
 ## [12.2.2](https://github.com/Collektive/collektive/compare/12.2.1...12.2.2) (2025-01-18)
 
 ### Dependency updates
