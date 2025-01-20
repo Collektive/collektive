@@ -46,34 +46,32 @@ class UnnecessaryYieldingSpec : FreeSpec({
 
         forAll(constructs) { construct ->
 
-            "performing a data exchange inside the '$construct' construct and yielding the same value"
-                .config(enabled = false) -
-                {
+            "performing a data exchange inside the '$construct' construct and yielding the same value" - {
 
-                    "with a simple expression" - {
-                        val subjectName = "UnnecessaryYielding${construct.replaceFirstChar(Char::uppercase)}Simple"
-                        val code = testSubjects.getTestingProgram(subjectName)
+                "with a simple expression" - {
+                    val subjectName = "UnnecessaryYielding${construct.replaceFirstChar(Char::uppercase)}Simple"
+                    val code = testSubjects.getTestingProgram(subjectName)
 
-                        "should compile producing a warning" - {
-                            code shouldCompileWith
-                                warning(
-                                    expectedWarning(construct),
-                                )
-                        }
-                    }
-
-                    "with a complex expression" - {
-                        val subjectName = "UnnecessaryYielding${construct.replaceFirstChar(Char::uppercase)}Complex"
-                        val code = testSubjects.getTestingProgram(subjectName)
-
-                        "should compile producing a warning" - {
-                            code shouldCompileWith
-                                warning(
-                                    expectedWarning(construct),
-                                )
-                        }
+                    "should compile producing a warning" - {
+                        code shouldCompileWith
+                            warning(
+                                expectedWarning(construct),
+                            )
                     }
                 }
+
+                "with a complex expression" - {
+                    val subjectName = "UnnecessaryYielding${construct.replaceFirstChar(Char::uppercase)}Complex"
+                    val code = testSubjects.getTestingProgram(subjectName)
+
+                    "should compile producing a warning" - {
+                        code shouldCompileWith
+                            warning(
+                                expectedWarning(construct),
+                            )
+                    }
+                }
+            }
 
             "performing a data exchange inside the '$construct' construct and yielding a different value" - {
                 val subjectName = "NecessaryYielding${construct.replaceFirstChar(Char::uppercase)}"
@@ -83,6 +81,16 @@ class UnnecessaryYieldingSpec : FreeSpec({
                     code shouldCompileWith noWarning
                 }
             }
+
+            "performing a data exchange inside the '$construct' construct and yielding a different value with " +
+                "a different type" - {
+                    val subjectName = "NecessaryYieldingDifferentType${construct.replaceFirstChar(Char::uppercase)}"
+                    val code = testSubjects.getTestingProgram(subjectName)
+
+                    "should compile without warnings" - {
+                        code shouldCompileWith noWarning
+                    }
+                }
         }
     }
 })

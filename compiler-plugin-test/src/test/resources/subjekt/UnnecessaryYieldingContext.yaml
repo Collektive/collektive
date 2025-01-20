@@ -63,6 +63,22 @@ parameters:
           maxValue.yielding { maxValue + 1 }
         }
 
+  - name: NECESSARY_YIELDING_DIFFERENT_TYPE
+    values:
+      - |-
+        evolving(initial) {
+          it.yielding { "Test$it" }
+        }
+      - |-
+        exchanging(initial) { 
+          it.yielding { it.map { "Test${it + 1}" } }
+        }
+      - |-
+        sharing(initial) {
+          val maxValue = it.maxBy(0) { it }
+          maxValue.yielding { "Test${maxValue + 1}" }
+        }  
+
 macros:
   def: aggregateBlock(specificCode)
   values:
@@ -81,3 +97,6 @@ subjects:
 
   - name: NecessaryYielding${{ prettify(NECESSARY_YIELDING) }}
     code: ${{ aggregateBlock(NECESSARY_YIELDING) }}
+
+  - name: NecessaryYieldingDifferentType${{ prettify(NECESSARY_YIELDING_DIFFERENT_TYPE) }}
+    code: ${{ aggregateBlock(NECESSARY_YIELDING_DIFFERENT_TYPE) }}
