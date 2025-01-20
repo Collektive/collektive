@@ -4,6 +4,7 @@ import it.unibo.collektive.frontend.checkers.ExplicitAlignDealign
 import it.unibo.collektive.frontend.checkers.ImproperConstruct
 import it.unibo.collektive.frontend.checkers.NoAlignInsideLoop
 import it.unibo.collektive.frontend.checkers.UnnecessaryUseOfConstructs
+import it.unibo.collektive.frontend.checkers.UnnecessaryYielding
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.expression.ExpressionCheckers
 import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirFunctionCallChecker
@@ -18,6 +19,13 @@ class CollektiveExtension(
     override val expressionCheckers: ExpressionCheckers =
         object : ExpressionCheckers() {
             override val functionCallCheckers: Set<FirFunctionCallChecker>
-                get() = setOf(NoAlignInsideLoop, ExplicitAlignDealign, UnnecessaryUseOfConstructs, ImproperConstruct)
+                get() =
+                    setOf(
+                        NoAlignInsideLoop,
+                        ExplicitAlignDealign,
+                        UnnecessaryUseOfConstructs,
+                        ImproperConstruct,
+                        UnnecessaryYielding,
+                    )
         }
 }

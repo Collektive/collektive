@@ -42,7 +42,7 @@ parameters:
       - |-
         exchanging(0) { 
           val field = neighboringViaExchange(0)
-          field.yielding { field }
+          field.yielding { field.map { it + 1 }}
         }
       - |-
         sharing(initial) {
@@ -65,7 +65,7 @@ parameters:
         }
       - |-
         share(initial) {
-          it.maxBy { v -> v. value }.value
+          it.maxBy(0) { v -> v }
         }
       - |-
         evolving(initial) {
@@ -77,7 +77,7 @@ parameters:
         }
       - |-
         exchanging(initial) {
-          it.yielding { it }
+          it.yielding { it.map { it + 1 }}
         }
       - |-
         sharing(initial) {
@@ -140,7 +140,7 @@ parameters:
         }
       - |-
         share(initial) { field ->
-          field.maxBy { v -> v. value }.value
+          field.maxBy(0) { v -> v }
         }
       - |-
         evolving(initial) { field ->
@@ -148,7 +148,7 @@ parameters:
         }
       - |-
         exchanging(0) { field ->
-            field.yielding { field }
+            field.yielding { field.map { it + 1 }}
         }
       - |-
         neighboringViaExchange {
