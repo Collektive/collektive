@@ -26,8 +26,6 @@ import it.unibo.alchemist.util.RandomGenerators.nextDouble
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.compiler.CollektiveK2JVMCompiler
 import it.unibo.collektive.compiler.logging.CollectingMessageCollector
-import it.unibo.collektive.compiler.util.md5
-import it.unibo.collektive.compiler.util.toBase32
 import org.apache.commons.math3.random.RandomGenerator
 import org.danilopianini.util.ListSet
 import org.jetbrains.kotlin.cli.common.ExitCode
@@ -42,6 +40,7 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.lang.reflect.Method
 import java.net.URLClassLoader
+import java.security.MessageDigest
 import javax.script.ScriptEngineManager
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.createTempDirectory
@@ -117,7 +116,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         val code: String = parameters["code"]?.toString().orEmpty()
         val sourceSets: List<File> = parameters["source-sets"].toFiles()
         val classpath = sourceSets.joinToString(separator = File.pathSeparator) { it.absolutePath }
-        val internalIdentifier = "$classpath$code$entrypoint".md5().toBase32()
+        val internalIdentifier = "$classpath$code$entrypoint".md5()
         val (name: String, methodName: String) =
             when (val nameFromParameters = parameters["name"]) {
                 null -> "collektive$internalIdentifier".let { it to it }
@@ -221,6 +220,11 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
             ) = ScriptEngineManager().getEngineByName(property.name)
                 ?: error("No script engine with ${property.name} found.")
         }
+
+        private fun String.md5(): String =
+            MessageDigest.getInstance("MD5").digest(toByteArray()).joinToString("") {
+                "%02x".format(it)
+            }
 
         private val findPackage = Regex("""package\s+((\w+\.)*\w+)(\s|;|/|$)""", RegexOption.MULTILINE)
         private val validName = Regex("^[a-zA-Z_][a-zA-Z0-9_]*$", RegexOption.MULTILINE)

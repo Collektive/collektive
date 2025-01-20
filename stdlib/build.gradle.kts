@@ -31,22 +31,18 @@ tasks.withType<SourceTask>().configureEach {
 
 kotlinMultiplatform {
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 implementation(project(":dsl"))
             }
             kotlin.srcDirs(collektivizeKotlinStdlibTask)
         }
-        val commonTest by getting {
-            dependencies {
-                implementation(project(":test-tooling"))
-                implementation(rootProject.libs.bundles.kotlin.testing.common)
-            }
+        commonTest.dependencies {
+            implementation(project(":test-tooling"))
+            implementation(rootProject.libs.bundles.kotlin.testing.common)
         }
-        val jvmTest by getting {
-            dependencies {
-                implementation(rootProject.libs.kotest.runner.junit5.jvm)
-            }
+        jvmTest.dependencies {
+            implementation(rootProject.libs.kotest.runner.junit5.jvm)
         }
     }
 }
