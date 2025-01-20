@@ -62,8 +62,7 @@ object KtDefaultErrorMessagesCollektive : BaseDiagnosticRendererFactory() {
                 The yielding block inside the ''{0}'' construct may not be necessary for this use case, as the 
                 expression that is exchanged is the same as the one yielded inside the ''yielding'' block.
                 
-                Consider switching to the same construct without the ''yielding'' block (''evolve'', ''exchange'' or
-                ''share'').
+                Consider switching to the same construct without the ''yielding'' block.
                 """.trimIndent(),
                 CommonRenderers.STRING,
             )
