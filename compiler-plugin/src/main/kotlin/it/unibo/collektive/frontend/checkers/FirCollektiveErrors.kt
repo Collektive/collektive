@@ -39,6 +39,14 @@ object FirCollektiveErrors {
     val UNNECESSARY_CONSTRUCT_CALL by warning1<KtNameReferenceExpression, String>()
 
     /**
+     * Warning raised when an aggregate call like `evolving`, `exchanging` or `sharing` is called and the expression
+     * that is exchanged is the same as the one that is yielded inside the `yielding` block, therefore resulting in
+     * an unnecessary yielding context that can be replaced with the same construct without it (`evolve`, `exchange` and
+     * `share`).
+     */
+    val UNNECESSARY_YIELDING_CONTEXT by warning1<KtNameReferenceExpression, String>()
+
+    /**
      * Warning raised when a construct is used improperly (i.e., another more appropriate construct should be used
      * instead).
      *
