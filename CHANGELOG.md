@@ -1,3 +1,33 @@
+## [12.3.1](https://github.com/Collektive/collektive/compare/12.3.0...12.3.1) (2025-01-26)
+
+### Dependency updates
+
+* **core-deps:** update plugin collektivize to v1.0.7 ([fce6a7a](https://github.com/Collektive/collektive/commit/fce6a7a3fef067de4a875c2fecf3285696fcd5ea))
+* **deps:** update alchemist to v37.1.0 ([4d56665](https://github.com/Collektive/collektive/commit/4d566651a1f43edc79c5e9027614f3e39116cfcd))
+* **deps:** update alchemist to v37.1.1 ([b8350ac](https://github.com/Collektive/collektive/commit/b8350ac5ea976a5c8e8896a428b3ad6b9d28d658))
+* **deps:** update alchemist to v37.1.2 ([9ac6389](https://github.com/Collektive/collektive/commit/9ac63890509c0a57c17b87f0d73f2082ed3d1a25))
+* **deps:** update alchemist to v37.1.3 ([37b38ab](https://github.com/Collektive/collektive/commit/37b38abb3c7992ff853f13aa78a448c2e5a3b1fc))
+* **deps:** update alchemist to v37.1.4 ([e1b4c25](https://github.com/Collektive/collektive/commit/e1b4c257eba934b7a5d45883219c1e9582cac9f3))
+* **deps:** update alchemist to v37.1.5 ([31c09d0](https://github.com/Collektive/collektive/commit/31c09d0a397dd5148ad3cb7820167a45bfa01152))
+* **deps:** update dependency gradle to v8.12.1 ([ad4f01a](https://github.com/Collektive/collektive/commit/ad4f01a512281274a875c8eb2ca21c3988ece7ad))
+* **deps:** update plugin com.gradle.develocity to v3.19.1 ([1e97342](https://github.com/Collektive/collektive/commit/1e97342ec996ca90625253dfd75925024481b85c))
+* **deps:** update plugin multijvmtesting to v3.2.0 ([7c9ea13](https://github.com/Collektive/collektive/commit/7c9ea138d53371f973405ca86c0755885ca5bea9))
+* **deps:** update plugin multijvmtesting to v3.2.1 ([1e7932f](https://github.com/Collektive/collektive/commit/1e7932fc06d8f0546dc9370974f2248a939768f7))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.19 ([e06695e](https://github.com/Collektive/collektive/commit/e06695ee68ad483df2f03ee26f779729c0e2a733))
+* **deps:** update plugin publishoncentral to v8.0.2 ([87e6c51](https://github.com/Collektive/collektive/commit/87e6c5135cae5a2a60488514671af9a566c7b9e1))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.1 ([8a8c20f](https://github.com/Collektive/collektive/commit/8a8c20f91f3e11b6da352be7c8ef4165ce493808))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.2 ([c5739af](https://github.com/Collektive/collektive/commit/c5739af9e59dcc4a099d4ba084df48ad1d9e6070))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.3 ([e96c3bd](https://github.com/Collektive/collektive/commit/e96c3bd5a5070cf6de9f7b1af85a75e51fbf3e3c))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.5 ([b5778de](https://github.com/Collektive/collektive/commit/b5778de64a5ad4965631e6dd22b7ff6abe85ba97))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.6 ([8b273c6](https://github.com/Collektive/collektive/commit/8b273c605c97983169cd99be5b0dff57cf15696a))
+* **deps:** update github/codeql-action action to v3.28.2 ([9ea1b09](https://github.com/Collektive/collektive/commit/9ea1b095984fceea928458e1bdf1196ff1255f9b))
+* **deps:** update github/codeql-action action to v3.28.3 ([7b05a5e](https://github.com/Collektive/collektive/commit/7b05a5ebac4a39a45d756e97be25e1e665665b03))
+* **deps:** update github/codeql-action action to v3.28.4 ([e1fd806](https://github.com/Collektive/collektive/commit/e1fd80682e9514f11972a4d9398693939785fe5c))
+* **deps:** update github/codeql-action action to v3.28.5 ([8647549](https://github.com/Collektive/collektive/commit/8647549bbfb75c5fa6510f7e8c5ae6039f415d87))
+
 ## [12.3.0](https://github.com/Collektive/collektive/compare/12.2.2...12.3.0) (2025-01-20)
 
 ### Features
