@@ -1,3 +1,10 @@
+## [12.3.3](https://github.com/Collektive/collektive/compare/12.3.2...12.3.3) (2025-01-27)
+
+### Dependency updates
+
+* **core-deps:** update plugin collektivize to v1.0.8 ([a0ff5ae](https://github.com/Collektive/collektive/commit/a0ff5ae12be5cdbce63daaf7fe4b04af59d79a66))
+* **deps:** update plugin gitsemver to v4 ([f050f68](https://github.com/Collektive/collektive/commit/f050f68d548cd0d48d29af2b0b5807bbce14b5fa))
+
 ## [12.3.2](https://github.com/Collektive/collektive/compare/12.3.1...12.3.2) (2025-01-27)
 
 ### Dependency updates
