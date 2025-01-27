@@ -1,3 +1,16 @@
+## [12.3.2](https://github.com/Collektive/collektive/compare/12.3.1...12.3.2) (2025-01-27)
+
+### Dependency updates
+
+* **core-deps:** update kotlin monorepo to v2.1.10 ([34b7924](https://github.com/Collektive/collektive/commit/34b792412db5c97e720fdcd01d2555953c7eaaef))
+* **deps:** update plugin gitsemver to v3.1.10 ([57ffecd](https://github.com/Collektive/collektive/commit/57ffecd3d3b30a80643e4d9408ca4044c4bde434))
+* **deps:** update plugin gitsemver to v3.1.8 ([8938d8b](https://github.com/Collektive/collektive/commit/8938d8bf76ce776c3faf9e65c53623980c1c446f))
+* **deps:** update plugin gitsemver to v3.1.9 ([c9fd90a](https://github.com/Collektive/collektive/commit/c9fd90ac211e53731df4da244520b87afd25e654))
+
+### Build and continuous integration
+
+* **deps:** update actions/setup-node action to v4.2.0 ([0af84f3](https://github.com/Collektive/collektive/commit/0af84f363a608a42a6ed0a6acf3d1181bfbf2c1f))
+
 ## [12.3.1](https://github.com/Collektive/collektive/compare/12.3.0...12.3.1) (2025-01-26)
 
 ### Dependency updates
