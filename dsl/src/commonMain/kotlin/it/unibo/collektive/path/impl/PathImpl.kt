@@ -1,8 +1,12 @@
 package it.unibo.collektive.path.impl
 
 import it.unibo.collektive.path.Path
+import it.unibo.collektive.serialization.ListAnySerializer
+import kotlinx.serialization.Serializable
 
+@Serializable
 internal data class PathImpl(
+    @Serializable(with = ListAnySerializer::class)
     private val path: List<Any?>,
 ) : Path {
     private val hash = path.hashCode()

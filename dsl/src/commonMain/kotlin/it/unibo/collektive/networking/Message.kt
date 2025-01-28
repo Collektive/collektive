@@ -1,6 +1,8 @@
 package it.unibo.collektive.networking
 
 import it.unibo.collektive.path.Path
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 /**
  * Types of messages.
@@ -10,22 +12,28 @@ sealed interface Message
 /**
  * [messages] received by a node from [senderId].
  */
+@Serializable
 data class InboundMessage<ID : Any>(
     val senderId: ID,
-    val messages: Map<Path, *>,
+    @Serializable(with = MapAnySerializer::class)
+    val messages: Map<Path, Any?>,
 ) : Message
 
 /**
  * An [OutboundMessage] are messages that a device [senderId] sends to all other neighbours.
  */
-class OutboundMessage<ID : Any>(
-    expectedSize: Int,
+@Serializable
+data class OutboundMessage<ID : Any>(
+    private val expectedSize: Int,
     val senderId: ID,
 ) : Message {
     /**
      * The default messages to be sent to all neighbours.
      */
+    @Serializable(with = MutableMapAnySerializer::class)
     val defaults: MutableMap<Path, Any?> = LinkedHashMap(expectedSize * 2)
+
+    @Transient
     private val overrides: MutableMap<ID, MutableList<Pair<Path, Any?>>> = LinkedHashMap(expectedSize * 2)
 
     /**
@@ -79,6 +87,7 @@ class OutboundMessage<ID : Any>(
  * Has a [default] value that is sent regardless the awareness the device's neighbours, [overrides] specifies the
  * payload depending on the neighbours' values.
  */
+@Serializable
 data class SingleOutboundMessage<ID : Any, Payload>(
     val default: Payload,
     val overrides: Map<ID, Payload> = emptyMap(),
