@@ -43,7 +43,7 @@ kotlinMultiplatform {
         }
         commonTest.dependencies {
             implementation(project(":test-tooling"))
-            implementation(rootProject.libs.bundles.kotlin.testing.common)
+            implementation(rootProject.libs.kotlin.test)
         }
         jvmTest.dependencies {
             implementation(rootProject.libs.kotest.runner.junit5.jvm)
