@@ -14,7 +14,6 @@ import kotlinx.serialization.Serializable
 /**
  * Serializable [Path] implementation based on a single string [hash].
  */
-@Serializable
 data class StringPath(
     val hash: String,
 ) : Path

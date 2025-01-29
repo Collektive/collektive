@@ -9,17 +9,22 @@
 package it.unibo.collektive.serialization
 
 import it.unibo.collektive.path.Path
+import it.unibo.collektive.path.impl.StringPath
 import it.unibo.collektive.serialization.JsonSerializationUtils.toJsonElement
 import it.unibo.collektive.serialization.JsonSerializationUtils.toKotlinType
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonDecoder
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonEncoder
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.serializer
 import kotlin.reflect.KClass
 
 /**
@@ -34,6 +39,7 @@ internal object MapAnySerializer : KSerializer<Map<Path, Any?>>, CollektiveTypeS
 
     private val registeredTypes = mutableSetOf<KClass<*>>()
 
+    @OptIn(InternalSerializationApi::class)
     @Suppress("UNCHECKED_CAST")
     override fun deserialize(decoder: Decoder): Map<Path, Any?> =
         when (decoder) {
@@ -41,8 +47,10 @@ internal object MapAnySerializer : KSerializer<Map<Path, Any?>>, CollektiveTypeS
                 val decodedObject = decoder.decodeJsonElement() as JsonObject
                 println(decodedObject)
                 decodedObject
-                    .map { (key, value) ->
-                        Json.decodeFromString<Path>(key) to value.toKotlinType(registeredTypes)
+                    .asSequence()
+                    .map { (hash, element: JsonElement) ->
+                        val decoder = element::class.serializer()
+                        StringPath(hash) to Json.decodeFromJsonElement(decoder, element).toKotlinType(registeredTypes)
                     }.toMap()
             }
             else -> error("Unsupported decoder: $decoder")
@@ -52,7 +60,14 @@ internal object MapAnySerializer : KSerializer<Map<Path, Any?>>, CollektiveTypeS
         encoder: Encoder,
         value: Map<Path, Any?>,
     ) = when (encoder) {
-        is JsonEncoder -> encoder.encodeJsonElement(value.toJsonElement())
+        is JsonEncoder -> encoder.encodeJsonElement(
+            value.map { (path, message) ->
+                check(path is StringPath) {
+                    "Serializing a ${path::class} is not supported. Select a different path factory implementation"
+                }
+                path.hash to message
+            }.toMap().toJsonElement()
+        )
         else -> error("Unsupported encoder: $encoder")
     }
 
