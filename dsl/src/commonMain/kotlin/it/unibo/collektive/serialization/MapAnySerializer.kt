@@ -15,6 +15,9 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
+/**
+ * A serializer for a map of paths and any objects.
+ */
 internal object MapAnySerializer : KSerializer<Map<Path, Any?>> {
     @Serializable
     private abstract class MapAnyMap : Map<Path, Any?>
@@ -28,7 +31,7 @@ internal object MapAnySerializer : KSerializer<Map<Path, Any?>> {
 
     override fun serialize(
         encoder: Encoder,
-        value: Map<Path, Any?>
+        value: Map<Path, Any?>,
     ) {
         TODO("Not yet implemented")
     }

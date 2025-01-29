@@ -22,7 +22,7 @@ class ExchangeTest : StringSpec({
                 val res = exchange(1, increaseOrDouble)
                 res.localValue shouldBe 2
             }
-        val messages = result.toSend.messagesFor(1)
+        val messages = result.toSend.messagesFor(1).messages
         messages.keys shouldHaveSize 1
         messages.values.toList() shouldBe listOf(2)
     }
@@ -40,7 +40,7 @@ class ExchangeTest : StringSpec({
                 res1.localValue shouldBe 2
                 res2.localValue shouldBe 3
             }
-        val messagesFor2 = resultDevice1.toSend.messagesFor(2)
+        val messagesFor2 = resultDevice1.toSend.messagesFor(2).messages
         messagesFor2 shouldHaveSize 2
         messagesFor2.values.toList() shouldBe listOf(2, 3)
 
@@ -53,8 +53,8 @@ class ExchangeTest : StringSpec({
                 res1.localValue shouldBe 6
                 res2.localValue shouldBe 5
             }
-        val messagesFor1 = resultDevice2.toSend.messagesFor(1)
-        val messagesForAnyoneElse = resultDevice2.toSend.messagesFor(Int.MIN_VALUE)
+        val messagesFor1 = resultDevice2.toSend.messagesFor(1).messages
+        val messagesForAnyoneElse = resultDevice2.toSend.messagesFor(Int.MIN_VALUE).messages
         messagesFor1 shouldHaveSize 2
         messagesForAnyoneElse shouldHaveSize 2
         messagesFor1.values.toList() shouldBe listOf(3, 6)
@@ -69,9 +69,9 @@ class ExchangeTest : StringSpec({
                 res1.localValue shouldBe 10
                 res2.localValue shouldBe 7
             }
-        val messagesFrom3To1 = resultDevice3.toSend.messagesFor(1)
-        val messagesFrom3To2 = resultDevice3.toSend.messagesFor(2)
-        val messagesFrom3ToAnyoneElse = resultDevice3.toSend.messagesFor(Int.MIN_VALUE)
+        val messagesFrom3To1 = resultDevice3.toSend.messagesFor(1).messages
+        val messagesFrom3To2 = resultDevice3.toSend.messagesFor(2).messages
+        val messagesFrom3ToAnyoneElse = resultDevice3.toSend.messagesFor(Int.MIN_VALUE).messages
         messagesFrom3To1 shouldHaveSize 2
         messagesFrom3To2 shouldHaveSize 2
         messagesFrom3ToAnyoneElse shouldHaveSize 2
@@ -90,7 +90,7 @@ class ExchangeTest : StringSpec({
                     }
                 xcRes.toMap() shouldBe mapOf(0 to "return: 2")
             }
-        val messages = result.toSend.messagesFor(1)
+        val messages = result.toSend.messagesFor(1).messages
         messages shouldHaveSize 1
         messages.values.toList() shouldBe listOf(2)
     }
@@ -105,7 +105,7 @@ class ExchangeTest : StringSpec({
                     }
                 xcRes.toMap() shouldBe mapOf(0 to null)
             }
-        val messages = result.toSend.messagesFor(1)
+        val messages = result.toSend.messagesFor(1).messages
         messages shouldHaveSize 1
         messages.values.toList() shouldBe listOf(2)
     }
@@ -124,7 +124,7 @@ class ExchangeTest : StringSpec({
             val res =
                 aggregate(id, emptyMap(), networkManager.receive(id), programUnderTest)
                     .also { networkManager.send(it.toSend) }
-            val toUnknown = res.toSend.messagesFor(Int.MIN_VALUE)
+            val toUnknown = res.toSend.messagesFor(Int.MIN_VALUE).messages
             toUnknown shouldHaveSize 1
             val next = res.toSend.messagesFor((id + 1) % 3)
             val previous = res.toSend.messagesFor((id + 2) % 3)

@@ -3,7 +3,7 @@ package it.unibo.collektive
 import it.unibo.collektive.aggregate.AggregateResult
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.impl.AggregateContext
-import it.unibo.collektive.networking.InboundMessage
+import it.unibo.collektive.networking.Message
 import it.unibo.collektive.networking.Network
 import it.unibo.collektive.state.State
 
@@ -58,7 +58,7 @@ class Collektive<ID : Any, R>(
         fun <ID : Any, R> aggregate(
             localId: ID,
             previousState: State = emptyMap(),
-            inbound: Iterable<InboundMessage<ID>> = emptySet(),
+            inbound: Iterable<Message<ID>> = emptySet(),
             compute: Aggregate<ID>.() -> R,
         ): AggregateResult<ID, R> =
             AggregateContext(localId, inbound, previousState).run {

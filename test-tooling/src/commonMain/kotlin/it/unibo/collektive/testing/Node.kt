@@ -10,9 +10,9 @@ package it.unibo.collektive.testing
 
 import it.unibo.collektive.Collektive
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.networking.InboundMessage
+import it.unibo.collektive.networking.Message
 import it.unibo.collektive.networking.Network
-import it.unibo.collektive.networking.OutboundMessage
+import it.unibo.collektive.networking.OutboundSendOperation
 
 /**
  * A network node with an associated [environment], [id], [value], and [program].
@@ -47,14 +47,14 @@ class Node<R>(
      * A network device that can send and receive messages.
      */
     private inner class NetworkDevice : Network<Int> {
-        private var messageBuffer: Set<InboundMessage<Int>> = emptySet()
+        private var messageBuffer: Set<Message<Int>> = emptySet()
 
-        override fun write(message: OutboundMessage<Int>) {
+        override fun write(message: OutboundSendOperation<Int>) {
             environment.neighborsOf(this@Node).forEach { neighbor ->
-                neighbor.network.messageBuffer += InboundMessage(id, message.messagesFor(neighbor.id))
+                neighbor.network.messageBuffer += message.messagesFor(neighbor.id)
             }
         }
 
-        override fun read(): Collection<InboundMessage<Int>> = messageBuffer.also { messageBuffer = emptySet() }
+        override fun read(): Collection<Message<Int>> = messageBuffer.also { messageBuffer = emptySet() }
     }
 }

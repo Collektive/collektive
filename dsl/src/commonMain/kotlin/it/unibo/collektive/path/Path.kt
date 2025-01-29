@@ -1,13 +1,11 @@
 package it.unibo.collektive.path
 
 import it.unibo.collektive.path.impl.PathImpl
-import kotlinx.serialization.Serializable
 
 /**
  * A path represents a specific point in the AST of an aggregate program.
  * The point in the AS is identified as a sequence of tokens.
  */
-@Serializable
 interface Path {
     /**
      * Returns the path as a sequence of tokens constituting the path.

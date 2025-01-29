@@ -1,69 +1,67 @@
 package it.unibo.collektive.networking
 
 import it.unibo.collektive.path.Path
+import it.unibo.collektive.serialization.MapAnySerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
-
-/**
- * Types of messages.
- */
-sealed interface Message
+import kotlin.collections.putAll
 
 /**
  * [messages] received by a node from [senderId].
  */
 @Serializable
-data class InboundMessage<ID : Any>(
+data class Message<ID : Any>(
     val senderId: ID,
     @Serializable(with = MapAnySerializer::class)
     val messages: Map<Path, Any?>,
-) : Message
+)
 
 /**
- * An [OutboundMessage] are messages that a device [senderId] sends to all other neighbours.
+ * An [OutboundSendOperation] represents the act of [senderId] to send (possibly custom) [Message]s
+ * to its neighbors.
  */
-@Serializable
-data class OutboundMessage<ID : Any>(
+data class OutboundSendOperation<ID : Any>(
     private val expectedSize: Int,
     val senderId: ID,
-) : Message {
+) {
     /**
      * The default messages to be sent to all neighbours.
      */
-    @Serializable(with = MutableMapAnySerializer::class)
     val defaults: MutableMap<Path, Any?> = LinkedHashMap(expectedSize * 2)
 
-    @Transient
     private val overrides: MutableMap<ID, MutableList<Pair<Path, Any?>>> = LinkedHashMap(expectedSize * 2)
 
     /**
-     * Check if the [OutboundMessage] is empty.
+     * Check if the [OutboundSendOperation] is empty.
      */
     fun isEmpty(): Boolean = defaults.isEmpty()
 
     /**
-     * Check if the [OutboundMessage] is not empty.
+     * Check if the [OutboundSendOperation] is not empty.
      */
     fun isNotEmpty(): Boolean = defaults.isNotEmpty()
 
     /**
      * Returns the messages for device [id].
      */
-    fun messagesFor(id: ID): Map<Path, *> =
-        LinkedHashMap<Path, Any?>(
-            defaults.size + overrides.size,
-            1.0f,
-        ).also { result ->
-            result.putAll(defaults)
-            overrides[id]?.let { result.putAll(it) }
-        }
+    fun messagesFor(id: ID): Message<ID> =
+        Message(
+            senderId = senderId,
+            messages =
+                LinkedHashMap<Path, Any?>(
+                    defaults.size + overrides.size,
+                    1.0f,
+                ).also { result ->
+                    result.putAll(defaults)
+                    overrides[id]?.let { result.putAll(it) }
+                },
+        )
 
     /**
-     * Add a [message] to the [OutboundMessage].
+     * Add a [message] to the [OutboundSendOperation].
      */
-    fun addMessage(
+    fun <Payload> addMessage(
         path: Path,
-        message: SingleOutboundMessage<ID, *>,
+        message: SingleOutboundMessage<ID, @Serializable Payload>,
     ) {
         check(!defaults.containsKey(path)) {
             """
@@ -83,7 +81,7 @@ data class OutboundMessage<ID : Any>(
 }
 
 /**
- * A [SingleOutboundMessage] contains the values associated to a [Path] in the messages of [OutboundMessage].
+ * A [SingleOutboundMessage] contains the values associated to a [Path] in the messages of [OutboundSendOperation].
  * Has a [default] value that is sent regardless the awareness the device's neighbours, [overrides] specifies the
  * payload depending on the neighbours' values.
  */

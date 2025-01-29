@@ -22,8 +22,14 @@ import it.unibo.collektive.path.Path
  */
 fun <ID : Any, R> alignWith(expected: AggregateResult<ID, R>) =
     Matcher<AggregateResult<ID, R>> { valueResult ->
-        val originPaths = valueResult.toSend.messagesFor(valueResult.localId).keys
-        val expectedPaths = expected.toSend.messagesFor(valueResult.localId).keys
+        val originPaths =
+            valueResult.toSend
+                .messagesFor(valueResult.localId)
+                .messages.keys
+        val expectedPaths =
+            expected.toSend
+                .messagesFor(valueResult.localId)
+                .messages.keys
         aggregateMatcher(expectedPaths, originPaths)
     }
 
@@ -41,10 +47,10 @@ fun <R> alignWith(expected: Aggregate<Int>.() -> R): Matcher<Aggregate<Int>.() -
     Matcher { program ->
         val expectedRes =
             aggregate(0, emptyMap(), emptySet(), expected)
-                .run { toSend.messagesFor(this.localId).keys }
+                .run { toSend.messagesFor(this.localId).messages.keys }
         val result =
             aggregate(0, emptyMap(), emptySet(), program)
-                .run { toSend.messagesFor(this.localId).keys }
+                .run { toSend.messagesFor(this.localId).messages.keys }
         aggregateMatcher(expectedRes, result)
     }
 

@@ -10,9 +10,9 @@ import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.networking.InboundMessage
+import it.unibo.collektive.networking.Message
 import it.unibo.collektive.networking.Network
-import it.unibo.collektive.networking.OutboundMessage
+import it.unibo.collektive.networking.OutboundSendOperation
 
 /**
  * Representation of a Collektive device in Alchemist.
@@ -30,7 +30,7 @@ class CollektiveDevice<P>(
     DistanceSensor where P : Position<P> {
     private data class TimedMessage(
         val receivedAt: Time,
-        val payload: InboundMessage<Int>,
+        val payload: Message<Int>,
     )
 
     /**
@@ -47,7 +47,7 @@ class CollektiveDevice<P>(
 
     private fun receiveMessage(
         time: Time,
-        message: InboundMessage<Int>,
+        message: Message<Int>,
     ) {
         validMessages += TimedMessage(time, message)
     }
@@ -60,7 +60,7 @@ class CollektiveDevice<P>(
     override fun cloneOnNewNode(node: Node<Any?>): NodeProperty<Any?> =
         CollektiveDevice(environment, node, retainMessagesFor)
 
-    override fun read(): Collection<InboundMessage<Int>> =
+    override fun read(): Collection<Message<Int>> =
         when {
             validMessages.isEmpty() -> emptyList()
             retainMessagesFor == null ->
@@ -71,7 +71,7 @@ class CollektiveDevice<P>(
             }
         }
 
-    override fun write(message: OutboundMessage<Int>) {
+    override fun write(message: OutboundSendOperation<Int>) {
         if (message.isNotEmpty()) {
             val neighboringNodes = environment.getNeighborhood(node)
             if (!neighboringNodes.isEmpty) {
@@ -83,7 +83,7 @@ class CollektiveDevice<P>(
                 neighborhood.forEach { neighbor ->
                     neighbor.receiveMessage(
                         currentTime,
-                        InboundMessage(message.senderId, message.messagesFor(neighbor.id)),
+                        message.messagesFor(neighbor.id),
                     )
                 }
             }

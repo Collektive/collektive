@@ -5,12 +5,12 @@ package it.unibo.collektive.networking
  */
 interface Network<ID : Any> {
     /**
-     * Sends a [message] of type [OutboundMessage] to the neighbours.
+     * Sends a [message] of type [OutboundSendOperation] to the neighbours.
      */
-    fun write(message: OutboundMessage<ID>)
+    fun write(message: OutboundSendOperation<ID>)
 
     /**
-     * Returns a set of [InboundMessage]s representing the received messages from the neighbours.
+     * Returns a set of [Message]s representing the received messages from the neighbours.
      */
-    fun read(): Collection<InboundMessage<ID>>
+    fun read(): Collection<Message<ID>>
 }

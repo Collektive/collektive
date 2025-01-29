@@ -8,27 +8,40 @@
 
 package it.unibo.collektive.serialization
 
+import it.unibo.collektive.serialization.JsonSerializationUtils.toJsonElement
+import it.unibo.collektive.serialization.JsonSerializationUtils.toPrimitive
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.JsonDecoder
+import kotlinx.serialization.json.JsonEncoder
+import kotlin.reflect.KClass
 
-internal object ListAnySerializer : KSerializer<List<Any?>> {
+/**
+ * A serializer for a list of any objects.
+ */
+object ListAnySerializer : KSerializer<List<Any?>> {
     @Serializable
     private abstract class ListAny : List<Any?>
 
     override val descriptor: SerialDescriptor
         get() = ListAny.serializer().descriptor
 
-    override fun deserialize(decoder: Decoder): List<Any?> {
-        TODO("Not yet implemented")
-    }
+    private val registeredTypes = mutableSetOf<KClass<*>>()
+
+    override fun deserialize(decoder: Decoder): List<Any?> =
+        when (decoder) {
+            is JsonDecoder -> decoder.decodeJsonElement().toPrimitive(registeredTypes) as List<Any?>
+            else -> error("Unsupported decoder: $decoder")
+        }
 
     override fun serialize(
         encoder: Encoder,
-        value: List<Any?>
-    ) {
-        TODO("Not yet implemented")
+        value: List<Any?>,
+    ) = when (encoder) {
+        is JsonEncoder -> encoder.encodeJsonElement(value.toJsonElement())
+        else -> error("Unsupported encoder: $encoder")
     }
 }

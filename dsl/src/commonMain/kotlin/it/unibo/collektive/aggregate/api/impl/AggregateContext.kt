@@ -8,8 +8,8 @@ import it.unibo.collektive.aggregate.api.impl.stack.Stack
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.field.ConstantField
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.networking.InboundMessage
-import it.unibo.collektive.networking.OutboundMessage
+import it.unibo.collektive.networking.Message
+import it.unibo.collektive.networking.OutboundSendOperation
 import it.unibo.collektive.networking.SingleOutboundMessage
 import it.unibo.collektive.path.Path
 import it.unibo.collektive.state.State
@@ -22,17 +22,17 @@ import it.unibo.collektive.state.impl.getTyped
  */
 internal class AggregateContext<ID : Any>(
     override val localId: ID,
-    private val messages: Iterable<InboundMessage<ID>>,
+    private val messages: Iterable<Message<ID>>,
     private val previousState: State,
 ) : Aggregate<ID> {
     private val stack = Stack()
     private var state: MutableMap<Path, Any?> = mutableMapOf()
-    private val toBeSent = OutboundMessage(messages.count(), localId)
+    private val toBeSent = OutboundSendOperation(messages.count(), localId)
 
     /**
      * Messages to send to the other nodes.
      */
-    fun messagesToSend(): OutboundMessage<ID> = toBeSent
+    fun messagesToSend(): OutboundSendOperation<ID> = toBeSent
 
     /**
      * Return the current state of the device as a new state.
