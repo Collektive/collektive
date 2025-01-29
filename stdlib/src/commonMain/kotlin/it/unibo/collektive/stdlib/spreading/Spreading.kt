@@ -12,6 +12,7 @@ import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.operators.share
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.operations.minBy
+import it.unibo.collektive.stdlib.util.coerceIn
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmOverloads
 
@@ -79,8 +80,12 @@ inline fun <ID : Any, Value, Distance : Comparable<Distance>> Aggregate<ID>.grad
     val topValue = top to local
     return share(topValue) { neighborData ->
         val paths =
-            neighborData.alignedMap(metric()) { (fromSource, data), toNeighbor ->
-                val totalDistance = accumulateDistance(fromSource, toNeighbor)
+            neighborData.alignedMap(metric().coerceIn(bottom, top)) { (fromSource, data), toNeighbor ->
+                val totalDistance = accumulateDistance(fromSource, toNeighbor).coerceIn(bottom, top)
+                check(totalDistance >= fromSource && totalDistance >= toNeighbor) {
+                    "The provided distance accumulation function violates the triangle inequality: " +
+                        "accumulating $fromSource and $toNeighbor produced $totalDistance"
+                }
                 val newData = accumulateData(fromSource, toNeighbor, data)
                 totalDistance to newData
             }
