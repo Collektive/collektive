@@ -8,9 +8,9 @@
 
 package it.unibo.collektive.stdlib.test
 
-import it.unibo.collektive.stdlib.NonSelfStabilizingGossip.gossip
-import it.unibo.collektive.stdlib.SelfStabilizingGossip.gossipMax
-import it.unibo.collektive.stdlib.SelfStabilizingGossip.gossipMin
+import it.unibo.collektive.stdlib.spreading.gossipMax
+import it.unibo.collektive.stdlib.spreading.gossipMin
+import it.unibo.collektive.stdlib.spreading.nonStabilizingGossip
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.test.Test
@@ -62,7 +62,7 @@ class GossipTest {
 
     private fun squareMooreGridWithNonSelfStabilizingGossip(size: Int) =
         mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }) {
-            gossip(localId) { first, second -> if (first >= second) first else second }
+            nonStabilizingGossip(localId) { first, second -> if (first >= second) first else second }
         }.apply {
             assertEquals(size * size, nodes.size)
             val initial = status().values.distinct()

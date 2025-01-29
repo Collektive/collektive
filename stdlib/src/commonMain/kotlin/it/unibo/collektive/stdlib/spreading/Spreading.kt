@@ -1,4 +1,12 @@
-package it.unibo.collektive.stdlib
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
+package it.unibo.collektive.stdlib.spreading
 
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.operators.share
@@ -25,11 +33,7 @@ inline fun <ID : Any, Distance : Comparable<Distance>> Aggregate<ID>.distanceTo(
         local = if (source) bottom else top,
         bottom = bottom,
         top = top,
-        accumulateData = {
-            neighborToSource,
-            hereToNeighbor,
-            _,
-            ->
+        accumulateData = { neighborToSource, hereToNeighbor, _ ->
             accumulateDistance(neighborToSource, hereToNeighbor)
         },
         accumulateDistance,
@@ -37,16 +41,10 @@ inline fun <ID : Any, Distance : Comparable<Distance>> Aggregate<ID>.distanceTo(
     )
 
 /**
- * Compute the distance from the closest [source], using [Int]egers.
- *
- * The distance between neighboring devices is computed using the [metric] function,
- * and defaults to the hop distance.
+ * Computes the hop distance from the closest [source].
  */
-@JvmOverloads
-inline fun <ID : Any> Aggregate<ID>.intDistanceTo(
-    source: Boolean,
-    crossinline metric: () -> Field<ID, Int> = { neighboring(1) },
-): Int = distanceTo(source, 0, Int.MAX_VALUE, Int::plus, metric)
+fun <ID : Any> Aggregate<ID>.hopDistanceTo(source: Boolean): Int =
+    distanceTo(source, 0, Int.MAX_VALUE, Int::plus) { neighboring(1) }
 
 /**
  * Compute the distance from the closest [source], using [Double]s.

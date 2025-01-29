@@ -7,7 +7,7 @@
  */
 package it.unibo.collektive.stdlib.test
 
-import it.unibo.collektive.stdlib.distanceTo
+import it.unibo.collektive.stdlib.spreading.distanceTo
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.math.abs
