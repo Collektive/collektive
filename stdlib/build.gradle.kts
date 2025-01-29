@@ -1,7 +1,11 @@
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
 import it.unibo.collektive.collektivize.CollektivizeTask
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 plugins {
     alias(libs.plugins.collektivize)
+    alias(libs.plugins.kotlin.power.assert)
 }
 
 apply(plugin = libs.plugins.kotlin.multiplatform.id)
@@ -45,4 +49,19 @@ kotlinMultiplatform {
             implementation(rootProject.libs.kotest.runner.junit5.jvm)
         }
     }
+}
+
+powerAssert {
+    functions =
+        listOf(
+            "assert",
+            "check",
+            "checkNotNull",
+            "require",
+            "requireNotNull",
+            "test.assertTrue",
+            "test.assertEquals",
+            "test.assertNull",
+        ).map { "kotlin.$it" }
+    includedSourceSets = listOf("commonMain", "commonTest")
 }
