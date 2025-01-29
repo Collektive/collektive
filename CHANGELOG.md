@@ -1,3 +1,35 @@
+## [13.0.0](https://github.com/Collektive/collektive/compare/12.3.3...13.0.0) (2025-01-29)
+
+### ⚠ BREAKING CHANGES
+
+* **stdlib:** revisit the base structure of the standard library
+
+### Dependency updates
+
+* **deps:** update alchemist to v37.1.6 ([4430611](https://github.com/Collektive/collektive/commit/4430611d5818c9b5f8f330c07341d98dfb09fb76))
+* **deps:** update plugin gitsemver to v4.0.1 ([12cd867](https://github.com/Collektive/collektive/commit/12cd8675a16ae0a8a3dd98f0831117d676c8322e))
+* **deps:** update plugin gitsemver to v4.0.2 ([74626e1](https://github.com/Collektive/collektive/commit/74626e1f3a8c81820cbf7cf44c8cceb748d2afd7))
+* **deps:** update plugin multijvmtesting to v3.2.2 ([8adeac7](https://github.com/Collektive/collektive/commit/8adeac7d9b213f10ed4cb969170f859644a473be))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.20 ([53e77d9](https://github.com/Collektive/collektive/commit/53e77d95a95cdff197d0ea08edc6d6286c36e3ea))
+
+### Bug Fixes
+
+* **stdlib:** coerce all spread distances within the provided distance range, and verify the triangle inequality ([c61736f](https://github.com/Collektive/collektive/commit/c61736ff8025c266c8d38eceaefafcfed359575c))
+
+### Tests
+
+* **stdlib:** drop kotest, use kotlin.test instead ([39ab094](https://github.com/Collektive/collektive/commit/39ab09454cb64db0ef0343116dacfdbe1e1672fc))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.7 ([de60db0](https://github.com/Collektive/collektive/commit/de60db0843936bd7e5cbde8ada9a7534b575c809))
+* **deps:** update github/codeql-action action to v3.28.6 ([9607dd7](https://github.com/Collektive/collektive/commit/9607dd75370e3a24c69a1fc26f41480959f03842))
+* **stdlib:** enable [power-assert](https://kotlinlang.org/docs/power-assert.html) ([50486d0](https://github.com/Collektive/collektive/commit/50486d06863d674ba08af01338cdca8c139a9566))
+
+### Refactoring
+
+* **stdlib:** revisit the base structure of the standard library ([eacdded](https://github.com/Collektive/collektive/commit/eacdded614b76950660dcd4fc4fa48bc2872c84d))
+
 ## [12.3.3](https://github.com/Collektive/collektive/compare/12.3.2...12.3.3) (2025-01-27)
 
 ### Dependency updates
