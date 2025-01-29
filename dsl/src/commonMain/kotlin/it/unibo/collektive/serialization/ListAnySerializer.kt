@@ -9,7 +9,7 @@
 package it.unibo.collektive.serialization
 
 import it.unibo.collektive.serialization.JsonSerializationUtils.toJsonElement
-import it.unibo.collektive.serialization.JsonSerializationUtils.toPrimitive
+import it.unibo.collektive.serialization.JsonSerializationUtils.toKotlinType
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -22,7 +22,7 @@ import kotlin.reflect.KClass
 /**
  * A serializer for a list of any objects.
  */
-object ListAnySerializer : KSerializer<List<Any?>> {
+object ListAnySerializer : KSerializer<List<Any?>>, CollektiveTypeSerializer {
     @Serializable
     private abstract class ListAny : List<Any?>
 
@@ -33,7 +33,7 @@ object ListAnySerializer : KSerializer<List<Any?>> {
 
     override fun deserialize(decoder: Decoder): List<Any?> =
         when (decoder) {
-            is JsonDecoder -> decoder.decodeJsonElement().toPrimitive(registeredTypes) as List<Any?>
+            is JsonDecoder -> decoder.decodeJsonElement().toKotlinType(registeredTypes) as List<Any?>
             else -> error("Unsupported decoder: $decoder")
         }
 
@@ -43,5 +43,9 @@ object ListAnySerializer : KSerializer<List<Any?>> {
     ) = when (encoder) {
         is JsonEncoder -> encoder.encodeJsonElement(value.toJsonElement())
         else -> error("Unsupported encoder: $encoder")
+    }
+
+    override fun <Type : Any> registerType(kClass: KClass<Type>) {
+        registeredTypes.add(kClass)
     }
 }

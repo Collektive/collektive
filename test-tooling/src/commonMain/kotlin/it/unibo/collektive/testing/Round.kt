@@ -28,7 +28,7 @@ object Round {
         require(steps > 0) { "Unable to perform '$steps' rounds. At least 1 round is required" }
         val firstRoundResult = aggregate(deviceId, compute = computation)
         return (1 until steps).fold(firstRoundResult) { previousResult, _ ->
-            aggregate(deviceId, previousResult.newState, emptySet(), computation)
+            aggregate(deviceId, previousResult.newState, emptySet(), compute = computation)
         }
     }
 }

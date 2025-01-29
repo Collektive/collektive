@@ -46,10 +46,10 @@ fun <ID : Any, R> alignWith(expected: AggregateResult<ID, R>) =
 fun <R> alignWith(expected: Aggregate<Int>.() -> R): Matcher<Aggregate<Int>.() -> R> =
     Matcher { program ->
         val expectedRes =
-            aggregate(0, emptyMap(), emptySet(), expected)
+            aggregate(0, emptyMap(), emptySet(), compute = expected)
                 .run { toSend.messagesFor(this.localId).messages.keys }
         val result =
-            aggregate(0, emptyMap(), emptySet(), program)
+            aggregate(0, emptyMap(), emptySet(), compute = program)
                 .run { toSend.messagesFor(this.localId).messages.keys }
         aggregateMatcher(expectedRes, result)
     }

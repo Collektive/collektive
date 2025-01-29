@@ -19,7 +19,6 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.doubleOrNull
-import kotlinx.serialization.json.floatOrNull
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.longOrNull
 import kotlinx.serialization.serializer
@@ -34,13 +33,13 @@ object JsonSerializationUtils {
     private val requiredKeys = setOf(TYPE_FIELD, DATA_FIELD)
 
     @OptIn(InternalSerializationApi::class)
-    internal fun JsonElement.toPrimitive(registeredTypes: Set<KClass<*>>): Any? =
+    internal fun JsonElement.toKotlinType(registeredTypes: Set<KClass<*>>): Any? =
         when (this) {
             is JsonPrimitive -> {
                 if (isString) {
                     contentOrNull
                 } else {
-                    booleanOrNull ?: intOrNull ?: longOrNull ?: floatOrNull ?: doubleOrNull
+                    booleanOrNull ?: intOrNull ?: longOrNull ?: doubleOrNull
                 }
             }
             is JsonObject -> {
@@ -50,14 +49,14 @@ object JsonSerializationUtils {
                             requireNotNull(get(DATA_FIELD)) {
                                 "Missing required key $DATA_FIELD? $this"
                             }
-                        val type: String = get(TYPE_FIELD)?.toPrimitive(registeredTypes).toString()
+                        val type: String = get(TYPE_FIELD)?.toKotlinType(registeredTypes).toString()
                         val candidateType = registeredTypes.first { it.qualifiedName == type }
                         Json.decodeFromJsonElement(candidateType.serializer(), objectContents)
                     }
-                    else -> toMap()
+                    else -> mapValues { (_, value) -> value.toKotlinType(registeredTypes) }
                 }
             }
-            is JsonArray -> map { it.toPrimitive(registeredTypes) }
+            is JsonArray -> map { it.toKotlinType(registeredTypes) }
             is JsonNull -> null
         }
 

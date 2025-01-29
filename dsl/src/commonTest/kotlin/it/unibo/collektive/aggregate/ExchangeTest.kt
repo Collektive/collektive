@@ -9,6 +9,7 @@ import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
+import it.unibo.collektive.path.PathFactory
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
 
 class ExchangeTest : StringSpec({
@@ -122,10 +123,10 @@ class ExchangeTest : StringSpec({
         (0..5).forEach { iteration ->
             val id = iteration % 3
             val res =
-                aggregate(id, emptyMap(), networkManager.receive(id), programUnderTest)
+                aggregate(id, emptyMap(), networkManager.receive(id), PathFactory.FullPathFactory, programUnderTest)
                     .also { networkManager.send(it.toSend) }
-            val toUnknown = res.toSend.messagesFor(Int.MIN_VALUE).messages
-            toUnknown shouldHaveSize 1
+            val toUnknown = res.toSend.messagesFor(Int.MIN_VALUE)
+            toUnknown.messages shouldHaveSize 1
             val next = res.toSend.messagesFor((id + 1) % 3)
             val previous = res.toSend.messagesFor((id + 2) % 3)
             // When a constant field is used, the map of overrides should be empty

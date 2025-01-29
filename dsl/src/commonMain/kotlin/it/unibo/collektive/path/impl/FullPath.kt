@@ -1,34 +1,40 @@
 package it.unibo.collektive.path.impl
 
 import it.unibo.collektive.path.Path
-import it.unibo.collektive.serialization.ListAnySerializer
-import kotlinx.serialization.Serializable
 
-@Serializable
-internal data class PathImpl(
-    @Serializable(with = ListAnySerializer::class)
+/**
+ * Non-serializable, list-based, high performance path intended for use in simulated environments.
+ * Unsuitable for practical applications.
+ */
+data class FullPath(
     private val path: List<Any?>,
 ) : Path {
     private val hash = path.hashCode()
-
-    override fun tokens(): List<Any?> = path
 
     override fun hashCode(): Int = hash
 
     override fun equals(other: Any?): Boolean =
         when {
             this === other -> true
-            other !is Path -> false
-            else -> hash == other.hashCode() && path == other.tokens()
+            other !is FullPath -> false
+            else -> hash == other.hashCode() && path == other.path
         }
 
+    override fun toString(): String = path.joinToString(separator = "/")
+
+    /**
+     * Utility companion object.
+     */
     companion object {
         private val cache = mutableMapOf<List<Any?>, Path>()
         private const val MAX_CACHE_SIZE = 10_000
         private const val CACHE_CLEANUP_SIZE = 1000
 
+        /**
+         * Creates a new [Path] from the given [path].
+         */
         fun of(path: List<Any?>): Path =
-            cache.getOrPut(path) { PathImpl(path) }.also {
+            cache.getOrPut(path) { FullPath(path) }.also {
                 if (cache.size >= MAX_CACHE_SIZE) {
                     val iterator = cache.iterator()
                     repeat(CACHE_CLEANUP_SIZE) {

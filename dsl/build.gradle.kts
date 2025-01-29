@@ -6,6 +6,7 @@ kotlinMultiplatform {
     sourceSets {
         commonMain.dependencies {
             implementation(libs.kotlinx.serialization)
+            implementation(rootProject.libs.hash.sha3)
         }
         commonTest.dependencies {
             implementation(project(":stdlib"))

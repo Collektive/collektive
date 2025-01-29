@@ -12,6 +12,7 @@ import it.unibo.alchemist.model.actions.AbstractAction
 import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.collektive.Collektive
 import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.path.PathFactory
 import java.lang.reflect.Method
 import java.lang.reflect.Parameter
 import kotlin.reflect.jvm.kotlinFunction
@@ -40,7 +41,7 @@ class RunCollektiveProgram<P : Position<P>>(
     init {
         declareDependencyTo(programIdentifier)
         collektiveProgram =
-            Collektive(localDevice.id, network = localDevice) {
+            Collektive(localDevice.id, network = localDevice, PathFactory.FullPathFactory) {
                 program(localDevice)
             }
     }
