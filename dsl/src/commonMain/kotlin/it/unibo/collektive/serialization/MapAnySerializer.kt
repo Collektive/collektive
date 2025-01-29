@@ -18,8 +18,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonEncoder
@@ -45,12 +43,10 @@ internal object MapAnySerializer : KSerializer<Map<Path, Any?>>, CollektiveTypeS
         when (decoder) {
             is JsonDecoder -> {
                 val decodedObject = decoder.decodeJsonElement() as JsonObject
-                println(decodedObject)
                 decodedObject
                     .asSequence()
                     .map { (hash, element: JsonElement) ->
-                        val decoder = element::class.serializer()
-                        StringPath(hash) to Json.decodeFromJsonElement(decoder, element).toKotlinType(registeredTypes)
+                        StringPath(hash) to element.toKotlinType(registeredTypes)
                     }.toMap()
             }
             else -> error("Unsupported decoder: $decoder")
@@ -60,14 +56,20 @@ internal object MapAnySerializer : KSerializer<Map<Path, Any?>>, CollektiveTypeS
         encoder: Encoder,
         value: Map<Path, Any?>,
     ) = when (encoder) {
-        is JsonEncoder -> encoder.encodeJsonElement(
-            value.map { (path, message) ->
-                check(path is StringPath) {
-                    "Serializing a ${path::class} is not supported. Select a different path factory implementation"
-                }
-                path.hash to message
-            }.toMap().toJsonElement()
-        )
+        is JsonEncoder ->
+            encoder.encodeJsonElement(
+                value
+                    .map { (path, message) ->
+                        check(path is StringPath) {
+                            """
+                            Serializing a ${path::class} is not supported.
+                            Select a different path factory implementation.
+                            """.trimIndent()
+                        }
+                        path.hash to message
+                    }.toMap()
+                    .toJsonElement(),
+            )
         else -> error("Unsupported encoder: $encoder")
     }
 

@@ -9,7 +9,6 @@
 package it.unibo.collektive.path.impl
 
 import it.unibo.collektive.path.Path
-import kotlinx.serialization.Serializable
 
 /**
  * Serializable [Path] implementation based on a single string [hash].
