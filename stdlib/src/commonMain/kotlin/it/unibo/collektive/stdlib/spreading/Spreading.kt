@@ -73,8 +73,9 @@ inline fun <ID : Any, Value, Distance : Comparable<Distance>> Aggregate<ID>.grad
     local: Value,
     bottom: Distance,
     top: Distance,
-    crossinline accumulateData: (Distance, Distance, Value) -> Value = { _, _, data -> data },
-    crossinline accumulateDistance: (Distance, Distance) -> Distance,
+    crossinline accumulateData: (fromSource: Distance, toNeighbor: Distance, data: Value) -> Value =
+        { _, _, data -> data },
+    crossinline accumulateDistance: (fromSource: Distance, toNeighbor: Distance) -> Distance,
     crossinline metric: () -> Field<ID, Distance>,
 ): Value {
     val topValue = top to local
@@ -108,7 +109,7 @@ inline fun <ID : Any, Value, Distance : Comparable<Distance>> Aggregate<ID>.grad
 inline fun <ID : Any, Type> Aggregate<ID>.gradientCast(
     source: Boolean,
     local: Type,
-    crossinline accumulateData: (Int, Int, Type) -> Type = { _, _, data -> data },
+    crossinline accumulateData: (fromSource: Int, toNeighbor: Int, data: Type) -> Type = { _, _, data -> data },
     crossinline metric: () -> Field<ID, Int> = { neighboring(1) },
 ): Type = gradientCast(source, local, Int.MIN_VALUE, Int.MAX_VALUE, accumulateData, Int::plus, metric)
 
@@ -124,6 +125,6 @@ inline fun <ID : Any, Type> Aggregate<ID>.gradientCast(
 inline fun <ID : Any, Type> Aggregate<ID>.gradientCast(
     source: Boolean,
     local: Type,
-    crossinline accumulateData: (Double, Double, Type) -> Type = { _, _, data -> data },
+    crossinline accumulateData: (fromSource: Double, toNeighbor: Double, data: Type) -> Type = { _, _, data -> data },
     crossinline metric: () -> Field<ID, Double> = { neighboring(1.0) },
 ): Type = gradientCast(source, local, 0.0, Double.POSITIVE_INFINITY, accumulateData, Double::plus, metric)
