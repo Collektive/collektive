@@ -71,7 +71,7 @@ interface PathFactory {
         }
 
         fun Any?.hashable(): Iterable<HashableToken> {
-            val typeName = if (this == null) "⭕" else this::class.qualifiedName
+            val typeName = if (this == null) "⭕" else this::class.simpleName
             checkNotNull(typeName) {
                 "Hashing anonymous types is not supported"
             }
@@ -95,7 +95,7 @@ interface PathFactory {
                 is Float -> this.toRawBits().toByteArray()
                 is Double -> this.toRawBits().toByteArray()
                 is Char -> this.toString().toByteArray()
-                else -> error("Alignment on elements of type ${this::class.qualifiedName} is not supported")
+                else -> error("Alignment on elements of type ${this::class.simpleName} is not supported")
             }
 
         fun Any.toByteArray(): ByteArray =

@@ -74,6 +74,9 @@ internal object MapAnySerializer : KSerializer<Map<Path, Any?>>, CollektiveTypeS
     }
 
     override fun <Type : Any> registerType(kClass: KClass<Type>) {
+        require(registeredTypes.any { it.simpleName == kClass.simpleName }) {
+            "Type ${kClass.simpleName} is already registered"
+        }
         registeredTypes.add(kClass)
     }
 }

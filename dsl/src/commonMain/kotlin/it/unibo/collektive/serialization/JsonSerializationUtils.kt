@@ -50,7 +50,7 @@ object JsonSerializationUtils {
                                 "Missing required key $DATA_FIELD? $this"
                             }
                         val type: String = get(TYPE_FIELD)?.toKotlinType(registeredTypes).toString()
-                        val candidateType = registeredTypes.first { it.qualifiedName == type }
+                        val candidateType = registeredTypes.first { it.simpleName == type }
                         Json.decodeFromJsonElement(candidateType.serializer(), objectContents)
                     }
                     else -> mapValues { (_, value) -> value.toKotlinType(registeredTypes) }
@@ -74,12 +74,12 @@ object JsonSerializationUtils {
                 val clazz: KClass<*> = this::class
                 val kSerializer = clazz.serializer()
                 kSerializer as KSerializer<Any>
-                requireNotNull(clazz.qualifiedName) {
+                requireNotNull(clazz.simpleName) {
                     "No qualified name found for $clazz"
                 }
                 JsonObject(
                     mapOf(
-                        TYPE_FIELD to JsonPrimitive(clazz.qualifiedName),
+                        TYPE_FIELD to JsonPrimitive(clazz.simpleName),
                         DATA_FIELD to Json.encodeToJsonElement(kSerializer, this),
                     ),
                 )
