@@ -66,6 +66,9 @@ inline fun <ID : Any> Aggregate<ID>.distanceTo(
  * The [metric] function is used to compute the distance between devices in form of a field of [Distance]s.
  * [Distance]s must be in the [[bottom], [top]] range, [accumulateDistance] is used to sum distances.
  * [accumulateData] is used to modify data from neighbors on the fly, and defaults to the identity function.
+ *
+ * This function features *incremental repair*, and it is subject to the *rising value problem*,
+ * see [Fast self-healing gradients](https://doi.org/10.1145/1363686.1364163).
  */
 @JvmOverloads
 inline fun <ID : Any, Value, Distance : Comparable<Distance>> Aggregate<ID>.gradientCast(
