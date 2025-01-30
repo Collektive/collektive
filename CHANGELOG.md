@@ -1,3 +1,26 @@
+## [13.1.0](https://github.com/Collektive/collektive/compare/13.0.0...13.1.0) (2025-01-30)
+
+### Features
+
+* **stdlib:** write a `multiGradientCast` ([cc9f35f](https://github.com/Collektive/collektive/commit/cc9f35fe523a0a7a86920f2a9f7c8c61f5c588aa))
+
+### Dependency updates
+
+* **deps:** update plugin gradlepluginpublish to v1.3.1 ([e57b550](https://github.com/Collektive/collektive/commit/e57b550f8fdbfeb0ec312e913b09c5ccffd92675))
+
+### Documentation
+
+* **stdlib:** document the rising value problem ([caac4b5](https://github.com/Collektive/collektive/commit/caac4b537cbe26dc3dd21b9cbe71e059f72b36ca))
+
+### Build and continuous integration
+
+* **deps:** update github/codeql-action action to v3.28.7 ([fb7d337](https://github.com/Collektive/collektive/commit/fb7d3372b3e5d7e15b5071c33effc0fbfcc2874c))
+* **deps:** update github/codeql-action action to v3.28.8 ([5f8fc0c](https://github.com/Collektive/collektive/commit/5f8fc0c2767eb3400be49c7777c50b5d7b0e591d))
+
+### Style improvements
+
+* **stdlib:** name the lambda parameters for clarity (thanks [@cric96](https://github.com/cric96)) ([500364f](https://github.com/Collektive/collektive/commit/500364ff39bbbba3743325f576740978d7fa6914))
+
 ## [13.0.0](https://github.com/Collektive/collektive/compare/12.3.3...13.0.0) (2025-01-29)
 
 ### ⚠ BREAKING CHANGES
