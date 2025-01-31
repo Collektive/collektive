@@ -28,9 +28,9 @@ fun <ID : Any, Scalar> Aggregate<ID>.neighboringViaExchange(local: Scalar): Fiel
     }
 
 /**
- * [sharing] captures the space-time nature of field computation through observation of neighbours' values, starting
+ * [sharing] captures the space-time nature of field computation through observation of neighbors' values, starting
  * from an [initial] value, it reduces to a single local value given a [transform] function and updating and sharing
- * to neighbours of a local variable.
+ * to neighbors of a local variable.
  * ```
  * val result = sharing(0) {
  *   val maxValue = it.maxBy { v -> v.value }.value
@@ -39,7 +39,7 @@ fun <ID : Any, Scalar> Aggregate<ID>.neighboringViaExchange(local: Scalar): Fiel
  * result // result: kotlin.String
  * ```
  *
- * In the example above, the function [sharing] will return the string initialised as in yielding.
+ * In the example above, the function [sharing] will return the string initialized as in yielding.
  *
  * ### Invalid use:
  *
