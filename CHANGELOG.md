@@ -1,3 +1,13 @@
+## [13.1.1](https://github.com/Collektive/collektive/compare/13.1.0...13.1.1) (2025-01-31)
+
+### Documentation
+
+* **dsl:** 🇬🇧 ➡️ 🇺🇸 ([e37116c](https://github.com/Collektive/collektive/commit/e37116c587e1cb6769299ec80e73003b5bf83d9a))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.8 ([96c74a0](https://github.com/Collektive/collektive/commit/96c74a0d03df5ad05fb170b208590390ecf1ffb0))
+
 ## [13.1.0](https://github.com/Collektive/collektive/compare/13.0.0...13.1.0) (2025-01-30)
 
 ### Features
