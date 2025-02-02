@@ -1,6 +1,7 @@
 package it.unibo.collektive.aggregate.api.operators
 
 import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchanging
 import it.unibo.collektive.aggregate.api.YieldingContext
 import it.unibo.collektive.aggregate.api.YieldingResult
 import it.unibo.collektive.field.Field
@@ -22,7 +23,7 @@ import it.unibo.collektive.field.Field
  *
  * In this case, the field returned has the result of the computation as local value.
  */
-fun <ID : Any, Scalar> Aggregate<ID>.neighboringViaExchange(local: Scalar): Field<ID, Scalar> =
+inline fun <ID : Any, reified Scalar : Any> Aggregate<ID>.neighboringViaExchange(local: Scalar?): Field<ID, Scalar?> =
     exchanging(local) { toYield ->
         toYield.mapToConstantField(local).yielding { toYield }
     }
@@ -54,13 +55,13 @@ fun <ID : Any, Scalar> Aggregate<ID>.neighboringViaExchange(local: Scalar): Fiel
  * }
  * ```
  */
-fun <ID : Any, Initial, Return> Aggregate<ID>.sharing(
-    initial: Initial,
-    transform: YieldingContext<Initial, Return>.(Field<ID, Initial>) -> YieldingResult<Initial, Return>,
+inline fun <ID : Any, reified Initial : Any, Return> Aggregate<ID>.sharing(
+    initial: Initial?,
+    crossinline transform: YieldingContext<Initial?, Return>.(Field<ID, Initial?>) -> YieldingResult<Initial?, Return>,
 ): Return =
-    exchanging(initial) { field: Field<ID, Initial> ->
-        with(YieldingContext<Initial, Return>()) {
-            val result: YieldingResult<Initial, Return> = transform(field)
+    exchanging(initial) { field: Field<ID, Initial?> ->
+        with(YieldingContext<Initial?, Return>()) {
+            val result: YieldingResult<Initial?, Return> = transform(field)
             field.map { result.toSend }.yielding {
                 field.map { result.toReturn }
             }
@@ -79,7 +80,7 @@ fun <ID : Any, Initial, Return> Aggregate<ID>.sharing(
  * ```
  * In the example above, the function [share] wil return a value that is the max found in the field.
  **/
-fun <ID : Any, Initial> Aggregate<ID>.share(
-    initial: Initial,
-    transform: (Field<ID, Initial>) -> Initial,
-): Initial = sharing(initial) { field -> transform(field).run { yielding { this } } }
+inline fun <ID : Any, reified Initial : Any> Aggregate<ID>.share(
+    initial: Initial?,
+    crossinline transform: (Field<ID, Initial?>) -> Initial?,
+): Initial? = sharing(initial) { field -> transform(field).run { yielding { this } } }
