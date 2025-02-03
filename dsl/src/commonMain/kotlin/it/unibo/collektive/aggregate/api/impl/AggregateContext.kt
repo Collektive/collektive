@@ -15,7 +15,6 @@ import it.unibo.collektive.path.Path
 import it.unibo.collektive.path.PathFactory
 import it.unibo.collektive.state.State
 import it.unibo.collektive.state.impl.getTyped
-import kotlin.reflect.KClass
 
 /**
  * Context for managing aggregate computation.
@@ -47,29 +46,27 @@ internal class AggregateContext<ID : Any>(
         others: Map<ID, T>,
     ): Field<ID, T> = Field(localId, localValue, others)
 
-    override fun <Initial : Any> exchange(
-        initial: Initial?,
-        kClazz: KClass<Initial>,
-        body: (Field<ID, Initial?>) -> Field<ID, Initial?>,
-    ): Field<ID, Initial?> = exchanging(initial, kClazz) { field -> body(field).run { yielding { this } } }
+    override fun <X> exchange(
+        initial: X,
+        body: (Field<ID, X>) -> Field<ID, X>,
+    ): Field<ID, X> = exchanging(initial) { field -> body(field).run { yielding { this } } }
 
-    override fun <Initial : Any, Return> exchanging(
-        initial: Initial?,
-        kClazz: KClass<Initial>,
-        body: YieldingScope<Field<ID, Initial?>, Field<ID, Return>>,
-    ): Field<ID, Return> {
+    override fun <Init, Ret> exchanging(
+        initial: Init,
+        body: YieldingScope<Field<ID, Init>, Field<ID, Ret>>,
+    ): Field<ID, Ret> {
         val path: Path = stack.currentPath()
-        val messages = messagesAt<Initial>(path)
+        val messages = messagesAt<Init>(path)
         val previous = stateAt(path, initial)
         val subject = newField(previous, messages)
-        val context = YieldingContext<Field<ID, Initial?>, Field<ID, Return>>()
+        val context = YieldingContext<Field<ID, Init>, Field<ID, Ret>>()
         return body(context, subject)
             .also {
                 val message =
                     SingleOutboundMessage(
                         it.toSend.localValue,
                         when (it.toSend) {
-                            is ConstantField<*, *> -> emptyMap()
+                            is ConstantField<ID, Init> -> emptyMap()
                             else -> it.toSend.excludeSelf()
                         },
                     )
@@ -92,7 +89,7 @@ internal class AggregateContext<ID : Any>(
             }.toReturn
     }
 
-    override fun <Scalar : Any> neighboring(local: Scalar?, kClazz: KClass<Scalar>): Field<ID, Scalar?> {
+    override fun <Scalar> neighboring(local: Scalar): Field<ID, Scalar> {
         val path = stack.currentPath()
         val neighborValues = messagesAt<Scalar>(path)
         toBeSent.addMessage(path, SingleOutboundMessage(local))
