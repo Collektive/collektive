@@ -1,5 +1,6 @@
 package it.unibo.collektive
 
+import it.unibo.collektive.codegen.SerializationObjectGeneration
 import it.unibo.collektive.frontend.CollektiveFrontendExtensionRegistrar
 import it.unibo.collektive.utils.logging.info
 import it.unibo.collektive.utils.logging.strongWarning
@@ -52,6 +53,7 @@ class AlignmentComponentRegistrar : CompilerPluginRegistrar() {
         }
         if (configuration.get(AlignmentCommandLineProcessor.ARG_ENABLED) != false) {
             IrGenerationExtension.registerExtension(AlignmentIrGenerationExtension(logger))
+            IrGenerationExtension.registerExtension(SerializationObjectGeneration(logger))
             FirExtensionRegistrarAdapter.registerExtension(CollektiveFrontendExtensionRegistrar())
         }
     }
