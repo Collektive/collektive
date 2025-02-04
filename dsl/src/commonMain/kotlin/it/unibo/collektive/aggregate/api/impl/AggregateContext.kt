@@ -1,36 +1,37 @@
 package it.unibo.collektive.aggregate.api.impl
 
 import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
 import it.unibo.collektive.aggregate.api.YieldingContext
 import it.unibo.collektive.aggregate.api.YieldingResult
 import it.unibo.collektive.aggregate.api.YieldingScope
 import it.unibo.collektive.aggregate.api.impl.stack.Stack
-import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.field.ConstantField
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.networking.Message
+import it.unibo.collektive.networking.MessageProvider
 import it.unibo.collektive.networking.OutboundSendOperation
 import it.unibo.collektive.networking.SingleOutboundMessage
 import it.unibo.collektive.path.Path
 import it.unibo.collektive.path.PathFactory
+import it.unibo.collektive.serialization.ListAnySerializer
 import it.unibo.collektive.state.State
 import it.unibo.collektive.state.impl.getTyped
 import kotlin.reflect.KClass
 
 /**
  * Context for managing aggregate computation.
- * It represents the [localId] of the device, the [messages] received from the neighbours,
+ * It represents the [localId] of the device, the [messageProvider] received from the neighbours,
  * and the [previousState] of the device.
  */
 internal class AggregateContext<ID : Any>(
     override val localId: ID,
-    private val messages: Iterable<Message<ID>>,
+    private val messageProvider: MessageProvider<ID>,
     private val previousState: State,
-    val pathFactory: PathFactory,
+    pathFactory: PathFactory,
 ) : Aggregate<ID> {
     private val stack = Stack(pathFactory)
     private var state: MutableMap<Path, Any?> = mutableMapOf()
-    private val toBeSent = OutboundSendOperation(messages.count(), localId)
+    private val toBeSent = OutboundSendOperation(messageProvider.neighbors.size, localId)
 
     /**
      * Messages to send to the other nodes.
@@ -59,7 +60,7 @@ internal class AggregateContext<ID : Any>(
         body: YieldingScope<Field<ID, Initial?>, Field<ID, Return>>,
     ): Field<ID, Return> {
         val path: Path = stack.currentPath()
-        val messages = messagesAt<Initial>(path)
+        val messages = messageProvider.messageAt<Initial>(path)
         val previous = stateAt(path, initial)
         val subject = newField(previous, messages)
         val context = YieldingContext<Field<ID, Initial?>, Field<ID, Return>>()
@@ -92,9 +93,12 @@ internal class AggregateContext<ID : Any>(
             }.toReturn
     }
 
-    override fun <Scalar : Any> neighboring(local: Scalar?, kClazz: KClass<Scalar>): Field<ID, Scalar?> {
+    override fun <Scalar> neighboring(local: Scalar, kClazz: KClass<*>): Field<ID, Scalar> {
+        if (messageProvider.requiresSerialization) {
+            ListAnySerializer.registerType(kClazz.qualifiedName(local), kClazz)
+        }
         val path = stack.currentPath()
-        val neighborValues = messagesAt<Scalar>(path)
+        val neighborValues = messageProvider.messageAt<Scalar>(path)
         toBeSent.addMessage(path, SingleOutboundMessage(local))
         return newField(local, neighborValues)
     }
@@ -122,18 +126,6 @@ internal class AggregateContext<ID : Any>(
 
     override fun dealign() = stack.dealign()
 
-    @Suppress("UNCHECKED_CAST")
-    private fun <T> messagesAt(path: Path): Map<ID, T> =
-        messages
-            .mapNotNull { received ->
-                received.messages
-                    .getOrElse(path) { NoEntry }
-                    .takeIf { it != NoEntry }
-                    ?.let { received.senderId to it as T }
-            }.associate { it }
-
-    private object NoEntry
-
     private fun <T> stateAt(
         path: Path,
         default: T,
@@ -150,7 +142,7 @@ internal class AggregateContext<ID : Any>(
  * This function takes such [field] and restricts it to be aligned with the current neighbors.
  */
 fun <ID : Any, T> Aggregate<ID>.project(field: Field<ID, T>): Field<ID, T> {
-    val others = neighboringViaExchange(0.toByte())
+    val others = neighboring(0.toByte())
     return when {
         field.neighborsCount == others.neighborsCount -> field
         field.neighborsCount > others.neighborsCount -> others.mapWithId { id, _ -> field[id] }
@@ -164,3 +156,5 @@ fun <ID : Any, T> Aggregate<ID>.project(field: Field<ID, T>): Field<ID, T> {
             )
     }
 }
+
+expect fun KClass<*>.qualifiedName(evidence: Any?): String

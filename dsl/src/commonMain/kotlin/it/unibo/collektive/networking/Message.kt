@@ -1,17 +1,46 @@
 package it.unibo.collektive.networking
 
 import it.unibo.collektive.path.Path
-import it.unibo.collektive.serialization.MapAnySerializer
+import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.serialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.serializer
 import kotlin.collections.putAll
+
+//object PorcioDioSerializer : KSerializer<Message<*>> {
+//
+//    @OptIn(InternalSerializationApi::class)
+//    override val descriptor: SerialDescriptor
+//        get() = Pair::class.serializer().descriptor
+//
+//    override fun serialize(
+//        encoder: Encoder,
+//        value: Message<*>
+//    ) {
+//        Pair
+//    }
+//
+//    override fun deserialize(decoder: Decoder): Message<*> {
+//        TODO("Not yet implemented")
+//    }
+//
+//}
+
+@Serializable
+data class SerializableMessage<ID : Any>(
+    val senderId: ID,
+    val messages: Map<Path, ByteArray>,
+)
 
 /**
  * [messages] received by a node from [senderId].
  */
-@Serializable
 data class Message<ID : Any>(
     val senderId: ID,
-    @Serializable(with = MapAnySerializer::class)
     val messages: Map<Path, Any?>,
 )
 
@@ -20,13 +49,13 @@ data class Message<ID : Any>(
  * to its neighbors.
  */
 data class OutboundSendOperation<ID : Any>(
-    private val expectedSize: Int,
+    val expectedSize: Int,
     val senderId: ID,
 ) {
     /**
      * The default messages to be sent to all neighbours.
      */
-    val defaults: MutableMap<Path, Any?> = LinkedHashMap(expectedSize * 2)
+    private val defaults: MutableMap<Path, Any?> = LinkedHashMap(expectedSize * 2)
 
     private val overrides: MutableMap<ID, MutableList<Pair<Path, Any?>>> = LinkedHashMap(expectedSize * 2)
 

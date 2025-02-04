@@ -91,9 +91,9 @@ interface Aggregate<ID : Any> {
      * In this case, the field returned has the computation as a result,
      * in form of a field of functions with type `() -> Int`.
      */
-    fun <Scalar : Any> neighboring(local: Scalar?, kClazz: KClass<Scalar>): Field<ID, Scalar?>
+    fun <Scalar> neighboring(local: Scalar, kClazz: KClass<*>): Field<ID, Scalar>
 
-    /**
+          /**
      * Alignment function that pushes in the stack the pivot, executes the body and pop the last
      * element of the stack after it is called.
      * Returns the body's return element.
@@ -169,7 +169,7 @@ interface Aggregate<ID : Any> {
          * In this case, the field returned has the computation as a result,
          * in form of a field of functions with type `() -> Int`.
          */
-        inline fun <ID : Any, reified Scalar : Any> Aggregate<ID>.neighboring(local: Scalar?): Field<ID, Scalar?> =
+        inline fun <ID : Any, reified Scalar> Aggregate<ID>.neighboring(local: Scalar): Field<ID, Scalar> =
             neighboring(local, Scalar::class)
     }
 }

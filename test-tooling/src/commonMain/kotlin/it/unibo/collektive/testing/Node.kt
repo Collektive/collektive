@@ -49,7 +49,7 @@ class Node<R>(
     private inner class NetworkDevice : Network<Int> {
         private var messageBuffer: Set<Message<Int>> = emptySet()
 
-        override fun write(message: OutboundSendOperation<Int>) {
+        override fun deliver(message: OutboundSendOperation<Int>) {
             environment.neighborsOf(this@Node).forEach { neighbor ->
                 neighbor.network.messageBuffer += message.messagesFor(neighbor.id)
             }

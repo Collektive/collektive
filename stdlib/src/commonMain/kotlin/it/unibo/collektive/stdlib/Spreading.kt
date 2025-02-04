@@ -1,6 +1,7 @@
 package it.unibo.collektive.stdlib
 
 import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
 import it.unibo.collektive.aggregate.api.operators.share
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.operations.minBy

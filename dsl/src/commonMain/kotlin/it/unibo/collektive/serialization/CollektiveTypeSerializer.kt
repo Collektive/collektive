@@ -17,12 +17,12 @@ interface CollektiveTypeSerializer {
     /**
      * Register a custom [Type] to be serialized.
      */
-    fun <Type : Any> registerType(kClass: KClass<Type>)
+    fun <Type : Any> registerType(qualifiedName: String, kClass: KClass<Type>)
 
     /**
      * Register multiple custom types to be serialized.
      */
-    fun registerTypes(vararg kClasses: KClass<*>) {
-        kClasses.forEach { registerType(it) }
+    fun registerTypes(kClasses: Map<String, KClass<*>>) {
+        kClasses.forEach { registerType(it.key, it.value) }
     }
 }

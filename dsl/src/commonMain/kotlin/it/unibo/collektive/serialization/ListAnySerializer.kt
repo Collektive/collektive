@@ -22,33 +22,44 @@ import kotlin.reflect.KClass
 /**
  * A serializer for a list of any objects.
  */
-object ListAnySerializer : KSerializer<List<Any?>>, CollektiveTypeSerializer {
+object ListAnySerializer : KSerializer<Any?>, CollektiveTypeSerializer {
+
     @Serializable
     private abstract class ListAny : List<Any?>
 
     override val descriptor: SerialDescriptor
         get() = ListAny.serializer().descriptor
 
-    private val registeredTypes = mutableSetOf<KClass<*>>()
+    private val registeredTypes = object : MutableMap<String, KClass<*>> by mutableMapOf<String, KClass<*>>() {
+        override fun remove(key: String): KClass<*>? = error("Cannot remove types from the registry")
+    }
+    private val reverseLookupTable = object : Map<KClass<*>, String> {
+        private val reversed get() = registeredTypes.entries.associate { (key, value) -> value to key }
+        override val size: Int get() = registeredTypes.size
+        override val keys: Set<KClass<*>> get() = registeredTypes.values.toSet()
+        override val values: Collection<String> get() = registeredTypes.keys
+        override val entries: Set<Map.Entry<KClass<*>, String>> get() = reversed.entries
+        override fun isEmpty(): Boolean = registeredTypes.isEmpty()
+        override fun containsKey(key: KClass<*>): Boolean = registeredTypes.containsValue(key)
+        override fun containsValue(value: String): Boolean = registeredTypes.containsKey(value)
+        override fun get(key: KClass<*>): String? = registeredTypes.entries.first { it.value == key }.key
+    }
 
-    override fun deserialize(decoder: Decoder): List<Any?> =
+    override fun deserialize(decoder: Decoder): Any? =
         when (decoder) {
-            is JsonDecoder -> decoder.decodeJsonElement().toKotlinType(registeredTypes) as List<Any?>
+            is JsonDecoder -> (decoder.decodeJsonElement().toKotlinType(registeredTypes) as List<Any?>).single()
             else -> error("Unsupported decoder: $decoder")
         }
 
     override fun serialize(
         encoder: Encoder,
-        value: List<Any?>,
+        value: Any?,
     ) = when (encoder) {
-        is JsonEncoder -> encoder.encodeJsonElement(value.toJsonElement())
+        is JsonEncoder -> encoder.encodeJsonElement(listOf(value).toJsonElement(reverseLookupTable))
         else -> error("Unsupported encoder: $encoder")
     }
 
-    override fun <Type : Any> registerType(kClass: KClass<Type>) {
-        require(registeredTypes.any { it.simpleName == kClass.simpleName }) {
-            "Type ${kClass.simpleName} is already registered"
-        }
-        registeredTypes.add(kClass)
+    override fun <Type : Any> registerType(qualifiedName: String, kClass: KClass<Type>) {
+        registeredTypes[qualifiedName] = kClass
     }
 }

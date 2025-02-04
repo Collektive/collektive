@@ -33,7 +33,7 @@ object JsonSerializationUtils {
     private val requiredKeys = setOf(TYPE_FIELD, DATA_FIELD)
 
     @OptIn(InternalSerializationApi::class)
-    internal fun JsonElement.toKotlinType(registeredTypes: Set<KClass<*>>): Any? =
+    internal fun JsonElement.toKotlinType(registeredTypes: Map<String, KClass<*>>): Any? =
         when (this) {
             is JsonPrimitive -> {
                 if (isString) {
@@ -50,10 +50,12 @@ object JsonSerializationUtils {
                                 "Missing required key $DATA_FIELD? $this"
                             }
                         val type: String = get(TYPE_FIELD)?.toKotlinType(registeredTypes).toString()
-                        val candidateType = registeredTypes.first { it.simpleName == type }
+                        val candidateType = registeredTypes.getValue(type) // TODO: clear error message
                         Json.decodeFromJsonElement(candidateType.serializer(), objectContents)
                     }
-                    else -> mapValues { (_, value) -> value.toKotlinType(registeredTypes) }
+                    else -> map { (key, value) ->
+                        Json.decodeFromString(ListAnySerializer, key) to value.toKotlinType(registeredTypes)
+                    }.toMap()
                 }
             }
             is JsonArray -> map { it.toKotlinType(registeredTypes) }
@@ -61,14 +63,14 @@ object JsonSerializationUtils {
         }
 
     @OptIn(InternalSerializationApi::class)
-    internal fun Any?.toJsonElement(): JsonElement =
+    internal fun Any?.toJsonElement(registeredTypes: Map<KClass<*>, String>): JsonElement =
         when (this) {
             is JsonElement -> this
             is String -> JsonPrimitive(this)
             is Number -> JsonPrimitive(this)
             is Boolean -> JsonPrimitive(this)
-            is Map<*, *> -> JsonObject(this.mapKeys { it.key.toString() }.mapValues { it.value.toJsonElement() })
-            is Iterable<*> -> JsonArray(this.map { it.toJsonElement() })
+            is Map<*, *> -> JsonObject(this.map { (key, value) -> key.toJsonElement(registeredTypes).toString() to value.toJsonElement(registeredTypes) }.toMap())
+            is Iterable<*> -> JsonArray(this.map { it.toJsonElement(registeredTypes) })
             null -> JsonNull
             else -> {
                 val clazz: KClass<*> = this::class
@@ -79,7 +81,7 @@ object JsonSerializationUtils {
                 }
                 JsonObject(
                     mapOf(
-                        TYPE_FIELD to JsonPrimitive(clazz.simpleName),
+                        TYPE_FIELD to JsonPrimitive(registeredTypes.getValue(clazz)),
                         DATA_FIELD to Json.encodeToJsonElement(kSerializer, this),
                     ),
                 )

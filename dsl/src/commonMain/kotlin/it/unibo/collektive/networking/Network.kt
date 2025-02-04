@@ -1,16 +1,8 @@
 package it.unibo.collektive.networking
 
+import it.unibo.collektive.path.Path
+
 /**
  * Network interface for the aggregate computation.
  */
-interface Network<ID : Any> {
-    /**
-     * Sends a [message] of type [OutboundSendOperation] to the neighbours.
-     */
-    fun write(message: OutboundSendOperation<ID>)
-
-    /**
-     * Returns a set of [Message]s representing the received messages from the neighbours.
-     */
-    fun read(): Collection<Message<ID>>
-}
+interface Network<ID : Any> : MessageProvider<ID>, MessageDeliverer<ID>

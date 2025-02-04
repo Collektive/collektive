@@ -4,7 +4,9 @@ import it.unibo.collektive.aggregate.AggregateResult
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.impl.AggregateContext
 import it.unibo.collektive.networking.Message
+import it.unibo.collektive.networking.MessageProvider
 import it.unibo.collektive.networking.Network
+import it.unibo.collektive.path.Path
 import it.unibo.collektive.path.PathFactory
 import it.unibo.collektive.state.State
 
@@ -64,7 +66,21 @@ class Collektive<ID : Any, R>(
             pathFactory: PathFactory = PathFactory.CryptographicHashingFactory,
             compute: Aggregate<ID>.() -> R,
         ): AggregateResult<ID, R> =
-            AggregateContext(localId, inbound, previousState, pathFactory).run {
+            AggregateContext(
+                localId,
+                object : MessageProvider<ID> {
+                    private val messages: Map<ID, Message<ID>> = inbound.associateBy { it.senderId }
+                    override val neighbors: Set<ID> get() = messages.keys
+
+                    override fun <T> messageAt(path: Path): Map<ID, T> =
+                        messages.mapValues { (_, message) ->
+                            @Suppress("UNCHECKED_CAST")
+                            message.messages[path] as T
+                        }
+                },
+                previousState,
+                pathFactory
+            ).run {
                 AggregateResult(localId, compute(), messagesToSend(), newState())
             }
 
@@ -80,9 +96,9 @@ class Collektive<ID : Any, R>(
             pathFactory: PathFactory = PathFactory.CryptographicHashingFactory,
             compute: Aggregate<ID>.() -> R,
         ): AggregateResult<ID, R> =
-            with(AggregateContext(localId, network.read(), previousState, pathFactory)) {
+            with(AggregateContext(localId, network, previousState, pathFactory)) {
                 AggregateResult(localId, compute(), messagesToSend(), newState()).also {
-                    network.write(it.toSend)
+                    network.deliver(it.toSend)
                 }
             }
     }
