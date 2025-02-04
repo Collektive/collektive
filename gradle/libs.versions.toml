@@ -1,5 +1,5 @@
 [versions]
-alchemist = "37.1.7"
+alchemist = "37.1.8"
 build-config = "5.5.1"
 dokka = "2.0.0"
 kotest = "6.0.0.M1"
