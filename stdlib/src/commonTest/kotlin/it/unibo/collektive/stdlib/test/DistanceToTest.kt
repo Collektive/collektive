@@ -7,6 +7,7 @@
  */
 package it.unibo.collektive.stdlib.test
 
+import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
 import it.unibo.collektive.stdlib.spreading.distanceTo
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
@@ -30,6 +31,7 @@ class DistanceToTest {
                         val diagonalSteps = (steps - manhattanSteps) / 2
                         sqrt(2.0) * diagonalSteps + manhattanSteps
                     }
+
                     else -> steps
                 }
             abs(value - expected.toFloat()) < 1e-6

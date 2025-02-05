@@ -14,6 +14,7 @@ import it.unibo.collektive.networking.SingleOutboundMessage
 import it.unibo.collektive.path.Path
 import it.unibo.collektive.state.State
 import it.unibo.collektive.state.impl.getTyped
+import kotlin.reflect.KClass
 
 /**
  * Context for managing aggregate computation.
@@ -44,13 +45,15 @@ internal class AggregateContext<ID : Any>(
         others: Map<ID, T>,
     ): Field<ID, T> = Field(localId, localValue, others)
 
-    override fun <X> exchange(
-        initial: X,
-        body: (Field<ID, X>) -> Field<ID, X>,
-    ): Field<ID, X> = exchanging(initial) { field -> body(field).run { yielding { this } } }
+    override fun <Initial> exchange(
+        initial: Initial,
+        kClass: KClass<*>,
+        body: (Field<ID, Initial>) -> Field<ID, Initial>,
+    ): Field<ID, Initial> = exchanging(initial, kClass) { field -> body(field).run { yielding { this } } }
 
     override fun <Init, Ret> exchanging(
         initial: Init,
+        kClass: KClass<*>,
         body: YieldingScope<Field<ID, Init>, Field<ID, Ret>>,
     ): Field<ID, Ret> {
         val path: Path = stack.currentPath()
@@ -87,7 +90,10 @@ internal class AggregateContext<ID : Any>(
             }.toReturn
     }
 
-    override fun <Scalar> neighboring(local: Scalar): Field<ID, Scalar> {
+    override fun <Scalar> neighboring(
+        local: Scalar,
+        kClass: KClass<*>,
+    ): Field<ID, Scalar> {
         val path = stack.currentPath()
         val neighborValues = messagesAt<Scalar>(path)
         toBeSent.addMessage(path, SingleOutboundMessage(local))

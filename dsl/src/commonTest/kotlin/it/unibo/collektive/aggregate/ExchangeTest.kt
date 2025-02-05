@@ -6,6 +6,8 @@ import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchange
+import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchanging
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager

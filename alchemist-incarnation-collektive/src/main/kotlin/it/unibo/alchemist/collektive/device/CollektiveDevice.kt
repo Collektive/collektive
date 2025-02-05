@@ -7,7 +7,7 @@ import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Time
 import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
+import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
 import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.InboundMessage
@@ -54,7 +54,10 @@ class CollektiveDevice<P>(
 
     override fun <ID : Any> Aggregate<ID>.distances(): Field<ID, Double> =
         environment.getPosition(node).let { nodePosition ->
-            neighboringViaExchange(nodePosition).map { position -> nodePosition.distanceTo(position) }
+            neighboring(nodePosition.coordinates).map { position ->
+                // TODO: make a makePosition(DoubleArray) in the simulator
+                nodePosition.distanceTo(environment.makePosition(position.toList()))
+            }
         }
 
     override fun cloneOnNewNode(node: Node<Any?>): NodeProperty<Any?> =
@@ -65,6 +68,7 @@ class CollektiveDevice<P>(
             validMessages.isEmpty() -> emptyList()
             retainMessagesFor == null ->
                 validMessages.map { it.payload }.also { validMessages.clear() }
+
             else -> {
                 validMessages.retainAll { it.receivedAt + retainMessagesFor >= currentTime }
                 validMessages.map { it.payload }

@@ -95,9 +95,9 @@ fun <ID : Comparable<ID>> Aggregate<ID>.isHappeningAnywhere(condition: () -> Boo
  * A **non-self-stabilizing** gossip function for repeated propagation of a [value] and [aggregation]
  * of state estimates between neighboring devices.
  */
-fun <ID : Any, Value> Aggregate<ID>.nonStabilizingGossip(
+inline fun <ID : Any, reified Value> Aggregate<ID>.nonStabilizingGossip(
     value: Value,
-    aggregation: (Value, Value) -> Value,
+    noinline aggregation: (Value, Value) -> Value,
 ): Value = share(value) { it.fold(value, aggregation) }
 
 /**
