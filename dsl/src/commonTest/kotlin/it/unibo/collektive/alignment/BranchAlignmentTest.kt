@@ -32,7 +32,7 @@ class BranchAlignmentTest : StringSpec({
                     test2()
                 }
             }
-        val messageFor1 = result.toSend.messagesFor(id0).messages
+        val messageFor1 = result.toSend.messagesFor(id0).sharedData
         messageFor1 shouldHaveSize 1 // 1 path of alignment
         messageFor1.values.toList() shouldBe listOf("test")
     }
@@ -51,7 +51,7 @@ class BranchAlignmentTest : StringSpec({
                     test2()
                 }
             }
-        result.toSend.messagesFor(id0).messages shouldHaveSize 0 // 0 path of alignment
+        result.toSend.messagesFor(id0).sharedData shouldHaveSize 0 // 0 path of alignment
     }
 
     "A field should be projected when used in a body of a branch condition (issue #171)" {

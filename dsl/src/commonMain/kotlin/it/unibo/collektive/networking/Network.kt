@@ -1,7 +1,5 @@
 package it.unibo.collektive.networking
 
-import it.unibo.collektive.path.Path
-
 /**
  * Network interface for the aggregate computation.
  */

@@ -9,10 +9,14 @@
 package it.unibo.collektive.path.impl
 
 import it.unibo.collektive.path.Path
+import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmInline
 
 /**
- * Serializable [Path] implementation based on a single string [hash].
+ * Serializable [Path] implementation.
  */
-data class StringPath(
-    val hash: String,
-) : Path
+@JvmInline
+@Serializable
+value class SerializablePath<T>(val backend: T) : Path
+
+typealias StringPath = SerializablePath<String>

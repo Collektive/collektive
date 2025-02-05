@@ -13,7 +13,6 @@ import it.unibo.collektive.networking.OutboundSendOperation
 import it.unibo.collektive.networking.SingleOutboundMessage
 import it.unibo.collektive.path.Path
 import it.unibo.collektive.path.PathFactory
-import it.unibo.collektive.serialization.ListAnySerializer
 import it.unibo.collektive.state.State
 import it.unibo.collektive.state.impl.getTyped
 import kotlin.reflect.KClass
@@ -56,11 +55,11 @@ internal class AggregateContext<ID : Any>(
 
     override fun <Initial : Any, Return> exchanging(
         initial: Initial?,
-        kClazz: KClass<Initial>,
+        kClass: KClass<Initial>,
         body: YieldingScope<Field<ID, Initial?>, Field<ID, Return>>,
     ): Field<ID, Return> {
         val path: Path = stack.currentPath()
-        val messages = messageProvider.messageAt<Initial>(path)
+        val messages = messageProvider.messageAt<Initial>(path, kClass)
         val previous = stateAt(path, initial)
         val subject = newField(previous, messages)
         val context = YieldingContext<Field<ID, Initial?>, Field<ID, Return>>()
@@ -74,7 +73,7 @@ internal class AggregateContext<ID : Any>(
                             else -> it.toSend.excludeSelf()
                         },
                     )
-                toBeSent.addMessage(path, message)
+                toBeSent.addMessage(path, message, kClass)
                 state += path to it.toSend.localValue
             }.toReturn
     }
@@ -93,13 +92,10 @@ internal class AggregateContext<ID : Any>(
             }.toReturn
     }
 
-    override fun <Scalar> neighboring(local: Scalar, kClazz: KClass<*>): Field<ID, Scalar> {
-        if (messageProvider.requiresSerialization) {
-            ListAnySerializer.registerType(kClazz.qualifiedName(local), kClazz)
-        }
+    override fun <Scalar> neighboring(local: Scalar, kClass: KClass<*>): Field<ID, Scalar> {
         val path = stack.currentPath()
-        val neighborValues = messageProvider.messageAt<Scalar>(path)
-        toBeSent.addMessage(path, SingleOutboundMessage(local))
+        val neighborValues = messageProvider.messageAt<Scalar>(path, kClass)
+        toBeSent.addMessage(path, SingleOutboundMessage(local), kClass)
         return newField(local, neighborValues)
     }
 
@@ -156,5 +152,3 @@ fun <ID : Any, T> Aggregate<ID>.project(field: Field<ID, T>): Field<ID, T> {
             )
     }
 }
-
-expect fun KClass<*>.qualifiedName(evidence: Any?): String

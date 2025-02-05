@@ -8,7 +8,6 @@ import it.unibo.alchemist.model.Time
 import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
-import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.Message
@@ -77,7 +76,7 @@ class CollektiveDevice<P>(
             val result = LinkedHashMap<Int, T>(neighborsCount, 1f)
             for ((_, message) in validMessages) {
                 @Suppress("UNCHECKED_CAST")
-                result[message.senderId] = message.messages[path] as T
+                result[message.senderId] = message.sharedData[path] as T
             }
             result
         }

@@ -1,6 +1,7 @@
 package it.unibo.collektive.networking
 
 import it.unibo.collektive.path.Path
+import kotlin.reflect.KClass
 
 /**
  * Network interface for the aggregate computation.
@@ -11,7 +12,7 @@ interface MessageProvider<ID : Any> {
 
     val neighbors: Set<ID>
 
-    fun <T> messageAt(path: Path): Map<ID, T>
+    fun <T> messageAt(path: Path, kClazz: KClass<*>): Map<ID, T>
 }
 
 interface MessageDeliverer<ID : Any> {

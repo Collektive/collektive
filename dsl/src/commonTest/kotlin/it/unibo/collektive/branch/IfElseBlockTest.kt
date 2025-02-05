@@ -19,7 +19,7 @@ class IfElseBlockTest : StringSpec({
                     neighboringViaExchange("test2")
                 }
             }
-        val messageFor0 = result.toSend.messagesFor(id0).messages
+        val messageFor0 = result.toSend.messagesFor(id0).sharedData
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test1")
     }
@@ -34,7 +34,7 @@ class IfElseBlockTest : StringSpec({
                     neighboringViaExchange("test2")
                 }
             }
-        val messageFor0 = result.toSend.messagesFor(id0).messages
+        val messageFor0 = result.toSend.messagesFor(id0).sharedData
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test2")
     }
@@ -52,7 +52,7 @@ class IfElseBlockTest : StringSpec({
                     neighboringViaExchange("test3")
                 }
             }
-        val messageFor0 = result.toSend.messagesFor(id0).messages
+        val messageFor0 = result.toSend.messagesFor(id0).sharedData
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test2")
     }

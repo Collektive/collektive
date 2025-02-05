@@ -75,7 +75,7 @@ class Collektive<ID : Any, R>(
                     override fun <T> messageAt(path: Path): Map<ID, T> =
                         messages.mapValues { (_, message) ->
                             @Suppress("UNCHECKED_CAST")
-                            message.messages[path] as T
+                            message.sharedData[path] as T
                         }
                 },
                 previousState,

@@ -1,48 +1,45 @@
 package it.unibo.collektive.networking
 
 import it.unibo.collektive.path.Path
-import kotlinx.serialization.InternalSerializationApi
-import kotlinx.serialization.KSerializer
+import it.unibo.collektive.path.impl.SerializablePath
+import kotlinx.serialization.SerialFormat
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.descriptors.serialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.serializer
+import kotlinx.serialization.StringFormat
 import kotlin.collections.putAll
-
-//object PorcioDioSerializer : KSerializer<Message<*>> {
-//
-//    @OptIn(InternalSerializationApi::class)
-//    override val descriptor: SerialDescriptor
-//        get() = Pair::class.serializer().descriptor
-//
-//    override fun serialize(
-//        encoder: Encoder,
-//        value: Message<*>
-//    ) {
-//        Pair
-//    }
-//
-//    override fun deserialize(decoder: Decoder): Message<*> {
-//        TODO("Not yet implemented")
-//    }
-//
-//}
+import kotlin.reflect.KClass
 
 @Serializable
-data class SerializableMessage<ID : Any>(
+data class MessageWithSerializedData<ID : Any, S>(
     val senderId: ID,
-    val messages: Map<Path, ByteArray>,
-)
+    val serializedSharedData: Map<SerializablePath<S>, ByteArray>,
+) {
+
+    /**
+     * Get the serialized data at the given [path], assuming the provided [serialFormat].
+     *
+     * This function returns `null` if the path is not present in the serialized data.
+     * The return result is a [Result.Success] if the deserialization is successful,
+     */
+    inline operator fun <reified T> get(serialFormat: SerialFormat, path: SerializablePath<S>): Result<Message<ID>>? {
+//        when (serialFormat) {
+//            is StringFormat -> serialFormat.decodeFromString(serializedSharedData[path]!!)
+//            else -> error("Unsupported serial format: $serialFormat")
+//        }
+        TODO()
+    }
+}
 
 /**
- * [messages] received by a node from [senderId].
+ * [sharedData] received by a node from [senderId].
  */
 data class Message<ID : Any>(
     val senderId: ID,
-    val messages: Map<Path, Any?>,
+    val sharedData: Map<Path, Any?>,
 )
+
+data class SharedData<Value>(val path: Path, val neighborValue: Value)
+
+data class SerializableData<Value>(val data: Value, val type: KClass<*>)
 
 /**
  * An [OutboundSendOperation] represents the act of [senderId] to send (possibly custom) [Message]s
@@ -55,7 +52,7 @@ data class OutboundSendOperation<ID : Any>(
     /**
      * The default messages to be sent to all neighbours.
      */
-    private val defaults: MutableMap<Path, Any?> = LinkedHashMap(expectedSize * 2)
+    private val defaults: MutableMap<Path, SerializableData<*>> = LinkedHashMap(expectedSize * 2)
 
     private val overrides: MutableMap<ID, MutableList<Pair<Path, Any?>>> = LinkedHashMap(expectedSize * 2)
 
@@ -75,7 +72,7 @@ data class OutboundSendOperation<ID : Any>(
     fun messagesFor(id: ID): Message<ID> =
         Message(
             senderId = senderId,
-            messages =
+            sharedData =
                 LinkedHashMap<Path, Any?>(
                     defaults.size + overrides.size,
                     1.0f,
@@ -88,9 +85,18 @@ data class OutboundSendOperation<ID : Any>(
     /**
      * Add a [message] to the [OutboundSendOperation].
      */
+    inline fun <reified Payload> addMessage(
+        path: Path,
+        message: SingleOutboundMessage<ID, Payload>,
+    ) = addMessage(path, message, Payload::class)
+
+    /**
+     * Add a [message] to the [OutboundSendOperation].
+     */
     fun <Payload> addMessage(
         path: Path,
-        message: SingleOutboundMessage<ID, @Serializable Payload>,
+        message: SingleOutboundMessage<ID, Payload>,
+        kclass: KClass<*>,
     ) {
         check(!defaults.containsKey(path)) {
             """
@@ -101,7 +107,7 @@ data class OutboundSendOperation<ID : Any>(
             If none of the above, please open an issue at https://github.com/Collektive/collektive/issues .
             """.trimIndent()
         }
-        defaults[path] = message.default
+        defaults[path] = SerializableData(message.default, kclass)
         message.overrides.forEach { (id, value) ->
             val destination = overrides.getOrPut(id) { mutableListOf() }
             destination += path to value

@@ -1,11 +1,15 @@
 package it.unibo.collektive.path
 
 import it.unibo.collektive.path.impl.FullPath
-import it.unibo.collektive.path.impl.StringPath
+import it.unibo.collektive.path.impl.SerializablePath
 import org.kotlincrypto.core.Updatable
 import org.kotlincrypto.hash.sha3.Keccak512
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
+
+value class Foo(val value: Int)
+
+value class Bar<T>(val path: T)
 
 /**
  * A path represents a specific point in the AST of an aggregate program.
@@ -47,7 +51,7 @@ interface PathFactory {
     object CryptographicHashingFactory : PathFactory {
         @OptIn(ExperimentalEncodingApi::class)
         override fun invoke(tokens: List<Any?>): Path =
-            StringPath(
+            SerializablePath(
                 Base64.Default.encode(
                     Keccak512()
                         .apply {

@@ -25,11 +25,11 @@ fun <ID : Any, R> alignWith(expected: AggregateResult<ID, R>) =
         val originPaths =
             valueResult.toSend
                 .messagesFor(valueResult.localId)
-                .messages.keys
+                .sharedData.keys
         val expectedPaths =
             expected.toSend
                 .messagesFor(valueResult.localId)
-                .messages.keys
+                .sharedData.keys
         aggregateMatcher(expectedPaths, originPaths)
     }
 
@@ -47,10 +47,10 @@ fun <R> alignWith(expected: Aggregate<Int>.() -> R): Matcher<Aggregate<Int>.() -
     Matcher { program ->
         val expectedRes =
             aggregate(0, emptyMap(), emptySet(), compute = expected)
-                .run { toSend.messagesFor(this.localId).messages.keys }
+                .run { toSend.messagesFor(this.localId).sharedData.keys }
         val result =
             aggregate(0, emptyMap(), emptySet(), compute = program)
-                .run { toSend.messagesFor(this.localId).messages.keys }
+                .run { toSend.messagesFor(this.localId).sharedData.keys }
         aggregateMatcher(expectedRes, result)
     }
 
