@@ -1,6 +1,6 @@
 package it.unibo.collektive.utils.common
 
-import it.unibo.collektive.visitors.collectAggregateReference
+import it.unibo.collektive.backend.visitors.collectAggregateReference
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.IrBlock
