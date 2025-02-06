@@ -41,6 +41,27 @@ interface Aggregate<ID : Any> {
     ): Field<ID, Initial>
 
     /**
+     * The [exchange] function manages the computation of values between neighbors in a specific context.
+     * It computes a [body] function starting from the [initial] value and the messages received from other neighbors,
+     * then sends the results from the evaluation to specific neighbors or to everyone,
+     * it is contingent upon the origin of the calculated value, whether it was received from a neighbor or if it
+     * constituted the initial value.
+     *
+     * ## Example
+     * ```
+     * exchange(0) { f ->
+     *  f.mapField { _, v -> if (v % 2 == 0) v + 1 else v * 2 }
+     * }
+     * ```
+     * The result of the exchange function is a field with as messages a map with key the id of devices across the
+     * network and the result of the computation passed as relative local values.
+     */
+    fun <Initial : Any> exchange(
+        initial: Initial,
+        body: (Field<ID, Initial>) -> Field<ID, Initial>,
+    ): Field<ID, Initial> = exchange(initial, initial::class, body)
+
+    /**
      * Same behavior of [exchange] but this function can yield a [Field] of [Return] value.
      *
      * ## Example
@@ -56,6 +77,22 @@ interface Aggregate<ID : Any> {
         kClass: KClass<*>,
         body: YieldingScope<Field<ID, Initial>, Field<ID, Return>>,
     ): Field<ID, Return>
+
+    /**
+     * Same behavior of [exchange] but this function can yield a [Field] of [Return] value.
+     *
+     * ## Example
+     * ```
+     * exchanging(initial = 1) {
+     *   val fieldResult = it + 1
+     *   fieldResult.yielding { fieldResult.map { value -> "return: $value" } }
+     * }
+     * ```
+     */
+    fun <Initial : Any, Return> exchanging(
+        initial: Initial,
+        body: YieldingScope<Field<ID, Initial>, Field<ID, Return>>,
+    ): Field<ID, Return> = exchanging(initial, initial::class, body)
 
     /**
      * Iteratively updates the value computing the [transform] expression at each device using the last
