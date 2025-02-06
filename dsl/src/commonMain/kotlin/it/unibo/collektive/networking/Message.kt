@@ -10,7 +10,7 @@ sealed interface Message
 /**
  * [messages] received by a node from [senderId].
  */
-data class InboundMessage<ID : Any>(
+data class InboundMessage2<ID : Any>(
     val senderId: ID,
     val messages: Map<Path, *>,
 ) : Message
@@ -18,7 +18,7 @@ data class InboundMessage<ID : Any>(
 /**
  * An [OutboundMessage] are messages that a device [senderId] sends to all other neighbours.
  */
-class OutboundMessage<ID : Any>(
+class OutboundMessage2<ID : Any>(
     expectedSize: Int,
     val senderId: ID,
 ) : Message {

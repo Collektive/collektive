@@ -1,6 +1,8 @@
 package it.unibo.collektive.aggregate.api.impl.stack
 
+import it.unibo.collektive.path.FullPathFactory
 import it.unibo.collektive.path.Path
+import it.unibo.collektive.path.PathFactory
 
 /**
  * Simple Stack interface with additional methods for the aggregate computation.
@@ -25,6 +27,7 @@ internal interface Stack {
         /**
          * Smart constructor for the [Stack] interface.
          */
-        internal operator fun invoke(): Stack = StackDeque()
+        internal operator fun invoke(pathFactory: PathFactory = FullPathFactory): Stack =
+            StackDeque(pathFactory)
     }
 }

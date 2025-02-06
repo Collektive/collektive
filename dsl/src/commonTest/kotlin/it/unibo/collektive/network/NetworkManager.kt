@@ -19,13 +19,13 @@ class NetworkManager {
     /**
      * Return the messages directed to a specific [receiverId].
      */
-    fun receive(receiverId: Int): Collection<InboundMessage<Int>> =
-        messageBuffer
-            .filterNot { it.senderId == receiverId }
-            .map { received ->
-                InboundMessage(
-                    received.senderId,
-                    received.messagesFor(receiverId),
-                )
-            }
+    fun receive(receiverId: Int): Collection<InboundMessage<Int>> = TODO()
+//        messageBuffer
+//            .filterNot { it.senderId == receiverId }
+//            .map { received ->
+//                InboundMessage(
+//                    received.senderId,
+//                    received.messagesFor(receiverId),
+//                )
+//            }
 }

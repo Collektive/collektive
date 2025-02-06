@@ -3,8 +3,11 @@ package it.unibo.collektive
 import it.unibo.collektive.aggregate.AggregateResult
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.impl.AggregateContext
+import it.unibo.collektive.networking.EmptyInboundMessage
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.Network
+import it.unibo.collektive.path.DigestHashingFactory
+import it.unibo.collektive.path.PathFactory
 import it.unibo.collektive.state.State
 
 /**
@@ -14,6 +17,7 @@ import it.unibo.collektive.state.State
 class Collektive<ID : Any, R>(
     val localId: ID,
     private val network: Network<ID>,
+    private val pathFactory: PathFactory = DigestHashingFactory(),
     private val computeFunction: Aggregate<ID>.() -> R,
 ) {
     /**
@@ -41,7 +45,7 @@ class Collektive<ID : Any, R>(
     }
 
     private fun executeRound(): AggregateResult<ID, R> {
-        val result = aggregate(localId, network, state, computeFunction)
+        val result = aggregate(localId, network, state, pathFactory, computeFunction)
         state = result.newState
         return result
     }
@@ -58,10 +62,11 @@ class Collektive<ID : Any, R>(
         fun <ID : Any, R> aggregate(
             localId: ID,
             previousState: State = emptyMap(),
-            inbound: Iterable<InboundMessage<ID>> = emptySet(),
+            inbound: InboundMessage<ID> = EmptyInboundMessage(),
+            pathFactory: PathFactory = DigestHashingFactory(),
             compute: Aggregate<ID>.() -> R,
         ): AggregateResult<ID, R> =
-            AggregateContext(localId, inbound, previousState).run {
+            AggregateContext(localId, inbound, previousState, pathFactory).run {
                 AggregateResult(localId, compute(), messagesToSend(), newState())
             }
 
@@ -74,11 +79,12 @@ class Collektive<ID : Any, R>(
             localId: ID,
             network: Network<ID>,
             previousState: State = emptyMap(),
+            pathFactory: PathFactory = DigestHashingFactory(),
             compute: Aggregate<ID>.() -> R,
         ): AggregateResult<ID, R> =
-            with(AggregateContext(localId, network.read(), previousState)) {
+            with(AggregateContext(localId, network.currentInbound(), previousState, pathFactory)) {
                 AggregateResult(localId, compute(), messagesToSend(), newState()).also {
-                    network.write(it.toSend)
+                    network.deliverableFor(localId, it.toSend)
                 }
             }
     }

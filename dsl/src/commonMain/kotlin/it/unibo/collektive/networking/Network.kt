@@ -1,16 +1,21 @@
 package it.unibo.collektive.networking
 
 /**
- * Network interface for the aggregate computation.
+ * TODO.
  */
 interface Network<ID : Any> {
     /**
-     * Sends a [message] of type [OutboundMessage] to the neighbours.
+     * TODO.
      */
-    fun write(message: OutboundMessage<ID>)
+    fun deliverableFor(id: ID, outboundMessage: OutboundMessage<ID>): DeliverableMessage<ID, *>?
 
     /**
-     * Returns a set of [InboundMessage]s representing the received messages from the neighbours.
+     * TODO.
      */
-    fun read(): Collection<InboundMessage<ID>>
+    fun deliverableReceived(message: DeliverableMessage<ID, *>)
+
+    /**
+     * TODO.
+     */
+    fun currentInbound(): InboundMessage<ID>
 }

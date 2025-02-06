@@ -13,7 +13,7 @@ class IfConditionTest : StringSpec({
             aggregate(id0) {
                 if (true) neighboringViaExchange("test")
             }
-        val messageFor0 = result.toSend.messagesFor(id0)
+        val messageFor0 = result.toSend.deliverableMessageFor(id0).sharedData
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test")
     }
@@ -24,7 +24,7 @@ class IfConditionTest : StringSpec({
             aggregate(id0) {
                 if (customCondition) neighboringViaExchange("test")
             }
-        val messageFor0 = result.toSend.messagesFor(id0)
+        val messageFor0 = result.toSend.deliverableMessageFor(id0).sharedData
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test")
     }
@@ -35,7 +35,7 @@ class IfConditionTest : StringSpec({
             aggregate(id0) {
                 if (customFunction()) neighboringViaExchange("test")
             }
-        val messageFor0 = result.toSend.messagesFor(id0)
+        val messageFor0 = result.toSend.deliverableMessageFor(id0).sharedData
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test")
     }
@@ -47,7 +47,7 @@ class IfConditionTest : StringSpec({
             aggregate(id0) {
                 if (customCondition1 && customCondition2) neighboringViaExchange("test")
             }
-        val messageFor0 = result.toSend.messagesFor(id0)
+        val messageFor0 = result.toSend.deliverableMessageFor(id0).sharedData
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test")
     }
@@ -59,7 +59,7 @@ class IfConditionTest : StringSpec({
             aggregate(id0) {
                 if (customCondition1 || customCondition2) neighboringViaExchange("test")
             }
-        val messageFor0 = result.toSend.messagesFor(id0)
+        val messageFor0 = result.toSend.deliverableMessageFor(id0).sharedData
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test")
     }
@@ -71,7 +71,7 @@ class IfConditionTest : StringSpec({
             aggregate(id0) {
                 if (customCondition1 && !customCondition2) neighboringViaExchange("test")
             }
-        val messageFor0 = result.toSend.messagesFor(id0)
+        val messageFor0 = result.toSend.deliverableMessageFor(id0).sharedData
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test")
     }

@@ -19,7 +19,7 @@ class WhenTest : StringSpec({
                     else -> neighboringViaExchange("test")
                 }
             }
-        val messageFor0 = result.toSend.messagesFor(id0)
+        val messageFor0 = result.toSend.deliverableMessageFor(id0).sharedData
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("string")
     }
@@ -34,7 +34,7 @@ class WhenTest : StringSpec({
                     else -> neighboringViaExchange("test")
                 }
             }
-        val messageFor0 = result.toSend.messagesFor(id0)
+        val messageFor0 = result.toSend.deliverableMessageFor(id0).sharedData
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test")
     }
@@ -56,7 +56,7 @@ class WhenTest : StringSpec({
                     else -> test()
                 }
             }
-        val messageFor0 = result.toSend.messagesFor(id0)
+        val messageFor0 = result.toSend.deliverableMessageFor(id0).sharedData
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test2")
     }
@@ -75,7 +75,7 @@ class WhenTest : StringSpec({
                         }
                 }
             }
-        val messageFor0 = result.toSend.messagesFor(id0)
+        val messageFor0 = result.toSend.deliverableMessageFor(id0).sharedData
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test2")
     }

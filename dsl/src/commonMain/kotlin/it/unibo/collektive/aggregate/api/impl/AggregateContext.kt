@@ -8,12 +8,17 @@ import it.unibo.collektive.aggregate.api.impl.stack.Stack
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.field.ConstantField
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.networking.MessageProvider
+import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.OutboundMessage
-import it.unibo.collektive.networking.SingleOutboundMessage
+import it.unibo.collektive.networking.OutboundMessage.ToBeDefined
 import it.unibo.collektive.path.Path
+import it.unibo.collektive.path.PathFactory
 import it.unibo.collektive.state.State
 import it.unibo.collektive.state.impl.getTyped
+import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.serializer
 import kotlin.reflect.KClass
 
 /**
@@ -23,12 +28,15 @@ import kotlin.reflect.KClass
  */
 internal class AggregateContext<ID : Any>(
     override val localId: ID,
-    private val messageProvider: MessageProvider<ID>,
+    private val inboundMessage: InboundMessage<ID>,
     private val previousState: State,
+    pathFactory: PathFactory,
 ) : Aggregate<ID> {
-    private val stack = Stack()
+    private val stack = Stack(pathFactory)
     private var state: MutableMap<Path, Any?> = mutableMapOf()
-    private val toBeSent = OutboundMessage(messageProvider.neighbors.size, localId)
+    private val toBeSent: OutboundMessage<ID> = TODO() //OutboundMessage(inboundMessage.neighbors.size, localId)
+
+    fun pluto() = neighboring(Any(), Any::class)
 
     /**
      * Messages to send to the other nodes.
@@ -57,21 +65,21 @@ internal class AggregateContext<ID : Any>(
         body: YieldingScope<Field<ID, Init>, Field<ID, Ret>>,
     ): Field<ID, Ret> {
         val path: Path = stack.currentPath()
-        val messages = messageProvider.messageAt<Init>(path, kClass)
+        val messages = inboundMessage.dataAt<Init>(path, kClass)
         val previous = stateAt(path, initial)
         val subject = newField(previous, messages)
         val context = YieldingContext<Field<ID, Init>, Field<ID, Ret>>()
         return body(context, subject)
             .also {
                 val message =
-                    SingleOutboundMessage(
+                    ToBeDefined(
                         it.toSend.localValue,
                         when (it.toSend) {
                             is ConstantField<ID, Init> -> emptyMap()
                             else -> it.toSend.excludeSelf()
                         },
                     )
-                toBeSent.addMessage(path, message)
+                toBeSent.addData(path, message)
                 state += path to it.toSend.localValue
             }.toReturn
     }
@@ -91,12 +99,12 @@ internal class AggregateContext<ID : Any>(
     }
 
     override fun <Scalar> neighboring(
-        local: Scalar,
+        local: @Serializable Scalar,
         kClass: KClass<*>,
     ): Field<ID, Scalar> {
         val path = stack.currentPath()
-        val neighborValues = messageProvider.messageAt<Scalar>(path, kClass)
-        toBeSent.addMessage(path, SingleOutboundMessage(local))
+        val neighborValues = inboundMessage.dataAt<Scalar>(path, kClass)
+        toBeSent.addData(path, ToBeDefined(local))
         return newField(local, neighborValues)
     }
 
@@ -152,4 +160,15 @@ fun <ID : Any, T> Aggregate<ID>.project(field: Field<ID, T>): Field<ID, T> {
                 """.trimIndent().replace(Regex("'\\R"), " "),
             )
     }
+}
+
+data class Foo(val fo: Int)
+
+@OptIn(InternalSerializationApi::class)
+fun main() {
+    fun pippo(pp: @Serializable Foo, kClass: KClass<Foo>) {
+        println(Json.encodeToString(kClass.serializer(), pp))
+    }
+
+    pippo(Foo(3), Foo::class)
 }

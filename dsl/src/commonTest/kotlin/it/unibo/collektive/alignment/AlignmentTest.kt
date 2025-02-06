@@ -29,7 +29,7 @@ class AlignmentTest : StringSpec({
                 5
             }
         result.result shouldBe 5
-        val messageFor0 = result.toSend.messagesFor(0)
+        val messageFor0 = result.toSend.deliverableMessageFor(0).sharedData
         messageFor0 shouldHaveSize 4 // 4 paths of alignment
         messageFor0.values.toList() shouldBe listOf(10, 20, 5, 30)
     }
