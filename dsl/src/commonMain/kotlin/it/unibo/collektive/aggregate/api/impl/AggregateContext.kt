@@ -8,7 +8,7 @@ import it.unibo.collektive.aggregate.api.impl.stack.Stack
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.field.ConstantField
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.networking.InboundMessage
+import it.unibo.collektive.networking.MessageProvider
 import it.unibo.collektive.networking.OutboundMessage
 import it.unibo.collektive.networking.SingleOutboundMessage
 import it.unibo.collektive.path.Path
@@ -23,12 +23,12 @@ import kotlin.reflect.KClass
  */
 internal class AggregateContext<ID : Any>(
     override val localId: ID,
-    private val messages: Iterable<InboundMessage<ID>>,
+    private val messageProvider: MessageProvider<ID>,
     private val previousState: State,
 ) : Aggregate<ID> {
     private val stack = Stack()
     private var state: MutableMap<Path, Any?> = mutableMapOf()
-    private val toBeSent = OutboundMessage(messages.count(), localId)
+    private val toBeSent = OutboundMessage(messageProvider.neighbors.size, localId)
 
     /**
      * Messages to send to the other nodes.
@@ -57,7 +57,7 @@ internal class AggregateContext<ID : Any>(
         body: YieldingScope<Field<ID, Init>, Field<ID, Ret>>,
     ): Field<ID, Ret> {
         val path: Path = stack.currentPath()
-        val messages = messagesAt<Init>(path)
+        val messages = messageProvider.messageAt<Init>(path, kClass)
         val previous = stateAt(path, initial)
         val subject = newField(previous, messages)
         val context = YieldingContext<Field<ID, Init>, Field<ID, Ret>>()
@@ -95,7 +95,7 @@ internal class AggregateContext<ID : Any>(
         kClass: KClass<*>,
     ): Field<ID, Scalar> {
         val path = stack.currentPath()
-        val neighborValues = messagesAt<Scalar>(path)
+        val neighborValues = messageProvider.messageAt<Scalar>(path, kClass)
         toBeSent.addMessage(path, SingleOutboundMessage(local))
         return newField(local, neighborValues)
     }
@@ -122,18 +122,6 @@ internal class AggregateContext<ID : Any>(
     override fun align(pivot: Any?) = stack.alignRaw(pivot)
 
     override fun dealign() = stack.dealign()
-
-    @Suppress("UNCHECKED_CAST")
-    private fun <T> messagesAt(path: Path): Map<ID, T> =
-        messages
-            .mapNotNull { received ->
-                received.messages
-                    .getOrElse(path) { NoEntry }
-                    .takeIf { it != NoEntry }
-                    ?.let { received.senderId to it as T }
-            }.associate { it }
-
-    private object NoEntry
 
     private fun <T> stateAt(
         path: Path,
