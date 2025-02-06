@@ -5,6 +5,7 @@ configureKotlinMultiplatform()
 kotlinMultiplatform {
     sourceSets {
         commonMain.dependencies {
+            implementation(libs.arrow.core)
             implementation(libs.hash.sha3)
             implementation(libs.kotlinx.serialization)
         }
