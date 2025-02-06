@@ -14,14 +14,33 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.jvm.JvmInline
 
+/**
+ * A factory that creates [Path] instances by hashing their content.
+ */
 interface Digest {
+    /**
+     * Updates the digest with the given [data].
+     */
     fun update(data: ByteArray)
+
+    /**
+     * Returns the digest of the data passed to [update].
+     */
     fun digest(): ByteArray
+
+    /**
+     * Returns the digest as a string.
+     */
     fun digestToString(): String
 }
 
+/**
+ * A factory that creates [Path] instances by hashing their content with a specific [backend].
+ */
 @JvmInline
-value class KotlinCryptoDigest(val backend: org.kotlincrypto.core.digest.Digest) : Digest {
+value class KotlinCryptoDigest(
+    val backend: org.kotlincrypto.core.digest.Digest,
+) : Digest {
     override fun update(data: ByteArray) {
         backend.update(data)
     }
@@ -34,10 +53,16 @@ value class KotlinCryptoDigest(val backend: org.kotlincrypto.core.digest.Digest)
     }
 }
 
+/**
+ * A factory that creates [Path] instances by hashing their content with a specific [digest].
+ */
 @JvmInline
-value class DigestHashingFactory(val digest: Digest = KotlinCryptoDigest(Keccak512())) : PathFactory {
+value class DigestHashingFactory(
+    val digest: Digest = KotlinCryptoDigest(Keccak512()),
+) : PathFactory {
     override fun invoke(tokens: List<Any?>): Path {
         val hashedTokens = digest.apply { tokens.hashable().forEach { digest(it) } }.digest()
+
         @OptIn(ExperimentalEncodingApi::class)
         val base64encoding = Base64.encode(hashedTokens)
         return SerializablePath(base64encoding)

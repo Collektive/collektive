@@ -6,23 +6,14 @@ import it.unibo.collektive.networking.Network
 import it.unibo.collektive.networking.OutboundMessage
 
 class NetworkImplTest(private val networkManager: NetworkManager, private val localId: Int) : Network<Int> {
-    //    override fun write(message: OutboundMessage<Int>) {
-//        networkManager.send(message)
-//    }
-//
-//    override fun read(): Collection<InboundMessage<Int>> = networkManager.receive(localId)
     override fun deliverableFor(
         id: Int,
-        outboundMessage: OutboundMessage<Int>
-    ): DeliverableMessage<Int, *>? {
-        TODO("Not yet implemented")
-    }
+        outboundMessage: OutboundMessage<Int>,
+    ) = networkManager.send(id, outboundMessage)
 
     override fun deliverableReceived(message: DeliverableMessage<Int, *>) {
-        TODO("Not yet implemented")
+        error("This network is supposed to be in-memory, no need to deliver messages since it is already in the buffer")
     }
 
-    override fun currentInbound(): InboundMessage<Int> {
-        TODO("Not yet implemented")
-    }
+    override fun currentInbound(): InboundMessage<Int> = networkManager.receiveMessageFor(localId)
 }

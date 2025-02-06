@@ -10,15 +10,11 @@ import it.unibo.collektive.field.ConstantField
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.OutboundMessage
-import it.unibo.collektive.networking.OutboundMessage.ToBeDefined
+import it.unibo.collektive.networking.OutboundMessage.SharedData
 import it.unibo.collektive.path.Path
 import it.unibo.collektive.path.PathFactory
 import it.unibo.collektive.state.State
 import it.unibo.collektive.state.impl.getTyped
-import kotlinx.serialization.InternalSerializationApi
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.serializer
 import kotlin.reflect.KClass
 
 /**
@@ -34,9 +30,7 @@ internal class AggregateContext<ID : Any>(
 ) : Aggregate<ID> {
     private val stack = Stack(pathFactory)
     private var state: MutableMap<Path, Any?> = mutableMapOf()
-    private val toBeSent: OutboundMessage<ID> = TODO() //OutboundMessage(inboundMessage.neighbors.size, localId)
-
-    fun pluto() = neighboring(Any(), Any::class)
+    private val toBeSent: OutboundMessage<ID> = OutboundMessage(inboundMessage.neighbors.size)
 
     /**
      * Messages to send to the other nodes.
@@ -72,7 +66,7 @@ internal class AggregateContext<ID : Any>(
         return body(context, subject)
             .also {
                 val message =
-                    ToBeDefined(
+                    SharedData(
                         it.toSend.localValue,
                         when (it.toSend) {
                             is ConstantField<ID, Init> -> emptyMap()
@@ -99,12 +93,12 @@ internal class AggregateContext<ID : Any>(
     }
 
     override fun <Scalar> neighboring(
-        local: @Serializable Scalar,
+        local: Scalar,
         kClass: KClass<*>,
     ): Field<ID, Scalar> {
         val path = stack.currentPath()
         val neighborValues = inboundMessage.dataAt<Scalar>(path, kClass)
-        toBeSent.addData(path, ToBeDefined(local))
+        toBeSent.addData(path, SharedData(local))
         return newField(local, neighborValues)
     }
 
@@ -160,15 +154,4 @@ fun <ID : Any, T> Aggregate<ID>.project(field: Field<ID, T>): Field<ID, T> {
                 """.trimIndent().replace(Regex("'\\R"), " "),
             )
     }
-}
-
-data class Foo(val fo: Int)
-
-@OptIn(InternalSerializationApi::class)
-fun main() {
-    fun pippo(pp: @Serializable Foo, kClass: KClass<Foo>) {
-        println(Json.encodeToString(kClass.serializer(), pp))
-    }
-
-    pippo(Foo(3), Foo::class)
 }

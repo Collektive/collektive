@@ -10,6 +10,12 @@ package it.unibo.collektive.path
 
 import it.unibo.collektive.path.impl.FullPath
 
+/**
+ * A factory that creates [Path] instances by concatenating their content.
+ */
 object FullPathFactory : PathFactory {
+    /**
+     * Creates a [Path] instance by concatenating the given [tokens].
+     */
     override fun invoke(tokens: List<Any?>): Path = FullPath(tokens)
 }

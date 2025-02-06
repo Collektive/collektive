@@ -10,9 +10,13 @@ import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
 import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
 import it.unibo.collektive.field.Field
+import it.unibo.collektive.networking.DeliverableMessage
+import it.unibo.collektive.networking.EmptyInboundMessage
 import it.unibo.collektive.networking.InboundMessage
 import it.unibo.collektive.networking.Network
 import it.unibo.collektive.networking.OutboundMessage
+import it.unibo.collektive.path.Path
+import kotlin.reflect.KClass
 
 /**
  * Representation of a Collektive device in Alchemist.
@@ -30,7 +34,7 @@ class CollektiveDevice<P>(
     DistanceSensor where P : Position<P> {
     private data class TimedMessage(
         val receivedAt: Time,
-        val payload: InboundMessage<Int>,
+        val payload: DeliverableMessage<Int, *>,
     )
 
     /**
@@ -47,7 +51,7 @@ class CollektiveDevice<P>(
 
     private fun receiveMessage(
         time: Time,
-        message: InboundMessage<Int>,
+        message: DeliverableMessage<Int, *>,
     ) {
         validMessages += TimedMessage(time, message)
     }
@@ -63,36 +67,58 @@ class CollektiveDevice<P>(
     override fun cloneOnNewNode(node: Node<Any?>): NodeProperty<Any?> =
         CollektiveDevice(environment, node, retainMessagesFor)
 
-    override fun read(): Collection<InboundMessage<Int>> =
-        when {
-            validMessages.isEmpty() -> emptyList()
-            retainMessagesFor == null ->
-                validMessages.map { it.payload }.also { validMessages.clear() }
-
-            else -> {
-                validMessages.retainAll { it.receivedAt + retainMessagesFor >= currentTime }
-                validMessages.map { it.payload }
-            }
-        }
-
-    override fun write(message: OutboundMessage<Int>) {
-        if (message.isNotEmpty()) {
-            val neighboringNodes = environment.getNeighborhood(node)
-            if (!neighboringNodes.isEmpty) {
+    override fun deliverableFor(
+        id: Int,
+        outboundMessage: OutboundMessage<Int>,
+    ) {
+        if (outboundMessage.isNotEmpty()) {
+            val neighborsNodes = environment.getNeighborhood(node)
+            if (!neighborsNodes.isEmpty) {
                 val neighborhood =
-                    neighboringNodes.mapNotNull { node ->
+                    neighborsNodes.mapNotNull { node ->
                         @Suppress("UNCHECKED_CAST")
                         node.properties.firstOrNull { it is CollektiveDevice<*> } as? CollektiveDevice<P>
                     }
                 neighborhood.forEach { neighbor ->
-                    neighbor.receiveMessage(
-                        currentTime,
-                        InboundMessage(message.senderId, message.messagesFor(neighbor.id)),
-                    )
+                    neighbor.deliverableReceived(outboundMessage.deliverableMessageFor(node.id))
                 }
             }
         }
     }
+
+    override fun deliverableReceived(message: DeliverableMessage<Int, *>) {
+        receiveMessage(currentTime, message)
+    }
+
+    override fun currentInbound(): InboundMessage<Int> {
+        if (validMessages.isEmpty()) {
+            return EmptyInboundMessage()
+        }
+        val messages: List<DeliverableMessage<Int, *>> =
+            when {
+                retainMessagesFor == null -> validMessages.map { it.payload }.also { validMessages.clear() }
+                else -> {
+                    validMessages.retainAll { it.receivedAt + retainMessagesFor >= currentTime }
+                    validMessages.map { it.payload }
+                }
+            }
+        return object : InboundMessage<Int> {
+            override val neighbors: Set<Int> get() = messages.map { it.senderId }.toSet()
+
+            @Suppress("UNCHECKED_CAST")
+            override fun <Value> dataAt(
+                path: Path,
+                kClass: KClass<*>,
+            ): Map<Int, Value> =
+                messages
+                    .associate { it.senderId to it }
+                    .mapValues { (_, message) ->
+                        message.sharedData.getOrElse(path) { NoValue } as Value
+                    }.filter { it.value != NoValue }
+        }
+    }
+
+    private object NoValue
 
     @Suppress("UNCHECKED_CAST")
     override fun <T> get(name: String): T = node.getConcentration(SimpleMolecule(name)) as T

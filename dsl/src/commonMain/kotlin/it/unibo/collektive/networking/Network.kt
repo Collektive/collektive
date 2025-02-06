@@ -7,7 +7,10 @@ interface Network<ID : Any> {
     /**
      * TODO.
      */
-    fun deliverableFor(id: ID, outboundMessage: OutboundMessage<ID>): DeliverableMessage<ID, *>?
+    fun deliverableFor(
+        id: ID,
+        outboundMessage: OutboundMessage<ID>,
+    )
 
     /**
      * TODO.

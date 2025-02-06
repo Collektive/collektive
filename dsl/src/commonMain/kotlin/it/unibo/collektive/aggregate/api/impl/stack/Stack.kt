@@ -27,7 +27,6 @@ internal interface Stack {
         /**
          * Smart constructor for the [Stack] interface.
          */
-        internal operator fun invoke(pathFactory: PathFactory = FullPathFactory): Stack =
-            StackDeque(pathFactory)
+        internal operator fun invoke(pathFactory: PathFactory = FullPathFactory): Stack = StackDeque(pathFactory)
     }
 }

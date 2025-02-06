@@ -55,7 +55,7 @@ class CollektiveTest : StringSpec({
     "Collektive compute function can be a val" {
         val networkManager = NetworkManager()
         val network0 = NetworkImplTest(networkManager, id0)
-        val collectiveDevice = Collektive(id0, network0, computeFunction =  computeFunctionDevice0)
+        val collectiveDevice = Collektive(id0, network0, computeFunction = computeFunctionDevice0)
 
         val result = collectiveDevice.cycle()
         result shouldBe 3

@@ -15,9 +15,9 @@ import it.unibo.collektive.path.Path
  */
 interface OutboundMessage<ID : Any> {
     /**
-     * TODO.
+     * Shared data holding a [default] value and [overrides] for each [ID].
      */
-    data class ToBeDefined<ID : Any, Value>(
+    data class SharedData<ID : Any, Value>(
         val default: Value,
         val overrides: Map<ID, Value> = emptyMap(),
     )
@@ -25,38 +25,73 @@ interface OutboundMessage<ID : Any> {
     /**
      * TODO.
      */
-    fun <Value> addData(path: Path, data: ToBeDefined<ID, Value>)
+    fun <Value> addData(
+        path: Path,
+        data: SharedData<ID, Value>,
+    )
 
-    fun deliverableMessageFor(id: ID): DeliverableMessage<ID, *>
+    /**
+     * TODO.
+     */
+    fun deliverableMessageFor(
+        id: ID,
+        factory: DeliverableMessageFactory<ID, Any?> = InMemoryDeliverableMessageFactory(),
+    ): DeliverableMessage<ID, Any?>
 
-//    /**
-//     * TODO.
-//     */
-//    companion object {
-//        /**
-//         * TODO.
-//         */
-//        internal operator fun <ID : Any> invoke(
-//            expectedSize: Int,
-//        ): OutboundMessage<ID> = object : OutboundMessage<ID> {
-//            private val defaults: MutableMap<Path, Any?> = LinkedHashMap(expectedSize * 2)
-//            private val overrides: MutableMap<ID, MutableList<Pair<Path, Any?>>> = LinkedHashMap(expectedSize * 2)
-//            override fun <Value> addData(path: Path, data: ToBeDefined<ID, Value>) {
-//                check(!defaults.containsKey(path)) {
-//                    """
-//                    Aggregate alignment clash originated at the same path: $path.
-//                    Possible causes are:
-//                        - compiler plugin is not enabled,
-//                        - multiple aligned calls. The most likely cause is an aggregate function call within a loop without proper manual alignment.
-//                    If none of the above, please open an issue at https://github.com/Collektive/collektive/issues .
-//                    """.trimIndent()
-//                }
-//                defaults[path] = data.default
-//                data.overrides.forEach { (id, value) ->
-//                    val destination = overrides.getOrPut(id) { mutableListOf() }
-//                    destination += path to value
-//                }
-//            }
-//        }
-//    }
+    /**
+     * TODO.
+     */
+    fun isEmpty(): Boolean
+
+    /**
+     * TODO.
+     */
+    fun isNotEmpty(): Boolean
+
+    /**
+     * TODO.
+     */
+    companion object {
+        /**
+         * TODO.
+         */
+        internal operator fun <ID : Any> invoke(expectedSize: Int): OutboundMessage<ID> =
+            object : OutboundMessage<ID> {
+                private val defaults: MutableMap<Path, Any?> = LinkedHashMap(expectedSize * 2)
+                private val overrides: MutableMap<ID, MutableList<Pair<Path, Any?>>> = LinkedHashMap(expectedSize * 2)
+
+                override fun <Value> addData(
+                    path: Path,
+                    data: SharedData<ID, Value>,
+                ) {
+                    check(!defaults.containsKey(path)) {
+                        """
+                        Aggregate alignment clash originated at the same path: $path.
+                        Possible causes are:
+                            - compiler plugin is not enabled,
+                            - multiple aligned calls. The most likely cause is an aggregate function call within a loop without proper manual alignment.
+                        If none of the above, please open an issue at https://github.com/Collektive/collektive/issues .
+                        """.trimIndent()
+                    }
+                    defaults[path] = data.default
+                    data.overrides.forEach { (id, value) ->
+                        val destination = overrides.getOrPut(id) { mutableListOf() }
+                        destination += path to value
+                    }
+                }
+
+                override fun deliverableMessageFor(
+                    id: ID,
+                    factory: DeliverableMessageFactory<ID, Any?>,
+                ): DeliverableMessage<ID, Any?> =
+                    factory(
+                        id,
+                        overrides[id]?.toMap() ?: defaults,
+                    )
+
+                override fun isEmpty(): Boolean = defaults.isEmpty()
+
+                override fun isNotEmpty(): Boolean = defaults.isNotEmpty()
+            }
+    }
 }

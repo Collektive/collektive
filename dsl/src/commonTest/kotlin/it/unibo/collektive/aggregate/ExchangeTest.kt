@@ -1,6 +1,5 @@
 package it.unibo.collektive.aggregate
 
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
@@ -12,13 +11,15 @@ import it.unibo.collektive.field.Field
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
+import kotlin.test.Test
 
-class ExchangeTest : StringSpec({
+class ExchangeTest {
     val increaseOrDouble: (Field<Int, Int>) -> Field<Int, Int> = { f ->
         f.mapWithId { _, v -> if (v % 2 == 0) v + 1 else v * 2 }
     }
 
-    "First time exchange should return the initial value" {
+    @Test
+    fun `First time exchange should return the initial value`() {
         val result =
             aggregate(0) {
                 val res = exchange(1, increaseOrDouble)
@@ -29,7 +30,8 @@ class ExchangeTest : StringSpec({
         messages.values.toList() shouldBe listOf(2)
     }
 
-    "Exchange should work between three aligned devices" {
+    @Test
+    fun `Exchange should work between three aligned devices`() {
         val networkManager = NetworkManager()
 
         // Device 1
@@ -38,7 +40,7 @@ class ExchangeTest : StringSpec({
             aggregate(1, testNetwork1) {
                 val res1 = exchange(1, increaseOrDouble)
                 val res2 = exchange(2, increaseOrDouble)
-                testNetwork1.read() shouldHaveSize 0
+                testNetwork1.currentInbound().neighbors shouldHaveSize 0
                 res1.localValue shouldBe 2
                 res2.localValue shouldBe 3
             }
@@ -82,7 +84,8 @@ class ExchangeTest : StringSpec({
         messagesFrom3To2.values.toList() shouldBe listOf(7, 10)
     }
 
-    "Exchange can yield a result but return a different value" {
+    @Test
+    fun `Exchange can yield a result but return a different value`() {
         val result =
             aggregate(0) {
                 val xcRes =
@@ -97,7 +100,8 @@ class ExchangeTest : StringSpec({
         messages.values.toList() shouldBe listOf(2)
     }
 
-    "Exchange can yield a result of nullable values" {
+    @Test
+    fun `Exchange can yield a result of nullable values`() {
         val result =
             aggregate(0) {
                 val xcRes =
@@ -112,7 +116,8 @@ class ExchangeTest : StringSpec({
         messages.values.toList() shouldBe listOf(2)
     }
 
-    "Exchange should produce a message with no overrides when producing a constant field" {
+    @Test
+    fun `Exchange should produce a message with no overrides when producing a constant field`() {
         val programUnderTest: Aggregate<Int>.() -> Unit = {
             exchanging(0) {
                 it.mapToConstantField(10).yielding { it.mapToConstantField("singleton") }
@@ -124,15 +129,15 @@ class ExchangeTest : StringSpec({
         (0..5).forEach { iteration ->
             val id = iteration % 3
             val res =
-                aggregate(id, emptyMap(), networkManager.receive(id), programUnderTest)
-                    .also { networkManager.send(it.toSend) }
-            val toUnknown = res.toSend.messagesFor(Int.MIN_VALUE)
+                aggregate(id, emptyMap(), networkManager.receiveMessageFor(id), compute = programUnderTest)
+                    .also { networkManager.send(id, it.toSend) }
+            val toUnknown = res.toSend.deliverableMessageFor(Int.MIN_VALUE).sharedData
             toUnknown shouldHaveSize 1
-            val next = res.toSend.messagesFor((id + 1) % 3)
-            val previous = res.toSend.messagesFor((id + 2) % 3)
+            val next = res.toSend.deliverableMessageFor((id + 1) % 3).sharedData
+            val previous = res.toSend.deliverableMessageFor((id + 2) % 3).sharedData
             // When a constant field is used, the map of overrides should be empty
             next shouldBe toUnknown
             previous shouldBe toUnknown
         }
     }
-})
+}

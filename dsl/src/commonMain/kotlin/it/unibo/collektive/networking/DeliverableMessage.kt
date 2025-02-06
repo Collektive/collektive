@@ -12,7 +12,7 @@ import it.unibo.collektive.path.Path
 import kotlinx.serialization.Serializable
 
 /**
- * TODO.
+ * A message meant to be delivered in a communication medium, containing a [senderId] and [sharedData].
  */
 sealed interface DeliverableMessage<ID : Any, Payload> {
     val senderId: ID
@@ -20,15 +20,25 @@ sealed interface DeliverableMessage<ID : Any, Payload> {
 }
 
 /**
- * TODO.
+ * A message specifically designed to be delivered in a in-memory fashion, containing a [senderId] and [sharedData].
  */
-data class InMemoryDeliverableMessage<ID : Any, Payload>(
+data class InMemoryDeliverableMessage<ID : Any>(
     override val senderId: ID,
-    override val sharedData: Map<Path, Payload>,
-) : DeliverableMessage<ID, Payload>
+    override val sharedData: Map<Path, Any?>,
+) : DeliverableMessage<ID, Any?>
 
 /**
  * TODO.
+ */
+class InMemoryDeliverableMessageFactory<ID : Any> : DeliverableMessageFactory<ID, Any?> {
+    override fun invoke(
+        senderId: ID,
+        sharedData: Map<Path, Any?>,
+    ): DeliverableMessage<ID, Any?> = InMemoryDeliverableMessage(senderId, sharedData)
+}
+
+/**
+ * Serialized message meant to be sent over the network containing a [senderId] and [sharedData].
  */
 @Serializable
 data class SerializedDeliverableMessage<ID : Any>(

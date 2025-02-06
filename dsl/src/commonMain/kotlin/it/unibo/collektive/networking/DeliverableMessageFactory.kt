@@ -6,17 +6,19 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
-package it.unibo.collektive.path.impl
+package it.unibo.collektive.networking
 
 import it.unibo.collektive.path.Path
-import kotlinx.serialization.Serializable
-import kotlin.jvm.JvmInline
 
 /**
- * Serializable [Path] implementation that wraps a [backend] object.
+ * Factory for creating [DeliverableMessage] instances.
  */
-@JvmInline
-@Serializable
-value class SerializablePath<T>(
-    val backend: T,
-) : Path
+interface DeliverableMessageFactory<ID : Any, Payload> {
+    /**
+     * Creates a [DeliverableMessage] instance with the given [senderId] and [sharedData].
+     */
+    operator fun invoke(
+        senderId: ID,
+        sharedData: Map<Path, Payload>,
+    ): DeliverableMessage<ID, Payload>
+}
