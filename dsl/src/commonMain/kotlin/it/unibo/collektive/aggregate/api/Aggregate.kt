@@ -99,6 +99,26 @@ interface Aggregate<ID : Any> {
     ): Field<ID, Scalar>
 
     /**
+     * Observes the value of an expression [local] across neighbours.
+     *
+     * ## Example
+     *
+     * ```kotlin
+     * val field = neighboring(0)
+     * ```
+     *
+     * The field returned has as local value the value passed as input (0 in this example).
+     *
+     * ```kotlin
+     * val field = neighboring({ 2 * 2 })
+     * ```
+     *
+     * In this case, the field returned has the computation as a result,
+     * in form of a field of functions with type `() -> Int`.
+     */
+    fun <Scalar : Any> neighboring(local: Scalar): Field<ID, Scalar> = neighboring(local, local::class)
+
+    /**
      * Alignment function that pushes in the stack the pivot, executes the body and pop the last
      * element of the stack after it is called.
      * Returns the body's return element.
