@@ -1,11 +1,11 @@
 package it.unibo.collektive.aggregate.api.impl
 
 import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
 import it.unibo.collektive.aggregate.api.YieldingContext
 import it.unibo.collektive.aggregate.api.YieldingResult
 import it.unibo.collektive.aggregate.api.YieldingScope
 import it.unibo.collektive.aggregate.api.impl.stack.Stack
-import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.field.ConstantField
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.NeighborsData
@@ -145,7 +145,7 @@ internal class AggregateContext<ID : Any>(
  *
  */
 fun <ID : Any, T> Aggregate<ID>.project(field: Field<ID, T>): Field<ID, T> {
-    val others = neighboringViaExchange(0.toByte())
+    val others = neighboring(0.toByte())
     return when {
         field.neighborsCount == others.neighborsCount -> field
         field.neighborsCount > others.neighborsCount -> others.mapWithId { id, _ -> field[id] }
