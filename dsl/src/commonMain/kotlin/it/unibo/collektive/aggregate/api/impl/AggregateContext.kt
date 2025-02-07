@@ -19,7 +19,7 @@ import kotlin.reflect.KClass
 
 /**
  * Context for managing aggregate computation.
- * It represents the [localId] of the device, the [messages] received from the neighbours,
+ * It represents the [localId] of the device, the [inboundMessage] received from the neighbours,
  * and the [previousState] of the device.
  */
 internal class AggregateContext<ID : Any>(
