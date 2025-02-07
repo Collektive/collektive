@@ -132,13 +132,17 @@ internal class AggregateContext<ID : Any>(
 }
 
 /**
- * Projects the field into the current context.
- * This method is meant to be used internally by the Collektive compiler plugin and,
- * unless there is some major bug that needs to be worked around with a kludge,
- * it should never be called, as it incurs in a performance penalty
- * both in computation and message size.
+ * Projects the field into the current context, restricting the field to the current context.
+ *
  * A field may be misaligned if captured by a sub-scope which contains an alignment operation.
  * This function takes such [field] and restricts it to be aligned with the current neighbors.
+ *
+ * This method is meant to be used internally by the Collektive compiler plugin
+ * and should never be called from the outside.
+ *
+ * If you happen to call it, be aware that you are probably building a terrible kludge that will
+ * break sooner or later.
+ *
  */
 fun <ID : Any, T> Aggregate<ID>.project(field: Field<ID, T>): Field<ID, T> {
     val others = neighboringViaExchange(0.toByte())
