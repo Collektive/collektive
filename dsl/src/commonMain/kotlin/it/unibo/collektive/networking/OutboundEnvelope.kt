@@ -9,6 +9,7 @@
 package it.unibo.collektive.networking
 
 import it.unibo.collektive.path.Path
+import kotlin.reflect.KClass
 
 /**
  * TODO.
@@ -28,6 +29,7 @@ interface OutboundEnvelope<ID : Any> {
     fun <Value> addData(
         path: Path,
         data: SharedData<ID, Value>,
+        valueRepresentation: KClass<*>,
     )
 
     /**
@@ -35,7 +37,7 @@ interface OutboundEnvelope<ID : Any> {
      */
     fun prepareMessageFor(
         id: ID,
-        factory: MessageFactory<ID, Any?> = InMemoryMessageFactory(),
+        factory: MessageFactory<ID, Any?, Any?> = InMemoryMessageFactory(),
     ): Message<ID, Any?>
 
     /**
@@ -57,12 +59,14 @@ interface OutboundEnvelope<ID : Any> {
          */
         internal operator fun <ID : Any> invoke(expectedSize: Int): OutboundEnvelope<ID> =
             object : OutboundEnvelope<ID> {
-                private val defaults: MutableMap<Path, Any?> = LinkedHashMap(expectedSize * 2)
-                private val overrides: MutableMap<ID, MutableList<Pair<Path, Any?>>> = LinkedHashMap(expectedSize * 2)
+                private val defaults: MutableMap<Path, PayloadRepresentation<Any?>> = LinkedHashMap(expectedSize * 2)
+                private val overrides: MutableMap<ID, MutableList<Pair<Path, PayloadRepresentation<Any?>>>> =
+                    LinkedHashMap(expectedSize * 2)
 
                 override fun <Value> addData(
                     path: Path,
                     data: SharedData<ID, Value>,
+                    valueRepresentation: KClass<*>,
                 ) {
                     check(!defaults.containsKey(path)) {
                         """
@@ -73,16 +77,16 @@ interface OutboundEnvelope<ID : Any> {
                         If none of the above, please open an issue at https://github.com/Collektive/collektive/issues .
                         """.trimIndent()
                     }
-                    defaults[path] = data.default
+                    defaults[path] = PayloadRepresentation(data.default, valueRepresentation)
                     data.overrides.forEach { (id, value) ->
                         val destination = overrides.getOrPut(id) { mutableListOf() }
-                        destination += path to value
+                        destination += path to PayloadRepresentation(value, valueRepresentation)
                     }
                 }
 
                 override fun prepareMessageFor(
                     id: ID,
-                    factory: MessageFactory<ID, Any?>,
+                    factory: MessageFactory<ID, Any?, Any?>,
                 ): Message<ID, Any?> =
                     factory(
                         id,

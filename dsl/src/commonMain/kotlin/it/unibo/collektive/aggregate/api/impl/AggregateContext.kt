@@ -73,7 +73,7 @@ internal class AggregateContext<ID : Any>(
                             else -> it.toSend.excludeSelf()
                         },
                     )
-                toBeSent.addData(path, message)
+                toBeSent.addData(path, message, kClass)
                 state += path to it.toSend.localValue
             }.toReturn
     }
@@ -98,7 +98,7 @@ internal class AggregateContext<ID : Any>(
     ): Field<ID, Scalar> {
         val path = stack.currentPath()
         val neighborValues = inboundMessage.dataAt<Scalar>(path, kClass)
-        toBeSent.addData(path, SharedData(local))
+        toBeSent.addData(path, SharedData(local), kClass)
         return newField(local, neighborValues)
     }
 
