@@ -1,8 +1,8 @@
 package it.unibo.collektive.network
 
-import it.unibo.collektive.networking.DeliverableMessage
-import it.unibo.collektive.networking.InboundMessage
-import it.unibo.collektive.networking.OutboundMessage
+import it.unibo.collektive.networking.Message
+import it.unibo.collektive.networking.NeighborsData
+import it.unibo.collektive.networking.OutboundEnvelope
 import it.unibo.collektive.path.Path
 import kotlin.reflect.KClass
 
@@ -10,24 +10,24 @@ import kotlin.reflect.KClass
  * A fully connected virtual network.
  */
 class NetworkManager {
-    private var messageBuffer: Map<Int, DeliverableMessage<Int, *>> = emptyMap()
+    private var messageBuffer: Map<Int, Message<Int, *>> = emptyMap()
 
     /**
      * Adds the [message] to the message buffer.
      */
     fun send(
         id: Int,
-        message: OutboundMessage<Int>,
+        message: OutboundEnvelope<Int>,
     ) {
-        val deliverableMessage = message.deliverableMessageFor(id)
+        val deliverableMessage = message.prepareMessageFor(id)
         messageBuffer += id to deliverableMessage
     }
 
     /**
      * Return the messages directed to a specific [receiverId].
      */
-    fun receiveMessageFor(receiverId: Int): InboundMessage<Int> =
-        object : InboundMessage<Int> {
+    fun receiveMessageFor(receiverId: Int): NeighborsData<Int> =
+        object : NeighborsData<Int> {
             private val neighborDeliverableMessages by lazy { messageBuffer.filter { it.key != receiverId } }
             override val neighbors: Set<Int> get() = neighborDeliverableMessages.keys
 

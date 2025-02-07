@@ -8,9 +8,9 @@ import it.unibo.collektive.aggregate.api.impl.stack.Stack
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.field.ConstantField
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.networking.InboundMessage
-import it.unibo.collektive.networking.OutboundMessage
-import it.unibo.collektive.networking.OutboundMessage.SharedData
+import it.unibo.collektive.networking.NeighborsData
+import it.unibo.collektive.networking.OutboundEnvelope
+import it.unibo.collektive.networking.OutboundEnvelope.SharedData
 import it.unibo.collektive.path.Path
 import it.unibo.collektive.path.PathFactory
 import it.unibo.collektive.state.State
@@ -24,18 +24,18 @@ import kotlin.reflect.KClass
  */
 internal class AggregateContext<ID : Any>(
     override val localId: ID,
-    private val inboundMessage: InboundMessage<ID>,
+    private val inboundMessage: NeighborsData<ID>,
     private val previousState: State,
     pathFactory: PathFactory,
 ) : Aggregate<ID> {
     private val stack = Stack(pathFactory)
     private var state: MutableMap<Path, Any?> = mutableMapOf()
-    private val toBeSent: OutboundMessage<ID> = OutboundMessage(inboundMessage.neighbors.size)
+    private val toBeSent: OutboundEnvelope<ID> = OutboundEnvelope(inboundMessage.neighbors.size)
 
     /**
      * Messages to send to the other nodes.
      */
-    fun messagesToSend(): OutboundMessage<ID> = toBeSent
+    fun messagesToSend(): OutboundEnvelope<ID> = toBeSent
 
     /**
      * Return the current state of the device as a new state.

@@ -11,14 +11,14 @@ package it.unibo.collektive.networking
 import it.unibo.collektive.path.Path
 
 /**
- * Factory for creating [DeliverableMessage] instances.
+ * Factory for creating [Message] instances.
  */
-interface DeliverableMessageFactory<ID : Any, Payload> {
+interface MessageFactory<ID : Any, Payload> {
     /**
-     * Creates a [DeliverableMessage] instance with the given [senderId] and [sharedData].
+     * Creates a [Message] instance with the given [senderId] and [sharedData].
      */
     operator fun invoke(
         senderId: ID,
         sharedData: Map<Path, Payload>,
-    ): DeliverableMessage<ID, Payload>
+    ): Message<ID, Payload>
 }

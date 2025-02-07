@@ -3,22 +3,22 @@ package it.unibo.collektive.networking
 /**
  * TODO.
  */
-interface Network<ID : Any> {
+interface Mailbox<ID : Any> {
     /**
      * TODO.
      */
     fun deliverableFor(
         id: ID,
-        outboundMessage: OutboundMessage<ID>,
+        outboundMessage: OutboundEnvelope<ID>,
     )
 
     /**
      * TODO.
      */
-    fun deliverableReceived(message: DeliverableMessage<ID, *>)
+    fun deliverableReceived(message: Message<ID, *>)
 
     /**
      * TODO.
      */
-    fun currentInbound(): InboundMessage<ID>
+    fun currentInbound(): NeighborsData<ID>
 }

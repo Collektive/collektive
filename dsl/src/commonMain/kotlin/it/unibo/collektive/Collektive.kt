@@ -3,9 +3,9 @@ package it.unibo.collektive
 import it.unibo.collektive.aggregate.AggregateResult
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.impl.AggregateContext
-import it.unibo.collektive.networking.EmptyInboundMessage
-import it.unibo.collektive.networking.InboundMessage
-import it.unibo.collektive.networking.Network
+import it.unibo.collektive.networking.Mailbox
+import it.unibo.collektive.networking.NeighborsData
+import it.unibo.collektive.networking.NoNeighborsData
 import it.unibo.collektive.path.DigestHashingFactory
 import it.unibo.collektive.path.PathFactory
 import it.unibo.collektive.state.State
@@ -16,7 +16,7 @@ import it.unibo.collektive.state.State
  */
 class Collektive<ID : Any, R>(
     val localId: ID,
-    private val network: Network<ID>,
+    private val network: Mailbox<ID>,
     private val pathFactory: PathFactory = DigestHashingFactory(),
     private val computeFunction: Aggregate<ID>.() -> R,
 ) {
@@ -62,7 +62,7 @@ class Collektive<ID : Any, R>(
         fun <ID : Any, R> aggregate(
             localId: ID,
             previousState: State = emptyMap(),
-            inbound: InboundMessage<ID> = EmptyInboundMessage(),
+            inbound: NeighborsData<ID> = NoNeighborsData(),
             pathFactory: PathFactory = DigestHashingFactory(),
             compute: Aggregate<ID>.() -> R,
         ): AggregateResult<ID, R> =
@@ -77,7 +77,7 @@ class Collektive<ID : Any, R>(
          */
         fun <ID : Any, R> aggregate(
             localId: ID,
-            network: Network<ID>,
+            network: Mailbox<ID>,
             previousState: State = emptyMap(),
             pathFactory: PathFactory = DigestHashingFactory(),
             compute: Aggregate<ID>.() -> R,

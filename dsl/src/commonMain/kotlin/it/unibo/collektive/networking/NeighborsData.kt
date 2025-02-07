@@ -14,7 +14,7 @@ import kotlin.reflect.KClass
 /**
  * TODO.
  */
-interface InboundMessage<ID : Any> {
+interface NeighborsData<ID : Any> {
     /**
      * TODO.
      */
@@ -32,7 +32,7 @@ interface InboundMessage<ID : Any> {
 /**
  * An empty inbound message.
  */
-class EmptyInboundMessage<ID : Any> : InboundMessage<ID> {
+class NoNeighborsData<ID : Any> : NeighborsData<ID> {
     override val neighbors: Set<ID> = emptySet()
 
     override fun <Value> dataAt(

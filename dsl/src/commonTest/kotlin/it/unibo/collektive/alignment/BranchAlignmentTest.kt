@@ -5,7 +5,6 @@ import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchange
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.operations.min
@@ -33,7 +32,7 @@ class BranchAlignmentTest : StringSpec({
                     test2()
                 }
             }
-        val messageFor1 = result.toSend.deliverableMessageFor(id0).sharedData
+        val messageFor1 = result.toSend.prepareMessageFor(id0).sharedData
         messageFor1 shouldHaveSize 1 // 1 path of alignment
         messageFor1.values.toList() shouldBe listOf("test")
     }
@@ -52,7 +51,7 @@ class BranchAlignmentTest : StringSpec({
                     test2()
                 }
             }
-        result.toSend.deliverableMessageFor(id0).sharedData shouldHaveSize 0 // 0 path of alignment
+        result.toSend.prepareMessageFor(id0).sharedData shouldHaveSize 0 // 0 path of alignment
     }
 
     "A field should be projected when used in a body of a branch condition (issue #171)" {

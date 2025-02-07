@@ -5,8 +5,6 @@ import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchange
-import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchanging
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
@@ -25,7 +23,7 @@ class ExchangeTest {
                 val res = exchange(1, increaseOrDouble)
                 res.localValue shouldBe 2
             }
-        val messages = result.toSend.deliverableMessageFor(1).sharedData
+        val messages = result.toSend.prepareMessageFor(1).sharedData
         messages.keys shouldHaveSize 1
         messages.values.toList() shouldBe listOf(2)
     }
@@ -44,7 +42,7 @@ class ExchangeTest {
                 res1.localValue shouldBe 2
                 res2.localValue shouldBe 3
             }
-        val messagesFor2 = resultDevice1.toSend.deliverableMessageFor(2).sharedData
+        val messagesFor2 = resultDevice1.toSend.prepareMessageFor(2).sharedData
         messagesFor2 shouldHaveSize 2
         messagesFor2.values.toList() shouldBe listOf(2, 3)
 
@@ -57,8 +55,8 @@ class ExchangeTest {
                 res1.localValue shouldBe 6
                 res2.localValue shouldBe 5
             }
-        val messagesFor1 = resultDevice2.toSend.deliverableMessageFor(1).sharedData
-        val messagesForAnyoneElse = resultDevice2.toSend.deliverableMessageFor(Int.MIN_VALUE).sharedData
+        val messagesFor1 = resultDevice2.toSend.prepareMessageFor(1).sharedData
+        val messagesForAnyoneElse = resultDevice2.toSend.prepareMessageFor(Int.MIN_VALUE).sharedData
         messagesFor1 shouldHaveSize 2
         messagesForAnyoneElse shouldHaveSize 2
         messagesFor1.values.toList() shouldBe listOf(3, 6)
@@ -73,9 +71,9 @@ class ExchangeTest {
                 res1.localValue shouldBe 10
                 res2.localValue shouldBe 7
             }
-        val messagesFrom3To1 = resultDevice3.toSend.deliverableMessageFor(1).sharedData
-        val messagesFrom3To2 = resultDevice3.toSend.deliverableMessageFor(2).sharedData
-        val messagesFrom3ToAnyoneElse = resultDevice3.toSend.deliverableMessageFor(Int.MIN_VALUE).sharedData
+        val messagesFrom3To1 = resultDevice3.toSend.prepareMessageFor(1).sharedData
+        val messagesFrom3To2 = resultDevice3.toSend.prepareMessageFor(2).sharedData
+        val messagesFrom3ToAnyoneElse = resultDevice3.toSend.prepareMessageFor(Int.MIN_VALUE).sharedData
         messagesFrom3To1 shouldHaveSize 2
         messagesFrom3To2 shouldHaveSize 2
         messagesFrom3ToAnyoneElse shouldHaveSize 2
@@ -95,7 +93,7 @@ class ExchangeTest {
                     }
                 xcRes.toMap() shouldBe mapOf(0 to "return: 2")
             }
-        val messages = result.toSend.deliverableMessageFor(1).sharedData
+        val messages = result.toSend.prepareMessageFor(1).sharedData
         messages shouldHaveSize 1
         messages.values.toList() shouldBe listOf(2)
     }
@@ -111,7 +109,7 @@ class ExchangeTest {
                     }
                 xcRes.toMap() shouldBe mapOf(0 to null)
             }
-        val messages = result.toSend.deliverableMessageFor(1).sharedData
+        val messages = result.toSend.prepareMessageFor(1).sharedData
         messages shouldHaveSize 1
         messages.values.toList() shouldBe listOf(2)
     }
@@ -131,10 +129,10 @@ class ExchangeTest {
             val res =
                 aggregate(id, emptyMap(), networkManager.receiveMessageFor(id), compute = programUnderTest)
                     .also { networkManager.send(id, it.toSend) }
-            val toUnknown = res.toSend.deliverableMessageFor(Int.MIN_VALUE).sharedData
+            val toUnknown = res.toSend.prepareMessageFor(Int.MIN_VALUE).sharedData
             toUnknown shouldHaveSize 1
-            val next = res.toSend.deliverableMessageFor((id + 1) % 3).sharedData
-            val previous = res.toSend.deliverableMessageFor((id + 2) % 3).sharedData
+            val next = res.toSend.prepareMessageFor((id + 1) % 3).sharedData
+            val previous = res.toSend.prepareMessageFor((id + 2) % 3).sharedData
             // When a constant field is used, the map of overrides should be empty
             next shouldBe toUnknown
             previous shouldBe toUnknown

@@ -13,7 +13,7 @@ import it.unibo.collektive.path.Path
 /**
  * TODO.
  */
-interface OutboundMessage<ID : Any> {
+interface OutboundEnvelope<ID : Any> {
     /**
      * Shared data holding a [default] value and [overrides] for each [ID].
      */
@@ -33,10 +33,10 @@ interface OutboundMessage<ID : Any> {
     /**
      * TODO.
      */
-    fun deliverableMessageFor(
+    fun prepareMessageFor(
         id: ID,
-        factory: DeliverableMessageFactory<ID, Any?> = InMemoryDeliverableMessageFactory(),
-    ): DeliverableMessage<ID, Any?>
+        factory: MessageFactory<ID, Any?> = InMemoryMessageFactory(),
+    ): Message<ID, Any?>
 
     /**
      * TODO.
@@ -55,8 +55,8 @@ interface OutboundMessage<ID : Any> {
         /**
          * TODO.
          */
-        internal operator fun <ID : Any> invoke(expectedSize: Int): OutboundMessage<ID> =
-            object : OutboundMessage<ID> {
+        internal operator fun <ID : Any> invoke(expectedSize: Int): OutboundEnvelope<ID> =
+            object : OutboundEnvelope<ID> {
                 private val defaults: MutableMap<Path, Any?> = LinkedHashMap(expectedSize * 2)
                 private val overrides: MutableMap<ID, MutableList<Pair<Path, Any?>>> = LinkedHashMap(expectedSize * 2)
 
@@ -80,10 +80,10 @@ interface OutboundMessage<ID : Any> {
                     }
                 }
 
-                override fun deliverableMessageFor(
+                override fun prepareMessageFor(
                     id: ID,
-                    factory: DeliverableMessageFactory<ID, Any?>,
-                ): DeliverableMessage<ID, Any?> =
+                    factory: MessageFactory<ID, Any?>,
+                ): Message<ID, Any?> =
                     factory(
                         id,
                         overrides[id]?.toMap() ?: defaults,

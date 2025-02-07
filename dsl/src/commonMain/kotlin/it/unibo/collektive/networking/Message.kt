@@ -1,85 +1,47 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 package it.unibo.collektive.networking
 
 import it.unibo.collektive.path.Path
+import kotlinx.serialization.Serializable
 
 /**
- * Types of messages.
+ * A message meant to be delivered in a communication medium, containing a [senderId] and [sharedData].
  */
-sealed interface Message
-
-/**
- * [messages] received by a node from [senderId].
- */
-data class InboundMessage2<ID : Any>(
-    val senderId: ID,
-    val messages: Map<Path, *>,
-) : Message
-
-/**
- * An [OutboundMessage] are messages that a device [senderId] sends to all other neighbours.
- */
-class OutboundMessage2<ID : Any>(
-    expectedSize: Int,
-    val senderId: ID,
-) : Message {
-    /**
-     * The default messages to be sent to all neighbours.
-     */
-    val defaults: MutableMap<Path, Any?> = LinkedHashMap(expectedSize * 2)
-    private val overrides: MutableMap<ID, MutableList<Pair<Path, Any?>>> = LinkedHashMap(expectedSize * 2)
-
-    /**
-     * Check if the [OutboundMessage] is empty.
-     */
-    fun isEmpty(): Boolean = defaults.isEmpty()
-
-    /**
-     * Check if the [OutboundMessage] is not empty.
-     */
-    fun isNotEmpty(): Boolean = defaults.isNotEmpty()
-
-    /**
-     * Returns the messages for device [id].
-     */
-    fun messagesFor(id: ID): Map<Path, *> =
-        LinkedHashMap<Path, Any?>(
-            defaults.size + overrides.size,
-            1.0f,
-        ).also { result ->
-            result.putAll(defaults)
-            overrides[id]?.let { result.putAll(it) }
-        }
-
-    /**
-     * Add a [message] to the [OutboundMessage].
-     */
-    fun addMessage(
-        path: Path,
-        message: SingleOutboundMessage<ID, *>,
-    ) {
-        check(!defaults.containsKey(path)) {
-            """
-            Aggregate alignment clash originated at the same path: $path. 
-            Possible causes are: 
-                - compiler plugin is not enabled,
-                - multiple aligned calls. The most likely cause is an aggregate function call within a loop without proper manual alignment.
-            If none of the above, please open an issue at https://github.com/Collektive/collektive/issues .
-            """.trimIndent()
-        }
-        defaults[path] = message.default
-        message.overrides.forEach { (id, value) ->
-            val destination = overrides.getOrPut(id) { mutableListOf() }
-            destination += path to value
-        }
-    }
+sealed interface Message<ID : Any, Payload> {
+    val senderId: ID
+    val sharedData: Map<Path, Payload>
 }
 
 /**
- * A [SingleOutboundMessage] contains the values associated to a [Path] in the messages of [OutboundMessage].
- * Has a [default] value that is sent regardless the awareness the device's neighbours, [overrides] specifies the
- * payload depending on the neighbours' values.
+ * A message specifically designed to be delivered in a in-memory fashion, containing a [senderId] and [sharedData].
  */
-data class SingleOutboundMessage<ID : Any, Payload>(
-    val default: Payload,
-    val overrides: Map<ID, Payload> = emptyMap(),
-)
+data class InMemoryMessage<ID : Any>(
+    override val senderId: ID,
+    override val sharedData: Map<Path, Any?>,
+) : Message<ID, Any?>
+
+/**
+ * TODO.
+ */
+class InMemoryMessageFactory<ID : Any> : MessageFactory<ID, Any?> {
+    override fun invoke(
+        senderId: ID,
+        sharedData: Map<Path, Any?>,
+    ): Message<ID, Any?> = InMemoryMessage(senderId, sharedData)
+}
+
+/**
+ * Serialized message meant to be sent over the network containing a [senderId] and [sharedData].
+ */
+@Serializable
+data class SerializedMessage<ID : Any>(
+    override val senderId: ID,
+    override val sharedData: Map<Path, ByteArray>,
+) : Message<ID, ByteArray>

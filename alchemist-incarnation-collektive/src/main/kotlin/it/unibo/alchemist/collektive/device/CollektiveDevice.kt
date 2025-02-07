@@ -7,14 +7,13 @@ import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Time
 import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
 import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.networking.DeliverableMessage
-import it.unibo.collektive.networking.EmptyInboundMessage
-import it.unibo.collektive.networking.InboundMessage
-import it.unibo.collektive.networking.Network
-import it.unibo.collektive.networking.OutboundMessage
+import it.unibo.collektive.networking.Mailbox
+import it.unibo.collektive.networking.Message
+import it.unibo.collektive.networking.NeighborsData
+import it.unibo.collektive.networking.NoNeighborsData
+import it.unibo.collektive.networking.OutboundEnvelope
 import it.unibo.collektive.path.Path
 import kotlin.reflect.KClass
 
@@ -29,12 +28,12 @@ class CollektiveDevice<P>(
     override val node: Node<Any?>,
     private val retainMessagesFor: Time? = null,
 ) : NodeProperty<Any?>,
-    Network<Int>,
+    Mailbox<Int>,
     EnvironmentVariables,
     DistanceSensor where P : Position<P> {
     private data class TimedMessage(
         val receivedAt: Time,
-        val payload: DeliverableMessage<Int, *>,
+        val payload: Message<Int, *>,
     )
 
     /**
@@ -51,7 +50,7 @@ class CollektiveDevice<P>(
 
     private fun receiveMessage(
         time: Time,
-        message: DeliverableMessage<Int, *>,
+        message: Message<Int, *>,
     ) {
         validMessages += TimedMessage(time, message)
     }
@@ -69,7 +68,7 @@ class CollektiveDevice<P>(
 
     override fun deliverableFor(
         id: Int,
-        outboundMessage: OutboundMessage<Int>,
+        outboundMessage: OutboundEnvelope<Int>,
     ) {
         if (outboundMessage.isNotEmpty()) {
             val neighborsNodes = environment.getNeighborhood(node)
@@ -80,21 +79,21 @@ class CollektiveDevice<P>(
                         node.properties.firstOrNull { it is CollektiveDevice<*> } as? CollektiveDevice<P>
                     }
                 neighborhood.forEach { neighbor ->
-                    neighbor.deliverableReceived(outboundMessage.deliverableMessageFor(node.id))
+                    neighbor.deliverableReceived(outboundMessage.prepareMessageFor(node.id))
                 }
             }
         }
     }
 
-    override fun deliverableReceived(message: DeliverableMessage<Int, *>) {
+    override fun deliverableReceived(message: Message<Int, *>) {
         receiveMessage(currentTime, message)
     }
 
-    override fun currentInbound(): InboundMessage<Int> {
+    override fun currentInbound(): NeighborsData<Int> {
         if (validMessages.isEmpty()) {
-            return EmptyInboundMessage()
+            return NoNeighborsData()
         }
-        val messages: List<DeliverableMessage<Int, *>> =
+        val messages: List<Message<Int, *>> =
             when {
                 retainMessagesFor == null -> validMessages.map { it.payload }.also { validMessages.clear() }
                 else -> {
@@ -102,8 +101,8 @@ class CollektiveDevice<P>(
                     validMessages.map { it.payload }
                 }
             }
-        return object : InboundMessage<Int> {
-            override val neighbors: Set<Int> get() = messages.map { it.senderId }.toSet()
+        return object : NeighborsData<Int> {
+            override val neighbors: Set<Int> by lazy { messages.map { it.senderId }.toSet() }
 
             @Suppress("UNCHECKED_CAST")
             override fun <Value> dataAt(
@@ -111,7 +110,7 @@ class CollektiveDevice<P>(
                 kClass: KClass<*>,
             ): Map<Int, Value> =
                 messages
-                    .associate { it.senderId to it }
+                    .associateBy { it.senderId }
                     .mapValues { (_, message) ->
                         message.sharedData.getOrElse(path) { NoValue } as Value
                     }.filter { it.value != NoValue }
@@ -124,10 +123,9 @@ class CollektiveDevice<P>(
     override fun <T> get(name: String): T = node.getConcentration(SimpleMolecule(name)) as T
 
     override fun <T> getOrNull(name: String): T? =
-        if (isDefined(name)) {
-            get(name)
-        } else {
-            null
+        when {
+            isDefined(name) -> get(name)
+            else -> null
         }
 
     override fun <T> getOrDefault(
