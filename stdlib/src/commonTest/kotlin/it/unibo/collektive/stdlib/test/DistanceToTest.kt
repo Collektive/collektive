@@ -7,9 +7,12 @@
  */
 package it.unibo.collektive.stdlib.test
 
+import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.neighboring
+import it.unibo.collektive.stdlib.spreading.GradientPath
 import it.unibo.collektive.stdlib.spreading.distanceTo
 import it.unibo.collektive.testing.Environment
+import it.unibo.collektive.testing.SerializingMailbox
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.math.abs
 import kotlin.math.sqrt
@@ -64,7 +67,6 @@ class DistanceToTest {
         val environment: Environment<Double> = mooreGridWithGradient(size)
         environment.cycleInReverseOrder()
         val firstRound = environment.status()
-
         assertEquals(0.0, firstRound[0])
         firstRound.forEach { (id, value) ->
             when (id) {
@@ -72,12 +74,20 @@ class DistanceToTest {
                 else -> assertEquals(Double.POSITIVE_INFINITY, value)
             }
         }
-
         repeat(size - 1) {
             assertFalse(environment.gradientIsStable(isMoore = true, size))
             environment.cycleInReverseOrder()
         }
-
         assertTrue(environment.gradientIsStable(isMoore = true, size))
+    }
+
+    @Test
+    fun `GradientPath is serializable`() {
+        val network = SerializingMailbox()
+        aggregate(0, network) {
+            neighboring(GradientPath(0, 0, 0, 0))
+            neighboring(GradientPath(0, 0, 0, listOf(1, 2, 3)))
+        }
+        println(network.serializeToString(1))
     }
 }
