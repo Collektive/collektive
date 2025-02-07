@@ -1,45 +1,44 @@
 package it.unibo.collektive.branch
 
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
+import kotlin.test.Test
 
-class WhenTest : StringSpec({
+class WhenTest {
     val id0 = 0
 
-    "When in single expression" {
+    private fun programUnderTest(input: Any) =
+        aggregate(id0) {
+            when (input) {
+                is String -> neighboringViaExchange("string")
+                else -> neighboringViaExchange("test")
+            }
+        }
+
+    @Test
+    fun `When in single expression`() {
         val condition = true
         val x = if (condition) "hello" else 123
-        val result =
-            aggregate(id0) {
-                when (x) {
-                    is String -> neighboringViaExchange("string")
-                    else -> neighboringViaExchange("test")
-                }
-            }
+        val result = programUnderTest(x)
         val messageFor0 = result.toSend.prepareMessageFor(id0).sharedData
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("string")
     }
 
-    "When in single expression in else case" {
+    @Test
+    fun `When in single expression in else case`() {
         val condition = false
         val x = if (condition) "hello" else 123
-        val result =
-            aggregate(id0) {
-                when (x) {
-                    is String -> neighboringViaExchange("string")
-                    else -> neighboringViaExchange("test")
-                }
-            }
+        val result = programUnderTest(x)
         val messageFor0 = result.toSend.prepareMessageFor(id0).sharedData
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test")
     }
 
-    "When with nested function" {
+    @Test
+    fun `When with nested function`() {
         val condition = true
         val x = if (condition) "hello" else 123
         val result =
@@ -61,7 +60,8 @@ class WhenTest : StringSpec({
         messageFor0.values.toList() shouldBe listOf("test2")
     }
 
-    "Nested when condition must be aligned" {
+    @Test
+    fun `Nested when condition must be aligned`() {
         val condition1 = false
         val condition2 = true
         val result =
@@ -79,4 +79,4 @@ class WhenTest : StringSpec({
         messageFor0 shouldHaveSize 1
         messageFor0.values.toList() shouldBe listOf("test2")
     }
-})
+}
