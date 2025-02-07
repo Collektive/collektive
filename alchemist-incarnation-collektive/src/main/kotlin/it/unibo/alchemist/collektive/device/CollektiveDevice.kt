@@ -58,7 +58,7 @@ class CollektiveDevice<P>(
     override fun <ID : Any> Aggregate<ID>.distances(): Field<ID, Double> =
         environment.getPosition(node).let { nodePosition ->
             neighboring(nodePosition.coordinates).map { position ->
-                // TODO: make a makePosition(DoubleArray) in the simulator
+                // TODO: call makePosition(DoubleArray) in the simulator as the new version arrives
                 nodePosition.distanceTo(environment.makePosition(position.toList()))
             }
         }
