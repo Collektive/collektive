@@ -13,12 +13,12 @@ import it.unibo.collektive.path.Path
 /**
  * Factory for creating [Message] instances.
  */
-interface MessageFactory<ID : Any, SourcePayload, DestinationPayload> {
+interface MessageFactory<ID : Any, out Payload> {
     /**
      * Creates a [Message] instance with the given [senderId] and [sharedData].
      */
     operator fun invoke(
         senderId: ID,
-        sharedData: Map<Path, PayloadRepresentation<SourcePayload>>,
-    ): Message<ID, DestinationPayload>
+        sharedData: Map<Path, PayloadRepresentation<Any?>>,
+    ): Message<ID, Payload>
 }
