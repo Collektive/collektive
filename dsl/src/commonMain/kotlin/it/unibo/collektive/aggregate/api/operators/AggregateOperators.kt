@@ -6,7 +6,7 @@ import it.unibo.collektive.aggregate.api.YieldingResult
 import it.unibo.collektive.field.Field
 
 /**
- * Observes the value of an expression [local] across neighbours.
+ * Observes the value of an expression [local] across neighbors.
  *
  * ## Example
  *
@@ -14,7 +14,7 @@ import it.unibo.collektive.field.Field
  * val field = neighboring(0)
  * ```
  *
- * The field returned has as local value the value passed as input (0 in this example).
+ * The field returned the value passed as input (0 in this example) as local.
  *
  * ```kotlin
  * val field = neighboring({ 2 * 2 })
@@ -68,9 +68,9 @@ fun <ID : Any, Initial, Return> Aggregate<ID>.sharing(
     }.localValue
 
 /**
- * [share] captures the space-time nature of field computation through observation of neighbours' values, starting
+ * [share] captures the space-time nature of field computation through observation of neighbors' values, starting
  * from an [initial] value, it reduces to a single local value given a [transform] function and updating and sharing to
- * neighbours of a local variable.
+ * neighbors of a local variable.
  * ```
  * val result = share(0) {
  *   it.maxBy { v -> v.value }.value

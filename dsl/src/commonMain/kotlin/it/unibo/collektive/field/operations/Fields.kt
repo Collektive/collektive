@@ -5,7 +5,6 @@ package it.unibo.collektive.field.operations
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.Field.Companion.fold
 import it.unibo.collektive.field.Field.Companion.foldWithId
-import kotlin.jvm.JvmName
 import kotlin.jvm.JvmOverloads
 
 /**
@@ -18,17 +17,7 @@ import kotlin.jvm.JvmOverloads
  */
 operator fun <ID : Any, T> Field<ID, T>.contains(value: T): Boolean = anyWithSelf { it == value }
 
-/**
- * Check if the field contains the [id], **including the local id**.
- * If you need to exclude the local value, use instead:
- *
- * ```kotlin
- * id in field.withoutSelf().keys
- * ```
- */
-@JvmName("containsId")
-operator fun <ID : Any, T> Field<ID, T>.contains(id: ID): Boolean =
-    foldWithId(localValue == id) { current, id, _ -> current || id == id }
+fun <ID : Any> Field<ID, *>.ids(id: ID): Field<ID, ID> = mapWithId { id, _ -> id }
 
 /**
  * Count the number of elements in the field that satisfy the [predicate],

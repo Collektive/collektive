@@ -136,7 +136,7 @@ internal class AggregateContext<ID : Any>(
 }
 
 /**
- * Projects the field into the current context.
+ * Projects the field into the current context, pruning non-aligned neighbors.
  * This method is meant to be used internally by the Collektive compiler plugin and,
  * unless there is some major bug that needs to be worked around with a kludge,
  * it should never be called, as it incurs in a performance penalty

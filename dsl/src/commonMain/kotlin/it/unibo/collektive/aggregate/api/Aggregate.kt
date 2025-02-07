@@ -78,14 +78,14 @@ interface Aggregate<ID : Any> {
      * val field = neighboring(0)
      * ```
      *
-     * The field returned has as local value the value passed as input (0 in this example).
+     * The field returned has the value passed as input (0 in this example) as local.
      *
      * ```kotlin
      * val field = neighboring({ 2 * 2 })
      * ```
      *
      * In this case, the field returned has the computation as a result,
-     * in form of a field of functions with type `() -> Int`.
+     * as a field of functions with type `() -> Int`.
      */
     fun <Scalar> neighboring(local: Scalar): Field<ID, Scalar>
 
