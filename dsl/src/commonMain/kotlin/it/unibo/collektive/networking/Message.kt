@@ -20,7 +20,7 @@ import kotlinx.serialization.serializer
 /**
  * A message meant to be delivered in a communication medium, containing a [senderId] and [sharedData].
  */
-sealed interface Message<ID : Any, Payload> {
+sealed interface Message<ID : Any, out Payload> {
     val senderId: ID
     val sharedData: Map<Path, Payload>
 }
@@ -36,7 +36,7 @@ data class InMemoryMessage<ID : Any>(
 /**
  * TODO.
  */
-class InMemoryMessageFactory<ID : Any> : MessageFactory<ID, Any?, Any?> {
+class InMemoryMessageFactory<ID : Any> : MessageFactory<ID, Any?> {
     override fun invoke(
         senderId: ID,
         sharedData: Map<Path, PayloadRepresentation<Any?>>,
@@ -57,11 +57,11 @@ data class SerializedMessage<ID : Any>(
  */
 abstract class SerializedMessageFactory<ID : Any, Payload>(
     private val serializerFormat: SerialFormat,
-) : MessageFactory<ID, Payload, ByteArray> {
+) : MessageFactory<ID, ByteArray> {
     @OptIn(InternalSerializationApi::class)
     override fun invoke(
         senderId: ID,
-        sharedData: Map<Path, PayloadRepresentation<Payload>>,
+        sharedData: Map<Path, PayloadRepresentation<Any?>>,
     ): Message<ID, ByteArray> {
         val serializedSharedData =
             sharedData.mapValues { (_, representation) ->
@@ -71,10 +71,15 @@ abstract class SerializedMessageFactory<ID : Any, Payload>(
                 when (serializerFormat) {
                     is StringFormat ->
                         serializerFormat
-                            .encodeToString(typeSerializer as SerializationStrategy<Payload>, value)
+                            .encodeToString(typeSerializer as SerializationStrategy<Payload>, value as Payload)
                             .encodeToByteArray()
+
                     is BinaryFormat ->
-                        serializerFormat.encodeToByteArray(typeSerializer as SerializationStrategy<Payload>, value)
+                        serializerFormat.encodeToByteArray(
+                            typeSerializer as SerializationStrategy<Payload>,
+                            value as Payload,
+                        )
+
                     else -> error("Unsupported serialization format")
                 }
             }

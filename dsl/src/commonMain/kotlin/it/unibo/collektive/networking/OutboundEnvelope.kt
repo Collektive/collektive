@@ -37,7 +37,7 @@ interface OutboundEnvelope<ID : Any> {
      */
     fun prepareMessageFor(
         id: ID,
-        factory: MessageFactory<ID, Any?, Any?> = InMemoryMessageFactory(),
+        factory: MessageFactory<ID, *> = InMemoryMessageFactory(),
     ): Message<ID, Any?>
 
     /**
@@ -86,7 +86,7 @@ interface OutboundEnvelope<ID : Any> {
 
                 override fun prepareMessageFor(
                     id: ID,
-                    factory: MessageFactory<ID, Any?, Any?>,
+                    factory: MessageFactory<ID, *>,
                 ): Message<ID, Any?> =
                     factory(
                         id,
