@@ -5,6 +5,7 @@ config:
     /**
       * This file has been auto-generated with Subjekt (https://github.com/mini-roostico/subjekt).
     */
+    import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
     import it.unibo.collektive.aggregate.api.Aggregate
     import it.unibo.collektive.field.operations.max
 
