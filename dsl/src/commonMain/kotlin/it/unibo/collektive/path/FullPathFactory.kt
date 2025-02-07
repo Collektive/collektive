@@ -8,8 +8,6 @@
 
 package it.unibo.collektive.path
 
-import it.unibo.collektive.path.impl.FullPath
-
 /**
  * A factory that creates [Path] instances by concatenating their content.
  */

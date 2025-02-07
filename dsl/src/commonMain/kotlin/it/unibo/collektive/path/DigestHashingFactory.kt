@@ -8,7 +8,6 @@
 
 package it.unibo.collektive.path
 
-import it.unibo.collektive.path.impl.SerializablePath
 import org.kotlincrypto.hash.sha3.Keccak512
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi

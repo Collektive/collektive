@@ -10,7 +10,6 @@ package it.unibo.collektive.path
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import it.unibo.collektive.path.impl.FullPath
 
 const val ONE_MILLION = 1_000_000
 
