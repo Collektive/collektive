@@ -8,6 +8,7 @@ config:
     import it.unibo.collektive.aggregate.api.Aggregate
     import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
     import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchange
+    import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchanging
     import it.unibo.collektive.field.operations.max
     import it.unibo.collektive.field.operations.maxBy
     import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange

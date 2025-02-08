@@ -40,11 +40,14 @@ object UnnecessaryUseOfConstructs : FirFunctionCallChecker(MppCheckerKind.Common
     private val constructs =
         listOf(
             AggregateFunctionNames.NEIGHBORING_FUNCTION_FQ_NAME,
+            AggregateFunctionNames.NEIGHBORING_INLINE_FUNCTION_FQ_NAME,
             AggregateFunctionNames.EXCHANGE_FUNCTION_FQ_NAME,
+            AggregateFunctionNames.EXCHANGE_INLINE_FUNCTION_FQ_NAME,
             AggregateFunctionNames.SHARE_FUNCTION_FQ_NAME,
             AggregateFunctionNames.EVOLVE_FUNCTION_FQ_NAME,
             AggregateFunctionNames.NEIGHBORING_VIA_EXCHANGE_FUNCTION_FQ_NAME,
             AggregateFunctionNames.EXCHANGING_FUNCTION_FQ_NAME,
+            AggregateFunctionNames.EXCHANGING_INLINE_FUNCTION_FQ_NAME,
             AggregateFunctionNames.SHARING_FUNCTION_FQ_NAME,
             AggregateFunctionNames.EVOLVING_FUNCTION_FQ_NAME,
         )
@@ -54,6 +57,7 @@ object UnnecessaryUseOfConstructs : FirFunctionCallChecker(MppCheckerKind.Common
     private fun FirFunctionCall.doesNotUseParameter(): Boolean =
         if (fqName().run {
                 this == AggregateFunctionNames.NEIGHBORING_FUNCTION_FQ_NAME ||
+                    this == AggregateFunctionNames.NEIGHBORING_INLINE_FUNCTION_FQ_NAME ||
                     this == AggregateFunctionNames.NEIGHBORING_VIA_EXCHANGE_FUNCTION_FQ_NAME
             }
         ) {
