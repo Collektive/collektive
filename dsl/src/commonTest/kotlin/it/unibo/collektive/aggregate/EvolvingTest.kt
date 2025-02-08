@@ -1,79 +1,93 @@
 package it.unibo.collektive.aggregate
 
-import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.collections.shouldContain
-import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchange
-import it.unibo.collektive.network.NetworkImplTest
-import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
 import it.unibo.collektive.testing.Round.roundFor
+import kotlin.test.Test
+import kotlin.test.assertContains
+import kotlin.test.assertEquals
+import kotlin.test.assertFails
+import kotlin.test.assertNull
 
-class EvolvingTest : StringSpec({
-    val id0 = 0
-    val id1 = 1
+class EvolvingTest {
+    private val doubleValue: (Int) -> Int = { it * 2 }
+    private val initialValue = 1
 
-    val double: (Int) -> Int = { it * 2 }
-    val initV1 = 1
-
-    "First time evolving" {
-        aggregate(id0) {
-            evolve(initV1, double) shouldBe 2
+    @Test
+    fun `evolve should use execute the given function against the initial value on the first round`() {
+        aggregate(0) {
+            val result = evolve(initialValue, doubleValue)
+            assertEquals(2, result)
         }
     }
 
-    "Evolving more than once" {
-        var res = 0
-
-        val testNetwork = NetworkImplTest(NetworkManager(), id1)
-        aggregate(id1, testNetwork) {
-            res = evolve(initV1, double)
-            res = evolve(res, double)
-        }
-        res shouldBe 4
+    @Test
+    fun `evolve when executed multiple times should execute the given function against the most recent state`() {
+        val finalResult =
+            roundFor(steps = 2, deviceId = 0) {
+                evolve(initialValue, doubleValue)
+            }
+        assertEquals(4, finalResult.newState.values.first())
     }
 
-    "Evolve with lambda body should work fine" {
-        val testNetwork = NetworkImplTest(NetworkManager(), id1)
-        aggregate(id1, testNetwork) {
-            evolve(initV1) { it * 2 } shouldBe 2
+    @Test
+    fun `evolve should accept a lambda function as a function body describing the evolution logic`() {
+        aggregate(0) {
+            val result = evolve(initialValue) { it * 10 }
+            assertEquals(10, result)
         }
     }
 
-    "Evolving should return the value passed in the yielding function" {
-        val steps = 10
+    @Test
+    fun `evolving should evolve the value but should yield a different passed in the yielding function`() {
         val producedResult =
-            roundFor(steps, deviceId = 0) {
-                val evolvingRes =
+            roundFor(steps = 10, deviceId = 0) {
+                val evolvingResult =
                     evolving(0) {
                         (it + 1).yielding { "A string" }
                     }
-                evolvingRes shouldBe "A string"
-                evolvingRes
+                assertEquals("A string", evolvingResult)
+                evolvingResult
             }
-        producedResult.newState.values.size shouldBe 1
-        producedResult.newState.values shouldContain steps
+        assertEquals(1, producedResult.newState.values.size)
+        assertContains(producedResult.newState.values, 10)
     }
 
-    "Evolving should work fine even with null as value" {
-        val testNetwork1 = NetworkImplTest(NetworkManager(), id1)
-        aggregate(id1, testNetwork1) {
-            evolving(initV1) {
-                val mult = it * 2
-                mult.yielding { "Hello".takeIf { mult < 1 } }
-            } shouldBe null
+    @Test
+    fun `evolving should properly manage also null values when yielding a different value`() {
+        aggregate(0) {
+            val result =
+                evolving(initialValue) {
+                    val mult = it * 2
+                    mult.yielding { "Hello".takeIf { mult < 1 } }
+                }
+            assertNull(result)
         }
     }
 
-    "When the evolving returns a Field an exception must be raised" {
-        shouldThrow<IllegalStateException> {
-            aggregate(id1) {
+    @Test
+    fun `evolve should raise an exception when a field is returned`() {
+        assertFails {
+            aggregate(0) {
                 exchange(0) { field ->
                     evolve(field) { it + 1 }
                 }
             }
         }
     }
-})
+
+    @Test
+    fun `evolving should raise an exception when a field is returned`() {
+        assertFails {
+            aggregate(0) {
+                exchange(0) { field ->
+                    evolving(field) {
+                        val result = it + 1
+                        result.yielding { field.map { it + 2 } }
+                    }
+                }
+            }
+        }
+    }
+}
