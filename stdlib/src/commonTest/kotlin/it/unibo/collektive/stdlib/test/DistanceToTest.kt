@@ -15,6 +15,7 @@ import kotlin.math.abs
 import kotlin.math.sqrt
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class DistanceToTest {
@@ -73,7 +74,7 @@ class DistanceToTest {
         }
 
         repeat(size - 1) {
-            assertTrue(!environment.gradientIsStable(isMoore = true))
+            assertFalse(environment.gradientIsStable(isMoore = true))
             environment.cycleInReverseOrder()
         }
 
