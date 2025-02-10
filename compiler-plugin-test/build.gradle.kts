@@ -30,6 +30,7 @@ kotlinJvm {
             dependencies {
                 implementation(project(":dsl"))
                 implementation(project(":compiler-embeddable"))
+                implementation(kotlin("test"))
                 implementation(rootProject.libs.kotest.runner.junit5.jvm)
                 implementation(libs.javap)
                 implementation(libs.kotlinpoet)
