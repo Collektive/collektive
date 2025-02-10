@@ -1,3 +1,29 @@
+## [14.0.0](https://github.com/Collektive/collektive/compare/13.1.1...14.0.0) (2025-02-10)
+
+### ⚠ BREAKING CHANGES
+
+* ready the DSL and boundary for kotlinx.serialization (#753)
+
+### Dependency updates
+
+* **deps:** update alchemist to v37.1.7 ([12cc235](https://github.com/Collektive/collektive/commit/12cc2351dc161da9536d8ac97cfb4d11079022dd))
+* **deps:** update alchemist to v37.1.8 ([21080e1](https://github.com/Collektive/collektive/commit/21080e1934ea179902bd1aae3a55d2a3c1fc1068))
+* **deps:** update alchemist to v37.2.0 ([ffab524](https://github.com/Collektive/collektive/commit/ffab524923203caa8d49ff738e62ff49dceb46b6))
+* **deps:** update alchemist to v37.2.1 ([777b54a](https://github.com/Collektive/collektive/commit/777b54a8d26f16887c3fe1a922c5f74a84a6b8b9))
+* **deps:** update alchemist to v37.3.0 ([e1b6746](https://github.com/Collektive/collektive/commit/e1b6746eca227fb86a1ea649e4aa71c24ba76c61))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.120 ([91da80c](https://github.com/Collektive/collektive/commit/91da80c1cb3e2aab68117b6a55dd4aa540ee8d4c))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.121 ([1dd4ee9](https://github.com/Collektive/collektive/commit/1dd4ee9c26fa7d28a7fd98e0d24140d1f4f37547))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.122 ([fbae1ca](https://github.com/Collektive/collektive/commit/fbae1ca38377c356910516097d5b99394b5d6472))
+* **deps:** update plugin publishoncentral to v8.0.3 ([b9a0851](https://github.com/Collektive/collektive/commit/b9a085179114b8c3c2ccecd4e3eeb1713bd7c151))
+
+### Build and continuous integration
+
+* **deps:** update github/codeql-action action to v3.28.9 ([78951d0](https://github.com/Collektive/collektive/commit/78951d0f27b6705d1126956c3f02bb4bec4fdd88))
+
+### Refactoring
+
+* ready the DSL and boundary for kotlinx.serialization ([#753](https://github.com/Collektive/collektive/issues/753)) ([512d438](https://github.com/Collektive/collektive/commit/512d4383457a4b96a4e0a0a91ac9eea2430234c5))
+
 ## [13.1.1](https://github.com/Collektive/collektive/compare/13.1.0...13.1.1) (2025-01-31)
 
 ### Documentation
