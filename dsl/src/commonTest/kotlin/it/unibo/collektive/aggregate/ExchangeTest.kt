@@ -19,7 +19,7 @@ class ExchangeTest {
     }
 
     private fun mooreGridWithIncreaseOrDouble(size: Int) =
-        mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }) {
+        mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }) { _, _ ->
             exchange(1) { field ->
                 field.map { field.fold(localId) { acc, value -> acc + value } }
             }.localValue
@@ -28,7 +28,7 @@ class ExchangeTest {
         }
 
     private fun mooreGridWithConstantFieldResult(size: Int) =
-        mooreGrid<Field<Int, Int>>(size, size, { _, _ -> Field.invoke(0, 0, emptyMap()) }) {
+        mooreGrid<Field<Int, Int>>(size, size, { _, _ -> Field.invoke(0, 0, emptyMap()) }) { _, _ ->
             exchange(1) { field ->
                 field.mapToConstantField(10)
             }
@@ -63,57 +63,6 @@ class ExchangeTest {
          */
         val expectedResult = mapOf(0 to 0, 1 to 1, 2 to 3, 3 to 7)
         assertEquals(expectedResult, result)
-
-        //        val networkManager = NetworkManager()
-        //
-        //        // Device 1
-        //        val testNetwork1 = NetworkImplTest(networkManager, 1)
-        //        val resultDevice1 =
-        //            aggregate(1, testNetwork1) {
-        //                val res1 = exchange(1, increaseOrDouble)
-        //                val res2 = exchange(2, increaseOrDouble)
-        //                testNetwork1.currentInbound().neighbors shouldHaveSize 0
-        //                res1.localValue shouldBe 2
-        //                res2.localValue shouldBe 3
-        //            }
-        //        val messagesFor2 = resultDevice1.toSend.prepareMessageFor(2).sharedData
-        //        messagesFor2 shouldHaveSize 2
-        //        messagesFor2.values.toList() shouldBe listOf(2, 3)
-        //
-        //        // Device 2
-        //        val testNetwork2 = NetworkImplTest(networkManager, 2)
-        //        val resultDevice2 =
-        //            aggregate(2, testNetwork2) {
-        //                val res1 = exchange(3, increaseOrDouble)
-        //                val res2 = exchange(4, increaseOrDouble)
-        //                res1.localValue shouldBe 6
-        //                res2.localValue shouldBe 5
-        //            }
-        //        val messagesFor1 = resultDevice2.toSend.prepareMessageFor(1).sharedData
-        //        val messagesForAnyoneElse = resultDevice2.toSend.prepareMessageFor(Int.MIN_VALUE).sharedData
-        //        messagesFor1 shouldHaveSize 2
-        //        messagesForAnyoneElse shouldHaveSize 2
-        //        messagesFor1.values.toList() shouldBe listOf(3, 6)
-        //        messagesForAnyoneElse.values.toList() shouldBe listOf(6, 5)
-        //
-        //        // Device 3
-        //        val testNetwork3 = NetworkImplTest(networkManager, 3)
-        //        val resultDevice3 =
-        //            aggregate(3, testNetwork3) {
-        //                val res1 = exchange(5, increaseOrDouble)
-        //                val res2 = exchange(6, increaseOrDouble)
-        //                res1.localValue shouldBe 10
-        //                res2.localValue shouldBe 7
-        //            }
-        //        val messagesFrom3To1 = resultDevice3.toSend.prepareMessageFor(1).sharedData
-        //        val messagesFrom3To2 = resultDevice3.toSend.prepareMessageFor(2).sharedData
-        //        val messagesFrom3ToAnyoneElse = resultDevice3.toSend.prepareMessageFor(Int.MIN_VALUE).sharedData
-        //        messagesFrom3To1 shouldHaveSize 2
-        //        messagesFrom3To2 shouldHaveSize 2
-        //        messagesFrom3ToAnyoneElse shouldHaveSize 2
-        //        messagesFrom3ToAnyoneElse.values.toList() shouldBe listOf(10, 7)
-        //        messagesFrom3To1.values.toList() shouldBe listOf(3, 6)
-        //        messagesFrom3To2.values.toList() shouldBe listOf(7, 10)
     }
 
     @Test
@@ -159,27 +108,5 @@ class ExchangeTest {
         assertEquals(1, result.values.distinct().size)
         assertTrue(result.values.all { it is ConstantField })
         assertEquals(listOf(10, 10, 10, 10), result.values.map { it.localValue })
-
-        //        val programUnderTest: Aggregate<Int>.() -> Unit = {
-        //            exchanging(0) {
-        //                it.mapToConstantField(10).yielding { it.mapToConstantField("singleton") }
-        //            }
-        //        }
-        //        val networkManager = NetworkManager()
-        //
-        //        // Three devices linked together executed for 2 round each.
-        //        (0..5).forEach { iteration ->
-        //            val id = iteration % 3
-        //            val res =
-        //                aggregate(id, emptyMap(), networkManager.receiveMessageFor(id), compute = programUnderTest)
-        //                    .also { networkManager.send(id, it.toSend) }
-        //            val toUnknown = res.toSend.prepareMessageFor(Int.MIN_VALUE).sharedData
-        //            toUnknown shouldHaveSize 1
-        //            val next = res.toSend.prepareMessageFor((id + 1) % 3).sharedData
-        //            val previous = res.toSend.prepareMessageFor((id + 2) % 3).sharedData
-        //            // When a constant field is used, the map of overrides should be empty
-        //            next shouldBe toUnknown
-        //            previous shouldBe toUnknown
-        //        }
     }
 }
