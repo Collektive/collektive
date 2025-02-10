@@ -15,9 +15,3 @@ with(extensions.getByType<VersionCatalogsExtension>().named("libs")) {
         implementation(findLibrary("kotlinpoet").get())
     }
 }
-
-sourceSets {
-    main {
-        kotlin.srcDir("../dsl/src/commonMain")
-    }
-}

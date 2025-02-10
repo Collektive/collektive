@@ -1,9 +1,14 @@
-apply(plugin = libs.plugins.kotlin.multiplatform.id)
+apply(plugin = rootProject.libs.plugins.kotlin.multiplatform.id)
 
 configureKotlinMultiplatform()
 
 kotlinMultiplatform {
     sourceSets {
+        commonMain.dependencies {
+            implementation(libs.arrow.core)
+            implementation(libs.hash.sha3)
+            implementation(libs.kotlinx.serialization)
+        }
         commonTest.dependencies {
             implementation(project(":stdlib"))
             implementation(project(":test-tooling"))

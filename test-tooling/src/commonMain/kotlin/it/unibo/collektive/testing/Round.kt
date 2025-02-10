@@ -11,6 +11,7 @@ package it.unibo.collektive.testing
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.AggregateResult
 import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.networking.NoNeighborsData
 
 /**
  * Utility object for round-based computation testing.
@@ -28,7 +29,7 @@ object Round {
         require(steps > 0) { "Unable to perform '$steps' rounds. At least 1 round is required" }
         val firstRoundResult = aggregate(deviceId, compute = computation)
         return (1 until steps).fold(firstRoundResult) { previousResult, _ ->
-            aggregate(deviceId, previousResult.newState, emptySet(), computation)
+            aggregate(deviceId, previousResult.newState, NoNeighborsData(), compute = computation)
         }
     }
 }

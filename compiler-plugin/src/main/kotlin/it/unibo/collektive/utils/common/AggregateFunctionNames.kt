@@ -60,6 +60,11 @@ object AggregateFunctionNames {
     const val NEIGHBORING_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.neighboring"
 
     /**
+     * The FQ name of the `neighboring` function.
+     */
+    const val NEIGHBORING_INLINE_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring"
+
+    /**
      * The FQ name of the `neighboringViaExchange` function.
      */
     const val NEIGHBORING_VIA_EXCHANGE_FUNCTION_FQ_NAME =
@@ -69,6 +74,11 @@ object AggregateFunctionNames {
      * The FQ name of the `exchange` function.
      */
     const val EXCHANGE_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.exchange"
+
+    /**
+     * The FQ name of the `exchange` function.
+     */
+    const val EXCHANGE_INLINE_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.Companion.exchange"
 
     /**
      * The FQ name of the `share` function.
@@ -84,6 +94,11 @@ object AggregateFunctionNames {
      * The FQ name of the `exchanging` function.
      */
     const val EXCHANGING_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.exchanging"
+
+    /**
+     * The FQ name of the `exchanging` function.
+     */
+    const val EXCHANGING_INLINE_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.Companion.exchanging"
 
     /**
      * The FQ name of the `sharing` function.

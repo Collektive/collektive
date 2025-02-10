@@ -1,6 +1,10 @@
 package it.unibo.collektive.aggregate.api
 
+import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchange
+import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchanging
+import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
 import it.unibo.collektive.field.Field
+import kotlin.reflect.KClass
 
 typealias YieldingScope<Initial, Return> = YieldingContext<Initial, Return>.(Initial) -> YieldingResult<Initial, Return>
 
@@ -32,6 +36,7 @@ interface Aggregate<ID : Any> {
      */
     fun <Initial> exchange(
         initial: Initial,
+        kClass: KClass<*>,
         body: (Field<ID, Initial>) -> Field<ID, Initial>,
     ): Field<ID, Initial>
 
@@ -48,6 +53,7 @@ interface Aggregate<ID : Any> {
      */
     fun <Initial, Return> exchanging(
         initial: Initial,
+        kClass: KClass<*>,
         body: YieldingScope<Field<ID, Initial>, Field<ID, Return>>,
     ): Field<ID, Return>
 
@@ -87,7 +93,10 @@ interface Aggregate<ID : Any> {
      * In this case, the field returned has the computation as a result,
      * in form of a field of functions with type `() -> Int`.
      */
-    fun <Scalar> neighboring(local: Scalar): Field<ID, Scalar>
+    fun <Scalar> neighboring(
+        local: Scalar,
+        kClass: KClass<*>,
+    ): Field<ID, Scalar>
 
     /**
      * Alignment function that pushes in the stack the pivot, executes the body and pop the last
@@ -108,4 +117,32 @@ interface Aggregate<ID : Any> {
      * Pops the last element of the alignment stack.
      */
     fun dealign()
+
+    /**
+     * Contains the inlined version of the [Aggregate.exchange],
+     * [Aggregate.exchanging], [Aggregate.neighboring] functions.
+     */
+    companion object {
+        /**
+         * Inlined version of the [Aggregate.exchange] function.
+         */
+        inline fun <ID : Any, reified Initial> Aggregate<ID>.exchange(
+            initial: Initial,
+            noinline body: (Field<ID, Initial>) -> Field<ID, Initial>,
+        ): Field<ID, Initial> = exchange(initial, Initial::class, body)
+
+        /**
+         * Inlined version of the [Aggregate.exchanging] function.
+         */
+        inline fun <ID : Any, reified Initial, Return> Aggregate<ID>.exchanging(
+            initial: Initial,
+            noinline body: YieldingScope<Field<ID, Initial>, Field<ID, Return>>,
+        ): Field<ID, Return> = exchanging(initial, Initial::class, body)
+
+        /**
+         * Inlined version of the [Aggregate.neighboring] function.
+         */
+        inline fun <ID : Any, reified Scalar> Aggregate<ID>.neighboring(local: Scalar): Field<ID, Scalar> =
+            neighboring(local, Scalar::class)
+    }
 }

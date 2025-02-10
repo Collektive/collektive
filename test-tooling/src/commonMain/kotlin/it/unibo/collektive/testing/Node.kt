@@ -10,9 +10,12 @@ package it.unibo.collektive.testing
 
 import it.unibo.collektive.Collektive
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.networking.InboundMessage
-import it.unibo.collektive.networking.Network
-import it.unibo.collektive.networking.OutboundMessage
+import it.unibo.collektive.networking.Mailbox
+import it.unibo.collektive.networking.Message
+import it.unibo.collektive.networking.NeighborsData
+import it.unibo.collektive.networking.OutboundEnvelope
+import it.unibo.collektive.path.Path
+import kotlin.reflect.KClass
 
 /**
  * A network node with an associated [environment], [id], [value], and [program].
@@ -46,15 +49,39 @@ class Node<R>(
     /**
      * A network device that can send and receive messages.
      */
-    private inner class NetworkDevice : Network<Int> {
-        private var messageBuffer: Set<InboundMessage<Int>> = emptySet()
+    private inner class NetworkDevice : Mailbox<Int> {
+        private var messageBuffer: Map<Int, Message<Int, *>> = emptyMap()
 
-        override fun write(message: OutboundMessage<Int>) {
-            environment.neighborsOf(this@Node).forEach { neighbor ->
-                neighbor.network.messageBuffer += InboundMessage(id, message.messagesFor(neighbor.id))
-            }
+        override fun deliverableFor(
+            id: Int,
+            outboundMessage: OutboundEnvelope<Int>,
+        ) = environment.neighborsOf(this@Node).forEach { neighbor ->
+            neighbor.network.messageBuffer += id to outboundMessage.prepareMessageFor(id)
         }
 
-        override fun read(): Collection<InboundMessage<Int>> = messageBuffer.also { messageBuffer = emptySet() }
+        override fun deliverableReceived(message: Message<Int, *>) {
+            error(
+                "This network is supposed to be in-memory," +
+                    " no need to deliver messages since it is already in the buffer",
+            )
+        }
+
+        override fun currentInbound(): NeighborsData<Int> =
+            object : NeighborsData<Int> {
+                private val neighborDeliverableMessages by lazy { messageBuffer.filter { it.key != id } }
+                override val neighbors: Set<Int> get() = neighborDeliverableMessages.keys
+
+                @Suppress("UNCHECKED_CAST")
+                override fun <Value> dataAt(
+                    path: Path,
+                    kClass: KClass<*>,
+                ): Map<Int, Value> =
+                    neighborDeliverableMessages
+                        .mapValues { it.value.sharedData.getOrElse(path) { NoValue } as Value }
+                        .filter { it.value != NoValue }
+                        .also { messageBuffer = emptyMap() }
+            }
     }
+
+    private object NoValue
 }
