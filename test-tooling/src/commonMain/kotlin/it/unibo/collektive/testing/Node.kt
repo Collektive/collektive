@@ -24,14 +24,14 @@ class Node<R>(
     val environment: Environment<R>,
     val id: Int,
     var value: R,
-    private val program: Aggregate<Int>.(Environment<R>) -> R,
+    private val program: Aggregate<Int>.(Environment<R>, Int) -> R,
 ) {
     private var network = NetworkDevice()
 
     /**
      * The Collektive instance associated with this node.
      */
-    val collektive = Collektive(id, network) { program(environment) }
+    val collektive = Collektive(id, network) { program(environment, id) }
 
     /**
      * Runs a Collektive cycle for this node.
