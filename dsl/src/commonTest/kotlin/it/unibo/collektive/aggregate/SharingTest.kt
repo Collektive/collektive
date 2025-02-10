@@ -1,6 +1,5 @@
 package it.unibo.collektive.aggregate
 
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.operators.share
@@ -10,18 +9,21 @@ import it.unibo.collektive.field.operations.max
 import it.unibo.collektive.field.operations.min
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
+import kotlin.test.Test
 
-class SharingTest : StringSpec({
+class SharingTest {
     val findMax: (Field<*, Int>) -> Int = { e -> e.max(e.localValue) }
 
-    "first time sharing" {
+    @Test
+    fun `first time sharing`() {
         aggregate(0) {
             val res = share(1, findMax)
             res shouldBe 1
         }
     }
 
-    "Share with two aligned devices" {
+    @Test
+    fun `Share with three aligned devices`() {
         val nm = NetworkManager()
 
         // Device 1
@@ -58,7 +60,8 @@ class SharingTest : StringSpec({
         }
     }
 
-    "Share with lambda body should work fine" {
+    @Test
+    fun `Share with lambda body should work fine`() {
         val testNetwork = NetworkImplTest(NetworkManager(), 1)
 
         aggregate(1, testNetwork) {
@@ -70,7 +73,8 @@ class SharingTest : StringSpec({
         }
     }
 
-    "Sharing should return the value passed in the yielding function" {
+    @Test
+    fun `Sharing should return the value passed in the yielding function`() {
         val testNetwork = NetworkImplTest(NetworkManager(), 1)
 
         aggregate(1, testNetwork) {
@@ -83,7 +87,8 @@ class SharingTest : StringSpec({
         }
     }
 
-    "Sharing should work fine even with null as value" {
+    @Test
+    fun `Sharing should work fine even with null as value`() {
         val testNetwork = NetworkImplTest(NetworkManager(), 1)
 
         aggregate(1, testNetwork) {
@@ -95,4 +100,4 @@ class SharingTest : StringSpec({
             res shouldBe null
         }
     }
-})
+}

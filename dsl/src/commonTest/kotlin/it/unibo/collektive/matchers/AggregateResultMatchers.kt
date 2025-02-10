@@ -5,6 +5,7 @@ import io.kotest.matchers.MatcherResult
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.AggregateResult
 import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.networking.NoNeighborsData
 import it.unibo.collektive.path.Path
 
 /**
@@ -22,8 +23,14 @@ import it.unibo.collektive.path.Path
  */
 fun <ID : Any, R> alignWith(expected: AggregateResult<ID, R>) =
     Matcher<AggregateResult<ID, R>> { valueResult ->
-        val originPaths = valueResult.toSend.messagesFor(valueResult.localId).keys
-        val expectedPaths = expected.toSend.messagesFor(valueResult.localId).keys
+        val originPaths =
+            valueResult.toSend
+                .prepareMessageFor(valueResult.localId)
+                .sharedData.keys
+        val expectedPaths =
+            expected.toSend
+                .prepareMessageFor(valueResult.localId)
+                .sharedData.keys
         aggregateMatcher(expectedPaths, originPaths)
     }
 
@@ -40,11 +47,11 @@ fun <ID : Any, R> alignWith(expected: AggregateResult<ID, R>) =
 fun <R> alignWith(expected: Aggregate<Int>.() -> R): Matcher<Aggregate<Int>.() -> R> =
     Matcher { program ->
         val expectedRes =
-            aggregate(0, emptyMap(), emptySet(), expected)
-                .run { toSend.messagesFor(this.localId).keys }
+            aggregate(0, emptyMap(), NoNeighborsData(), compute = expected)
+                .run { toSend.prepareMessageFor(this.localId).sharedData.keys }
         val result =
-            aggregate(0, emptyMap(), emptySet(), program)
-                .run { toSend.messagesFor(this.localId).keys }
+            aggregate(0, emptyMap(), NoNeighborsData(), compute = program)
+                .run { toSend.prepareMessageFor(this.localId).sharedData.keys }
         aggregateMatcher(expectedRes, result)
     }
 

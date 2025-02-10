@@ -7,6 +7,7 @@
  */
 package it.unibo.collektive.stdlib.test
 
+import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
 import it.unibo.collektive.stdlib.spreading.distanceTo
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
@@ -14,13 +15,17 @@ import kotlin.math.abs
 import kotlin.math.sqrt
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class DistanceToTest {
-    private fun Environment<Double>.gradientIsStable(isMoore: Boolean): Boolean =
+    private fun Environment<Double>.gradientIsStable(
+        isMoore: Boolean,
+        size: Int,
+    ): Boolean =
         status().all { (id, value) ->
-            val x = id % 10
-            val y = id / 10
+            val x = id % size
+            val y = id / size
             val steps = x + y
             val expected =
                 when {
@@ -30,6 +35,7 @@ class DistanceToTest {
                         val diagonalSteps = (steps - manhattanSteps) / 2
                         sqrt(2.0) * diagonalSteps + manhattanSteps
                     }
+
                     else -> steps
                 }
             abs(value - expected.toFloat()) < 1e-6
@@ -40,7 +46,7 @@ class DistanceToTest {
             val localPosition = environment.positionOf(localId)
             distanceTo(localId == 0) { neighboring(localPosition).map { it.distanceTo(localPosition) } }
         }.apply {
-            assertEquals(100, nodes.size)
+            assertEquals(size * size, nodes.size)
             val initial = status().values.distinct()
             assertEquals(1, initial.size)
             check(initial.first().isNaN()) {
@@ -52,12 +58,12 @@ class DistanceToTest {
     fun `distanceTo in the luckiest case stabilizes in one cycle`() {
         val environment: Environment<Double> = mooreGridWithGradient(10)
         environment.cycleInOrder()
-        assertTrue(environment.gradientIsStable(isMoore = true))
+        assertTrue(environment.gradientIsStable(isMoore = true, 10))
     }
 
     @Test
     fun `distanceTo requires at most the longest path length cycles to stabilize`() {
-        val size = 10
+        val size = 5
         val environment: Environment<Double> = mooreGridWithGradient(size)
         environment.cycleInReverseOrder()
         val firstRound = environment.status()
@@ -71,10 +77,10 @@ class DistanceToTest {
         }
 
         repeat(size - 1) {
-            assertTrue(!environment.gradientIsStable(isMoore = true))
+            assertFalse(environment.gradientIsStable(isMoore = true, size))
             environment.cycleInReverseOrder()
         }
 
-        assertTrue(environment.gradientIsStable(isMoore = true))
+        assertTrue(environment.gradientIsStable(isMoore = true, size))
     }
 }

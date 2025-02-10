@@ -1,38 +1,41 @@
 package it.unibo.collektive.aggregate.api.impl
 
 import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
 import it.unibo.collektive.aggregate.api.YieldingContext
 import it.unibo.collektive.aggregate.api.YieldingResult
 import it.unibo.collektive.aggregate.api.YieldingScope
 import it.unibo.collektive.aggregate.api.impl.stack.Stack
-import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.field.ConstantField
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.networking.InboundMessage
-import it.unibo.collektive.networking.OutboundMessage
-import it.unibo.collektive.networking.SingleOutboundMessage
+import it.unibo.collektive.networking.NeighborsData
+import it.unibo.collektive.networking.OutboundEnvelope
+import it.unibo.collektive.networking.OutboundEnvelope.SharedData
 import it.unibo.collektive.path.Path
+import it.unibo.collektive.path.PathFactory
 import it.unibo.collektive.state.State
 import it.unibo.collektive.state.impl.getTyped
+import kotlin.reflect.KClass
 
 /**
  * Context for managing aggregate computation.
- * It represents the [localId] of the device, the [messages] received from the neighbours,
+ * It represents the [localId] of the device, the [inboundMessage] received from the neighbours,
  * and the [previousState] of the device.
  */
 internal class AggregateContext<ID : Any>(
     override val localId: ID,
-    private val messages: Iterable<InboundMessage<ID>>,
+    private val inboundMessage: NeighborsData<ID>,
     private val previousState: State,
+    pathFactory: PathFactory,
 ) : Aggregate<ID> {
-    private val stack = Stack()
+    private val stack = Stack(pathFactory)
     private var state: MutableMap<Path, Any?> = mutableMapOf()
-    private val toBeSent = OutboundMessage(messages.count(), localId)
+    private val toBeSent: OutboundEnvelope<ID> = OutboundEnvelope(inboundMessage.neighbors.size)
 
     /**
      * Messages to send to the other nodes.
      */
-    fun messagesToSend(): OutboundMessage<ID> = toBeSent
+    fun messagesToSend(): OutboundEnvelope<ID> = toBeSent
 
     /**
      * Return the current state of the device as a new state.
@@ -44,31 +47,33 @@ internal class AggregateContext<ID : Any>(
         others: Map<ID, T>,
     ): Field<ID, T> = Field(localId, localValue, others)
 
-    override fun <X> exchange(
-        initial: X,
-        body: (Field<ID, X>) -> Field<ID, X>,
-    ): Field<ID, X> = exchanging(initial) { field -> body(field).run { yielding { this } } }
+    override fun <Initial> exchange(
+        initial: Initial,
+        kClass: KClass<*>,
+        body: (Field<ID, Initial>) -> Field<ID, Initial>,
+    ): Field<ID, Initial> = exchanging(initial, kClass) { field -> body(field).run { yielding { this } } }
 
     override fun <Init, Ret> exchanging(
         initial: Init,
+        kClass: KClass<*>,
         body: YieldingScope<Field<ID, Init>, Field<ID, Ret>>,
     ): Field<ID, Ret> {
         val path: Path = stack.currentPath()
-        val messages = messagesAt<Init>(path)
+        val messages = inboundMessage.dataAt<Init>(path, kClass)
         val previous = stateAt(path, initial)
         val subject = newField(previous, messages)
         val context = YieldingContext<Field<ID, Init>, Field<ID, Ret>>()
         return body(context, subject)
             .also {
                 val message =
-                    SingleOutboundMessage(
+                    SharedData(
                         it.toSend.localValue,
                         when (it.toSend) {
                             is ConstantField<ID, Init> -> emptyMap()
                             else -> it.toSend.excludeSelf()
                         },
                     )
-                toBeSent.addMessage(path, message)
+                toBeSent.addData(path, message, kClass)
                 state += path to it.toSend.localValue
             }.toReturn
     }
@@ -87,10 +92,13 @@ internal class AggregateContext<ID : Any>(
             }.toReturn
     }
 
-    override fun <Scalar> neighboring(local: Scalar): Field<ID, Scalar> {
+    override fun <Scalar> neighboring(
+        local: Scalar,
+        kClass: KClass<*>,
+    ): Field<ID, Scalar> {
         val path = stack.currentPath()
-        val neighborValues = messagesAt<Scalar>(path)
-        toBeSent.addMessage(path, SingleOutboundMessage(local))
+        val neighborValues = inboundMessage.dataAt<Scalar>(path, kClass)
+        toBeSent.addData(path, SharedData(local), kClass)
         return newField(local, neighborValues)
     }
 
@@ -117,18 +125,6 @@ internal class AggregateContext<ID : Any>(
 
     override fun dealign() = stack.dealign()
 
-    @Suppress("UNCHECKED_CAST")
-    private fun <T> messagesAt(path: Path): Map<ID, T> =
-        messages
-            .mapNotNull { received ->
-                received.messages
-                    .getOrElse(path) { NoEntry }
-                    .takeIf { it != NoEntry }
-                    ?.let { received.senderId to it as T }
-            }.associate { it }
-
-    private object NoEntry
-
     private fun <T> stateAt(
         path: Path,
         default: T,
@@ -136,16 +132,20 @@ internal class AggregateContext<ID : Any>(
 }
 
 /**
- * Projects the field into the current context.
- * This method is meant to be used internally by the Collektive compiler plugin and,
- * unless there is some major bug that needs to be worked around with a kludge,
- * it should never be called, as it incurs in a performance penalty
- * both in computation and message size.
+ * Projects the field into the current context, restricting the field to the current context.
+ *
  * A field may be misaligned if captured by a sub-scope which contains an alignment operation.
  * This function takes such [field] and restricts it to be aligned with the current neighbors.
+ *
+ * This method is meant to be used internally by the Collektive compiler plugin
+ * and should never be called from the outside.
+ *
+ * If you happen to call it, be aware that you are probably building a terrible kludge that will
+ * break sooner or later.
+ *
  */
 fun <ID : Any, T> Aggregate<ID>.project(field: Field<ID, T>): Field<ID, T> {
-    val others = neighboringViaExchange(0.toByte())
+    val others = neighboring(0.toByte())
     return when {
         field.neighborsCount == others.neighborsCount -> field
         field.neighborsCount > others.neighborsCount -> others.mapWithId { id, _ -> field[id] }

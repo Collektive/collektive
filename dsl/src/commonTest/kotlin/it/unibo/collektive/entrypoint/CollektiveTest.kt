@@ -5,6 +5,7 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive
 import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchange
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
@@ -54,7 +55,7 @@ class CollektiveTest : StringSpec({
     "Collektive compute function can be a val" {
         val networkManager = NetworkManager()
         val network0 = NetworkImplTest(networkManager, id0)
-        val collectiveDevice = Collektive(id0, network0, computeFunctionDevice0)
+        val collectiveDevice = Collektive(id0, network0, computeFunction = computeFunctionDevice0)
 
         val result = collectiveDevice.cycle()
         result shouldBe 3
@@ -74,11 +75,11 @@ class CollektiveTest : StringSpec({
         val network0 = NetworkImplTest(networkManager, id0)
         val network1 = NetworkImplTest(networkManager, id1)
 
-        val collektiveDevice0 = Collektive(id0, network0, computeFunctionDevice0)
-        val collektiveDevice1 = Collektive(id1, network1, computeFunctionDevice0)
+        val collektiveDevice0 = Collektive(id0, network0, computeFunction = computeFunctionDevice0)
+        val collektiveDevice1 = Collektive(id1, network1, computeFunction = computeFunctionDevice0)
 
         collektiveDevice0.cycle() shouldBe 3
-        network0.read() shouldHaveSize 0
+        network0.currentInbound().neighbors shouldHaveSize 0
 
         collektiveDevice1.cycle() shouldBe 3
     }
@@ -88,8 +89,8 @@ class CollektiveTest : StringSpec({
         val network0 = NetworkImplTest(networkManager, id0)
         val network1 = NetworkImplTest(networkManager, id1)
 
-        val collektiveDevice0 = Collektive(id0, network0, computeFunctionDevice0)
-        val collektiveDevice1 = Collektive(id1, network1, computeFunctionDevice0)
+        val collektiveDevice0 = Collektive(id0, network0, computeFunction = computeFunctionDevice0)
+        val collektiveDevice1 = Collektive(id1, network1, computeFunction = computeFunctionDevice0)
 
         collektiveDevice0.cycleWhile { it.result < 6 } shouldBe 6
         collektiveDevice1.cycleWhile { it.result < 10 } shouldBe 14
@@ -122,7 +123,7 @@ class CollektiveTest : StringSpec({
         val network0 = NetworkImplTest(networkManager, id0)
         val network1 = NetworkImplTest(networkManager, id1)
 
-        val collektiveDevice0 = Collektive(id0, network0, computeFunctionDevice0)
+        val collektiveDevice0 = Collektive(id0, network0, computeFunction = computeFunctionDevice0)
         val collektiveDevice1 = Collektive(id1, network1) { computeFunctionDevice1() }
 
         collektiveDevice0.cycle() shouldBe 3
