@@ -6,6 +6,8 @@ import it.unibo.collektive.networking.NeighborsData
 import it.unibo.collektive.networking.OutboundEnvelope
 
 class NetworkImplTest(private val networkManager: NetworkManager, private val localId: Int) : Mailbox<Int> {
+    override val inMemory: Boolean = false
+
     override fun deliverableFor(
         id: Int,
         outboundMessage: OutboundEnvelope<Int>,

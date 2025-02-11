@@ -4,7 +4,6 @@ import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchange
 import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchanging
 import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
 import it.unibo.collektive.field.Field
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.serializer
 
 typealias YieldingScope<Initial, Return> = YieldingContext<Initial, Return>.(Initial) -> YieldingResult<Initial, Return>
@@ -14,6 +13,12 @@ typealias YieldingScope<Initial, Return> = YieldingContext<Initial, Return>.(Ini
  * Holds the [localId] of the device executing the aggregate program.
  */
 interface Aggregate<ID : Any> {
+    /**
+     * Whether this context works only in memory.
+     * If false, this context is capable of serializing and deserializing messages.
+     */
+    val inMemoryOnly: Boolean
+
     /**
      * The local [ID] of the device.
      */
@@ -37,7 +42,7 @@ interface Aggregate<ID : Any> {
      */
     fun <Initial> exchange(
         initial: Initial,
-        kClass: KSerializer<Initial>,
+        dataSharingMethod: DataSharingMethod<Initial>,
         body: (Field<ID, Initial>) -> Field<ID, Initial>,
     ): Field<ID, Initial>
 
@@ -54,7 +59,7 @@ interface Aggregate<ID : Any> {
      */
     fun <Initial, Return> exchanging(
         initial: Initial,
-        kClass: KSerializer<Initial>,
+        dataSharingMethod: DataSharingMethod<Initial>,
         body: YieldingScope<Field<ID, Initial>, Field<ID, Return>>,
     ): Field<ID, Return>
 
@@ -96,7 +101,7 @@ interface Aggregate<ID : Any> {
      */
     fun <Scalar> neighboring(
         local: Scalar,
-        kClass: KSerializer<Scalar>,
+        dataSharingMethod: DataSharingMethod<Scalar>,
     ): Field<ID, Scalar>
 
     /**
@@ -125,12 +130,22 @@ interface Aggregate<ID : Any> {
      */
     companion object {
         /**
+         * Inline access to the data serialization method of an [Aggregate].
+         * This method is used to avoid building serializers for in-memory-only contexts.
+         */
+        inline fun <reified T> Aggregate<*>.dataSharingMethod(): DataSharingMethod<T> =
+            when {
+                inMemoryOnly -> InMemory
+                else -> Serialize<T>(serializer<T>())
+            }
+
+        /**
          * Inlined version of the [Aggregate.exchange] function.
          */
         inline fun <ID : Any, reified Initial> Aggregate<ID>.exchange(
             initial: Initial,
             noinline body: (Field<ID, Initial>) -> Field<ID, Initial>,
-        ): Field<ID, Initial> = exchange(initial, serializer(), body)
+        ): Field<ID, Initial> = exchange(initial, dataSharingMethod(), body)
 
         /**
          * Inlined version of the [Aggregate.exchanging] function.
@@ -138,12 +153,12 @@ interface Aggregate<ID : Any> {
         inline fun <ID : Any, reified Initial, Return> Aggregate<ID>.exchanging(
             initial: Initial,
             noinline body: YieldingScope<Field<ID, Initial>, Field<ID, Return>>,
-        ): Field<ID, Return> = exchanging(initial, serializer(), body)
+        ): Field<ID, Return> = exchanging(initial, dataSharingMethod(), body)
 
         /**
          * Inlined version of the [Aggregate.neighboring] function.
          */
         inline fun <ID : Any, reified Scalar> Aggregate<ID>.neighboring(local: Scalar): Field<ID, Scalar> =
-            neighboring(local, serializer())
+            neighboring(local, dataSharingMethod())
     }
 }
