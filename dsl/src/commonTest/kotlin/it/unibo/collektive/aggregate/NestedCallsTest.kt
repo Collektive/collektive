@@ -1,6 +1,7 @@
 package it.unibo.collektive.aggregate
 
 import it.unibo.collektive.Collektive
+import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.aggregate.api.operators.share
