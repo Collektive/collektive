@@ -37,7 +37,7 @@ data class GossipValue<ID : Comparable<ID>, Value>(
  * Spreads across all (aligned) devices the current maximum [Value] of [local],
  * as computed by [comparator].
  */
-inline fun <reified ID : Comparable<ID>, Value> Aggregate<ID>.gossipMax(
+inline fun <reified ID : Comparable<ID>, reified Value> Aggregate<ID>.gossipMax(
     local: Value,
     comparator: Comparator<Value>,
 ): Value {
