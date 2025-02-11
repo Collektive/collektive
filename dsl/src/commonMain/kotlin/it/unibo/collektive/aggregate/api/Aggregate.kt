@@ -136,7 +136,7 @@ interface Aggregate<ID : Any> {
         inline fun <reified T> Aggregate<*>.dataSharingMethod(): DataSharingMethod<T> =
             when {
                 inMemoryOnly -> InMemory
-                else -> Serialize<T>(serializer<T>())
+                else -> Serialize(serializer())
             }
 
         /**
