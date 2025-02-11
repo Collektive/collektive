@@ -10,6 +10,8 @@ package it.unibo.collektive.networking
 
 import it.unibo.collektive.path.Path
 import kotlinx.serialization.BinaryFormat
+import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialFormat
 import kotlinx.serialization.StringFormat
 import kotlinx.serialization.decodeFromByteArray
@@ -17,7 +19,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlin.reflect.KClass
+import kotlinx.serialization.serializer
 
 class SerializerNetworkTest(private val serializer: SerialFormat = Json) : Mailbox<Int> {
     val messages = mutableMapOf<Int, Message<Int, Any?>>()
@@ -56,19 +58,30 @@ class SerializerNetworkTest(private val serializer: SerialFormat = Json) : Mailb
         messages[message.senderId] = message
     }
 
+    @OptIn(InternalSerializationApi::class)
     override fun currentInbound(): NeighborsData<Int> =
         object : NeighborsData<Int> {
             override val neighbors: Set<Int> get() = messages.keys
 
             override fun <Value> dataAt(
                 path: Path,
-                kClass: KClass<*>,
+                kClass: KSerializer<Value>,
             ): Map<Int, Value> =
                 messages
                     .mapValues { (_, message) ->
-                        @Suppress("UNCHECKED_CAST")
-                        message.sharedData.getOrElse(path) { NoValue } as Value
+                        require(message.sharedData.all { it.value is ByteArray }) {
+                            "Message ${message.senderId} is not serialized"
+                        }
+                        message.sharedData.getOrElse(path) { NoValue }
                     }.filterValues { it != NoValue }
+                    .mapValues { (_, payload) ->
+                        val byteArrayPayload = payload as ByteArray
+                        when (serializer) {
+                            is StringFormat -> serializer.decodeFromString(kClass, byteArrayPayload.decodeToString())
+                            is BinaryFormat -> serializer.decodeFromByteArray(kClass, byteArrayPayload)
+                            else -> error("Unsupported serializer")
+                        }
+                    }
         }
 
     private object NoValue

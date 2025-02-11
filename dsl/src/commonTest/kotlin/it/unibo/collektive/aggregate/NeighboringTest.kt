@@ -1,145 +1,119 @@
 package it.unibo.collektive.aggregate
 
-import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.maps.shouldContainValue
-import io.kotest.matchers.maps.shouldHaveSize
 import it.unibo.collektive.Collektive.Companion.aggregate
+import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
-import it.unibo.collektive.network.NetworkImplTest
-import it.unibo.collektive.network.NetworkManager
+import it.unibo.collektive.field.Field
+import it.unibo.collektive.field.operations.all
+import it.unibo.collektive.testing.Environment
+import it.unibo.collektive.testing.mooreGrid
+import kotlin.test.Test
+import kotlin.test.assertContains
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
-class NeighboringTest : StringSpec({
-    // device ids
-    val id0 = 0
-    val id1 = 1
-    val id2 = 2
-    val id3 = 3
+class NeighboringTest {
+    private fun mooreGrid(
+        size: Int,
+        program: Aggregate<Int>.(Environment<Field<Int, Int>>, Int) -> Field<Int, Int>,
+    ) = mooreGrid(size, size, { _, _ -> Field(Int.MAX_VALUE, 0) }, program).also {
+        assertEquals(size * size, it.nodes.size)
+    }
 
-    // values
-    val initV1 = 1
-    val initV2 = 2
-    val initV3 = 3
-    val double: (Int) -> Int = { it * 2 }
-    val add: (Int) -> Int = { it + 1 }
-
-    "Neighboring must produce a field with the local value when no neighbours are present" {
-        aggregate(id0) {
-            val field = neighboringViaExchange(initV1)
-            field.toMap() shouldContainValue initV1
+    @Test
+    fun `neighboring must produce a field with the local value when no neighbours are present`() {
+        aggregate(0) {
+            val field = neighboringViaExchange(1)
+            assertContains(field.toMap().values, 1)
+            assertEquals(1, field.localValue)
         }
     }
 
-    "Optimized neighboring must produce a field with the local value when no neighbours are present" {
-        aggregate(id0) {
-            val field = neighboring(initV1)
-            field.toMap() shouldContainValue initV1
+    @Test
+    fun `optimized neighboring must produce a field with the local value when no neighbours are present`() {
+        aggregate(0) {
+            val field = neighboring(1)
+            assertContains(field.toMap().values, 1)
+            assertEquals(1, field.localValue)
         }
     }
 
-    "Neighboring works across three aligned devices" {
-        val nm = NetworkManager()
-
-        // Device 1
-        val testNetwork1 = NetworkImplTest(nm, id1)
-        aggregate(id1, testNetwork1) {
-            val field = neighboringViaExchange(double(initV1))
-            field.toMap() shouldContainValue 2
+    @Test
+    fun `neighboring should build a field containing the values of the aligned neighbors`() {
+        val size = 5
+        val environment =
+            mooreGrid(size) { _, _ ->
+                neighboringViaExchange(1)
+            }
+        repeat(size - 1) {
+            environment.cycleInOrder()
         }
-
-        // Device 2
-        val testNetwork2 = NetworkImplTest(nm, id2)
-        aggregate(id2, testNetwork2) {
-            val field = neighboringViaExchange(double(initV2))
-            field.toMap() shouldContainValue 2
-            field.toMap() shouldContainValue 4
-        }
-
-        // Device 3
-        val testNetwork3 = NetworkImplTest(nm, id3)
-        aggregate(id3, testNetwork3) {
-            val field = neighboringViaExchange(double(initV3))
-            field.toMap() shouldContainValue 4
-            field.toMap() shouldContainValue 6
+        environment.status().forEach { (_, field) ->
+            assertEquals(1, field.localValue)
+            assertTrue(field.all { it == 1 })
         }
     }
 
-    "Optimized neighboring works across three aligned devices" {
-        val nm = NetworkManager()
-
-        // Device 1
-        val testNetwork1 = NetworkImplTest(nm, id1)
-        aggregate(id1, testNetwork1) {
-            val field = neighboring(double(initV1))
-            field.toMap() shouldContainValue 2
+    @Test
+    fun `optimized neighboring should build a field containing the values of the aligned neighbors`() {
+        val size = 10
+        val environment =
+            mooreGrid(size) { _, _ ->
+                neighboring(1)
+            }
+        repeat(size - 1) {
+            environment.cycleInOrder()
         }
-
-        // Device 2
-        val testNetwork2 = NetworkImplTest(nm, id2)
-        aggregate(id2, testNetwork2) {
-            val field = neighboring(double(initV2))
-            field.toMap() shouldContainValue 2
-            field.toMap() shouldContainValue 4
-        }
-
-        // Device 3
-        val testNetwork3 = NetworkImplTest(nm, id3)
-        aggregate(id3, testNetwork3) {
-            val field = neighboring(double(initV3))
-            field.toMap() shouldContainValue 4
-            field.toMap() shouldContainValue 6
+        environment.status().forEach { (_, field) ->
+            assertEquals(1, field.localValue)
+            assertTrue(field.all { it == 1 })
         }
     }
 
-    "Non-aligned devices do not communicate" {
-        val nm = NetworkManager()
+    @Test
+    fun `only aligned devices should communicate each other`() {
+        val size = 2
+        val condition: (Int) -> Boolean = { it % 2 == 0 }
+        val environment =
+            mooreGrid(size) { _, id ->
+                fun kingBehaviour() = neighboringViaExchange(1)
 
-        // Device 1
-        val isDeviceOneKing = true
-        val testNetwork1 = NetworkImplTest(nm, id1)
-        aggregate(id1, testNetwork1) {
-            fun kingBehaviour() = neighboringViaExchange(double(initV2))
-
-            fun queenBehaviour() = neighboringViaExchange(add(initV1))
-            val f = if (isDeviceOneKing) kingBehaviour() else queenBehaviour()
-            f.toMap() shouldHaveSize 1
+                fun queenBehaviour() = neighboringViaExchange(2)
+                if (condition(id)) kingBehaviour() else queenBehaviour()
+            }
+        repeat(size - 1) {
+            environment.cycleInOrder()
         }
-
-        // Device 2
-        val isDeviceTwoKing = false
-        val testNetwork2 = NetworkImplTest(nm, id2)
-        aggregate(id2, testNetwork2) {
-            fun kingBehaviour() = neighboringViaExchange(double(initV1))
-
-            fun queenBehaviour() = neighboringViaExchange(add(initV2))
-            val field = if (isDeviceTwoKing) kingBehaviour() else queenBehaviour()
-            field.toMap() shouldHaveSize 1
-        }
-    }
-
-    "Non-aligned devices do not communicate with optimized neighboring" {
-        val nm = NetworkManager()
-
-        // Device 1
-        val isDeviceOneKing = true
-        val testNetwork1 = NetworkImplTest(nm, id1)
-        aggregate(id1, testNetwork1) {
-            fun kingBehaviour() = neighboring(double(initV2))
-
-            fun queenBehaviour() = neighboring(add(initV1))
-            val f = if (isDeviceOneKing) kingBehaviour() else queenBehaviour()
-            f.toMap() shouldHaveSize 1
-        }
-
-        // Device 2
-        val isDeviceTwoKing = false
-        val testNetwork2 = NetworkImplTest(nm, id2)
-        aggregate(id2, testNetwork2) {
-            fun kingBehaviour() = neighboring(double(initV1))
-
-            fun queenBehaviour() = neighboring(add(initV2))
-            val field = if (isDeviceTwoKing) kingBehaviour() else queenBehaviour()
-            field.toMap() shouldHaveSize 1
+        environment.status().forEach { (id, field) ->
+            if (condition(id)) {
+                assertEquals(1, field.localValue)
+                assertTrue(field.all { it == 1 })
+            } else {
+                assertEquals(2, field.localValue)
+                assertTrue(field.all { it == 2 })
+            }
         }
     }
-})
+
+    @Test
+    fun `only aligned devices should communicate each other with optimized neighboring`() {
+        val size = 4
+        val condition: (Int) -> Boolean = { it % 2 == 0 }
+        val environment =
+            mooreGrid(size) { _, id ->
+                fun kingBehaviour() = neighboring(1)
+
+                fun queenBehaviour() = neighboring(2)
+                if (condition(id)) kingBehaviour() else queenBehaviour()
+            }
+        repeat(size - 1) {
+            environment.cycleInOrder()
+        }
+        environment.status().forEach { (id, field) ->
+            val expectedValue = if (condition(id)) 1 else 2
+            assertEquals(expectedValue, field.localValue)
+            assertTrue(field.all { it == expectedValue })
+        }
+    }
+}

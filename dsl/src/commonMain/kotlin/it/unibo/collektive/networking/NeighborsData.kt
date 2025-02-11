@@ -9,7 +9,7 @@
 package it.unibo.collektive.networking
 
 import it.unibo.collektive.path.Path
-import kotlin.reflect.KClass
+import kotlinx.serialization.KSerializer
 
 /**
  * TODO.
@@ -25,7 +25,7 @@ interface NeighborsData<ID : Any> {
      */
     fun <Value> dataAt(
         path: Path,
-        kClass: KClass<*>,
+        kClass: KSerializer<Value>,
     ): Map<ID, Value>
 }
 
@@ -37,6 +37,6 @@ class NoNeighborsData<ID : Any> : NeighborsData<ID> {
 
     override fun <Value> dataAt(
         path: Path,
-        kClass: KClass<*>,
+        kClass: KSerializer<Value>,
     ): Map<ID, Value> = emptyMap()
 }

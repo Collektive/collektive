@@ -38,7 +38,7 @@ open class Environment<R>(
     fun addNode(
         position: Position,
         initial: R,
-        program: Aggregate<Int>.(Environment<R>) -> R,
+        program: Aggregate<Int>.(Environment<R>, Int) -> R,
     ) {
         positions[Node(this, nextId++, initial, program)] = position
     }
