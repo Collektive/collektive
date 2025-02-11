@@ -4,7 +4,8 @@ import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchange
 import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchanging
 import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
 import it.unibo.collektive.field.Field
-import kotlin.reflect.KClass
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.serializer
 
 typealias YieldingScope<Initial, Return> = YieldingContext<Initial, Return>.(Initial) -> YieldingResult<Initial, Return>
 
@@ -36,7 +37,7 @@ interface Aggregate<ID : Any> {
      */
     fun <Initial> exchange(
         initial: Initial,
-        kClass: KClass<*>,
+        kClass: KSerializer<Initial>,
         body: (Field<ID, Initial>) -> Field<ID, Initial>,
     ): Field<ID, Initial>
 
@@ -53,7 +54,7 @@ interface Aggregate<ID : Any> {
      */
     fun <Initial, Return> exchanging(
         initial: Initial,
-        kClass: KClass<*>,
+        kClass: KSerializer<Initial>,
         body: YieldingScope<Field<ID, Initial>, Field<ID, Return>>,
     ): Field<ID, Return>
 
@@ -95,7 +96,7 @@ interface Aggregate<ID : Any> {
      */
     fun <Scalar> neighboring(
         local: Scalar,
-        kClass: KClass<*>,
+        kClass: KSerializer<Scalar>,
     ): Field<ID, Scalar>
 
     /**
@@ -129,7 +130,7 @@ interface Aggregate<ID : Any> {
         inline fun <ID : Any, reified Initial> Aggregate<ID>.exchange(
             initial: Initial,
             noinline body: (Field<ID, Initial>) -> Field<ID, Initial>,
-        ): Field<ID, Initial> = exchange(initial, Initial::class, body)
+        ): Field<ID, Initial> = exchange(initial, serializer(), body)
 
         /**
          * Inlined version of the [Aggregate.exchanging] function.
@@ -137,12 +138,12 @@ interface Aggregate<ID : Any> {
         inline fun <ID : Any, reified Initial, Return> Aggregate<ID>.exchanging(
             initial: Initial,
             noinline body: YieldingScope<Field<ID, Initial>, Field<ID, Return>>,
-        ): Field<ID, Return> = exchanging(initial, Initial::class, body)
+        ): Field<ID, Return> = exchanging(initial, serializer(), body)
 
         /**
          * Inlined version of the [Aggregate.neighboring] function.
          */
         inline fun <ID : Any, reified Scalar> Aggregate<ID>.neighboring(local: Scalar): Field<ID, Scalar> =
-            neighboring(local, Scalar::class)
+            neighboring(local, serializer())
     }
 }

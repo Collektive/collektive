@@ -8,12 +8,12 @@
 
 package it.unibo.collektive.networking
 
-import kotlin.reflect.KClass
+import kotlinx.serialization.KSerializer
 
 /**
  * Representation of a payload with its [payload] and [representation].
  */
 data class PayloadRepresentation<Payload>(
     val payload: Payload,
-    val representation: KClass<*>,
+    val representation: KSerializer<Payload>,
 )

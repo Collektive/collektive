@@ -15,7 +15,7 @@ import it.unibo.collektive.path.Path
 import it.unibo.collektive.path.PathFactory
 import it.unibo.collektive.state.State
 import it.unibo.collektive.state.impl.getTyped
-import kotlin.reflect.KClass
+import kotlinx.serialization.KSerializer
 
 /**
  * Context for managing aggregate computation.
@@ -49,13 +49,13 @@ internal class AggregateContext<ID : Any>(
 
     override fun <Initial> exchange(
         initial: Initial,
-        kClass: KClass<*>,
+        kClass: KSerializer<Initial>,
         body: (Field<ID, Initial>) -> Field<ID, Initial>,
     ): Field<ID, Initial> = exchanging(initial, kClass) { field -> body(field).run { yielding { this } } }
 
     override fun <Init, Ret> exchanging(
         initial: Init,
-        kClass: KClass<*>,
+        kClass: KSerializer<Init>,
         body: YieldingScope<Field<ID, Init>, Field<ID, Ret>>,
     ): Field<ID, Ret> {
         val path: Path = stack.currentPath()
@@ -94,7 +94,7 @@ internal class AggregateContext<ID : Any>(
 
     override fun <Scalar> neighboring(
         local: Scalar,
-        kClass: KClass<*>,
+        kClass: KSerializer<Scalar>,
     ): Field<ID, Scalar> {
         val path = stack.currentPath()
         val neighborValues = inboundMessage.dataAt<Scalar>(path, kClass)

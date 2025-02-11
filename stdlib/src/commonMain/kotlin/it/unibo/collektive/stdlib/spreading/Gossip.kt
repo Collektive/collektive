@@ -1,3 +1,4 @@
+@file:Suppress("MatchingDeclarationName")
 /*
  * Copyright (c) 2024-2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
@@ -12,29 +13,34 @@ import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.operators.share
 import it.unibo.collektive.field.Field.Companion.fold
 import it.unibo.collektive.field.Field.Companion.foldWithId
+import kotlinx.serialization.Serializable
+
+/**
+ * The best value exchanged in the gossip algorithm.
+ * It contains the [best] value evaluated yet,
+ * the [local] value of the node, and the [path] of nodes through which it has passed.
+ */
+@Serializable
+data class GossipValue<ID : Comparable<ID>, Value>(
+    val best: Value,
+    val local: Value,
+    val path: List<ID> = emptyList(),
+) {
+    /**
+     * TODO.
+     */
+    fun base(id: ID) = GossipValue(local, local, listOf(id))
+}
 
 /**
  * Self-stabilizing gossip-max.
  * Spreads across all (aligned) devices the current maximum [Value] of [local],
  * as computed by [comparator].
  */
-fun <ID : Comparable<ID>, Value> Aggregate<ID>.gossipMax(
+inline fun <reified ID : Comparable<ID>, reified Value> Aggregate<ID>.gossipMax(
     local: Value,
     comparator: Comparator<Value>,
 ): Value {
-    /*
-     * The best value exchanged in the gossip algorithm.
-     * It contains the [best] value evaluated yet,
-     * the [local] value of the node, and the [path] of nodes through which it has passed.
-     */
-    data class GossipValue<ID : Comparable<ID>, Value>(
-        val best: Value,
-        val local: Value,
-        val path: List<ID> = emptyList(),
-    ) {
-        fun base(id: ID) = GossipValue(local, local, listOf(id))
-    }
-
     val localGossip = GossipValue<ID, Value>(best = local, local = local)
     return share(localGossip) { gossip ->
         val neighbors = gossip.neighbors.toSet()
@@ -63,15 +69,16 @@ fun <ID : Comparable<ID>, Value> Aggregate<ID>.gossipMax(
  * Spreads across all (aligned) devices the current maximum [Value] of [local],
  * as computed by first value compared to the second.
  */
-fun <ID : Comparable<ID>, Value : Comparable<Value>> Aggregate<ID>.gossipMax(local: Value): Value =
-    gossipMax(local) { first, second -> first.compareTo(second) }
+inline fun <reified ID : Comparable<ID>, reified Value : Comparable<Value>> Aggregate<ID>.gossipMax(
+    local: Value,
+): Value = gossipMax(local) { first, second -> first.compareTo(second) }
 
 /**
  * Self-stabilizing gossip-min.
  * Spreads across all (aligned) devices the current minimum [Value] of [local],
  * as computed by [comparator].
  */
-fun <ID : Comparable<ID>, Value> Aggregate<ID>.gossipMin(
+inline fun <reified ID : Comparable<ID>, reified Value> Aggregate<ID>.gossipMin(
     local: Value,
     comparator: Comparator<Value>,
 ): Value = gossipMax(local, comparator.reversed())
@@ -82,13 +89,14 @@ fun <ID : Comparable<ID>, Value> Aggregate<ID>.gossipMin(
  * as computed by first value compared to the second,
  * and then reversed.
  */
-fun <ID : Comparable<ID>, Value : Comparable<Value>> Aggregate<ID>.gossipMin(local: Value): Value =
-    gossipMin(local) { first, second -> first.compareTo(second) }
+inline fun <reified ID : Comparable<ID>, reified Value : Comparable<Value>> Aggregate<ID>.gossipMin(
+    local: Value,
+): Value = gossipMin(local) { first, second -> first.compareTo(second) }
 
 /**
  * Returns true if the condition is holding anywhere in the network, false otherwise.
  */
-fun <ID : Comparable<ID>> Aggregate<ID>.isHappeningAnywhere(condition: () -> Boolean): Boolean =
+inline fun <reified ID : Comparable<ID>> Aggregate<ID>.isHappeningAnywhere(condition: () -> Boolean): Boolean =
     gossipMax(condition()) { first, second -> first.compareTo(second) }
 
 /**

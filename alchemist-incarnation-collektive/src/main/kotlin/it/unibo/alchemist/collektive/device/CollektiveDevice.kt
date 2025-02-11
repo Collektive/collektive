@@ -16,7 +16,7 @@ import it.unibo.collektive.networking.NeighborsData
 import it.unibo.collektive.networking.NoNeighborsData
 import it.unibo.collektive.networking.OutboundEnvelope
 import it.unibo.collektive.path.Path
-import kotlin.reflect.KClass
+import kotlinx.serialization.KSerializer
 
 /**
  * Representation of a Collektive device in Alchemist.
@@ -108,7 +108,7 @@ class CollektiveDevice<P>(
             @Suppress("UNCHECKED_CAST")
             override fun <Value> dataAt(
                 path: Path,
-                kClass: KClass<*>,
+                kClass: KSerializer<Value>,
             ): Map<Int, Value> =
                 messages
                     .associateBy { it.senderId }

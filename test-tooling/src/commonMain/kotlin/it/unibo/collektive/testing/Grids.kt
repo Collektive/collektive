@@ -18,7 +18,7 @@ fun <R, E : Environment<R>> E.grid(
     sizeX: Int,
     sizeY: Int,
     initial: (Environment<R>, Position) -> R,
-    program: Aggregate<Int>.(Environment<R>) -> R,
+    program: Aggregate<Int>.(Environment<R>, id: Int) -> R,
 ) = apply {
     for (x in 0 until sizeX) {
         for (y in 0 until sizeY) {
@@ -37,7 +37,7 @@ fun <R> mooreGrid(
     sizeX: Int,
     sizeY: Int,
     initial: (Environment<R>, Position) -> R,
-    program: Aggregate<Int>.(Environment<R>) -> R,
+    program: Aggregate<Int>.(Environment<R>, id: Int) -> R,
 ): EnvironmentWithMeshNetwork<R> =
     EnvironmentWithMeshNetwork<R>(
         SAFE_MOORE_DISTANCE,
@@ -50,7 +50,7 @@ fun <R> vonNeumannGrid(
     sizeX: Int,
     sizeY: Int,
     initial: (Environment<R>, Position) -> R,
-    program: Aggregate<Int>.(Environment<R>) -> R,
+    program: Aggregate<Int>.(Environment<R>, id: Int) -> R,
 ) = EnvironmentWithMeshNetwork<R>(1.0).grid(sizeX, sizeY, initial, program)
 
 fun <R> linearGrid(

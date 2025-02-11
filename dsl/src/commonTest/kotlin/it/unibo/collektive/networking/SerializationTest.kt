@@ -19,6 +19,9 @@ class SerializationTest {
     @Serializable
     data class Custom(val x: Int, val y: Int)
 
+    @Serializable
+    data class CustomGeneric<T>(val t: T)
+
     @Test
     fun `an aggregate output can be serialized when the used network support it`() {
         val network = SerializerNetworkTest()
@@ -51,5 +54,16 @@ class SerializationTest {
             }
             network.serializeAndSend(1)
         }
+    }
+
+    @Test
+    fun `a generic data class should be serialized properly`() {
+        val network = SerializerNetworkTest()
+        aggregate(1, network, emptyMap()) {
+            neighboring(CustomGeneric(localId))
+        }
+        val serializedMessage = network.serializeAndSend(1)
+        network.deserializeAndReceive(serializedMessage)
+        assertEquals(1, network.messages.size)
     }
 }

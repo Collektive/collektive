@@ -42,7 +42,7 @@ class DistanceToTest {
         }
 
     private fun mooreGridWithGradient(size: Int) =
-        mooreGrid<Double>(size, size, { _, _ -> Double.NaN }) { environment ->
+        mooreGrid<Double>(size, size, { _, _ -> Double.NaN }) { environment, _ ->
             val localPosition = environment.positionOf(localId)
             distanceTo(localId == 0) { neighboring(localPosition).map { it.distanceTo(localPosition) } }
         }.apply {
