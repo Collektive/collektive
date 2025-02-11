@@ -12,11 +12,7 @@ kotlinMultiplatform {
         commonTest.dependencies {
             implementation(project(":stdlib"))
             implementation(project(":test-tooling"))
-            implementation(rootProject.libs.bundles.kotlin.testing.common)
-        }
-
-        jvmTest.dependencies {
-            implementation(rootProject.libs.kotest.runner.junit5.jvm)
+            implementation(libs.bundles.kotlin.test)
         }
     }
 }
