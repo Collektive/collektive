@@ -13,12 +13,14 @@ import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.operators.share
 import it.unibo.collektive.field.Field.Companion.fold
 import it.unibo.collektive.field.Field.Companion.foldWithId
+import kotlinx.serialization.Serializable
 
 /**
  * The best value exchanged in the gossip algorithm.
  * It contains the [best] value evaluated yet,
  * the [local] value of the node, and the [path] of nodes through which it has passed.
  */
+@Serializable
 data class GossipValue<ID : Comparable<ID>, Value>(
     val best: Value,
     val local: Value,
