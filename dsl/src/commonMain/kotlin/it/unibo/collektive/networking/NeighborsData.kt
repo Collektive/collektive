@@ -8,8 +8,8 @@
 
 package it.unibo.collektive.networking
 
+import it.unibo.collektive.aggregate.api.DataSharingMethod
 import it.unibo.collektive.path.Path
-import kotlinx.serialization.KSerializer
 
 /**
  * TODO.
@@ -25,7 +25,7 @@ interface NeighborsData<ID : Any> {
      */
     fun <Value> dataAt(
         path: Path,
-        kClass: KSerializer<Value>,
+        dataSharingMethod: DataSharingMethod<Value>,
     ): Map<ID, Value>
 }
 
@@ -37,6 +37,6 @@ class NoNeighborsData<ID : Any> : NeighborsData<ID> {
 
     override fun <Value> dataAt(
         path: Path,
-        kClass: KSerializer<Value>,
+        dataSharingMethod: DataSharingMethod<Value>,
     ): Map<ID, Value> = emptyMap()
 }

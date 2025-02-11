@@ -56,17 +56,18 @@ class Collektive<ID : Any, R>(
     companion object {
         /**
          * Aggregate program entry point which computes an iteration of a device [localId], taking as parameters
-         * the [previousState], the [inbound] messages received from the neighbours and the [compute]
+         * the [previousState], the [inbound] messages received from the neighbors and the [compute]
          * with AggregateContext receiver that provides the aggregate constructs.
          */
         fun <ID : Any, R> aggregate(
             localId: ID,
             previousState: State = emptyMap(),
             inbound: NeighborsData<ID> = NoNeighborsData(),
+            inMemory: Boolean = inbound is NoNeighborsData,
             pathFactory: PathFactory = DigestHashingFactory(),
             compute: Aggregate<ID>.() -> R,
         ): AggregateResult<ID, R> =
-            AggregateContext(localId, inbound, previousState, pathFactory).run {
+            AggregateContext(localId, inbound, previousState, inMemory, pathFactory).run {
                 AggregateResult(localId, compute(), messagesToSend(), newState())
             }
 
@@ -82,7 +83,7 @@ class Collektive<ID : Any, R>(
             pathFactory: PathFactory = DigestHashingFactory(),
             compute: Aggregate<ID>.() -> R,
         ): AggregateResult<ID, R> =
-            with(AggregateContext(localId, network.currentInbound(), previousState, pathFactory)) {
+            with(AggregateContext(localId, network.currentInbound(), previousState, network.inMemory, pathFactory)) {
                 AggregateResult(localId, compute(), messagesToSend(), newState()).also {
                     network.deliverableFor(localId, it.toSend)
                 }

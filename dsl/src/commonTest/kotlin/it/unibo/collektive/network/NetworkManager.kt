@@ -1,10 +1,10 @@
 package it.unibo.collektive.network
 
+import it.unibo.collektive.aggregate.api.DataSharingMethod
 import it.unibo.collektive.networking.Message
 import it.unibo.collektive.networking.NeighborsData
 import it.unibo.collektive.networking.OutboundEnvelope
 import it.unibo.collektive.path.Path
-import kotlinx.serialization.KSerializer
 
 /**
  * A fully connected virtual network.
@@ -34,7 +34,7 @@ class NetworkManager {
             @Suppress("UNCHECKED_CAST")
             override fun <Value> dataAt(
                 path: Path,
-                kClass: KSerializer<Value>,
+                dataSharingMethod: DataSharingMethod<Value>,
             ): Map<Int, Value> =
                 neighborDeliverableMessages
                     .mapValues { it.value.sharedData.getOrElse(path) { NoValue } as Value }

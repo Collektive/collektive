@@ -8,12 +8,12 @@
 
 package it.unibo.collektive.networking
 
-import kotlinx.serialization.KSerializer
+import it.unibo.collektive.aggregate.api.DataSharingMethod
 
 /**
  * Representation of a payload with its [payload] and [representation].
  */
 data class PayloadRepresentation<Payload>(
     val payload: Payload,
-    val representation: KSerializer<Payload>,
+    val representation: DataSharingMethod<Payload>,
 )

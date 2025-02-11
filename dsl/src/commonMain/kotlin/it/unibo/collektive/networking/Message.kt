@@ -8,9 +8,11 @@
 
 package it.unibo.collektive.networking
 
+import it.unibo.collektive.aggregate.api.Serialize
 import it.unibo.collektive.path.Path
 import kotlinx.serialization.BinaryFormat
 import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialFormat
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.StringFormat
@@ -64,15 +66,18 @@ abstract class SerializedMessageFactory<ID : Any, Payload>(
         val serializedSharedData =
             sharedData.mapValues { (_, representation) ->
                 val (value, serial) = representation
+                check(serial is Serialize<*>) {
+                    "Serialization has been required for in-memory messages. This is likely a misconfiguration."
+                }
                 @Suppress("UNCHECKED_CAST")
                 when (serializerFormat) {
                     is StringFormat ->
                         serializerFormat
-                            .encodeToString(serial, value as Payload)
+                            .encodeToString(serial.serializer as KSerializer<Payload>, value as Payload)
                             .encodeToByteArray()
 
                     is BinaryFormat ->
-                        serializerFormat.encodeToByteArray(serial, value as Payload)
+                        serializerFormat.encodeToByteArray(serial.serializer as KSerializer<Payload>, value as Payload)
 
                     else -> error("Unsupported serialization format")
                 }
