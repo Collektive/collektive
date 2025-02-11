@@ -10,12 +10,12 @@ package it.unibo.collektive.testing
 
 import it.unibo.collektive.Collektive
 import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.DataSharingMethod
 import it.unibo.collektive.networking.Mailbox
 import it.unibo.collektive.networking.Message
 import it.unibo.collektive.networking.NeighborsData
 import it.unibo.collektive.networking.OutboundEnvelope
 import it.unibo.collektive.path.Path
-import kotlinx.serialization.KSerializer
 
 /**
  * A network node with an associated [environment], [id], [value], and [program].
@@ -50,6 +50,8 @@ class Node<R>(
      * A network device that can send and receive messages.
      */
     private inner class NetworkDevice : Mailbox<Int> {
+        override val inMemory: Boolean = false
+
         private var messageBuffer: Map<Int, Message<Int, *>> = emptyMap()
 
         override fun deliverableFor(
@@ -74,7 +76,7 @@ class Node<R>(
                 @Suppress("UNCHECKED_CAST")
                 override fun <Value> dataAt(
                     path: Path,
-                    kClass: KSerializer<Value>,
+                    dataSharingMethod: DataSharingMethod<Value>,
                 ): Map<Int, Value> =
                     neighborDeliverableMessages
                         .mapValues { it.value.sharedData.getOrElse(path) { NoValue } as Value }

@@ -8,6 +8,7 @@ import it.unibo.alchemist.model.Time
 import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
+import it.unibo.collektive.aggregate.api.DataSharingMethod
 import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.Mailbox
@@ -16,7 +17,6 @@ import it.unibo.collektive.networking.NeighborsData
 import it.unibo.collektive.networking.NoNeighborsData
 import it.unibo.collektive.networking.OutboundEnvelope
 import it.unibo.collektive.path.Path
-import kotlinx.serialization.KSerializer
 
 /**
  * Representation of a Collektive device in Alchemist.
@@ -36,6 +36,8 @@ class CollektiveDevice<P>(
         val receivedAt: Time,
         val payload: Message<Int, *>,
     )
+
+    override val inMemory: Boolean = true
 
     /**
      * The current time.
@@ -108,7 +110,7 @@ class CollektiveDevice<P>(
             @Suppress("UNCHECKED_CAST")
             override fun <Value> dataAt(
                 path: Path,
-                kClass: KSerializer<Value>,
+                dataSharingMethod: DataSharingMethod<Value>,
             ): Map<Int, Value> =
                 messages
                     .associateBy { it.senderId }

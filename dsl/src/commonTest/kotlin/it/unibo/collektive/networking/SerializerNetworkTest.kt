@@ -8,10 +8,11 @@
 
 package it.unibo.collektive.networking
 
+import it.unibo.collektive.aggregate.api.DataSharingMethod
+import it.unibo.collektive.aggregate.api.Serialize
 import it.unibo.collektive.path.Path
 import kotlinx.serialization.BinaryFormat
 import kotlinx.serialization.InternalSerializationApi
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialFormat
 import kotlinx.serialization.StringFormat
 import kotlinx.serialization.decodeFromByteArray
@@ -19,9 +20,10 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.serializer
 
 class SerializerNetworkTest(private val serializer: SerialFormat = Json) : Mailbox<Int> {
+    override val inMemory: Boolean = false
+
     val messages = mutableMapOf<Int, Message<Int, Any?>>()
     private val factory = object : SerializedMessageFactory<Int, Any?>(serializer) {}
 
@@ -65,9 +67,12 @@ class SerializerNetworkTest(private val serializer: SerialFormat = Json) : Mailb
 
             override fun <Value> dataAt(
                 path: Path,
-                kClass: KSerializer<Value>,
-            ): Map<Int, Value> =
-                messages
+                dataSharingMethod: DataSharingMethod<Value>,
+            ): Map<Int, Value> {
+                require(dataSharingMethod is Serialize<Value>) {
+                    "Serialization has been required for in-memory messages. This is likely a misconfiguration."
+                }
+                return messages
                     .mapValues { (_, message) ->
                         require(message.sharedData.all { it.value is ByteArray }) {
                             "Message ${message.senderId} is not serialized"
@@ -77,11 +82,20 @@ class SerializerNetworkTest(private val serializer: SerialFormat = Json) : Mailb
                     .mapValues { (_, payload) ->
                         val byteArrayPayload = payload as ByteArray
                         when (serializer) {
-                            is StringFormat -> serializer.decodeFromString(kClass, byteArrayPayload.decodeToString())
-                            is BinaryFormat -> serializer.decodeFromByteArray(kClass, byteArrayPayload)
+                            is StringFormat ->
+                                serializer.decodeFromString(
+                                    dataSharingMethod.serializer,
+                                    byteArrayPayload.decodeToString(),
+                                )
+                            is BinaryFormat ->
+                                serializer.decodeFromByteArray(
+                                    dataSharingMethod.serializer,
+                                    byteArrayPayload,
+                                )
                             else -> error("Unsupported serializer")
                         }
                     }
+            }
         }
 
     private object NoValue

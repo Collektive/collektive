@@ -5,6 +5,11 @@ package it.unibo.collektive.networking
  */
 interface Mailbox<ID : Any> {
     /**
+     * True if this mailbox is simple memory sharing. False if it actually serializes messages.
+     */
+    val inMemory: Boolean
+
+    /**
      * TODO.
      */
     fun deliverableFor(

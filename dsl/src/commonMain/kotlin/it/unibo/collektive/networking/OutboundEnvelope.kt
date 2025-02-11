@@ -8,8 +8,8 @@
 
 package it.unibo.collektive.networking
 
+import it.unibo.collektive.aggregate.api.DataSharingMethod
 import it.unibo.collektive.path.Path
-import kotlinx.serialization.KSerializer
 
 /**
  * TODO.
@@ -29,7 +29,7 @@ interface OutboundEnvelope<ID : Any> {
     fun <Value> addData(
         path: Path,
         data: SharedData<ID, Value>,
-        valueRepresentation: KSerializer<Value>,
+        dataSharingMethod: DataSharingMethod<Value>,
     )
 
     /**
@@ -66,7 +66,7 @@ interface OutboundEnvelope<ID : Any> {
                 override fun <Value> addData(
                     path: Path,
                     data: SharedData<ID, Value>,
-                    valueRepresentation: KSerializer<Value>,
+                    dataSharingMethod: DataSharingMethod<Value>,
                 ) {
                     check(!defaults.containsKey(path)) {
                         """
@@ -79,12 +79,12 @@ interface OutboundEnvelope<ID : Any> {
                     }
                     @Suppress("UNCHECKED_CAST")
                     defaults[path] =
-                        PayloadRepresentation(data.default, valueRepresentation) as PayloadRepresentation<Any?>
+                        PayloadRepresentation(data.default, dataSharingMethod) as PayloadRepresentation<Any?>
                     data.overrides.forEach { (id, value) ->
                         val destination = overrides.getOrPut(id) { mutableListOf() }
                         @Suppress("UNCHECKED_CAST")
                         destination +=
-                            path to PayloadRepresentation(value, valueRepresentation) as PayloadRepresentation<Any?>
+                            path to PayloadRepresentation(value, dataSharingMethod) as PayloadRepresentation<Any?>
                     }
                 }
 

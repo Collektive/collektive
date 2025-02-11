@@ -2,6 +2,7 @@ package it.unibo.collektive.aggregate.api.impl
 
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
+import it.unibo.collektive.aggregate.api.DataSharingMethod
 import it.unibo.collektive.aggregate.api.YieldingContext
 import it.unibo.collektive.aggregate.api.YieldingResult
 import it.unibo.collektive.aggregate.api.YieldingScope
@@ -15,7 +16,6 @@ import it.unibo.collektive.path.Path
 import it.unibo.collektive.path.PathFactory
 import it.unibo.collektive.state.State
 import it.unibo.collektive.state.impl.getTyped
-import kotlinx.serialization.KSerializer
 
 /**
  * Context for managing aggregate computation.
@@ -26,6 +26,7 @@ internal class AggregateContext<ID : Any>(
     override val localId: ID,
     private val inboundMessage: NeighborsData<ID>,
     private val previousState: State,
+    override val inMemoryOnly: Boolean = false,
     pathFactory: PathFactory,
 ) : Aggregate<ID> {
     private val stack = Stack(pathFactory)
@@ -49,31 +50,31 @@ internal class AggregateContext<ID : Any>(
 
     override fun <Initial> exchange(
         initial: Initial,
-        kClass: KSerializer<Initial>,
+        dataSharingMethod: DataSharingMethod<Initial>,
         body: (Field<ID, Initial>) -> Field<ID, Initial>,
-    ): Field<ID, Initial> = exchanging(initial, kClass) { field -> body(field).run { yielding { this } } }
+    ): Field<ID, Initial> = exchanging(initial, dataSharingMethod) { field -> body(field).run { yielding { this } } }
 
-    override fun <Init, Ret> exchanging(
-        initial: Init,
-        kClass: KSerializer<Init>,
-        body: YieldingScope<Field<ID, Init>, Field<ID, Ret>>,
+    override fun <Initial, Ret> exchanging(
+        initial: Initial,
+        dataSharingMethod: DataSharingMethod<Initial>,
+        body: YieldingScope<Field<ID, Initial>, Field<ID, Ret>>,
     ): Field<ID, Ret> {
         val path: Path = stack.currentPath()
-        val messages = inboundMessage.dataAt<Init>(path, kClass)
+        val messages = inboundMessage.dataAt<Initial>(path, dataSharingMethod)
         val previous = stateAt(path, initial)
         val subject = newField(previous, messages)
-        val context = YieldingContext<Field<ID, Init>, Field<ID, Ret>>()
+        val context = YieldingContext<Field<ID, Initial>, Field<ID, Ret>>()
         return body(context, subject)
             .also {
                 val message =
                     SharedData(
                         it.toSend.localValue,
                         when (it.toSend) {
-                            is ConstantField<ID, Init> -> emptyMap()
+                            is ConstantField<ID, Initial> -> emptyMap()
                             else -> it.toSend.excludeSelf()
                         },
                     )
-                toBeSent.addData(path, message, kClass)
+                toBeSent.addData(path, message, dataSharingMethod)
                 state += path to it.toSend.localValue
             }.toReturn
     }
@@ -94,11 +95,11 @@ internal class AggregateContext<ID : Any>(
 
     override fun <Scalar> neighboring(
         local: Scalar,
-        kClass: KSerializer<Scalar>,
+        dataSharingMethod: DataSharingMethod<Scalar>,
     ): Field<ID, Scalar> {
         val path = stack.currentPath()
-        val neighborValues = inboundMessage.dataAt<Scalar>(path, kClass)
-        toBeSent.addData(path, SharedData(local), kClass)
+        val neighborValues = inboundMessage.dataAt<Scalar>(path, dataSharingMethod)
+        toBeSent.addData(path, SharedData(local), dataSharingMethod)
         return newField(local, neighborValues)
     }
 
