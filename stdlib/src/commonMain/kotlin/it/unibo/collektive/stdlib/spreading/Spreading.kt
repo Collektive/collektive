@@ -72,7 +72,7 @@ inline fun <ID : Any> Aggregate<ID>.distanceTo(
  * see [Fast self-healing gradients](https://doi.org/10.1145/1363686.1364163).
  */
 @JvmOverloads
-inline fun <ID : Any, Value, reified Distance : Comparable<Distance>> Aggregate<ID>.gradientCast(
+inline fun <ID : Any, reified Value, reified Distance : Comparable<Distance>> Aggregate<ID>.gradientCast(
     source: Boolean,
     local: Value,
     bottom: Distance,
@@ -110,12 +110,12 @@ inline fun <ID : Any, Value, reified Distance : Comparable<Distance>> Aggregate<
  */
 @JvmOverloads
 @JvmName("gradientCastInt")
-inline fun <ID : Any, Type> Aggregate<ID>.gradientCast(
+inline fun <ID : Any, reified Value> Aggregate<ID>.gradientCast(
     source: Boolean,
-    local: Type,
-    crossinline accumulateData: (fromSource: Int, toNeighbor: Int, data: Type) -> Type = { _, _, data -> data },
+    local: Value,
+    crossinline accumulateData: (fromSource: Int, toNeighbor: Int, data: Value) -> Value = { _, _, data -> data },
     crossinline metric: () -> Field<ID, Int> = { neighboring(1) },
-): Type = gradientCast(source, local, Int.MIN_VALUE, Int.MAX_VALUE, accumulateData, Int::plus, metric)
+): Value = gradientCast(source, local, Int.MIN_VALUE, Int.MAX_VALUE, accumulateData, Int::plus, metric)
 
 /**
  * Propagate [local] values across a spanning tree starting from the closest [source].
@@ -126,12 +126,12 @@ inline fun <ID : Any, Type> Aggregate<ID>.gradientCast(
  */
 @JvmOverloads
 @JvmName("gradientCastDouble")
-inline fun <ID : Any, Type> Aggregate<ID>.gradientCast(
+inline fun <ID : Any, reified Value> Aggregate<ID>.gradientCast(
     source: Boolean,
-    local: Type,
-    crossinline accumulateData: (fromSource: Double, toNeighbor: Double, data: Type) -> Type = { _, _, data -> data },
+    local: Value,
+    crossinline accumulateData: (fromSource: Double, toNeighbor: Double, data: Value) -> Value = { _, _, data -> data },
     crossinline metric: () -> Field<ID, Double> = { neighboring(1.0) },
-): Type = gradientCast(source, local, 0.0, Double.POSITIVE_INFINITY, accumulateData, Double::plus, metric)
+): Value = gradientCast(source, local, 0.0, Double.POSITIVE_INFINITY, accumulateData, Double::plus, metric)
 
 /**
  * Provided a list of [sources], propagates information from each, collecting it in a map.
@@ -141,7 +141,7 @@ inline fun <ID : Any, Type> Aggregate<ID>.gradientCast(
  * [accumulateData] is used to modify data from neighbors on the fly, and defaults to the identity function.
  */
 @JvmOverloads
-inline fun <ID : Any, Value, reified Distance : Comparable<Distance>> Aggregate<ID>.multiGradientCast(
+inline fun <ID : Any, reified Value, reified Distance : Comparable<Distance>> Aggregate<ID>.multiGradientCast(
     sources: Iterable<ID>,
     local: Value,
     bottom: Distance,
@@ -166,7 +166,7 @@ inline fun <ID : Any, Value, reified Distance : Comparable<Distance>> Aggregate<
  */
 @JvmOverloads
 @JvmName("multiGradientCastDouble")
-inline fun <ID : Any, Value> Aggregate<ID>.multiGradientCast(
+inline fun <ID : Any, reified Value> Aggregate<ID>.multiGradientCast(
     sources: Iterable<ID>,
     local: Value,
     crossinline accumulateData: (fromSource: Double, toNeighbor: Double, data: Value) -> Value = { _, _, data -> data },
@@ -187,7 +187,7 @@ inline fun <ID : Any, Value> Aggregate<ID>.multiGradientCast(
  */
 @JvmOverloads
 @JvmName("multiGradientCastInt")
-inline fun <ID : Any, Value> Aggregate<ID>.multiGradientCast(
+inline fun <ID : Any, reified Value> Aggregate<ID>.multiGradientCast(
     sources: Iterable<ID>,
     local: Value,
     crossinline accumulateData: (fromSource: Int, toNeighbor: Int, data: Value) -> Value = { _, _, data -> data },
