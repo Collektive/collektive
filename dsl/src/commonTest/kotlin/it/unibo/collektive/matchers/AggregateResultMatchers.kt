@@ -7,6 +7,40 @@ import it.unibo.collektive.aggregate.AggregateResult
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.networking.NoNeighborsData
 import it.unibo.collektive.path.Path
+import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
+
+/**
+ * Asserts that two aggregate programs align.
+ */
+fun <Result> assertAligned(
+    firstProgram: Aggregate<Int>.() -> Result,
+    secondProgram: Aggregate<Int>.() -> Result,
+) {
+    val first =
+        aggregate(0, emptyMap(), NoNeighborsData(), compute = firstProgram)
+            .run { toSend.prepareMessageFor(this.localId).sharedData.keys }
+    val second =
+        aggregate(0, emptyMap(), NoNeighborsData(), compute = secondProgram)
+            .run { toSend.prepareMessageFor(this.localId).sharedData.keys }
+    assertEquals(first, second)
+}
+
+/**
+ * Asserts that two aggregate programs do not align.
+ */
+fun <First, Second> assertNotAligned(
+    firstProgram: Aggregate<Int>.() -> First,
+    secondProgram: Aggregate<Int>.() -> Second,
+) {
+    val first =
+        aggregate(0, emptyMap(), NoNeighborsData(), compute = firstProgram)
+            .run { toSend.prepareMessageFor(this.localId).sharedData.keys }
+    val second =
+        aggregate(0, emptyMap(), NoNeighborsData(), compute = secondProgram)
+            .run { toSend.prepareMessageFor(this.localId).sharedData.keys }
+    assertNotEquals(first, second)
+}
 
 /**
  * Matcher checking if the result of an aggregate program aligns with the [expected] result.
@@ -54,18 +88,6 @@ fun <R> alignWith(expected: Aggregate<Int>.() -> R): Matcher<Aggregate<Int>.() -
                 .run { toSend.prepareMessageFor(this.localId).sharedData.keys }
         aggregateMatcher(expectedRes, result)
     }
-
-/**
- * Utility test function to create an [aggregateProgram] on fly.
- *
- * Can be combined with [alignWith] to check if two aggregate programs align.
- *
- * Example:
- * ```
- * acProgram { neighboringViaExchange(0) } should alignWith { neighboringViaExchange(0) }
- * ```
- */
-fun <R> acProgram(aggregateProgram: Aggregate<Int>.() -> R): Aggregate<Int>.() -> R = aggregateProgram
 
 private fun aggregateMatcher(
     expected: Set<Path>,
