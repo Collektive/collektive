@@ -1,3 +1,13 @@
+## [16.0.0](https://github.com/Collektive/collektive/compare/15.0.0...16.0.0) (2025-02-11)
+
+### ⚠ BREAKING CHANGES
+
+* capture the concept of data sharing method as part of the API (#764)
+
+### Features
+
+* capture the concept of data sharing method as part of the API ([#764](https://github.com/Collektive/collektive/issues/764)) ([658a0b6](https://github.com/Collektive/collektive/commit/658a0b6de5b3133e2c28d7bbf28c679782a39162))
+
 ## [15.0.0](https://github.com/Collektive/collektive/compare/14.0.0...15.0.0) (2025-02-11)
 
 ### ⚠ BREAKING CHANGES
