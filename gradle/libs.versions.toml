@@ -39,6 +39,10 @@ kotlin-testing-common = [
     "kotlin-test",
     "kotlin-test-annotations-common",
 ]
+kotlin-test = [
+    "kotlin-test",
+    "kotlin-test-annotations-common",
+]
 alchemist = [
     "alchemist",
     "alchemist-api",

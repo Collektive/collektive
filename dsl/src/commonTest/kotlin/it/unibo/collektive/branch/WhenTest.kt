@@ -1,16 +1,13 @@
 package it.unibo.collektive.branch
 
-import io.kotest.matchers.maps.shouldHaveSize
-import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class WhenTest {
-    val id0 = 0
-
     private fun programUnderTest(input: Any) =
-        aggregate(id0) {
+        aggregate(0) {
             when (input) {
                 is String -> neighboringViaExchange("string")
                 else -> neighboringViaExchange("test")
@@ -22,9 +19,9 @@ class WhenTest {
         val condition = true
         val x = if (condition) "hello" else 123
         val result = programUnderTest(x)
-        val messageFor0 = result.toSend.prepareMessageFor(id0).sharedData
-        messageFor0 shouldHaveSize 1
-        messageFor0.values.toList() shouldBe listOf("string")
+        val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
+        assertEquals(1, messageFor0.size)
+        assertEquals(listOf("string"), messageFor0.values.toList())
     }
 
     @Test
@@ -32,9 +29,9 @@ class WhenTest {
         val condition = false
         val x = if (condition) "hello" else 123
         val result = programUnderTest(x)
-        val messageFor0 = result.toSend.prepareMessageFor(id0).sharedData
-        messageFor0 shouldHaveSize 1
-        messageFor0.values.toList() shouldBe listOf("test")
+        val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
+        assertEquals(1, messageFor0.size)
+        assertEquals(listOf("test"), messageFor0.values.toList())
     }
 
     @Test
@@ -42,7 +39,7 @@ class WhenTest {
         val condition = true
         val x = if (condition) "hello" else 123
         val result =
-            aggregate(id0) {
+            aggregate(0) {
                 fun test() {
                     neighboringViaExchange("test")
                 }
@@ -55,9 +52,9 @@ class WhenTest {
                     else -> test()
                 }
             }
-        val messageFor0 = result.toSend.prepareMessageFor(id0).sharedData
-        messageFor0 shouldHaveSize 1
-        messageFor0.values.toList() shouldBe listOf("test2")
+        val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
+        assertEquals(1, messageFor0.size)
+        assertEquals(listOf("test2"), messageFor0.values.toList())
     }
 
     @Test
@@ -75,8 +72,8 @@ class WhenTest {
                         }
                 }
             }
-        val messageFor0 = result.toSend.prepareMessageFor(id0).sharedData
-        messageFor0 shouldHaveSize 1
-        messageFor0.values.toList() shouldBe listOf("test2")
+        val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
+        assertEquals(1, messageFor0.size)
+        assertEquals(listOf("test2"), messageFor0.values.toList())
     }
 }

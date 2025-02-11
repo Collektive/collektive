@@ -3,13 +3,11 @@ package it.unibo.collektive.test.util
 import it.unibo.collektive.compiler.CollektiveK2JVMCompiler
 import it.unibo.collektive.compiler.logging.CollectingMessageCollector
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
-import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import java.io.File
 import java.io.FileNotFoundException
 import kotlin.io.path.createTempDirectory
 import kotlin.test.assertTrue
 
-@OptIn(ExperimentalCompilerApi::class)
 object CompileUtils {
     data class KotlinTestingProgram(
         val fileName: String,
