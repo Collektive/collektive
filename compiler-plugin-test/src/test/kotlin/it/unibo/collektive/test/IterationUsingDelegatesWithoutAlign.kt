@@ -14,11 +14,9 @@ import it.unibo.collektive.test.util.CompileUtils.formsOfIteration
 import it.unibo.collektive.test.util.CompileUtils.`iteration with warning`
 import it.unibo.collektive.test.util.CompileUtils.`iteration without warning`
 import it.unibo.collektive.test.util.CompileUtils.testedAggregateFunctions
-import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import java.io.File
 import kotlin.test.Test
 
-@OptIn(ExperimentalCompilerApi::class)
 class IterationUsingDelegatesWithoutAlign {
     private val testSubjects: Map<String, File> =
         subjekt {
@@ -39,9 +37,9 @@ class IterationUsingDelegatesWithoutAlign {
                     `iteration without warning`("IterationAlignRecursiveDelegate", functionName, iteration)
                     `iteration without warning`("IterationRecursiveDelegateAlign", functionName, iteration)
                     // Disabled tests
-//                `iteration with warning`("IterationDelegatedNestedFun", functionName, iteration, expectedWarning)
-//                `iteration without warning`("IterationAlignDelegatedNestedFun", functionName, iteration)
-//                `iteration without warning`("IterationDelegatedNestedFunAlign", functionName, iteration)
+                    // `iteration with warning`("IterationDelegatedNestedFun", functionName, iteration, expectedWarning)
+                    // `iteration without warning`("IterationAlignDelegatedNestedFun", functionName, iteration)
+                    // `iteration without warning`("IterationDelegatedNestedFunAlign", functionName, iteration)
                 }
             }
         }
