@@ -9,7 +9,7 @@
 package it.unibo.collektive.networking
 
 import it.unibo.collektive.path.Path
-import kotlin.reflect.KClass
+import kotlinx.serialization.KSerializer
 
 /**
  * TODO.
@@ -29,7 +29,7 @@ interface OutboundEnvelope<ID : Any> {
     fun <Value> addData(
         path: Path,
         data: SharedData<ID, Value>,
-        valueRepresentation: KClass<*>,
+        valueRepresentation: KSerializer<Value>,
     )
 
     /**
@@ -66,7 +66,7 @@ interface OutboundEnvelope<ID : Any> {
                 override fun <Value> addData(
                     path: Path,
                     data: SharedData<ID, Value>,
-                    valueRepresentation: KClass<*>,
+                    valueRepresentation: KSerializer<Value>,
                 ) {
                     check(!defaults.containsKey(path)) {
                         """
@@ -77,10 +77,14 @@ interface OutboundEnvelope<ID : Any> {
                         If none of the above, please open an issue at https://github.com/Collektive/collektive/issues .
                         """.trimIndent()
                     }
-                    defaults[path] = PayloadRepresentation(data.default, valueRepresentation)
+                    @Suppress("UNCHECKED_CAST")
+                    defaults[path] =
+                        PayloadRepresentation(data.default, valueRepresentation) as PayloadRepresentation<Any?>
                     data.overrides.forEach { (id, value) ->
                         val destination = overrides.getOrPut(id) { mutableListOf() }
-                        destination += path to PayloadRepresentation(value, valueRepresentation)
+                        @Suppress("UNCHECKED_CAST")
+                        destination +=
+                            path to PayloadRepresentation(value, valueRepresentation) as PayloadRepresentation<Any?>
                     }
                 }
 

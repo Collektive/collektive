@@ -111,13 +111,9 @@ class NeighboringTest {
             environment.cycleInOrder()
         }
         environment.status().forEach { (id, field) ->
-            if (condition(id)) {
-                assertEquals(1, field.localValue)
-                assertTrue(field.all { it == 1 })
-            } else {
-                assertEquals(2, field.localValue)
-                assertTrue(field.all { it == 2 })
-            }
+            val expectedValue = if (condition(id)) 1 else 2
+            assertEquals(expectedValue, field.localValue)
+            assertTrue(field.all { it == expectedValue })
         }
     }
 }

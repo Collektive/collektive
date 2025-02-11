@@ -15,7 +15,7 @@ import it.unibo.collektive.networking.Message
 import it.unibo.collektive.networking.NeighborsData
 import it.unibo.collektive.networking.OutboundEnvelope
 import it.unibo.collektive.path.Path
-import kotlin.reflect.KClass
+import kotlinx.serialization.KSerializer
 
 /**
  * A network node with an associated [environment], [id], [value], and [program].
@@ -74,7 +74,7 @@ class Node<R>(
                 @Suppress("UNCHECKED_CAST")
                 override fun <Value> dataAt(
                     path: Path,
-                    kClass: KClass<*>,
+                    kClass: KSerializer<Value>,
                 ): Map<Int, Value> =
                     neighborDeliverableMessages
                         .mapValues { it.value.sharedData.getOrElse(path) { NoValue } as Value }

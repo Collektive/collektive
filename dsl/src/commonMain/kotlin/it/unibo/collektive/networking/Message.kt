@@ -13,9 +13,7 @@ import kotlinx.serialization.BinaryFormat
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerialFormat
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.StringFormat
-import kotlinx.serialization.serializer
 
 /**
  * A message meant to be delivered in a communication medium, containing a [senderId] and [sharedData].
@@ -66,19 +64,15 @@ abstract class SerializedMessageFactory<ID : Any, Payload>(
         val serializedSharedData =
             sharedData.mapValues { (_, representation) ->
                 val (value, serial) = representation
-                val typeSerializer = serial.serializer()
                 @Suppress("UNCHECKED_CAST")
                 when (serializerFormat) {
                     is StringFormat ->
                         serializerFormat
-                            .encodeToString(typeSerializer as SerializationStrategy<Payload>, value as Payload)
+                            .encodeToString(serial, value as Payload)
                             .encodeToByteArray()
 
                     is BinaryFormat ->
-                        serializerFormat.encodeToByteArray(
-                            typeSerializer as SerializationStrategy<Payload>,
-                            value as Payload,
-                        )
+                        serializerFormat.encodeToByteArray(serial, value as Payload)
 
                     else -> error("Unsupported serialization format")
                 }

@@ -23,7 +23,7 @@ import kotlin.jvm.JvmOverloads
  * the [Distance] between neighboring devices is computed using the [metric] function,
  * the distance summation is governed by the [accumulateDistance] function.
  */
-inline fun <ID : Any, Distance : Comparable<Distance>> Aggregate<ID>.distanceTo(
+inline fun <ID : Any, reified Distance : Comparable<Distance>> Aggregate<ID>.distanceTo(
     source: Boolean,
     bottom: Distance,
     top: Distance,
@@ -72,7 +72,7 @@ inline fun <ID : Any> Aggregate<ID>.distanceTo(
  * see [Fast self-healing gradients](https://doi.org/10.1145/1363686.1364163).
  */
 @JvmOverloads
-inline fun <ID : Any, Value, Distance : Comparable<Distance>> Aggregate<ID>.gradientCast(
+inline fun <ID : Any, Value, reified Distance : Comparable<Distance>> Aggregate<ID>.gradientCast(
     source: Boolean,
     local: Value,
     bottom: Distance,
@@ -141,7 +141,7 @@ inline fun <ID : Any, Type> Aggregate<ID>.gradientCast(
  * [accumulateData] is used to modify data from neighbors on the fly, and defaults to the identity function.
  */
 @JvmOverloads
-inline fun <ID : Any, Value, Distance : Comparable<Distance>> Aggregate<ID>.multiGradientCast(
+inline fun <ID : Any, Value, reified Distance : Comparable<Distance>> Aggregate<ID>.multiGradientCast(
     sources: Iterable<ID>,
     local: Value,
     bottom: Distance,

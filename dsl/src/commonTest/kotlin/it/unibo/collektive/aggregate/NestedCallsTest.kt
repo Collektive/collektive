@@ -1,6 +1,7 @@
 package it.unibo.collektive.aggregate
 
 import it.unibo.collektive.Collektive
+import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.aggregate.api.operators.share
@@ -23,7 +24,7 @@ class NestedCallsTest {
         }
 
     @Test
-    fun `regression test for the issue #207`() {
+    fun `regression test for the issue 207`() {
         val networkManager = NetworkManager()
         val network0 = NetworkImplTest(networkManager, 0)
         val network1 = NetworkImplTest(networkManager, 1)
