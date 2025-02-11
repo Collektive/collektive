@@ -1,7 +1,5 @@
 package it.unibo.collektive.alignment
 
-import io.kotest.matchers.maps.shouldHaveSize
-import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchange
@@ -13,14 +11,13 @@ import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.stdlib.ints.FieldedInts.minus
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class BranchAlignmentTest {
-    val id0 = 0
-
     @Test
     fun `Branch alignment should work in nested functions`() {
         val result =
-            aggregate(id0) {
+            aggregate(0) {
                 val condition = true
 
                 fun test() {
@@ -34,15 +31,15 @@ class BranchAlignmentTest {
                     test2()
                 }
             }
-        val messageFor1 = result.toSend.prepareMessageFor(id0).sharedData
-        messageFor1 shouldHaveSize 1 // 1 path of alignment
-        messageFor1.values.toList() shouldBe listOf("test")
+        val messageFor1 = result.toSend.prepareMessageFor(0).sharedData
+        assertEquals(1, messageFor1.size) // 1 path of alignment
+        assertEquals(listOf("test"), messageFor1.values.toList())
     }
 
     @Test
     fun `Branch alignment should not occur in non aggregate context`() {
         val result =
-            aggregate(id0) {
+            aggregate(0) {
                 val condition = true
 
                 fun test(): String = "hello"
@@ -54,7 +51,12 @@ class BranchAlignmentTest {
                     test2()
                 }
             }
-        result.toSend.prepareMessageFor(id0).sharedData shouldHaveSize 0 // 0 path of alignment
+        assertEquals(
+            0,
+            result.toSend
+                .prepareMessageFor(0)
+                .sharedData.size,
+        ) // 0 path of alignment
     }
 
     @Test
@@ -65,12 +67,12 @@ class BranchAlignmentTest {
             .map { (net, id) ->
                 aggregate(id, net) {
                     val outerField = neighboringViaExchange(0)
-                    outerField.neighborsCount shouldBe id
+                    assertEquals(id, outerField.neighborsCount)
                     if (id % 2 == 0) {
-                        neighboringViaExchange(1).neighborsCount shouldBe id / 2
+                        assertEquals(id / 2, neighboringViaExchange(1).neighborsCount)
                         neighboringViaExchange(1) + outerField
                     } else {
-                        neighboringViaExchange(1).neighborsCount shouldBe (id - 1) / 2
+                        assertEquals((id - 1) / 2, neighboringViaExchange(1).neighborsCount)
                         neighboringViaExchange(1) - outerField
                         outerField.min(Int.MAX_VALUE)
                     }

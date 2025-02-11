@@ -1,16 +1,16 @@
 package it.unibo.collektive.entrypoint
 
-import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.collections.shouldHaveSize
-import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchange
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
-class CollektiveTest : StringSpec({
+class CollektiveTest {
     val id0 = 0
     val id1 = 1
 
@@ -28,7 +28,8 @@ class CollektiveTest : StringSpec({
 
     fun Aggregate<Int>.computeFunctionDevice1(): Int = exchange(initV3, increaseOrDouble).localValue
 
-    "One Collektive device with cycle() as entrypoint should work fine" {
+    @Test
+    fun `One Collektive device with cycle as entrypoint should work fine`() {
         val networkManager = NetworkManager()
         val network0 = NetworkImplTest(networkManager, id0)
         val collectiveDevice =
@@ -37,10 +38,11 @@ class CollektiveTest : StringSpec({
             }
 
         val result = collectiveDevice.cycle()
-        result shouldBe 2
+        assertEquals(2, result)
     }
 
-    "One Collektive device with cycleWhile() as entrypoint should return the cycled result" {
+    @Test
+    fun `One Collektive device with cycleWhile as entrypoint should return the cycled result`() {
         val networkManager = NetworkManager()
         val network0 = NetworkImplTest(networkManager, id0)
         val collectiveDevice =
@@ -49,28 +51,31 @@ class CollektiveTest : StringSpec({
             }
 
         val result = collectiveDevice.cycleWhile { it.result < 10 }
-        result shouldBe 14
+        assertEquals(14, result)
     }
 
-    "Collektive compute function can be a val" {
+    @Test
+    fun `Collektive compute function can be a val`() {
         val networkManager = NetworkManager()
         val network0 = NetworkImplTest(networkManager, id0)
         val collectiveDevice = Collektive(id0, network0, computeFunction = computeFunctionDevice0)
 
         val result = collectiveDevice.cycle()
-        result shouldBe 3
+        assertEquals(3, result)
     }
 
-    "Collektive compute function can be a function" {
+    @Test
+    fun `Collektive compute function can be a function`() {
         val networkManager = NetworkManager()
         val network0 = NetworkImplTest(networkManager, id0)
         val collectiveDevice = Collektive(id0, network0) { computeFunctionDevice1() }
 
         val result = collectiveDevice.cycle()
-        result shouldBe 6
+        assertEquals(6, result)
     }
 
-    "Two Collektive aligned devices with cycle() as entrypoint should exchange messages and results fine" {
+    @Test
+    fun `Two Collektive aligned devices with cycle as entrypoint should exchange messages and results fine`() {
         val networkManager = NetworkManager()
         val network0 = NetworkImplTest(networkManager, id0)
         val network1 = NetworkImplTest(networkManager, id1)
@@ -78,13 +83,14 @@ class CollektiveTest : StringSpec({
         val collektiveDevice0 = Collektive(id0, network0, computeFunction = computeFunctionDevice0)
         val collektiveDevice1 = Collektive(id1, network1, computeFunction = computeFunctionDevice0)
 
-        collektiveDevice0.cycle() shouldBe 3
-        network0.currentInbound().neighbors shouldHaveSize 0
+        assertEquals(3, collektiveDevice0.cycle())
+        assertTrue(network0.currentInbound().neighbors.isEmpty())
 
-        collektiveDevice1.cycle() shouldBe 3
+        assertEquals(3, collektiveDevice1.cycle())
     }
 
-    "Two Collektive aligned devices with cycleWhile() as entrypoint should exchange messages and results fine" {
+    @Test
+    fun `Two Collektive aligned devices with cycleWhile as entrypoint should exchange messages and results fine`() {
         val networkManager = NetworkManager()
         val network0 = NetworkImplTest(networkManager, id0)
         val network1 = NetworkImplTest(networkManager, id1)
@@ -92,11 +98,12 @@ class CollektiveTest : StringSpec({
         val collektiveDevice0 = Collektive(id0, network0, computeFunction = computeFunctionDevice0)
         val collektiveDevice1 = Collektive(id1, network1, computeFunction = computeFunctionDevice0)
 
-        collektiveDevice0.cycleWhile { it.result < 6 } shouldBe 6
-        collektiveDevice1.cycleWhile { it.result < 10 } shouldBe 14
+        assertEquals(6, collektiveDevice0.cycleWhile { it.result < 6 })
+        assertEquals(14, collektiveDevice1.cycleWhile { it.result < 10 })
     }
 
-    "Two Collektive aligned devices with cycle() as entrypoint should exchange messages in more than one cycle" {
+    @Test
+    fun `Two Collektive aligned devices with cycle as entrypoint should exchange messages in more than one cycle`() {
         val networkManager = NetworkManager()
         val network0 = NetworkImplTest(networkManager, id0)
         val network1 = NetworkImplTest(networkManager, id1)
@@ -109,16 +116,17 @@ class CollektiveTest : StringSpec({
                 exchange(2, increaseOrDouble).localValue
             }
         // from its initial value 1, apply increaseOrDouble, then sends to device1
-        collektiveDevice0.cycle() shouldBe 2
+        assertEquals(2, collektiveDevice0.cycle())
         // from its initial value 2, apply increaseOrDouble, then sends to device0
-        collektiveDevice1.cycle() shouldBe 3
+        assertEquals(3, collektiveDevice1.cycle())
         // from its value after first cycle 2, apply increaseOrDouble, then sends to device1
-        collektiveDevice0.cycle() shouldBe 3
+        assertEquals(3, collektiveDevice0.cycle())
         // from its value after first cycle 3, apply increaseOrDouble, then sends to device1
-        collektiveDevice1.cycle() shouldBe 6
+        assertEquals(6, collektiveDevice1.cycle())
     }
 
-    "Two unaligned Collektive devices should not interfere with each others" {
+    @Test
+    fun `Two unaligned Collektive devices should not interfere with each others`() {
         val networkManager = NetworkManager()
         val network0 = NetworkImplTest(networkManager, id0)
         val network1 = NetworkImplTest(networkManager, id1)
@@ -126,11 +134,11 @@ class CollektiveTest : StringSpec({
         val collektiveDevice0 = Collektive(id0, network0, computeFunction = computeFunctionDevice0)
         val collektiveDevice1 = Collektive(id1, network1) { computeFunctionDevice1() }
 
-        collektiveDevice0.cycle() shouldBe 3
-        collektiveDevice1.cycle() shouldBe 6
+        assertEquals(3, collektiveDevice0.cycle())
+        assertEquals(6, collektiveDevice1.cycle())
 
         // if those devices were aligned, the result of the computation would have been different
-        collektiveDevice0.cycle() shouldBe 6
-        collektiveDevice1.cycle() shouldBe 7
+        assertEquals(6, collektiveDevice0.cycle())
+        assertEquals(7, collektiveDevice1.cycle())
     }
-})
+}

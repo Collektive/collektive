@@ -6,10 +6,8 @@ import it.unibo.collektive.test.util.CompileUtils.formsOfIteration
 import it.unibo.collektive.test.util.CompileUtils.`iteration with warning`
 import it.unibo.collektive.test.util.CompileUtils.`iteration without warning`
 import it.unibo.collektive.test.util.CompileUtils.testedAggregateFunctions
-import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import kotlin.test.Test
 
-@OptIn(ExperimentalCompilerApi::class)
 class IterationWithoutAlign {
     private val testSubjects =
         subjekt {
