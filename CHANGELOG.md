@@ -1,3 +1,24 @@
+## [15.0.0](https://github.com/Collektive/collektive/compare/14.0.0...15.0.0) (2025-02-11)
+
+### ⚠ BREAKING CHANGES
+
+* use `KSerializer` instead of `KClass` for serializing also compound types (#763)
+
+### Dependency updates
+
+* **deps:** update alchemist to v37.3.1 ([174408a](https://github.com/Collektive/collektive/commit/174408a8f29c636ca117a8c8d43971f5c14000a5))
+* **deps:** update alchemist to v38 ([511520b](https://github.com/Collektive/collektive/commit/511520bf03bfb6e58a4116e9cce28beeeb2760ad))
+* **deps:** update dependency org.kotlincrypto.hash:sha3 to v0.6.1 ([9217f20](https://github.com/Collektive/collektive/commit/9217f204cdb80d8f357103da00f62c0211617a0e))
+* **deps:** update kotest to v6.0.0.m2 ([ec30cea](https://github.com/Collektive/collektive/commit/ec30cea0e5d1b55da4a0066bb2cabbbed7869d32))
+
+### Tests
+
+* **compiler-plugin-test:** migrate a couple of tests to kotlin.test ([#761](https://github.com/Collektive/collektive/issues/761)) ([0d768b3](https://github.com/Collektive/collektive/commit/0d768b3c433a630ab2dfe58d8d3d265f56516919))
+
+### Refactoring
+
+* use `KSerializer` instead of `KClass` for serializing also compound types ([#763](https://github.com/Collektive/collektive/issues/763)) ([e80cbd6](https://github.com/Collektive/collektive/commit/e80cbd602dc8a0625f84bf275445829c2b3f9170))
+
 ## [14.0.0](https://github.com/Collektive/collektive/compare/13.1.1...14.0.0) (2025-02-10)
 
 ### ⚠ BREAKING CHANGES
