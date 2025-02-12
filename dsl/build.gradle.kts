@@ -1,21 +1,18 @@
-apply(plugin = libs.plugins.kotlin.multiplatform.id)
+apply(plugin = rootProject.libs.plugins.kotlin.multiplatform.id)
 
 configureKotlinMultiplatform()
 
 kotlinMultiplatform {
     sourceSets {
-        val commonTest by getting {
-            dependencies {
-                implementation(project(":stdlib"))
-                implementation(project(":test-tooling"))
-                implementation(rootProject.libs.bundles.kotlin.testing.common)
-            }
+        commonMain.dependencies {
+            implementation(libs.arrow.core)
+            implementation(libs.hash.sha3)
+            implementation(libs.kotlinx.serialization)
         }
-
-        val jvmTest by getting {
-            dependencies {
-                implementation(rootProject.libs.kotest.runner.junit5.jvm)
-            }
+        commonTest.dependencies {
+            implementation(project(":stdlib"))
+            implementation(project(":test-tooling"))
+            implementation(libs.kotlin.test)
         }
     }
 }

@@ -1,3 +1,224 @@
+## [16.0.0](https://github.com/Collektive/collektive/compare/15.0.0...16.0.0) (2025-02-11)
+
+### ⚠ BREAKING CHANGES
+
+* capture the concept of data sharing method as part of the API (#764)
+
+### Features
+
+* capture the concept of data sharing method as part of the API ([#764](https://github.com/Collektive/collektive/issues/764)) ([658a0b6](https://github.com/Collektive/collektive/commit/658a0b6de5b3133e2c28d7bbf28c679782a39162))
+
+## [15.0.0](https://github.com/Collektive/collektive/compare/14.0.0...15.0.0) (2025-02-11)
+
+### ⚠ BREAKING CHANGES
+
+* use `KSerializer` instead of `KClass` for serializing also compound types (#763)
+
+### Dependency updates
+
+* **deps:** update alchemist to v37.3.1 ([174408a](https://github.com/Collektive/collektive/commit/174408a8f29c636ca117a8c8d43971f5c14000a5))
+* **deps:** update alchemist to v38 ([511520b](https://github.com/Collektive/collektive/commit/511520bf03bfb6e58a4116e9cce28beeeb2760ad))
+* **deps:** update dependency org.kotlincrypto.hash:sha3 to v0.6.1 ([9217f20](https://github.com/Collektive/collektive/commit/9217f204cdb80d8f357103da00f62c0211617a0e))
+* **deps:** update kotest to v6.0.0.m2 ([ec30cea](https://github.com/Collektive/collektive/commit/ec30cea0e5d1b55da4a0066bb2cabbbed7869d32))
+
+### Tests
+
+* **compiler-plugin-test:** migrate a couple of tests to kotlin.test ([#761](https://github.com/Collektive/collektive/issues/761)) ([0d768b3](https://github.com/Collektive/collektive/commit/0d768b3c433a630ab2dfe58d8d3d265f56516919))
+
+### Refactoring
+
+* use `KSerializer` instead of `KClass` for serializing also compound types ([#763](https://github.com/Collektive/collektive/issues/763)) ([e80cbd6](https://github.com/Collektive/collektive/commit/e80cbd602dc8a0625f84bf275445829c2b3f9170))
+
+## [14.0.0](https://github.com/Collektive/collektive/compare/13.1.1...14.0.0) (2025-02-10)
+
+### ⚠ BREAKING CHANGES
+
+* ready the DSL and boundary for kotlinx.serialization (#753)
+
+### Dependency updates
+
+* **deps:** update alchemist to v37.1.7 ([12cc235](https://github.com/Collektive/collektive/commit/12cc2351dc161da9536d8ac97cfb4d11079022dd))
+* **deps:** update alchemist to v37.1.8 ([21080e1](https://github.com/Collektive/collektive/commit/21080e1934ea179902bd1aae3a55d2a3c1fc1068))
+* **deps:** update alchemist to v37.2.0 ([ffab524](https://github.com/Collektive/collektive/commit/ffab524923203caa8d49ff738e62ff49dceb46b6))
+* **deps:** update alchemist to v37.2.1 ([777b54a](https://github.com/Collektive/collektive/commit/777b54a8d26f16887c3fe1a922c5f74a84a6b8b9))
+* **deps:** update alchemist to v37.3.0 ([e1b6746](https://github.com/Collektive/collektive/commit/e1b6746eca227fb86a1ea649e4aa71c24ba76c61))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.120 ([91da80c](https://github.com/Collektive/collektive/commit/91da80c1cb3e2aab68117b6a55dd4aa540ee8d4c))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.121 ([1dd4ee9](https://github.com/Collektive/collektive/commit/1dd4ee9c26fa7d28a7fd98e0d24140d1f4f37547))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.122 ([fbae1ca](https://github.com/Collektive/collektive/commit/fbae1ca38377c356910516097d5b99394b5d6472))
+* **deps:** update plugin publishoncentral to v8.0.3 ([b9a0851](https://github.com/Collektive/collektive/commit/b9a085179114b8c3c2ccecd4e3eeb1713bd7c151))
+
+### Build and continuous integration
+
+* **deps:** update github/codeql-action action to v3.28.9 ([78951d0](https://github.com/Collektive/collektive/commit/78951d0f27b6705d1126956c3f02bb4bec4fdd88))
+
+### Refactoring
+
+* ready the DSL and boundary for kotlinx.serialization ([#753](https://github.com/Collektive/collektive/issues/753)) ([512d438](https://github.com/Collektive/collektive/commit/512d4383457a4b96a4e0a0a91ac9eea2430234c5))
+
+## [13.1.1](https://github.com/Collektive/collektive/compare/13.1.0...13.1.1) (2025-01-31)
+
+### Documentation
+
+* **dsl:** 🇬🇧 ➡️ 🇺🇸 ([e37116c](https://github.com/Collektive/collektive/commit/e37116c587e1cb6769299ec80e73003b5bf83d9a))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.8 ([96c74a0](https://github.com/Collektive/collektive/commit/96c74a0d03df5ad05fb170b208590390ecf1ffb0))
+
+## [13.1.0](https://github.com/Collektive/collektive/compare/13.0.0...13.1.0) (2025-01-30)
+
+### Features
+
+* **stdlib:** write a `multiGradientCast` ([cc9f35f](https://github.com/Collektive/collektive/commit/cc9f35fe523a0a7a86920f2a9f7c8c61f5c588aa))
+
+### Dependency updates
+
+* **deps:** update plugin gradlepluginpublish to v1.3.1 ([e57b550](https://github.com/Collektive/collektive/commit/e57b550f8fdbfeb0ec312e913b09c5ccffd92675))
+
+### Documentation
+
+* **stdlib:** document the rising value problem ([caac4b5](https://github.com/Collektive/collektive/commit/caac4b537cbe26dc3dd21b9cbe71e059f72b36ca))
+
+### Build and continuous integration
+
+* **deps:** update github/codeql-action action to v3.28.7 ([fb7d337](https://github.com/Collektive/collektive/commit/fb7d3372b3e5d7e15b5071c33effc0fbfcc2874c))
+* **deps:** update github/codeql-action action to v3.28.8 ([5f8fc0c](https://github.com/Collektive/collektive/commit/5f8fc0c2767eb3400be49c7777c50b5d7b0e591d))
+
+### Style improvements
+
+* **stdlib:** name the lambda parameters for clarity (thanks [@cric96](https://github.com/cric96)) ([500364f](https://github.com/Collektive/collektive/commit/500364ff39bbbba3743325f576740978d7fa6914))
+
+## [13.0.0](https://github.com/Collektive/collektive/compare/12.3.3...13.0.0) (2025-01-29)
+
+### ⚠ BREAKING CHANGES
+
+* **stdlib:** revisit the base structure of the standard library
+
+### Dependency updates
+
+* **deps:** update alchemist to v37.1.6 ([4430611](https://github.com/Collektive/collektive/commit/4430611d5818c9b5f8f330c07341d98dfb09fb76))
+* **deps:** update plugin gitsemver to v4.0.1 ([12cd867](https://github.com/Collektive/collektive/commit/12cd8675a16ae0a8a3dd98f0831117d676c8322e))
+* **deps:** update plugin gitsemver to v4.0.2 ([74626e1](https://github.com/Collektive/collektive/commit/74626e1f3a8c81820cbf7cf44c8cceb748d2afd7))
+* **deps:** update plugin multijvmtesting to v3.2.2 ([8adeac7](https://github.com/Collektive/collektive/commit/8adeac7d9b213f10ed4cb969170f859644a473be))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.20 ([53e77d9](https://github.com/Collektive/collektive/commit/53e77d95a95cdff197d0ea08edc6d6286c36e3ea))
+
+### Bug Fixes
+
+* **stdlib:** coerce all spread distances within the provided distance range, and verify the triangle inequality ([c61736f](https://github.com/Collektive/collektive/commit/c61736ff8025c266c8d38eceaefafcfed359575c))
+
+### Tests
+
+* **stdlib:** drop kotest, use kotlin.test instead ([39ab094](https://github.com/Collektive/collektive/commit/39ab09454cb64db0ef0343116dacfdbe1e1672fc))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.7 ([de60db0](https://github.com/Collektive/collektive/commit/de60db0843936bd7e5cbde8ada9a7534b575c809))
+* **deps:** update github/codeql-action action to v3.28.6 ([9607dd7](https://github.com/Collektive/collektive/commit/9607dd75370e3a24c69a1fc26f41480959f03842))
+* **stdlib:** enable [power-assert](https://kotlinlang.org/docs/power-assert.html) ([50486d0](https://github.com/Collektive/collektive/commit/50486d06863d674ba08af01338cdca8c139a9566))
+
+### Refactoring
+
+* **stdlib:** revisit the base structure of the standard library ([eacdded](https://github.com/Collektive/collektive/commit/eacdded614b76950660dcd4fc4fa48bc2872c84d))
+
+## [12.3.3](https://github.com/Collektive/collektive/compare/12.3.2...12.3.3) (2025-01-27)
+
+### Dependency updates
+
+* **core-deps:** update plugin collektivize to v1.0.8 ([a0ff5ae](https://github.com/Collektive/collektive/commit/a0ff5ae12be5cdbce63daaf7fe4b04af59d79a66))
+* **deps:** update plugin gitsemver to v4 ([f050f68](https://github.com/Collektive/collektive/commit/f050f68d548cd0d48d29af2b0b5807bbce14b5fa))
+
+## [12.3.2](https://github.com/Collektive/collektive/compare/12.3.1...12.3.2) (2025-01-27)
+
+### Dependency updates
+
+* **core-deps:** update kotlin monorepo to v2.1.10 ([34b7924](https://github.com/Collektive/collektive/commit/34b792412db5c97e720fdcd01d2555953c7eaaef))
+* **deps:** update plugin gitsemver to v3.1.10 ([57ffecd](https://github.com/Collektive/collektive/commit/57ffecd3d3b30a80643e4d9408ca4044c4bde434))
+* **deps:** update plugin gitsemver to v3.1.8 ([8938d8b](https://github.com/Collektive/collektive/commit/8938d8bf76ce776c3faf9e65c53623980c1c446f))
+* **deps:** update plugin gitsemver to v3.1.9 ([c9fd90a](https://github.com/Collektive/collektive/commit/c9fd90ac211e53731df4da244520b87afd25e654))
+
+### Build and continuous integration
+
+* **deps:** update actions/setup-node action to v4.2.0 ([0af84f3](https://github.com/Collektive/collektive/commit/0af84f363a608a42a6ed0a6acf3d1181bfbf2c1f))
+
+## [12.3.1](https://github.com/Collektive/collektive/compare/12.3.0...12.3.1) (2025-01-26)
+
+### Dependency updates
+
+* **core-deps:** update plugin collektivize to v1.0.7 ([fce6a7a](https://github.com/Collektive/collektive/commit/fce6a7a3fef067de4a875c2fecf3285696fcd5ea))
+* **deps:** update alchemist to v37.1.0 ([4d56665](https://github.com/Collektive/collektive/commit/4d566651a1f43edc79c5e9027614f3e39116cfcd))
+* **deps:** update alchemist to v37.1.1 ([b8350ac](https://github.com/Collektive/collektive/commit/b8350ac5ea976a5c8e8896a428b3ad6b9d28d658))
+* **deps:** update alchemist to v37.1.2 ([9ac6389](https://github.com/Collektive/collektive/commit/9ac63890509c0a57c17b87f0d73f2082ed3d1a25))
+* **deps:** update alchemist to v37.1.3 ([37b38ab](https://github.com/Collektive/collektive/commit/37b38abb3c7992ff853f13aa78a448c2e5a3b1fc))
+* **deps:** update alchemist to v37.1.4 ([e1b4c25](https://github.com/Collektive/collektive/commit/e1b4c257eba934b7a5d45883219c1e9582cac9f3))
+* **deps:** update alchemist to v37.1.5 ([31c09d0](https://github.com/Collektive/collektive/commit/31c09d0a397dd5148ad3cb7820167a45bfa01152))
+* **deps:** update dependency gradle to v8.12.1 ([ad4f01a](https://github.com/Collektive/collektive/commit/ad4f01a512281274a875c8eb2ca21c3988ece7ad))
+* **deps:** update plugin com.gradle.develocity to v3.19.1 ([1e97342](https://github.com/Collektive/collektive/commit/1e97342ec996ca90625253dfd75925024481b85c))
+* **deps:** update plugin multijvmtesting to v3.2.0 ([7c9ea13](https://github.com/Collektive/collektive/commit/7c9ea138d53371f973405ca86c0755885ca5bea9))
+* **deps:** update plugin multijvmtesting to v3.2.1 ([1e7932f](https://github.com/Collektive/collektive/commit/1e7932fc06d8f0546dc9370974f2248a939768f7))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.19 ([e06695e](https://github.com/Collektive/collektive/commit/e06695ee68ad483df2f03ee26f779729c0e2a733))
+* **deps:** update plugin publishoncentral to v8.0.2 ([87e6c51](https://github.com/Collektive/collektive/commit/87e6c5135cae5a2a60488514671af9a566c7b9e1))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.1 ([8a8c20f](https://github.com/Collektive/collektive/commit/8a8c20f91f3e11b6da352be7c8ef4165ce493808))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.2 ([c5739af](https://github.com/Collektive/collektive/commit/c5739af9e59dcc4a099d4ba084df48ad1d9e6070))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.3 ([e96c3bd](https://github.com/Collektive/collektive/commit/e96c3bd5a5070cf6de9f7b1af85a75e51fbf3e3c))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.5 ([b5778de](https://github.com/Collektive/collektive/commit/b5778de64a5ad4965631e6dd22b7ff6abe85ba97))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.6 ([8b273c6](https://github.com/Collektive/collektive/commit/8b273c605c97983169cd99be5b0dff57cf15696a))
+* **deps:** update github/codeql-action action to v3.28.2 ([9ea1b09](https://github.com/Collektive/collektive/commit/9ea1b095984fceea928458e1bdf1196ff1255f9b))
+* **deps:** update github/codeql-action action to v3.28.3 ([7b05a5e](https://github.com/Collektive/collektive/commit/7b05a5ebac4a39a45d756e97be25e1e665665b03))
+* **deps:** update github/codeql-action action to v3.28.4 ([e1fd806](https://github.com/Collektive/collektive/commit/e1fd80682e9514f11972a4d9398693939785fe5c))
+* **deps:** update github/codeql-action action to v3.28.5 ([8647549](https://github.com/Collektive/collektive/commit/8647549bbfb75c5fa6510f7e8c5ae6039f415d87))
+
+## [12.3.0](https://github.com/Collektive/collektive/compare/12.2.2...12.3.0) (2025-01-20)
+
+### Features
+
+* **frontend-compiler-plugin:** check whether using a `YieldingContext` when not necessary ([#698](https://github.com/Collektive/collektive/issues/698)) ([95232f9](https://github.com/Collektive/collektive/commit/95232f9dd6d83d3d758469d2f05be8f514dc0209))
+
+### Build and continuous integration
+
+* prevent kotest classpath scan ([5befb2f](https://github.com/Collektive/collektive/commit/5befb2f607c367be736b81c7742f8e1cacbab4ed))
+* use direct access syntax for source sets ([5f82f3f](https://github.com/Collektive/collektive/commit/5f82f3f00a956f9108220c00cdf6df07d508b7aa))
+
+### Refactoring
+
+* use jdk md5 hashing removing apache commons from dependencies ([9602772](https://github.com/Collektive/collektive/commit/960277242147da6637c49c6c394d6b437b0ade70))
+
+## [12.2.2](https://github.com/Collektive/collektive/compare/12.2.1...12.2.2) (2025-01-18)
+
+### Dependency updates
+
+* **core-deps:** update plugin collektivize to v1.0.4 ([2f3d3e1](https://github.com/Collektive/collektive/commit/2f3d3e13f21f9344513656d0f061738f61f26ace))
+
+## [12.2.1](https://github.com/Collektive/collektive/compare/12.2.0...12.2.1) (2025-01-18)
+
+### Dependency updates
+
+* **core-deps:** update plugin collektivize to v1.0.3 ([b68ba51](https://github.com/Collektive/collektive/commit/b68ba5132947b9b0c0e341b6e6ce7de24cf087e2))
+* **deps:** update alchemist to v37 ([82ad709](https://github.com/Collektive/collektive/commit/82ad709c1542633ca78dc6e5dc95efb3b1e023ee))
+* **deps:** update alchemist to v37.0.1 ([1faa052](https://github.com/Collektive/collektive/commit/1faa05218063c9496fd9050081145ef7cddf34c4))
+* **deps:** update dependency com.github.ben-manes.caffeine:caffeine to v3.2.0 ([93f8476](https://github.com/Collektive/collektive/commit/93f847648d5dc7361dd3731c8c000d86fcb54704))
+
+## [12.2.0](https://github.com/Collektive/collektive/compare/12.1.1...12.2.0) (2025-01-17)
+
+### Features
+
+* **frontend-compiler-plugin:** identify wrong use of pattern `evolve` + `neighboring` instead of using `share` ([#693](https://github.com/Collektive/collektive/issues/693)) ([fbb0337](https://github.com/Collektive/collektive/commit/fbb0337cdaee87a0857954268e975dbf5f78cf0b))
+
+### Dependency updates
+
+* **deps:** add collektivize gradle plugin ([22364c8](https://github.com/Collektive/collektive/commit/22364c80e1e2f895e458b25a065facdd0943b1cd))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.119 ([90195bd](https://github.com/Collektive/collektive/commit/90195bd99cc4b6ea68d636a327d0f1464e976d75))
+* **deps:** update dependency typescript to v5.7.3 ([d41db26](https://github.com/Collektive/collektive/commit/d41db26efd474174e555024d7a3eb6d3e9296a94))
+
+### Build and continuous integration
+
+* **deps:** update actions/upload-artifact action to v4.6.0 ([8808143](https://github.com/Collektive/collektive/commit/8808143fa6fab0a2e7431b427e8a49fbffe1878f))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.0 ([d59005d](https://github.com/Collektive/collektive/commit/d59005d166245197514a3c35ad17fc10bb385ad0))
+* **deps:** update github/codeql-action action to v3.28.1 ([fb4efc0](https://github.com/Collektive/collektive/commit/fb4efc06b6c9e194d6b8fd143122a4e1e343346e))
+* generate collektivized stdlib via gradle plugin ([fcb0da7](https://github.com/Collektive/collektive/commit/fcb0da7fc912bf8920c0a45266dd3f5b6535db7a))
+
 ## [12.1.1](https://github.com/Collektive/collektive/compare/12.1.0...12.1.1) (2025-01-10)
 
 ### Bug Fixes

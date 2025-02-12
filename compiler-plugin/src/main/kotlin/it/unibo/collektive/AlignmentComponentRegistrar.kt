@@ -1,6 +1,6 @@
 package it.unibo.collektive
 
-import it.unibo.collektive.frontend.AlignmentFrontendExtensionRegistrar
+import it.unibo.collektive.frontend.CollektiveFrontendExtensionRegistrar
 import it.unibo.collektive.utils.logging.info
 import it.unibo.collektive.utils.logging.strongWarning
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
@@ -52,7 +52,7 @@ class AlignmentComponentRegistrar : CompilerPluginRegistrar() {
         }
         if (configuration.get(AlignmentCommandLineProcessor.ARG_ENABLED) != false) {
             IrGenerationExtension.registerExtension(AlignmentIrGenerationExtension(logger))
-            FirExtensionRegistrarAdapter.registerExtension(AlignmentFrontendExtensionRegistrar())
+            FirExtensionRegistrarAdapter.registerExtension(CollektiveFrontendExtensionRegistrar())
         }
     }
 }

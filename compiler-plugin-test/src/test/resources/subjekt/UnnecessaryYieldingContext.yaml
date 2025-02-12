@@ -1,0 +1,104 @@
+---
+name: UnnecessaryYieldingContext
+config:
+  codePreamble: |-
+    /**
+      * This file has been auto-generated with Subjekt (https://github.com/FreshMag/subjekt).
+    */
+    import it.unibo.collektive.aggregate.api.Aggregate
+    import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
+    import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchanging
+    import it.unibo.collektive.field.operations.max
+    import it.unibo.collektive.field.operations.maxBy
+    import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
+    import it.unibo.collektive.aggregate.api.operators.share
+    import it.unibo.collektive.aggregate.api.operators.sharing
+    import kotlin.math.floor
+
+parameters:
+  - name: UNNECESSARY_YIELDING_SIMPLE
+    values:
+      - |-
+        evolving(initial) {
+            it.yielding { it }
+        }
+      - |-
+        exchanging(initial) { 
+          it.yielding { it }
+        }
+      - |-
+        sharing(initial) {
+          it.max(initial).yielding { it.max(initial) }
+        }
+
+  - name: UNNECESSARY_YIELDING_COMPLEX
+    values:
+      - |-
+        evolving(initial) {
+          val value = it + 1
+          floor(value.toDouble()).toInt().yielding { floor(value.toDouble()).toInt() }
+        }
+      - |-
+        exchanging(initial) {
+          val field = it.map { it / 2.toDouble() }
+          field.map(::floor).map { it.toInt() }.yielding { field.map(::floor).map { it.toInt() } }
+        }
+      - |-
+        sharing(initial) {
+          val maxValue = it.maxBy(0) { it }
+          floor(maxValue.toDouble() / 2).toInt().yielding { floor(maxValue.toDouble() / 2).toInt() }
+        }
+
+  - name: NECESSARY_YIELDING
+    values:
+      - |-
+        evolving(initial) {
+          it.yielding { it + 1 }
+        }
+      - |-
+        exchanging(initial) { 
+          it.yielding { it.map { it + 1 } }
+        }
+      - |-
+        sharing(initial) {
+          val maxValue = it.maxBy(0) { it }
+          maxValue.yielding { maxValue + 1 }
+        }
+
+  - name: NECESSARY_YIELDING_DIFFERENT_TYPE
+    values:
+      - |-
+        evolving(initial) {
+          it.yielding { "Test$it" }
+        }
+      - |-
+        exchanging(initial) { 
+          it.yielding { it.map { "Test${it + 1}" } }
+        }
+      - |-
+        sharing(initial) {
+          val maxValue = it.maxBy(0) { it }
+          maxValue.yielding { "Test${maxValue + 1}" }
+        }  
+
+macros:
+  def: aggregateBlock(specificCode)
+  values:
+    - |-
+      fun Aggregate<Int>.entry() {
+        val initial = 0
+        ${{ specificCode }}
+      }
+
+subjects:
+  - name: UnnecessaryYielding${{ prettify(UNNECESSARY_YIELDING_SIMPLE) }}Simple
+    code: ${{ aggregateBlock(UNNECESSARY_YIELDING_SIMPLE) }}
+
+  - name: UnnecessaryYielding${{ prettify(UNNECESSARY_YIELDING_COMPLEX) }}Complex
+    code: ${{ aggregateBlock(UNNECESSARY_YIELDING_COMPLEX) }}
+
+  - name: NecessaryYielding${{ prettify(NECESSARY_YIELDING) }}
+    code: ${{ aggregateBlock(NECESSARY_YIELDING) }}
+
+  - name: NecessaryYieldingDifferentType${{ prettify(NECESSARY_YIELDING_DIFFERENT_TYPE) }}
+    code: ${{ aggregateBlock(NECESSARY_YIELDING_DIFFERENT_TYPE) }}

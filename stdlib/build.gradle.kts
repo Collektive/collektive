@@ -1,10 +1,14 @@
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
 import it.unibo.collektive.collektivize.CollektivizeTask
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 plugins {
     alias(libs.plugins.collektivize)
+    alias(libs.plugins.kotlin.power.assert)
 }
 
-apply(plugin = libs.plugins.kotlin.multiplatform.id)
+apply(plugin = rootProject.libs.plugins.kotlin.multiplatform.id)
 
 configureKotlinMultiplatform()
 
@@ -31,22 +35,31 @@ tasks.withType<SourceTask>().configureEach {
 
 kotlinMultiplatform {
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 implementation(project(":dsl"))
+                implementation(libs.kotlinx.serialization)
             }
             kotlin.srcDirs(collektivizeKotlinStdlibTask)
         }
-        val commonTest by getting {
-            dependencies {
-                implementation(project(":test-tooling"))
-                implementation(rootProject.libs.bundles.kotlin.testing.common)
-            }
-        }
-        val jvmTest by getting {
-            dependencies {
-                implementation(rootProject.libs.kotest.runner.junit5.jvm)
-            }
+        commonTest.dependencies {
+            implementation(project(":test-tooling"))
+            implementation(libs.kotlin.test)
         }
     }
+}
+
+powerAssert {
+    functions =
+        listOf(
+            "assert",
+            "check",
+            "checkNotNull",
+            "require",
+            "requireNotNull",
+            "test.assertTrue",
+            "test.assertEquals",
+            "test.assertNull",
+        ).map { "kotlin.$it" }
+    includedSourceSets = listOf("commonMain", "commonTest")
 }

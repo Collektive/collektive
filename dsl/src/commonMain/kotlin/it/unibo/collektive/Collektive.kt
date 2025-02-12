@@ -3,8 +3,11 @@ package it.unibo.collektive
 import it.unibo.collektive.aggregate.AggregateResult
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.impl.AggregateContext
-import it.unibo.collektive.networking.InboundMessage
-import it.unibo.collektive.networking.Network
+import it.unibo.collektive.networking.Mailbox
+import it.unibo.collektive.networking.NeighborsData
+import it.unibo.collektive.networking.NoNeighborsData
+import it.unibo.collektive.path.DigestHashingFactory
+import it.unibo.collektive.path.PathFactory
 import it.unibo.collektive.state.State
 
 /**
@@ -13,7 +16,8 @@ import it.unibo.collektive.state.State
  */
 class Collektive<ID : Any, R>(
     val localId: ID,
-    private val network: Network<ID>,
+    private val network: Mailbox<ID>,
+    private val pathFactory: PathFactory = DigestHashingFactory(),
     private val computeFunction: Aggregate<ID>.() -> R,
 ) {
     /**
@@ -41,7 +45,7 @@ class Collektive<ID : Any, R>(
     }
 
     private fun executeRound(): AggregateResult<ID, R> {
-        val result = aggregate(localId, network, state, computeFunction)
+        val result = aggregate(localId, network, state, pathFactory, computeFunction)
         state = result.newState
         return result
     }
@@ -52,16 +56,18 @@ class Collektive<ID : Any, R>(
     companion object {
         /**
          * Aggregate program entry point which computes an iteration of a device [localId], taking as parameters
-         * the [previousState], the [inbound] messages received from the neighbours and the [compute]
+         * the [previousState], the [inbound] messages received from the neighbors and the [compute]
          * with AggregateContext receiver that provides the aggregate constructs.
          */
         fun <ID : Any, R> aggregate(
             localId: ID,
             previousState: State = emptyMap(),
-            inbound: Iterable<InboundMessage<ID>> = emptySet(),
+            inbound: NeighborsData<ID> = NoNeighborsData(),
+            inMemory: Boolean = inbound is NoNeighborsData,
+            pathFactory: PathFactory = DigestHashingFactory(),
             compute: Aggregate<ID>.() -> R,
         ): AggregateResult<ID, R> =
-            AggregateContext(localId, inbound, previousState).run {
+            AggregateContext(localId, inbound, previousState, inMemory, pathFactory).run {
                 AggregateResult(localId, compute(), messagesToSend(), newState())
             }
 
@@ -72,13 +78,14 @@ class Collektive<ID : Any, R>(
          */
         fun <ID : Any, R> aggregate(
             localId: ID,
-            network: Network<ID>,
+            network: Mailbox<ID>,
             previousState: State = emptyMap(),
+            pathFactory: PathFactory = DigestHashingFactory(),
             compute: Aggregate<ID>.() -> R,
         ): AggregateResult<ID, R> =
-            with(AggregateContext(localId, network.read(), previousState)) {
+            with(AggregateContext(localId, network.currentInbound(), previousState, network.inMemory, pathFactory)) {
                 AggregateResult(localId, compute(), messagesToSend(), newState()).also {
-                    network.write(it.toSend)
+                    network.deliverableFor(localId, it.toSend)
                 }
             }
     }

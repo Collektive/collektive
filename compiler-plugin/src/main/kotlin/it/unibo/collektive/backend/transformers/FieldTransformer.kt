@@ -1,9 +1,17 @@
-package it.unibo.collektive.transformers
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
 
+package it.unibo.collektive.backend.transformers
+
+import it.unibo.collektive.backend.visitors.collectAggregateReference
 import it.unibo.collektive.utils.common.AggregateFunctionNames
 import it.unibo.collektive.utils.common.isAssignableFrom
 import it.unibo.collektive.utils.logging.debug
-import it.unibo.collektive.visitors.collectAggregateReference
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.declarations.IrClass

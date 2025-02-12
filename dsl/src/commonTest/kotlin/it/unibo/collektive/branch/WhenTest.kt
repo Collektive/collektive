@@ -1,49 +1,45 @@
 package it.unibo.collektive.branch
 
-import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.maps.shouldHaveSize
-import io.kotest.matchers.shouldBe
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
-class WhenTest : StringSpec({
-    val id0 = 0
+class WhenTest {
+    private fun programUnderTest(input: Any) =
+        aggregate(0) {
+            when (input) {
+                is String -> neighboringViaExchange("string")
+                else -> neighboringViaExchange("test")
+            }
+        }
 
-    "When in single expression" {
+    @Test
+    fun `When in single expression`() {
         val condition = true
         val x = if (condition) "hello" else 123
-        val result =
-            aggregate(id0) {
-                when (x) {
-                    is String -> neighboringViaExchange("string")
-                    else -> neighboringViaExchange("test")
-                }
-            }
-        val messageFor0 = result.toSend.messagesFor(id0)
-        messageFor0 shouldHaveSize 1
-        messageFor0.values.toList() shouldBe listOf("string")
+        val result = programUnderTest(x)
+        val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
+        assertEquals(1, messageFor0.size)
+        assertEquals(listOf("string"), messageFor0.values.toList())
     }
 
-    "When in single expression in else case" {
+    @Test
+    fun `When in single expression in else case`() {
         val condition = false
         val x = if (condition) "hello" else 123
-        val result =
-            aggregate(id0) {
-                when (x) {
-                    is String -> neighboringViaExchange("string")
-                    else -> neighboringViaExchange("test")
-                }
-            }
-        val messageFor0 = result.toSend.messagesFor(id0)
-        messageFor0 shouldHaveSize 1
-        messageFor0.values.toList() shouldBe listOf("test")
+        val result = programUnderTest(x)
+        val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
+        assertEquals(1, messageFor0.size)
+        assertEquals(listOf("test"), messageFor0.values.toList())
     }
 
-    "When with nested function" {
+    @Test
+    fun `When with nested function`() {
         val condition = true
         val x = if (condition) "hello" else 123
         val result =
-            aggregate(id0) {
+            aggregate(0) {
                 fun test() {
                     neighboringViaExchange("test")
                 }
@@ -56,12 +52,13 @@ class WhenTest : StringSpec({
                     else -> test()
                 }
             }
-        val messageFor0 = result.toSend.messagesFor(id0)
-        messageFor0 shouldHaveSize 1
-        messageFor0.values.toList() shouldBe listOf("test2")
+        val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
+        assertEquals(1, messageFor0.size)
+        assertEquals(listOf("test2"), messageFor0.values.toList())
     }
 
-    "Nested when condition must be aligned" {
+    @Test
+    fun `Nested when condition must be aligned`() {
         val condition1 = false
         val condition2 = true
         val result =
@@ -75,8 +72,8 @@ class WhenTest : StringSpec({
                         }
                 }
             }
-        val messageFor0 = result.toSend.messagesFor(id0)
-        messageFor0 shouldHaveSize 1
-        messageFor0.values.toList() shouldBe listOf("test2")
+        val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
+        assertEquals(1, messageFor0.size)
+        assertEquals(listOf("test2"), messageFor0.values.toList())
     }
-})
+}

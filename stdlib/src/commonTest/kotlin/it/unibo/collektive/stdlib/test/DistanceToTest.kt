@@ -1,23 +1,31 @@
-import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.shouldBe
-import it.unibo.collektive.stdlib.distanceTo
-import it.unibo.collektive.testing.Environment
-import it.unibo.collektive.testing.mooreGrid
-import kotlin.math.abs
-import kotlin.math.sqrt
-
 /*
- * Copyright (c) 2024, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti, and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ * Copyright (c) 2024, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
  * as described in the LICENSE file in this project's repository's top directory.
  */
+package it.unibo.collektive.stdlib.test
 
-class DistanceToTest : StringSpec({
-    fun Environment<Double>.gradientIsStable(isMoore: Boolean): Boolean =
+import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
+import it.unibo.collektive.stdlib.spreading.distanceTo
+import it.unibo.collektive.testing.Environment
+import it.unibo.collektive.testing.mooreGrid
+import kotlin.math.abs
+import kotlin.math.sqrt
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+
+class DistanceToTest {
+    private fun Environment<Double>.gradientIsStable(
+        isMoore: Boolean,
+        size: Int,
+    ): Boolean =
         status().all { (id, value) ->
-            val x = id % 10
-            val y = id / 10
+            val x = id % size
+            val y = id / size
             val steps = x + y
             val expected =
                 when {
@@ -27,45 +35,52 @@ class DistanceToTest : StringSpec({
                         val diagonalSteps = (steps - manhattanSteps) / 2
                         sqrt(2.0) * diagonalSteps + manhattanSteps
                     }
+
                     else -> steps
                 }
             abs(value - expected.toFloat()) < 1e-6
         }
 
-    fun mooreGridWithGradient(size: Int) =
-        mooreGrid<Double>(size, size, { _, _ -> Double.NaN }) { environment ->
+    private fun mooreGridWithGradient(size: Int) =
+        mooreGrid<Double>(size, size, { _, _ -> Double.NaN }) { environment, _ ->
             val localPosition = environment.positionOf(localId)
             distanceTo(localId == 0) { neighboring(localPosition).map { it.distanceTo(localPosition) } }
         }.apply {
-            nodes.size shouldBe 100
+            assertEquals(size * size, nodes.size)
             val initial = status().values.distinct()
-            initial.size shouldBe 1
+            assertEquals(1, initial.size)
             check(initial.first().isNaN()) {
                 "Initial status is not NaN, but it is $initial (${initial::class.simpleName})"
             }
         }
-    "distanceTo in the luckiest case stabilizes in one cycle" {
+
+    @Test
+    fun `distanceTo in the luckiest case stabilizes in one cycle`() {
         val environment: Environment<Double> = mooreGridWithGradient(10)
         environment.cycleInOrder()
-        environment.gradientIsStable(isMoore = true) shouldBe true
+        assertTrue(environment.gradientIsStable(isMoore = true, 10))
     }
-    "distanceTo requires at most the longest path length cycles to stabilize" {
-        val size = 10
+
+    @Test
+    fun `distanceTo requires at most the longest path length cycles to stabilize`() {
+        val size = 5
         val environment: Environment<Double> = mooreGridWithGradient(size)
         environment.cycleInReverseOrder()
         val firstRound = environment.status()
-        firstRound[0] shouldBe 0.0
+
+        assertEquals(0.0, firstRound[0])
         firstRound.forEach { (id, value) ->
             when (id) {
-                0 -> value shouldBe 0.0
-                else -> value shouldBe Double.POSITIVE_INFINITY
+                0 -> assertEquals(0.0, value)
+                else -> assertEquals(Double.POSITIVE_INFINITY, value)
             }
         }
-        repeat(times = size - 1) {
-            // One round per device has been executed already
-            environment.gradientIsStable(isMoore = true) shouldBe false
+
+        repeat(size - 1) {
+            assertFalse(environment.gradientIsStable(isMoore = true, size))
             environment.cycleInReverseOrder()
         }
-        environment.gradientIsStable(isMoore = true) shouldBe true
+
+        assertTrue(environment.gradientIsStable(isMoore = true, size))
     }
-})
+}
