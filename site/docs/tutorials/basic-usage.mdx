@@ -9,42 +9,31 @@ title: Basic Usage
 A preliminary code example demonstrates how devices, through mutual communication, are able to identify the maximum ID among the neighboring nodes within their local network area (neighborhood):
 
 ```kotlin
-package it.unibo.collektive.examples.maxID
-
-import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
-import it.unibo.collektive.field.operations.max
-import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
-
 /**
  * First example - Tutorial:
  * 1. Identify the maximum value among the neighboring nodes.
  * 2. Assign a distinct color to the nodes with the identified maximum values.
 */
 
-fun Aggregate<Int>.maxID(environment: EnvironmentVariables) =
-    when (environment.get<Boolean>("isMaxID")) {
-        true -> searchMaxNeighborIDValue(environment)
-        false -> environment.get<Int>("maxNeighborID")
-    }
+fun Aggregate<Int>.maxID(environment: EnvironmentVariables) = maxNeighborID(environment)
 
-fun Aggregate<Int>.searchMaxNeighborIDValue(environment: EnvironmentVariables): Int {
+fun Aggregate<Int>.maxNeighborID(environment: EnvironmentVariables): Int {
     // Step 1: Exchange the localId with neighbors and obtain a field of values
-    val neighborValues = neighboringViaExchange(local = localId)
+    val neighborValues = neighboring(local = localId)
 
     // Step 2: Find the maximum value among neighbors (including self)
     val maxValue = neighborValues.max(base = localId)
 
-    // Step 3: Assign the result to a molecule
-    environment.set<Boolean>("isMaxID", localId == maxValue)
-    environment.set<Int>("localID", localId)
-    environment.set<Int>("maxNeighborID", maxValue)
+    // Step 3: Assign the result to a molecule (only if using Alchemist)
+    environment["isMaxID"] = localId == maxValue
+    environment["localID"] = localId
+    environment["maxNeighborID"] = maxValue
 
     return maxValue
 }
 
 ```
-The library function `neighboringViaExchange(local)` is a **aggregate operator** and is used to observe the value of an expression [local] across neighboring nodes.
+The library function `neighboring(local)` is a **aggregate operator** and is used to observe the value of an expression [local] across neighboring nodes.
 
 #### Example
 
@@ -54,9 +43,13 @@ val field = neighboring(0)
 
 The returned field has as its local value the value passed as input (0 in this example).
 
-**Note**: the scenario in which the functions are applied is modeled using the [Alchemist simulator](https://alchemistsimulator.github.io/), enabling a precise and controlled representation of network dynamics.
+The simulation environment used to demonstrate these examples is [Alchemist simulator](https://alchemistsimulator.github.io/). 
 
-<details>
+However, it is important to emphasize that the Collektive library is designed for broader applicability and is not limited to this specific tool.
+
+The correct execution of this exercise does not depend on Alchemist Simulator or the environment used for molecule assignment. The latter serves solely a graphical purpose, enabling the visualization of results by assigning different colors based on the identified maximum values.
+
+<details style={{ backgroundColor: 'transparent', border: '1px solid purple', borderRadius: '5px', padding: '5px' }}>
   <summary>Click to view images</summary>
   <div style={{ textAlign: 'center' }}>
     <img src="/img/basic-usage-first-example-1.png" style={{ maxWidth: '70%' }} />
@@ -69,12 +62,6 @@ The returned field has as its local value the value passed as input (0 in this e
   <div style={{ textAlign: 'center' }}>
     <img src="/img/basic-usage-first-example-3.png" style={{ maxWidth: '70%' }} />
   </div>
-
-  <div style={{ textAlign: 'center' }}>
-    <img src="/img/basic-usage-first-example-4.png" style={{ maxWidth: '70%' }} />
-  </div>
-
-  In the third step of the code from the first example, the computed values are assigned to molecules. These molecules can be inspected within the data of a selected device, thereby simplifying the debugging process and enabling a more effective analysis of the system's behavior.
 </details>
 
 The example we have seen represents a straightforward instance of aggregated behavior.
@@ -86,13 +73,6 @@ This second example represents a variation of the previous one. Building upon th
 **Note**: the global maximum is visually represented in green, while the local maximum is consistently indicated in red.
 
 ```kotlin
-package it.unibo.collektive.examples.maxID
-
-import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
-import it.unibo.collektive.field.operations.max
-import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
-
 /**
  * First example - Tutorial:
  * 1. Identify the maximum value among the neighboring nodes.
@@ -102,61 +82,55 @@ import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
  * 4. Assign a distinct color to the nodes with the identified maximum values.
 */
 
-fun Aggregate<Int>.maxID(environment: EnvironmentVariables) =
-    when (environment.get<Boolean>("isMaxID")) {
-        true -> searchMaxNetworkIDValue(environment)
-        false -> environment.get<Int>("maxNetworkID")
-    }
+fun Aggregate<Int>.maxID(environment: EnvironmentVariables) = maxNetworkID(environment)
 
-fun Aggregate<Int>.searchMaxNeighborIDValue(environment: EnvironmentVariables): Int {
+fun Aggregate<Int>.maxNeighborID(): Int {
     // Step 1: Exchange the localId with neighbors and obtain a field of values
-    val neighborValues = neighboringViaExchange(local = localId)
+    val neighborValues = neighboring(local = localId)
 
     // Step 2: Find the maximum value among neighbors (including self)
     val maxValue = neighborValues.max(base = localId)
 
-    // Step 3: Assign the result to a molecule
-    environment.set<Boolean>("isMaxLocalID", localId == maxValue)
-    environment.set<Int>("maxNeighborID", maxValue)
-
     return maxValue
 }
 
-fun Aggregate<Int>.searchMaxNetworkIDValue(environment: EnvironmentVariables): Int {
-    environment.set<Int>("localID", localId)
-
-    when (environment.get<Boolean>("isMaxLocalID")) {
-        true -> searchMaxNeighborIDValue(environment)
-        false -> environment.get<Int>("maxNeighborID")
-    }
-
-    // Step 1: Exchange the maxNeighborID with neighbors and obtain a field of values
-    val neighborValues = neighboringViaExchange(local = environment.get<Int>("maxNeighborID"))
-
-    // Step 2: Find the maximum value among neighbors (including self)
-    val maxValue = neighborValues.max(base = environment.get<Int>("maxNeighborID"))
+fun Aggregate<Int>.maxNetworkID(environment: EnvironmentVariables): Int {
+    val maxLocalValue = maxNeighborID()
 
     // Step 3: Assign the result to a molecule
-    environment.set<Boolean>("isMaxID", localId == maxValue)
-    environment.set<Int>("maxNetworkID", maxValue)
+    environment["isMaxLocalID"] = localId == maxLocalValue
+    environment["localID"] = localId
+    environment["maxNeighborID"] = maxLocalValue
+
+    // Step 1: Exchange the maxNeighborID with neighbors and obtain a field of values
+    val neighborValues = neighboring(local = maxLocalValue)
+
+    // Step 2: Find the maximum value among neighbors (including self)
+    val maxValue = neighborValues.max(base = maxLocalValue)
+
+    // Step 3: Assign the result to a molecule (only if using Alchemist)
+    environment["isMaxID"] = localId == maxValue
+    environment["maxNetworkID"] = maxValue
     
     return maxValue
 }
 
 ```
-<details>
+<details style={{ backgroundColor: 'transparent', border: '1px solid purple', borderRadius: '5px', padding: '5px' }}>
   <summary>Click to view images</summary>
   <div style={{ textAlign: 'center' }}>
-    <img src="/img/basic-usage-second-example-1.png" style={{ maxWidth: '70%' }} />
+    <img src="/img/basic-usage-second-example-3.png" style={{ maxWidth: '70%' }} />
   </div>
-
-  The network remains unchanged from the first example, except for the interconnection radius between devices. A poorly connected network would result in the presence of multiple global maxima within the network.
 
   <div style={{ textAlign: 'center' }}>
     <img src="/img/basic-usage-second-example-2.png" style={{ maxWidth: '70%' }} />
   </div>
 
-  This second example represents a highly simplified demonstration of leader election using the Collektive library.
+  <div style={{ textAlign: 'center' }}>
+    <img src="/img/basic-usage-second-example-1.png" style={{ maxWidth: '70%' }} />
+  </div>
 </details>
+
+This second example represents a highly simplified demonstration of leader election using the Collektive library.
 
 More examples can be found in the following repository: [Collektive Examples Repository](https://github.com/Collektive/collektive-examples).
