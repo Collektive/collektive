@@ -13,5 +13,4 @@ sidebar_position: 0
 
 3. [Tutorial](/docs/category/tutorial/)
     - [Basic Usage](../tutorials/basic-usage/)
-    - [Functions and Features](../tutorials/functions-and-features/)
-    - [Simple Aggregate Behavior](../tutorials/simple-aggregate-behavior/)
+    - [Operators](../tutorials/functions-and-features/)
