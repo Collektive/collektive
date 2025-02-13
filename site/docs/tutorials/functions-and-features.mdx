@@ -1,3 +1,185 @@
 ---
-title: Functions and Features
+title: Operators
 ---
+
+import { useState } from "react";
+import ReactMarkdown from "react-markdown";
+import rehypeRaw from 'rehype-raw';
+
+export default function OperatorList() {
+const operators = [
+{ name: ` sharing(initial: Initial, noinline transform: YieldingContext<Initial, Return>.(Field<ID, Initial>) -> YieldingResult<Initial, Return>): 
+
+Return = exchanging(initial) { field: Field<ID, Initial> ->
+>with(YieldingContext<Initial, Return>()) {
+>>val result: YieldingResult<Initial, Return> = transform(field)
+>>field.map { result.toSend }.yielding {
+>>>field.map { result.toReturn }
+>>}
+>}
+
+}.localValue
+
+`, description: ` \## Description 
+\`sharing(initial: Initial, noinline transform: YieldingContext<Initial, Return>.(Field<ID, Initial>) -> YieldingResult<Initial, Return>)\` is an aggregate operator: captures the space-time nature of field computation through observation of neighbors' values, 
+starting from an \`initial\` value, it reduces to a single local value given a \`transform\` function and updating and sharing to neighbors of a local variable.
+
+\### Example
+
+\`\`\`kotlin
+val result = sharing(0) {
+val maxValue = it.maxBy { v -> v.value }.value
+    maxValue.yielding { "Something different" }
+}
+result // result: kotlin.String
+\`\`\`
+
+In the example above, the function \`sharing\` will return the string initialized as in yielding.
+
+\#### Invalid use: 
+
+Do not write code after calling the sending or returning values, they must be the last statement of the body (the lambda expression).
+
+\`\`\`kotlin
+share(0) {
+    val maxValue = it.maxBy { v -> v.value }.value
+    maxValue.yielding { "Don't do this" }
+    maxValue
+}
+\`\`\`
+
+`},
+{ name:`share(initial: Initial, noinline transform: (Field<ID, Initial>) -> Initial): 
+    
+Initial = sharing(initial) { field -> transform(field).run { yielding { this } } }
+`, description: ` \## Description 
+
+\` share(initial: Initial, noinline transform: (Field<ID, Initial>) -> Initial) \` is an aggregate operator: captures the space-time nature of field computation through observation of neighbours' values, starting from an \`initial\` value, it reduces to a single local value given a \`transform\` function and updating and sharing to neighbours of a local variable.
+ 
+\### Example
+
+\`\`\`kotlin
+val result = share(0) {
+    it.maxBy { v -> v.value }.value
+}
+result // result: kotlin.Int
+\`\`\`
+
+In the example above, the function \`share\` wil return a value that is the max found in the field.`
+},
+{ name:`neighboringViaExchange(local: Scalar): 
+
+Field<ID, Scalar> `, 
+description: ` \## Description 
+
+\`neighboringViaExchange(local: Scalar)\` is an aggregate operator: observes the value of an expression \`local\` across neighbours.
+
+\### Example 
+
+\`\`\`kotlin
+val field = neighboring(0)
+\`\`\`
+
+The field returned has as local value the value passed as input (0 in this example).
+
+\`\`\`kotlin
+val field = neighboring({ 2 * 2 })
+\`\`\`
+
+In this case, the field returned has the result of the computation as local value.
+` 
+},
+{ name:"all", description: "TODO" },
+{ name:"allWithSelf", description: "TODO" },
+{ name:"any", description: "TODO" },
+{ name:"anyWithSelf", description: "TODO" },
+{ name:"none", description: "TODO" },
+{ name:"noneWithSelf", description: "TODO" },
+{ name:"min", description: "TODO" },
+{ name:"minWithSelf", description: "TODO" },
+{ name:"minWith", description: "TODO" },
+{ name:"minBy", description: "TODO" },
+{ name:"max", description: "TODO" },
+{ name:"maxWithSelf", description: "TODO" },
+{ name:"maxWith", description: "TODO" },
+{ name:"maxBy", description: "TODO" },
+{ name:"count", description: "TODO" },
+{ name:"countWithSelf", description: "TODO" },
+{ name:"replaceMatchingWithId", description: "TODO" },
+{ name:"replaceMatching", description: "TODO" },
+{ name:"excludeSelf", description: "TODO" },
+{ name:"alignedMapWithId", description: "TODO" },
+{ name:"alignedMap", description: "TODO" },
+{ name:"mapWithId", description: "TODO" },
+{ name:"map", description: "TODO" },
+{ name:"mapToConstantField", description: "TODO" },
+{ name:"get", description: "TODO" },
+{ name:"asSequence", description: "TODO" },
+{ name:"toMap", description: "TODO" },
+{ name:"exchange", description: "TODO" },
+{ name:"exchanging", description: "TODO" },
+{ name:"evolve", description: "TODO" },
+{ name:"evolving", description: "TODO" },
+{ name:"neighboring", description: "TODO" },
+{ name:"alignedOn", description: "TODO" },
+{ name:"align", description: "TODO" },
+{ name:"dealign", description: "TODO" },
+];
+
+const [search, setSearch] = useState("");
+
+// Filter operators based on search
+const filteredOperators = operators.filter(op =>
+    op.name.toLowerCase().includes(search.toLowerCase())
+);
+
+const highlightMatch = (text, searchTerm) => {
+    if (!searchTerm) return text; 
+    const escapedSearchTerm = searchTerm.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+
+    const regex = new RegExp(`(${escapedSearchTerm})`, 'gi');
+    return text.replace(regex, (match) => {
+        return `<mark class="bg-yellow-300">${match}</mark>`; 
+    });
+};
+
+return (
+    <div className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-2xl">
+        <h2 className="text-xl font-semibold text-purple-600 mb-4">
+        The operators present in the Collektive library are illustrated below
+        </h2>
+        
+        {/* Search bar */}
+        <input
+        type="text"
+        placeholder="🔍 Search for an operator..."
+        className="w-full h-12 p-3 text-lg border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        />
+
+        {/* Operator list with description in Markdown */}
+        <ul className="mt-4 space-y-3">
+        {filteredOperators.length > 0 ? (
+            filteredOperators.map((op) => (
+            <li key={op.name} className="p-3 bg-gray-100 rounded-lg shadow-sm text-lg">
+                <ReactMarkdown 
+                    className="font-bold text-purple-700"
+                    children={highlightMatch(op.name, search)} 
+                    rehypePlugins={[rehypeRaw]}
+                />
+                <details style={{ backgroundColor: 'transparent', border: '1px solid purple', borderRadius: '5px', padding: '5px' }}>
+                    <summary>Click to view description</summary>
+                    <ReactMarkdown className="text-gray-600 text-sm">
+                            {op.description}
+                    </ReactMarkdown>
+                </details>
+            </li>
+            ))
+        ) : (
+            <li className="text-gray-500 text-lg">No operators found</li>
+        )}
+        </ul>
+    </div>
+);
+}
