@@ -1,5 +1,5 @@
 ---
-title: Operators
+title: Aggregate Operators and Field Operations
 ---
 
 import { useState } from "react";
@@ -15,7 +15,9 @@ Return = exchanging(initial) { field: Field<ID, Initial> ->
 >>val result: YieldingResult<Initial, Return> = transform(field)
 >>field.map { result.toSend }.yielding {
 >>>field.map { result.toReturn }
+
 >>}
+
 >}
 
 }.localValue
@@ -69,7 +71,8 @@ In the example above, the function \`share\` wil return a value that is the max 
 },
 { name:`neighboringViaExchange(local: Scalar): 
 
-Field<ID, Scalar> `, 
+Field<ID, Scalar> = exchanging(local) { toYield -> toYield.mapToConstantField(local).yielding { toYield } }
+`, 
 description: ` \## Description 
 
 \`neighboringViaExchange(local: Scalar)\` is an aggregate operator: observes the value of an expression \`local\` across neighbours.
@@ -89,41 +92,144 @@ val field = neighboring({ 2 * 2 })
 In this case, the field returned has the result of the computation as local value.
 ` 
 },
-{ name:"all", description: "TODO" },
-{ name:"allWithSelf", description: "TODO" },
-{ name:"any", description: "TODO" },
-{ name:"anyWithSelf", description: "TODO" },
-{ name:"none", description: "TODO" },
-{ name:"noneWithSelf", description: "TODO" },
-{ name:"min", description: "TODO" },
-{ name:"minWithSelf", description: "TODO" },
-{ name:"minWith", description: "TODO" },
-{ name:"minBy", description: "TODO" },
-{ name:"max", description: "TODO" },
-{ name:"maxWithSelf", description: "TODO" },
-{ name:"maxWith", description: "TODO" },
-{ name:"maxBy", description: "TODO" },
-{ name:"count", description: "TODO" },
-{ name:"countWithSelf", description: "TODO" },
-{ name:"replaceMatchingWithId", description: "TODO" },
-{ name:"replaceMatching", description: "TODO" },
-{ name:"excludeSelf", description: "TODO" },
-{ name:"alignedMapWithId", description: "TODO" },
-{ name:"alignedMap", description: "TODO" },
-{ name:"mapWithId", description: "TODO" },
-{ name:"map", description: "TODO" },
-{ name:"mapToConstantField", description: "TODO" },
-{ name:"get", description: "TODO" },
-{ name:"asSequence", description: "TODO" },
-{ name:"toMap", description: "TODO" },
-{ name:"exchange", description: "TODO" },
-{ name:"exchanging", description: "TODO" },
-{ name:"evolve", description: "TODO" },
-{ name:"evolving", description: "TODO" },
-{ name:"neighboring", description: "TODO" },
-{ name:"alignedOn", description: "TODO" },
-{ name:"align", description: "TODO" },
-{ name:"dealign", description: "TODO" },
+{ name:`all(base: Boolean, predicate: (Boolean) -> Boolean = { it }): 
+
+Boolean = fold(predicate(base)) { acc, value -> acc && predicate(value) }
+`, description:`\## Description 
+
+\`all(base: Boolean, predicate: (Boolean) -> Boolean = { it })\` is a boolean field operation: check if all the \`Boolean\` elements in the field are true by default.
+
+If \`predicate\` is defined, it is applied to the elements.
+
+The \`base\` value is used as a first element to start the fold operation at which the \`predicate\` is applied.
+` 
+},
+{ name:`all(crossinline predicate: (T) -> Boolean):
+
+Boolean = fold(true) { acc, value -> acc && predicate(value) }
+`, description: `\## Description 
+
+\`all(crossinline predicate: (T) -> Boolean)\` is a field operation: check if all the elements in the field satisfy the \`predicate\`, ignoring the local value.
+`
+},
+{ name:`allWithSelf(crossinline predicate: (T) -> Boolean): 
+
+Boolean = all(predicate) && predicate(localValue)
+`, description: `\## Description 
+
+\`allWithSelf(crossinline predicate: (T) -> Boolean)\` is a field operation: check if all the elements in the field satisfy the \`predicate\`, including the local value.` },
+{ name:`any(base: Boolean, predicate: (Boolean) -> Boolean = { it }): 
+
+Boolean = fold(predicate(base)) { acc, value -> acc || predicate(value) }
+`, description: `\## Description 
+
+\`any(base: Boolean, predicate: (Boolean) -> Boolean = { it })\` is a boolean field operation: check if any of the \`Boolean\` elements in the field are true by default.
+
+If \`predicate\` is defined, it is applied to the elements.
+
+The \`base\` value is used as a first element to start the fold operation at which the \`predicate\` is applied.` },
+{ name:`any(crossinline predicate: (T) -> Boolean): 
+
+Boolean = fold(false) { acc, value -> acc || predicate(value) }
+`, description: `\## Description 
+
+\`any(crossinline predicate: (T) -> Boolean)\` is a field operation: check if any of the elements in the field satisfy the \`predicate\`, ignoring the local value.` },
+{ name:`anyWithSelf(crossinline predicate: (T) -> Boolean): 
+
+Boolean = any(predicate) || predicate(localValue)
+`, description: `\## Description 
+
+\`anyWithSelf(crossinline predicate: (T) -> Boolean)\` is a field operation: check if any of the elements in the field satisfy the \`predicate\`, including the local value.` },
+{ name:`none(base: Boolean, predicate: (Boolean) -> Boolean = { it }): 
+
+Boolean = !all(base, predicate)
+`, description: `\## Description 
+
+\`none(base: Boolean, predicate: (Boolean) -> Boolean = { it })\` is a boolean field operation: check if none of the \`Boolean\` elements in the field are true by default.
+
+If \`predicate\` is defined, it is applied to the elements.
+
+The \`base\` value is used as a first element to start the fold operation at which the \`predicate\` is applied.
+` },
+{ name:`none(crossinline predicate: (T) -> Boolean): 
+
+Boolean = !any(predicate)`, description: `\## Description
+
+\`none(crossinline predicate: (T) -> Boolean)\` is a field operation: check if none of the elements in the field satisfy the \`predicate\`, ignoring the local value.
+
+ ` },
+{ name:`noneWithSelf(crossinline predicate: (T) -> Boolean): 
+
+Boolean = !anyWithSelf(predicate)`, description: `\## Description 
+
+\`noneWithSelf(crossinline predicate: (T) -> Boolean)\` is a field operation: check if none of the elements in the field satisfy the \`predicate\`, including the local value.
+` },
+{ name:`min(base: T): 
+
+T = fold(base) { acc, value -> if (value < acc) value else acc }
+`, description: `\## Description 
+
+\` min(base: T) \` is a comparable field operation: get the minimum value of a field, excluding the local value, starting from \`base\`.
+
+To consider the local value, explicitly provide it as \`base\`.
+` },
+{ name:`minWithSelf():
+
+T = min(localValue)
+`, description: `\## Description 
+\`minWithSelf()\` is a comparable field operation: get the minimum value of a field, including the local value.
+` },
+{ name:`minWith`, description: `\## Description ` },
+{ name:`minBy`, description: `\## Description ` },
+{ name:`max(base: T): 
+
+T = fold(base) { acc, value -> if (value > acc) value else acc }
+`, description: `\## Description 
+
+\`max(base: T)\` is a comparable field operation: get the maximum value of a field, excluding the local value, starting from \`base\`.
+
+To consider the local value, explicitly provide it as \`base\`.
+` },
+{ name:`maxWithSelf(): T = max(localValue)`, description: `\## Description 
+
+\`maxWithSelf()\` is a comparable field operation: get the maximum value of a field, including the local value.
+` },
+{ name:`maxWith`, description: `\## Description ` },
+{ name:`maxBy`, description: `\## Description ` },
+{ name:`count(crossinline predicate: (T) -> Boolean = { true }): 
+
+Int = fold(0) { acc, value -> if (predicate(value)) acc + 1 else acc }
+`, description: `\## Description 
+
+\`count(crossinline predicate: (T) -> Boolean = { true })\` is a field operation: count the number of elements in the field that satisfy the \`predicate\`, ignoring the local value.
+` },
+{ name:`countWithSelf(crossinline predicate: (T) -> Boolean = { true }): 
+
+Int = count(predicate) + if (predicate(localValue)) 1 else 0
+`, description: `\## Description 
+
+\`countWithSelf(crossinline predicate: (T) -> Boolean = { true })\` is a field operation: count the number of elements in the field that satisfy the \`predicate\`, including the local value.
+
+` },
+{ name:`replaceMatchingWithId`, description: `\## Description ` },
+{ name:`replaceMatching`, description: `\## Description ` },
+{ name:`excludeSelf`, description: `\## Description ` },
+{ name:`alignedMapWithId`, description: `\## Description ` },
+{ name:`alignedMap`, description: `\## Description ` },
+{ name:`mapWithId`, description: `\## Description ` },
+{ name:`map`, description: `\## Description ` },
+{ name:`mapToConstantField`, description: `\## Description ` },
+{ name:`get`, description: `\## Description ` },
+{ name:`asSequence`, description: `\## Description ` },
+{ name:`toMap`, description: `\## Description ` },
+{ name:`exchange`, description: `\## Description ` },
+{ name:`exchanging`, description: `\## Description ` },
+{ name:`evolve`, description: `\## Description ` },
+{ name:`evolving`, description: `\## Description ` },
+{ name:`neighboring`, description: `\## Description ` },
+{ name:`alignedOn`, description: `\## Description ` },
+{ name:`align`, description: `\## Description ` },
+{ name:`dealign`, description: `\## Description ` },
 ];
 
 const [search, setSearch] = useState("");
@@ -152,7 +258,7 @@ return (
         {/* Search bar */}
         <input
         type="text"
-        placeholder="🔍 Search for an operator..."
+        placeholder="🔍 Search for a function..."
         className="w-full h-12 p-3 text-lg border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
