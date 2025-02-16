@@ -25,4 +25,4 @@ fun <ID : Any, T : Comparable<T>> Field<ID, T>.max(base: T): T =
 /**
  * Get the maximum value of a field, including the local value.
  */
-fun <ID : Any, T : Comparable<T>> Field<ID, T>.maxWithSelf(): T = min(localValue)
+fun <ID : Any, T : Comparable<T>> Field<ID, T>.maxWithSelf(): T = max(localValue)
