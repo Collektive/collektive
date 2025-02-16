@@ -10,7 +10,9 @@ package it.unibo.collektive.networking
 
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.protobuf.ProtoBuf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
@@ -61,6 +63,18 @@ class SerializationTest {
         val network = SerializerNetworkTest()
         aggregate(1, network, emptyMap()) {
             neighboring(CustomGeneric(localId))
+        }
+        val serializedMessage = network.serializeAndSend(1)
+        network.deserializeAndReceive(serializedMessage)
+        assertEquals(1, network.messages.size)
+    }
+
+    @Test
+    fun `protobuf can be used as a serializer for binary encoded payload`() {
+        @OptIn(ExperimentalSerializationApi::class)
+        val network = SerializerNetworkTest(ProtoBuf)
+        aggregate(1, network, emptyMap()) {
+            neighboring(10)
         }
         val serializedMessage = network.serializeAndSend(1)
         network.deserializeAndReceive(serializedMessage)
