@@ -3,7 +3,9 @@ package it.unibo.collektive.field
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
 import it.unibo.collektive.field.operations.max
+import it.unibo.collektive.field.operations.maxWithSelf
 import it.unibo.collektive.field.operations.min
+import it.unibo.collektive.field.operations.minWithSelf
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 import kotlin.test.Test
@@ -17,24 +19,37 @@ class FieldManipulationTest {
     private val id1 = 1
 
     @Test
-    fun `Get the min value including self`() {
+    fun `get the min value including self`() {
+        aggregate(id0) {
+            val sharedField = neighboringViaExchange(double(3))
+            assertEquals(6, sharedField.minWithSelf())
+        }
+
+        aggregate(id1) {
+            val sharedField = neighboringViaExchange(double(2))
+            assertEquals(4, sharedField.minWithSelf())
+        }
+    }
+
+    @Test
+    fun `get the max value including self issue 767`() {
         val nm = NetworkManager()
         val network0 = NetworkImplTest(nm, id0)
         val network1 = NetworkImplTest(nm, id1)
 
         aggregate(id0, network0) {
             val sharedField = neighboringViaExchange(double(3))
-            assertEquals(6, sharedField.min(sharedField.localValue))
+            assertEquals(6, sharedField.maxWithSelf())
         }
 
         aggregate(id1, network1) {
-            val sharedField = neighboringViaExchange(double(2))
-            assertEquals(4, sharedField.min(sharedField.localValue))
+            val sharedField = neighboringViaExchange(double(4))
+            assertEquals(8, sharedField.maxWithSelf())
         }
     }
 
     @Test
-    fun `Get min value non including self`() {
+    fun `get min value non including self`() {
         val nm = NetworkManager()
         val network0 = NetworkImplTest(nm, id0)
         val network1 = NetworkImplTest(nm, id1)
@@ -51,7 +66,7 @@ class FieldManipulationTest {
     }
 
     @Test
-    fun `Get max value non including self`() {
+    fun `get max value non including self`() {
         val nm = NetworkManager()
         val network0 = NetworkImplTest(nm, id0)
         val network1 = NetworkImplTest(nm, id1)
