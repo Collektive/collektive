@@ -13,4 +13,5 @@ sidebar_position: 0
 
 3. [Tutorial](/docs/category/tutorial/)
     - [Basic Usage](../tutorials/basic-usage/)
-    - [Operators](../tutorials/functions-and-features/)
+    - [Aggregate Operators and Field Operations](../tutorials/dsl-descriptions/)
+    - [Standard Library Functions](../tutorials/stdlib-descriptions/)

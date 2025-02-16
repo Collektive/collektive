@@ -1,0 +1,74 @@
+---
+title: Standard Library Functions
+---
+
+import { useState } from "react";
+import ReactMarkdown from "react-markdown";
+import rehypeRaw from 'rehype-raw';
+
+export default function OperatorList() {
+const operators = [
+{ name: `distanceTo`, description: `\## Description `},
+
+
+
+]
+
+
+const [search, setSearch] = useState("");
+
+// Filter operators based on search
+const filteredOperators = operators.filter(op =>
+    op.name.toLowerCase().includes(search.toLowerCase())
+);
+
+const highlightMatch = (text, searchTerm) => {
+    if (!searchTerm) return text; 
+    const escapedSearchTerm = searchTerm.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+
+    const regex = new RegExp(`(${escapedSearchTerm})`, 'gi');
+    return text.replace(regex, (match) => {
+        return `<mark class="bg-yellow-300">${match}</mark>`; 
+    });
+};
+
+return (
+    <div className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-2xl">
+        <h2 className="text-xl font-semibold text-purple-600 mb-4">
+        The standard library functions present in the Collektive library are illustrated below
+        </h2>
+        
+        {/* Search bar */}
+        <input
+        type="text"
+        placeholder="🔍 Search for a function..."
+        className="w-full h-12 p-3 text-lg border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        />
+
+        {/* Operator list with description in Markdown */}
+        <ul className="mt-4 space-y-3">
+        {filteredOperators.length > 0 ? (
+            filteredOperators.map((op) => (
+            <li key={op.name} className="p-3 bg-gray-100 rounded-lg shadow-sm text-lg">
+                <ReactMarkdown 
+                    className="font-bold text-purple-700"
+                    children={highlightMatch(op.name, search)} 
+                    rehypePlugins={[rehypeRaw]}
+                />
+                <details style={{ backgroundColor: 'transparent', border: '1px solid purple', borderRadius: '5px', padding: '5px' }}>
+                    <summary>Click to view description</summary>
+                    <ReactMarkdown className="text-gray-600 text-sm">
+                            {op.description}
+                    </ReactMarkdown>
+                </details>
+            </li>
+            ))
+        ) : (
+            <li className="text-gray-500 text-lg">No operators found</li>
+        )}
+        </ul>
+    </div>
+);
+}
