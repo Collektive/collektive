@@ -177,10 +177,27 @@ To consider the local value, explicitly provide it as \`base\`.
 
 T = min(localValue)
 `, description: `\## Description 
+
 \`minWithSelf()\` is a comparable field operation: get the minimum value of a field, including the local value.
 ` },
-{ name:`minWith`, description: `\## Description ` },
-{ name:`minBy`, description: `\## Description ` },
+{ name:`minWith(base: T, comparator: Comparator<T>): 
+
+T = fold(base) { acc, value -> if (comparator.compare(acc, value) < 0) acc else value }
+`, description: `\## Description 
+
+\`minWith(base: T, comparator: Comparator<T>)\` is a field operation: returns the element yielding the smallest value of the given \`comparator\`.
+
+In case multiple elements are minimal, there is no guarantee which one will be returned.
+` },
+{ name:`minBy(base: T, crossinline selector: (T) -> R):
+
+T = minWith(base, compareBy(selector))
+`, description: `\## Description 
+
+\`minBy(base: T, crossinline selector: (T) -> R)\` is a field operator: returns the element yielding the smallest value of the given \`selector\`.
+
+In case multiple elements are minimal, there is no guarantee which one will be returned.
+` },
 { name:`max(base: T): 
 
 T = fold(base) { acc, value -> if (value > acc) value else acc }
@@ -190,12 +207,29 @@ T = fold(base) { acc, value -> if (value > acc) value else acc }
 
 To consider the local value, explicitly provide it as \`base\`.
 ` },
-{ name:`maxWithSelf(): T = max(localValue)`, description: `\## Description 
+{ name:`maxWithSelf(): 
+
+T = max(localValue)`, description: `\## Description 
 
 \`maxWithSelf()\` is a comparable field operation: get the maximum value of a field, including the local value.
 ` },
-{ name:`maxWith`, description: `\## Description ` },
-{ name:`maxBy`, description: `\## Description ` },
+{ name:`maxWith(base: T, comparator: Comparator<T>,): 
+
+T = minWith(base, comparator.reversed())`, description: `\## Description 
+
+\`maxWith(base: T, comparator: Comparator<T>)\` is a field operation: returns the element yielding the largest value of the given \`comparator\`.
+
+In case multiple elements are maximal, there is no guarantee which one will be returned.
+` },
+{ name:`maxBy(base: T, crossinline selector: (T) -> R):
+
+ T = maxWith(base, compareBy(selector))
+`, description: `\## Description 
+
+\`maxBy(base: T, crossinline selector: (T) -> R)\` is a field operation: returns the element yielding the largest value of the given \`selector\`.
+
+In case multiple elements are maximal, there is no guarantee which one will be returned.
+` },
 { name:`count(crossinline predicate: (T) -> Boolean = { true }): 
 
 Int = fold(0) { acc, value -> if (predicate(value)) acc + 1 else acc }
@@ -211,25 +245,190 @@ Int = count(predicate) + if (predicate(localValue)) 1 else 0
 \`countWithSelf(crossinline predicate: (T) -> Boolean = { true })\` is a field operation: count the number of elements in the field that satisfy the \`predicate\`, including the local value.
 
 ` },
-{ name:`replaceMatchingWithId`, description: `\## Description ` },
-{ name:`replaceMatching`, description: `\## Description ` },
-{ name:`excludeSelf`, description: `\## Description ` },
-{ name:`alignedMapWithId`, description: `\## Description ` },
-{ name:`alignedMap`, description: `\## Description ` },
-{ name:`mapWithId`, description: `\## Description ` },
-{ name:`map`, description: `\## Description ` },
-{ name:`mapToConstantField`, description: `\## Description ` },
-{ name:`get`, description: `\## Description ` },
-{ name:`asSequence`, description: `\## Description ` },
-{ name:`toMap`, description: `\## Description ` },
-{ name:`exchange`, description: `\## Description ` },
-{ name:`exchanging`, description: `\## Description ` },
-{ name:`evolve`, description: `\## Description ` },
-{ name:`evolving`, description: `\## Description ` },
-{ name:`neighboring`, description: `\## Description ` },
-{ name:`alignedOn`, description: `\## Description ` },
-{ name:`align`, description: `\## Description ` },
-{ name:`dealign`, description: `\## Description ` },
+{ name:`replaceMatchingWithId(replaceWith: T, crossinline predicate: (ID, T) -> Boolean): 
+
+Field<ID, T> = mapWithId { id, value -> if (predicate(id, value)) replaceWith else value }
+`, description: `\## Description 
+
+\`replaceMatchingWithId(replaceWith: T, crossinline predicate: (ID, T) -> Boolean)\` is a field operation: returns a new field containing \`replaceWith\` for each element that satisfies the \`predicate\`.
+` },
+{ name:`replaceMatching(replaceWith: T, crossinline predicate: (T) -> Boolean):
+
+Field<ID, T> = replaceMatchingWithId(replaceWith) { _, value -> predicate(value) }
+`, description: `\## Description 
+
+\`replaceMatching(replaceWith: T, crossinline predicate: (T) -> Boolean)\` is a field operations: returns a new field containing \`replaceWith\` for each element that satisfies the \`predicate\`.
+` },
+{ name:`excludeSelf(): 
+
+Map<ID, T>
+`, description: `\## Description 
+
+\`excludeSelf()\` is a method of the field interface: returns a \`Map\` with the neighboring values of this field (namely, all values but self).
+
+` },
+{ name:`alignedMapWithId(other: Field<ID, B>, transform: (ID, T, B) -> R):
+
+Field<ID, R> {
+>checkAligned(this, other)
+>return mapWithId { id, value -> transform(id, value, other[id]) }
+
+}
+`, description: `\## Description 
+
+\`alignedMapWithId(other: Field<ID, B>, transform: (ID, T, B) -> R)\` is a method of the field interface: combines this field with another (aligned) one considering the \`ID\` when combining the values.
+
+` },
+{ name:`alignedMap(other: Field<ID, B>, transform: (T, B) -> R): 
+
+Field<ID, R> = alignedMapWithId(other) { _, value, otherValue -> transform(value, otherValue) }
+`, description: `\## Description 
+
+\`alignedMap(other: Field<ID, B>, transform: (T, B) -> R)\` is a method of the field interface: combines this field with another (aligned) one.
+
+` },
+{ name:`mapWithId(transform: (ID, T) -> B): 
+
+Field<ID, B>`, description: `\## Description 
+
+\`mapWithId(transform: (ID, T) -> B)\` is a method of the field interface: map the field using the \`transform\` function (including it self).
+
+` },
+{ name:`map(transform: (T) -> B): 
+
+Field<ID, B> = mapWithId { _, value -> transform(value) }
+`, description: `\## Description 
+
+\`map(transform: (T) -> B)\` is a method of the field interface: map the field using the \`transform\` function.
+
+` },
+{ name:`mapToConstantField(singleton: B): 
+
+Field<ID, B> = ConstantField(localId, singleton, excludeSelf().keys)
+`, description: `\## Description 
+
+\`mapToConstantField(singleton: B)\` is a method of the field interface: map the field resulting in a new one where the value for the local and the neighbors is \`singleton\`.
+
+` },
+{ name:`get(id: ID): 
+
+T`, description: `\## Description 
+
+\`get(id: ID)\` is a method of the field interface: get the value associated with the \`id\`.
+
+Raise an error if the \`id\` is not present in the field.
+
+` },
+{ name:`asSequence(): 
+
+Sequence<Pair<ID, T>>
+`, description: `\## Description 
+
+\`asSequence()\` is a method of the field interface: transform the field into a sequence of pairs containing the \`id\` and the associated value.
+
+` },
+{ name:`toMap(): 
+
+Map<ID, T>
+`, description: `\## Description 
+
+\`toMap()\` is a method of the field interface: converts the Field into a \`Map\`.
+
+This method is meant to bridge the aggregate APIs with the Kotlin collections framework.
+
+The resulting map _will contain the local value_.
+
+` },
+{ name:`exchange(initial: Initial, dataSharingMethod: DataSharingMethod<Initial>, body: (Field<ID, Initial>) -> Field<ID, Initial>): 
+    
+Field<ID, Initial>
+`, description: `\## Description 
+
+\`exchange(initial: Initial, dataSharingMethod: DataSharingMethod<Initial>, body: (Field<ID, Initial>) -> Field<ID, Initial>)\` is a method of the aggregate interface: manages the computation of values between neighbors in a specific context.
+
+It computes a \`body\` function starting from the \`initial\` value and the messages received from other neighbors, then sends the results from the evaluation to specific neighbors or to everyone, it is contingent upon the origin of the calculated value, whether it was received from a neighbor or if it constituted the initial value.
+
+\### Example
+
+\`\`\`kotlin
+exchange(0) { f ->
+    f.mapField { _, v -> if (v % 2 == 0) v + 1 else v * 2 }
+}
+\`\`\`
+
+The result of the exchange function is a field with as messages a map with key the id of devices across the network and the result of the computation passed as relative local values.
+` },
+{ name:`exchanging(initial: Initial, dataSharingMethod: DataSharingMethod<Initial>, body: YieldingScope<Field<ID, Initial>, Field<ID, Return>>):
+
+Field<ID, Return>
+`, description: `\## Description 
+
+\`exchanging(initial: Initial, dataSharingMethod: DataSharingMethod<Initial>, body: YieldingScope<Field<ID, Initial>, Field<ID, Return>>)\` is a method of the aggregate interface: same behavior of \`exchange\` but this function can yield a \`Field\` of \`Return\` value.
+
+\### Example
+
+\`\`\`kotlin
+exchanging(initial = 1) {
+    val fieldResult = it + 1
+    fieldResult.yielding { fieldResult.map { value -> "return: $value" } }
+}
+\`\`\`
+
+` },
+{ name:`evolve(initial: Initial, transform: (Initial) -> Initial): 
+
+Initial
+`, description: `\## Description 
+
+\`evolve(initial: Initial, transform: (Initial) -> Initial)\` is a method of the aggregate interface: iteratively updates the value computing the \`transform\` expression at each device using the last computed value or the \`initial\`.
+
+` },
+{ name:`evolving(initial: Initial, transform: YieldingScope<Initial, Return>): 
+
+Return`, description: `\## Description 
+
+\`evolving(initial: Initial, transform: YieldingScope<Initial, Return>)\` is a method of the aggregate interface: iteratively updates the value computing the \`transform\` expression from a \`YieldingContext\` at each device using the last computed value or the \`initial\`.
+
+` },
+{ name:`neighboring(local: Scalar, dataSharingMethod: DataSharingMethod<Scalar>): 
+
+Field<ID, Scalar>
+`, description: `\## Description 
+
+\`neighboring(local: Scalar, dataSharingMethod: DataSharingMethod<Scalar>)\` is a method of the aggregate interface: observes the value of an expression \`local\` across neighbours.
+
+\### Example
+
+\`\`\`kotlin
+val field = neighboring(0)
+\`\`\`
+
+The field returned has as local value the value passed as input (0 in this example).
+
+\`\`\`kotlin
+val field = neighboring({ 2 * 2 })
+\`\`\`
+
+In this case, the field returned has the computation as a result, in form of a field of functions with type \`() -> Int\`.
+` },
+{ name:`alignedOn(pivot: Any?, body: () -> R): 
+
+R
+`, description: `\## Description 
+
+\`alignedOn(pivot: Any?, body: () -> R)\` is a method of the aggregate interface: alignment function that pushes in the stack the pivot, executes the body and pop the last element of the stack after it is called.
+
+Returns the body's return element.
+` },
+{ name:`align(pivot: Any?)
+`, description: `\## Description 
+
+\`align(pivot: Any?)\` is a method of the aggregate interface: pushes the pivot in the alignment stack.
+` },
+{ name:`dealign()`, description: `\## Description 
+
+\`dealign()\` is a method of the aggregate interface: pops the last element of the alignment stack.
+` },
 ];
 
 const [search, setSearch] = useState("");
@@ -252,7 +451,7 @@ const highlightMatch = (text, searchTerm) => {
 return (
     <div className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-2xl">
         <h2 className="text-xl font-semibold text-purple-600 mb-4">
-        The operators present in the Collektive library are illustrated below
+        The aggregate operators and field operations present in the Collektive library are illustrated below
         </h2>
         
         {/* Search bar */}
