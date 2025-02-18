@@ -54,14 +54,21 @@ The correct execution of this exercise does not depend on Alchemist Simulator or
   <div style={{ textAlign: 'center' }}>
     <img src="/img/basic-usage-first-example-1.png" style={{ maxWidth: '70%' }} />
   </div>
+  In the initial configuration depicted in the first image, all nodes have the "isMaxID" flag initially set to true. A node for which "isMaxID == true" is represented in red.
 
+  It is observed that the network has a low degree of connectivity, leading to the formation of multiple small subnetworks. 
+  
+  The resulting configuration after executing the code shown above is as follows:
   <div style={{ textAlign: 'center' }}>
     <img src="/img/basic-usage-first-example-2.png" style={{ maxWidth: '70%' }} />
   </div>
 
+  The obtained result is briefly analyzed by considering one of these small subnetworks as an example. Specifically, we examine the nodes with ID 197, 277, and the intermediate node connecting them. 
   <div style={{ textAlign: 'center' }}>
     <img src="/img/basic-usage-first-example-3.png" style={{ maxWidth: '70%' }} />
   </div>
+
+  In the figure, the ID of the intermediate node between nodes 197 and 277 is not displayed, but it can reasonably be assumed to be lower than those of the other two nodes. For this reason, both node 277 and node 197 have the flag "isMaxID == true." However, it is observed that node 197 does not recognize node 277 as the maximum. This occurs because there is no direct communication between them, and each node only transmits its own ID to its neighbors. This mechanism leads to a solution characterized by local maxima.
 </details>
 
 The example we have seen represents a straightforward instance of aggregated behavior.
@@ -122,13 +129,22 @@ fun Aggregate<Int>.maxNetworkID(environment: EnvironmentVariables): Int {
     <img src="/img/basic-usage-second-example-3.png" style={{ maxWidth: '70%' }} />
   </div>
 
+  An additional layer of communication is introduced, as shown in the first image, which depicts the initial configuration where all nodes have the "isMaxID" flag set to true. In this second example, this flag represents the global maximum of the network. The flag previously used in the first example, called "isMaxID," has been renamed to "isMaxLocalID." A node for which "isMaxID == true" is represented in green, while a node for which "isMaxLocalID == true" is represented in red.
+  
+  Furthermore, in this example, the network is more interconnected. Taking this into account, along with the additional layer of communication between the nodes, where once a local maximum is identified, it will be communicated by all nodes within the interconnected subnet, these two characteristics will allow for the attainment of a global maximum.
+  
+  The resulting configuration after executing the code shown above is as follows:
   <div style={{ textAlign: 'center' }}>
     <img src="/img/basic-usage-second-example-2.png" style={{ maxWidth: '70%' }} />
   </div>
 
+  There are four interconnected subnets, and the number of interconnected subnets is determined by the number of highlighted nodes. The nodes within each of these subnets communicate the local maximum value identified within them, thereby enabling the identification of the global maximum value of the entire network.
   <div style={{ textAlign: 'center' }}>
     <img src="/img/basic-usage-second-example-1.png" style={{ maxWidth: '70%' }} />
   </div>
+  For the sake of visual clarity, the network is presented without the connection edges between the nodes. 
+  
+  Additionally, it should be noted that fewer nodes have been included compared to the previous example.
 </details>
 
 This second example represents a highly simplified demonstration of leader election using the Collektive library.
