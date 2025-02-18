@@ -8,22 +8,35 @@ import rehypeRaw from 'rehype-raw';
 
 export default function OperatorList() {
 const operators = [
+{ name: "## Spreading Functions", description: "" }, 
 {name: `distanceTo(
+
 >source: Boolean,
+
 >bottom: Distance,
+
 >top: Distance,
+
 >crossinline accumulateDistance: (Distance, Distance) -> Distance,
+
 >crossinline metric: () -> Field<ID, Distance>
 
 ): 
 
 Distance = gradientCast(
+
 >source = source,
+
 >local = if (source) bottom else top,
+
 >bottom = bottom,
+
 >top = top,
+
 >accumulateData = { neighborToSource, hereToNeighbor, _ -> accumulateDistance(neighborToSource, hereToNeighbor)},
+
 >accumulateDistance,
+
 >metric
 
 )
@@ -286,6 +299,7 @@ The \`metric\` function is used to compute the distance between devices in form 
 
 \`accumulateData\` is used to modify data from neighbors on the fly, and defaults to the identity function.
 `},
+{ name: "## Gossip Functions", description: "" },
 {name: `gossipMax(local: Value, comparator: Comparator<Value>): 
 
 Value {
@@ -391,6 +405,7 @@ Boolean = nonStabilizingGossip(condition()) { a, b -> a || b }
 
 To check whether a condition is still holding, use \`isHappeningAnywhere\`
 `},
+{ name: "## Comparable Functions", description: "" },
 {name: `coerceIn(min: T, max: T): 
 
 T = minOf(max, maxOf(this, min))
@@ -455,26 +470,42 @@ return (
 
         {/* Operator list with description in Markdown */}
         <ul className="mt-4 space-y-3">
-        {filteredOperators.length > 0 ? (
-            filteredOperators.map((op) => (
-            <li key={op.name} className="p-3 bg-gray-100 rounded-lg shadow-sm text-lg">
-                <ReactMarkdown 
+        {(() => {
+            let showSection = false; 
+
+            return operators.flatMap((op, index) => {
+            if (op.name.startsWith("##")) {
+                showSection = op.name.toLowerCase().includes(search.toLowerCase());
+
+                return (
+                    <h2 className="text-xl font-bold">{op.name.replace("##", "")}</h2>
+                );
+            }
+
+            if (op.name.toLowerCase().includes(search.toLowerCase()) || showSection) {
+                return (
+                <li key={op.name} className="p-3 bg-gray-100 rounded-lg shadow-sm text-lg">
+                    <ReactMarkdown 
                     className="font-bold text-purple-700"
                     children={highlightMatch(op.name, search)} 
                     rehypePlugins={[rehypeRaw]}
-                />
-                <details style={{ backgroundColor: 'transparent', border: '1px solid purple', borderRadius: '5px', padding: '5px' }}>
+                    />
+                    <details 
+                    style={{ backgroundColor: 'transparent', border: '1px solid purple', borderRadius: '5px', padding: '5px' }}
+                    >
                     <summary>Click to view description</summary>
                     <ReactMarkdown className="text-gray-600 text-sm">
-                            {op.description}
+                        {op.description}
                     </ReactMarkdown>
-                </details>
-            </li>
-            ))
-        ) : (
-            <li className="text-gray-500 text-lg">No operators found</li>
-        )}
+                    </details>
+                </li>
+                );
+            }
+            return []; 
+            });
+        })()}
         </ul>
+
     </div>
 );
 }

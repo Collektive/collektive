@@ -8,12 +8,17 @@ import rehypeRaw from 'rehype-raw';
 
 export default function OperatorList() {
 const operators = [
+{ name: "## Aggregate Operators", description: "" }, 
 { name: ` sharing(initial: Initial, noinline transform: YieldingContext<Initial, Return>.(Field<ID, Initial>) -> YieldingResult<Initial, Return>): 
 
 Return = exchanging(initial) { field: Field<ID, Initial> ->
+
 >with(YieldingContext<Initial, Return>()) {
+
 >>val result: YieldingResult<Initial, Return> = transform(field)
+
 >>field.map { result.toSend }.yielding {
+    
 >>>field.map { result.toReturn }
 
 >>}
@@ -92,6 +97,7 @@ val field = neighboring({ 2 * 2 })
 In this case, the field returned has the result of the computation as local value.
 ` 
 },
+{ name: "## Boolean Field Operations", description: "" }, 
 { name:`all(base: Boolean, predicate: (Boolean) -> Boolean = { it }): 
 
 Boolean = fold(predicate(base)) { acc, value -> acc && predicate(value) }
@@ -104,6 +110,28 @@ If \`predicate\` is defined, it is applied to the elements.
 The \`base\` value is used as a first element to start the fold operation at which the \`predicate\` is applied.
 ` 
 },
+{ name:`any(base: Boolean, predicate: (Boolean) -> Boolean = { it }): 
+
+Boolean = fold(predicate(base)) { acc, value -> acc || predicate(value) }
+`, description: `\## Description 
+
+\`any(base: Boolean, predicate: (Boolean) -> Boolean = { it })\` is a boolean field operation: check if any of the \`Boolean\` elements in the field are true by default.
+
+If \`predicate\` is defined, it is applied to the elements.
+
+The \`base\` value is used as a first element to start the fold operation at which the \`predicate\` is applied.` },
+{ name:`none(base: Boolean, predicate: (Boolean) -> Boolean = { it }): 
+
+Boolean = !all(base, predicate)
+`, description: `\## Description 
+
+\`none(base: Boolean, predicate: (Boolean) -> Boolean = { it })\` is a boolean field operation: check if none of the \`Boolean\` elements in the field are true by default.
+
+If \`predicate\` is defined, it is applied to the elements.
+
+The \`base\` value is used as a first element to start the fold operation at which the \`predicate\` is applied.
+` },
+{ name: "## Field Operations", description: "" }, 
 { name:`all(crossinline predicate: (T) -> Boolean):
 
 Boolean = fold(true) { acc, value -> acc && predicate(value) }
@@ -118,16 +146,6 @@ Boolean = all(predicate) && predicate(localValue)
 `, description: `\## Description 
 
 \`allWithSelf(crossinline predicate: (T) -> Boolean)\` is a field operation: check if all the elements in the field satisfy the \`predicate\`, including the local value.` },
-{ name:`any(base: Boolean, predicate: (Boolean) -> Boolean = { it }): 
-
-Boolean = fold(predicate(base)) { acc, value -> acc || predicate(value) }
-`, description: `\## Description 
-
-\`any(base: Boolean, predicate: (Boolean) -> Boolean = { it })\` is a boolean field operation: check if any of the \`Boolean\` elements in the field are true by default.
-
-If \`predicate\` is defined, it is applied to the elements.
-
-The \`base\` value is used as a first element to start the fold operation at which the \`predicate\` is applied.` },
 { name:`any(crossinline predicate: (T) -> Boolean): 
 
 Boolean = fold(false) { acc, value -> acc || predicate(value) }
@@ -140,17 +158,6 @@ Boolean = any(predicate) || predicate(localValue)
 `, description: `\## Description 
 
 \`anyWithSelf(crossinline predicate: (T) -> Boolean)\` is a field operation: check if any of the elements in the field satisfy the \`predicate\`, including the local value.` },
-{ name:`none(base: Boolean, predicate: (Boolean) -> Boolean = { it }): 
-
-Boolean = !all(base, predicate)
-`, description: `\## Description 
-
-\`none(base: Boolean, predicate: (Boolean) -> Boolean = { it })\` is a boolean field operation: check if none of the \`Boolean\` elements in the field are true by default.
-
-If \`predicate\` is defined, it is applied to the elements.
-
-The \`base\` value is used as a first element to start the fold operation at which the \`predicate\` is applied.
-` },
 { name:`none(crossinline predicate: (T) -> Boolean): 
 
 Boolean = !any(predicate)`, description: `\## Description
@@ -194,7 +201,7 @@ In case multiple elements are minimal, there is no guarantee which one will be r
 T = minWith(base, compareBy(selector))
 `, description: `\## Description 
 
-\`minBy(base: T, crossinline selector: (T) -> R)\` is a field operator: returns the element yielding the smallest value of the given \`selector\`.
+\`minBy(base: T, crossinline selector: (T) -> R)\` is a field operation: returns the element yielding the smallest value of the given \`selector\`.
 
 In case multiple elements are minimal, there is no guarantee which one will be returned.
 ` },
@@ -257,8 +264,9 @@ Field<ID, T> = mapWithId { id, value -> if (predicate(id, value)) replaceWith el
 Field<ID, T> = replaceMatchingWithId(replaceWith) { _, value -> predicate(value) }
 `, description: `\## Description 
 
-\`replaceMatching(replaceWith: T, crossinline predicate: (T) -> Boolean)\` is a field operations: returns a new field containing \`replaceWith\` for each element that satisfies the \`predicate\`.
+\`replaceMatching(replaceWith: T, crossinline predicate: (T) -> Boolean)\` is a field operation: returns a new field containing \`replaceWith\` for each element that satisfies the \`predicate\`.
 ` },
+{ name: "## Method of the Field Interface", description: "" },
 { name:`excludeSelf(): 
 
 Map<ID, T>
@@ -339,6 +347,7 @@ This method is meant to bridge the aggregate APIs with the Kotlin collections fr
 The resulting map _will contain the local value_.
 
 ` },
+{ name: "## Method of the Aggregate Interface", description: "" },
 { name:`exchange(initial: Initial, dataSharingMethod: DataSharingMethod<Initial>, body: (Field<ID, Initial>) -> Field<ID, Initial>): 
     
 Field<ID, Initial>
@@ -465,26 +474,42 @@ return (
 
         {/* Operator list with description in Markdown */}
         <ul className="mt-4 space-y-3">
-        {filteredOperators.length > 0 ? (
-            filteredOperators.map((op) => (
-            <li key={op.name} className="p-3 bg-gray-100 rounded-lg shadow-sm text-lg">
-                <ReactMarkdown 
+        {(() => {
+            let showSection = false; 
+
+            return operators.flatMap((op, index) => {
+            if (op.name.startsWith("##")) {
+                showSection = op.name.toLowerCase().includes(search.toLowerCase());
+
+                return (
+                    <h2 className="text-xl font-bold">{op.name.replace("##", "")}</h2>
+                );
+            }
+
+            if (op.name.toLowerCase().includes(search.toLowerCase()) || showSection) {
+                return (
+                <li key={op.name} className="p-3 bg-gray-100 rounded-lg shadow-sm text-lg">
+                    <ReactMarkdown 
                     className="font-bold text-purple-700"
                     children={highlightMatch(op.name, search)} 
                     rehypePlugins={[rehypeRaw]}
-                />
-                <details style={{ backgroundColor: 'transparent', border: '1px solid purple', borderRadius: '5px', padding: '5px' }}>
+                    />
+                    <details 
+                    style={{ backgroundColor: 'transparent', border: '1px solid purple', borderRadius: '5px', padding: '5px' }}
+                    >
                     <summary>Click to view description</summary>
                     <ReactMarkdown className="text-gray-600 text-sm">
-                            {op.description}
+                        {op.description}
                     </ReactMarkdown>
-                </details>
-            </li>
-            ))
-        ) : (
-            <li className="text-gray-500 text-lg">No operators found</li>
-        )}
+                    </details>
+                </li>
+                );
+            }
+            return []; 
+            });
+        })()}
         </ul>
+
     </div>
 );
 }
