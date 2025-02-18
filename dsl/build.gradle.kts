@@ -7,12 +7,14 @@ kotlinMultiplatform {
         commonMain.dependencies {
             implementation(libs.arrow.core)
             implementation(libs.hash.sha3)
-            implementation(libs.kotlinx.serialization)
+            implementation(libs.kotlinx.serialization.core)
         }
         commonTest.dependencies {
             implementation(project(":stdlib"))
             implementation(project(":test-tooling"))
             implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.serialization.protobuf)
         }
     }
 }

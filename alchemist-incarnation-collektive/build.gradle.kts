@@ -29,7 +29,7 @@ kotlinJvm {
                 implementation(libs.bundles.kotlin.compiler)
                 implementation(libs.caffeine)
                 implementation(libs.kotlin.test)
-                implementation(libs.kotlinx.serialization)
+                implementation(libs.kotlinx.serialization.core)
                 implementation(libs.slf4j)
             }
         }

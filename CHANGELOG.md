@@ -1,3 +1,24 @@
+## [16.0.1](https://github.com/Collektive/collektive/compare/16.0.0...16.0.1) (2025-02-16)
+
+### Dependency updates
+
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.123 ([3732329](https://github.com/Collektive/collektive/commit/3732329cb03dda6dbd6f87aeb74d42e4dd9da7bd))
+* **deps:** update node.js to 22.14 ([a4df604](https://github.com/Collektive/collektive/commit/a4df604bbc3ca2de2a8902a7693fb4db4d30070b))
+
+### Bug Fixes
+
+* correct `maxWithSelf` implementation to use max instead of min ([58a449f](https://github.com/Collektive/collektive/commit/58a449f79fb9cb8965d2d562ac95beb2c562e8e4))
+
+### Tests
+
+* regression test for issue [#767](https://github.com/Collektive/collektive/issues/767) ([5ea04bd](https://github.com/Collektive/collektive/commit/5ea04bdd146c348417920f24df9449da1aee127c))
+* remove kotest from `dsl` module ([#765](https://github.com/Collektive/collektive/issues/765)) ([6ac2403](https://github.com/Collektive/collektive/commit/6ac2403757dc92ddb2e70c4955d2a6791c8815be))
+* testing protobuf serializer ([03bbebc](https://github.com/Collektive/collektive/commit/03bbebc48c3bbc9e55c138a027e158f2eee9009b))
+
+### Build and continuous integration
+
+* use core serialization library in the DSL and specific serialization formats in the tests ([41c3a91](https://github.com/Collektive/collektive/commit/41c3a91d850fe01ec033b6edbf7337774cd9cc6f))
+
 ## [16.0.0](https://github.com/Collektive/collektive/compare/15.0.0...16.0.0) (2025-02-11)
 
 ### ⚠ BREAKING CHANGES
