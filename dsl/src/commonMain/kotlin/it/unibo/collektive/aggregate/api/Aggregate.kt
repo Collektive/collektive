@@ -9,6 +9,15 @@ import kotlinx.serialization.serializer
 typealias YieldingScope<Initial, Return> = YieldingContext<Initial, Return>.(Initial) -> YieldingResult<Initial, Return>
 
 /**
+ * Represents methods intended to be used internally only.
+ * The usage of these methods is discouraged and should be avoided.
+ */
+@RequiresOptIn(level = RequiresOptIn.Level.ERROR)
+@Retention(AnnotationRetention.BINARY)
+@Target(AnnotationTarget.FUNCTION)
+annotation class DelicateCollektiveApi
+
+/**
  * Models the minimal set of aggregate operations.
  * Holds the [localId] of the device executing the aggregate program.
  */
@@ -40,6 +49,7 @@ interface Aggregate<ID : Any> {
      * The result of the exchange function is a field with as messages a map with key the id of devices across the
      * network and the result of the computation passed as relative local values.
      */
+    @DelicateCollektiveApi
     fun <Initial> exchange(
         initial: Initial,
         dataSharingMethod: DataSharingMethod<Initial>,
@@ -57,6 +67,7 @@ interface Aggregate<ID : Any> {
      * }
      * ```
      */
+    @DelicateCollektiveApi
     fun <Initial, Return> exchanging(
         initial: Initial,
         dataSharingMethod: DataSharingMethod<Initial>,
@@ -99,6 +110,7 @@ interface Aggregate<ID : Any> {
      * In this case, the field returned has the computation as a result,
      * in form of a field of functions with type `() -> Int`.
      */
+    @DelicateCollektiveApi
     fun <Scalar> neighboring(
         local: Scalar,
         dataSharingMethod: DataSharingMethod<Scalar>,
@@ -142,10 +154,13 @@ interface Aggregate<ID : Any> {
         /**
          * Inlined version of the [Aggregate.exchange] function.
          */
+
         inline fun <ID : Any, reified Initial> Aggregate<ID>.exchange(
             initial: Initial,
             noinline body: (Field<ID, Initial>) -> Field<ID, Initial>,
-        ): Field<ID, Initial> = exchange(initial, dataSharingMethod(), body)
+        ): Field<ID, Initial> =
+            @OptIn(DelicateCollektiveApi::class)
+            exchange(initial, dataSharingMethod(), body)
 
         /**
          * Inlined version of the [Aggregate.exchanging] function.
@@ -153,12 +168,15 @@ interface Aggregate<ID : Any> {
         inline fun <ID : Any, reified Initial, Return> Aggregate<ID>.exchanging(
             initial: Initial,
             noinline body: YieldingScope<Field<ID, Initial>, Field<ID, Return>>,
-        ): Field<ID, Return> = exchanging(initial, dataSharingMethod(), body)
+        ): Field<ID, Return> =
+            @OptIn(DelicateCollektiveApi::class)
+            exchanging(initial, dataSharingMethod(), body)
 
         /**
          * Inlined version of the [Aggregate.neighboring] function.
          */
         inline fun <ID : Any, reified Scalar> Aggregate<ID>.neighboring(local: Scalar): Field<ID, Scalar> =
+            @OptIn(DelicateCollektiveApi::class)
             neighboring(local, dataSharingMethod())
     }
 }

@@ -3,6 +3,7 @@ package it.unibo.collektive.aggregate.api.impl
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
 import it.unibo.collektive.aggregate.api.DataSharingMethod
+import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
 import it.unibo.collektive.aggregate.api.YieldingContext
 import it.unibo.collektive.aggregate.api.YieldingResult
 import it.unibo.collektive.aggregate.api.YieldingScope
@@ -48,12 +49,14 @@ internal class AggregateContext<ID : Any>(
         others: Map<ID, T>,
     ): Field<ID, T> = Field(localId, localValue, others)
 
+    @DelicateCollektiveApi
     override fun <Initial> exchange(
         initial: Initial,
         dataSharingMethod: DataSharingMethod<Initial>,
         body: (Field<ID, Initial>) -> Field<ID, Initial>,
     ): Field<ID, Initial> = exchanging(initial, dataSharingMethod) { field -> body(field).run { yielding { this } } }
 
+    @DelicateCollektiveApi
     override fun <Initial, Ret> exchanging(
         initial: Initial,
         dataSharingMethod: DataSharingMethod<Initial>,
@@ -93,6 +96,7 @@ internal class AggregateContext<ID : Any>(
             }.toReturn
     }
 
+    @DelicateCollektiveApi
     override fun <Scalar> neighboring(
         local: Scalar,
         dataSharingMethod: DataSharingMethod<Scalar>,
