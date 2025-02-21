@@ -5,7 +5,6 @@ package it.unibo.collektive.field.operations
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.Field.Companion.fold
 import it.unibo.collektive.field.Field.Companion.foldWithId
-import kotlin.jvm.JvmName
 import kotlin.jvm.JvmOverloads
 
 /**
@@ -26,9 +25,8 @@ operator fun <ID : Any, T> Field<ID, T>.contains(value: T): Boolean = anyWithSel
  * id in field.withoutSelf().keys
  * ```
  */
-@JvmName("containsId")
-operator fun <ID : Any, T> Field<ID, T>.contains(id: ID): Boolean =
-    foldWithId(localValue == id) { current, id, _ -> current || id == id }
+fun <ID : Any, T> Field<ID, T>.containsId(id: ID): Boolean =
+    foldWithId(localId == id) { current, id, _ -> current || id == id }
 
 /**
  * Count the number of elements in the field that satisfy the [predicate],
@@ -72,7 +70,7 @@ inline fun <ID : Any, T> Field<ID, T>.any(crossinline predicate: (T) -> Boolean)
  * including the local value.
  */
 inline fun <ID : Any, T> Field<ID, T>.anyWithSelf(crossinline predicate: (T) -> Boolean): Boolean =
-    any(predicate) || predicate(localValue)
+    predicate(localValue) || any(predicate)
 
 /**
  * Returns the element yielding the largest value of the given [comparator].
