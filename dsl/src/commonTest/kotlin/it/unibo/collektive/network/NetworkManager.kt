@@ -1,31 +1,45 @@
 package it.unibo.collektive.network
 
-import it.unibo.collektive.networking.InboundMessage
-import it.unibo.collektive.networking.OutboundMessage
+import it.unibo.collektive.aggregate.api.DataSharingMethod
+import it.unibo.collektive.networking.Message
+import it.unibo.collektive.networking.NeighborsData
+import it.unibo.collektive.networking.OutboundEnvelope
+import it.unibo.collektive.path.Path
 
 /**
  * A fully connected virtual network.
  */
 class NetworkManager {
-    private var messageBuffer: Set<OutboundMessage<Int>> = emptySet()
+    private var messageBuffer: Map<Int, Message<Int, *>> = emptyMap()
 
     /**
      * Adds the [message] to the message buffer.
      */
-    fun send(message: OutboundMessage<Int>) {
-        messageBuffer = messageBuffer + message
+    fun send(
+        id: Int,
+        message: OutboundEnvelope<Int>,
+    ) {
+        val deliverableMessage = message.prepareMessageFor(id)
+        messageBuffer += id to deliverableMessage
     }
 
     /**
      * Return the messages directed to a specific [receiverId].
      */
-    fun receive(receiverId: Int): Collection<InboundMessage<Int>> =
-        messageBuffer
-            .filterNot { it.senderId == receiverId }
-            .map { received ->
-                InboundMessage(
-                    received.senderId,
-                    received.messagesFor(receiverId),
-                )
-            }
+    fun receiveMessageFor(receiverId: Int): NeighborsData<Int> =
+        object : NeighborsData<Int> {
+            private val neighborDeliverableMessages by lazy { messageBuffer.filter { it.key != receiverId } }
+            override val neighbors: Set<Int> get() = neighborDeliverableMessages.keys
+
+            @Suppress("UNCHECKED_CAST")
+            override fun <Value> dataAt(
+                path: Path,
+                dataSharingMethod: DataSharingMethod<Value>,
+            ): Map<Int, Value> =
+                neighborDeliverableMessages
+                    .mapValues { it.value.sharedData.getOrElse(path) { NoValue } as Value }
+                    .filter { it.value != NoValue }
+        }
+
+    private object NoValue
 }

@@ -1,5 +1,14 @@
-package it.unibo.collektive.transformers
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
 
+package it.unibo.collektive.backend.transformers
+
+import it.unibo.collektive.backend.visitors.collectAggregateReference
 import it.unibo.collektive.utils.common.AggregateFunctionNames.ALIGN_FUNCTION_NAME
 import it.unibo.collektive.utils.common.AggregateFunctionNames.DEALIGN_FUNCTION_NAME
 import it.unibo.collektive.utils.common.findAggregateReference
@@ -8,7 +17,6 @@ import it.unibo.collektive.utils.common.irStatement
 import it.unibo.collektive.utils.common.isAssignableFrom
 import it.unibo.collektive.utils.common.simpleFunctionName
 import it.unibo.collektive.utils.stack.StackFunctionCall
-import it.unibo.collektive.visitors.collectAggregateReference
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.builders.IrBlockBodyBuilder
@@ -30,7 +38,7 @@ import org.jetbrains.kotlin.ir.expressions.putArgument
 import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.receiverAndArgs
-import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
+import org.jetbrains.kotlin.ir.visitors.IrTransformer
 
 /**
  * This transforms the generated IR only when an aggregate computing's function is involved:
@@ -43,7 +51,7 @@ class AlignmentTransformer(
     private val functionToAlign: IrFunction,
     private val alignRawFunction: IrFunction,
     private val dealignFunction: IrFunction,
-) : IrElementTransformer<StackFunctionCall> {
+) : IrTransformer<StackFunctionCall>() {
     private var alignedFunctions = emptyMap<String, Int>()
 
     @OptIn(UnsafeDuringIrConstructionAPI::class)

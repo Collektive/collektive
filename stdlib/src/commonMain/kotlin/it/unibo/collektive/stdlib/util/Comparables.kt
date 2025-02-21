@@ -26,7 +26,7 @@ fun <T : Comparable<T>> T.coerceIn(range: ClosedRange<T>): T = minOf(range.endIn
 /**
  * Coerce all field values to be in the range between [min] and [max].
  */
-fun <ID: Any, T : Comparable<T>> Field<ID, T>.coerceIn(
+fun <ID : Any, T : Comparable<T>> Field<ID, T>.coerceIn(
     min: T,
     max: T,
 ): Field<ID, T> = map { it.coerceIn(min, max) }
@@ -34,6 +34,6 @@ fun <ID: Any, T : Comparable<T>> Field<ID, T>.coerceIn(
 /**
  * Coerces all field values in a [range].
  */
-fun <ID: Any, T : Comparable<T>> Field<ID, T>.coerceIn(
+fun <ID : Any, T : Comparable<T>> Field<ID, T>.coerceIn(
     range: ClosedRange<T>
 ): Field<ID, T> = map { it.coerceIn(range) }

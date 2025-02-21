@@ -1,14 +1,33 @@
 package it.unibo.collektive.aggregate.api
 
+import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchange
+import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchanging
+import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
 import it.unibo.collektive.field.Field
+import kotlinx.serialization.serializer
 
 typealias YieldingScope<Initial, Return> = YieldingContext<Initial, Return>.(Initial) -> YieldingResult<Initial, Return>
+
+/**
+ * Represents methods intended to be used internally only.
+ * The usage of these methods is discouraged and should be avoided.
+ */
+@RequiresOptIn(level = RequiresOptIn.Level.ERROR)
+@Retention(AnnotationRetention.BINARY)
+@Target(AnnotationTarget.FUNCTION)
+annotation class DelicateCollektiveApi
 
 /**
  * Models the minimal set of aggregate operations.
  * Holds the [localId] of the device executing the aggregate program.
  */
 interface Aggregate<ID : Any> {
+    /**
+     * Whether this context works only in memory.
+     * If false, this context is capable of serializing and deserializing messages.
+     */
+    val inMemoryOnly: Boolean
+
     /**
      * The local [ID] of the device.
      */
@@ -30,8 +49,10 @@ interface Aggregate<ID : Any> {
      * The result of the exchange function is a field with as messages a map with key the id of devices across the
      * network and the result of the computation passed as relative local values.
      */
+    @DelicateCollektiveApi
     fun <Initial> exchange(
         initial: Initial,
+        dataSharingMethod: DataSharingMethod<Initial>,
         body: (Field<ID, Initial>) -> Field<ID, Initial>,
     ): Field<ID, Initial>
 
@@ -46,8 +67,10 @@ interface Aggregate<ID : Any> {
      * }
      * ```
      */
+    @DelicateCollektiveApi
     fun <Initial, Return> exchanging(
         initial: Initial,
+        dataSharingMethod: DataSharingMethod<Initial>,
         body: YieldingScope<Field<ID, Initial>, Field<ID, Return>>,
     ): Field<ID, Return>
 
@@ -87,7 +110,11 @@ interface Aggregate<ID : Any> {
      * In this case, the field returned has the computation as a result,
      * in form of a field of functions with type `() -> Int`.
      */
-    fun <Scalar> neighboring(local: Scalar): Field<ID, Scalar>
+    @DelicateCollektiveApi
+    fun <Scalar> neighboring(
+        local: Scalar,
+        dataSharingMethod: DataSharingMethod<Scalar>,
+    ): Field<ID, Scalar>
 
     /**
      * Alignment function that pushes in the stack the pivot, executes the body and pop the last
@@ -108,4 +135,48 @@ interface Aggregate<ID : Any> {
      * Pops the last element of the alignment stack.
      */
     fun dealign()
+
+    /**
+     * Contains the inlined version of the [Aggregate.exchange],
+     * [Aggregate.exchanging], [Aggregate.neighboring] functions.
+     */
+    companion object {
+        /**
+         * Inline access to the data serialization method of an [Aggregate].
+         * This method is used to avoid building serializers for in-memory-only contexts.
+         */
+        inline fun <reified T> Aggregate<*>.dataSharingMethod(): DataSharingMethod<T> =
+            when {
+                inMemoryOnly -> InMemory
+                else -> Serialize(serializer())
+            }
+
+        /**
+         * Inlined version of the [Aggregate.exchange] function.
+         */
+
+        inline fun <ID : Any, reified Initial> Aggregate<ID>.exchange(
+            initial: Initial,
+            noinline body: (Field<ID, Initial>) -> Field<ID, Initial>,
+        ): Field<ID, Initial> =
+            @OptIn(DelicateCollektiveApi::class)
+            exchange(initial, dataSharingMethod(), body)
+
+        /**
+         * Inlined version of the [Aggregate.exchanging] function.
+         */
+        inline fun <ID : Any, reified Initial, Return> Aggregate<ID>.exchanging(
+            initial: Initial,
+            noinline body: YieldingScope<Field<ID, Initial>, Field<ID, Return>>,
+        ): Field<ID, Return> =
+            @OptIn(DelicateCollektiveApi::class)
+            exchanging(initial, dataSharingMethod(), body)
+
+        /**
+         * Inlined version of the [Aggregate.neighboring] function.
+         */
+        inline fun <ID : Any, reified Scalar> Aggregate<ID>.neighboring(local: Scalar): Field<ID, Scalar> =
+            @OptIn(DelicateCollektiveApi::class)
+            neighboring(local, dataSharingMethod())
+    }
 }

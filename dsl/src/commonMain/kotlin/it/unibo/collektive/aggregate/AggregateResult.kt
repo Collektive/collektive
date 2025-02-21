@@ -1,6 +1,6 @@
 package it.unibo.collektive.aggregate
 
-import it.unibo.collektive.networking.OutboundMessage
+import it.unibo.collektive.networking.OutboundEnvelope
 import it.unibo.collektive.state.State
 
 /**
@@ -11,6 +11,6 @@ import it.unibo.collektive.state.State
 data class AggregateResult<ID : Any, out R>(
     val localId: ID,
     val result: R,
-    val toSend: OutboundMessage<ID>,
+    val toSend: OutboundEnvelope<ID>,
     val newState: State,
 )

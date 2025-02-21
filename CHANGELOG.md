@@ -1,3 +1,165 @@
+## [16.1.0](https://github.com/Collektive/collektive/compare/16.0.1...16.1.0) (2025-02-20)
+
+### Features
+
+* introduce opt-in annotation preventing the erroneous usage of API intended to be internal ([#777](https://github.com/Collektive/collektive/issues/777)) ([9aeb063](https://github.com/Collektive/collektive/commit/9aeb06358ef1d51d60bc38496418bdb81732e56c))
+
+### Dependency updates
+
+* **deps:** update alchemist to v38.0.1 ([8629445](https://github.com/Collektive/collektive/commit/8629445df4f43f63f1060b41a6ae6d1f8b914db9))
+* **deps:** update alchemist to v38.0.3 ([a3e7490](https://github.com/Collektive/collektive/commit/a3e74904c2cfb1725205afa53aaca619c0e975bd))
+* **deps:** update alchemist to v39 ([b683afc](https://github.com/Collektive/collektive/commit/b683afc81146b1712db5819884844b3fd870b572))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.124 ([3875293](https://github.com/Collektive/collektive/commit/38752935b4af7b0c19fdbc3a0911690e4acaeb6d))
+* **deps:** update plugin com.gradle.develocity to v3.19.2 ([36104c0](https://github.com/Collektive/collektive/commit/36104c02a2bfe42be49905db83126f217e8104c3))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.10 ([0babc68](https://github.com/Collektive/collektive/commit/0babc68992ea527e6228e50cf61ce0582385e49d))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.9 ([6ba1df3](https://github.com/Collektive/collektive/commit/6ba1df30954cce8b72d24b43dd59ac7555e57511))
+
+## [16.0.1](https://github.com/Collektive/collektive/compare/16.0.0...16.0.1) (2025-02-16)
+
+### Dependency updates
+
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.123 ([3732329](https://github.com/Collektive/collektive/commit/3732329cb03dda6dbd6f87aeb74d42e4dd9da7bd))
+* **deps:** update node.js to 22.14 ([a4df604](https://github.com/Collektive/collektive/commit/a4df604bbc3ca2de2a8902a7693fb4db4d30070b))
+
+### Bug Fixes
+
+* correct `maxWithSelf` implementation to use max instead of min ([58a449f](https://github.com/Collektive/collektive/commit/58a449f79fb9cb8965d2d562ac95beb2c562e8e4))
+
+### Tests
+
+* regression test for issue [#767](https://github.com/Collektive/collektive/issues/767) ([5ea04bd](https://github.com/Collektive/collektive/commit/5ea04bdd146c348417920f24df9449da1aee127c))
+* remove kotest from `dsl` module ([#765](https://github.com/Collektive/collektive/issues/765)) ([6ac2403](https://github.com/Collektive/collektive/commit/6ac2403757dc92ddb2e70c4955d2a6791c8815be))
+* testing protobuf serializer ([03bbebc](https://github.com/Collektive/collektive/commit/03bbebc48c3bbc9e55c138a027e158f2eee9009b))
+
+### Build and continuous integration
+
+* use core serialization library in the DSL and specific serialization formats in the tests ([41c3a91](https://github.com/Collektive/collektive/commit/41c3a91d850fe01ec033b6edbf7337774cd9cc6f))
+
+## [16.0.0](https://github.com/Collektive/collektive/compare/15.0.0...16.0.0) (2025-02-11)
+
+### ⚠ BREAKING CHANGES
+
+* capture the concept of data sharing method as part of the API (#764)
+
+### Features
+
+* capture the concept of data sharing method as part of the API ([#764](https://github.com/Collektive/collektive/issues/764)) ([658a0b6](https://github.com/Collektive/collektive/commit/658a0b6de5b3133e2c28d7bbf28c679782a39162))
+
+## [15.0.0](https://github.com/Collektive/collektive/compare/14.0.0...15.0.0) (2025-02-11)
+
+### ⚠ BREAKING CHANGES
+
+* use `KSerializer` instead of `KClass` for serializing also compound types (#763)
+
+### Dependency updates
+
+* **deps:** update alchemist to v37.3.1 ([174408a](https://github.com/Collektive/collektive/commit/174408a8f29c636ca117a8c8d43971f5c14000a5))
+* **deps:** update alchemist to v38 ([511520b](https://github.com/Collektive/collektive/commit/511520bf03bfb6e58a4116e9cce28beeeb2760ad))
+* **deps:** update dependency org.kotlincrypto.hash:sha3 to v0.6.1 ([9217f20](https://github.com/Collektive/collektive/commit/9217f204cdb80d8f357103da00f62c0211617a0e))
+* **deps:** update kotest to v6.0.0.m2 ([ec30cea](https://github.com/Collektive/collektive/commit/ec30cea0e5d1b55da4a0066bb2cabbbed7869d32))
+
+### Tests
+
+* **compiler-plugin-test:** migrate a couple of tests to kotlin.test ([#761](https://github.com/Collektive/collektive/issues/761)) ([0d768b3](https://github.com/Collektive/collektive/commit/0d768b3c433a630ab2dfe58d8d3d265f56516919))
+
+### Refactoring
+
+* use `KSerializer` instead of `KClass` for serializing also compound types ([#763](https://github.com/Collektive/collektive/issues/763)) ([e80cbd6](https://github.com/Collektive/collektive/commit/e80cbd602dc8a0625f84bf275445829c2b3f9170))
+
+## [14.0.0](https://github.com/Collektive/collektive/compare/13.1.1...14.0.0) (2025-02-10)
+
+### ⚠ BREAKING CHANGES
+
+* ready the DSL and boundary for kotlinx.serialization (#753)
+
+### Dependency updates
+
+* **deps:** update alchemist to v37.1.7 ([12cc235](https://github.com/Collektive/collektive/commit/12cc2351dc161da9536d8ac97cfb4d11079022dd))
+* **deps:** update alchemist to v37.1.8 ([21080e1](https://github.com/Collektive/collektive/commit/21080e1934ea179902bd1aae3a55d2a3c1fc1068))
+* **deps:** update alchemist to v37.2.0 ([ffab524](https://github.com/Collektive/collektive/commit/ffab524923203caa8d49ff738e62ff49dceb46b6))
+* **deps:** update alchemist to v37.2.1 ([777b54a](https://github.com/Collektive/collektive/commit/777b54a8d26f16887c3fe1a922c5f74a84a6b8b9))
+* **deps:** update alchemist to v37.3.0 ([e1b6746](https://github.com/Collektive/collektive/commit/e1b6746eca227fb86a1ea649e4aa71c24ba76c61))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.120 ([91da80c](https://github.com/Collektive/collektive/commit/91da80c1cb3e2aab68117b6a55dd4aa540ee8d4c))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.121 ([1dd4ee9](https://github.com/Collektive/collektive/commit/1dd4ee9c26fa7d28a7fd98e0d24140d1f4f37547))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.122 ([fbae1ca](https://github.com/Collektive/collektive/commit/fbae1ca38377c356910516097d5b99394b5d6472))
+* **deps:** update plugin publishoncentral to v8.0.3 ([b9a0851](https://github.com/Collektive/collektive/commit/b9a085179114b8c3c2ccecd4e3eeb1713bd7c151))
+
+### Build and continuous integration
+
+* **deps:** update github/codeql-action action to v3.28.9 ([78951d0](https://github.com/Collektive/collektive/commit/78951d0f27b6705d1126956c3f02bb4bec4fdd88))
+
+### Refactoring
+
+* ready the DSL and boundary for kotlinx.serialization ([#753](https://github.com/Collektive/collektive/issues/753)) ([512d438](https://github.com/Collektive/collektive/commit/512d4383457a4b96a4e0a0a91ac9eea2430234c5))
+
+## [13.1.1](https://github.com/Collektive/collektive/compare/13.1.0...13.1.1) (2025-01-31)
+
+### Documentation
+
+* **dsl:** 🇬🇧 ➡️ 🇺🇸 ([e37116c](https://github.com/Collektive/collektive/commit/e37116c587e1cb6769299ec80e73003b5bf83d9a))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.8 ([96c74a0](https://github.com/Collektive/collektive/commit/96c74a0d03df5ad05fb170b208590390ecf1ffb0))
+
+## [13.1.0](https://github.com/Collektive/collektive/compare/13.0.0...13.1.0) (2025-01-30)
+
+### Features
+
+* **stdlib:** write a `multiGradientCast` ([cc9f35f](https://github.com/Collektive/collektive/commit/cc9f35fe523a0a7a86920f2a9f7c8c61f5c588aa))
+
+### Dependency updates
+
+* **deps:** update plugin gradlepluginpublish to v1.3.1 ([e57b550](https://github.com/Collektive/collektive/commit/e57b550f8fdbfeb0ec312e913b09c5ccffd92675))
+
+### Documentation
+
+* **stdlib:** document the rising value problem ([caac4b5](https://github.com/Collektive/collektive/commit/caac4b537cbe26dc3dd21b9cbe71e059f72b36ca))
+
+### Build and continuous integration
+
+* **deps:** update github/codeql-action action to v3.28.7 ([fb7d337](https://github.com/Collektive/collektive/commit/fb7d3372b3e5d7e15b5071c33effc0fbfcc2874c))
+* **deps:** update github/codeql-action action to v3.28.8 ([5f8fc0c](https://github.com/Collektive/collektive/commit/5f8fc0c2767eb3400be49c7777c50b5d7b0e591d))
+
+### Style improvements
+
+* **stdlib:** name the lambda parameters for clarity (thanks [@cric96](https://github.com/cric96)) ([500364f](https://github.com/Collektive/collektive/commit/500364ff39bbbba3743325f576740978d7fa6914))
+
+## [13.0.0](https://github.com/Collektive/collektive/compare/12.3.3...13.0.0) (2025-01-29)
+
+### ⚠ BREAKING CHANGES
+
+* **stdlib:** revisit the base structure of the standard library
+
+### Dependency updates
+
+* **deps:** update alchemist to v37.1.6 ([4430611](https://github.com/Collektive/collektive/commit/4430611d5818c9b5f8f330c07341d98dfb09fb76))
+* **deps:** update plugin gitsemver to v4.0.1 ([12cd867](https://github.com/Collektive/collektive/commit/12cd8675a16ae0a8a3dd98f0831117d676c8322e))
+* **deps:** update plugin gitsemver to v4.0.2 ([74626e1](https://github.com/Collektive/collektive/commit/74626e1f3a8c81820cbf7cf44c8cceb748d2afd7))
+* **deps:** update plugin multijvmtesting to v3.2.2 ([8adeac7](https://github.com/Collektive/collektive/commit/8adeac7d9b213f10ed4cb969170f859644a473be))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.20 ([53e77d9](https://github.com/Collektive/collektive/commit/53e77d95a95cdff197d0ea08edc6d6286c36e3ea))
+
+### Bug Fixes
+
+* **stdlib:** coerce all spread distances within the provided distance range, and verify the triangle inequality ([c61736f](https://github.com/Collektive/collektive/commit/c61736ff8025c266c8d38eceaefafcfed359575c))
+
+### Tests
+
+* **stdlib:** drop kotest, use kotlin.test instead ([39ab094](https://github.com/Collektive/collektive/commit/39ab09454cb64db0ef0343116dacfdbe1e1672fc))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.7 ([de60db0](https://github.com/Collektive/collektive/commit/de60db0843936bd7e5cbde8ada9a7534b575c809))
+* **deps:** update github/codeql-action action to v3.28.6 ([9607dd7](https://github.com/Collektive/collektive/commit/9607dd75370e3a24c69a1fc26f41480959f03842))
+* **stdlib:** enable [power-assert](https://kotlinlang.org/docs/power-assert.html) ([50486d0](https://github.com/Collektive/collektive/commit/50486d06863d674ba08af01338cdca8c139a9566))
+
+### Refactoring
+
+* **stdlib:** revisit the base structure of the standard library ([eacdded](https://github.com/Collektive/collektive/commit/eacdded614b76950660dcd4fc4fa48bc2872c84d))
+
 ## [12.3.3](https://github.com/Collektive/collektive/compare/12.3.2...12.3.3) (2025-01-27)
 
 ### Dependency updates

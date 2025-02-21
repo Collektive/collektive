@@ -1,4 +1,4 @@
-package it.unibo.collektive.visitors
+package it.unibo.collektive.backend.visitors
 
 import it.unibo.collektive.utils.common.isAssignableFrom
 import org.jetbrains.kotlin.ir.IrElement
@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.receiverAndArgs
-import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
+import org.jetbrains.kotlin.ir.visitors.IrVisitor
 
 /**
  * Class that visit all the children of the IR, looking for the
@@ -16,7 +16,7 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 private class AggregateRefChildrenVisitor(
     private val aggregateContextClass: IrClass,
     private val elements: MutableList<IrExpression>,
-) : IrElementVisitor<Unit, Nothing?> {
+) : IrVisitor<Unit, Nothing?>() {
     // Visit all the children of the root element
     override fun visitElement(
         element: IrElement,

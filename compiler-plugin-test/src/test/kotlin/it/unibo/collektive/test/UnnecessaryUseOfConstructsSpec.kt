@@ -17,7 +17,7 @@ import io.kotest.data.row
 import io.kotest.data.table
 import it.unibo.collektive.test.util.CompileUtils.getTestingProgram
 import it.unibo.collektive.test.util.CompileUtils.noWarning
-import it.unibo.collektive.test.util.CompileUtils.warning
+import it.unibo.collektive.test.util.CompileUtils.warningMessage
 
 class UnnecessaryUseOfConstructsSpec : FreeSpec({
 
@@ -56,7 +56,7 @@ class UnnecessaryUseOfConstructsSpec : FreeSpec({
 
                 "should compile producing a warning" - {
                     code shouldCompileWith
-                        warning(
+                        warningMessage(
                             expectedWarning(construct),
                         )
                 }
@@ -78,7 +78,7 @@ class UnnecessaryUseOfConstructsSpec : FreeSpec({
 
                 "should compile producing a warning" - {
                     code shouldCompileWith
-                        warning(
+                        warningMessage(
                             expectedWarning(construct),
                         )
                 }

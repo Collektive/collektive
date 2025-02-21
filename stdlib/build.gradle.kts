@@ -8,7 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.power.assert)
 }
 
-apply(plugin = libs.plugins.kotlin.multiplatform.id)
+apply(plugin = rootProject.libs.plugins.kotlin.multiplatform.id)
 
 configureKotlinMultiplatform()
 
@@ -38,15 +38,13 @@ kotlinMultiplatform {
         commonMain {
             dependencies {
                 implementation(project(":dsl"))
+                implementation(libs.kotlinx.serialization.core)
             }
             kotlin.srcDirs(collektivizeKotlinStdlibTask)
         }
         commonTest.dependencies {
             implementation(project(":test-tooling"))
-            implementation(rootProject.libs.kotlin.test)
-        }
-        jvmTest.dependencies {
-            implementation(rootProject.libs.kotest.runner.junit5.jvm)
+            implementation(libs.kotlin.test)
         }
     }
 }

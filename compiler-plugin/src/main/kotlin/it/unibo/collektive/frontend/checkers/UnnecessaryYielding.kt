@@ -13,6 +13,7 @@ import it.unibo.collektive.frontend.checkers.CheckersUtility.functionName
 import it.unibo.collektive.frontend.visitors.YieldingUnnecessaryUsageVisitor
 import it.unibo.collektive.utils.common.AggregateFunctionNames.EVOLVING_FUNCTION_FQ_NAME
 import it.unibo.collektive.utils.common.AggregateFunctionNames.EXCHANGING_FUNCTION_FQ_NAME
+import it.unibo.collektive.utils.common.AggregateFunctionNames.EXCHANGING_INLINE_FUNCTION_FQ_NAME
 import it.unibo.collektive.utils.common.AggregateFunctionNames.SHARING_FUNCTION_FQ_NAME
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
@@ -50,6 +51,7 @@ object UnnecessaryYielding : FirFunctionCallChecker(MppCheckerKind.Common) {
         listOf(
             EVOLVING_FUNCTION_FQ_NAME,
             EXCHANGING_FUNCTION_FQ_NAME,
+            EXCHANGING_INLINE_FUNCTION_FQ_NAME,
             SHARING_FUNCTION_FQ_NAME,
         )
 

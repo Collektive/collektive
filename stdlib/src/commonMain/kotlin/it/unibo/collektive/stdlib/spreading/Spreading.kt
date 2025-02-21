@@ -9,6 +9,7 @@
 package it.unibo.collektive.stdlib.spreading
 
 import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
 import it.unibo.collektive.aggregate.api.operators.share
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.operations.minBy
@@ -22,7 +23,7 @@ import kotlin.jvm.JvmOverloads
  * the [Distance] between neighboring devices is computed using the [metric] function,
  * the distance summation is governed by the [accumulateDistance] function.
  */
-inline fun <ID : Any, Distance : Comparable<Distance>> Aggregate<ID>.distanceTo(
+inline fun <ID : Any, reified Distance : Comparable<Distance>> Aggregate<ID>.distanceTo(
     source: Boolean,
     bottom: Distance,
     top: Distance,
@@ -66,15 +67,19 @@ inline fun <ID : Any> Aggregate<ID>.distanceTo(
  * The [metric] function is used to compute the distance between devices in form of a field of [Distance]s.
  * [Distance]s must be in the [[bottom], [top]] range, [accumulateDistance] is used to sum distances.
  * [accumulateData] is used to modify data from neighbors on the fly, and defaults to the identity function.
+ *
+ * This function features *incremental repair*, and it is subject to the *rising value problem*,
+ * see [Fast self-healing gradients](https://doi.org/10.1145/1363686.1364163).
  */
 @JvmOverloads
-inline fun <ID : Any, Value, Distance : Comparable<Distance>> Aggregate<ID>.gradientCast(
+inline fun <ID : Any, reified Value, reified Distance : Comparable<Distance>> Aggregate<ID>.gradientCast(
     source: Boolean,
     local: Value,
     bottom: Distance,
     top: Distance,
-    crossinline accumulateData: (Distance, Distance, Value) -> Value = { _, _, data -> data },
-    crossinline accumulateDistance: (Distance, Distance) -> Distance,
+    crossinline accumulateData: (fromSource: Distance, toNeighbor: Distance, data: Value) -> Value =
+        { _, _, data -> data },
+    crossinline accumulateDistance: (fromSource: Distance, toNeighbor: Distance) -> Distance,
     crossinline metric: () -> Field<ID, Distance>,
 ): Value {
     val topValue = top to local
@@ -105,12 +110,12 @@ inline fun <ID : Any, Value, Distance : Comparable<Distance>> Aggregate<ID>.grad
  */
 @JvmOverloads
 @JvmName("gradientCastInt")
-inline fun <ID : Any, Type> Aggregate<ID>.gradientCast(
+inline fun <ID : Any, reified Value> Aggregate<ID>.gradientCast(
     source: Boolean,
-    local: Type,
-    crossinline accumulateData: (Int, Int, Type) -> Type = { _, _, data -> data },
+    local: Value,
+    crossinline accumulateData: (fromSource: Int, toNeighbor: Int, data: Value) -> Value = { _, _, data -> data },
     crossinline metric: () -> Field<ID, Int> = { neighboring(1) },
-): Type = gradientCast(source, local, Int.MIN_VALUE, Int.MAX_VALUE, accumulateData, Int::plus, metric)
+): Value = gradientCast(source, local, Int.MIN_VALUE, Int.MAX_VALUE, accumulateData, Int::plus, metric)
 
 /**
  * Propagate [local] values across a spanning tree starting from the closest [source].
@@ -121,9 +126,75 @@ inline fun <ID : Any, Type> Aggregate<ID>.gradientCast(
  */
 @JvmOverloads
 @JvmName("gradientCastDouble")
-inline fun <ID : Any, Type> Aggregate<ID>.gradientCast(
+inline fun <ID : Any, reified Value> Aggregate<ID>.gradientCast(
     source: Boolean,
-    local: Type,
-    crossinline accumulateData: (Double, Double, Type) -> Type = { _, _, data -> data },
+    local: Value,
+    crossinline accumulateData: (fromSource: Double, toNeighbor: Double, data: Value) -> Value = { _, _, data -> data },
     crossinline metric: () -> Field<ID, Double> = { neighboring(1.0) },
-): Type = gradientCast(source, local, 0.0, Double.POSITIVE_INFINITY, accumulateData, Double::plus, metric)
+): Value = gradientCast(source, local, 0.0, Double.POSITIVE_INFINITY, accumulateData, Double::plus, metric)
+
+/**
+ * Provided a list of [sources], propagates information from each, collecting it in a map.
+ *
+ * If there are no sources and no neighbors, default to [local] value.
+ * The [metric] function is used to compute the distance between devices in form of a field of [Float]s.
+ * [accumulateData] is used to modify data from neighbors on the fly, and defaults to the identity function.
+ */
+@JvmOverloads
+inline fun <ID : Any, reified Value, reified Distance : Comparable<Distance>> Aggregate<ID>.multiGradientCast(
+    sources: Iterable<ID>,
+    local: Value,
+    bottom: Distance,
+    top: Distance,
+    crossinline accumulateData: (fromSource: Distance, toNeighbor: Distance, data: Value) -> Value =
+        { _, _, data -> data },
+    crossinline accumulateDistance: (Distance, Distance) -> Distance,
+    crossinline metric: () -> Field<ID, Distance>,
+): Map<ID, Value> =
+    sources.associateWith { source ->
+        alignedOn(source) {
+            gradientCast(source == localId, local, bottom, top, accumulateData, accumulateDistance, metric)
+        }
+    }
+
+/**
+ * Provided a list of [sources], propagates information from each, collecting it in a map.
+ *
+ * If there are no sources and no neighbors, default to [local] value.
+ * The [metric] function is used to compute the distance between devices in form of a field of [Float]s.
+ * [accumulateData] is used to modify data from neighbors on the fly, and defaults to the identity function.
+ */
+@JvmOverloads
+@JvmName("multiGradientCastDouble")
+inline fun <ID : Any, reified Value> Aggregate<ID>.multiGradientCast(
+    sources: Iterable<ID>,
+    local: Value,
+    crossinline accumulateData: (fromSource: Double, toNeighbor: Double, data: Value) -> Value = { _, _, data -> data },
+    crossinline metric: () -> Field<ID, Double> = { neighboring(1.0) },
+): Map<ID, Value> =
+    sources.associateWith { source ->
+        alignedOn(source) {
+            gradientCast(source == localId, local, 0.0, Double.POSITIVE_INFINITY, accumulateData, Double::plus, metric)
+        }
+    }
+
+/**
+ * Provided a list of [sources], propagates information from each, collecting it in a map.
+ *
+ * If there are no sources and no neighbors, default to [local] value.
+ * The [metric] function is used to compute the distance between devices in form of a field of [Float]s.
+ * [accumulateData] is used to modify data from neighbors on the fly, and defaults to the identity function.
+ */
+@JvmOverloads
+@JvmName("multiGradientCastInt")
+inline fun <ID : Any, reified Value> Aggregate<ID>.multiGradientCast(
+    sources: Iterable<ID>,
+    local: Value,
+    crossinline accumulateData: (fromSource: Int, toNeighbor: Int, data: Value) -> Value = { _, _, data -> data },
+    crossinline metric: () -> Field<ID, Int> = { neighboring(1) },
+): Map<ID, Value> =
+    sources.associateWith { source ->
+        alignedOn(source) {
+            gradientCast(source == localId, local, Int.MIN_VALUE, Int.MAX_VALUE, accumulateData, Int::plus, metric)
+        }
+    }
