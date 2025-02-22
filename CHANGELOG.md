@@ -1,3 +1,19 @@
+## [16.1.1](https://github.com/Collektive/collektive/compare/16.1.0...16.1.1) (2025-02-22)
+
+### Dependency updates
+
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.125 ([48bbb51](https://github.com/Collektive/collektive/commit/48bbb519a8abe9710a86f946681137a2b52012a9))
+
+### Bug Fixes
+
+* add delicate api annotation to `projection` method ([aabd16f](https://github.com/Collektive/collektive/commit/aabd16f920d89e32ef874fa3feca50b5975934d8))
+
+### Build and continuous integration
+
+* **deps:** update actions/upload-artifact action to v4.6.1 ([4f94f9f](https://github.com/Collektive/collektive/commit/4f94f9f804d90f558388ff016ad983c9dec465e7))
+* **deps:** update github/codeql-action action to v3.28.10 ([56eb8d5](https://github.com/Collektive/collektive/commit/56eb8d5d0c1313245e1ad1b64abcf7b33627395d))
+* drop unused bundle alias ([#780](https://github.com/Collektive/collektive/issues/780)) ([215f033](https://github.com/Collektive/collektive/commit/215f033589eceac7fd1a57e4a2923096edaffabd))
+
 ## [16.1.0](https://github.com/Collektive/collektive/compare/16.0.1...16.1.0) (2025-02-20)
 
 ### Features
