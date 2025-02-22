@@ -149,6 +149,7 @@ internal class AggregateContext<ID : Any>(
  * break sooner or later.
  *
  */
+@DelicateCollektiveApi
 fun <ID : Any, T> Aggregate<ID>.project(field: Field<ID, T>): Field<ID, T> {
     val others = neighboring(0.toByte())
     return when {
