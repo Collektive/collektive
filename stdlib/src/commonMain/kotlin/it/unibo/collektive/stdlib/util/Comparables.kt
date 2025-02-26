@@ -34,5 +34,6 @@ fun <ID : Any, T : Comparable<T>> Field<ID, T>.coerceIn(
 /**
  * Coerces all field values in a [range].
  */
-fun <ID : Any, T : Comparable<T>> Field<ID, T>.coerceIn(range: ClosedRange<T>): Field<ID, T> =
-    map { it.coerceIn(range) }
+fun <ID : Any, T : Comparable<T>> Field<ID, T>.coerceIn(
+    range: ClosedRange<T>
+): Field<ID, T> = map { it.coerceIn(range) }
