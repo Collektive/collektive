@@ -153,6 +153,71 @@ Specifically, in this first two examples, the use of aggregated operators and op
 
 ## Third example
 
-TODO
+In this final example, we extend the previous exercise with the goal of determining the diameter in relation to a source corresponding to the global maximum. To make the exercise more interesting, we reduce the number of nodes and the distance at which two nodes are connected, in order to obtain a larger number of diameter values. For each time step in the simulation, the average of these values will be calculated. 
+
+Subsequently, we will analyze the behavior of the developed program using a graphical representation based on these data.
+
+```kotlin
+/**
+ * Third example - Tutorial:
+ * 1. Determine the diameter of the subnetworks corresponding to the nodes with the maximum global values of the last exercise.
+ * 2. The nodes that are the farthest, in terms of hop count, from the maximum-value nodes (which serve as the center of the connected subnetwork) must be colored with different colors.
+*/
+
+// Preliminary step: define a data class to represent the association between a source node and its distance
+data class SourceDistance(val sourceID: Int, val distance: Int)
+
+fun Aggregate<Int>.diameter(sourceID: Int, distanceToSource: Int): SourceDistance {
+    // Step 1: retrieve the distances from neighboring nodes, including the distance of the current node
+    val distances = neighboring(SourceDistance(sourceID, distanceToSource))
+
+    // Step 2: find the neighbor with the maximum distance for the given sourceID
+    return distances.maxBy(SourceDistance(sourceID, distanceToSource)){ 
+
+        // If the sourceID matches, return the actual distance; otherwise, Int.MIN_VALUE is used to exclude it
+        if(sourceID == it.sourceID) it.distance else Int.MIN_VALUE 
+    }
+}
+
+fun Aggregate<Int>.maxNetworkID(environment: EnvironmentVariables): Int {
+    
+    ...
+
+    // Preliminary step: the distance from the nearest source is calculated using the hopDistanceTo library function 
+    // (see the "Tutorial > Standard Library Functions" section for a detailed description)
+    environment["distanceToSource"] = hopDistanceTo(environment["isMaxID"])
+
+    val networkDiameter = diameter(environment["maxNetworkID"], environment["distanceToSource"])
+
+    environment["diameter"] = networkDiameter
+
+    val diameterDistance = networkDiameter.distance
+
+    environment["diameterValue"] = diameterDistance
+    environment["isDiameterDistance"] = diameterDistance == environment["distanceToSource"]
+    environment["nothing"] =  !(environment["isDiameterDistance"] || environment["isMaxID"] || environment["isMaxLocalID"])
+
+    return maxValue
+}
+```
+
+<details style={{ backgroundColor: 'transparent', border: '1px solid purple', borderRadius: '5px', padding: '5px' }}>
+  <summary>Click to view images</summary>
+
+  The colors used to represent the local and global maxima of the network are the same as those described in the previous exercise. An additional color (violet) has been introduced to highlight the nodes that are furthest from their nearest source among the nodes within the network of that particular source.
+  <div style={{ textAlign: 'center' }}>
+    <img src="/img/basic-usage-third-example-1.png" style={{ maxWidth: '70%' }} />
+  </div>
+
+  For the sake of clarity in visualization, the network is presented without the connecting links between the nodes.
+  
+  **Note**: the label value of a node represents the value of the source id identified by that node.
+  <div style={{ textAlign: 'center' }}>
+    <img src="/img/basic-usage-third-example-2.png" style={{ maxWidth: '70%' }} />
+  </div>
+  <div style={{ textAlign: 'center' }}>
+    <img src="/img/basic-usage-third-example-3.png" style={{ maxWidth: '70%' }} />
+  </div>
+</details>
 
 More examples can be found in the following repository: [Collektive Examples Repository](https://github.com/Collektive/collektive-examples).
