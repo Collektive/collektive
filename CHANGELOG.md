@@ -1,3 +1,38 @@
+## [16.1.1](https://github.com/Collektive/collektive/compare/16.1.0...16.1.1) (2025-02-22)
+
+### Dependency updates
+
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.125 ([48bbb51](https://github.com/Collektive/collektive/commit/48bbb519a8abe9710a86f946681137a2b52012a9))
+
+### Bug Fixes
+
+* add delicate api annotation to `projection` method ([aabd16f](https://github.com/Collektive/collektive/commit/aabd16f920d89e32ef874fa3feca50b5975934d8))
+
+### Build and continuous integration
+
+* **deps:** update actions/upload-artifact action to v4.6.1 ([4f94f9f](https://github.com/Collektive/collektive/commit/4f94f9f804d90f558388ff016ad983c9dec465e7))
+* **deps:** update github/codeql-action action to v3.28.10 ([56eb8d5](https://github.com/Collektive/collektive/commit/56eb8d5d0c1313245e1ad1b64abcf7b33627395d))
+* drop unused bundle alias ([#780](https://github.com/Collektive/collektive/issues/780)) ([215f033](https://github.com/Collektive/collektive/commit/215f033589eceac7fd1a57e4a2923096edaffabd))
+
+## [16.1.0](https://github.com/Collektive/collektive/compare/16.0.1...16.1.0) (2025-02-20)
+
+### Features
+
+* introduce opt-in annotation preventing the erroneous usage of API intended to be internal ([#777](https://github.com/Collektive/collektive/issues/777)) ([9aeb063](https://github.com/Collektive/collektive/commit/9aeb06358ef1d51d60bc38496418bdb81732e56c))
+
+### Dependency updates
+
+* **deps:** update alchemist to v38.0.1 ([8629445](https://github.com/Collektive/collektive/commit/8629445df4f43f63f1060b41a6ae6d1f8b914db9))
+* **deps:** update alchemist to v38.0.3 ([a3e7490](https://github.com/Collektive/collektive/commit/a3e74904c2cfb1725205afa53aaca619c0e975bd))
+* **deps:** update alchemist to v39 ([b683afc](https://github.com/Collektive/collektive/commit/b683afc81146b1712db5819884844b3fd870b572))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.124 ([3875293](https://github.com/Collektive/collektive/commit/38752935b4af7b0c19fdbc3a0911690e4acaeb6d))
+* **deps:** update plugin com.gradle.develocity to v3.19.2 ([36104c0](https://github.com/Collektive/collektive/commit/36104c02a2bfe42be49905db83126f217e8104c3))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.10 ([0babc68](https://github.com/Collektive/collektive/commit/0babc68992ea527e6228e50cf61ce0582385e49d))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.9 ([6ba1df3](https://github.com/Collektive/collektive/commit/6ba1df30954cce8b72d24b43dd59ac7555e57511))
+
 ## [16.0.1](https://github.com/Collektive/collektive/compare/16.0.0...16.0.1) (2025-02-16)
 
 ### Dependency updates

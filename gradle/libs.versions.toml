@@ -1,5 +1,5 @@
 [versions]
-alchemist = "38.0.3"
+alchemist = "39.0.1"
 build-config = "5.5.1"
 dokka = "2.0.0"
 kotest = "6.0.0.M2"
@@ -11,7 +11,7 @@ alchemist-api = { module = "it.unibo.alchemist:alchemist-api", version.ref = "al
 alchemist = { module = "it.unibo.alchemist:alchemist", version.ref = "alchemist" }
 arrow-core = "io.arrow-kt:arrow-core:2.0.1"
 caffeine = "com.github.ben-manes.caffeine:caffeine:3.2.0"
-hash-sha3 = "org.kotlincrypto.hash:sha3:0.6.1"
+hash-sha3 = "org.kotlincrypto.hash:sha3:0.7.0"
 javap = "com.perfma.wrapped:com.sun.tools:1.8.0_jdk8u275-b01_linux_x64"
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
@@ -23,11 +23,11 @@ kotlin-scripting-jvm = { module = "org.jetbrains.kotlin:kotlin-scripting-jvm", v
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-annotations-common = { module = "org.jetbrains.kotlin:kotlin-test-annotations-common", version.ref = "kotlin" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-kotlinpoet = "com.squareup:kotlinpoet:2.0.0"
+kotlinpoet = "com.squareup:kotlinpoet:2.1.0"
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "serialization" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 kotlinx-serialization-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-serialization-protobuf", version.ref = "serialization" }
-slf4j = "org.slf4j:slf4j-api:2.0.16"
+slf4j = "org.slf4j:slf4j-api:2.0.17"
 subjekt = "io.github.freshmag:subjekt-api:1.1.5"
 
 [bundles]
@@ -39,10 +39,6 @@ kotlin-compiler = [
 kotlin-testing-common = [
     "kotest-assertions-core",
     "kotest-framework-engine",
-    "kotlin-test",
-    "kotlin-test-annotations-common",
-]
-kotlin-test = [
     "kotlin-test",
     "kotlin-test-annotations-common",
 ]
@@ -64,6 +60,6 @@ kotlin-power-assert = { id = "org.jetbrains.kotlin.plugin.power-assert", version
 kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.78.0"
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kover = "org.jetbrains.kotlinx.kover:0.9.1"
-multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:3.2.2"
+multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:3.2.3"
 publishOnCentral = "org.danilopianini.publish-on-central:8.0.3"
 taskTree = "com.dorongold.task-tree:4.0.0"
