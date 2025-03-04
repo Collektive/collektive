@@ -16,4 +16,6 @@ sidebar_position: 0
     - [Aggregate Operators and Field Operations](../tutorials/dsl-descriptions/)
     - [Standard Library Functions](../tutorials/stdlib-descriptions/)
 
-4. [Library Structure](/docs/about-the-structure/)
+4. [Simulation Setup and Execution](/docs/category/simulation-setup-and-execution/)
+
+5. [Library Structure](/docs/about-the-structure/)
