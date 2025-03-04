@@ -3,18 +3,12 @@ import Heading from '@theme/Heading';
 import CodeBlock from '@theme/CodeBlock';
 import styles from './styles.module.css';
 
-const codeNeighbor = `fun Aggregate<Int>.neighborCounter(): Int =
-    neighboring(1).hood(0) { acc, _ ->
-        acc + 1
-    }
-
-context(Aggregate<Int>, DistanceSensor)
-fun gradient(source: Boolean): Double =
+const codeNeighbor = `fun Aggregate<Int>.gradient(distanceSensor: DistanceSensor, source: Boolean): Double =
     share(POSITIVE_INFINITY) {
         val dist = distances()
         when {
             source -> 0.0
-            else -> (it + dist).min(100)
+            else -> (it + dist).min(POSITIVE_INFINITY)
         }
     }
 `
