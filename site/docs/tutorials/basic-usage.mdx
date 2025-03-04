@@ -60,12 +60,12 @@ The correct execution of this exercise does not depend on Alchemist Simulator or
   
   The resulting configuration after executing the code shown above is as follows:
   <div style={{ textAlign: 'center' }}>
-    <img src="/img/basic-usage-first-example-2.png" style={{ maxWidth: '70%' }} />
+    <img src="/img/basic-usage-first-example-2.PNG" style={{ maxWidth: '70%' }} />
   </div>
 
   The obtained result is briefly analyzed by considering one of these small subnetworks as an example. Specifically, we examine the nodes with ID 197, 277, and the intermediate node connecting them. 
   <div style={{ textAlign: 'center' }}>
-    <img src="/img/basic-usage-first-example-3.png" style={{ maxWidth: '70%' }} />
+    <img src="/img/basic-usage-first-example-3.PNG" style={{ maxWidth: '70%' }} />
   </div>
 
   In the figure, the ID of the intermediate node between nodes 197 and 277 is not displayed, but it can reasonably be assumed to be lower than those of the other two nodes. For this reason, both node 277 and node 197 have the flag "isMaxID == true." However, it is observed that node 197 does not recognize node 277 as the maximum. This occurs because there is no direct communication between them, and each node only transmits its own ID to its neighbors. This mechanism leads to a solution characterized by local maxima.
@@ -206,15 +206,17 @@ fun Aggregate<Int>.maxNetworkID(environment: EnvironmentVariables): Int {
 
   The colors used to represent the local and global maxima of the network are the same as those described in the previous exercise. An additional color (violet) has been introduced to highlight the nodes that are furthest from their nearest source among the nodes within the network of that particular source.
   <div style={{ textAlign: 'center' }}>
-    <img src="/img/basic-usage-third-example-1.png" style={{ maxWidth: '70%' }} />
+    <img src="/img/basic-usage-third-example-1.PNG" style={{ maxWidth: '70%' }} />
   </div>
 
   For the sake of clarity in visualization, the network is presented without the connecting links between the nodes.
   
   **Note**: the label value of a node represents the value of the source id identified by that node.
   <div style={{ textAlign: 'center' }}>
-    <img src="/img/basic-usage-third-example-2.png" style={{ maxWidth: '70%' }} />
+    <img src="/img/basic-usage-third-example-2.PNG" style={{ maxWidth: '70%' }} />
   </div>
+
+  Finally, the graph representing the average diameter resulting from the simulation is presented. The analysis of the graph shows that, once the communication between nodes stabilizes, the average diameter converges to a value of 2.
   <div style={{ textAlign: 'center' }}>
     <img src="/img/basic-usage-third-example-3.png" style={{ maxWidth: '70%' }} />
   </div>
