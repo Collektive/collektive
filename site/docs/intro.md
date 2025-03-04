@@ -15,3 +15,5 @@ sidebar_position: 0
     - [Basic Usage](../tutorials/basic-usage/)
     - [Aggregate Operators and Field Operations](../tutorials/dsl-descriptions/)
     - [Standard Library Functions](../tutorials/stdlib-descriptions/)
+
+4. [Library Structure](/docs/about-the-structure/)

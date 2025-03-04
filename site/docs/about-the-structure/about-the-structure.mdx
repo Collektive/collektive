@@ -1,0 +1,18 @@
+---
+title: Library Structure
+---
+
+import TreeNode from './tree-structure';
+
+export const nodeData = {
+  name: 'Root',
+  type: 'folder',
+  children: [
+    { name: 'Child 1', type: 'file' },
+    { name: 'Child 2', type: 'folder', children: [{ name: 'Grandchild 1', type: 'file' }] }
+  ]
+};
+
+<TreeNode node={nodeData} />
+
+
