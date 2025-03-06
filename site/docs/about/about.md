@@ -76,6 +76,10 @@ $env:CI="true"
 $env:CI="false" 
 ```
 
+### With containers
+
+TODO 
+
 ## How to add new task
 
 To add a new experiment, simply create a new `.yml` file in the same folder as the other experiments. Gradle will automatically generate the tasks required to run the experiment.
