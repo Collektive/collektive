@@ -9,6 +9,8 @@ title: Collektive & Alchemist Simulator
 1. Install docker and docker-compose.
 2. Run `docker-compose up`.
 
+TODO explanation of next steps
+
 ## Reproduce natively
 
 1. Install a Gradle-compatible version of Java. Use the [Gradle/Java compatibility matrix](https://docs.gradle.org/current/userguide/compatibility.html) to learn which is the compatible version range. The version of Gradle used in this experiment can be found in the `gradle-wrapper.properties` file located in the `gradle/wrapper` folder.
