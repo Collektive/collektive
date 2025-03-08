@@ -1,7 +1,10 @@
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
 import de.aaschmid.gradle.plugins.cpd.Cpd
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektPlugin
 import io.gitlab.arturbosch.detekt.report.ReportMergeTask
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
 
 plugins {
@@ -11,6 +14,7 @@ plugins {
     alias(libs.plugins.kotest)
     alias(libs.plugins.kotlin.qa)
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.power.assert)
     alias(libs.plugins.publishOnCentral)
     alias(libs.plugins.taskTree)
     id("it.unibo.collektive.collektive-plugin")
@@ -28,15 +32,41 @@ allprojects {
 
     with(rootProject.libs.plugins) {
         apply(plugin = dokka.id)
-        apply(plugin = publishOnCentral.id)
+        apply(plugin = gitSemVer.id)
+        apply(plugin = kotest.id)
         apply(plugin = kotlin.qa.id)
         apply(plugin = kotlinx.serialization.id)
-        apply(plugin = gitSemVer.id)
-        apply(plugin = taskTree.id)
         apply(plugin = kover.id)
-        apply(plugin = kotest.id)
+        apply(plugin = power.assert.id)
+        apply(plugin = publishOnCentral.id)
+        apply(plugin = taskTree.id)
     }
     apply(plugin = "it.unibo.collektive.collektive-plugin")
+
+    powerAssert {
+        val kotlinAssertions = listOf(
+            "assert",
+            "check",
+            "checkNotNull",
+            "require",
+            "requireNotNull",
+        )
+        val testAssertions = listOf(
+            "Contains",
+            "ContentEquals",
+            "Equals",
+            "False",
+            "Is",
+            "IsNot",
+            "NotEquals",
+            "NotNull",
+            "NotSame",
+            "Null",
+            "Same",
+            "True",
+        ).map { "test.assert$it" }
+        functions = (kotlinAssertions + testAssertions).map { "kotlin.$it" }
+    }
 
     signing {
         if (System.getenv("CI") == "true") {
