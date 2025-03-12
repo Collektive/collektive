@@ -1,6 +1,6 @@
 [versions]
 alchemist = "42.0.0"
-build-config = "5.5.2"
+build-config = "5.5.4"
 dokka = "2.0.0"
 kotest = "6.0.0.M2"
 kotlin = "2.1.10"
