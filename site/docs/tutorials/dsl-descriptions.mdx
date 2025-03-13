@@ -7,438 +7,50 @@ import { useLocation } from 'react-router-dom';
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from 'rehype-raw';
 
+The aggregate operators and field operations present in Collektive are illustrated below.
+
 export default function OperatorList() {
 const operators = [
 { name: "## Aggregate Operators", description: "" }, 
-{ name: ` sharing(initial: Initial, noinline transform: YieldingContext<Initial, Return>.(Field<ID, Initial>) -> YieldingResult<Initial, Return>): 
-
-Return = exchanging(initial) { field: Field<ID, Initial> ->
-
->with(YieldingContext<Initial, Return>()) {
-
->>val result: YieldingResult<Initial, Return> = transform(field)
-
->>field.map { result.toSend }.yielding {
-    
->>>field.map { result.toReturn }
-
->>}
-
->}
-
-}.localValue
-
-`, description: ` \## Description 
-\`sharing(initial: Initial, noinline transform: YieldingContext<Initial, Return>.(Field<ID, Initial>) -> YieldingResult<Initial, Return>)\` is an aggregate operator: captures the space-time nature of field computation through observation of neighbors' values, 
-starting from an \`initial\` value, it reduces to a single local value given a \`transform\` function and updating and sharing to neighbors of a local variable.
-
-\### Example
-
-\`\`\`kotlin
-val result = sharing(0) {
-val maxValue = it.maxBy { v -> v.value }.value
-    maxValue.yielding { "Something different" }
-}
-result // result: kotlin.String
-\`\`\`
-
-In the example above, the function \`sharing\` will return the string initialized as in yielding.
-
-\#### Invalid use: 
-
-Do not write code after calling the sending or returning values, they must be the last statement of the body (the lambda expression).
-
-\`\`\`kotlin
-share(0) {
-    val maxValue = it.maxBy { v -> v.value }.value
-    maxValue.yielding { "Don't do this" }
-    maxValue
-}
-\`\`\`
-
-`},
-{ name:`share(initial: Initial, noinline transform: (Field<ID, Initial>) -> Initial): 
-    
-Initial = sharing(initial) { field -> transform(field).run { yielding { this } } }
-`, description: ` \## Description 
-
-\` share(initial: Initial, noinline transform: (Field<ID, Initial>) -> Initial) \` is an aggregate operator: captures the space-time nature of field computation through observation of neighbours' values, starting from an \`initial\` value, it reduces to a single local value given a \`transform\` function and updating and sharing to neighbours of a local variable.
- 
-\### Example
-
-\`\`\`kotlin
-val result = share(0) {
-    it.maxBy { v -> v.value }.value
-}
-result // result: kotlin.Int
-\`\`\`
-
-In the example above, the function \`share\` wil return a value that is the max found in the field.`
-},
-{ name:`neighboringViaExchange(local: Scalar): 
-
-Field<ID, Scalar> = exchanging(local) { toYield -> toYield.mapToConstantField(local).yielding { toYield } }
-`, 
-description: ` \## Description 
-
-\`neighboringViaExchange(local: Scalar)\` is an aggregate operator: observes the value of an expression \`local\` across neighbours.
-
-\### Example 
-
-\`\`\`kotlin
-val field = neighboring(0)
-\`\`\`
-
-The field returned has as local value the value passed as input (0 in this example).
-
-\`\`\`kotlin
-val field = neighboring({ 2 * 2 })
-\`\`\`
-
-In this case, the field returned has the result of the computation as local value.
-` 
-},
-{ name: "## Boolean Field Operations", description: "" }, 
-{ name:`all(base: Boolean, predicate: (Boolean) -> Boolean = { it }): 
-
-Boolean = fold(predicate(base)) { acc, value -> acc && predicate(value) }
-`, description:`\## Description 
-
-\`all(base: Boolean, predicate: (Boolean) -> Boolean = { it })\` is a boolean field operation: check if all the \`Boolean\` elements in the field are true by default.
-
-If \`predicate\` is defined, it is applied to the elements.
-
-The \`base\` value is used as a first element to start the fold operation at which the \`predicate\` is applied.
-` 
-},
-{ name:`any(base: Boolean, predicate: (Boolean) -> Boolean = { it }): 
-
-Boolean = fold(predicate(base)) { acc, value -> acc || predicate(value) }
-`, description: `\## Description 
-
-\`any(base: Boolean, predicate: (Boolean) -> Boolean = { it })\` is a boolean field operation: check if any of the \`Boolean\` elements in the field are true by default.
-
-If \`predicate\` is defined, it is applied to the elements.
-
-The \`base\` value is used as a first element to start the fold operation at which the \`predicate\` is applied.` },
-{ name:`none(base: Boolean, predicate: (Boolean) -> Boolean = { it }): 
-
-Boolean = !all(base, predicate)
-`, description: `\## Description 
-
-\`none(base: Boolean, predicate: (Boolean) -> Boolean = { it })\` is a boolean field operation: check if none of the \`Boolean\` elements in the field are true by default.
-
-If \`predicate\` is defined, it is applied to the elements.
-
-The \`base\` value is used as a first element to start the fold operation at which the \`predicate\` is applied.
-` },
+{ name: "[exchange](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/exchange.html)", description: "![](/img/exchange.svg)" },
+{ name: "[exchanging](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/exchanging.html)", description: "" },
+{ name: "[share](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api.operators/share.html)", description: "![](/img/share.svg)" },
+{ name: "[sharing](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api.operators/sharing.html)", description: `` },
+{ name: "[neighboring](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/neighboring.html)", description: "![](/img/nbr.svg)" },
+{ name: "[neighboringViaExchange](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api.operators/neighboring-via-exchange.html)", description: "" },
+{ name: "[evolve](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/evolve.html)", description: "" },
+{ name: "[evolving](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/evolving.html)", description: "" },
+{ name: "[alignedOn](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/index.html)", description: "" },
+{ name: "[align](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/align.html)", description: "" },
+{ name: "[dealign](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/dealign.html)", description: "" },
 { name: "## Field Operations", description: "" }, 
-{ name:`all(crossinline predicate: (T) -> Boolean):
-
-Boolean = fold(true) { acc, value -> acc && predicate(value) }
-`, description: `\## Description 
-
-\`all(crossinline predicate: (T) -> Boolean)\` is a field operation: check if all the elements in the field satisfy the \`predicate\`, ignoring the local value.
-`
-},
-{ name:`allWithSelf(crossinline predicate: (T) -> Boolean): 
-
-Boolean = all(predicate) && predicate(localValue)
-`, description: `\## Description 
-
-\`allWithSelf(crossinline predicate: (T) -> Boolean)\` is a field operation: check if all the elements in the field satisfy the \`predicate\`, including the local value.` },
-{ name:`any(crossinline predicate: (T) -> Boolean): 
-
-Boolean = fold(false) { acc, value -> acc || predicate(value) }
-`, description: `\## Description 
-
-\`any(crossinline predicate: (T) -> Boolean)\` is a field operation: check if any of the elements in the field satisfy the \`predicate\`, ignoring the local value.` },
-{ name:`anyWithSelf(crossinline predicate: (T) -> Boolean): 
-
-Boolean = any(predicate) || predicate(localValue)
-`, description: `\## Description 
-
-\`anyWithSelf(crossinline predicate: (T) -> Boolean)\` is a field operation: check if any of the elements in the field satisfy the \`predicate\`, including the local value.` },
-{ name:`none(crossinline predicate: (T) -> Boolean): 
-
-Boolean = !any(predicate)`, description: `\## Description
-
-\`none(crossinline predicate: (T) -> Boolean)\` is a field operation: check if none of the elements in the field satisfy the \`predicate\`, ignoring the local value.
-
- ` },
-{ name:`noneWithSelf(crossinline predicate: (T) -> Boolean): 
-
-Boolean = !anyWithSelf(predicate)`, description: `\## Description 
-
-\`noneWithSelf(crossinline predicate: (T) -> Boolean)\` is a field operation: check if none of the elements in the field satisfy the \`predicate\`, including the local value.
-` },
-{ name:`min(base: T): 
-
-T = fold(base) { acc, value -> if (value < acc) value else acc }
-`, description: `\## Description 
-
-\` min(base: T) \` is a comparable field operation: get the minimum value of a field, excluding the local value, starting from \`base\`.
-
-To consider the local value, explicitly provide it as \`base\`.
-` },
-{ name:`minWithSelf():
-
-T = min(localValue)
-`, description: `\## Description 
-
-\`minWithSelf()\` is a comparable field operation: get the minimum value of a field, including the local value.
-` },
-{ name:`minWith(base: T, comparator: Comparator<T>): 
-
-T = fold(base) { acc, value -> if (comparator.compare(acc, value) < 0) acc else value }
-`, description: `\## Description 
-
-\`minWith(base: T, comparator: Comparator<T>)\` is a field operation: returns the element yielding the smallest value of the given \`comparator\`.
-
-In case multiple elements are minimal, there is no guarantee which one will be returned.
-` },
-{ name:`minBy(base: T, crossinline selector: (T) -> R):
-
-T = minWith(base, compareBy(selector))
-`, description: `\## Description 
-
-\`minBy(base: T, crossinline selector: (T) -> R)\` is a field operation: returns the element yielding the smallest value of the given \`selector\`.
-
-In case multiple elements are minimal, there is no guarantee which one will be returned.
-` },
-{ name:`max(base: T): 
-
-T = fold(base) { acc, value -> if (value > acc) value else acc }
-`, description: `\## Description 
-
-\`max(base: T)\` is a comparable field operation: get the maximum value of a field, excluding the local value, starting from \`base\`.
-
-To consider the local value, explicitly provide it as \`base\`.
-` },
-{ name:`maxWithSelf(): 
-
-T = max(localValue)`, description: `\## Description 
-
-\`maxWithSelf()\` is a comparable field operation: get the maximum value of a field, including the local value.
-` },
-{ name:`maxWith(base: T, comparator: Comparator<T>,): 
-
-T = minWith(base, comparator.reversed())`, description: `\## Description 
-
-\`maxWith(base: T, comparator: Comparator<T>)\` is a field operation: returns the element yielding the largest value of the given \`comparator\`.
-
-In case multiple elements are maximal, there is no guarantee which one will be returned.
-` },
-{ name:`maxBy(base: T, crossinline selector: (T) -> R):
-
- T = maxWith(base, compareBy(selector))
-`, description: `\## Description 
-
-\`maxBy(base: T, crossinline selector: (T) -> R)\` is a field operation: returns the element yielding the largest value of the given \`selector\`.
-
-In case multiple elements are maximal, there is no guarantee which one will be returned.
-` },
-{ name:`count(crossinline predicate: (T) -> Boolean = { true }): 
-
-Int = fold(0) { acc, value -> if (predicate(value)) acc + 1 else acc }
-`, description: `\## Description 
-
-\`count(crossinline predicate: (T) -> Boolean = { true })\` is a field operation: count the number of elements in the field that satisfy the \`predicate\`, ignoring the local value.
-` },
-{ name:`countWithSelf(crossinline predicate: (T) -> Boolean = { true }): 
-
-Int = count(predicate) + if (predicate(localValue)) 1 else 0
-`, description: `\## Description 
-
-\`countWithSelf(crossinline predicate: (T) -> Boolean = { true })\` is a field operation: count the number of elements in the field that satisfy the \`predicate\`, including the local value.
-
-` },
-{ name:`replaceMatchingWithId(replaceWith: T, crossinline predicate: (ID, T) -> Boolean): 
-
-Field<ID, T> = mapWithId { id, value -> if (predicate(id, value)) replaceWith else value }
-`, description: `\## Description 
-
-\`replaceMatchingWithId(replaceWith: T, crossinline predicate: (ID, T) -> Boolean)\` is a field operation: returns a new field containing \`replaceWith\` for each element that satisfies the \`predicate\`.
-` },
-{ name:`replaceMatching(replaceWith: T, crossinline predicate: (T) -> Boolean):
-
-Field<ID, T> = replaceMatchingWithId(replaceWith) { _, value -> predicate(value) }
-`, description: `\## Description 
-
-\`replaceMatching(replaceWith: T, crossinline predicate: (T) -> Boolean)\` is a field operation: returns a new field containing \`replaceWith\` for each element that satisfies the \`predicate\`.
-` },
-{ name: "## Method of the Field Interface", description: "" },
-{ name:`excludeSelf(): 
-
-Map<ID, T>
-`, description: `\## Description 
-
-\`excludeSelf()\` is a method of the field interface: returns a \`Map\` with the neighboring values of this field (namely, all values but self).
-
-` },
-{ name:`alignedMapWithId(other: Field<ID, B>, transform: (ID, T, B) -> R):
-
-Field<ID, R> {
->checkAligned(this, other)
->return mapWithId { id, value -> transform(id, value, other[id]) }
-
-}
-`, description: `\## Description 
-
-\`alignedMapWithId(other: Field<ID, B>, transform: (ID, T, B) -> R)\` is a method of the field interface: combines this field with another (aligned) one considering the \`ID\` when combining the values.
-
-` },
-{ name:`alignedMap(other: Field<ID, B>, transform: (T, B) -> R): 
-
-Field<ID, R> = alignedMapWithId(other) { _, value, otherValue -> transform(value, otherValue) }
-`, description: `\## Description 
-
-\`alignedMap(other: Field<ID, B>, transform: (T, B) -> R)\` is a method of the field interface: combines this field with another (aligned) one.
-
-` },
-{ name:`mapWithId(transform: (ID, T) -> B): 
-
-Field<ID, B>`, description: `\## Description 
-
-\`mapWithId(transform: (ID, T) -> B)\` is a method of the field interface: map the field using the \`transform\` function (including it self).
-
-` },
-{ name:`map(transform: (T) -> B): 
-
-Field<ID, B> = mapWithId { _, value -> transform(value) }
-`, description: `\## Description 
-
-\`map(transform: (T) -> B)\` is a method of the field interface: map the field using the \`transform\` function.
-
-` },
-{ name:`mapToConstantField(singleton: B): 
-
-Field<ID, B> = ConstantField(localId, singleton, excludeSelf().keys)
-`, description: `\## Description 
-
-\`mapToConstantField(singleton: B)\` is a method of the field interface: map the field resulting in a new one where the value for the local and the neighbors is \`singleton\`.
-
-` },
-{ name:`get(id: ID): 
-
-T`, description: `\## Description 
-
-\`get(id: ID)\` is a method of the field interface: get the value associated with the \`id\`.
-
-Raise an error if the \`id\` is not present in the field.
-
-` },
-{ name:`asSequence(): 
-
-Sequence<Pair<ID, T>>
-`, description: `\## Description 
-
-\`asSequence()\` is a method of the field interface: transform the field into a sequence of pairs containing the \`id\` and the associated value.
-
-` },
-{ name:`toMap(): 
-
-Map<ID, T>
-`, description: `\## Description 
-
-\`toMap()\` is a method of the field interface: converts the Field into a \`Map\`.
-
-This method is meant to bridge the aggregate APIs with the Kotlin collections framework.
-
-The resulting map _will contain the local value_.
-
-` },
-{ name: "## Method of the Aggregate Interface", description: "" },
-{ name:`exchange(initial: Initial, dataSharingMethod: DataSharingMethod<Initial>, body: (Field<ID, Initial>) -> Field<ID, Initial>): 
-    
-Field<ID, Initial>
-`, description: `\## Description 
-
-\`exchange(initial: Initial, dataSharingMethod: DataSharingMethod<Initial>, body: (Field<ID, Initial>) -> Field<ID, Initial>)\` is a method of the aggregate interface: manages the computation of values between neighbors in a specific context.
-
-It computes a \`body\` function starting from the \`initial\` value and the messages received from other neighbors, then sends the results from the evaluation to specific neighbors or to everyone, it is contingent upon the origin of the calculated value, whether it was received from a neighbor or if it constituted the initial value.
-
-\### Example
-
-\`\`\`kotlin
-exchange(0) { f ->
-    f.mapField { _, v -> if (v % 2 == 0) v + 1 else v * 2 }
-}
-\`\`\`
-
-The result of the exchange function is a field with as messages a map with key the id of devices across the network and the result of the computation passed as relative local values.
-` },
-{ name:`exchanging(initial: Initial, dataSharingMethod: DataSharingMethod<Initial>, body: YieldingScope<Field<ID, Initial>, Field<ID, Return>>):
-
-Field<ID, Return>
-`, description: `\## Description 
-
-\`exchanging(initial: Initial, dataSharingMethod: DataSharingMethod<Initial>, body: YieldingScope<Field<ID, Initial>, Field<ID, Return>>)\` is a method of the aggregate interface: same behavior of \`exchange\` but this function can yield a \`Field\` of \`Return\` value.
-
-\### Example
-
-\`\`\`kotlin
-exchanging(initial = 1) {
-    val fieldResult = it + 1
-    fieldResult.yielding { fieldResult.map { value -> "return: $value" } }
-}
-\`\`\`
-
-` },
-{ name:`evolve(initial: Initial, transform: (Initial) -> Initial): 
-
-Initial
-`, description: `\## Description 
-
-\`evolve(initial: Initial, transform: (Initial) -> Initial)\` is a method of the aggregate interface: iteratively updates the value computing the \`transform\` expression at each device using the last computed value or the \`initial\`.
-
-` },
-{ name:`evolving(initial: Initial, transform: YieldingScope<Initial, Return>): 
-
-Return`, description: `\## Description 
-
-\`evolving(initial: Initial, transform: YieldingScope<Initial, Return>)\` is a method of the aggregate interface: iteratively updates the value computing the \`transform\` expression from a \`YieldingContext\` at each device using the last computed value or the \`initial\`.
-
-` },
-{ name:`neighboring(local: Scalar, dataSharingMethod: DataSharingMethod<Scalar>): 
-
-Field<ID, Scalar>
-`, description: `\## Description 
-
-\`neighboring(local: Scalar, dataSharingMethod: DataSharingMethod<Scalar>)\` is a method of the aggregate interface: observes the value of an expression \`local\` across neighbours.
-
-\### Example
-
-\`\`\`kotlin
-val field = neighboring(0)
-\`\`\`
-
-The field returned has as local value the value passed as input (0 in this example).
-
-\`\`\`kotlin
-val field = neighboring({ 2 * 2 })
-\`\`\`
-
-In this case, the field returned has the computation as a result, in form of a field of functions with type \`() -> Int\`.
-` },
-{ name:`alignedOn(pivot: Any?, body: () -> R): 
-
-R
-`, description: `\## Description 
-
-\`alignedOn(pivot: Any?, body: () -> R)\` is a method of the aggregate interface: alignment function that pushes in the stack the pivot, executes the body and pop the last element of the stack after it is called.
-
-Returns the body's return element.
-` },
-{ name:`align(pivot: Any?)
-`, description: `\## Description 
-
-\`align(pivot: Any?)\` is a method of the aggregate interface: pushes the pivot in the alignment stack.
-` },
-{ name:`dealign()`, description: `\## Description 
-
-\`dealign()\` is a method of the aggregate interface: pops the last element of the alignment stack.
-` },
+{ name: "[all](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/all.html)", description: "" },
+{ name: "[any](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/any.html)", description: "" },
+{ name: "[none](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/none.html)", description: "" },
+{ name: "[allWithSelf](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/all-with-self.html)", description: "" },
+{ name: "[anyWithSelf](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/any-with-self.html)", description: "" },
+{ name: "[noneWithSelf](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/none-with-self.html)", description: "" },
+{ name: "[min](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/min.html)", description: "" },
+{ name: "[minWithSelf](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/min-with-self.html)", description: "" },
+{ name: "[minWith](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/min-with.html)", description: "" },
+{ name: "[minBy](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/min-by.html)", description: "" },
+{ name: "[max]https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/max.html", description: "" },
+{ name: "[maxWithSelf](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/max-with-self.html)", description: "" },
+{ name: "[maxWith](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/max-with.html)", description: "" },
+{ name: "[maxBy](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/max-by.html)", description: "" },
+{ name: "[count](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/count.html)", description: "" },
+{ name: "[countWithSelf](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/count-with-self.html)", description: "" },
+{ name: "[replaceMatchingWithId](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/replace-matching-with-id.html)", description: "" },
+{ name: "[replaceMatching](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/replace-matching.html)", description: "" },
+{ name: "[excludeSelf](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field/-field/exclude-self.html)", description: "" },
+{ name: "[alignedMapWithId](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field/-field/aligned-map-with-id.html)", description: "" },
+{ name: "[alignedMap](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field/-field/aligned-map.html)", description: "" },
+{ name: "[mapWithId](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field/-field/map-with-id.html)", description: "" },
+{ name: "[map](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field/-field/map.html)", description: "" },
+{ name: "[mapToConstantField](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field/-field/map-to-constant-field.html)", description: "" },
+{ name: "[get](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field/-field/get.html)", description: "" },
+{ name: "[asSequence](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field/-field/as-sequence.html)", description: "" },
+{ name: "[toMap](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field/-field/to-map.html)", description: "" },
 ];
 
 const [search, setSearch] = useState("");
@@ -469,9 +81,9 @@ const highlightMatch = (text, searchTerm) => {
 
 return (
     <div className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-2xl">
-        <h2 className="text-xl font-semibold text-purple-600 mb-4">
-        The aggregate operators and field operations present in the Collektive library are illustrated below
-        </h2>
+        <p>
+        The aggregate operators and field operations present in Collektive are illustrated below.
+        </p>
         
         {/* Search bar */}
         <input
@@ -519,7 +131,6 @@ return (
             });
         })()}
         </ul>
-
     </div>
 );
 }
