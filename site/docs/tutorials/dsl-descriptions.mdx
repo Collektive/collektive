@@ -2,7 +2,8 @@
 title: Aggregate Operators and Field Operations
 ---
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLocation } from 'react-router-dom';
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from 'rehype-raw';
 
@@ -441,6 +442,15 @@ Returns the body's return element.
 ];
 
 const [search, setSearch] = useState("");
+const location = useLocation();
+
+useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const initialSearch = queryParams.get('search');
+    if (initialSearch) {
+        setSearch(initialSearch);
+    }
+}, [location]);
 
 // Filter operators based on search
 const filteredOperators = operators.filter(op =>

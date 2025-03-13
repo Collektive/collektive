@@ -2,7 +2,8 @@
 title: Standard Library Functions
 ---
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLocation } from 'react-router-dom';
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from 'rehype-raw';
 
@@ -437,6 +438,15 @@ Field<ID, T> = map { it.coerceIn(range) }
 ]
 
 const [search, setSearch] = useState("");
+const location = useLocation();
+
+useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const initialSearch = queryParams.get('search');
+    if (initialSearch) {
+        setSearch(initialSearch);
+    }
+}, [location]);
 
 // Filter operators based on search
 const filteredOperators = operators.filter(op =>
