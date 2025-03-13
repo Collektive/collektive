@@ -20,7 +20,7 @@ const operators = [
 { name: "[neighboringViaExchange](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api.operators/neighboring-via-exchange.html)", description: "" },
 { name: "[evolve](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/evolve.html)", description: "" },
 { name: "[evolving](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/evolving.html)", description: "" },
-{ name: "[alignedOn](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/index.html)", description: "" },
+{ name: "[alignedOn](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/aligned-on.html)", description: "" },
 { name: "[align](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/align.html)", description: "" },
 { name: "[dealign](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/dealign.html)", description: "" },
 { name: "## Field Operations", description: "" }, 
@@ -71,56 +71,53 @@ const filteredOperators = operators.filter(op =>
 
 const highlightMatch = (text, searchTerm) => {
     if (!searchTerm) return text; 
-    const escapedSearchTerm = searchTerm.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
-
-    const regex = new RegExp(`(${escapedSearchTerm})`, 'gi');
-    return text.replace(regex, (match) => {
-        return `<mark class="bg-yellow-300">${match}</mark>`; 
+    const regex = new RegExp(`\\[([^\\]]+)\\]`, 'g');
+    return text.replace(regex, (match, content) => {
+        const highlightedContent = content.replace(new RegExp(`(${searchTerm})`, 'gi'), (match) => {
+            return `<mark class="bg-yellow-300">${match}</mark>`;
+        });
+        return `[${highlightedContent}]`; 
     });
 };
 
 return (
-    <div className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-2xl">
+    <div>
         <p>
         The aggregate operators and field operations present in Collektive are illustrated below.
         </p>
-        
         {/* Search bar */}
         <input
-        type="text"
-        placeholder="🔍 Search for a function..."
-        className="w-full h-12 p-3 text-lg border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
+            type="text"
+            placeholder="🔍 Search for a function..."
+            className="w-full h-12 p-3 text-lg border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
         />
-
         {/* Operator list with description in Markdown */}
-        <ul className="mt-4 space-y-3">
+        <ul>
         {(() => {
             let showSection = false; 
-
             return operators.flatMap((op, index) => {
             if (op.name.startsWith("##")) {
                 showSection = op.name.toLowerCase().includes(search.toLowerCase());
-
                 return (
-                    <h2 className="text-xl font-bold">{op.name.replace("##", "")}</h2>
+                    <ReactMarkdown>
+                        {op.name}
+                    </ReactMarkdown>
                 );
             }
-
-            if (op.name.toLowerCase().includes(search.toLowerCase()) || showSection) {
+            if (op.name.toLowerCase().includes(search.toLowerCase()) || showSection) {   
                 return (
-                <li key={op.name} className="p-3 bg-gray-100 rounded-lg shadow-sm text-lg">
+                <li key={op.name}>
                     <ReactMarkdown 
-                    className="font-bold text-purple-700"
-                    children={highlightMatch(op.name, search)} 
-                    rehypePlugins={[rehypeRaw]}
+                        children={highlightMatch(op.name, search)} 
+                        rehypePlugins={[rehypeRaw]}
                     />
                     <details 
-                    style={{ backgroundColor: 'transparent', border: '1px solid purple', borderRadius: '5px', padding: '5px' }}
+                        style={{ backgroundColor: 'transparent', border: '1px solid purple', borderRadius: '5px', padding: '5px' }}
                     >
                     <summary>Click to view description</summary>
-                    <ReactMarkdown className="text-gray-600 text-sm">
+                    <ReactMarkdown>
                         {op.description}
                     </ReactMarkdown>
                     </details>

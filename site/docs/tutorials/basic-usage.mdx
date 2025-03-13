@@ -9,7 +9,7 @@ title: Basic Usage
 fun Aggregate<Int>.neighborCounter(): Int = neighboring(1).count()
 ```
 
-The library function [neighboring(local: Scalar)](./dsl-descriptions.mdx?search=neighboring) is a **aggregate operator** and is used to observe the value of an expression [local] across neighboring nodes.
+The library function [neighboring](./dsl-descriptions.mdx?search=neighboring) is a **aggregate operator** and is used to observe the value of an expression [local] across neighboring nodes.
 
 The returned field has as its local value the value passed as input (1 in this example). Using the [count](./dsl-descriptions.mdx?search=count) function, you count the values ​​in the field, thus obtaining the number of neighbors of a node.
 
