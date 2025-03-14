@@ -512,6 +512,7 @@ fun Aggregate<Int>.maxID(environment: EnvironmentVariables): Int {
     // Preliminary step: the distance from the nearest source is calculated using the distanceTo library function 
     environment["distanceToSource"] = distanceToSource(environment["isMaxID"])
 
+    // Calculate subnets diameter 
     val subnetDiameterValue = subnetDiameter(environment["maxNetworkID"], environment["distanceToSource"])
 
     // Collektive & Alchemist: Assign the result to a molecule
