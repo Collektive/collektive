@@ -148,6 +148,8 @@ export:
     ```
 </details>
 
+Once the YAML configuration file has been created, it is necessary to generate a corresponding JSON file, named identically to the configuration file, in order to specify the graphical effects that will be used to display the components described in the YAML configuration file.
+
 <details 
     style={{ backgroundColor: 'transparent', border: '1px solid purple', borderRadius: '5px', padding: '5px' }}
 >
@@ -458,15 +460,72 @@ export:
     ```
 </details>
 
-The codes illustrated represent the configuration used for the graphical simulation of the example examined in the previous section. Below is presented the graphical simulation obtained from the configuration.
+The codes illustrated represent the entire configuration used for the graphical simulation of the example examined in the previous section. Below is presented the graphical simulation obtained from the configuration.
 
 ## Graphical simulation
 
 ![](/img/collektive-and-alchemist-1.png)
 ![](/img/collektive-and-alchemist-2.png)
 
+On the left, the network of nodes is displayed with the connection edges hidden, while on the right, the network is shown with the edges between the nodes, from which the interconnection of the network can be observed.
+
+The molecules with Boolean concentration have been used to assign different colors to the nodes based on their role:
+- **Green nodes** are those with the highest ID within a subnet.
+- **Red nodes** are those with the highest ID within their neighborhood, but where a node with a higher ID has been identified within the neighborhood of their neighbors.
+- **Purple nodes** are those located farther from the nearest green node.
+- **Blue nodes** are those that do not fall into any of the previous categories.
+- Finally, the **labels of the nodes** correspond to the maximum ID value identified by each node, allowing for the distinction of three subnets (identified by the ID of the green nodes) and the nodes belonging to each subnet.
+
 ![](/img/collektive-and-alchemist-3.png)
 
+Selecting a node opens a window where it is possible to view the current value of the molecules and the value returned by the function specified in the parameters of the YAML configuration file.
+
 <p align="center">
-<img src="/img/collektive-and-alchemist-4.png" alt="Collektive and Alchemist 4" width="70%" />
+    <img src="/img/collektive-and-alchemist-4.png" alt="Collektive and Alchemist 4" width="70%" />
 </p>
+
+This graph shows the average of the maximum distance of the three subnets, which evolves over time as defined in the YAML configuration file. However, to generate this graph, it is not sufficient to specify it in the YAML configuration file. Its definition involves the creation of a CSV file, from which, through a Python script, the graph shown in the figure is generated.
+
+Below is presented the example code, including the logic for Alchemist Simulator.
+
+```kotlin
+fun Aggregate<Int>.maxID(environment: EnvironmentVariables): Int {
+    val maxLocalValue = maxNeighborID()
+
+    // Collektive & Alchemist: Assign the result to a molecule
+    environment["localID"] = localId
+    environment["isMaxLocalID"] = localId == maxLocalValue
+    environment["maxNeighborID"] = maxLocalValue
+
+    // Step 1: Exchange the maxNeighborID with neighbors and obtain a field of values
+    val neighborValues = neighboring(local = maxLocalValue)
+
+    // Step 2: Find the maximum value among neighbors (including self)
+    val maxValue = neighborValues.max(base = maxLocalValue)
+
+    // Collektive & Alchemist: Assign the result to a molecule 
+    environment["isMaxID"] = localId == maxValue
+    environment["maxNetworkID"] = maxValue
+
+    /* Third part */
+
+    // Preliminary step: the distance from the nearest source is calculated using the distanceTo library function 
+    environment["distanceToSource"] = distanceToSource(environment["isMaxID"])
+
+    val subnetDiameterValue = subnetDiameter(environment["maxNetworkID"], environment["distanceToSource"])
+
+    // Collektive & Alchemist: Assign the result to a molecule
+    environment["subnetDiameter"] = subnetDiameterValue
+
+    val subnetDiameterDistance = subnetDiameter.distance
+
+    // Collektive & Alchemist: Assign the result to a molecule
+    environment["subnetDiameterValue"] = subnetDiameterDistance
+    environment["isSubnetDiameterDistance"] = subnetDiameterDistance == environment["distanceToSource"]
+    environment["nothing"] =  !(environment["isSubnetDiameterDistance"] || environment["isMaxID"] || environment["isMaxLocalID"])
+
+    return maxValue
+}
+```
+
+The results derived from the calculations are assigned to the molecules, thus updating the value of their concentration.
