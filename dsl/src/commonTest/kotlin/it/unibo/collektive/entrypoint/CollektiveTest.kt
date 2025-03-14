@@ -8,7 +8,6 @@ import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class CollektiveTest {
     val id0 = 0
@@ -84,8 +83,6 @@ class CollektiveTest {
         val collektiveDevice1 = Collektive(id1, network1, computeFunction = computeFunctionDevice0)
 
         assertEquals(3, collektiveDevice0.cycle())
-        assertTrue(network0.currentInbound().neighbors.isEmpty())
-
         assertEquals(3, collektiveDevice1.cycle())
     }
 

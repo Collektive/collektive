@@ -8,10 +8,11 @@ import it.unibo.collektive.networking.OutboundEnvelope
 class NetworkImplTest(private val networkManager: NetworkManager, private val localId: Int) : Mailbox<Int> {
     override val inMemory: Boolean = false
 
-    override fun deliverableFor(
-        id: Int,
-        outboundMessage: OutboundEnvelope<Int>,
-    ) = networkManager.send(id, outboundMessage)
+    init {
+        networkManager.registerDevice(localId)
+    }
+
+    override fun deliverableFor(outboundMessage: OutboundEnvelope<Int>) = networkManager.send(localId, outboundMessage)
 
     override fun deliverableReceived(message: Message<Int, *>) {
         error("This network is supposed to be in-memory, no need to deliver messages since it is already in the buffer")
