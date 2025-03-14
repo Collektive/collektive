@@ -36,6 +36,22 @@ class ExchangeTest {
             assertEquals(size * size, it.nodes.size)
         }
 
+    private fun mooreGridWithDedicatedNeighborValues(size: Int) =
+        mooreGrid<Int>(size, size, { _, _ -> Int.MIN_VALUE }) { _, _ ->
+            val res =
+                exchange(0) { field ->
+                    field.mapWithId { id, value ->
+                        when (id) {
+                            0 -> 0
+                            else -> 1
+                        }
+                    }
+                }
+            res.fold(res.localValue, Int::plus)
+        }.also {
+            assertEquals(size * size, it.nodes.size)
+        }
+
     @Test
     fun `exchange on the first round should use the initial value and send the new value according to the function`() {
         val result =
@@ -108,5 +124,19 @@ class ExchangeTest {
         assertEquals(1, result.values.distinct().size)
         assertTrue(result.values.all { it is ConstantField })
         assertEquals(listOf(10, 10, 10, 10), result.values.map { it.localValue })
+    }
+
+    @Test
+    fun `exchange should send dedicated values to neighbors`() {
+        val size = 3
+        val environment = mooreGridWithDedicatedNeighborValues(size)
+        // Executes two rounds per device
+        for (i in 0 until size * size) {
+            environment.cycleInOrder()
+        }
+        val result = environment.status()
+        // Program rationale: if you have the device with ID=0 in the neighbor, it counts as 0, otherwise 1
+        val expectedLocalValues = mapOf(0 to 3, 1 to 5, 2 to 4, 3 to 5, 4 to 8, 5 to 6, 6 to 4, 7 to 6, 8 to 4)
+        assertEquals(expectedLocalValues, result)
     }
 }

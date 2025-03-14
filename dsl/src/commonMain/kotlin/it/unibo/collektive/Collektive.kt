@@ -85,7 +85,7 @@ class Collektive<ID : Any, R>(
         ): AggregateResult<ID, R> =
             with(AggregateContext(localId, network.currentInbound(), previousState, network.inMemory, pathFactory)) {
                 AggregateResult(localId, compute(), messagesToSend(), newState()).also {
-                    network.deliverableFor(localId, it.toSend)
+                    network.deliverableFor(it.toSend)
                 }
             }
     }

@@ -12,10 +12,7 @@ interface Mailbox<ID : Any> {
     /**
      * TODO.
      */
-    fun deliverableFor(
-        id: ID,
-        outboundMessage: OutboundEnvelope<ID>,
-    )
+    fun deliverableFor(outboundMessage: OutboundEnvelope<ID>)
 
     /**
      * TODO.

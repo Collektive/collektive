@@ -26,7 +26,7 @@ class SerializationTest {
 
     @Test
     fun `an aggregate output can be serialized when the used network support it`() {
-        val network = SerializerNetworkTest()
+        val network = SerializerNetworkTest(1)
         aggregate(1, network, emptyMap()) {
             neighboring(10)
         }
@@ -40,7 +40,7 @@ class SerializationTest {
 
     @Test
     fun `an aggregate output can be serialized when using custom types without exception`() {
-        val network = SerializerNetworkTest()
+        val network = SerializerNetworkTest(1)
         aggregate(1, network, emptyMap()) {
             neighboring(Custom(10, 20))
         }
@@ -50,7 +50,7 @@ class SerializationTest {
     @Test
     fun `an exception should be raised when a non-serializable type is used`() {
         assertFails {
-            val network = SerializerNetworkTest()
+            val network = SerializerNetworkTest(1)
             aggregate(1, network, emptyMap()) {
                 neighboring(Any())
             }
@@ -60,7 +60,7 @@ class SerializationTest {
 
     @Test
     fun `a generic data class should be serialized properly`() {
-        val network = SerializerNetworkTest()
+        val network = SerializerNetworkTest(1)
         aggregate(1, network, emptyMap()) {
             neighboring(CustomGeneric(localId))
         }
@@ -72,7 +72,7 @@ class SerializationTest {
     @Test
     fun `protobuf can be used as a serializer for binary encoded payload`() {
         @OptIn(ExperimentalSerializationApi::class)
-        val network = SerializerNetworkTest(ProtoBuf)
+        val network = SerializerNetworkTest(1, ProtoBuf)
         aggregate(1, network, emptyMap()) {
             neighboring(10)
         }

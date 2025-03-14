@@ -21,7 +21,7 @@ import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class SerializerNetworkTest(private val serializer: SerialFormat = Json) : Mailbox<Int> {
+class SerializerNetworkTest(private val deviceId: Int, private val serializer: SerialFormat = Json) : Mailbox<Int> {
     override val inMemory: Boolean = false
 
     val messages = mutableMapOf<Int, Message<Int, Any?>>()
@@ -49,11 +49,12 @@ class SerializerNetworkTest(private val serializer: SerialFormat = Json) : Mailb
         deliverableReceived(message)
     }
 
-    override fun deliverableFor(
-        id: Int,
-        outboundMessage: OutboundEnvelope<Int>,
-    ) {
-        messages[id] = outboundMessage.prepareMessageFor(id, factory)
+    override fun deliverableFor(outboundMessage: OutboundEnvelope<Int>) {
+        val neighborIds = messages.keys + deviceId
+        for (neighborId in neighborIds) {
+            val message = outboundMessage.prepareMessageFor(neighborId, factory)
+            messages[neighborId] = message
+        }
     }
 
     override fun deliverableReceived(message: Message<Int, *>) {
