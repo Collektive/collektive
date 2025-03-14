@@ -13,7 +13,4 @@ import it.unibo.collektive.aggregate.api.DataSharingMethod
 /**
  * Representation of a payload with its [payload] and [representation].
  */
-data class PayloadRepresentation<Payload>(
-    val payload: Payload,
-    val representation: DataSharingMethod<Payload>,
-)
+data class PayloadRepresentation<Payload>(val payload: Payload, val representation: DataSharingMethod<Payload>)

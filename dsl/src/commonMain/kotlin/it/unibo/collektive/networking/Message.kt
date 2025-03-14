@@ -28,41 +28,31 @@ sealed interface Message<ID : Any, out Payload> {
 /**
  * A message specifically designed to be delivered in a in-memory fashion, containing a [senderId] and [sharedData].
  */
-data class InMemoryMessage<ID : Any>(
-    override val senderId: ID,
-    override val sharedData: Map<Path, Any?>,
-) : Message<ID, Any?>
+data class InMemoryMessage<ID : Any>(override val senderId: ID, override val sharedData: Map<Path, Any?>) :
+    Message<ID, Any?>
 
 /**
  * TODO.
  */
 class InMemoryMessageFactory<ID : Any> : MessageFactory<ID, Any?> {
-    override fun invoke(
-        senderId: ID,
-        sharedData: Map<Path, PayloadRepresentation<Any?>>,
-    ): Message<ID, Any?> = InMemoryMessage(senderId, sharedData.mapValues { it.value.payload })
+    override fun invoke(senderId: ID, sharedData: Map<Path, PayloadRepresentation<Any?>>): Message<ID, Any?> =
+        InMemoryMessage(senderId, sharedData.mapValues { it.value.payload })
 }
 
 /**
  * Serialized message meant to be sent over the network containing a [senderId] and [sharedData].
  */
 @Serializable
-data class SerializedMessage<ID : Any>(
-    override val senderId: ID,
-    override val sharedData: Map<Path, ByteArray>,
-) : Message<ID, ByteArray>
+data class SerializedMessage<ID : Any>(override val senderId: ID, override val sharedData: Map<Path, ByteArray>) :
+    Message<ID, ByteArray>
 
 /**
  * TODO.
  */
-abstract class SerializedMessageFactory<ID : Any, Payload>(
-    private val serializerFormat: SerialFormat,
-) : MessageFactory<ID, ByteArray> {
+abstract class SerializedMessageFactory<ID : Any, Payload>(private val serializerFormat: SerialFormat) :
+    MessageFactory<ID, ByteArray> {
     @OptIn(InternalSerializationApi::class)
-    override fun invoke(
-        senderId: ID,
-        sharedData: Map<Path, PayloadRepresentation<Any?>>,
-    ): Message<ID, ByteArray> {
+    override fun invoke(senderId: ID, sharedData: Map<Path, PayloadRepresentation<Any?>>): Message<ID, ByteArray> {
         val serializedSharedData =
             sharedData.mapValues { (_, representation) ->
                 val (value, serial) = representation

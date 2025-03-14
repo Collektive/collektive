@@ -68,21 +68,17 @@ class Node<R>(
             )
         }
 
-        override fun currentInbound(): NeighborsData<Int> =
-            object : NeighborsData<Int> {
-                private val neighborDeliverableMessages by lazy { messageBuffer.filter { it.key != id } }
-                override val neighbors: Set<Int> get() = neighborDeliverableMessages.keys
+        override fun currentInbound(): NeighborsData<Int> = object : NeighborsData<Int> {
+            private val neighborDeliverableMessages by lazy { messageBuffer.filter { it.key != id } }
+            override val neighbors: Set<Int> get() = neighborDeliverableMessages.keys
 
-                @Suppress("UNCHECKED_CAST")
-                override fun <Value> dataAt(
-                    path: Path,
-                    dataSharingMethod: DataSharingMethod<Value>,
-                ): Map<Int, Value> =
-                    neighborDeliverableMessages
-                        .mapValues { it.value.sharedData.getOrElse(path) { NoValue } as Value }
-                        .filter { it.value != NoValue }
-                        .also { messageBuffer = emptyMap() }
-            }
+            @Suppress("UNCHECKED_CAST")
+            override fun <Value> dataAt(path: Path, dataSharingMethod: DataSharingMethod<Value>): Map<Int, Value> =
+                neighborDeliverableMessages
+                    .mapValues { it.value.sharedData.getOrElse(path) { NoValue } as Value }
+                    .filter { it.value != NoValue }
+                    .also { messageBuffer = emptyMap() }
+        }
     }
 
     private object NoValue

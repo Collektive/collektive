@@ -15,9 +15,7 @@ import kotlin.random.Random
  * An environment with a set of [nodes] mapped into [positions],
  * which are considered connected if the [areConnected] function returns true for them.
  */
-open class Environment<R>(
-    val areConnected: (Environment<R>, Node<R>, Node<R>) -> Boolean = { _, _, _ -> true },
-) {
+open class Environment<R>(val areConnected: (Environment<R>, Node<R>, Node<R>) -> Boolean = { _, _, _ -> true }) {
     private val positions = mutableMapOf<Node<R>, Position>()
     private val randomGenerator = Random(0)
     private var nextId = 0
@@ -35,11 +33,7 @@ open class Environment<R>(
     /**
      * Adds a node to the environment at the given [position] with the given [initial] value and [program].
      */
-    fun addNode(
-        position: Position,
-        initial: R,
-        program: Aggregate<Int>.(Environment<R>, Int) -> R,
-    ) {
+    fun addNode(position: Position, initial: R, program: Aggregate<Int>.(Environment<R>, Int) -> R) {
         positions[Node(this, nextId++, initial, program)] = position
     }
 

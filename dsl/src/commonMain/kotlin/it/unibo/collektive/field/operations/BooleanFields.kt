@@ -10,10 +10,8 @@ import kotlin.jvm.JvmOverloads
  * The [base] value is used as a first element to start the fold operation at which the [predicate] is applied.
  */
 @JvmOverloads
-fun <ID : Any> Field<ID, Boolean>.all(
-    base: Boolean,
-    predicate: (Boolean) -> Boolean = { it },
-): Boolean = fold(predicate(base)) { acc, value -> acc && predicate(value) }
+fun <ID : Any> Field<ID, Boolean>.all(base: Boolean, predicate: (Boolean) -> Boolean = { it }): Boolean =
+    fold(predicate(base)) { acc, value -> acc && predicate(value) }
 
 /**
  * Check if any of the [Boolean] elements in the field are true by default.
@@ -21,10 +19,8 @@ fun <ID : Any> Field<ID, Boolean>.all(
  * The [base] value is used as a first element to start the fold operation at which the [predicate] is applied.
  */
 @JvmOverloads
-fun <ID : Any> Field<ID, Boolean>.any(
-    base: Boolean,
-    predicate: (Boolean) -> Boolean = { it },
-): Boolean = fold(predicate(base)) { acc, value -> acc || predicate(value) }
+fun <ID : Any> Field<ID, Boolean>.any(base: Boolean, predicate: (Boolean) -> Boolean = { it }): Boolean =
+    fold(predicate(base)) { acc, value -> acc || predicate(value) }
 
 /**
  * Check if none of the [Boolean] elements in the field are true by default.
@@ -32,7 +28,5 @@ fun <ID : Any> Field<ID, Boolean>.any(
  * The [base] value is used as a first element to start the fold operation at which the [predicate] is applied.
  */
 @JvmOverloads
-fun <ID : Any> Field<ID, Boolean>.none(
-    base: Boolean,
-    predicate: (Boolean) -> Boolean = { it },
-): Boolean = !all(base, predicate)
+fun <ID : Any> Field<ID, Boolean>.none(base: Boolean, predicate: (Boolean) -> Boolean = { it }): Boolean =
+    !all(base, predicate)

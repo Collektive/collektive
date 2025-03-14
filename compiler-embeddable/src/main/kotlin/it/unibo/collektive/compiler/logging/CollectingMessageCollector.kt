@@ -30,16 +30,11 @@ class CollectingMessageCollector : MessageCollector {
 
     override fun clear() = timeline.clear()
 
-    override fun hasErrors(): Boolean =
-        listOf(ERROR, EXCEPTION).let { errors ->
-            messages.any { it.severity in errors }
-        }
+    override fun hasErrors(): Boolean = listOf(ERROR, EXCEPTION).let { errors ->
+        messages.any { it.severity in errors }
+    }
 
-    override fun report(
-        severity: CompilerMessageSeverity,
-        message: String,
-        location: CompilerMessageSourceLocation?,
-    ) {
+    override fun report(severity: CompilerMessageSeverity, message: String, location: CompilerMessageSourceLocation?) {
         timeline += CompilerMessage(severity, message, location)
     }
 }

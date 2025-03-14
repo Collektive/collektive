@@ -38,36 +38,35 @@ object CollektiveK2JVMCompiler {
         destinationFolder: Path,
         verbose: Boolean = true,
         allWarningsAsErrors: Boolean = true,
-    ): K2JVMCompilerArguments =
-        K2JVMCompilerArguments()
-            .apply {
-                destination = destinationFolder.absolutePathString()
-                this.verbose = verbose
-                suppressWarnings = false
-                this.allWarningsAsErrors = allWarningsAsErrors
-                reportOutputFiles = true
-                reportPerf = false
-                languageVersion = "2.0"
-                multiPlatform = false
-                noCheckActual = true
-                val classpath =
-                    checkNotNull(classpathFromClassloader(Thread.currentThread().contextClassLoader)) {
-                        "Empty classpath from current classloader." +
-                            "Likely a bug in alchemist-incarnation-collective's Kotlin compiler facade"
-                    }
-                val pluginClasspath =
-                    classpath.filter {
-                        it.absolutePath.contains("compiler-plugin${File.separator}")
-                    }
-                classpathAsList = classpath
-                noStdlib = true
-                noReflect = true
-                pluginClasspaths = pluginClasspath.map(File::getAbsolutePath).toTypedArray()
-                pluginOptions =
-                    arrayOf(
-                        "plugin:it.unibo.collektive.compiler-plugin:collektiveEnabled=true",
-                    )
-            }
+    ): K2JVMCompilerArguments = K2JVMCompilerArguments()
+        .apply {
+            destination = destinationFolder.absolutePathString()
+            this.verbose = verbose
+            suppressWarnings = false
+            this.allWarningsAsErrors = allWarningsAsErrors
+            reportOutputFiles = true
+            reportPerf = false
+            languageVersion = "2.0"
+            multiPlatform = false
+            noCheckActual = true
+            val classpath =
+                checkNotNull(classpathFromClassloader(Thread.currentThread().contextClassLoader)) {
+                    "Empty classpath from current classloader." +
+                        "Likely a bug in alchemist-incarnation-collective's Kotlin compiler facade"
+                }
+            val pluginClasspath =
+                classpath.filter {
+                    it.absolutePath.contains("compiler-plugin${File.separator}")
+                }
+            classpathAsList = classpath
+            noStdlib = true
+            noReflect = true
+            pluginClasspaths = pluginClasspath.map(File::getAbsolutePath).toTypedArray()
+            pluginOptions =
+                arrayOf(
+                    "plugin:it.unibo.collektive.compiler-plugin:collektiveEnabled=true",
+                )
+        }
 
     /**
      * Configures the Kotlin-JVM compiler to compile the [sources] using the Collektive plugin.

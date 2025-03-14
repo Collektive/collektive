@@ -23,10 +23,7 @@ interface NeighborsData<ID : Any> {
     /**
      * TODO.
      */
-    fun <Value> dataAt(
-        path: Path,
-        dataSharingMethod: DataSharingMethod<Value>,
-    ): Map<ID, Value>
+    fun <Value> dataAt(path: Path, dataSharingMethod: DataSharingMethod<Value>): Map<ID, Value>
 }
 
 /**
@@ -35,8 +32,5 @@ interface NeighborsData<ID : Any> {
 class NoNeighborsData<ID : Any> : NeighborsData<ID> {
     override val neighbors: Set<ID> = emptySet()
 
-    override fun <Value> dataAt(
-        path: Path,
-        dataSharingMethod: DataSharingMethod<Value>,
-    ): Map<ID, Value> = emptyMap()
+    override fun <Value> dataAt(path: Path, dataSharingMethod: DataSharingMethod<Value>): Map<ID, Value> = emptyMap()
 }

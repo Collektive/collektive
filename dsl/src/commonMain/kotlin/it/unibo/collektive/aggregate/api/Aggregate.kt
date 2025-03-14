@@ -78,19 +78,13 @@ interface Aggregate<ID : Any> {
      * Iteratively updates the value computing the [transform] expression at each device using the last
      * computed value or the [initial].
      */
-    fun <Initial> evolve(
-        initial: Initial,
-        transform: (Initial) -> Initial,
-    ): Initial
+    fun <Initial> evolve(initial: Initial, transform: (Initial) -> Initial): Initial
 
     /**
      * Iteratively updates the value computing the [transform] expression from a [YieldingContext]
      * at each device using the last computed value or the [initial].
      */
-    fun <Initial, Return> evolving(
-        initial: Initial,
-        transform: YieldingScope<Initial, Return>,
-    ): Return
+    fun <Initial, Return> evolving(initial: Initial, transform: YieldingScope<Initial, Return>): Return
 
     /**
      * Observes the value of an expression [local] across neighbours.
@@ -111,20 +105,14 @@ interface Aggregate<ID : Any> {
      * in form of a field of functions with type `() -> Int`.
      */
     @DelicateCollektiveApi
-    fun <Scalar> neighboring(
-        local: Scalar,
-        dataSharingMethod: DataSharingMethod<Scalar>,
-    ): Field<ID, Scalar>
+    fun <Scalar> neighboring(local: Scalar, dataSharingMethod: DataSharingMethod<Scalar>): Field<ID, Scalar>
 
     /**
      * Alignment function that pushes in the stack the pivot, executes the body and pop the last
      * element of the stack after it is called.
      * Returns the body's return element.
      */
-    fun <R> alignedOn(
-        pivot: Any?,
-        body: () -> R,
-    ): R
+    fun <R> alignedOn(pivot: Any?, body: () -> R): R
 
     /**
      * Pushes the pivot in the alignment stack.
@@ -145,11 +133,10 @@ interface Aggregate<ID : Any> {
          * Inline access to the data serialization method of an [Aggregate].
          * This method is used to avoid building serializers for in-memory-only contexts.
          */
-        inline fun <reified T> Aggregate<*>.dataSharingMethod(): DataSharingMethod<T> =
-            when {
-                inMemoryOnly -> InMemory
-                else -> Serialize(serializer())
-            }
+        inline fun <reified T> Aggregate<*>.dataSharingMethod(): DataSharingMethod<T> = when {
+            inMemoryOnly -> InMemory
+            else -> Serialize(serializer())
+        }
 
         /**
          * Inlined version of the [Aggregate.exchange] function.

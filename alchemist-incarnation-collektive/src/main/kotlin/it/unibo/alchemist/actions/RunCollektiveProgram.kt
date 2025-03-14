@@ -63,10 +63,8 @@ class RunCollektiveProgram<P : Position<P>>(
         name: String = entrypoint.name,
     ) : this(node, name, buildEntryPoint(entrypoint))
 
-    override fun cloneAction(
-        node: Node<Any?>,
-        reaction: Reaction<Any?>,
-    ): Action<Any?> = RunCollektiveProgram(node, name)
+    override fun cloneAction(node: Node<Any?>, reaction: Reaction<Any?>): Action<Any?> =
+        RunCollektiveProgram(node, name)
 
     override fun execute() {
         collektiveProgram.cycle().also {
