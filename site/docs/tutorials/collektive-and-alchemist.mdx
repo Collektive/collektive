@@ -1,3 +1,472 @@
 ---
 title: Using Collektive with Alchemist Simulator
 ---
+
+[Alchemist Simulator](https://alchemistsimulator.github.io/) is a distributed systems simulation platform, particularly suited for aggregate programming. It allows you to model and simulate interactions between agents in complex environments, supporting different abstractions and programming paradigms.
+
+Together, Alchemist and Collektive allow you to write aggregate programs in Kotlin that can be executed and simulated within dynamic and configurable environments through YAML files.
+
+## YAML configuration file for Collektive
+
+The YAML files define a Collektive simulation run through Alchemist. Below is how it is composed.
+
+### Incarnation
+
+```yaml
+incarnation: collektive
+```
+
+`incarnation` specifies the programming "dialect" used for the simulation. In this case, we use `collektive`.
+
+---
+
+### Network model
+
+```yaml
+network-model:
+  type: ConnectWithinDistance
+  parameters: [2]
+```
+
+`network-model` defines how nodes communicate with each other. Here we use `ConnectWithinDistance`, a pattern that connects nodes that are at most 2 units apart.
+
+---
+
+### Program definition
+
+```yaml
+_pool: &program
+  - time-distribution: 1
+    type: Event
+    actions:
+      - type: RunCollektiveProgram
+        parameters: [it.unibo.collektive.examples.tutorialExample.TutorialExampleKt.maxID]
+```
+
+This section defines the program to be executed. The program is executed as an `Event` with a time distribution of 1 unit. The executed action is the Collektive program `maxID`.
+
+---
+
+### Nodes deploy
+
+```yaml
+deployments:
+  - type: GraphStreamDeployment
+    parameters: [20, 2, 0, PreferentialAttachment]
+    programs:
+      - *program
+```
+
+`GraphStreamDeployment` is used to create a network of 20 nodes with connectivity based on `PreferentialAttachment`. Each node runs the previously defined Collektive program.
+
+---
+
+### Initial state of the nodes
+
+```yaml
+    contents:
+      - molecule: isMaxID
+        concentration: true
+      ...
+```
+
+`molecule` are variables associated with nodes, with an initial concentration. For example:
+
+- `isMaxID`: indicates whether the node has the maximum ID, the value of this variable is initialized to `true`, before starting the simulation all nodes will therefore have this variable equal to `true`.
+
+---
+
+### Data export
+
+```yaml
+export:
+  - type: CSVExporter
+    parameters:
+      fileNameRoot: "tutorial-example"
+      exportPath: "data"
+```
+
+`CSVExporter` saves simulation data in CSV format, with an export interval of 1 time unit.
+
+<details 
+    style={{ backgroundColor: 'transparent', border: '1px solid purple', borderRadius: '5px', padding: '5px' }}
+>
+    <summary>Click to view full YAML code</summary>
+    ```yml
+    incarnation: collektive
+
+    network-model:
+    type: ConnectWithinDistance
+    parameters: [2]
+
+    _pool: &program
+    - time-distribution: 1
+        type: Event
+        actions:
+        - type: RunCollektiveProgram
+            parameters: [it.unibo.collektive.examples.tutorialExample.TutorialExampleKt.maxID]
+
+    deployments:
+    - type: GraphStreamDeployment
+        parameters: [20, 2, 0, PreferentialAttachment]
+        programs:
+        - *program
+        contents:
+        - molecule: isMaxID
+            concentration: true
+        - molecule: isMaxLocalID
+            concentration: true
+        - molecule: localID
+            concentration: 0
+        - molecule: maxNeighborID
+            concentration: 0
+        - molecule: maxNetworkID
+            concentration: 0
+        - molecule: subnetDiameter
+            concentration: null
+        - molecule: distanceToSource
+            concentration: 0
+        - molecule: isSubnetDiameterDistance
+            concentration: true
+        - molecule: nothing
+            concentration: true
+        - molecule: subnetDiameterValue
+            concentration: 0
+
+    export:
+    - type: CSVExporter
+        parameters:
+        fileNameRoot: "tutorial-example"
+        interval: 1.0
+        exportPath: "data"
+        data:
+        - time
+        - molecule: subnetDiameterValue
+            aggregators: [ mean ]
+            value-filter: onlyfinite
+            precision: 1
+    ```
+</details>
+
+<details 
+    style={{ backgroundColor: 'transparent', border: '1px solid purple', borderRadius: '5px', padding: '5px' }}
+>
+    <summary>Click to view effects code</summary>
+    ```json
+    [
+    {
+        "type": "class it.unibo.alchemist.boundary.gui.effects.DrawShape",
+        "curIncarnation": "collektive",
+        "mode": "FILL_ELLIPSE",
+        "red": {
+        "max": 255,
+        "min": 0,
+        "val": 250
+        },
+        "blue": {
+        "max": 255,
+        "min": 0,
+        "val": 200
+        },
+        "green": {
+        "max": 255,
+        "min": 0,
+        "val": 50
+        },
+        "alpha": {
+        "max": 255,
+        "min": 0,
+        "val": 255
+        },
+        "scaleFactor": {
+        "max": 100,
+        "min": 0,
+        "val": 50
+        },
+        "size": {
+        "max": 100,
+        "min": 0,
+        "val": 10
+        },
+        "molFilter": true,
+        "molString": "isSubnetDiameterDistance",
+        "molPropertyFilter": true,
+        "property": "if (it \u003d\u003d true) 1 else 0",
+        "writingPropertyValue": false,
+        "c": "ALPHA",
+        "reverse": false,
+        "propoom": {
+        "max": 10,
+        "min": -10,
+        "val": 0
+        },
+        "minprop": {
+        "max": 10,
+        "min": -10,
+        "val": 0
+        },
+        "maxprop": {
+        "max": 10,
+        "min": -10,
+        "val": 1
+        },
+        "colorCache": {
+        "value": -65536
+        }
+    },
+    {
+        "type": "class it.unibo.alchemist.boundary.gui.effects.DrawShape",
+        "curIncarnation": "collektive",
+        "mode": "FILL_ELLIPSE",
+        "red": {
+        "max": 255,
+        "min": 0,
+        "val": 0
+        },
+        "blue": {
+        "max": 255,
+        "min": 0,
+        "val": 255
+        },
+        "green": {
+        "max": 255,
+        "min": 0,
+        "val": 0
+        },
+        "alpha": {
+        "max": 255,
+        "min": 0,
+        "val": 255
+        },
+        "scaleFactor": {
+        "max": 100,
+        "min": 0,
+        "val": 50
+        },
+        "size": {
+        "max": 100,
+        "min": 0,
+        "val": 5
+        },
+        "molFilter": true,
+        "molString": "nothing",
+        "molPropertyFilter": true,
+        "property": "if (it \u003d\u003d true) 1 else 0",
+        "writingPropertyValue": false,
+        "c": "ALPHA",
+        "reverse": false,
+        "propoom": {
+        "max": 10,
+        "min": -10,
+        "val": 0
+        },
+        "minprop": {
+        "max": 10,
+        "min": -10,
+        "val": 0
+        },
+        "maxprop": {
+        "max": 10,
+        "min": -10,
+        "val": 1
+        },
+        "colorCache": {
+        "value": -65536
+        }
+    },
+    {
+        "type": "class it.unibo.alchemist.boundary.gui.effects.DrawShape",
+        "curIncarnation": "collektive",
+        "mode": "FILL_ELLIPSE",
+        "red": {
+        "max": 255,
+        "min": 0,
+        "val": 255
+        },
+        "blue": {
+        "max": 255,
+        "min": 0,
+        "val": 0
+        },
+        "green": {
+        "max": 255,
+        "min": 0,
+        "val": 0
+        },
+        "alpha": {
+        "max": 255,
+        "min": 0,
+        "val": 255
+        },
+        "scaleFactor": {
+        "max": 100,
+        "min": 0,
+        "val": 50
+        },
+        "size": {
+        "max": 100,
+        "min": 0,
+        "val": 15
+        },
+        "molFilter": true,
+        "molString": "isMaxLocalID",
+        "molPropertyFilter": true,
+        "property": "if (it \u003d\u003d true) 1 else 0",
+        "writingPropertyValue": false,
+        "c": "ALPHA",
+        "reverse": false,
+        "propoom": {
+        "max": 10,
+        "min": -10,
+        "val": 0
+        },
+        "minprop": {
+        "max": 10,
+        "min": -10,
+        "val": 0
+        },
+        "maxprop": {
+        "max": 10,
+        "min": -10,
+        "val": 1
+        },
+        "colorCache": {
+        "value": -65536
+        }
+    },
+    {
+        "type": "class it.unibo.alchemist.boundary.gui.effects.DrawShape",
+        "curIncarnation": "collektive",
+        "mode": "FILL_ELLIPSE",
+        "red": {
+        "max": 255,
+        "min": 0,
+        "val": 0
+        },
+        "blue": {
+        "max": 255,
+        "min": 0,
+        "val": 0
+        },
+        "green": {
+        "max": 255,
+        "min": 0,
+        "val": 255
+        },
+        "alpha": {
+        "max": 255,
+        "min": 0,
+        "val": 255
+        },
+        "scaleFactor": {
+        "max": 100,
+        "min": 0,
+        "val": 50
+        },
+        "size": {
+        "max": 100,
+        "min": 0,
+        "val": 15
+        },
+        "molFilter": true,
+        "molString": "isMaxID",
+        "molPropertyFilter": true,
+        "property": "if (it \u003d\u003d true) 1 else 0",
+        "writingPropertyValue": false,
+        "c": "ALPHA",
+        "reverse": false,
+        "propoom": {
+        "max": 10,
+        "min": -10,
+        "val": 0
+        },
+        "minprop": {
+        "max": 10,
+        "min": -10,
+        "val": 0
+        },
+        "maxprop": {
+        "max": 10,
+        "min": -10,
+        "val": 1
+        },
+        "colorCache": {
+        "value": -65536
+        }
+    },
+    {
+        "type": "class it.unibo.alchemist.boundary.gui.effects.DrawShape",
+        "curIncarnation": "collektive",
+        "mode": "DRAW_ELLIPSE",
+        "red": {
+        "max": 255,
+        "min": 0,
+        "val": 0
+        },
+        "blue": {
+        "max": 255,
+        "min": 0,
+        "val": 255
+        },
+        "green": {
+        "max": 255,
+        "min": 0,
+        "val": 115
+        },
+        "alpha": {
+        "max": 255,
+        "min": 0,
+        "val": 154
+        },
+        "scaleFactor": {
+        "max": 100,
+        "min": 0,
+        "val": 49
+        },
+        "size": {
+        "max": 100,
+        "min": 0,
+        "val": 5
+        },
+        "molFilter": true,
+        "molString": "it.unibo.collektive.examples.tutorialExample.TutorialExampleKt.maxID",
+        "molPropertyFilter": true,
+        "property": "",
+        "writingPropertyValue": true,
+        "c": "ALPHA",
+        "reverse": false,
+        "propoom": {
+        "max": 10,
+        "min": -10,
+        "val": 0
+        },
+        "minprop": {
+        "max": 10,
+        "min": -10,
+        "val": 0
+        },
+        "maxprop": {
+        "max": 10,
+        "min": -10,
+        "val": 10
+        },
+        "colorCache": {
+        "value": -1711246337
+        }
+    }
+    ]
+    ```
+</details>
+
+The codes illustrated represent the configuration used for the graphical simulation of the example examined in the previous section. Below is presented the graphical simulation obtained from the configuration.
+
+## Graphical simulation
+
+![](/img/collektive-and-alchemist-1.png)
+![](/img/collektive-and-alchemist-2.png)
+
+![](/img/collektive-and-alchemist-3.png)
+
+<p align="center">
+<img src="/img/collektive-and-alchemist-4.png" alt="Collektive and Alchemist 4" width="70%" />
+</p>

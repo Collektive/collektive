@@ -1,5 +1,5 @@
 ---
-title: Collektive & Alchemist Simulator
+title: Collektive with Alchemist Simulator
 ---
 
 # How to simulate
