@@ -69,10 +69,7 @@ class CollektiveDevice<P>(
     override fun cloneOnNewNode(node: Node<Any?>): NodeProperty<Any?> =
         CollektiveDevice(environment, node, retainMessagesFor)
 
-    override fun deliverableFor(
-        id: Int,
-        outboundMessage: OutboundEnvelope<Int>,
-    ) {
+    override fun deliverableFor(outboundMessage: OutboundEnvelope<Int>) {
         if (outboundMessage.isNotEmpty()) {
             val neighborsNodes = environment.getNeighborhood(node)
             if (!neighborsNodes.isEmpty) {

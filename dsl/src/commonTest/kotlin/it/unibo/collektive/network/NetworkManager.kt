@@ -10,17 +10,31 @@ import it.unibo.collektive.path.Path
  * A fully connected virtual network.
  */
 class NetworkManager {
-    private var messageBuffer: Map<Int, Message<Int, *>> = emptyMap()
+    private var messageBuffer: MutableMap<Int, MutableMap<Int, Message<Int, *>>> = mutableMapOf()
 
     /**
-     * Adds the [message] to the message buffer.
+     * Registers a device with the given [deviceId].
+     */
+    fun registerDevice(deviceId: Int) {
+        messageBuffer[deviceId] = mutableMapOf()
+    }
+
+    /**
+     * Adds the [envelope] to the message buffer.
      */
     fun send(
-        id: Int,
-        message: OutboundEnvelope<Int>,
+        senderId: Int,
+        envelope: OutboundEnvelope<Int>,
     ) {
-        val deliverableMessage = message.prepareMessageFor(id)
-        messageBuffer += id to deliverableMessage
+        val neighborsIds = messageBuffer.keys
+        neighborsIds.forEach { neighborId ->
+            val message = envelope.prepareMessageFor(senderId)
+            messageBuffer[neighborId]?.let { neighborMessages ->
+                neighborMessages[senderId] = message
+            } ?: run {
+                messageBuffer[neighborId] = mutableMapOf(senderId to message)
+            }
+        }
     }
 
     /**
@@ -28,7 +42,7 @@ class NetworkManager {
      */
     fun receiveMessageFor(receiverId: Int): NeighborsData<Int> =
         object : NeighborsData<Int> {
-            private val neighborDeliverableMessages by lazy { messageBuffer.filter { it.key != receiverId } }
+            private val neighborDeliverableMessages by lazy { messageBuffer[receiverId] ?: emptyMap() }
             override val neighbors: Set<Int> get() = neighborDeliverableMessages.keys
 
             @Suppress("UNCHECKED_CAST")
