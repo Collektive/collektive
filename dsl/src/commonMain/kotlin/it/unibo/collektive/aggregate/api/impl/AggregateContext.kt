@@ -32,7 +32,7 @@ internal class AggregateContext<ID : Any>(
 ) : Aggregate<ID> {
     private val stack = Stack(pathFactory)
     private var state: MutableMap<Path, Any?> = mutableMapOf()
-    private val toBeSent: OutboundEnvelope<ID> = OutboundEnvelope(inboundMessage.neighbors.size)
+    private val toBeSent: OutboundEnvelope<ID> = OutboundEnvelope(localId, inboundMessage.neighbors.size)
 
     /**
      * Messages to send to the other nodes.
