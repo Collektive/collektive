@@ -1,3 +1,9 @@
+## [17.0.1](https://github.com/Collektive/collektive/compare/17.0.0...17.0.1) (2025-03-17)
+
+### Bug Fixes
+
+* properly set the sender ID to OutboundEnvelope when extracting the message for the neighbor ([75c38c3](https://github.com/Collektive/collektive/commit/75c38c3c78bccaa8ff061f406fe321c802f7e74d))
+
 ## [17.0.0](https://github.com/Collektive/collektive/compare/16.1.1...17.0.0) (2025-03-16)
 
 ### ⚠ BREAKING CHANGES
