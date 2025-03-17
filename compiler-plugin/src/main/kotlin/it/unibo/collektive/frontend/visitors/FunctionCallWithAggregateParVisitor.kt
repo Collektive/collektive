@@ -24,9 +24,7 @@ import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
  * This visitor is used for functions that takes an aggregate argument, checking whether any aggregate call inside that
  * function's body is used without a wrapping `alignedOn` call.
  */
-class FunctionCallWithAggregateParVisitor(
-    private val context: CheckerContext,
-) : FirVisitorVoid() {
+class FunctionCallWithAggregateParVisitor(private val context: CheckerContext) : FirVisitorVoid() {
     private var found = false
     private var insideAlignedOn = false
     private var functionCounter = 0

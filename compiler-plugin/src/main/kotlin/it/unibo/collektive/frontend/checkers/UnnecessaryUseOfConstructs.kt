@@ -54,27 +54,22 @@ object UnnecessaryUseOfConstructs : FirFunctionCallChecker(MppCheckerKind.Common
 
     private fun FirFunctionCall.isConstructToCheck() = fqName() in constructs
 
-    private fun FirFunctionCall.doesNotUseParameter(): Boolean =
-        if (fqName().run {
-                this == AggregateFunctionNames.NEIGHBORING_FUNCTION_FQ_NAME ||
-                    this == AggregateFunctionNames.NEIGHBORING_INLINE_FUNCTION_FQ_NAME ||
-                    this == AggregateFunctionNames.NEIGHBORING_VIA_EXCHANGE_FUNCTION_FQ_NAME
-            }
-        ) {
-            with(EmptyReturnVisitor()) {
-                hasEmptyReturn()
-            }
-        } else {
-            with(ConstructCallVisitor()) {
-                doesNotContainValueParameterUsagesInAnonymousFunctionCall()
-            }
+    private fun FirFunctionCall.doesNotUseParameter(): Boolean = if (fqName().run {
+            this == AggregateFunctionNames.NEIGHBORING_FUNCTION_FQ_NAME ||
+                this == AggregateFunctionNames.NEIGHBORING_INLINE_FUNCTION_FQ_NAME ||
+                this == AggregateFunctionNames.NEIGHBORING_VIA_EXCHANGE_FUNCTION_FQ_NAME
         }
-
-    override fun check(
-        expression: FirFunctionCall,
-        context: CheckerContext,
-        reporter: DiagnosticReporter,
     ) {
+        with(EmptyReturnVisitor()) {
+            hasEmptyReturn()
+        }
+    } else {
+        with(ConstructCallVisitor()) {
+            doesNotContainValueParameterUsagesInAnonymousFunctionCall()
+        }
+    }
+
+    override fun check(expression: FirFunctionCall, context: CheckerContext, reporter: DiagnosticReporter) {
         if (expression.isConstructToCheck() && expression.doesNotUseParameter()) {
             reporter.reportOn(
                 expression.calleeReference.source,

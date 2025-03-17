@@ -33,16 +33,11 @@ import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
  * The checker raises a warning because this operation can be replaced by using the more appropriate `share` construct.
  */
 object ImproperConstruct : FirFunctionCallChecker(MppCheckerKind.Common) {
-    private fun FirFunctionCall.isImproperEvolve(): Boolean =
-        with(ImproperConstructVisitor(fqName())) {
-            isReplaceableWithShare()
-        }
+    private fun FirFunctionCall.isImproperEvolve(): Boolean = with(ImproperConstructVisitor(fqName())) {
+        isReplaceableWithShare()
+    }
 
-    override fun check(
-        expression: FirFunctionCall,
-        context: CheckerContext,
-        reporter: DiagnosticReporter,
-    ) {
+    override fun check(expression: FirFunctionCall, context: CheckerContext, reporter: DiagnosticReporter) {
         if (expression
                 .fqName()
                 .run { this == EVOLVE_FUNCTION_FQ_NAME || this == EVOLVING_FUNCTION_FQ_NAME } &&
