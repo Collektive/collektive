@@ -6,13 +6,12 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class WhenTest {
-    private fun programUnderTest(input: Any) =
-        aggregate(0) {
-            when (input) {
-                is String -> neighboringViaExchange("string")
-                else -> neighboringViaExchange("test")
-            }
+    private fun programUnderTest(input: Any) = aggregate(0) {
+        when (input) {
+            is String -> neighboringViaExchange("string")
+            else -> neighboringViaExchange("test")
         }
+    }
 
     @Test
     fun `When in single expression`() {

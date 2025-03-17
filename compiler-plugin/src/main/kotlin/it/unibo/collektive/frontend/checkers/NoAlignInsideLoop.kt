@@ -43,59 +43,55 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         """,
     )
     @Suppress("UnusedPrivateMember")
-    private fun getCollectionMembersKotlin(): Set<String> =
-        sequenceOf(
-            Class.forName("kotlin.collections.CollectionsKt").kotlin,
-            Collection::class,
-            Iterable::class,
-            List::class,
-            Map::class,
-            Sequence::class,
-            Set::class,
-        ).flatMap { clazz -> clazz.java.methods.mapNotNull { it.kotlinFunction } + clazz.members }
-            .filter {
-                fun KParameter.isFunctionType(): Boolean =
-                    (type.classifier as? KClass<*>)
-                        ?.qualifiedName
-                        ?.startsWith("kotlin.Function")
-                        ?: false
-                it.parameters.any { parameter ->
-                    parameter.isFunctionType()
-                }
-            }.map { it.name }
-            .toSet()
+    private fun getCollectionMembersKotlin(): Set<String> = sequenceOf(
+        Class.forName("kotlin.collections.CollectionsKt").kotlin,
+        Collection::class,
+        Iterable::class,
+        List::class,
+        Map::class,
+        Sequence::class,
+        Set::class,
+    ).flatMap { clazz -> clazz.java.methods.mapNotNull { it.kotlinFunction } + clazz.members }
+        .filter {
+            fun KParameter.isFunctionType(): Boolean = (type.classifier as? KClass<*>)
+                ?.qualifiedName
+                ?.startsWith("kotlin.Function")
+                ?: false
+            it.parameters.any { parameter ->
+                parameter.isFunctionType()
+            }
+        }.map { it.name }
+        .toSet()
 
     /**
      * Getter for all Collection members using Java reflection, obtaining their names as a set.
      */
-    private fun getCollectionMembersJava(): Set<String> =
-        sequenceOf(
-            Class.forName("kotlin.collections.CollectionsKt"),
-            Collection::class.java,
-            Iterable::class.java,
-            List::class.java,
-            Map::class.java,
-            Sequence::class.java,
-            Set::class.java,
-        ).flatMap { it.methods.asSequence() }
-            .filter { method ->
-                method.parameters.any { parameter ->
-                    parameter.parameterizedType.typeName.startsWith("kotlin.jvm.functions.Function") ||
-                        parameter.parameterizedType is Function<*>
-                }
-            }.map { it.name }
-            .toSet()
+    private fun getCollectionMembersJava(): Set<String> = sequenceOf(
+        Class.forName("kotlin.collections.CollectionsKt"),
+        Collection::class.java,
+        Iterable::class.java,
+        List::class.java,
+        Map::class.java,
+        Sequence::class.java,
+        Set::class.java,
+    ).flatMap { it.methods.asSequence() }
+        .filter { method ->
+            method.parameters.any { parameter ->
+                parameter.parameterizedType.typeName.startsWith("kotlin.jvm.functions.Function") ||
+                    parameter.parameterizedType is Function<*>
+            }
+        }.map { it.name }
+        .toSet()
 
     /**
      * Methods used inside collections to iterate their elements.
      */
     private val collectionMembers = getCollectionMembersJava()
 
-    private fun CheckerContext.isInsideALoopWithoutAlignedOn(): Boolean =
-        wrappingElementsUntil { it is FirWhileLoop }
-            ?.discardIfFunctionDeclaration()
-            ?.discardIfOutsideAggregateEntryPoint()
-            ?.none(isFunctionCallsWithName(AggregateFunctionNames.ALIGNED_ON_FUNCTION_NAME)) ?: false
+    private fun CheckerContext.isInsideALoopWithoutAlignedOn(): Boolean = wrappingElementsUntil { it is FirWhileLoop }
+        ?.discardIfFunctionDeclaration()
+        ?.discardIfOutsideAggregateEntryPoint()
+        ?.none(isFunctionCallsWithName(AggregateFunctionNames.ALIGNED_ON_FUNCTION_NAME)) ?: false
 
     private fun CheckerContext.isInsideIteratedFunctionWithoutAlignedOn(): Boolean =
         wrappingElementsUntil { it is FirFunctionCall && it.functionName() in collectionMembers }
@@ -107,19 +103,12 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         isInsideALoopWithoutAlignedOn() || isInsideIteratedFunctionWithoutAlignedOn()
 
     @OptIn(SymbolInternals::class)
-    private fun isInvalidFunWithAggregateParameter(
-        expression: FirFunctionCall,
-        context: CheckerContext,
-    ): Boolean {
+    private fun isInvalidFunWithAggregateParameter(expression: FirFunctionCall, context: CheckerContext): Boolean {
         val visitor = FunctionCallWithAggregateParVisitor(context)
         return visitor.visitSuspiciousFunctionCallDeclaration(expression)
     }
 
-    override fun check(
-        expression: FirFunctionCall,
-        context: CheckerContext,
-        reporter: DiagnosticReporter,
-    ) {
+    override fun check(expression: FirFunctionCall, context: CheckerContext, reporter: DiagnosticReporter) {
         val calleeName = expression.functionName()
         if (expression.fqName() in safeOperators) return
         val error =

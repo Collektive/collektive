@@ -62,10 +62,7 @@ class AlignmentTest {
 
         fun foo(aggregate: Aggregate<Int>) = aggregate.neighboringViaExchange(x)
 
-        fun foo(
-            value: Int,
-            aggregate: Aggregate<Int>,
-        ) = aggregate.neighboringViaExchange(value)
+        fun foo(value: Int, aggregate: Aggregate<Int>) = aggregate.neighboringViaExchange(value)
 
         assertNotAligned(
             { foo(this) },
@@ -77,15 +74,9 @@ class AlignmentTest {
     fun `overload function with different arguments order should not align`() {
         val x = 0
 
-        fun foo(
-            aggregate: Aggregate<Int>,
-            value: Int,
-        ) = aggregate.neighboringViaExchange(value)
+        fun foo(aggregate: Aggregate<Int>, value: Int) = aggregate.neighboringViaExchange(value)
 
-        fun foo(
-            value: Int,
-            aggregate: Aggregate<Int>,
-        ) = aggregate.neighboringViaExchange(value)
+        fun foo(value: Int, aggregate: Aggregate<Int>) = aggregate.neighboringViaExchange(value)
 
         assertNotAligned(
             { foo(this, x) },
@@ -99,10 +90,7 @@ class AlignmentTest {
 
         fun foo(aggregate: Aggregate<Int>) = aggregate.neighboringViaExchange(x)
 
-        fun bar(
-            f1: Field<Int, Int>,
-            f2: Field<Int, Int>,
-        ) = f1 + f2
+        fun bar(f1: Field<Int, Int>, f2: Field<Int, Int>) = f1 + f2
 
         assertNotAligned(
             { foo(this) to foo(this) },

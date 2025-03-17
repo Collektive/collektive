@@ -18,19 +18,16 @@ sealed interface Path
  * Non-serializable, list-based, high performance path intended for use in simulated environments.
  * Unsuitable for practical applications.
  */
-data class FullPath(
-    private val path: List<Any?>,
-) : Path {
+data class FullPath(private val path: List<Any?>) : Path {
     private val hash = path.hashCode()
 
     override fun hashCode(): Int = hash
 
-    override fun equals(other: Any?): Boolean =
-        when {
-            this === other -> true
-            other !is FullPath -> false
-            else -> hash == other.hashCode() && path == other.path
-        }
+    override fun equals(other: Any?): Boolean = when {
+        this === other -> true
+        other !is FullPath -> false
+        else -> hash == other.hashCode() && path == other.path
+    }
 
     override fun toString(): String = path.joinToString(separator = "/")
 
@@ -45,16 +42,15 @@ data class FullPath(
         /**
          * Creates a new [Path] from the given [path].
          */
-        fun of(path: List<Any?>): Path =
-            cache.getOrPut(path) { FullPath(path) }.also {
-                if (cache.size >= MAX_CACHE_SIZE) {
-                    val iterator = cache.iterator()
-                    repeat(CACHE_CLEANUP_SIZE) {
-                        iterator.next()
-                        iterator.remove()
-                    }
+        fun of(path: List<Any?>): Path = cache.getOrPut(path) { FullPath(path) }.also {
+            if (cache.size >= MAX_CACHE_SIZE) {
+                val iterator = cache.iterator()
+                repeat(CACHE_CLEANUP_SIZE) {
+                    iterator.next()
+                    iterator.remove()
                 }
             }
+        }
     }
 }
 
@@ -63,18 +59,13 @@ data class FullPath(
  */
 @JvmInline
 @Serializable
-value class SerializablePath(
-    val backend: String,
-) : Path
+value class SerializablePath(val backend: String) : Path
 
 private object PathSerializer : KSerializer<Path> {
     override val descriptor: SerialDescriptor
         get() = SerializablePath.serializer().descriptor
 
-    override fun serialize(
-        encoder: Encoder,
-        value: Path,
-    ) {
+    override fun serialize(encoder: Encoder, value: Path) {
         when (value) {
             is SerializablePath -> SerializablePath.serializer().serialize(encoder, value)
             else -> throw IllegalArgumentException("Cannot serialize $value")

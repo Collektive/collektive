@@ -58,8 +58,7 @@ class AggregateCallTransformer(
         return super.visitFunction(declaration)
     }
 
-    private fun hasAggregateInArguments(declaration: IrFunction): Boolean =
-        declaration.valueParameters.any {
-            it.type.isAssignableFrom(aggregateContext)
-        }
+    private fun hasAggregateInArguments(declaration: IrFunction): Boolean = declaration.valueParameters.any {
+        it.type.isAssignableFrom(aggregateContext)
+    }
 }

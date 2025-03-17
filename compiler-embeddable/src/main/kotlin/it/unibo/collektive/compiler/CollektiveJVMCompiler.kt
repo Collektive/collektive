@@ -122,15 +122,14 @@ object CollektiveJVMCompiler {
         outputFolder: File = tempDir(moduleName),
         enableContextReceivers: Boolean = true,
         messageCollector: MessageCollector = SLF4JMessageCollector.default,
-    ): GenerationState? =
-        compile(
-            listOf(inputFile),
-            jvmTarget,
-            moduleName,
-            outputFolder,
-            enableContextReceivers,
-            messageCollector,
-        )
+    ): GenerationState? = compile(
+        listOf(inputFile),
+        jvmTarget,
+        moduleName,
+        outputFolder,
+        enableContextReceivers,
+        messageCollector,
+    )
 
     /**
      * Compiles the [input] string as a Kotlin-JVM file using the Collektive plugin.

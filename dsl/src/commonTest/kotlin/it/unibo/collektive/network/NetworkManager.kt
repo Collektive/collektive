@@ -22,10 +22,7 @@ class NetworkManager {
     /**
      * Adds the [envelope] to the message buffer.
      */
-    fun send(
-        senderId: Int,
-        envelope: OutboundEnvelope<Int>,
-    ) {
+    fun send(senderId: Int, envelope: OutboundEnvelope<Int>) {
         val neighborsIds = messageBuffer.keys
         neighborsIds.forEach { neighborId ->
             val message = envelope.prepareMessageFor(senderId)
@@ -40,20 +37,16 @@ class NetworkManager {
     /**
      * Return the messages directed to a specific [receiverId].
      */
-    fun receiveMessageFor(receiverId: Int): NeighborsData<Int> =
-        object : NeighborsData<Int> {
-            private val neighborDeliverableMessages by lazy { messageBuffer[receiverId] ?: emptyMap() }
-            override val neighbors: Set<Int> get() = neighborDeliverableMessages.keys
+    fun receiveMessageFor(receiverId: Int): NeighborsData<Int> = object : NeighborsData<Int> {
+        private val neighborDeliverableMessages by lazy { messageBuffer[receiverId] ?: emptyMap() }
+        override val neighbors: Set<Int> get() = neighborDeliverableMessages.keys
 
-            @Suppress("UNCHECKED_CAST")
-            override fun <Value> dataAt(
-                path: Path,
-                dataSharingMethod: DataSharingMethod<Value>,
-            ): Map<Int, Value> =
-                neighborDeliverableMessages
-                    .mapValues { it.value.sharedData.getOrElse(path) { NoValue } as Value }
-                    .filter { it.value != NoValue }
-        }
+        @Suppress("UNCHECKED_CAST")
+        override fun <Value> dataAt(path: Path, dataSharingMethod: DataSharingMethod<Value>): Map<Int, Value> =
+            neighborDeliverableMessages
+                .mapValues { it.value.sharedData.getOrElse(path) { NoValue } as Value }
+                .filter { it.value != NoValue }
+    }
 
     private object NoValue
 }

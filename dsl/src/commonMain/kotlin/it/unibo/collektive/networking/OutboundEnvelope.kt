@@ -19,10 +19,7 @@ interface OutboundEnvelope<ID : Any> {
     /**
      * Shared data holding a [default] value and [overrides] for each [ID].
      */
-    data class SharedData<ID : Any, Value>(
-        val default: Value,
-        val overrides: Map<ID, Value> = emptyMap(),
-    )
+    data class SharedData<ID : Any, Value>(val default: Value, val overrides: Map<ID, Value> = emptyMap())
 
     /**
      * Adds the [data] generated at the given [path] to the envelope.
@@ -30,21 +27,14 @@ interface OutboundEnvelope<ID : Any> {
      * The [dataSharingMethod] is used to determine how the data should be serialized for network
      * transmission or in-memory delivery.
      */
-    fun <Value> addData(
-        path: Path,
-        data: SharedData<ID, Value>,
-        dataSharingMethod: DataSharingMethod<Value>,
-    )
+    fun <Value> addData(path: Path, data: SharedData<ID, Value>, dataSharingMethod: DataSharingMethod<Value>)
 
     /**
      * Extract the message for the [receiverId] through the given [factory].
      *
      * One the [OutboundEnvelope] is created, this method extracts the message to send to the [receiverId].
      */
-    fun prepareMessageFor(
-        receiverId: ID,
-        factory: MessageFactory<ID, *> = InMemoryMessageFactory(),
-    ): Message<ID, Any?>
+    fun prepareMessageFor(receiverId: ID, factory: MessageFactory<ID, *> = InMemoryMessageFactory()): Message<ID, Any?>
 
     /**
      * Returns `true` if the envelope is empty.
@@ -63,10 +53,7 @@ interface OutboundEnvelope<ID : Any> {
         /**
          * Smart constructor for [OutboundEnvelope] given a [senderId] and an [expectedSize] for the neighbors.
          */
-        internal operator fun <ID : Any> invoke(
-            senderId: ID,
-            expectedSize: Int,
-        ): OutboundEnvelope<ID> =
+        internal operator fun <ID : Any> invoke(senderId: ID, expectedSize: Int): OutboundEnvelope<ID> =
             object : OutboundEnvelope<ID> {
                 private val defaults: MutableMap<Path, PayloadRepresentation<Any?>> = LinkedHashMap(expectedSize * 2)
                 private val overrides: MutableMap<ID, MutableList<Pair<Path, PayloadRepresentation<Any?>>>> =
@@ -97,14 +84,8 @@ interface OutboundEnvelope<ID : Any> {
                     }
                 }
 
-                override fun prepareMessageFor(
-                    receiverId: ID,
-                    factory: MessageFactory<ID, *>,
-                ): Message<ID, Any?> =
-                    factory(
-                        senderId,
-                        overrides[receiverId]?.toMap() ?: defaults,
-                    )
+                override fun prepareMessageFor(receiverId: ID, factory: MessageFactory<ID, *>): Message<ID, Any?> =
+                    factory(senderId, overrides[receiverId]?.toMap() ?: defaults)
 
                 override fun isEmpty(): Boolean = defaults.isEmpty()
 

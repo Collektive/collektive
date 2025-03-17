@@ -102,12 +102,11 @@ class BranchAlignmentTest {
         }
     }
 
-    fun manuallyAlignedExchangeWithThreeDevices(pivot: (Int) -> Any?) =
-        exchangeWithThreeDevices { field ->
-            alignedOn(pivot(localId)) {
-                neighboringViaExchange(1) + field
-            }
+    fun manuallyAlignedExchangeWithThreeDevices(pivot: (Int) -> Any?) = exchangeWithThreeDevices { field ->
+        alignedOn(pivot(localId)) {
+            neighboringViaExchange(1) + field
         }
+    }
 
     @Test
     fun `A field should be projected whenever there is an alignment operation not just on branches issue 171`() {

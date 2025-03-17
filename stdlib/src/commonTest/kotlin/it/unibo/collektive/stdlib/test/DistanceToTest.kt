@@ -19,10 +19,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class DistanceToTest {
-    private fun Environment<Double>.gradientIsStable(
-        isMoore: Boolean,
-        size: Int,
-    ): Boolean =
+    private fun Environment<Double>.gradientIsStable(isMoore: Boolean, size: Int): Boolean =
         status().all { (id, value) ->
             val x = id % size
             val y = id / size
