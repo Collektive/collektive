@@ -54,12 +54,11 @@ class Node<R>(
 
         private var messageBuffer: Map<Int, Message<Int, *>> = emptyMap()
 
-        override fun deliverableFor(outboundMessage: OutboundEnvelope<Int>) =
-            environment
-                .neighborsOf(this@Node)
-                .forEach { neighbor ->
-                    neighbor.network.messageBuffer += id to outboundMessage.prepareMessageFor(id)
-                }
+        override fun deliverableFor(outboundMessage: OutboundEnvelope<Int>) = environment
+            .neighborsOf(this@Node)
+            .forEach { neighbor ->
+                neighbor.network.messageBuffer += id to outboundMessage.prepareMessageFor(id)
+            }
 
         override fun deliverableReceived(message: Message<Int, *>) {
             error(

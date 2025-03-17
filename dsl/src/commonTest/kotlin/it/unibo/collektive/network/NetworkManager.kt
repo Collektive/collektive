@@ -38,7 +38,7 @@ class NetworkManager {
      * Return the messages directed to a specific [receiverId].
      */
     fun receiveMessageFor(receiverId: Int): NeighborsData<Int> = object : NeighborsData<Int> {
-        private val neighborDeliverableMessages by lazy { messageBuffer.filter { it.key != receiverId } }
+        private val neighborDeliverableMessages by lazy { messageBuffer[receiverId] ?: emptyMap() }
         override val neighbors: Set<Int> get() = neighborDeliverableMessages.keys
 
         @Suppress("UNCHECKED_CAST")
