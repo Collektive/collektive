@@ -53,11 +53,7 @@ import kotlin.reflect.full.starProjectedType
  * Collektive incarnation in Alchemist.
  */
 class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
-    override fun getProperty(
-        node: Node<Any?>,
-        molecule: Molecule,
-        property: String?,
-    ): Double {
+    override fun getProperty(node: Node<Any?>, molecule: Molecule, property: String?): Double {
         val interpreted =
             when (property.isNullOrBlank()) {
                 true -> node.getConcentration(molecule)
@@ -153,14 +149,13 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         time: TimeDistribution<Any?>,
         actionable: Actionable<Any?>,
         additionalParameters: Any?,
-    ): Condition<Any?> =
-        object : AbstractCondition<Any>(requireNotNull(node)) {
-            override fun getContext() = Context.LOCAL
+    ): Condition<Any?> = object : AbstractCondition<Any>(requireNotNull(node)) {
+        override fun getContext() = Context.LOCAL
 
-            override fun getPropensityContribution(): Double = 1.0
+        override fun getPropensityContribution(): Double = 1.0
 
-            override fun isValid(): Boolean = true
-        }
+        override fun isValid(): Boolean = true
+    }
 
     override fun createReaction(
         randomGenerator: RandomGenerator,
@@ -168,13 +163,12 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         node: Node<Any?>,
         timeDistribution: TimeDistribution<Any?>,
         parameter: Any?,
-    ): Reaction<Any?> =
-        Event(node, timeDistribution).also {
-            it.actions =
-                ListSet.of(
-                    createAction(randomGenerator, environment, node, timeDistribution, it, parameter),
-                )
-        }
+    ): Reaction<Any?> = Event(node, timeDistribution).also {
+        it.actions =
+            ListSet.of(
+                createAction(randomGenerator, environment, node, timeDistribution, it, parameter),
+            )
+    }
 
     override fun createTimeDistribution(
         randomGenerator: RandomGenerator,
@@ -196,35 +190,31 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         randomGenerator: RandomGenerator,
         environment: Environment<Any?, P>,
         parameter: Any?,
-    ): Node<Any?> =
-        GenericNode(environment).also { genericNode ->
-            genericNode.addProperty(
-                CollektiveDevice(
-                    environment,
-                    genericNode,
-                    when (parameter) {
-                        null -> null
-                        is Number -> DoubleTime(parameter.toDouble())
-                        is String -> DoubleTime(parameter.toDouble())
-                        else -> error("Invalid message retention time: $parameter")
-                    },
-                ),
-            )
-        }
+    ): Node<Any?> = GenericNode(environment).also { genericNode ->
+        genericNode.addProperty(
+            CollektiveDevice(
+                environment,
+                genericNode,
+                when (parameter) {
+                    null -> null
+                    is Number -> DoubleTime(parameter.toDouble())
+                    is String -> DoubleTime(parameter.toDouble())
+                    else -> error("Invalid message retention time: $parameter")
+                },
+            ),
+        )
+    }
 
     private companion object {
         private object ScriptEngine {
-            operator fun getValue(
-                thisRef: Any?,
-                property: KProperty<*>,
-            ) = ScriptEngineManager().getEngineByName(property.name)
-                ?: error("No script engine with ${property.name} found.")
+            operator fun getValue(thisRef: Any?, property: KProperty<*>) =
+                ScriptEngineManager().getEngineByName(property.name)
+                    ?: error("No script engine with ${property.name} found.")
         }
 
-        private fun String.md5(): String =
-            MessageDigest.getInstance("MD5").digest(toByteArray()).joinToString("") {
-                "%02x".format(it)
-            }
+        private fun String.md5(): String = MessageDigest.getInstance("MD5").digest(toByteArray()).joinToString("") {
+            "%02x".format(it)
+        }
 
         private val findPackage = Regex("""package\s+((\w+\.)*\w+)(\s|;|/|$)""", RegexOption.MULTILINE)
         private val validName = Regex("^[a-zA-Z_][a-zA-Z0-9_]*$", RegexOption.MULTILINE)
@@ -252,10 +242,8 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
                 URLClassLoader(arrayOf(outputFolder.toURI().toURL()), Thread.currentThread().contextClassLoader)
             }
 
-        private fun classFqNameFrom(
-            packageName: String?,
-            className: String,
-        ) = "${packageName?.takeUnless { it.isEmpty() }?.let { "$it." }.orEmpty()}$className"
+        private fun classFqNameFrom(packageName: String?, className: String) =
+            "${packageName?.takeUnless { it.isEmpty() }?.let { "$it." }.orEmpty()}$className"
 
         private fun compileCollektive(
             name: String,
@@ -305,20 +293,19 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         /**
          * Convert the source set to a list of files.
          */
-        private fun Any?.toFiles(): List<File> =
-            when (this) {
-                null -> emptyList()
-                is File -> listOf(this)
-                is CharSequence -> {
-                    val file = File(toString())
-                    check(file.exists()) {
-                        "Collektive source root ${file.absolutePath} does not exist"
-                    }
-                    listOf(file)
+        private fun Any?.toFiles(): List<File> = when (this) {
+            null -> emptyList()
+            is File -> listOf(this)
+            is CharSequence -> {
+                val file = File(toString())
+                check(file.exists()) {
+                    "Collektive source root ${file.absolutePath} does not exist"
                 }
-
-                is Iterable<*> -> flatMap { files -> files.toFiles() }
-                else -> error("Invalid source set of type ${this::class.simpleName ?: "anonymous"}: $this")
+                listOf(file)
             }
+
+            is Iterable<*> -> flatMap { files -> files.toFiles() }
+            else -> error("Invalid source set of type ${this::class.simpleName ?: "anonymous"}: $this")
+        }
     }
 }

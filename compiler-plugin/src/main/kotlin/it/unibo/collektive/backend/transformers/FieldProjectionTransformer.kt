@@ -27,17 +27,16 @@ internal class FieldProjectionTransformer(
         fieldExpression: IrExpression,
         projectFunction: IrFunction,
         dispatchReceiver: IrExpression,
-    ): IrExpression =
-        irStatement(pluginContext, projectFunction, fieldExpression) {
-            irCall(projectFunction).apply {
-                // Set the return type
-                type = fieldExpression.type
-                // Set generics type of the `alignOn` function
-                putTypeArgument(0, type)
-                // Set extension receiver
-                extensionReceiver = dispatchReceiver
-                // Set function argument
-                putValueArgument(0, fieldExpression)
-            }
+    ): IrExpression = irStatement(pluginContext, projectFunction, fieldExpression) {
+        irCall(projectFunction).apply {
+            // Set the return type
+            type = fieldExpression.type
+            // Set generics type of the `alignOn` function
+            putTypeArgument(0, type)
+            // Set extension receiver
+            extensionReceiver = dispatchReceiver
+            // Set function argument
+            putValueArgument(0, fieldExpression)
         }
+    }
 }

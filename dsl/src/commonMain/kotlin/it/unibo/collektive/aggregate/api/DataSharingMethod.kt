@@ -27,6 +27,4 @@ object InMemory : DataSharingMethod<Any?>
  * The data is serialized and deserialized using the provided [serializer].
  */
 @JvmInline
-value class Serialize<DataType>(
-    val serializer: KSerializer<DataType>,
-) : DataSharingMethod<DataType>
+value class Serialize<DataType>(val serializer: KSerializer<DataType>) : DataSharingMethod<DataType>

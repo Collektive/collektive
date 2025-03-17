@@ -27,17 +27,16 @@ private fun IrBlock.findAggregateReference(aggregateContextClass: IrClass): IrEx
     }
 
 @OptIn(UnsafeDuringIrConstructionAPI::class)
-internal fun IrExpression.findAggregateReference(aggregateContextClass: IrClass): IrExpression? =
-    when (this) {
-        is IrBlock -> findAggregateReference(aggregateContextClass)
+internal fun IrExpression.findAggregateReference(aggregateContextClass: IrClass): IrExpression? = when (this) {
+    is IrBlock -> findAggregateReference(aggregateContextClass)
 
-        is IrGetValue ->
-            collectAggregateReference(aggregateContextClass, this)
-                ?: collectAggregateReference(aggregateContextClass, symbol.owner)
+    is IrGetValue ->
+        collectAggregateReference(aggregateContextClass, this)
+            ?: collectAggregateReference(aggregateContextClass, symbol.owner)
 
-        is IrCall ->
-            collectAggregateReference(aggregateContextClass, this)
-                ?: collectAggregateReference(aggregateContextClass, symbol.owner)
+    is IrCall ->
+        collectAggregateReference(aggregateContextClass, this)
+            ?: collectAggregateReference(aggregateContextClass, symbol.owner)
 
-        else -> collectAggregateReference(aggregateContextClass, this)
-    }
+    else -> collectAggregateReference(aggregateContextClass, this)
+}

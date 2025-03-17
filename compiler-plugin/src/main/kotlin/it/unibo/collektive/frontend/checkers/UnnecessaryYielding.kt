@@ -55,16 +55,11 @@ object UnnecessaryYielding : FirFunctionCallChecker(MppCheckerKind.Common) {
             SHARING_FUNCTION_FQ_NAME,
         )
 
-    private fun FirFunctionCall.usesAnUnnecessaryYieldingContext(): Boolean =
-        with(YieldingUnnecessaryUsageVisitor()) {
-            containsUnnecessaryYielding()
-        }
+    private fun FirFunctionCall.usesAnUnnecessaryYieldingContext(): Boolean = with(YieldingUnnecessaryUsageVisitor()) {
+        containsUnnecessaryYielding()
+    }
 
-    override fun check(
-        expression: FirFunctionCall,
-        context: CheckerContext,
-        reporter: DiagnosticReporter,
-    ) {
+    override fun check(expression: FirFunctionCall, context: CheckerContext, reporter: DiagnosticReporter) {
         if (expression.fqName() in constructs && expression.usesAnUnnecessaryYieldingContext()) {
             reporter.reportOn(
                 expression.calleeReference.source,

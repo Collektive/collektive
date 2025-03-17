@@ -17,10 +17,7 @@ interface EnvironmentVariables {
     /**
      * Get the value of the variable with the given [name], or [default] if the variable is not defined.
      */
-    fun <T> getOrDefault(
-        name: String,
-        default: T,
-    ): T
+    fun <T> getOrDefault(name: String, default: T): T
 
     /**
      * Check if the variable with the given [name] is defined inside the environment.
@@ -30,8 +27,5 @@ interface EnvironmentVariables {
     /**
      * Set the value of the variable with the given [name] to [value].
      */
-    operator fun <T> set(
-        name: String,
-        value: T,
-    ): T
+    operator fun <T> set(name: String, value: T): T
 }

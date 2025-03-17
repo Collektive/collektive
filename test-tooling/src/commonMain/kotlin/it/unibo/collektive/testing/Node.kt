@@ -54,12 +54,11 @@ class Node<R>(
 
         private var messageBuffer: Map<Int, Message<Int, *>> = emptyMap()
 
-        override fun deliverableFor(outboundMessage: OutboundEnvelope<Int>) =
-            environment
-                .neighborsOf(this@Node)
-                .forEach { neighbor ->
-                    neighbor.network.messageBuffer += id to outboundMessage.prepareMessageFor(id)
-                }
+        override fun deliverableFor(outboundMessage: OutboundEnvelope<Int>) = environment
+            .neighborsOf(this@Node)
+            .forEach { neighbor ->
+                neighbor.network.messageBuffer += id to outboundMessage.prepareMessageFor(id)
+            }
 
         override fun deliverableReceived(message: Message<Int, *>) {
             error(
@@ -68,21 +67,17 @@ class Node<R>(
             )
         }
 
-        override fun currentInbound(): NeighborsData<Int> =
-            object : NeighborsData<Int> {
-                private val neighborDeliverableMessages by lazy { messageBuffer.filter { it.key != id } }
-                override val neighbors: Set<Int> get() = neighborDeliverableMessages.keys
+        override fun currentInbound(): NeighborsData<Int> = object : NeighborsData<Int> {
+            private val neighborDeliverableMessages by lazy { messageBuffer.filter { it.key != id } }
+            override val neighbors: Set<Int> get() = neighborDeliverableMessages.keys
 
-                @Suppress("UNCHECKED_CAST")
-                override fun <Value> dataAt(
-                    path: Path,
-                    dataSharingMethod: DataSharingMethod<Value>,
-                ): Map<Int, Value> =
-                    neighborDeliverableMessages
-                        .mapValues { it.value.sharedData.getOrElse(path) { NoValue } as Value }
-                        .filter { it.value != NoValue }
-                        .also { messageBuffer = emptyMap() }
-            }
+            @Suppress("UNCHECKED_CAST")
+            override fun <Value> dataAt(path: Path, dataSharingMethod: DataSharingMethod<Value>): Map<Int, Value> =
+                neighborDeliverableMessages
+                    .mapValues { it.value.sharedData.getOrElse(path) { NoValue } as Value }
+                    .filter { it.value != NoValue }
+                    .also { messageBuffer = emptyMap() }
+        }
     }
 
     private object NoValue

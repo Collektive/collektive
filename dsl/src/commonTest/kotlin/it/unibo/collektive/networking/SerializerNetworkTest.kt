@@ -62,42 +62,38 @@ class SerializerNetworkTest(private val deviceId: Int, private val serializer: S
     }
 
     @OptIn(InternalSerializationApi::class)
-    override fun currentInbound(): NeighborsData<Int> =
-        object : NeighborsData<Int> {
-            override val neighbors: Set<Int> get() = messages.keys
+    override fun currentInbound(): NeighborsData<Int> = object : NeighborsData<Int> {
+        override val neighbors: Set<Int> get() = messages.keys
 
-            override fun <Value> dataAt(
-                path: Path,
-                dataSharingMethod: DataSharingMethod<Value>,
-            ): Map<Int, Value> {
-                require(dataSharingMethod is Serialize<Value>) {
-                    "Serialization has been required for in-memory messages. This is likely a misconfiguration."
-                }
-                return messages
-                    .mapValues { (_, message) ->
-                        require(message.sharedData.all { it.value is ByteArray }) {
-                            "Message ${message.senderId} is not serialized"
-                        }
-                        message.sharedData.getOrElse(path) { NoValue }
-                    }.filterValues { it != NoValue }
-                    .mapValues { (_, payload) ->
-                        val byteArrayPayload = payload as ByteArray
-                        when (serializer) {
-                            is StringFormat ->
-                                serializer.decodeFromString(
-                                    dataSharingMethod.serializer,
-                                    byteArrayPayload.decodeToString(),
-                                )
-                            is BinaryFormat ->
-                                serializer.decodeFromByteArray(
-                                    dataSharingMethod.serializer,
-                                    byteArrayPayload,
-                                )
-                            else -> error("Unsupported serializer")
-                        }
-                    }
+        override fun <Value> dataAt(path: Path, dataSharingMethod: DataSharingMethod<Value>): Map<Int, Value> {
+            require(dataSharingMethod is Serialize<Value>) {
+                "Serialization has been required for in-memory messages. This is likely a misconfiguration."
             }
+            return messages
+                .mapValues { (_, message) ->
+                    require(message.sharedData.all { it.value is ByteArray }) {
+                        "Message ${message.senderId} is not serialized"
+                    }
+                    message.sharedData.getOrElse(path) { NoValue }
+                }.filterValues { it != NoValue }
+                .mapValues { (_, payload) ->
+                    val byteArrayPayload = payload as ByteArray
+                    when (serializer) {
+                        is StringFormat ->
+                            serializer.decodeFromString(
+                                dataSharingMethod.serializer,
+                                byteArrayPayload.decodeToString(),
+                            )
+                        is BinaryFormat ->
+                            serializer.decodeFromByteArray(
+                                dataSharingMethod.serializer,
+                                byteArrayPayload,
+                            )
+                        else -> error("Unsupported serializer")
+                    }
+                }
         }
+    }
 
     private object NoValue
 }

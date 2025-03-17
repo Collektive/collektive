@@ -15,13 +15,12 @@ import kotlin.test.assertEquals
 class NestedCallsTest {
     fun Aggregate<Int>.foo(id: Int) = neighboringViaExchange(id.toDouble())
 
-    fun Aggregate<Int>.bar(): Double =
-        share(Double.POSITIVE_INFINITY) { dist ->
-            when (localId) {
-                0 -> 0.0
-                else -> (foo(localId) + dist).min(Double.POSITIVE_INFINITY)
-            }
+    fun Aggregate<Int>.bar(): Double = share(Double.POSITIVE_INFINITY) { dist ->
+        when (localId) {
+            0 -> 0.0
+            else -> (foo(localId) + dist).min(Double.POSITIVE_INFINITY)
         }
+    }
 
     @Test
     fun `regression test for the issue 207`() {

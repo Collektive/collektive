@@ -28,9 +28,7 @@ import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
 /**
  * Visitor that checks if an `evolve` or `evolving` construct can be replaced with a `share` construct.
  */
-class ImproperConstructVisitor(
-    private val constructNameFQName: String,
-) : FirVisitorVoid() {
+class ImproperConstructVisitor(private val constructNameFQName: String) : FirVisitorVoid() {
     private var nestingLevel = 0
     private var isReplaceable = false
     private var markExpression = false

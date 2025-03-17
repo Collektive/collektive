@@ -18,19 +18,13 @@ private class AggregateRefChildrenVisitor(
     private val elements: MutableList<IrExpression>,
 ) : IrVisitor<Unit, Nothing?>() {
     // Visit all the children of the root element
-    override fun visitElement(
-        element: IrElement,
-        data: Nothing?,
-    ) {
+    override fun visitElement(element: IrElement, data: Nothing?) {
         element.acceptChildren(this, data)
     }
 
     // Search in each call if in its receiver or arguments there is the reference to
     // the aggregate context
-    override fun visitCall(
-        expression: IrCall,
-        data: Nothing?,
-    ) {
+    override fun visitCall(expression: IrCall, data: Nothing?) {
         val aggregateContextRef =
             expression
                 .receiverAndArgs()
@@ -42,9 +36,6 @@ private class AggregateRefChildrenVisitor(
 /**
  * Retrieve the aggregate context reference by looking in all the function call in the element found.
  */
-fun collectAggregateReference(
-    aggregateContextClass: IrClass,
-    element: IrElement,
-): IrExpression? =
+fun collectAggregateReference(aggregateContextClass: IrClass, element: IrElement): IrExpression? =
     buildList { element.accept(AggregateRefChildrenVisitor(aggregateContextClass, this), null) }
         .firstOrNull()
