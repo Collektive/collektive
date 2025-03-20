@@ -3,7 +3,7 @@ alchemist = "42.0.1"
 build-config = "5.5.4"
 dokka = "2.0.0"
 kotest = "6.0.0.M2"
-kotlin = "2.1.10"
+kotlin = "2.1.20"
 serialization = "1.8.0"
 
 [libraries]
