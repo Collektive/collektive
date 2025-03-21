@@ -1,3 +1,21 @@
+## [17.0.2](https://github.com/Collektive/collektive/compare/17.0.1...17.0.2) (2025-03-21)
+
+### Performance improvements
+
+* use full path factory in simulation instead crypto paths ([2505a5c](https://github.com/Collektive/collektive/commit/2505a5c85f6e56a0a440f01e6a429aca58adb344))
+
+### Build and continuous integration
+
+* **deps:** update actions/download-artifact action to v4.2.1 ([c5844df](https://github.com/Collektive/collektive/commit/c5844df23eb52cb0ca0ff9bb2fc1a048874e6fb0))
+* **deps:** update actions/setup-node action to v4.3.0 ([56f35f5](https://github.com/Collektive/collektive/commit/56f35f58a6d3b878069644646bc87572536dcf4b))
+* **deps:** update actions/upload-artifact action to v4.6.2 ([101bc59](https://github.com/Collektive/collektive/commit/101bc59b6267ad30126c5de1798efb0b36d742d1))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.13 ([eb8af7a](https://github.com/Collektive/collektive/commit/eb8af7adb64cd02125d23240e8a4e3aff9e33322))
+* **deps:** update github/codeql-action action to v3.28.12 ([cc81ae1](https://github.com/Collektive/collektive/commit/cc81ae1026cb03fc5f7a28fc0dcbd0d80c8bbf6f))
+
+### Style improvements
+
+* format files according to intellij_idea style ([#805](https://github.com/Collektive/collektive/issues/805)) ([69a9941](https://github.com/Collektive/collektive/commit/69a9941f39d255f0e03f89dd098cd84cde93438d))
+
 ## [17.0.1](https://github.com/Collektive/collektive/compare/17.0.0...17.0.1) (2025-03-17)
 
 ### Bug Fixes
