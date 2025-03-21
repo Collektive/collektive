@@ -14,11 +14,7 @@ import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
  * Checker that looks for usages of "align" and "dealign" methods inside Aggregate functions, generating a warning.
  */
 object ExplicitAlignDealign : FirFunctionCallChecker(MppCheckerKind.Common) {
-    override fun check(
-        expression: FirFunctionCall,
-        context: CheckerContext,
-        reporter: DiagnosticReporter,
-    ) {
+    override fun check(expression: FirFunctionCall, context: CheckerContext, reporter: DiagnosticReporter) {
         val fqnCalleeName = expression.fqName()
         if (fqnCalleeName in FORBIDDEN_FUNCTIONS && context.isInsideAggregateFunction()) {
             reporter.reportOn(

@@ -13,10 +13,7 @@ import it.unibo.collektive.field.Field
 /**
  * Coerce this value to be in the range between [min] and [max].
  */
-fun <T : Comparable<T>> T.coerceIn(
-    min: T,
-    max: T,
-): T = minOf(max, maxOf(this, min))
+fun <T : Comparable<T>> T.coerceIn(min: T, max: T): T = minOf(max, maxOf(this, min))
 
 /**
  * Coerce this value in a [range].
@@ -26,10 +23,7 @@ fun <T : Comparable<T>> T.coerceIn(range: ClosedRange<T>): T = minOf(range.endIn
 /**
  * Coerce all field values to be in the range between [min] and [max].
  */
-fun <ID : Any, T : Comparable<T>> Field<ID, T>.coerceIn(
-    min: T,
-    max: T,
-): Field<ID, T> = map { it.coerceIn(min, max) }
+fun <ID : Any, T : Comparable<T>> Field<ID, T>.coerceIn(min: T, max: T): Field<ID, T> = map { it.coerceIn(min, max) }
 
 /**
  * Coerces all field values in a [range].

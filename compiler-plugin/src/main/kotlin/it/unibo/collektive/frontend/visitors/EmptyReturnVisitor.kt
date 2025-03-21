@@ -22,24 +22,15 @@ import org.jetbrains.kotlin.fir.visitors.FirVisitor
 class EmptyReturnVisitor : FirVisitor<Unit, Boolean>() {
     private var hasReturn = true
 
-    override fun visitElement(
-        element: FirElement,
-        data: Boolean,
-    ) {
+    override fun visitElement(element: FirElement, data: Boolean) {
         element.acceptChildren(this, data)
     }
 
-    override fun visitReturnExpression(
-        returnExpression: FirReturnExpression,
-        inReturn: Boolean,
-    ) {
+    override fun visitReturnExpression(returnExpression: FirReturnExpression, inReturn: Boolean) {
         super.visitReturnExpression(returnExpression, true)
     }
 
-    override fun visitExpression(
-        expression: FirExpression,
-        inReturn: Boolean,
-    ) {
+    override fun visitExpression(expression: FirExpression, inReturn: Boolean) {
         if (inReturn && expression is FirUnitExpression) {
             hasReturn = false
         } else {

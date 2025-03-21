@@ -8,6 +8,26 @@ import kotlin.test.assertTrue
 class FieldsTest {
     private val emptyField = Field(0, 10)
     private val fullField = Field(0, 1, mapOf(1 to 1, 2 to 2, 3 to 3))
+    private val charField = Field(0, 'a', mapOf(1 to 'b', 2 to 'c', 3 to 'd'))
+
+    @Test
+    fun `empty fields contain self`() {
+        assertTrue(10 in emptyField)
+        assertFalse(0 in emptyField)
+        assertTrue(emptyField.containsId(0))
+    }
+
+    @Test
+    fun `operator in for fields looks values`() {
+        assertFalse(charField.localId in charField)
+        assertTrue { charField.containsId(charField.localId) }
+        assertTrue(charField.localValue in charField)
+        for (neighbor in charField.neighbors) {
+            assertFalse(neighbor in charField)
+            assertTrue(charField.containsId(neighbor))
+            assertTrue(charField.toMap()[neighbor] in charField)
+        }
+    }
 
     @Test
     fun `The all operator on an empty field must return true`() {

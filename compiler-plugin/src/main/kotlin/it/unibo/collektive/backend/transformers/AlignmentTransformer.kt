@@ -55,10 +55,7 @@ class AlignmentTransformer(
     private var alignedFunctions = emptyMap<String, Int>()
 
     @OptIn(UnsafeDuringIrConstructionAPI::class)
-    override fun visitCall(
-        expression: IrCall,
-        data: StackFunctionCall,
-    ): IrElement {
+    override fun visitCall(expression: IrCall, data: StackFunctionCall): IrElement {
         val contextReference =
             expression
                 .receiverAndArgs()
@@ -95,18 +92,12 @@ class AlignmentTransformer(
         } ?: super.visitCall(expression, data)
     }
 
-    override fun visitBranch(
-        branch: IrBranch,
-        data: StackFunctionCall,
-    ): IrBranch {
+    override fun visitBranch(branch: IrBranch, data: StackFunctionCall): IrBranch {
         branch.generateBranchAlignmentCode(true)
         return super.visitBranch(branch, data)
     }
 
-    override fun visitElseBranch(
-        branch: IrElseBranch,
-        data: StackFunctionCall,
-    ): IrElseBranch {
+    override fun visitElseBranch(branch: IrElseBranch, data: StackFunctionCall): IrElseBranch {
         branch.generateBranchAlignmentCode(false)
         return super.visitElseBranch(branch, data)
     }
@@ -122,33 +113,32 @@ class AlignmentTransformer(
         function: IrFunction,
         expressionBody: IrExpression,
         alignmentToken: IrBlockBodyBuilder.() -> IrConst,
-    ): IrContainerExpression =
-        irStatement(pluginContext, function, expressionBody) {
-            // Call the `alignRaw` function before the body of the function to align
-            irBlock {
-                // Call the alignRaw function
-                +irCall(alignRawFunction).apply {
-                    putArgument(
-                        alignRawFunction.dispatchReceiverParameter
-                            ?: error("The alignRaw function has no dispatch receiver parameter"),
-                        context,
-                    )
-                    putValueArgument(0, alignmentToken(this@irStatement))
-                }
-                val code = irBlock { +expressionBody }
-                // Call the body of the function to align
-                val variableName = "blockResult"
-                val variableType = expressionBody.type
-                val tmpVar = createTmpVariable(code, irType = variableType, nameHint = variableName)
-                // Call the `dealign` function after the body of the function to align
-                +irCall(dealignFunction).apply {
-                    putArgument(
-                        dealignFunction.dispatchReceiverParameter
-                            ?: error("The dealign function has no dispatch receiver parameter"),
-                        context,
-                    )
-                }
-                +irGet(tmpVar)
+    ): IrContainerExpression = irStatement(pluginContext, function, expressionBody) {
+        // Call the `alignRaw` function before the body of the function to align
+        irBlock {
+            // Call the alignRaw function
+            +irCall(alignRawFunction).apply {
+                putArgument(
+                    alignRawFunction.dispatchReceiverParameter
+                        ?: error("The alignRaw function has no dispatch receiver parameter"),
+                    context,
+                )
+                putValueArgument(0, alignmentToken(this@irStatement))
             }
+            val code = irBlock { +expressionBody }
+            // Call the body of the function to align
+            val variableName = "blockResult"
+            val variableType = expressionBody.type
+            val tmpVar = createTmpVariable(code, irType = variableType, nameHint = variableName)
+            // Call the `dealign` function after the body of the function to align
+            +irCall(dealignFunction).apply {
+                putArgument(
+                    dealignFunction.dispatchReceiverParameter
+                        ?: error("The dealign function has no dispatch receiver parameter"),
+                    context,
+                )
+            }
+            +irGet(tmpVar)
         }
+    }
 }

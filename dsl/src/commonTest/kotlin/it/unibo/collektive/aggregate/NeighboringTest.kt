@@ -14,12 +14,10 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class NeighboringTest {
-    private fun mooreGrid(
-        size: Int,
-        program: Aggregate<Int>.(Environment<Field<Int, Int>>, Int) -> Field<Int, Int>,
-    ) = mooreGrid(size, size, { _, _ -> Field(Int.MAX_VALUE, 0) }, program).also {
-        assertEquals(size * size, it.nodes.size)
-    }
+    private fun mooreGrid(size: Int, program: Aggregate<Int>.(Environment<Field<Int, Int>>, Int) -> Field<Int, Int>) =
+        mooreGrid(size, size, { _, _ -> Field(Int.MAX_VALUE, 0) }, program).also {
+            assertEquals(size * size, it.nodes.size)
+        }
 
     @Test
     fun `neighboring must produce a field with the local value when no neighbours are present`() {

@@ -32,7 +32,7 @@ internal class AggregateContext<ID : Any>(
 ) : Aggregate<ID> {
     private val stack = Stack(pathFactory)
     private var state: MutableMap<Path, Any?> = mutableMapOf()
-    private val toBeSent: OutboundEnvelope<ID> = OutboundEnvelope(inboundMessage.neighbors.size)
+    private val toBeSent: OutboundEnvelope<ID> = OutboundEnvelope(localId, inboundMessage.neighbors.size)
 
     /**
      * Messages to send to the other nodes.
@@ -44,10 +44,7 @@ internal class AggregateContext<ID : Any>(
      */
     fun newState(): State = state
 
-    private fun <T> newField(
-        localValue: T,
-        others: Map<ID, T>,
-    ): Field<ID, T> = Field(localId, localValue, others)
+    private fun <T> newField(localValue: T, others: Map<ID, T>): Field<ID, T> = Field(localId, localValue, others)
 
     @DelicateCollektiveApi
     override fun <Initial> exchange(
@@ -82,10 +79,7 @@ internal class AggregateContext<ID : Any>(
             }.toReturn
     }
 
-    override fun <Initial, Return> evolving(
-        initial: Initial,
-        transform: YieldingScope<Initial, Return>,
-    ): Return {
+    override fun <Initial, Return> evolving(initial: Initial, transform: YieldingScope<Initial, Return>): Return {
         val path = stack.currentPath()
         return transform(YieldingContext(), stateAt(path, initial))
             .also {
@@ -97,29 +91,19 @@ internal class AggregateContext<ID : Any>(
     }
 
     @DelicateCollektiveApi
-    override fun <Scalar> neighboring(
-        local: Scalar,
-        dataSharingMethod: DataSharingMethod<Scalar>,
-    ): Field<ID, Scalar> {
+    override fun <Scalar> neighboring(local: Scalar, dataSharingMethod: DataSharingMethod<Scalar>): Field<ID, Scalar> {
         val path = stack.currentPath()
         val neighborValues = inboundMessage.dataAt<Scalar>(path, dataSharingMethod)
         toBeSent.addData(path, SharedData(local), dataSharingMethod)
         return newField(local, neighborValues)
     }
 
-    override fun <Initial> evolve(
-        initial: Initial,
-        transform: (Initial) -> Initial,
-    ): Initial =
-        evolving(initial) {
-            val res = transform(it)
-            YieldingResult(res, res)
-        }
+    override fun <Initial> evolve(initial: Initial, transform: (Initial) -> Initial): Initial = evolving(initial) {
+        val res = transform(it)
+        YieldingResult(res, res)
+    }
 
-    override fun <R> alignedOn(
-        pivot: Any?,
-        body: () -> R,
-    ): R {
+    override fun <R> alignedOn(pivot: Any?, body: () -> R): R {
         stack.alignRaw(pivot)
         return body().also {
             stack.dealign()
@@ -130,10 +114,7 @@ internal class AggregateContext<ID : Any>(
 
     override fun dealign() = stack.dealign()
 
-    private fun <T> stateAt(
-        path: Path,
-        default: T,
-    ): T = previousState.getTyped(path, default)
+    private fun <T> stateAt(path: Path, default: T): T = previousState.getTyped(path, default)
 }
 
 /**

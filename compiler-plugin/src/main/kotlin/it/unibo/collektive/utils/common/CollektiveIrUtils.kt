@@ -15,17 +15,13 @@ import org.jetbrains.kotlin.ir.types.classifierOrNull
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.ir.util.receiverAndArgs
 
-internal fun IrType.isAssignableFrom(other: IrType): Boolean =
-    classifierOrNull?.let { base ->
-        other.classifierOrNull?.let { other ->
-            FqNameEqualityChecker.areEqual(base, other)
-        } ?: false
+internal fun IrType.isAssignableFrom(other: IrType): Boolean = classifierOrNull?.let { base ->
+    other.classifierOrNull?.let { other ->
+        FqNameEqualityChecker.areEqual(base, other)
     } ?: false
+} ?: false
 
-internal fun List<IrType?>.stringified(
-    prefix: String = "(",
-    postfix: String = ")",
-): String =
+internal fun List<IrType?>.stringified(prefix: String = "(", postfix: String = ")"): String =
     joinToString(",", prefix = prefix, postfix = postfix) {
         it?.classFqName?.asString() ?: "?"
     }
@@ -49,10 +45,9 @@ internal fun <T : IrElement> irStatement(
     functionToAlign: IrFunction,
     expression: IrElement,
     body: IrBlockBodyBuilder.() -> T,
-): T =
-    IrBlockBodyBuilder(
-        pluginContext,
-        Scope(functionToAlign.symbol),
-        expression.startOffset,
-        expression.endOffset,
-    ).body()
+): T = IrBlockBodyBuilder(
+    pluginContext,
+    Scope(functionToAlign.symbol),
+    expression.startOffset,
+    expression.endOffset,
+).body()

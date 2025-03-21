@@ -4,7 +4,29 @@ package it.unibo.collektive.field.operations
 
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.Field.Companion.fold
+import it.unibo.collektive.field.Field.Companion.foldWithId
 import kotlin.jvm.JvmOverloads
+
+/**
+ * Check if the field contains the [value], **including the local value**.
+ * If you need to exclude the local value, use instead:
+ *
+ * ```kotlin
+ * value in field.withoutSelf().values
+ * ```
+ */
+operator fun <ID : Any, T> Field<ID, T>.contains(value: T): Boolean = anyWithSelf { it == value }
+
+/**
+ * Check if the field contains the [id], **including the local id**.
+ * If you need to exclude the local value, use instead:
+ *
+ * ```kotlin
+ * id in field.withoutSelf().keys
+ * ```
+ */
+fun <ID : Any, T> Field<ID, T>.containsId(id: ID): Boolean =
+    foldWithId(localId == id) { current, id, _ -> current || id == id }
 
 /**
  * Count the number of elements in the field that satisfy the [predicate],
@@ -48,43 +70,34 @@ inline fun <ID : Any, T> Field<ID, T>.any(crossinline predicate: (T) -> Boolean)
  * including the local value.
  */
 inline fun <ID : Any, T> Field<ID, T>.anyWithSelf(crossinline predicate: (T) -> Boolean): Boolean =
-    any(predicate) || predicate(localValue)
+    predicate(localValue) || any(predicate)
 
 /**
  * Returns the element yielding the largest value of the given [comparator].
  * In case multiple elements are maximal, there is no guarantee which one will be returned.
  */
-fun <ID : Any, T> Field<ID, T>.maxWith(
-    base: T,
-    comparator: Comparator<T>,
-): T = minWith(base, comparator.reversed())
+fun <ID : Any, T> Field<ID, T>.maxWith(base: T, comparator: Comparator<T>): T = minWith(base, comparator.reversed())
 
 /**
  * Returns the element yielding the largest value of the given [selector].
  * In case multiple elements are maximal, there is no guarantee which one will be returned.
  */
-inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.maxBy(
-    base: T,
-    crossinline selector: (T) -> R,
-): T = maxWith(base, compareBy(selector))
+inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.maxBy(base: T, crossinline selector: (T) -> R): T =
+    maxWith(base, compareBy(selector))
 
 /**
  * Returns the element yielding the smallest value of the given [comparator].
  * In case multiple elements are minimal, there is no guarantee which one will be returned.
  */
-fun <ID : Any, T> Field<ID, T>.minWith(
-    base: T,
-    comparator: Comparator<T>,
-): T = fold(base) { acc, value -> if (comparator.compare(acc, value) < 0) acc else value }
+fun <ID : Any, T> Field<ID, T>.minWith(base: T, comparator: Comparator<T>): T =
+    fold(base) { acc, value -> if (comparator.compare(acc, value) < 0) acc else value }
 
 /**
  * Returns the element yielding the smallest value of the given [selector].
  * In case multiple elements are minimal, there is no guarantee which one will be returned.
  */
-inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.minBy(
-    base: T,
-    crossinline selector: (T) -> R,
-): T = minWith(base, compareBy(selector))
+inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.minBy(base: T, crossinline selector: (T) -> R): T =
+    minWith(base, compareBy(selector))
 
 /**
  * Check if none of the elements in the field satisfy the [predicate],

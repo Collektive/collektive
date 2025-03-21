@@ -12,6 +12,7 @@ import it.unibo.alchemist.model.actions.AbstractAction
 import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.collektive.Collektive
 import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.path.FullPathFactory
 import java.lang.reflect.Method
 import java.lang.reflect.Parameter
 import kotlin.reflect.jvm.kotlinFunction
@@ -40,7 +41,7 @@ class RunCollektiveProgram<P : Position<P>>(
     init {
         declareDependencyTo(programIdentifier)
         collektiveProgram =
-            Collektive(localDevice.id, network = localDevice) {
+            Collektive(localDevice.id, network = localDevice, pathFactory = FullPathFactory) {
                 program(localDevice)
             }
     }
@@ -63,10 +64,8 @@ class RunCollektiveProgram<P : Position<P>>(
         name: String = entrypoint.name,
     ) : this(node, name, buildEntryPoint(entrypoint))
 
-    override fun cloneAction(
-        node: Node<Any?>,
-        reaction: Reaction<Any?>,
-    ): Action<Any?> = RunCollektiveProgram(node, name)
+    override fun cloneAction(node: Node<Any?>, reaction: Reaction<Any?>): Action<Any?> =
+        RunCollektiveProgram(node, name)
 
     override fun execute() {
         collektiveProgram.cycle().also {
