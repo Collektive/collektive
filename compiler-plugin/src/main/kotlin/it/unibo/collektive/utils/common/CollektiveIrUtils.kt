@@ -2,7 +2,6 @@ package it.unibo.collektive.utils.common
 
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrElement
-import org.jetbrains.kotlin.ir.backend.js.utils.typeArguments
 import org.jetbrains.kotlin.ir.builders.IrBlockBodyBuilder
 import org.jetbrains.kotlin.ir.builders.Scope
 import org.jetbrains.kotlin.ir.declarations.IrFunction
@@ -18,8 +17,8 @@ import org.jetbrains.kotlin.ir.util.receiverAndArgs
 internal fun IrType.isAssignableFrom(other: IrType): Boolean = classifierOrNull?.let { base ->
     other.classifierOrNull?.let { other ->
         FqNameEqualityChecker.areEqual(base, other)
-    } ?: false
-} ?: false
+    } == true
+} == true
 
 internal fun List<IrType?>.stringified(prefix: String = "(", postfix: String = ")"): String =
     joinToString(",", prefix = prefix, postfix = postfix) {
