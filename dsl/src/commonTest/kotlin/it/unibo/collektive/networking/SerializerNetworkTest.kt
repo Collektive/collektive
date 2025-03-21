@@ -21,7 +21,7 @@ import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class SerializerNetworkTest(private val serializer: SerialFormat = Json) : Mailbox<Int> {
+class SerializerNetworkTest(private val deviceId: Int, private val serializer: SerialFormat = Json) : Mailbox<Int> {
     override val inMemory: Boolean = false
 
     val messages = mutableMapOf<Int, Message<Int, Any?>>()
@@ -49,11 +49,12 @@ class SerializerNetworkTest(private val serializer: SerialFormat = Json) : Mailb
         deliverableReceived(message)
     }
 
-    override fun deliverableFor(
-        id: Int,
-        outboundMessage: OutboundEnvelope<Int>,
-    ) {
-        messages[id] = outboundMessage.prepareMessageFor(id, factory)
+    override fun deliverableFor(outboundMessage: OutboundEnvelope<Int>) {
+        val neighborIds = messages.keys + deviceId
+        for (neighborId in neighborIds) {
+            val message = outboundMessage.prepareMessageFor(neighborId, factory)
+            messages[neighborId] = message
+        }
     }
 
     override fun deliverableReceived(message: Message<Int, *>) {
@@ -61,42 +62,38 @@ class SerializerNetworkTest(private val serializer: SerialFormat = Json) : Mailb
     }
 
     @OptIn(InternalSerializationApi::class)
-    override fun currentInbound(): NeighborsData<Int> =
-        object : NeighborsData<Int> {
-            override val neighbors: Set<Int> get() = messages.keys
+    override fun currentInbound(): NeighborsData<Int> = object : NeighborsData<Int> {
+        override val neighbors: Set<Int> get() = messages.keys
 
-            override fun <Value> dataAt(
-                path: Path,
-                dataSharingMethod: DataSharingMethod<Value>,
-            ): Map<Int, Value> {
-                require(dataSharingMethod is Serialize<Value>) {
-                    "Serialization has been required for in-memory messages. This is likely a misconfiguration."
-                }
-                return messages
-                    .mapValues { (_, message) ->
-                        require(message.sharedData.all { it.value is ByteArray }) {
-                            "Message ${message.senderId} is not serialized"
-                        }
-                        message.sharedData.getOrElse(path) { NoValue }
-                    }.filterValues { it != NoValue }
-                    .mapValues { (_, payload) ->
-                        val byteArrayPayload = payload as ByteArray
-                        when (serializer) {
-                            is StringFormat ->
-                                serializer.decodeFromString(
-                                    dataSharingMethod.serializer,
-                                    byteArrayPayload.decodeToString(),
-                                )
-                            is BinaryFormat ->
-                                serializer.decodeFromByteArray(
-                                    dataSharingMethod.serializer,
-                                    byteArrayPayload,
-                                )
-                            else -> error("Unsupported serializer")
-                        }
-                    }
+        override fun <Value> dataAt(path: Path, dataSharingMethod: DataSharingMethod<Value>): Map<Int, Value> {
+            require(dataSharingMethod is Serialize<Value>) {
+                "Serialization has been required for in-memory messages. This is likely a misconfiguration."
             }
+            return messages
+                .mapValues { (_, message) ->
+                    require(message.sharedData.all { it.value is ByteArray }) {
+                        "Message ${message.senderId} is not serialized"
+                    }
+                    message.sharedData.getOrElse(path) { NoValue }
+                }.filterValues { it != NoValue }
+                .mapValues { (_, payload) ->
+                    val byteArrayPayload = payload as ByteArray
+                    when (serializer) {
+                        is StringFormat ->
+                            serializer.decodeFromString(
+                                dataSharingMethod.serializer,
+                                byteArrayPayload.decodeToString(),
+                            )
+                        is BinaryFormat ->
+                            serializer.decodeFromByteArray(
+                                dataSharingMethod.serializer,
+                                byteArrayPayload,
+                            )
+                        else -> error("Unsupported serializer")
+                    }
+                }
         }
+    }
 
     private object NoValue
 }

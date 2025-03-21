@@ -22,10 +22,7 @@ sealed interface Field<ID : Any, out T> {
     /**
      * Combines this field with another (aligned) one considering the [ID] when combining the values.
      */
-    fun <B, R> alignedMapWithId(
-        other: Field<ID, B>,
-        transform: (ID, T, B) -> R,
-    ): Field<ID, R> {
+    fun <B, R> alignedMapWithId(other: Field<ID, B>, transform: (ID, T, B) -> R): Field<ID, R> {
         checkAligned(this, other)
         return mapWithId { id, value -> transform(id, value, other[id]) }
     }
@@ -33,10 +30,8 @@ sealed interface Field<ID : Any, out T> {
     /**
      * Combines this field with another (aligned) one.
      */
-    fun <B, R> alignedMap(
-        other: Field<ID, B>,
-        transform: (T, B) -> R,
-    ): Field<ID, R> = alignedMapWithId(other) { _, value, otherValue -> transform(value, otherValue) }
+    fun <B, R> alignedMap(other: Field<ID, B>, transform: (T, B) -> R): Field<ID, R> =
+        alignedMapWithId(other) { _, value, otherValue -> transform(value, otherValue) }
 
     /**
      * Map the field using the [transform] function.
@@ -88,11 +83,7 @@ sealed interface Field<ID : Any, out T> {
         /**
          * Check if two or more fields are aligned, throwing an IllegalStateException otherwise.
          */
-        fun checkAligned(
-            field1: Field<*, *>,
-            field2: Field<*, *>,
-            vararg fields: Field<*, *>,
-        ) {
+        fun checkAligned(field1: Field<*, *>, field2: Field<*, *>, vararg fields: Field<*, *>) {
             val ids: Collection<Any?> = field1.neighbors
             sequenceOf(field2, *fields).map { it.neighbors }.forEach {
                 check(it.size == ids.size && it.containsAll(ids)) {
@@ -121,10 +112,8 @@ sealed interface Field<ID : Any, out T> {
          * returning the [default] value if the field to transform is empty.
          * The local value is not considered.
          */
-        inline fun <ID : Any, T> Field<ID, T>.hood(
-            default: T,
-            crossinline transform: (T, T) -> T,
-        ): T = hoodWithId(default) { (_, accumulator), (id, value) -> id to transform(accumulator, value) }
+        inline fun <ID : Any, T> Field<ID, T>.hood(default: T, crossinline transform: (T, T) -> T): T =
+            hoodWithId(default) { (_, accumulator), (id, value) -> id to transform(accumulator, value) }
 
         /**
          * Reduce the elements of the field using the [transform] function,
@@ -159,29 +148,22 @@ sealed interface Field<ID : Any, out T> {
          * The local value of the field is not considered.
          * Returns the [default] if the field to transform is empty.
          */
-        inline fun <ID : Any, T> Field<ID, T>.hoodWithId(
-            default: T,
-            crossinline transform: (T, ID, T) -> T,
-        ): T = hoodWithId(default) { (_, accumulator), (id, value) -> id to transform(accumulator, id, value) }
+        inline fun <ID : Any, T> Field<ID, T>.hoodWithId(default: T, crossinline transform: (T, ID, T) -> T): T =
+            hoodWithId(default) { (_, accumulator), (id, value) -> id to transform(accumulator, id, value) }
 
         /**
          * Accumulates the elements of a field starting from an [initial] through a [transform] function.
          * The local value of the field is not considered.
          */
-        inline fun <ID : Any, T, R> Field<ID, T>.fold(
-            initial: R,
-            crossinline transform: (R, T) -> R,
-        ): R = foldWithId(initial) { accumulator, _, value -> transform(accumulator, value) }
+        inline fun <ID : Any, T, R> Field<ID, T>.fold(initial: R, crossinline transform: (R, T) -> R): R =
+            foldWithId(initial) { accumulator, _, value -> transform(accumulator, value) }
 
         /**
          * Accumulates the elements of a field starting from an [initial] through a
          * [transform] function that includes the [ID] of the element.
          * The local value of the field is not considered.
          */
-        inline fun <ID : Any, T, R> Field<ID, T>.foldWithId(
-            initial: R,
-            crossinline transform: (R, ID, T) -> R,
-        ): R {
+        inline fun <ID : Any, T, R> Field<ID, T>.foldWithId(initial: R, crossinline transform: (R, ID, T) -> R): R {
             var accumulator = initial
             for (entry in excludeSelf()) {
                 accumulator = transform(accumulator, entry.key, entry.value)
@@ -191,10 +173,8 @@ sealed interface Field<ID : Any, out T> {
     }
 }
 
-internal abstract class AbstractField<ID : Any, T>(
-    override val localId: ID,
-    override val localValue: T,
-) : Field<ID, T> {
+internal abstract class AbstractField<ID : Any, T>(override val localId: ID, override val localValue: T) :
+    Field<ID, T> {
     private val asMap: Map<ID, T> by lazy {
         val result: Map<ID, T> = neighborsMap() + (localId to localValue)
         result
@@ -215,11 +195,10 @@ internal abstract class AbstractField<ID : Any, T>(
 
     final override fun hashCode(): Int = toMap().hashCode()
 
-    final override operator fun get(id: ID): T =
-        when {
-            id == localId -> localValue
-            else -> neighborValueOf(id)
-        }
+    final override operator fun get(id: ID): T = when {
+        id == localId -> localValue
+        else -> neighborValueOf(id)
+    }
 
     final override fun <B> mapWithId(transform: (ID, T) -> B): Field<ID, B> =
         SequenceBasedField(localId, transform(localId, localValue), mapOthersAsSequence(transform))
@@ -233,19 +212,15 @@ internal abstract class AbstractField<ID : Any, T>(
     final override fun toString() = "ϕ(localId=$localId, localValue=$localValue, neighbors=${neighborsMap()})"
 }
 
-internal class ArrayBasedField<ID : Any, T>(
-    localId: ID,
-    localValue: T,
-    private val others: List<Pair<ID, T>>,
-) : AbstractField<ID, T>(localId, localValue) {
+internal class ArrayBasedField<ID : Any, T>(localId: ID, localValue: T, private val others: List<Pair<ID, T>>) :
+    AbstractField<ID, T>(localId, localValue) {
     override val neighborsCount: Int get() = others.size
     override val neighbors: Collection<ID> by lazy { others.map { it.first } }
 
-    override fun neighborValueOf(id: ID): T =
-        when {
-            others.size <= MAP_OVER_LIST_PERFORMANCE_CROSSING_POINT -> others.first { it.first == id }.second
-            else -> excludeSelf().getValue(id)
-        }
+    override fun neighborValueOf(id: ID): T = when {
+        others.size <= MAP_OVER_LIST_PERFORMANCE_CROSSING_POINT -> others.first { it.first == id }.second
+        else -> excludeSelf().getValue(id)
+    }
 
     override fun <R> mapOthersAsSequence(transform: (ID, T) -> R): Sequence<Pair<ID, R>> =
         others.map { (id, value) -> id to transform(id, value) }.asSequence()
@@ -259,11 +234,8 @@ internal class ArrayBasedField<ID : Any, T>(
     }
 }
 
-internal class SequenceBasedField<ID : Any, T>(
-    localId: ID,
-    localValue: T,
-    private val others: Sequence<Pair<ID, T>>,
-) : AbstractField<ID, T>(localId, localValue) {
+internal class SequenceBasedField<ID : Any, T>(localId: ID, localValue: T, private val others: Sequence<Pair<ID, T>>) :
+    AbstractField<ID, T>(localId, localValue) {
     override val neighborsCount get() = neighbors.size
 
     override val neighbors: Collection<ID> by lazy { others.map { it.first }.toList() }
@@ -278,11 +250,8 @@ internal class SequenceBasedField<ID : Any, T>(
         others.map { (id, value) -> id to transform(id, value) }
 }
 
-internal class ConstantField<ID : Any, T>(
-    localId: ID,
-    localValue: T,
-    private val neighborsIds: Set<ID>,
-) : AbstractField<ID, T>(localId, localValue) {
+internal class ConstantField<ID : Any, T>(localId: ID, localValue: T, private val neighborsIds: Set<ID>) :
+    AbstractField<ID, T>(localId, localValue) {
     override val neighborsCount: Int = neighborsIds.size
 
     override val neighbors: Collection<ID> = neighborsIds

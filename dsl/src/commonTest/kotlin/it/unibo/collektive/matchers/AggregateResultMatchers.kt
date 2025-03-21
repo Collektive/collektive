@@ -14,10 +14,7 @@ private fun <Result> getSharedDataKeys(program: Aggregate<Int>.() -> Result): Se
 /**
  * Asserts that the [firstProgram] and [secondProgram] align.
  */
-fun <Result> assertAligned(
-    firstProgram: Aggregate<Int>.() -> Result,
-    secondProgram: Aggregate<Int>.() -> Result,
-) {
+fun <Result> assertAligned(firstProgram: Aggregate<Int>.() -> Result, secondProgram: Aggregate<Int>.() -> Result) {
     val first = getSharedDataKeys(firstProgram)
     val second = getSharedDataKeys(secondProgram)
     assertEquals(first, second)

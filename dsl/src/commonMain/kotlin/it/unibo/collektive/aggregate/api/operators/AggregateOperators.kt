@@ -58,15 +58,14 @@ inline fun <ID : Any, reified Scalar> Aggregate<ID>.neighboringViaExchange(local
 inline fun <ID : Any, reified Initial, Return> Aggregate<ID>.sharing(
     initial: Initial,
     noinline transform: YieldingContext<Initial, Return>.(Field<ID, Initial>) -> YieldingResult<Initial, Return>,
-): Return =
-    exchanging(initial) { field: Field<ID, Initial> ->
-        with(YieldingContext<Initial, Return>()) {
-            val result: YieldingResult<Initial, Return> = transform(field)
-            field.map { result.toSend }.yielding {
-                field.map { result.toReturn }
-            }
+): Return = exchanging(initial) { field: Field<ID, Initial> ->
+    with(YieldingContext<Initial, Return>()) {
+        val result: YieldingResult<Initial, Return> = transform(field)
+        field.map { result.toSend }.yielding {
+            field.map { result.toReturn }
         }
-    }.localValue
+    }
+}.localValue
 
 /**
  * [share] captures the space-time nature of field computation through observation of neighbours' values, starting

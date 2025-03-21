@@ -1,3 +1,46 @@
+## [17.0.1](https://github.com/Collektive/collektive/compare/17.0.0...17.0.1) (2025-03-17)
+
+### Bug Fixes
+
+* properly set the sender ID to OutboundEnvelope when extracting the message for the neighbor ([75c38c3](https://github.com/Collektive/collektive/commit/75c38c3c78bccaa8ff061f406fe321c802f7e74d))
+
+## [17.0.0](https://github.com/Collektive/collektive/compare/16.1.1...17.0.0) (2025-03-16)
+
+### ⚠ BREAKING CHANGES
+
+* remove uneeded device id from mailbox and implements networks supporting exchange communication pattern
+
+### Dependency updates
+
+* **deps:** update alchemist to v39.0.1 ([fefbe9a](https://github.com/Collektive/collektive/commit/fefbe9a1162a9f5088bf44adce449d1fe365f309))
+* **deps:** update alchemist to v40 ([6768920](https://github.com/Collektive/collektive/commit/6768920f9623610266c3764e51eb3f1d33a60725))
+* **deps:** update alchemist to v40.1.2 ([9c8873e](https://github.com/Collektive/collektive/commit/9c8873ec74ed779a0f0fecaa81f1bc43a3a4ec7a))
+* **deps:** update alchemist to v41 ([4b2ea56](https://github.com/Collektive/collektive/commit/4b2ea56e6cf00bd4502bfe6afc4f2cd592ff03f2))
+* **deps:** update alchemist to v42 ([2585114](https://github.com/Collektive/collektive/commit/2585114b4daa1a7af2f5218f67c42fe90e42e3e0))
+* **deps:** update alchemist to v42.0.1 ([96817a8](https://github.com/Collektive/collektive/commit/96817a85dda843e48c6874fe55b8106a1235480a))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5.5.2 ([57e9b0e](https://github.com/Collektive/collektive/commit/57e9b0e33857af5579265b0fc535d8425e0907b6))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5.5.4 ([5bca26b](https://github.com/Collektive/collektive/commit/5bca26b962c249399013cf801857004bb13153a9))
+* **deps:** update dependency com.squareup:kotlinpoet to v2.1.0 ([c22a719](https://github.com/Collektive/collektive/commit/c22a71915552fec11a6b55b4c66f207ff5ccde62))
+* **deps:** update dependency gradle to v8.13 ([c4b0382](https://github.com/Collektive/collektive/commit/c4b03820273f5b5f0c55db78358f8782f74582f6))
+* **deps:** update dependency it.unibo.alchemist:alchemist-api to v40.1.3 ([21ab352](https://github.com/Collektive/collektive/commit/21ab352e666385350d0c7174430fdd82a3290114))
+* **deps:** update dependency org.kotlincrypto.hash:sha3 to v0.7.0 ([c3dbe79](https://github.com/Collektive/collektive/commit/c3dbe790db85642a1fe1af230593d520a5694dcb))
+* **deps:** update dependency org.slf4j:slf4j-api to v2.0.17 ([58a6200](https://github.com/Collektive/collektive/commit/58a6200205dd6e5591136c21be6906ccc142e14e))
+* **deps:** update dependency typescript to ~5.8.0 ([7618cc0](https://github.com/Collektive/collektive/commit/7618cc029e9d8805dea8237c2ff4ba799e660883))
+* **deps:** update plugin multijvmtesting to v3.2.3 ([1b53280](https://github.com/Collektive/collektive/commit/1b532807775466828b1810402169bbe75e120eaa))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.21 ([e6d66fc](https://github.com/Collektive/collektive/commit/e6d66fc93c3404e7de0bef2d0138da92fd6715dd))
+* **deps:** update plugin publishoncentral to v8.0.4 ([c455f1e](https://github.com/Collektive/collektive/commit/c455f1e0d7a38b8dee7581435f35617ab479c1b7))
+* **deps:** update plugin tasktree to v4.0.1 ([bf91b95](https://github.com/Collektive/collektive/commit/bf91b95d34605d6a965fe4e0a2205100c37cb584))
+
+### Bug Fixes
+
+* remove uneeded device id from mailbox and implements networks supporting exchange communication pattern ([9723a02](https://github.com/Collektive/collektive/commit/9723a02999b3dda83fdf45eca1d8d9c90e8c0cb1))
+
+### Build and continuous integration
+
+* **deps:** update actions/download-artifact action to v4.1.9 ([6f53881](https://github.com/Collektive/collektive/commit/6f538817da8135808c0754b23bda2b142d32b158))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.12 ([3f0367e](https://github.com/Collektive/collektive/commit/3f0367e4f4bc20088179bff94f5f0a06bbe5bee3))
+* **deps:** update github/codeql-action action to v3.28.11 ([038b0c8](https://github.com/Collektive/collektive/commit/038b0c8d93629f09da8c5ae5258aa99d1e42a528))
+
 ## [16.1.1](https://github.com/Collektive/collektive/compare/16.1.0...16.1.1) (2025-02-22)
 
 ### Dependency updates

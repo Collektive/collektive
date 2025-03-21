@@ -12,52 +12,48 @@ import it.unibo.collektive.aggregate.api.DataSharingMethod
 import it.unibo.collektive.path.Path
 
 /**
- * TODO.
+ * Defined the output of the aggregate program.
+ * Holds all the messages to be sent to the neighbors.
  */
 interface OutboundEnvelope<ID : Any> {
     /**
      * Shared data holding a [default] value and [overrides] for each [ID].
      */
-    data class SharedData<ID : Any, Value>(
-        val default: Value,
-        val overrides: Map<ID, Value> = emptyMap(),
-    )
+    data class SharedData<ID : Any, Value>(val default: Value, val overrides: Map<ID, Value> = emptyMap())
 
     /**
-     * TODO.
+     * Adds the [data] generated at the given [path] to the envelope.
+     *
+     * The [dataSharingMethod] is used to determine how the data should be serialized for network
+     * transmission or in-memory delivery.
      */
-    fun <Value> addData(
-        path: Path,
-        data: SharedData<ID, Value>,
-        dataSharingMethod: DataSharingMethod<Value>,
-    )
+    fun <Value> addData(path: Path, data: SharedData<ID, Value>, dataSharingMethod: DataSharingMethod<Value>)
 
     /**
-     * TODO.
+     * Extract the message for the [receiverId] through the given [factory].
+     *
+     * One the [OutboundEnvelope] is created, this method extracts the message to send to the [receiverId].
      */
-    fun prepareMessageFor(
-        id: ID,
-        factory: MessageFactory<ID, *> = InMemoryMessageFactory(),
-    ): Message<ID, Any?>
+    fun prepareMessageFor(receiverId: ID, factory: MessageFactory<ID, *> = InMemoryMessageFactory()): Message<ID, Any?>
 
     /**
-     * TODO.
+     * Returns `true` if the envelope is empty.
      */
     fun isEmpty(): Boolean
 
     /**
-     * TODO.
+     * Returns `true` if the envelope contains data.
      */
     fun isNotEmpty(): Boolean
 
     /**
-     * TODO.
+     * Utilities for [OutboundEnvelope].
      */
     companion object {
         /**
-         * TODO.
+         * Smart constructor for [OutboundEnvelope] given a [senderId] and an [expectedSize] for the neighbors.
          */
-        internal operator fun <ID : Any> invoke(expectedSize: Int): OutboundEnvelope<ID> =
+        internal operator fun <ID : Any> invoke(senderId: ID, expectedSize: Int): OutboundEnvelope<ID> =
             object : OutboundEnvelope<ID> {
                 private val defaults: MutableMap<Path, PayloadRepresentation<Any?>> = LinkedHashMap(expectedSize * 2)
                 private val overrides: MutableMap<ID, MutableList<Pair<Path, PayloadRepresentation<Any?>>>> =
@@ -88,14 +84,8 @@ interface OutboundEnvelope<ID : Any> {
                     }
                 }
 
-                override fun prepareMessageFor(
-                    id: ID,
-                    factory: MessageFactory<ID, *>,
-                ): Message<ID, Any?> =
-                    factory(
-                        id,
-                        overrides[id]?.toMap() ?: defaults,
-                    )
+                override fun prepareMessageFor(receiverId: ID, factory: MessageFactory<ID, *>): Message<ID, Any?> =
+                    factory(senderId, overrides[receiverId]?.toMap() ?: defaults)
 
                 override fun isEmpty(): Boolean = defaults.isEmpty()
 

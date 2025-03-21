@@ -13,9 +13,7 @@ import org.jetbrains.kotlin.fir.analysis.extensions.FirAdditionalCheckersExtensi
 /**
  * Extension that adds a series of checkers that looks for improper usages of the Collektive DSL.
  */
-class CollektiveExtension(
-    session: FirSession,
-) : FirAdditionalCheckersExtension(session) {
+class CollektiveExtension(session: FirSession) : FirAdditionalCheckersExtension(session) {
     override val expressionCheckers: ExpressionCheckers =
         object : ExpressionCheckers() {
             override val functionCallCheckers: Set<FirFunctionCallChecker>

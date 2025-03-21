@@ -43,12 +43,9 @@ class AlignmentCommandLineProcessor : CommandLineProcessor {
             ),
         )
 
-    override fun processOption(
-        option: AbstractCliOption,
-        value: String,
-        configuration: CompilerConfiguration,
-    ) = when (option.optionName) {
-        OPTION_ENABLED -> configuration.put(ARG_ENABLED, value.toBoolean())
-        else -> throw IllegalArgumentException("Unexpected config option ${option.optionName}")
-    }
+    override fun processOption(option: AbstractCliOption, value: String, configuration: CompilerConfiguration) =
+        when (option.optionName) {
+            OPTION_ENABLED -> configuration.put(ARG_ENABLED, value.toBoolean())
+            else -> throw IllegalArgumentException("Unexpected config option ${option.optionName}")
+        }
 }

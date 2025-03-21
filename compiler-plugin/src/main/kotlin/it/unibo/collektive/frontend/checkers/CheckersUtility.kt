@@ -139,10 +139,9 @@ object CheckersUtility {
      * Returns a predicate for a [FirElement] that is *true* when that element represents a function call that has the
      * provided [name].
      */
-    fun isFunctionCallsWithName(name: String): ((FirElement) -> Boolean) =
-        {
-            it is FirFunctionCall && it.functionName() == name
-        }
+    fun isFunctionCallsWithName(name: String): ((FirElement) -> Boolean) = {
+        it is FirFunctionCall && it.functionName() == name
+    }
 
     /**
      * Returns the name of the called function in a [FirFunctionCall] element.
@@ -168,13 +167,12 @@ object CheckersUtility {
     /**
      * Returns a list of the arguments' types (in the form of [ConeKotlinType]) of the related function.
      */
-    fun FirFunctionCall.getArgumentsTypes(): List<ConeKotlinType>? =
-        calleeReference
-            .toResolvedNamedFunctionSymbol()
-            ?.valueParameterSymbols
-            ?.map { parameter ->
-                parameter.resolvedReturnTypeRef.coneType
-            }
+    fun FirFunctionCall.getArgumentsTypes(): List<ConeKotlinType>? = calleeReference
+        .toResolvedNamedFunctionSymbol()
+        ?.valueParameterSymbols
+        ?.map { parameter ->
+            parameter.resolvedReturnTypeRef.coneType
+        }
 
     /**
      * Converts a string representing a fully-qualified name (e.g. `it.unibo.collektive.aggregate.api.Aggregate`)
@@ -186,10 +184,9 @@ object CheckersUtility {
      * Checks whether if the called function accepts at least on argument of type
      * [it.unibo.collektive.aggregate.api.Aggregate].
      */
-    fun FirFunctionCall.hasAggregateArgument(): Boolean =
-        getArgumentsTypes()?.any {
-            it.classId == ClassId.topLevel(AGGREGATE_CLASS_FQ_NAME.toFqNameUnsafe())
-        } == true
+    fun FirFunctionCall.hasAggregateArgument(): Boolean = getArgumentsTypes()?.any {
+        it.classId == ClassId.topLevel(AGGREGATE_CLASS_FQ_NAME.toFqNameUnsafe())
+    } == true
 
     /**
      * Checks if the [FirExpression] is structurally equivalent to another [FirExpression].
@@ -199,24 +196,23 @@ object CheckersUtility {
     /**
      * Extracts the return expression from an anonymous function, or `null` if it is not found.
      */
-    fun FirAnonymousFunctionExpression.extractReturnExpression(): FirExpression? =
-        object : FirVisitorVoid() {
-            private var returnExpression: FirExpression? = null
+    fun FirAnonymousFunctionExpression.extractReturnExpression(): FirExpression? = object : FirVisitorVoid() {
+        private var returnExpression: FirExpression? = null
 
-            override fun visitElement(element: FirElement) {
-                element.acceptChildren(this)
-            }
+        override fun visitElement(element: FirElement) {
+            element.acceptChildren(this)
+        }
 
-            override fun visitReturnExpression(expression: FirReturnExpression) {
-                returnExpression = expression.result
-            }
+        override fun visitReturnExpression(expression: FirReturnExpression) {
+            returnExpression = expression.result
+        }
 
-            /**
-             * Extracts the return expression from the anonymous function.
-             */
-            fun extractReturnExpression(): FirExpression? {
-                visitElement(this@extractReturnExpression)
-                return returnExpression
-            }
-        }.extractReturnExpression()
+        /**
+         * Extracts the return expression from the anonymous function.
+         */
+        fun extractReturnExpression(): FirExpression? {
+            visitElement(this@extractReturnExpression)
+            return returnExpression
+        }
+    }.extractReturnExpression()
 }

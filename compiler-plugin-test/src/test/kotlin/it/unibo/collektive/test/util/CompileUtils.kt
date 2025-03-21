@@ -39,14 +39,13 @@ object CompileUtils {
         )
     }
 
-    fun warningMessage(warningMessage: String): (CollectingMessageCollector) -> Unit =
-        { collector ->
-            val warnings = collector[CompilerMessageSeverity.WARNING].map { it.message }
-            assertTrue(
-                warnings.contains(warningMessage),
-                "Expected warning '$warningMessage' not found. Actual warnings: $warnings",
-            )
-        }
+    fun warningMessage(warningMessage: String): (CollectingMessageCollector) -> Unit = { collector ->
+        val warnings = collector[CompilerMessageSeverity.WARNING].map { it.message }
+        assertTrue(
+            warnings.contains(warningMessage),
+            "Expected warning '$warningMessage' not found. Actual warnings: $warnings",
+        )
+    }
 
     fun String.asTestingProgram(fileName: String): KotlinTestingProgram = KotlinTestingProgram(fileName, this)
 
@@ -59,11 +58,8 @@ object CompileUtils {
         this[name]?.readText()?.asTestingProgram("$name.kt")
             ?: throw FileNotFoundException("Program not found: $name")
 
-    internal fun Map<String, File>.subject(
-        case: String,
-        functionName: String,
-        iteration: String,
-    ) = getTestingProgram(pascalCase(case, functionName, iteration))
+    internal fun Map<String, File>.subject(case: String, functionName: String, iteration: String) =
+        getTestingProgram(pascalCase(case, functionName, iteration))
 
     internal fun Map<String, File>.`iteration with warning`(
         case: String,
@@ -74,11 +70,7 @@ object CompileUtils {
         subject(case, functionName, iteration) shouldCompileWith warningMessage(warning)
     }
 
-    internal fun Map<String, File>.`iteration without warning`(
-        case: String,
-        functionName: String,
-        iteration: String,
-    ) {
+    internal fun Map<String, File>.`iteration without warning`(case: String, functionName: String, iteration: String) {
         subject(case, functionName, iteration) shouldCompileWith noWarning
     }
 

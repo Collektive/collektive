@@ -15,11 +15,7 @@ import kotlin.math.sqrt
  * A position in a 3D space with [x], [y], and [z] coordinates.
  */
 @Serializable
-data class Position(
-    val x: Double,
-    val y: Double,
-    val z: Double,
-) {
+data class Position(val x: Double, val y: Double, val z: Double) {
     /**
      * Returns the Euclidean distance between this position and [other].
      */
