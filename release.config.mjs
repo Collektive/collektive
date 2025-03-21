@@ -8,7 +8,7 @@ else
     git -C site/build commit --allow-empty -m "chore: new release \${nextRelease.version}, no website updates" || exit 3
 fi
 git -C site/build push || exit 4
-./gradlew gradle-plugin:publishPlugins -Pgradle.publish.key=$GRADLE_PUBLISH_KEY -Pgradle.publish.secret=$GRADLE_PUBLISH_SECRET || exit 5
+./gradlew -PforceVersion=\${nextRelease.version} gradle-plugin:publishPlugins -Pgradle.publish.key=$GRADLE_PUBLISH_KEY -Pgradle.publish.secret=$GRADLE_PUBLISH_SECRET || exit 5
 ./gradlew -PstagingRepositoryId=\${process.env.STAGING_REPO_ID} releaseStagingRepositoryOnMavenCentral || exit 6
 `;
 
