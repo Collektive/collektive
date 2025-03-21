@@ -26,15 +26,15 @@ class EmptyReturnVisitor : FirVisitor<Unit, Boolean>() {
         element.acceptChildren(this, data)
     }
 
-    override fun visitReturnExpression(returnExpression: FirReturnExpression, inReturn: Boolean) {
+    override fun visitReturnExpression(returnExpression: FirReturnExpression, data: Boolean) {
         super.visitReturnExpression(returnExpression, true)
     }
 
-    override fun visitExpression(expression: FirExpression, inReturn: Boolean) {
-        if (inReturn && expression is FirUnitExpression) {
+    override fun visitExpression(expression: FirExpression, data: Boolean) {
+        if (data && expression is FirUnitExpression) {
             hasReturn = false
         } else {
-            super.visitExpression(expression, inReturn)
+            super.visitExpression(expression, data)
         }
     }
 
