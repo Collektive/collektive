@@ -85,7 +85,7 @@ object CollektiveJVMCompiler {
             configuration.setupCommonArguments(config)
         }
         // Enable the IR backend, or the Collektive plugin cannot be applied
-        configuration.put(JVMConfigurationKeys.IR, true)
+        configuration.put(CommonConfigurationKeys.USE_FIR, true)
         // Classpath configuration
         val classpath =
             checkNotNull(classpathFromClassloader(Thread.currentThread().contextClassLoader)) {

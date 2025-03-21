@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter
 
@@ -22,33 +23,32 @@ class AlignmentComponentRegistrar : CompilerPluginRegistrar() {
 
     override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
         val logger = configuration.get(CommonConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE)
-        when (configuration.get(JVMConfigurationKeys.IR)) {
+        when (configuration.get(CommonConfigurationKeys.USE_FIR)) {
             false ->
                 error(
-                    "The Kotlin-JVM IR backend has been explicitly disabled," +
+                    "The IR verification has been explicitly disabled," +
                         " but the Collektive compiler plugin requires it",
                 )
-
             null -> {
                 when {
                     configuration.isReadOnly ->
                         logger.strongWarning(
-                            "The Kotlin-JVM IR backend has not been explicitly enabled and the compiler configuration" +
-                                "has been finalized. The Collektive compiler plugin requires the IR generation," +
+                            "The IR verification has not been explicitly enabled and the compiler configuration" +
+                                "has been finalized. The Collektive compiler plugin requires the IR verification," +
                                 "the plugin may not be able to apply its transformations correctly",
                         )
 
                     else ->
-                        configuration.put(JVMConfigurationKeys.IR, true).also {
+                        configuration.put(CommonConfigurationKeys.USE_FIR, true).also {
                             logger.info(
-                                "Implicitly enabling the Kotlin-JVM IR backend," +
+                                "Implicitly enabling the IR verification," +
                                     "it is required by the Collektive compiler plugin",
                             )
                         }
                 }
             }
-
             else -> Unit
+
         }
         if (configuration.get(AlignmentCommandLineProcessor.ARG_ENABLED) != false) {
             IrGenerationExtension.registerExtension(AlignmentIrGenerationExtension(logger))
