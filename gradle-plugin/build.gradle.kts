@@ -27,7 +27,8 @@ dependencies {
 }
 
 gitSemVer {
-    version = computeVersion()
+    val forceVersion: String? by project
+    version = forceVersion ?: computeVersion()
 }
 
 buildConfig {
@@ -35,7 +36,7 @@ buildConfig {
     buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"${project.group}.$compilerPlugin\"")
     buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${project.group}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"$compilerPlugin\"")
-    buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${project.version}\"")
+    buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"$version\"")
 }
 
 val pluginName = "collektive-plugin"
