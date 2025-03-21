@@ -1,3 +1,17 @@
+## [17.1.0](https://github.com/Collektive/collektive/compare/17.0.2...17.1.0) (2025-03-21)
+
+### Features
+
+* **dsl:** add `Field.contains` to enable the `in` operator ([#746](https://github.com/Collektive/collektive/issues/746)) ([927bd65](https://github.com/Collektive/collektive/commit/927bd65f676537a03990001d39bd3c20b3ca6bdb))
+
+### Bug Fixes
+
+* **build:** set version number when publishing gradle plugin ([052f362](https://github.com/Collektive/collektive/commit/052f3629ddd137d904d0b501b84e9de856351745))
+
+### Build and continuous integration
+
+* enable power-assert ([#778](https://github.com/Collektive/collektive/issues/778)) ([ef1810c](https://github.com/Collektive/collektive/commit/ef1810ca2b3a3f3afdad6df0cf6c0d3ee07a9880))
+
 ## [17.0.2](https://github.com/Collektive/collektive/compare/17.0.1...17.0.2) (2025-03-21)
 
 ### Performance improvements
