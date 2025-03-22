@@ -9,8 +9,6 @@ import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.config.CompilerConfigurationKey
-import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter
 
 /**
@@ -29,6 +27,7 @@ class AlignmentComponentRegistrar : CompilerPluginRegistrar() {
                     "The IR verification has been explicitly disabled," +
                         " but the Collektive compiler plugin requires it",
                 )
+
             null -> {
                 when {
                     configuration.isReadOnly ->
@@ -47,8 +46,8 @@ class AlignmentComponentRegistrar : CompilerPluginRegistrar() {
                         }
                 }
             }
-            else -> Unit
 
+            else -> Unit
         }
         if (configuration.get(AlignmentCommandLineProcessor.ARG_ENABLED) != false) {
             IrGenerationExtension.registerExtension(AlignmentIrGenerationExtension(logger))
