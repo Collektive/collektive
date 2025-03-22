@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter
 
 /**
@@ -21,37 +22,42 @@ class AlignmentComponentRegistrar : CompilerPluginRegistrar() {
 
     override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
         val logger = configuration.get(CommonConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE)
-        when (configuration.get(CommonConfigurationKeys.USE_FIR)) {
-            false ->
-                error(
-                    "The IR verification has been explicitly disabled," +
-                        " but the Collektive compiler plugin requires it",
-                )
-
-            null -> {
-                when {
-                    configuration.isReadOnly ->
-                        logger.strongWarning(
-                            "The IR verification has not been explicitly enabled and the compiler configuration" +
-                                "has been finalized. The Collektive compiler plugin requires the IR verification," +
-                                "the plugin may not be able to apply its transformations correctly",
-                        )
-
-                    else ->
-                        configuration.put(CommonConfigurationKeys.USE_FIR, true).also {
-                            logger.info(
-                                "Implicitly enabling the IR verification," +
-                                    "it is required by the Collektive compiler plugin",
-                            )
-                        }
-                }
-            }
-
-            else -> Unit
+        configuration.requireConfiguration(CommonConfigurationKeys.USE_FIR, true, logger) {
+            "The IR verification has been explicitly disabled, but the Collektive compiler plugin requires it"
         }
         if (configuration.get(AlignmentCommandLineProcessor.ARG_ENABLED) != false) {
             IrGenerationExtension.registerExtension(AlignmentIrGenerationExtension(logger))
             FirExtensionRegistrarAdapter.registerExtension(CollektiveFrontendExtensionRegistrar())
+        }
+    }
+
+    private fun <T> CompilerConfiguration.requireConfiguration(
+        key: CompilerConfigurationKey<T>,
+        value: T,
+        logger: MessageCollector,
+        messageOnError: (CompilerConfigurationKey<T>) -> String,
+    ) {
+        val returnedValue: T? = get(key)
+        if (returnedValue == null) {
+            when {
+                isReadOnly ->
+                    logger.strongWarning(messageOnError(key) + " The compiler configuration has been finalized.")
+
+                else -> {
+                    requireNotNull(value) { "The value of the key '$key' cannot be null." }
+                    put(key, value).also {
+                        logger.info(
+                            """
+                            Implicitly enabled '$key' setting the value '$value'.
+                            It is required by the Collektive compiler plugin.
+                        """.trimIndent()
+                        )
+                    }
+                }
+            }
+        }
+        if (returnedValue != value) {
+            error(messageOnError(key))
         }
     }
 }
