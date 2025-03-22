@@ -1,0 +1,133 @@
+---
+title: Aggregate Operators and Field Operations
+---
+
+import { useEffect, useState } from "react";
+import { useLocation } from 'react-router-dom';
+import ReactMarkdown from "react-markdown";
+import rehypeRaw from 'rehype-raw';
+
+The aggregate operators and field operations present in Collektive are illustrated below.
+
+export default function OperatorList() {
+const operators = [
+{ name: "## Aggregate Operators", description: "" }, 
+{ name: "[exchange](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/exchange.html)", description: "![](/img/exchange.svg)" },
+{ name: "[exchanging](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/exchanging.html)", description: "" },
+{ name: "[share](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api.operators/share.html)", description: "![](/img/share.svg)" },
+{ name: "[sharing](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api.operators/sharing.html)", description: `` },
+{ name: "[neighboring](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/neighboring.html)", description: "![](/img/nbr.svg)" },
+{ name: "[neighboringViaExchange](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api.operators/neighboring-via-exchange.html)", description: "" },
+{ name: "[evolve](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/evolve.html)", description: "" },
+{ name: "[evolving](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/evolving.html)", description: "" },
+{ name: "[alignedOn](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/aligned-on.html)", description: "" },
+{ name: "[align](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/align.html)", description: "" },
+{ name: "[dealign](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/dealign.html)", description: "" },
+{ name: "## Field Operations", description: "" }, 
+{ name: "[all](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/all.html)", description: "" },
+{ name: "[any](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/any.html)", description: "" },
+{ name: "[none](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/none.html)", description: "" },
+{ name: "[allWithSelf](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/all-with-self.html)", description: "" },
+{ name: "[anyWithSelf](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/any-with-self.html)", description: "" },
+{ name: "[noneWithSelf](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/none-with-self.html)", description: "" },
+{ name: "[min](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/min.html)", description: "" },
+{ name: "[minWithSelf](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/min-with-self.html)", description: "" },
+{ name: "[minWith](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/min-with.html)", description: "" },
+{ name: "[minBy](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/min-by.html)", description: "" },
+{ name: "[max](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/max.html)", description: "" },
+{ name: "[maxWithSelf](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/max-with-self.html)", description: "" },
+{ name: "[maxWith](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/max-with.html)", description: "" },
+{ name: "[maxBy](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/max-by.html)", description: "" },
+{ name: "[count](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/count.html)", description: "" },
+{ name: "[countWithSelf](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/count-with-self.html)", description: "" },
+{ name: "[replaceMatchingWithId](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/replace-matching-with-id.html)", description: "" },
+{ name: "[replaceMatching](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/replace-matching.html)", description: "" },
+{ name: "[excludeSelf](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field/-field/exclude-self.html)", description: "" },
+{ name: "[alignedMapWithId](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field/-field/aligned-map-with-id.html)", description: "" },
+{ name: "[alignedMap](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field/-field/aligned-map.html)", description: "" },
+{ name: "[mapWithId](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field/-field/map-with-id.html)", description: "" },
+{ name: "[map](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field/-field/map.html)", description: "" },
+{ name: "[mapToConstantField](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field/-field/map-to-constant-field.html)", description: "" },
+{ name: "[get](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field/-field/get.html)", description: "" },
+{ name: "[asSequence](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field/-field/as-sequence.html)", description: "" },
+{ name: "[toMap](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field/-field/to-map.html)", description: "" },
+];
+
+const [search, setSearch] = useState("");
+const location = useLocation();
+
+useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const initialSearch = queryParams.get('search');
+    if (initialSearch) {
+        setSearch(initialSearch);
+    }
+}, [location]);
+
+// Filter operators based on search
+const filteredOperators = operators.filter(op =>
+    op.name.toLowerCase().includes(search.toLowerCase())
+);
+
+const highlightMatch = (text, searchTerm) => {
+    if (!searchTerm) return text; 
+    const regex = new RegExp(`\\[([^\\]]+)\\]`, 'g');
+    return text.replace(regex, (match, content) => {
+        const highlightedContent = content.replace(new RegExp(`(${searchTerm})`, 'gi'), (match) => {
+            return `<mark class="bg-yellow-300">${match}</mark>`;
+        });
+        return `[${highlightedContent}]`; 
+    });
+};
+
+return (
+    <div>
+        <p>
+        The aggregate operators and field operations present in Collektive are illustrated below.
+        </p>
+        {/* Search bar */}
+        <input
+            type="text"
+            placeholder="🔍 Search for a function..."
+            className="w-full h-12 p-3 text-lg border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+        />
+        {/* Operator list with description in Markdown */}
+        <ul>
+        {(() => {
+            let showSection = false; 
+            return operators.flatMap((op, index) => {
+            if (op.name.startsWith("##")) {
+                showSection = op.name.toLowerCase().includes(search.toLowerCase());
+                return (
+                    <ReactMarkdown>
+                        {op.name}
+                    </ReactMarkdown>
+                );
+            }
+            if (op.name.toLowerCase().includes(search.toLowerCase()) || showSection) {   
+                return (
+                <li key={op.name}>
+                    <ReactMarkdown 
+                        children={highlightMatch(op.name, search)} 
+                        rehypePlugins={[rehypeRaw]}
+                    />
+                    <details 
+                        style={{ backgroundColor: 'transparent', border: '1px solid purple', borderRadius: '5px', padding: '5px' }}
+                    >
+                    <summary>Click to view description</summary>
+                    <ReactMarkdown>
+                        {op.description}
+                    </ReactMarkdown>
+                    </details>
+                </li>
+                );
+            }
+            return []; 
+            });
+        })()}
+        </ul>
+    </div>
+);
+}
