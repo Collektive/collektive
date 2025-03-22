@@ -1,0 +1,116 @@
+---
+title: Basic Usage
+---
+
+```kotlin
+/**
+ * Function to evaluate the number of neighbors of a node in an [Aggregate] context.
+ */
+fun Aggregate<Int>.neighborCounter(): Int = neighboring(1).count()
+```
+
+The library function [neighboring](./dsl-descriptions.mdx?search=neighboring) is a **aggregate operator** and is used to observe the value of an expression [local] across neighboring nodes.
+
+The returned field has as its local value the value passed as input (1 in this example). Using the [count](./dsl-descriptions.mdx?search=count) function, you count the values ​​in the field, thus obtaining the number of neighbors of a node.
+
+## Example
+
+### First part
+
+This first part code demonstrates how devices, through mutual communication, are able to identify the maximum ID among the neighboring nodes within their local network area (neighborhood):
+
+```kotlin
+/**
+ * Identify the maximum ID values among the neighboring nodes.
+*/
+
+fun Aggregate<Int>.maxNeighborID(environment: EnvironmentVariables): Int {
+    // Step 1: Exchange the localId with neighbors and obtain a field of values
+    val neighborValues = neighboring(local = localId)
+
+    // Step 2: Find the maximum value among neighbors (including self)
+    val maxValue = neighborValues.max(base = localId)
+
+    return maxValue
+}
+
+```
+
+With the [max](./dsl-descriptions.mdx?search=max) function the maximum value of a field that includes the local value of the node is identified.
+
+### Second part
+
+This second part represents a variation of the previous one. Building upon the local maximum computation introduced in the first part, the code presented here extends the process through a second layer of communication among nodes, enabling convergence toward the global maximum of the network. 
+
+```kotlin
+/**
+ * Identify the maximum ID values in the network.
+*/
+
+fun Aggregate<Int>.maxNetworkID(environment: EnvironmentVariables): Int {
+    val maxLocalValue = maxNeighborID()
+
+    // Step 1: Exchange the maxNeighborID with neighbors and obtain a field of values
+    val neighborValues = neighboring(local = maxLocalValue)
+
+    // Step 2: Find the maximum value among neighbors (including self)
+    val maxValue = neighborValues.max(base = maxLocalValue)
+    
+    return maxValue
+}
+
+// Function of the previous part
+fun Aggregate<Int>.maxNeighborID(): Int {
+    val neighborValues = neighboring(local = localId)
+    val maxValue = neighborValues.max(base = localId)
+    return maxValue
+}
+```
+
+This second part illustrates a variant of leader election implemented with Collektive.
+
+Specifically, in this first two part, the use of aggregated operators and operations on the neighborhood field is analyzed.
+
+### Third part
+
+In this final part, we extend the previous exercise by considering dividing the network into multiple subnets. The goal is to determine the diameter in relation to the source, which corresponds to the maximum value of the subnetworks.
+
+In other words, we aim to find the maximum distance (measured in terms of hops) from a non-source node to the nearest source node. The source nodes are those with the highest ID values in the network, and each source node identifies a separate subnetwork.
+
+```kotlin
+/**
+ * Determine the diameter of the subnetworks corresponding to the nodes with the maximum ID values in the network of the last exercise.
+*/
+
+// Preliminary step: define a data class to represent the association between a source node and its distance
+data class SourceDistance(val sourceID: Int, val distance: Int)
+
+fun Aggregate<Int>.subnetdiameter(sourceID: Int, distanceToSource: Int): SourceDistance {
+    // Step 1: retrieve the distances from neighboring nodes, including the distance of the current node
+    val distances = neighboring(SourceDistance(sourceID, distanceToSource))
+
+    // Step 2: find the neighbor with the maximum distance for the given sourceID
+    return distances.maxBy(SourceDistance(sourceID, distanceToSource)){ 
+
+        // If the sourceID matches, return the actual distance; otherwise, Int.MIN_VALUE is used to exclude it
+        if(sourceID == it.sourceID) it.distance else Int.MIN_VALUE 
+    }
+}
+
+fun Aggregate<Int>.maxNetworkID(environment: EnvironmentVariables): Int {
+    
+    ...
+
+    // Preliminary step: the distance from the nearest source is calculated using the hopDistanceTo library function 
+    distanceToSource = hopDistanceTo(localId == maxValue)
+
+    // Calculate subnets diameter 
+    val subnetDiameterValue = subnetdiameter(maxValue, distanceToSource).distance
+
+    ...
+}
+```
+
+The [maxBy](./dsl-descriptions.mdx?search=maxBy) function is a variant of the max function (used in previous parts) that calculates the maximum value in the field according to specifications. In particular, in this part, maxBy is used to specify towards which source the shared distance has been calculated. In such a way as to count in the identification of the maximum only the distances towards a specific source.
+
+The distance in terms of hops to the nearest source is calculated using the [hopDistanceTo](./stdlib-descriptions.mdx?search=hopDistanceTo) function.

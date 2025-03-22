@@ -1,0 +1,106 @@
+---
+title: Standard Library Functions
+---
+
+import { useEffect, useState } from "react";
+import { useLocation } from 'react-router-dom';
+import ReactMarkdown from "react-markdown";
+import rehypeRaw from 'rehype-raw';
+
+The standard library functions present in Collektive are illustrated below.
+
+export default function OperatorList() {
+const operators = [
+{ name: "## Spreading Functions", description: "" }, 
+{ name: "[distanceTo](https://javadoc.io/doc/it.unibo.collektive/stdlib/latest/stdlib/it.unibo.collektive.stdlib.spreading/distance-to.html)", description: "" },
+{ name: "[hopDistanceTo](https://javadoc.io/doc/it.unibo.collektive/stdlib/latest/stdlib/it.unibo.collektive.stdlib.spreading/hop-distance-to.html)", description: "" },
+{ name: "[gradientCast](https://javadoc.io/doc/it.unibo.collektive/stdlib/latest/stdlib/it.unibo.collektive.stdlib.spreading/gradient-cast.html)", description: "" },
+{ name: "[multiGradientCast](https://javadoc.io/doc/it.unibo.collektive/stdlib/latest/stdlib/it.unibo.collektive.stdlib.spreading/multi-gradient-cast.html)", description: "" },
+{ name: "## Gossip Functions", description: "" },
+{ name: "[gossipMax](https://javadoc.io/doc/it.unibo.collektive/stdlib/latest/stdlib/it.unibo.collektive.stdlib.spreading/gossip-max.html)", description: "" },
+{ name: "[gossipMin](https://javadoc.io/doc/it.unibo.collektive/stdlib/latest/stdlib/it.unibo.collektive.stdlib.spreading/gossip-min.html)", description: "" },
+{ name: "[isHappeningAnywhere](https://javadoc.io/doc/it.unibo.collektive/stdlib/latest/stdlib/it.unibo.collektive.stdlib.spreading/is-happening-anywhere.html)", description: "" },
+{ name: "[nonStabilizingGossip](https://javadoc.io/doc/it.unibo.collektive/stdlib/latest/stdlib/it.unibo.collektive.stdlib.spreading/non-stabilizing-gossip.html)", description: "" },
+{ name: "[everHappened](https://javadoc.io/doc/it.unibo.collektive/stdlib/latest/stdlib/it.unibo.collektive.stdlib.spreading/ever-happened.html)", description: "" },
+{ name: "## Comparable Functions", description: "" },
+{ name: "[coerceIn](https://javadoc.io/doc/it.unibo.collektive/stdlib/latest/stdlib/it.unibo.collektive.stdlib.util/coerce-in.html)", description: "" }
+];
+
+const [search, setSearch] = useState("");
+const location = useLocation();
+
+useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const initialSearch = queryParams.get('search');
+    if (initialSearch) {
+        setSearch(initialSearch);
+    }
+}, [location]);
+
+// Filter operators based on search
+const filteredOperators = operators.filter(op =>
+    op.name.toLowerCase().includes(search.toLowerCase())
+);
+
+const highlightMatch = (text, searchTerm) => {
+    if (!searchTerm) return text; 
+    const regex = new RegExp(`\\[([^\\]]+)\\]`, 'g');
+    return text.replace(regex, (match, content) => {
+        const highlightedContent = content.replace(new RegExp(`(${searchTerm})`, 'gi'), (match) => {
+            return `<mark class="bg-yellow-300">${match}</mark>`;
+        });
+        return `[${highlightedContent}]`; 
+    });
+};
+
+return (
+    <div>
+        <p>
+        The aggregate operators and field operations present in Collektive are illustrated below.
+        </p>
+        {/* Search bar */}
+        <input
+            type="text"
+            placeholder="🔍 Search for a function..."
+            className="w-full h-12 p-3 text-lg border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+        />
+        {/* Operator list with description in Markdown */}
+        <ul>
+        {(() => {
+            let showSection = false; 
+            return operators.flatMap((op, index) => {
+            if (op.name.startsWith("##")) {
+                showSection = op.name.toLowerCase().includes(search.toLowerCase());
+                return (
+                    <ReactMarkdown>
+                        {op.name}
+                    </ReactMarkdown>
+                );
+            }
+            if (op.name.toLowerCase().includes(search.toLowerCase()) || showSection) {   
+                return (
+                <li key={op.name}>
+                    <ReactMarkdown 
+                        children={highlightMatch(op.name, search)} 
+                        rehypePlugins={[rehypeRaw]}
+                    />
+                    <details 
+                        style={{ backgroundColor: 'transparent', border: '1px solid purple', borderRadius: '5px', padding: '5px' }}
+                    >
+                    <summary>Click to view description</summary>
+                    <ReactMarkdown>
+                        {op.description}
+                    </ReactMarkdown>
+                    </details>
+                </li>
+                );
+            }
+            return []; 
+            });
+        })()}
+        </ul>
+    </div>
+);
+}
