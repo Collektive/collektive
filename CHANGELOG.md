@@ -1,3 +1,9 @@
+## [17.1.1](https://github.com/Collektive/collektive/compare/17.1.0...17.1.1) (2025-03-22)
+
+### Bug Fixes
+
+* force version override if passed as property ([c29cd33](https://github.com/Collektive/collektive/commit/c29cd33cd1bba41ef468cfe2ea4eba7b0b15e44c))
+
 ## [17.1.0](https://github.com/Collektive/collektive/compare/17.0.2...17.1.0) (2025-03-21)
 
 ### Features
