@@ -1,3 +1,15 @@
+## [17.1.2](https://github.com/Collektive/collektive/compare/17.1.1...17.1.2) (2025-03-22)
+
+### Dependency updates
+
+* **deps:** update dependency react-markdown to v10 ([f9369ef](https://github.com/Collektive/collektive/commit/f9369ef6307fe3d629a2d55a41d0a7374102571e))
+* **deps:** update dependency react-markdown to v9.1.0 ([d0b8436](https://github.com/Collektive/collektive/commit/d0b8436a604c89ad566a45c59e63449d60834866))
+* **deps:** update dependency react-router-dom to v7 ([f574d26](https://github.com/Collektive/collektive/commit/f574d26b8b2a1770b1ea4020bde6486e1b137d8f))
+
+### Documentation
+
+* add preliminary knowledge about collektive and the paradigm ([#548](https://github.com/Collektive/collektive/issues/548)) ([d9fdd88](https://github.com/Collektive/collektive/commit/d9fdd88836e71cd40c7596904da21a1c29b1b38f))
+
 ## [17.1.1](https://github.com/Collektive/collektive/compare/17.1.0...17.1.1) (2025-03-22)
 
 ### Bug Fixes
