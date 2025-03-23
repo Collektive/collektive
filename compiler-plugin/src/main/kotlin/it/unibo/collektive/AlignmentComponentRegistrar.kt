@@ -50,7 +50,7 @@ class AlignmentComponentRegistrar : CompilerPluginRegistrar() {
                             """
                             Implicitly enabled '$key' setting the value '$value'.
                             It is required by the Collektive compiler plugin.
-                        """.trimIndent()
+                            """.trimIndent(),
                         )
                     }
                 }
