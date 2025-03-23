@@ -1,3 +1,30 @@
+## [17.1.3](https://github.com/Collektive/collektive/compare/17.1.2...17.1.3) (2025-03-23)
+
+### Dependency updates
+
+* **core-deps:** update kotlin monorepo to v2.1.20 ([258c55e](https://github.com/Collektive/collektive/commit/258c55e186e10cc7f85d6f6fb23459c167f1b57b))
+* **deps:** update dependency remark-code-import to v1.1.1 ([e34bdf9](https://github.com/Collektive/collektive/commit/e34bdf9fdb7dfc2b2ec613d3612a2a3697608373))
+* **deps:** update dependency remark-code-import to v1.2.0 ([f3a3a85](https://github.com/Collektive/collektive/commit/f3a3a852c84c1c22ec90ed015ebce39dc88f0acb))
+* **deps:** update plugin multijvmtesting to v3.2.4 ([70d1cdb](https://github.com/Collektive/collektive/commit/70d1cdb9c3310b5d5963a36f492b6544c1945a2e))
+* **deps:** update plugin multijvmtesting to v3.3.0 ([aac80b8](https://github.com/Collektive/collektive/commit/aac80b8451d1f0d2af26572cd1dcac4d75826911))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.22 ([1f84f9e](https://github.com/Collektive/collektive/commit/1f84f9e47aecad00717f90194fe7dd027ed6d469))
+
+### Build and continuous integration
+
+* **deps:** autid fix for npm dependencies ([0d9d696](https://github.com/Collektive/collektive/commit/0d9d69621800784c9d08f4101a4d34d87e3e903f))
+* **site:** add code-import remark plugin for embedding code snippets from file ([741cf43](https://github.com/Collektive/collektive/commit/741cf4324782c65b88750d8cad6cdeea388c478d))
+
+### Style improvements
+
+* reformat code ([d2eded6](https://github.com/Collektive/collektive/commit/d2eded6719421153ef4978fe0bf7c3e19f55a5ee))
+* reformat code ([a33146b](https://github.com/Collektive/collektive/commit/a33146b8fa974f2a1955c337ed5150bed64db7aa))
+
+### Refactoring
+
+* extract required configuration keys into a method for check and set ([ccce759](https://github.com/Collektive/collektive/commit/ccce759173c9e0908387126a787b694e92bbd9f8))
+* improve code quality ([2d0c06a](https://github.com/Collektive/collektive/commit/2d0c06ae986938dd8878fec13242beee0e58108b))
+* use api replacement for removed keys ([6410bac](https://github.com/Collektive/collektive/commit/6410bacce52eec1acd8aa248d396c906126aa340))
+
 ## [17.1.2](https://github.com/Collektive/collektive/compare/17.1.1...17.1.2) (2025-03-22)
 
 ### Dependency updates
