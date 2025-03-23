@@ -1,6 +1,6 @@
 plugins {
     `kotlin-dsl`
-    id("org.danilopianini.multi-jvm-test-plugin") version "3.2.3"
+    id("org.danilopianini.multi-jvm-test-plugin") version "3.2.4"
 }
 
 repositories {
