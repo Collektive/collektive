@@ -1,3 +1,17 @@
+## [17.2.0](https://github.com/Collektive/collektive/compare/17.1.3...17.2.0) (2025-03-24)
+
+### Features
+
+* **alchemist-incarnation:** allow access to `CollektiveDevice` properties from within Alchemist's molecule "properties" ([#823](https://github.com/Collektive/collektive/issues/823)) ([3f4077f](https://github.com/Collektive/collektive/commit/3f4077f89cf23e9276da55f1745afeebb4b9d2d0))
+
+### Dependency updates
+
+* **deps:** update plugin publishoncentral to v8.0.5 ([d009dbc](https://github.com/Collektive/collektive/commit/d009dbca01ec74eb294142e1e16e43d16ecc6132))
+
+### Tests
+
+* testing incarnation implementation via gradient ([#821](https://github.com/Collektive/collektive/issues/821)) ([8c24a3a](https://github.com/Collektive/collektive/commit/8c24a3aaca39b3fa7cb3b8ec5ce7fa78c4488745))
+
 ## [17.1.3](https://github.com/Collektive/collektive/compare/17.1.2...17.1.3) (2025-03-23)
 
 ### Dependency updates
