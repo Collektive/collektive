@@ -7,8 +7,9 @@ kotlin = "2.1.20"
 serialization = "1.8.0"
 
 [libraries]
-alchemist-api = { module = "it.unibo.alchemist:alchemist-api", version.ref = "alchemist" }
 alchemist = { module = "it.unibo.alchemist:alchemist", version.ref = "alchemist" }
+alchemist-api = { module = "it.unibo.alchemist:alchemist-api", version.ref = "alchemist" }
+alchemist-euclidean-geometry = { module = "it.unibo.alchemist:alchemist-euclidean-geometry", version.ref = "alchemist" }
 arrow-core = "io.arrow-kt:arrow-core:2.0.1"
 caffeine = "com.github.ben-manes.caffeine:caffeine:3.2.0"
 hash-sha3 = "org.kotlincrypto.hash:sha3:0.7.0"
@@ -45,6 +46,7 @@ kotlin-testing-common = [
 alchemist = [
     "alchemist",
     "alchemist-api",
+    "alchemist-euclidean-geometry",
 ]
 
 [plugins]
