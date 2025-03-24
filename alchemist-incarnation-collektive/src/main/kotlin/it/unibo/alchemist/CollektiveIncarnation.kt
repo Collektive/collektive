@@ -1,8 +1,15 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 package it.unibo.alchemist
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.LoadingCache
-import it.unibo.alchemist.CollektiveIncarnation.Companion.ScriptEngine.getValue
 import it.unibo.alchemist.actions.RunCollektiveProgram
 import it.unibo.alchemist.collektive.device.CollektiveDevice
 import it.unibo.alchemist.model.Action
@@ -55,23 +62,12 @@ import kotlin.reflect.full.starProjectedType
 class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
     override fun getProperty(node: Node<Any?>, molecule: Molecule, property: String?): Double {
         val interpreted =
-            when (property.isNullOrBlank()) {
-                true -> node.getConcentration(molecule)
+            when {
+                property.isNullOrBlank() -> node.getConcentration(molecule)
                 else -> {
                     val concentration = node.getConcentration(molecule)
-                    val concentrationType =
-                        when (concentration) {
-                            null -> "Any?"
-                            else -> {
-                                val type = concentration::class.starProjectedType
-                                "$type${"?".takeIf { type.isMarkedNullable }.orEmpty()}"
-                            }
-                        }
-                    val toInvoke =
-                        propertyCache.get(
-                            "import kotlin.math.*; val x: ($concentrationType) -> Any? = { $property }; x",
-                        )
-                    toInvoke(concentration)
+                    val toInvoke = propertyCache.get(CodeElements(concentration, property))
+                    node.asPropertyOrNull(CollektiveDevice::class).toInvoke(concentration)
                 }
             }
         return when (interpreted) {
@@ -206,6 +202,22 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
     }
 
     private companion object {
+
+        private data class CodeElements(val concentrationType: String, val property: String) {
+            constructor(concentration: Any?, property: String) : this(
+                when (concentration) {
+                    null -> "Any?"
+                    is List<*> -> "List<*>" // TODO: select the minimal common supertype
+                    // TODO: add support for maps, pairs, sets
+                    else -> {
+                        val type = concentration::class.starProjectedType
+                        "$type${"?".takeIf { type.isMarkedNullable }.orEmpty()}"
+                    }
+                },
+                property,
+            )
+        }
+
         private object ScriptEngine {
             operator fun getValue(thisRef: Any?, property: KProperty<*>) =
                 ScriptEngineManager().getEngineByName(property.name)
@@ -220,19 +232,34 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         private val validName = Regex("^[a-zA-Z_][a-zA-Z0-9_]*$", RegexOption.MULTILINE)
         private val logger = LoggerFactory.getLogger(CollektiveIncarnation::class.java)
         private val kotlin by ScriptEngine
-        private val defaultLambda: (Any?) -> Any? = { Double.NaN }
+        private val defaultLambda: CollektiveDevice<*>?.(Any?) -> Any? = { Double.NaN }
 
-        private val propertyCache: LoadingCache<String, (Any?) -> Any?> =
+        private val propertyCache: LoadingCache<CodeElements, CollektiveDevice<*>?.(Any?) -> Any?> =
             Caffeine
                 .newBuilder()
                 .maximumSize(1000)
-                .build { property ->
+                .build { (concentrationType, property) ->
+                    val header = """
+                        import kotlin.math.*
+                        import ${CollektiveDevice::class.qualifiedName}
+                        val `a beautiful lambda function`: CollektiveDevice<*>?.($concentrationType) -> Any? = {
+                    """.trimIndent()
+                    val footer = """
+                        }
+                        `a beautiful lambda function`
+                    """.trimIndent()
+                    val indentedProperty = property.lines().joinToString("\n") { "    $it" }
                     runCatching {
+                        kotlin.eval("$header\n$indentedProperty\n$footer")
+                    }.recover { _ ->
+                        val doubleIndentedProperty = indentedProperty.lines().joinToString("\n") { "    $it" }
+                        kotlin.eval("$header\n    this?.run {\n$doubleIndentedProperty\n    }$footer")
+                    }.map { interpreted ->
                         @Suppress("UNCHECKED_CAST")
-                        when (val interpreted = kotlin.eval(property)) {
-                            is (Nothing) -> Any? -> interpreted
+                        when (interpreted) {
+                            is Nothing.(Nothing) -> Any? -> interpreted
                             else -> defaultLambda
-                        } as (Any?) -> Any?
+                        } as CollektiveDevice<*>?.(Any?) -> Any?
                     }.getOrElse { defaultLambda }
                 }
 
