@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 package it.unibo.alchemist.collektive.device
 
 import it.unibo.alchemist.model.Environment
@@ -42,9 +50,14 @@ class CollektiveDevice<P>(
     var currentTime: Time = Time.ZERO
 
     /**
-     * The ID of the node.
+     * The ID of the node (alias of [localId]).
      */
     val id = node.id
+
+    /**
+     * The ID of the node (alias of [id]).
+     */
+    val localId = node.id
 
     private val validMessages: MutableList<TimedMessage> = mutableListOf()
 
