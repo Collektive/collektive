@@ -44,8 +44,15 @@ inline fun <ID : Any, reified Distance : Comparable<Distance>> Aggregate<ID>.dis
 /**
  * Computes the hop distance from the closest [source].
  */
-fun <ID : Any> Aggregate<ID>.hopDistanceTo(source: Boolean): Int =
-    distanceTo(source, 0, Int.MAX_VALUE, Int::plus) { neighboring(1) }
+fun <ID : Any> Aggregate<ID>.hopDistanceTo(source: Boolean): Int = distanceTo(
+    source = source,
+    bottom = 0,
+    top = MAX_VALUE,
+    accumulateDistance = { a, b ->
+        if (a == MAX_VALUE || b == MAX_VALUE) MAX_VALUE else (a + b).coerceAtMost(MAX_VALUE)
+    },
+    metric = { neighboring(1) },
+)
 
 /**
  * Compute the distance from the closest [source], using [Double]s.
