@@ -1,3 +1,25 @@
+## [17.2.1](https://github.com/Collektive/collektive/compare/17.2.0...17.2.1) (2025-04-01)
+
+### Dependency updates
+
+* **core-deps:** update serialization to v1.8.1 ([e205d1b](https://github.com/Collektive/collektive/commit/e205d1b9d68a0d7ca12ec7e885d1ead3731b6029))
+* **deps:** update alchemist to v42.0.2 ([7605f81](https://github.com/Collektive/collektive/commit/7605f812eb743967e1fc9a5cb2bce0fa54f354b9))
+* **deps:** update alchemist to v42.0.3 ([b4b0e82](https://github.com/Collektive/collektive/commit/b4b0e825534bf34e9547c9975da38aa176ffbfd4))
+* **deps:** update alchemist to v42.0.4 ([df14cc2](https://github.com/Collektive/collektive/commit/df14cc278e983aa9fe2337c83ef403f4486cce27))
+* **deps:** update alchemist to v42.0.5 ([afd6909](https://github.com/Collektive/collektive/commit/afd690978dd936474cdd3ebb6443530eb4ecef95))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5.6.0 ([17f4861](https://github.com/Collektive/collektive/commit/17f4861dca87590b3e9a3d989f09b45beb3f98dc))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5.6.1 ([2aa0d76](https://github.com/Collektive/collektive/commit/2aa0d7648ec6869182cd8dfd456e83a67aa5dfbf))
+* **deps:** update dependency react-router-dom to v7.4.1 ([eeaef95](https://github.com/Collektive/collektive/commit/eeaef9526e3539b31aefac257070025f61a13727))
+* **deps:** update plugin kotlin-qa to v0.78.2 ([4845a5c](https://github.com/Collektive/collektive/commit/4845a5c0f285755b0d27bcfc5cae77b0fcfb093e))
+* **deps:** update plugin kotlin-qa to v0.78.3 ([e09f009](https://github.com/Collektive/collektive/commit/e09f009ffb3a3a6799cf8acb432a67852454bdb2))
+* **deps:** update plugin kotlin-qa to v0.84.1 ([c83526a](https://github.com/Collektive/collektive/commit/c83526ada4fed6c1afae074dcee3478390f8f21f))
+* **deps:** update plugin kotlin-qa to v0.85.0 ([0091c34](https://github.com/Collektive/collektive/commit/0091c340141d8d4dd96015d957f1c575b39383d4))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.14 ([0d8747c](https://github.com/Collektive/collektive/commit/0d8747c3cb280b921a0c2c86b66869cd89260203))
+* **deps:** update github/codeql-action action to v3.28.13 ([446e97c](https://github.com/Collektive/collektive/commit/446e97c1ba71ae7edf8a999e6d52b41641d4f322))
+
 ## [17.2.0](https://github.com/Collektive/collektive/compare/17.1.3...17.2.0) (2025-03-24)
 
 ### Features
