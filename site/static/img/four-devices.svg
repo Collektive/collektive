@@ -23,9 +23,9 @@
      inkscape:pageopacity="0.0"
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
-     inkscape:zoom="1.5783392"
-     inkscape:cx="205.27907"
-     inkscape:cy="182.47028"
+     inkscape:zoom="1.3839378"
+     inkscape:cx="180.64396"
+     inkscape:cy="85.263947"
      inkscape:window-width="1224"
      inkscape:window-height="847"
      inkscape:window-x="217"
@@ -51,53 +51,23 @@
        d="M 57.274855,239.32525 162.72267,62.037453"
        id="path16"
        sodipodi:nodetypes="cc" />
-    <path
-       style="fill:#97ff00;fill-rule:evenodd;stroke:#b22ac6;stroke-width:1.512;stroke-linecap:round;stroke-dasharray:1.512, 3.024;stroke-dashoffset:0;fill-opacity:1;stroke-opacity:1"
-       d="M 162.72267,62.037453 265.43128,237.81344"
-       id="path17"
-       sodipodi:nodetypes="cc" />
     <g
-       id="g3"
-       transform="translate(17.274855,199.32525)"
-       style="fill:#21918c;fill-opacity:1;stroke:#1b1b1b;stroke-opacity:1">
+       id="g3-9"
+       transform="translate(17.377521,199.41325)">
       <circle
          cx="40"
          cy="40"
          fill="#d5e8d4"
          stroke="#82b366"
          pointer-events="all"
-         id="ellipse2"
-         r="40"
-         style="fill:#21918c;fill-opacity:1;stroke:#146662;stroke-opacity:1" />
+         id="ellipse2-3"
+         r="40" />
     </g>
-    <g
-       id="g6"
-       transform="translate(-51.160148,198.56935)"
-       style="stroke:#4b994e;stroke-opacity:1;fill:#5ec962;fill-opacity:1">
-      <circle
-         cx="316.59143"
-         cy="39.244095"
-         fill="#fad7ac"
-         stroke="#b46504"
-         pointer-events="all"
-         id="ellipse5"
-         r="40"
-         style="stroke:#4b994e;stroke-opacity:1;fill:#5ec962;fill-opacity:1" />
-    </g>
-    <g
-       id="g12"
-       transform="translate(-17.777333,-88.462547)"
-       style="stroke:#2e3e69;stroke-opacity:1;fill:#3b528b;fill-opacity:1">
-      <circle
-         cx="180.5"
-         cy="150.5"
-         fill="#b1ddf0"
-         stroke="#10739e"
-         pointer-events="all"
-         id="ellipse11"
-         r="40.5"
-         style="stroke:#2e3e69;stroke-opacity:1;fill:#3b528b;fill-opacity:1" />
-    </g>
+    <path
+       style="fill:#97ff00;fill-rule:evenodd;stroke:#b22ac6;stroke-width:1.512;stroke-linecap:round;stroke-dasharray:1.512, 3.024;stroke-dashoffset:0;fill-opacity:1;stroke-opacity:1"
+       d="M 162.72267,62.037453 265.43128,237.81344"
+       id="path17"
+       sodipodi:nodetypes="cc" />
     <text
        xml:space="preserve"
        style="font-size:20px;line-height:0.6;font-family:'Fira Math';-inkscape-font-specification:'Fira Math, Normal';text-align:start;letter-spacing:0px;word-spacing:0.21px;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#29364c;fill-rule:evenodd;stroke:none;stroke-width:1.51181;stroke-linecap:round"
@@ -128,6 +98,18 @@
          id="tspan11"
          x="248.88608"
          y="33.744061" /></text>
+    <g
+       id="g4-8"
+       transform="translate(170.5,-248.71855)">
+      <circle
+         cx="180"
+         cy="310"
+         fill="#fff2cc"
+         stroke="#d6b656"
+         pointer-events="all"
+         id="ellipse3-0"
+         r="40" />
+    </g>
     <text
        xml:space="preserve"
        style="font-size:14.6667px;line-height:0.8;font-family:'Fira Math';-inkscape-font-specification:'Fira Math, Normal';text-align:start;letter-spacing:0px;word-spacing:0.21px;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;fill-rule:evenodd;stroke:none;stroke-width:1.51181;stroke-linecap:round;fill-opacity:1"
@@ -144,6 +126,18 @@
          y="250.24461"
          id="tspan13"
          style="font-size:14.6667px;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1">value = 10</tspan></text>
+    <g
+       id="g6-2"
+       transform="translate(-43.812815,198.08115)">
+      <circle
+         cx="310"
+         cy="40"
+         fill="#fad7ac"
+         stroke="#b46504"
+         pointer-events="all"
+         id="ellipse5-4"
+         r="40" />
+    </g>
     <text
        xml:space="preserve"
        style="font-size:14.6667px;line-height:0.8;font-family:'Fira Math';-inkscape-font-specification:'Fira Math, Normal';text-align:start;letter-spacing:0px;word-spacing:0.21px;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;fill-rule:evenodd;stroke:none;stroke-width:1.51181;stroke-linecap:round;fill-opacity:1"
@@ -161,18 +155,16 @@
          id="tspan15"
          style="font-size:14.6667px;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1">value = 15</tspan></text>
     <g
-       id="g4"
-       transform="translate(170.5,-248.71855)"
-       style="fill:#fde725;fill-opacity:1;stroke:#bfb423;stroke-opacity:1">
+       id="g12-8"
+       transform="translate(-18.53333,-86.839916)">
       <circle
-         cx="180"
-         cy="310"
-         fill="#fff2cc"
-         stroke="#d6b656"
+         cx="180.5"
+         cy="150.5"
+         fill="#b1ddf0"
+         stroke="#10739e"
          pointer-events="all"
-         id="ellipse3"
-         r="40"
-         style="fill:#fde725;fill-opacity:1;stroke:#bfb423;stroke-opacity:1" />
+         id="ellipse11-3"
+         r="40.5" />
     </g>
     <text
        xml:space="preserve"
