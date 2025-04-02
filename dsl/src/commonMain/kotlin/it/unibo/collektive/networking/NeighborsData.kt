@@ -12,16 +12,16 @@ import it.unibo.collektive.aggregate.api.DataSharingMethod
 import it.unibo.collektive.path.Path
 
 /**
- * TODO.
+ * Data received from neighbors.
  */
 interface NeighborsData<ID : Any> {
     /**
-     * TODO.
+     * The set of known neighbors.
      */
     val neighbors: Set<ID>
 
     /**
-     * TODO.
+     * The data from all neighbors at a specific [path].
      */
     fun <Value> dataAt(path: Path, dataSharingMethod: DataSharingMethod<Value>): Map<ID, Value>
 }
