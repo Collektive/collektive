@@ -15,6 +15,7 @@ import it.unibo.collektive.frontend.checkers.CheckersUtility.functionName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.hasAggregateArgument
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isAggregate
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isFunctionCallsWithName
+import it.unibo.collektive.frontend.checkers.CheckersUtility.isInsideAggregateFunction
 import it.unibo.collektive.frontend.checkers.CheckersUtility.wrappingElementsUntil
 import it.unibo.collektive.frontend.visitors.FunctionCallWithAggregateParVisitor
 import it.unibo.collektive.utils.common.AggregateFunctionNames
@@ -25,7 +26,6 @@ import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirFunctionCallChecker
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.FirWhileLoop
-import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 import kotlin.reflect.jvm.kotlinFunction
@@ -96,21 +96,16 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
      */
     private val collectionMembers = getCollectionMembersJava()
 
-    private fun CheckerContext.isInsideALoopWithoutAlignedOn(): Boolean = wrappingElementsUntil { it is FirWhileLoop }
-        ?.discardIfFunctionDeclaration()
-        ?.discardIfOutsideAggregateEntryPoint()
-        ?.none(isFunctionCallsWithName(AggregateFunctionNames.ALIGNED_ON_FUNCTION_NAME)) ?: false
-
-    private fun CheckerContext.isInsideIteratedFunctionWithoutAlignedOn(): Boolean =
-        wrappingElementsUntil { it is FirFunctionCall && it.functionName() in collectionMembers }
+    private fun CheckerContext.isIteratedWithoutAlignedOn(): Boolean =
+        wrappingElementsUntil {
+            isInsideAggregateFunction() && (it is FirWhileLoop || it is FirFunctionCall && it.functionName() in collectionMembers)
+        }
             ?.discardIfFunctionDeclaration()
             ?.discardIfOutsideAggregateEntryPoint()
-            ?.none(isFunctionCallsWithName(AggregateFunctionNames.ALIGNED_ON_FUNCTION_NAME)) ?: false
+            ?.none(isFunctionCallsWithName(AggregateFunctionNames.ALIGNED_ON_FUNCTION_NAME))
+            ?: false
 
-    private fun CheckerContext.isIteratedWithoutAlignedOn(): Boolean =
-        isInsideALoopWithoutAlignedOn() || isInsideIteratedFunctionWithoutAlignedOn()
 
-    @OptIn(SymbolInternals::class)
     private fun isInvalidFunWithAggregateParameter(expression: FirFunctionCall, context: CheckerContext): Boolean {
         val visitor = FunctionCallWithAggregateParVisitor(context)
         return visitor.visitSuspiciousFunctionCallDeclaration(expression)
@@ -132,12 +127,7 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
                 else -> null
             }
         error?.let {
-            reporter.reportOn(
-                expression.calleeReference.source,
-                it,
-                calleeName,
-                context,
-            )
+            reporter.reportOn(expression.calleeReference.source, it, calleeName, context)
         }
     }
 }
