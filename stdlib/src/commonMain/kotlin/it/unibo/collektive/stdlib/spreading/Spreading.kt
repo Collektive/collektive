@@ -207,11 +207,10 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
                         pathsBySource.getOrPut(it.path.source) { mutableListOf() }.apply { add(it) }
                     }
                     while (size < maxPaths) {
-                        val candidates =
-                            pathsBySource.values
-                                .mapNotNull { it.removeFirstOrNull() }
-                                .take(maxPaths - size - fromLocalSource.size)
-                                .map { it.toLocalPath(accumulateData) }
+                        val candidates = pathsBySource.values
+                            .mapNotNull { it.removeFirstOrNull() }
+                            .take(maxPaths - size - fromLocalSource.size)
+                            .map { it.toLocalPath(accumulateData) }
                         addAll(candidates)
                     }
                 }
