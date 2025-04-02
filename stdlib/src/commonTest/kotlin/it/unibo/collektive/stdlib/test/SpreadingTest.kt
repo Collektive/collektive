@@ -11,17 +11,23 @@ import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.stdlib.spreading.GradientPath
 import it.unibo.collektive.stdlib.spreading.distanceTo
+import it.unibo.collektive.stdlib.spreading.gradientCast
 import it.unibo.collektive.testing.Environment
+import it.unibo.collektive.testing.EnvironmentWithMeshNetwork
+import it.unibo.collektive.testing.Position
 import it.unibo.collektive.testing.SerializingMailbox
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.math.abs
+import kotlin.math.nextDown
+import kotlin.math.nextUp
 import kotlin.math.sqrt
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class DistanceToTest {
+class SpreadingTest {
     private fun Environment<Double>.gradientIsStable(isMoore: Boolean, size: Int): Boolean =
         status().all { (id, value) ->
             val x = id % size
@@ -42,7 +48,7 @@ class DistanceToTest {
         }
 
     private fun mooreGridWithGradient(size: Int) =
-        mooreGrid<Double>(size, size, { _, _ -> Double.NaN }) { environment, _ ->
+        mooreGrid<Double>(size, size, { _, _ -> Double.NaN }) { environment ->
             val localPosition = environment.positionOf(localId)
             distanceTo(localId == 0) { neighboring(localPosition).map { it.distanceTo(localPosition) } }
         }.apply {
@@ -88,6 +94,34 @@ class DistanceToTest {
             neighboring(GradientPath(0, 0, 0, 0))
             neighboring(GradientPath(0, 0, 0, listOf(1, 2, 3)))
         }
-        println(network.serializeToString(1))
+        assertNotNull(network.serializeToString(1))
+    }
+
+    @Test
+    fun `gradientCast does not suffer from the raising value problem`() {
+        EnvironmentWithMeshNetwork<Double>(
+            connectDistance = 1.1,
+            defaultRetainTime = 2,
+        ).apply {
+            val left = 0.0.nextDown()
+            val right = 0.0.nextUp()
+            for ((x, y) in listOf(0.0 to 0.0, 1.0 to left, 1.0 to right)) {
+                // Not Aggregate.()
+                addNode(Position(x, y, 0.0), Double.NaN) { _ ->
+                    // This is Aggregate.()
+                    gradientCast(
+                        source = localId == 0,
+                        local = y,
+                    )
+                }
+            }
+            assertTrue(nodes.all { it.value.isNaN() })
+            repeat(2) { cycleInRandomOrder() }
+            assertTrue { nodes.all { it.value == 0.0 } }
+            removeNode(0)
+            repeat(4) { cycleInRandomOrder() }
+            assertEquals(left, nodes.single { it.id == 1 }.value)
+            assertEquals(right, nodes.single { it.id == 2 }.value)
+        }
     }
 }

@@ -26,17 +26,16 @@ class ExchangeTest {
         f.mapWithId { _, v -> if (v % 2 == 0) v + 1 else v * 2 }
     }
 
-    private fun mooreGridWithIncreaseOrDouble(size: Int) =
-        mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }) { _, _ ->
-            exchange(1) { field ->
-                field.map { field.fold(localId) { acc, value -> acc + value } }
-            }.localValue
-        }.also {
-            assertEquals(size * size, it.nodes.size)
-        }
+    private fun mooreGridWithIncreaseOrDouble(size: Int) = mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }) { _ ->
+        exchange(1) { field ->
+            field.map { field.fold(localId) { acc, value -> acc + value } }
+        }.localValue
+    }.also {
+        assertEquals(size * size, it.nodes.size)
+    }
 
     private fun mooreGridWithConstantFieldResult(size: Int) =
-        mooreGrid<Field<Int, Int>>(size, size, { _, _ -> Field.invoke(0, 0, emptyMap()) }) { _, _ ->
+        mooreGrid<Field<Int, Int>>(size, size, { _, _ -> Field.invoke(0, 0, emptyMap()) }) { _ ->
             exchange(1) { field ->
                 field.mapToConstantField(10)
             }
@@ -45,7 +44,7 @@ class ExchangeTest {
         }
 
     private fun mooreGridWithDedicatedNeighborValues(size: Int) =
-        mooreGrid<Int>(size, size, { _, _ -> Int.MIN_VALUE }) { _, _ ->
+        mooreGrid<Int>(size, size, { _, _ -> Int.MIN_VALUE }) { _ ->
             val res =
                 exchange(0) { field ->
                     field.mapWithId { id, value ->

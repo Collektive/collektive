@@ -25,7 +25,7 @@ class GossipTest {
     private fun <Value> Environment<Value>.gossipResult(): Value = status().values.distinct().first()
 
     private fun squareMooreGridWithGossip(size: Int, max: Boolean = true) =
-        mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }) { _, _ ->
+        mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }) { _ ->
             if (max) {
                 gossipMax(localId) // gossip the max localID in the network
             } else {
@@ -41,7 +41,7 @@ class GossipTest {
         }
 
     private fun linearMooreGridWithGossip(size: Int, max: Boolean = true) =
-        mooreGrid<Int>(size, 1, { _, _ -> Int.MAX_VALUE }) { _, _ ->
+        mooreGrid<Int>(size, 1, { _, _ -> Int.MAX_VALUE }) { _ ->
             if (max) {
                 gossipMax(localId) // gossip the max localID in the network
             } else {
@@ -57,7 +57,7 @@ class GossipTest {
         }
 
     private fun squareMooreGridWithNonSelfStabilizingGossip(size: Int) =
-        mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }) { _, _ ->
+        mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }) { _ ->
             nonStabilizingGossip(localId) { first, second -> if (first >= second) first else second }
         }.apply {
             assertEquals(size * size, nodes.size)
