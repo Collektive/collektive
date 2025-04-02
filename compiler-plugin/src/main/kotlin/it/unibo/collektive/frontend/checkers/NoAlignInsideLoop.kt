@@ -15,17 +15,18 @@ import it.unibo.collektive.frontend.checkers.CheckersUtility.functionName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.hasAggregateArgument
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isAggregate
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isFunctionCallsWithName
+import it.unibo.collektive.frontend.checkers.CheckersUtility.isInsideAggregateFunction
 import it.unibo.collektive.frontend.checkers.CheckersUtility.wrappingElementsUntil
 import it.unibo.collektive.frontend.visitors.FunctionCallWithAggregateParVisitor
 import it.unibo.collektive.utils.common.AggregateFunctionNames
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
+import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirFunctionCallChecker
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.FirWhileLoop
-import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 import kotlin.reflect.jvm.kotlinFunction
@@ -72,45 +73,40 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         .toSet()
 
     /**
-     * Getter for all Collection members using Java reflection, obtaining their names as a set.
-     */
-    private fun getCollectionMembersJava(): Set<String> = sequenceOf(
-        Class.forName("kotlin.collections.CollectionsKt"),
-        Collection::class.java,
-        Iterable::class.java,
-        List::class.java,
-        Map::class.java,
-        Sequence::class.java,
-        Set::class.java,
-    ).flatMap { it.methods.asSequence() }
-        .filter { method ->
-            method.parameters.any { parameter ->
-                parameter.parameterizedType.typeName.startsWith("kotlin.jvm.functions.Function") ||
-                    parameter.parameterizedType is Function<*>
-            }
-        }.map { it.name }
-        .toSet()
-
-    /**
      * Methods used inside collections to iterate their elements.
      */
-    private val collectionMembers = getCollectionMembersJava()
+    private val collectionMembers: Set<String> by lazy {
+        sequenceOf(
+            Class.forName("kotlin.collections.CollectionsKt"),
+            Collection::class.java,
+            Iterable::class.java,
+            List::class.java,
+            Map::class.java,
+            Sequence::class.java,
+            Set::class.java,
+        ).flatMap { it.methods.asSequence() }
+            .filter { method ->
+                method.parameters.any { parameter ->
+                    parameter.parameterizedType.typeName.startsWith("kotlin.jvm.functions.Function") ||
+                        parameter.parameterizedType is Function<*>
+                }
+            }.map { it.name }
+            .toSet()
+    }
 
-    private fun CheckerContext.isInsideALoopWithoutAlignedOn(): Boolean = wrappingElementsUntil { it is FirWhileLoop }
-        ?.discardIfFunctionDeclaration()
-        ?.discardIfOutsideAggregateEntryPoint()
-        ?.none(isFunctionCallsWithName(AggregateFunctionNames.ALIGNED_ON_FUNCTION_NAME)) ?: false
+    private fun FirElement.isACallToALoopingCollectionsMethod(): Boolean =
+        this is FirFunctionCall && this.functionName() in collectionMembers
 
-    private fun CheckerContext.isInsideIteratedFunctionWithoutAlignedOn(): Boolean =
-        wrappingElementsUntil { it is FirFunctionCall && it.functionName() in collectionMembers }
-            ?.discardIfFunctionDeclaration()
-            ?.discardIfOutsideAggregateEntryPoint()
-            ?.none(isFunctionCallsWithName(AggregateFunctionNames.ALIGNED_ON_FUNCTION_NAME)) ?: false
+    private fun CheckerContext.isALoopInsideAnAggregateContext(element: FirElement): Boolean =
+        (element is FirWhileLoop || element.isACallToALoopingCollectionsMethod()) && isInsideAggregateFunction()
 
     private fun CheckerContext.isIteratedWithoutAlignedOn(): Boolean =
-        isInsideALoopWithoutAlignedOn() || isInsideIteratedFunctionWithoutAlignedOn()
+        wrappingElementsUntil { isALoopInsideAnAggregateContext(it) }
+            ?.discardIfFunctionDeclaration()
+            ?.discardIfOutsideAggregateEntryPoint()
+            ?.none(isFunctionCallsWithName(AggregateFunctionNames.ALIGNED_ON_FUNCTION_NAME))
+            ?: false
 
-    @OptIn(SymbolInternals::class)
     private fun isInvalidFunWithAggregateParameter(expression: FirFunctionCall, context: CheckerContext): Boolean {
         val visitor = FunctionCallWithAggregateParVisitor(context)
         return visitor.visitSuspiciousFunctionCallDeclaration(expression)
@@ -132,12 +128,7 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
                 else -> null
             }
         error?.let {
-            reporter.reportOn(
-                expression.calleeReference.source,
-                it,
-                calleeName,
-                context,
-            )
+            reporter.reportOn(expression.calleeReference.source, it, calleeName, context)
         }
     }
 }
