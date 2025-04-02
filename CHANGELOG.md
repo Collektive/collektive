@@ -1,3 +1,25 @@
+## [17.2.2](https://github.com/Collektive/collektive/compare/17.2.1...17.2.2) (2025-04-02)
+
+### Dependency updates
+
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5.6.2 ([3a1da14](https://github.com/Collektive/collektive/commit/3a1da14d2085d36689f3ac06a27eac3e761d4992))
+
+### Bug Fixes
+
+* **compiler-plugin:** check the presence of an aggregate context before triggering "loop without align" warnings ([#843](https://github.com/Collektive/collektive/issues/843)) ([9253e35](https://github.com/Collektive/collektive/commit/9253e3523a1563e6e81834ddbd9cc2daf0cc76d0))
+
+### Documentation
+
+* **dsl:** write a minimal documentation for `NeighborsData` ([#846](https://github.com/Collektive/collektive/issues/846)) ([1ab4a83](https://github.com/Collektive/collektive/commit/1ab4a83446288cc618c5d4519b3985c5e4738775))
+
+### Build and continuous integration
+
+* **deps:** bump image-size from 1.1.1 to 1.2.1 in /site ([#844](https://github.com/Collektive/collektive/issues/844)) ([b149889](https://github.com/Collektive/collektive/commit/b149889c94a0c2429a4165bc4485c522288b1531))
+
+### General maintenance
+
+* update some copyright headers ([4730605](https://github.com/Collektive/collektive/commit/473060509f3b28855492065fd09058a45af668fd))
+
 ## [17.2.1](https://github.com/Collektive/collektive/compare/17.2.0...17.2.1) (2025-04-01)
 
 ### Dependency updates
