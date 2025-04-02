@@ -20,6 +20,19 @@ import kotlin.jvm.JvmName
 import kotlin.jvm.JvmOverloads
 
 /**
+ * Compute the distance from the closest [source], using [Double]s.
+ *
+ * The distance between neighboring devices is computed using the [metric] function,
+ * and defaults to the hop distance.
+ */
+@JvmOverloads
+inline fun <reified ID : Any> Aggregate<ID>.distanceTo(
+    source: Boolean,
+    maxPaths: Int = Int.MAX_VALUE,
+    crossinline metric: () -> Field<ID, Double> = { neighboring(1.0) },
+): Double = distanceTo(source, 0.0, Double.POSITIVE_INFINITY, maxPaths, Double::plus, metric)
+
+/**
  * Compute the [Distance] from the closest [source], starting from [bottom] and up to [top].
  *
  * the [Distance] between neighboring devices is computed using the [metric] function,
@@ -51,69 +64,6 @@ inline fun <reified ID : Any, reified Distance : Comparable<Distance>> Aggregate
 @JvmOverloads
 inline fun <reified ID : Any> Aggregate<ID>.hopDistanceTo(source: Boolean, maxPaths: Int = Int.MAX_VALUE): Int =
     distanceTo(source, 0, Int.MAX_VALUE, maxPaths, Int::plus) { neighboring(1) }
-
-/**
- * Compute the distance from the closest [source], using [Double]s.
- *
- * The distance between neighboring devices is computed using the [metric] function,
- * and defaults to the hop distance.
- */
-@JvmOverloads
-inline fun <reified ID : Any> Aggregate<ID>.distanceTo(
-    source: Boolean,
-    maxPaths: Int = Int.MAX_VALUE,
-    crossinline metric: () -> Field<ID, Double> = { neighboring(1.0) },
-): Double = distanceTo(source, 0.0, Double.POSITIVE_INFINITY, maxPaths, Double::plus, metric)
-
-/**
- * A path segment along a potential field that reaches the current device,
- * after [distance], starting from [source],
- * passing [through] an intermediate direct neighbor,
- * carrying [data].
- *
- * This data class is designed to be shared within [gradientCast] and derivative functions.
- */
-@Serializable
-data class GradientPath<ID : Any, Value, Distance : Comparable<Distance>>(
-    val distance: Distance,
-    val through: ID,
-    val source: ID,
-    val data: Value,
-)
-
-/**
- * A two-segment path along a potential field that reaches the current device,
- * after [totalDistance], starting from [source],
- * passing through an intermediate direct [neighbor]
- * distant [distanceToNeighbor] from the current device,
- * to which it arrives through [path].
- *
- * This class is meant to be used internally by the [gradientCast] function,
- * and it is not intended to be used outside of it.
- */
-@DelicateCollektiveApi
-data class UpdatedGradientPath<ID : Any, Value, Distance : Comparable<Distance>>(
-    val neighbor: ID,
-    val totalDistance: Distance,
-    val distanceToNeighbor: Distance,
-    val path: GradientPath<ID, Value, Distance>,
-) : Comparable<UpdatedGradientPath<ID, Value, Distance>> {
-
-    val source = path.source
-
-    override fun compareTo(other: UpdatedGradientPath<ID, Value, Distance>): Int =
-        totalDistance.compareTo(other.totalDistance)
-
-    /**
-     * Convert this path to a [GradientPath] by accumulating the data from the source to the neighbor.
-     *
-     * @param accumulateData function to accumulate data from the source to the neighbor.
-     */
-    fun toLocalPath(
-        accumulateData: (fromSource: Distance, toNeighbor: Distance, data: Value) -> Value,
-    ): GradientPath<ID, Value, Distance> =
-        GradientPath(totalDistance, neighbor, source, accumulateData(path.distance, distanceToNeighbor, path.data))
-}
 
 /**
  * Propagate [local] values across a spanning tree starting from the closest [source].
@@ -224,6 +174,22 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
  * Propagate [local] values across a spanning tree starting from the closest [source].
  *
  * If there are no sources and no neighbors, default to [local] value.
+ * The [metric] function is used to compute the distance between devices in form of a field of [Double]s.
+ * [accumulateData] is used to modify data from neighbors on the fly, and defaults to the identity function.
+ */
+@JvmOverloads
+inline fun <reified ID : Any, reified Type> Aggregate<ID>.gradientCast(
+    source: Boolean,
+    local: Type,
+    maxPaths: Int = Int.MAX_VALUE,
+    noinline accumulateData: (fromSource: Double, toNeighbor: Double, data: Type) -> Type = { _, _, data -> data },
+    crossinline metric: () -> Field<ID, Double> = { neighboring(1.0) },
+): Type = gradientCast(source, local, 0.0, Double.POSITIVE_INFINITY, maxPaths, accumulateData, Double::plus, metric)
+
+/**
+ * Propagate [local] values across a spanning tree starting from the closest [source].
+ *
+ * If there are no sources and no neighbors, default to [local] value.
  * The [metric] function is used to compute the distance between devices in form of a field of [Int]s.
  * [accumulateData] is used to modify data from neighbors on the fly, and defaults to the identity function.
  */
@@ -236,22 +202,6 @@ inline fun <reified ID : Any, reified Type> Aggregate<ID>.intGradientCast(
     crossinline metric: () -> Field<ID, Int> = { neighboring(1) },
 ): Type = // Int.MAX_VALUE - 1 avoids overflow in the case of raising value problem
     gradientCast(source, local, 0, Int.MAX_VALUE - 1, maxPaths, accumulateData, Int::plus, metric)
-
-/**
- * Propagate [local] values across a spanning tree starting from the closest [source].
- *
- * If there are no sources and no neighbors, default to [local] value.
- * The [metric] function is used to compute the distance between devices in form of a field of [Double]s.
- * [accumulateData] is used to modify data from neighbors on the fly, and defaults to the identity function.
- */
-@JvmOverloads
-inline fun <reified ID : Any, reified Type> Aggregate<ID>.gradientCast(
-    source: Boolean,
-    local: Type,
-    maxPaths: Int = Int.MAX_VALUE,
-    noinline accumulateData: (fromSource: Double, toNeighbor: Double, data: Type) -> Type = { _, _, data -> data },
-    crossinline metric: () -> Field<ID, Double> = { neighboring(1.0) },
-): Type = gradientCast(source, local, 0.0, Double.POSITIVE_INFINITY, maxPaths, accumulateData, Double::plus, metric)
 
 /**
  * Provided a list of [sources], propagates information from each, collecting it in a map.
@@ -335,4 +285,54 @@ inline fun <reified ID : Any, reified Value> Aggregate<ID>.multiGradientCast(
             metric = metric,
         )
     }
+}
+
+/**
+ * A path segment along a potential field that reaches the current device,
+ * after [distance], starting from [source],
+ * passing [through] an intermediate direct neighbor,
+ * carrying [data].
+ *
+ * This data class is designed to be shared within [gradientCast] and derivative functions.
+ */
+@Serializable
+data class GradientPath<ID : Any, Value, Distance : Comparable<Distance>>(
+    val distance: Distance,
+    val through: ID,
+    val source: ID,
+    val data: Value,
+)
+
+/**
+ * A two-segment path along a potential field that reaches the current device,
+ * after [totalDistance], starting from [source],
+ * passing through an intermediate direct [neighbor]
+ * distant [distanceToNeighbor] from the current device,
+ * to which it arrives through [path].
+ *
+ * This class is meant to be used internally by the [gradientCast] function,
+ * and it is not intended to be used outside of it.
+ */
+@DelicateCollektiveApi
+data class UpdatedGradientPath<ID : Any, Value, Distance : Comparable<Distance>>(
+    val neighbor: ID,
+    val totalDistance: Distance,
+    val distanceToNeighbor: Distance,
+    val path: GradientPath<ID, Value, Distance>,
+) : Comparable<UpdatedGradientPath<ID, Value, Distance>> {
+
+    val source = path.source
+
+    override fun compareTo(other: UpdatedGradientPath<ID, Value, Distance>): Int =
+        totalDistance.compareTo(other.totalDistance)
+
+    /**
+     * Convert this path to a [GradientPath] by accumulating the data from the source to the neighbor.
+     *
+     * @param accumulateData function to accumulate data from the source to the neighbor.
+     */
+    fun toLocalPath(
+        accumulateData: (fromSource: Distance, toNeighbor: Distance, data: Value) -> Value,
+    ): GradientPath<ID, Value, Distance> =
+        GradientPath(totalDistance, neighbor, source, accumulateData(path.distance, distanceToNeighbor, path.data))
 }
