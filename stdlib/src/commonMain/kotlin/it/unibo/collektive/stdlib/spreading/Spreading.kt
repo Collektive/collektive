@@ -228,14 +228,14 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
  * [accumulateData] is used to modify data from neighbors on the fly, and defaults to the identity function.
  */
 @JvmOverloads
-@JvmName("gradientCastInt")
-inline fun <reified ID : Any, reified Type> Aggregate<ID>.gradientCast(
+inline fun <reified ID : Any, reified Type> Aggregate<ID>.intGradientCast(
     source: Boolean,
     local: Type,
     maxPaths: Int = Int.MAX_VALUE,
     noinline accumulateData: (fromSource: Int, toNeighbor: Int, data: Type) -> Type = { _, _, data -> data },
     crossinline metric: () -> Field<ID, Int> = { neighboring(1) },
-): Type = gradientCast(source, local, Int.MIN_VALUE, Int.MAX_VALUE, maxPaths, accumulateData, Int::plus, metric)
+): Type = // Int.MAX_VALUE - 1 avoids overflow in the case of raising value problem
+    gradientCast(source, local, 0, Int.MAX_VALUE - 1, maxPaths, accumulateData, Int::plus, metric)
 
 /**
  * Propagate [local] values across a spanning tree starting from the closest [source].
@@ -245,7 +245,6 @@ inline fun <reified ID : Any, reified Type> Aggregate<ID>.gradientCast(
  * [accumulateData] is used to modify data from neighbors on the fly, and defaults to the identity function.
  */
 @JvmOverloads
-@JvmName("gradientCastDouble")
 inline fun <reified ID : Any, reified Type> Aggregate<ID>.gradientCast(
     source: Boolean,
     local: Type,
