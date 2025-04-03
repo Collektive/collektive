@@ -1,7 +1,15 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 package it.unibo.collektive.branch
 
 import it.unibo.collektive.Collektive.Companion.aggregate
-import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
+import it.unibo.collektive.aggregate.api.neighboring
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -10,7 +18,7 @@ class IfConditionTest {
     fun `Branches with constant conditions should get aligned`() {
         val result =
             aggregate(0) {
-                if (true) neighboringViaExchange("test")
+                if (true) neighboring("test")
             }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
         assertEquals(1, messageFor0.size)
@@ -22,7 +30,7 @@ class IfConditionTest {
         val customCondition = true
         val result =
             aggregate(0) {
-                if (customCondition) neighboringViaExchange("test")
+                if (customCondition) neighboring("test")
             }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
         assertEquals(1, messageFor0.size)
@@ -34,7 +42,7 @@ class IfConditionTest {
         fun customFunction() = true
         val result =
             aggregate(0) {
-                if (customFunction()) neighboringViaExchange("test")
+                if (customFunction()) neighboring("test")
             }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
         assertEquals(1, messageFor0.size)
@@ -47,7 +55,7 @@ class IfConditionTest {
         val customCondition2 = true
         val result =
             aggregate(0) {
-                if (customCondition1 && customCondition2) neighboringViaExchange("test")
+                if (customCondition1 && customCondition2) neighboring("test")
             }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
         assertEquals(1, messageFor0.size)
@@ -60,7 +68,7 @@ class IfConditionTest {
         val customCondition2 = true
         val result =
             aggregate(0) {
-                if (customCondition1 || customCondition2) neighboringViaExchange("test")
+                if (customCondition1 || customCondition2) neighboring("test")
             }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
         assertEquals(1, messageFor0.size)
@@ -73,7 +81,7 @@ class IfConditionTest {
         val customCondition2 = false
         val result =
             aggregate(0) {
-                if (customCondition1 && !customCondition2) neighboringViaExchange("test")
+                if (customCondition1 && !customCondition2) neighboring("test")
             }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
         assertEquals(1, messageFor0.size)

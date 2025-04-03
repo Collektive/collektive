@@ -9,8 +9,8 @@
 package it.unibo.collektive.aggregate
 
 import it.unibo.collektive.Collektive.Companion.aggregate
-import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchange
-import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchanging
+import it.unibo.collektive.aggregate.api.exchange
+import it.unibo.collektive.aggregate.api.exchanging
 import it.unibo.collektive.field.ConstantField
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.Field.Companion.fold

@@ -1,15 +1,23 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 package it.unibo.collektive.branch
 
 import it.unibo.collektive.Collektive.Companion.aggregate
-import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
+import it.unibo.collektive.aggregate.api.neighboring
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class WhenTest {
     private fun programUnderTest(input: Any) = aggregate(0) {
         when (input) {
-            is String -> neighboringViaExchange("string")
-            else -> neighboringViaExchange("test")
+            is String -> neighboring("string")
+            else -> neighboring("test")
         }
     }
 
@@ -40,11 +48,11 @@ class WhenTest {
         val result =
             aggregate(0) {
                 fun test() {
-                    neighboringViaExchange("test")
+                    neighboring("test")
                 }
 
                 fun test2() {
-                    neighboringViaExchange("test2")
+                    neighboring("test2")
                 }
                 when (x) {
                     is String -> test2()
@@ -63,11 +71,11 @@ class WhenTest {
         val result =
             aggregate(0) {
                 when {
-                    condition1 -> neighboringViaExchange("test")
+                    condition1 -> neighboring("test")
                     else ->
                         when {
-                            condition2 -> neighboringViaExchange("test2")
-                            else -> neighboringViaExchange("test3")
+                            condition2 -> neighboring("test2")
+                            else -> neighboring("test3")
                         }
                 }
             }

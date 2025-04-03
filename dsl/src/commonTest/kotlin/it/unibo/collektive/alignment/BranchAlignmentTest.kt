@@ -1,9 +1,17 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 package it.unibo.collektive.alignment
 
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchange
-import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
+import it.unibo.collektive.aggregate.api.exchange
+import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.operations.min
 import it.unibo.collektive.network.NetworkImplTest
@@ -21,7 +29,7 @@ class BranchAlignmentTest {
                 val condition = true
 
                 fun test() {
-                    neighboringViaExchange("test")
+                    neighboring("test")
                 }
 
                 fun test2() {
@@ -56,7 +64,7 @@ class BranchAlignmentTest {
             result.toSend
                 .prepareMessageFor(0)
                 .sharedData.size,
-        ) // 0 path of alignment
+        ) // 0 paths of alignment
     }
 
     @Test
@@ -66,21 +74,21 @@ class BranchAlignmentTest {
             .map { NetworkImplTest(nm, it) to it }
             .map { (net, id) ->
                 aggregate(id, net) {
-                    val outerField = neighboringViaExchange(0)
+                    val outerField = neighboring(0)
                     assertEquals(id, outerField.neighborsCount)
                     if (id % 2 == 0) {
-                        assertEquals(id / 2, neighboringViaExchange(1).neighborsCount)
-                        neighboringViaExchange(1) + outerField
+                        assertEquals(id / 2, neighboring(1).neighborsCount)
+                        neighboring(1) + outerField
                     } else {
-                        assertEquals((id - 1) / 2, neighboringViaExchange(1).neighborsCount)
-                        neighboringViaExchange(1) - outerField
+                        assertEquals((id - 1) / 2, neighboring(1).neighborsCount)
+                        neighboring(1) - outerField
                         outerField.min(Int.MAX_VALUE)
                     }
                 }
             }
     }
 
-    fun exchangeWithThreeDevices(body: Aggregate<Int>.(Field<Int, Int>) -> Field<Int, Int>) {
+    private fun exchangeWithThreeDevices(body: Aggregate<Int>.(Field<Int, Int>) -> Field<Int, Int>) {
         val nm = NetworkManager()
         (0..2)
             .map { NetworkImplTest(nm, it) to it }
@@ -95,16 +103,16 @@ class BranchAlignmentTest {
     fun `A field should be projected also when the field is referenced as lambda parameter issue 171`() {
         exchangeWithThreeDevices {
             if (localId % 2 == 0) {
-                neighboringViaExchange(1) + it
+                neighboring(1) + it
             } else {
-                neighboringViaExchange(1) + it
+                neighboring(1) + it
             }
         }
     }
 
-    fun manuallyAlignedExchangeWithThreeDevices(pivot: (Int) -> Any?) = exchangeWithThreeDevices { field ->
+    private fun manuallyAlignedExchangeWithThreeDevices(pivot: (Int) -> Any?) = exchangeWithThreeDevices { field ->
         alignedOn(pivot(localId)) {
-            neighboringViaExchange(1) + field
+            neighboring(1) + field
         }
     }
 
@@ -124,9 +132,9 @@ class BranchAlignmentTest {
             with(it) {
                 with(localId % 2 == 0) {
                     if (this) {
-                        alignedMap(neighboringViaExchange(1)) { a, b -> a + b }
+                        alignedMap(neighboring(1)) { a, b -> a + b }
                     } else {
-                        alignedMap(neighboringViaExchange(1)) { a, b -> a - b }
+                        alignedMap(neighboring(1)) { a, b -> a - b }
                     }
                 }
             }
