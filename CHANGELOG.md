@@ -1,3 +1,17 @@
+## [18.0.0](https://github.com/Collektive/collektive/compare/17.2.2...18.0.0) (2025-04-03)
+
+### ⚠ BREAKING CHANGES
+
+* **dsl:** revisit the core API of Collektive for clarity and coherence (#847)
+
+### General maintenance
+
+* **dsl:** update copyright header ([377431b](https://github.com/Collektive/collektive/commit/377431ba8e27ce161b00ac55abeab2f79d64a809))
+
+### Refactoring
+
+* **dsl:** revisit the core API of Collektive for clarity and coherence ([#847](https://github.com/Collektive/collektive/issues/847)) ([a77a0af](https://github.com/Collektive/collektive/commit/a77a0af7c465ff8b4dde4931af97ee632598ebc7))
+
 ## [17.2.2](https://github.com/Collektive/collektive/compare/17.2.1...17.2.2) (2025-04-02)
 
 ### Dependency updates
