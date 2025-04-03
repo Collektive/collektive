@@ -18,6 +18,9 @@ import it.unibo.collektive.field.Field.Companion.fold
 import it.unibo.collektive.field.operations.minBy
 import it.unibo.collektive.stdlib.util.coerceIn
 import kotlinx.serialization.Serializable
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmOverloads
 
@@ -78,6 +81,7 @@ inline fun <reified ID : Any> Aggregate<ID>.hopDistanceTo(source: Boolean, maxPa
  * This function features *incremental repair*, and it is subject to the *rising value problem*,
  * see [Fast self-healing gradients](https://doi.org/10.1145/1363686.1364163).
  */
+@OptIn(ExperimentalContracts::class)
 @JvmOverloads
 inline fun <reified ID, reified Value, reified Distance> Aggregate<ID>.bellmanFordGradientCast(
     source: Boolean,
@@ -89,18 +93,21 @@ inline fun <reified ID, reified Value, reified Distance> Aggregate<ID>.bellmanFo
     crossinline accumulateDistance: (fromSource: Distance, toNeighbor: Distance) -> Distance,
     crossinline metric: () -> Field<ID, Distance>,
 ): Value where ID : Any, Distance : Comparable<Distance> {
+    contract {
+        callsInPlace(metric, InvocationKind.EXACTLY_ONCE)
+    }
     val topValue = top to local
+    val distances = metric().coerceIn(bottom, top)
     return share(topValue) { neighborData ->
-        val paths =
-            neighborData.alignedMap(metric().coerceIn(bottom, top)) { (fromSource, data), toNeighbor ->
-                val totalDistance = accumulateDistance(fromSource, toNeighbor).coerceIn(bottom, top)
-                check(totalDistance >= fromSource && totalDistance >= toNeighbor) {
-                    "The provided distance accumulation function violates the triangle inequality: " +
-                        "accumulating $fromSource and $toNeighbor produced $totalDistance"
-                }
-                val newData = accumulateData(fromSource, toNeighbor, data)
-                totalDistance to newData
+        val paths = neighborData.alignedMap(distances) { (fromSource, data), toNeighbor ->
+            val totalDistance = accumulateDistance(fromSource, toNeighbor).coerceIn(bottom, top)
+            check(totalDistance >= fromSource && totalDistance >= toNeighbor) {
+                "The provided distance accumulation function violates the triangle inequality: " +
+                    "accumulating $fromSource and $toNeighbor produced $totalDistance"
             }
+            val newData = accumulateData(fromSource, toNeighbor, data)
+            totalDistance to newData
+        }
         when {
             source -> bottom to local
             else -> paths.minBy(base = topValue) { it.first } // sort by distance from the nearest source
@@ -123,7 +130,7 @@ inline fun <reified ID, reified Value, reified Distance> Aggregate<ID>.bellmanFo
  * On the other hand, it requires larger messages and more processing than the classic
  * [bellmanFordGradientCast].
  */
-@OptIn(DelicateCollektiveApi::class)
+@OptIn(DelicateCollektiveApi::class, ExperimentalContracts::class)
 @JvmOverloads
 inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Distance>> Aggregate<ID>.gradientCast(
     source: Boolean,
@@ -136,9 +143,13 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
     crossinline accumulateDistance: (fromSource: Distance, toNeighbor: Distance) -> Distance,
     crossinline metric: () -> Field<ID, Distance>,
 ): Value {
+    contract {
+        callsInPlace(metric, InvocationKind.EXACTLY_ONCE)
+    }
     require(maxPaths > 0) {
         "Computing the gradient requires at least one-path memory"
     }
+    val coercedMetric = metric().coerceIn(bottom, top)
     val fromLocalSource = if (source) listOf(GradientPath(bottom, localId, localId, local)) else emptyList()
     return sharing(fromLocalSource) { neighborData: Field<ID, List<GradientPath<ID, Value, Distance>>> ->
         /*
@@ -154,7 +165,6 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
                     neighbor == source || neighborsNeighbor != localId && neighborsNeighbor !in neighbors
                 }
             }
-        val coercedMetric = metric().coerceIn(bottom, top)
         val distanceUpdatedPaths = validPaths.alignedMapWithId(coercedMetric) { id, paths, distanceToNeighbor ->
             paths.map { path ->
                 val totalDistance = accumulateDistance(path.distance, distanceToNeighbor).coerceIn(bottom, top)
