@@ -250,13 +250,19 @@ inline fun <reified ID : Any, reified Type> Aggregate<ID>.gradientCast(
  * [bellmanFordGradientCast].
  */
 @JvmOverloads
-inline fun <reified ID : Any, reified Type> Aggregate<ID>.hopGradientCast(
+inline fun <reified ID : Any, reified Type> Aggregate<ID>.intGradientCast(
     source: Boolean,
     local: Type,
     maxPaths: Int = Int.MAX_VALUE,
     noinline accumulateData: (fromSource: Int, toNeighbor: Int, data: Type) -> Type = { _, _, data -> data },
-): Type = // Int.MAX_VALUE - 1 avoids overflow in the case of raising value problem
-    intGradientCast(source, local, maxPaths, accumulateData, Int::plus, ::hops)
+    crossinline accumulateDistance: (fromSource: Int, toNeighbor: Int) -> Int = { fromSource, toNeighbor ->
+        when (val sum = fromSource + toNeighbor) {
+            in 0..Int.MAX_VALUE -> sum
+            else -> Int.MAX_VALUE
+        }
+    },
+    crossinline metric: () -> Field<ID, Int>,
+): Type = gradientCast(source, local, 0, Int.MAX_VALUE, maxPaths, accumulateData, accumulateDistance, metric)
 
 /**
  * Propagate [local] values across multiple spanning trees starting from all the devices in which [source] holds,
