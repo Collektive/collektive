@@ -11,9 +11,11 @@ package it.unibo.collektive.stdlib.spreading
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
 import it.unibo.collektive.aggregate.api.neighboring
+import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.aggregate.api.sharing
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.Field.Companion.fold
+import it.unibo.collektive.field.operations.minBy
 import it.unibo.collektive.stdlib.util.coerceIn
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmName
@@ -75,6 +77,51 @@ inline fun <reified ID : Any> Aggregate<ID>.hopDistanceTo(source: Boolean, maxPa
  *
  * This function features *incremental repair*, and it is subject to the *rising value problem*,
  * see [Fast self-healing gradients](https://doi.org/10.1145/1363686.1364163).
+ */
+@JvmOverloads
+inline fun <reified ID, reified Value, reified Distance> Aggregate<ID>.bellmanFordGradientCast(
+    source: Boolean,
+    local: Value,
+    bottom: Distance,
+    top: Distance,
+    noinline accumulateData: (fromSource: Distance, toNeighbor: Distance, data: Value) -> Value =
+        { _, _, data -> data },
+    crossinline accumulateDistance: (fromSource: Distance, toNeighbor: Distance) -> Distance,
+    crossinline metric: () -> Field<ID, Distance>,
+): Value where ID : Any, Distance : Comparable<Distance> {
+    val topValue = top to local
+    return share(topValue) { neighborData ->
+        val paths =
+            neighborData.alignedMap(metric().coerceIn(bottom, top)) { (fromSource, data), toNeighbor ->
+                val totalDistance = accumulateDistance(fromSource, toNeighbor).coerceIn(bottom, top)
+                check(totalDistance >= fromSource && totalDistance >= toNeighbor) {
+                    "The provided distance accumulation function violates the triangle inequality: " +
+                        "accumulating $fromSource and $toNeighbor produced $totalDistance"
+                }
+                val newData = accumulateData(fromSource, toNeighbor, data)
+                totalDistance to newData
+            }
+        when {
+            source -> bottom to local
+            else -> paths.minBy(base = topValue) { it.first } // sort by distance from the nearest source
+        }
+    }.second // return the data
+}
+
+/**
+ * Propagate [local] values across multiple spanning trees starting from all the devices in which [source] holds,
+ * retaining the value of the closest source.
+ *
+ * If there are no sources, default to [local] value.
+ * The [metric] function is used to compute the distance between devices in form of a field of [Distance]s.
+ * [Distance]s must be in the [[bottom], [top]] range, [accumulateDistance] is used to sum distances.
+ * [accumulateData] is used to modify data from neighbors on the fly, and defaults to the identity function.
+ *
+ * This function features *fast repair*, and it is **not** subject to the *rising value problem*,
+ * see [Fast self-healing gradients](https://doi.org/10.1145/1363686.1364163).
+ *
+ * On the other hand, it requires larger messages and more processing than the classic
+ * [bellmanFordGradientCast].
  */
 @OptIn(DelicateCollektiveApi::class)
 @JvmOverloads
