@@ -12,10 +12,13 @@ import it.unibo.collektive.aggregate.api.Aggregate
 import kotlin.random.Random
 
 /**
- * An environment with a set of [nodes] mapped into [positions],
+ * An environment with a set of [nodes] with a [defaultRetainTime] mapped into [positions],
  * which are considered connected if the [areConnected] function returns true for them.
  */
-open class Environment<R>(val areConnected: (Environment<R>, Node<R>, Node<R>) -> Boolean = { _, _, _ -> true }) {
+open class Environment<R>(
+    val defaultRetainTime: Int = 1,
+    val areConnected: (Environment<R>, Node<R>, Node<R>) -> Boolean = { _, _, _ -> true },
+) {
     private val positions = mutableMapOf<Node<R>, Position>()
     private val randomGenerator = Random(0)
     private var nextId = 0
@@ -33,8 +36,13 @@ open class Environment<R>(val areConnected: (Environment<R>, Node<R>, Node<R>) -
     /**
      * Adds a node to the environment at the given [position] with the given [initial] value and [program].
      */
-    fun addNode(position: Position, initial: R, program: Aggregate<Int>.(Environment<R>, Int) -> R) {
-        positions[Node(this, nextId++, initial, program)] = position
+    fun addNode(
+        position: Position,
+        initial: R,
+        retainTime: Int = defaultRetainTime,
+        program: Aggregate<Int>.(environment: Environment<R>) -> R,
+    ) {
+        positions[Node(this, nextId++, initial, retainTime, program)] = position
     }
 
     /**
@@ -53,6 +61,16 @@ open class Environment<R>(val areConnected: (Environment<R>, Node<R>, Node<R>) -
     fun neighborsOf(node: Node<R>): List<Node<R>> = positions.keys.filter { it != node && areConnected(this, node, it) }
 
     override fun toString() = "Environment(nodes=$nodes)"
+
+    /**
+     * Removes a node from the environment.
+     */
+    fun removeNode(nodeId: Int) {
+        val node = positions.keys.single { it.id == nodeId }
+        requireNotNull(positions.remove(node)) {
+            "Node $node is not part of the environment and can't be removed"
+        }
+    }
 
     /**
      * Runs a Collektive cycles for all the nodes in the environment,

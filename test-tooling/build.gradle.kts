@@ -6,8 +6,10 @@ kotlinMultiplatform {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(libs.kotlinx.serialization.core)
                 implementation(rootProject.libs.bundles.kotlin.testing.common)
+                implementation(rootProject.libs.kotlinx.serialization.core)
+                implementation(rootProject.libs.kotlinx.serialization.json)
+                implementation(rootProject.libs.kotlinx.serialization.protobuf)
                 implementation(project(":dsl"))
             }
         }

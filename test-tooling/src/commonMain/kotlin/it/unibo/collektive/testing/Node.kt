@@ -16,6 +16,7 @@ import it.unibo.collektive.networking.Message
 import it.unibo.collektive.networking.NeighborsData
 import it.unibo.collektive.networking.OutboundEnvelope
 import it.unibo.collektive.path.Path
+import kotlin.jvm.JvmInline
 
 /**
  * A network node with an associated [environment], [id], [value], and [program].
@@ -24,20 +25,27 @@ class Node<R>(
     val environment: Environment<R>,
     val id: Int,
     var value: R,
-    private val program: Aggregate<Int>.(Environment<R>, Int) -> R,
+    private val cyclesToResetMessages: Int = 1,
+    private val program: Aggregate<Int>.(Environment<R>) -> R,
 ) {
-    private var network = NetworkDevice()
+    private var network = DeviceMailbox()
+    private var lastcycle = 0
 
     /**
      * The Collektive instance associated with this node.
      */
-    val collektive = Collektive(id, network) { program(environment, id) }
+    val collektive = Collektive(id, network) { program(environment) }
+
+    init {
+        require(cyclesToResetMessages >= 1)
+    }
 
     /**
      * Runs a Collektive cycle for this node.
      */
     fun cycle() {
         value = collektive.cycle()
+        lastcycle++
     }
 
     override fun equals(other: Any?) = other is Node<*> && id == other.id
@@ -46,18 +54,27 @@ class Node<R>(
 
     override fun toString() = "Node($id)"
 
+    @JvmInline
+    private value class TimedMessage<T>(private val backend: Pair<Message<Int, T>, Int>) {
+        val sharedData get() = message.sharedData
+        val message get() = backend.first
+        val cycle get() = backend.second
+    }
+
     /**
      * A network device that can send and receive messages.
      */
-    private inner class NetworkDevice : Mailbox<Int> {
+    private inner class DeviceMailbox : Mailbox<Int> {
+
         override val inMemory: Boolean = false
 
-        private var messageBuffer: Map<Int, Message<Int, *>> = emptyMap()
+        private var messageBuffer: Map<Int, TimedMessage<*>> = emptyMap()
 
         override fun deliverableFor(outboundMessage: OutboundEnvelope<Int>) = environment
             .neighborsOf(this@Node)
             .forEach { neighbor ->
-                neighbor.network.messageBuffer += id to outboundMessage.prepareMessageFor(id)
+                val timedMessage = TimedMessage(outboundMessage.prepareMessageFor(id) to neighbor.lastcycle)
+                neighbor.network.messageBuffer += id to timedMessage
             }
 
         override fun deliverableReceived(message: Message<Int, *>) {
@@ -68,15 +85,24 @@ class Node<R>(
         }
 
         override fun currentInbound(): NeighborsData<Int> = object : NeighborsData<Int> {
-            private val neighborDeliverableMessages by lazy { messageBuffer.filter { it.key != id } }
-            override val neighbors: Set<Int> get() = neighborDeliverableMessages.keys
+
+            init {
+                check(messageBuffer.keys.none { it == id }) {
+                    "The message buffer should not contain messages for the sender node"
+                }
+                // Cleanup the buffer
+                messageBuffer = messageBuffer.filterValues {
+                    it.cycle > lastcycle - cyclesToResetMessages
+                }
+            }
+
+            override val neighbors: Set<Int> get() = messageBuffer.keys
 
             @Suppress("UNCHECKED_CAST")
             override fun <Value> dataAt(path: Path, dataSharingMethod: DataSharingMethod<Value>): Map<Int, Value> =
-                neighborDeliverableMessages
+                messageBuffer
                     .mapValues { it.value.sharedData.getOrElse(path) { NoValue } as Value }
-                    .filter { it.value != NoValue }
-                    .also { messageBuffer = emptyMap() }
+                    .filterValues { it != NoValue }
         }
     }
 

@@ -38,13 +38,14 @@ kotlinMultiplatform {
         commonMain {
             dependencies {
                 implementation(project(":dsl"))
-                implementation(libs.kotlinx.serialization.core)
+                implementation(rootProject.libs.kotlinx.serialization.core)
             }
             kotlin.srcDirs(collektivizeKotlinStdlibTask)
         }
         commonTest.dependencies {
             implementation(project(":test-tooling"))
-            implementation(libs.kotlin.test)
+            implementation(rootProject.libs.bundles.kotlin.testing.common)
+            implementation(rootProject.libs.kotlinx.serialization.json)
         }
     }
 }
