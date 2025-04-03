@@ -28,7 +28,7 @@ class FieldsTest {
     @Test
     fun `operator in for fields looks values`() {
         assertFalse(charField.localId in charField)
-        assertTrue { charField.containsId(charField.localId) }
+        assertTrue(charField.containsId(charField.localId))
         assertTrue(charField.localValue in charField)
         for (neighbor in charField.neighbors) {
             assertFalse(neighbor in charField)
