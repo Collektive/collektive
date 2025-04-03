@@ -16,7 +16,7 @@ import it.unibo.collektive.field.operations.replaceMatching
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertFalse
+import kotlin.test.assertNotEquals
 
 class FieldOpsTest {
     private val emptyField = Field(0, "localVal")
@@ -81,12 +81,12 @@ class FieldOpsTest {
 
     @Test
     fun `Two fields are not equals if they contains different values`() {
-        assertFalse { field == Field(0, 0, mapOf(1 to -1, 2 to -1)) }
+        assertNotEquals(field, Field(0, 0, mapOf(1 to -1, 2 to -1)))
     }
 
     @Test
     fun `Two field are not equals if the contains the same neighboring values but the local id is different`() {
-        assertFalse { field == Field(10, 0, mapOf(1 to 10, 2 to 20)) }
+        assertNotEquals(field, Field(10, 0, mapOf(1 to 10, 2 to 20)))
     }
 
     @Test

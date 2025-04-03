@@ -6,13 +6,13 @@ config:
       * This file has been auto-generated with Subjekt (https://github.com/FreshMag/subjekt).
     */
     import it.unibo.collektive.aggregate.api.Aggregate
-    import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
-    import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchanging
+    import it.unibo.collektive.aggregate.api.neighboring
+    import it.unibo.collektive.aggregate.api.exchanging
     import it.unibo.collektive.field.operations.max
     import it.unibo.collektive.field.operations.maxBy
-    import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
-    import it.unibo.collektive.aggregate.api.operators.share
-    import it.unibo.collektive.aggregate.api.operators.sharing
+    import it.unibo.collektive.aggregate.api.neighboring
+    import it.unibo.collektive.aggregate.api.share
+    import it.unibo.collektive.aggregate.api.sharing
     import kotlin.math.floor
 
 parameters:

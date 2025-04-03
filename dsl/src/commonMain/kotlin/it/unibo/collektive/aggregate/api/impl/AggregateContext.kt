@@ -1,13 +1,22 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 package it.unibo.collektive.aggregate.api.impl
 
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
+import it.unibo.collektive.aggregate.api.Aggregate.InternalAPI
 import it.unibo.collektive.aggregate.api.DataSharingMethod
 import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
 import it.unibo.collektive.aggregate.api.YieldingContext
 import it.unibo.collektive.aggregate.api.YieldingResult
 import it.unibo.collektive.aggregate.api.YieldingScope
 import it.unibo.collektive.aggregate.api.impl.stack.Stack
+import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.field.ConstantField
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.NeighborsData
@@ -47,14 +56,7 @@ internal class AggregateContext<ID : Any>(
     private fun <T> newField(localValue: T, others: Map<ID, T>): Field<ID, T> = Field(localId, localValue, others)
 
     @DelicateCollektiveApi
-    override fun <Initial> exchange(
-        initial: Initial,
-        dataSharingMethod: DataSharingMethod<Initial>,
-        body: (Field<ID, Initial>) -> Field<ID, Initial>,
-    ): Field<ID, Initial> = exchanging(initial, dataSharingMethod) { field -> body(field).run { yielding { this } } }
-
-    @DelicateCollektiveApi
-    override fun <Initial, Ret> exchanging(
+    override fun <Initial, Ret> InternalAPI.`_ serialization aware exchanging`(
         initial: Initial,
         dataSharingMethod: DataSharingMethod<Initial>,
         body: YieldingScope<Field<ID, Initial>, Field<ID, Ret>>,
@@ -66,14 +68,13 @@ internal class AggregateContext<ID : Any>(
         val context = YieldingContext<Field<ID, Initial>, Field<ID, Ret>>()
         return body(context, subject)
             .also {
-                val message =
-                    SharedData(
-                        it.toSend.localValue,
-                        when (it.toSend) {
-                            is ConstantField<ID, Initial> -> emptyMap()
-                            else -> it.toSend.excludeSelf()
-                        },
-                    )
+                val message = SharedData(
+                    it.toSend.localValue,
+                    when (it.toSend) {
+                        is ConstantField<ID, Initial> -> emptyMap()
+                        else -> it.toSend.excludeSelf()
+                    },
+                )
                 toBeSent.addData(path, message, dataSharingMethod)
                 state += path to it.toSend.localValue
             }.toReturn
@@ -91,9 +92,12 @@ internal class AggregateContext<ID : Any>(
     }
 
     @DelicateCollektiveApi
-    override fun <Scalar> neighboring(local: Scalar, dataSharingMethod: DataSharingMethod<Scalar>): Field<ID, Scalar> {
+    override fun <Scalar> InternalAPI.`_ serialization aware neighboring`(
+        local: Scalar,
+        dataSharingMethod: DataSharingMethod<Scalar>,
+    ): Field<ID, Scalar> {
         val path = stack.currentPath()
-        val neighborValues = inboundMessage.dataAt<Scalar>(path, dataSharingMethod)
+        val neighborValues: Map<ID, Scalar> = inboundMessage.dataAt(path, dataSharingMethod)
         toBeSent.addData(path, SharedData(local), dataSharingMethod)
         return newField(local, neighborValues)
     }

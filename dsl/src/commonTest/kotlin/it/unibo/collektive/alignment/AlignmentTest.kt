@@ -1,9 +1,17 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 package it.unibo.collektive.alignment
 
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
-import it.unibo.collektive.aggregate.api.operators.share
+import it.unibo.collektive.aggregate.api.neighboring
+import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.matchers.assertNotAligned
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
@@ -17,12 +25,12 @@ class AlignmentTest {
     fun `the alignment should be performed also for the same aggregate operation called multiple times issue 51`() {
         val result =
             aggregate(0) {
-                neighboringViaExchange(10) // path -> [neighboring.1] = 10
+                neighboring(10) // path -> [neighboring.1] = 10
                 share(5) {
-                    requireNotNull(neighboringViaExchange(20).localValue) // path -> [share.1, neighboring.2] = 20
+                    requireNotNull(neighboring(20).localValue) // path -> [share.1, neighboring.2] = 20
                     it.localValue
                 } // path -> [sharing.1] = 5
-                neighboringViaExchange(30) // path -> [neighboring.3] = 30
+                neighboring(30) // path -> [neighboring.3] = 30
                 5
             }
         assertEquals(5, result.result)
@@ -37,7 +45,7 @@ class AlignmentTest {
             assertFailsWith<IllegalStateException> {
                 aggregate(0) {
                     repeat(2) {
-                        neighboringViaExchange(0)
+                        neighboring(0)
                     }
                 }
             }
@@ -48,11 +56,11 @@ class AlignmentTest {
     fun `different alignment should be performed when a function has an aggregate parameter`() {
         val x = 0
 
-        fun foo(agg: Aggregate<Int>) = agg.neighboringViaExchange(x)
+        fun foo(agg: Aggregate<Int>) = agg.neighboring(x)
 
         assertNotAligned(
             { foo(this) },
-            { neighboringViaExchange(x) },
+            { neighboring(x) },
         )
     }
 
@@ -60,9 +68,9 @@ class AlignmentTest {
     fun `overload function with different arity should not align`() {
         val x = 0
 
-        fun foo(aggregate: Aggregate<Int>) = aggregate.neighboringViaExchange(x)
+        fun foo(aggregate: Aggregate<Int>) = aggregate.neighboring(x)
 
-        fun foo(value: Int, aggregate: Aggregate<Int>) = aggregate.neighboringViaExchange(value)
+        fun foo(value: Int, aggregate: Aggregate<Int>) = aggregate.neighboring(value)
 
         assertNotAligned(
             { foo(this) },
@@ -74,9 +82,9 @@ class AlignmentTest {
     fun `overload function with different arguments order should not align`() {
         val x = 0
 
-        fun foo(aggregate: Aggregate<Int>, value: Int) = aggregate.neighboringViaExchange(value)
+        fun foo(aggregate: Aggregate<Int>, value: Int) = aggregate.neighboring(value)
 
-        fun foo(value: Int, aggregate: Aggregate<Int>) = aggregate.neighboringViaExchange(value)
+        fun foo(value: Int, aggregate: Aggregate<Int>) = aggregate.neighboring(value)
 
         assertNotAligned(
             { foo(this, x) },
@@ -88,7 +96,7 @@ class AlignmentTest {
     fun `non-collektive function taking collective function as argument should align the non-collective function`() {
         val x = 0
 
-        fun foo(aggregate: Aggregate<Int>) = aggregate.neighboringViaExchange(x)
+        fun foo(aggregate: Aggregate<Int>) = aggregate.neighboring(x)
 
         fun bar(f1: Field<Int, Int>, f2: Field<Int, Int>) = f1 + f2
 
@@ -102,9 +110,9 @@ class AlignmentTest {
     fun `different outer non-collektive functions with the same aggregate body should not align`() {
         val x = 0
 
-        fun foo(aggregate: Aggregate<Int>) = aggregate.neighboringViaExchange(x)
+        fun foo(aggregate: Aggregate<Int>) = aggregate.neighboring(x)
 
-        fun bar(aggregate: Aggregate<Int>) = aggregate.neighboringViaExchange(x)
+        fun bar(aggregate: Aggregate<Int>) = aggregate.neighboring(x)
 
         assertNotAligned(
             { foo(this) },

@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 package it.unibo.collektive.utils.common
 
 /**
@@ -57,33 +65,17 @@ object AggregateFunctionNames {
     /**
      * The FQ name of the `neighboring` function.
      */
-    const val NEIGHBORING_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.neighboring"
-
-    /**
-     * The FQ name of the `neighboring` function.
-     */
-    const val NEIGHBORING_INLINE_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring"
-
-    /**
-     * The FQ name of the `neighboringViaExchange` function.
-     */
-    const val NEIGHBORING_VIA_EXCHANGE_FUNCTION_FQ_NAME =
-        "it.unibo.collektive.aggregate.api.operators.neighboringViaExchange"
+    const val NEIGHBORING_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.neighboring"
 
     /**
      * The FQ name of the `exchange` function.
      */
-    const val EXCHANGE_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.exchange"
-
-    /**
-     * The FQ name of the `exchange` function.
-     */
-    const val EXCHANGE_INLINE_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.Companion.exchange"
+    const val EXCHANGE_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.exchange"
 
     /**
      * The FQ name of the `share` function.
      */
-    const val SHARE_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.operators.share"
+    const val SHARE_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.share"
 
     /**
      * The FQ name of the `evolve` function.
@@ -93,17 +85,12 @@ object AggregateFunctionNames {
     /**
      * The FQ name of the `exchanging` function.
      */
-    const val EXCHANGING_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.exchanging"
-
-    /**
-     * The FQ name of the `exchanging` function.
-     */
-    const val EXCHANGING_INLINE_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.Companion.exchanging"
+    const val EXCHANGING_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.exchanging"
 
     /**
      * The FQ name of the `sharing` function.
      */
-    const val SHARING_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.operators.sharing"
+    const val SHARING_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.sharing"
 
     /**
      * The FQ name of the `evolving` function.

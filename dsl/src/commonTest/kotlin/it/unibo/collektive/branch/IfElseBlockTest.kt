@@ -1,7 +1,15 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 package it.unibo.collektive.branch
 
 import it.unibo.collektive.Collektive.Companion.aggregate
-import it.unibo.collektive.aggregate.api.operators.neighboringViaExchange
+import it.unibo.collektive.aggregate.api.neighboring
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -12,9 +20,9 @@ class IfElseBlockTest {
         val result =
             aggregate(0) {
                 if (customCondition) {
-                    neighboringViaExchange("test1")
+                    neighboring("test1")
                 } else {
-                    neighboringViaExchange("test2")
+                    neighboring("test2")
                 }
             }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
@@ -28,9 +36,9 @@ class IfElseBlockTest {
         val result =
             aggregate(0) {
                 if (customCondition) {
-                    neighboringViaExchange("test1")
+                    neighboring("test1")
                 } else {
-                    neighboringViaExchange("test2")
+                    neighboring("test2")
                 }
             }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
@@ -45,11 +53,11 @@ class IfElseBlockTest {
         val result =
             aggregate(0) {
                 if (customCondition1) {
-                    neighboringViaExchange("test1")
+                    neighboring("test1")
                 } else if (customCondition2) {
-                    neighboringViaExchange("test2")
+                    neighboring("test2")
                 } else {
-                    neighboringViaExchange("test3")
+                    neighboring("test3")
                 }
             }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData

@@ -10,8 +10,8 @@ package it.unibo.collektive.aggregate
 
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.operators.share
-import it.unibo.collektive.aggregate.api.operators.sharing
+import it.unibo.collektive.aggregate.api.share
+import it.unibo.collektive.aggregate.api.sharing
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.operations.max
 import it.unibo.collektive.field.operations.min

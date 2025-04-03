@@ -13,7 +13,6 @@ import it.unibo.collektive.frontend.checkers.CheckersUtility.fqName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isStructurallyEquivalentTo
 import it.unibo.collektive.utils.common.AggregateFunctionNames.EVOLVING_FUNCTION_FQ_NAME
 import it.unibo.collektive.utils.common.AggregateFunctionNames.NEIGHBORING_FUNCTION_FQ_NAME
-import it.unibo.collektive.utils.common.AggregateFunctionNames.NEIGHBORING_INLINE_FUNCTION_FQ_NAME
 import it.unibo.collektive.utils.common.AggregateFunctionNames.YIELDING_FUNCTION_FQ_NAME
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.declarations.FirProperty
@@ -105,8 +104,7 @@ class ImproperConstructVisitor(private val constructNameFQName: String) : FirVis
 
     override fun visitFunctionCall(functionCall: FirFunctionCall) {
         val functionFqn = functionCall.fqName()
-        isInsideNeighboring = functionFqn == NEIGHBORING_FUNCTION_FQ_NAME ||
-            functionFqn == NEIGHBORING_INLINE_FUNCTION_FQ_NAME
+        isInsideNeighboring = functionFqn == NEIGHBORING_FUNCTION_FQ_NAME
         val firstArgument = functionCall.argumentList.arguments.firstOrNull()
         if (isInsideNeighboring && firstArgument is FirAnonymousFunctionExpression) {
             // case in which the neighboring construct is used with an anonymous function as parameter

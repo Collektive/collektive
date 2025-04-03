@@ -11,19 +11,19 @@ The aggregate operators and field operations present in Collektive are illustrat
 
 export default function OperatorList() {
 const operators = [
-{ name: "## Aggregate Operators", description: "" }, 
+{ name: "## Aggregate Operators", description: "" },
 { name: "[exchange](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/exchange.html)", description: "![](/img/exchange.svg)" },
 { name: "[exchanging](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/exchanging.html)", description: "" },
 { name: "[share](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api.operators/share.html)", description: "![](/img/share.svg)" },
 { name: "[sharing](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api.operators/sharing.html)", description: `` },
 { name: "[neighboring](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/neighboring.html)", description: "![](/img/nbr.svg)" },
-{ name: "[neighboringViaExchange](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api.operators/neighboring-via-exchange.html)", description: "" },
+{ name: "[neighboring](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api.operators/neighboring-via-exchange.html)", description: "" },
 { name: "[evolve](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/evolve.html)", description: "" },
 { name: "[evolving](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/evolving.html)", description: "" },
 { name: "[alignedOn](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/aligned-on.html)", description: "" },
 { name: "[align](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/align.html)", description: "" },
 { name: "[dealign](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/dealign.html)", description: "" },
-{ name: "## Field Operations", description: "" }, 
+{ name: "## Field Operations", description: "" },
 { name: "[all](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/all.html)", description: "" },
 { name: "[any](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/any.html)", description: "" },
 { name: "[none](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.field.operations/none.html)", description: "" },
@@ -70,13 +70,13 @@ const filteredOperators = operators.filter(op =>
 );
 
 const highlightMatch = (text, searchTerm) => {
-    if (!searchTerm) return text; 
+    if (!searchTerm) return text;
     const regex = new RegExp(`\\[([^\\]]+)\\]`, 'g');
     return text.replace(regex, (match, content) => {
         const highlightedContent = content.replace(new RegExp(`(${searchTerm})`, 'gi'), (match) => {
             return `<mark class="bg-yellow-300">${match}</mark>`;
         });
-        return `[${highlightedContent}]`; 
+        return `[${highlightedContent}]`;
     });
 };
 
@@ -96,7 +96,7 @@ return (
         {/* Operator list with description in Markdown */}
         <ul>
         {(() => {
-            let showSection = false; 
+            let showSection = false;
             return operators.flatMap((op, index) => {
             if (op.name.startsWith("##")) {
                 showSection = op.name.toLowerCase().includes(search.toLowerCase());
@@ -106,14 +106,14 @@ return (
                     </ReactMarkdown>
                 );
             }
-            if (op.name.toLowerCase().includes(search.toLowerCase()) || showSection) {   
+            if (op.name.toLowerCase().includes(search.toLowerCase()) || showSection) {
                 return (
                 <li key={op.name}>
-                    <ReactMarkdown 
-                        children={highlightMatch(op.name, search)} 
+                    <ReactMarkdown
+                        children={highlightMatch(op.name, search)}
                         rehypePlugins={[rehypeRaw]}
                     />
-                    <details 
+                    <details
                         style={{ backgroundColor: 'transparent', border: '1px solid purple', borderRadius: '5px', padding: '5px' }}
                     >
                     <summary>Click to view description</summary>
@@ -124,7 +124,7 @@ return (
                 </li>
                 );
             }
-            return []; 
+            return [];
             });
         })()}
         </ul>
