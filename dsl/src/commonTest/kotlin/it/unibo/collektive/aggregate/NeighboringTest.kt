@@ -21,7 +21,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class NeighboringTest {
-    private fun mooreGrid(size: Int, program: Aggregate<Int>.(Environment<Field<Int, Int>>, Int) -> Field<Int, Int>) =
+    private fun mooreGrid(size: Int, program: Aggregate<Int>.(Environment<Field<Int, Int>>) -> Field<Int, Int>) =
         mooreGrid(size, size, { _, _ -> Field(Int.MAX_VALUE, 0) }, program).also {
             assertEquals(size * size, it.nodes.size)
         }
@@ -44,7 +44,7 @@ class NeighboringTest {
         }
     }
 
-    private fun envWithNeihboring1(size: Int) = mooreGrid(size) { _, _ -> neighboring(1) }
+    private fun envWithNeihboring1(size: Int) = mooreGrid(size) { _ -> neighboring(1) }
 
     @Test
     fun `neighboring should build a field containing the values of the aligned neighbors`() {
@@ -72,11 +72,11 @@ class NeighboringTest {
         }
     }
 
-    private fun envWithTwoNeighboringOpsInBranch(size: Int, condition: (Int) -> Boolean) = mooreGrid(size) { _, id ->
+    private fun envWithTwoNeighboringOpsInBranch(size: Int, condition: (Int) -> Boolean) = mooreGrid(size) { _ ->
         fun kingBehavior() = neighboring(1)
 
         fun queenBehavior() = neighboring(2)
-        if (condition(id)) kingBehavior() else queenBehavior()
+        if (condition(localId)) kingBehavior() else queenBehavior()
     }
 
     @Test

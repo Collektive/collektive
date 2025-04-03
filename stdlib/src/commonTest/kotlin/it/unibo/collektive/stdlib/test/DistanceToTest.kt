@@ -7,8 +7,8 @@
  */
 package it.unibo.collektive.stdlib.test
 
-import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.stdlib.spreading.distanceTo
+import it.unibo.collektive.stdlib.util.euclideanDistance3D
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.math.abs
@@ -39,9 +39,9 @@ class DistanceToTest {
         }
 
     private fun mooreGridWithGradient(size: Int) =
-        mooreGrid<Double>(size, size, { _, _ -> Double.NaN }) { environment, _ ->
+        mooreGrid<Double>(size, size, { _, _ -> Double.NaN }) { environment ->
             val localPosition = environment.positionOf(localId)
-            distanceTo(localId == 0) { neighboring(localPosition).map { it.distanceTo(localPosition) } }
+            distanceTo(localId == 0) { euclideanDistance3D(localPosition.toTriple()) }
         }.apply {
             assertEquals(size * size, nodes.size)
             val initial = status().values.distinct()
@@ -64,7 +64,6 @@ class DistanceToTest {
         val environment: Environment<Double> = mooreGridWithGradient(size)
         environment.cycleInReverseOrder()
         val firstRound = environment.status()
-
         assertEquals(0.0, firstRound[0])
         firstRound.forEach { (id, value) ->
             when (id) {
@@ -72,12 +71,10 @@ class DistanceToTest {
                 else -> assertEquals(Double.POSITIVE_INFINITY, value)
             }
         }
-
         repeat(size - 1) {
             assertFalse(environment.gradientIsStable(isMoore = true, size))
             environment.cycleInReverseOrder()
         }
-
         assertTrue(environment.gradientIsStable(isMoore = true, size))
     }
 }

@@ -30,7 +30,7 @@ class SharingTest {
 
     private fun mooreGridWithProgram(
         size: Int,
-        program: Aggregate<Int>.(Environment<Pair<Int, Int>>, Int) -> Pair<Int, Int>,
+        program: Aggregate<Int>.(Environment<Pair<Int, Int>>) -> Pair<Int, Int>,
     ) = mooreGrid(size, size, { _, _ -> Int.MIN_VALUE to Int.MAX_VALUE }, program).also {
         assertEquals(size * size, it.nodes.size)
     }
@@ -47,9 +47,9 @@ class SharingTest {
     fun `share should communicate with aligned devices`() {
         val size = 5
         val environment =
-            mooreGridWithProgram(size) { _, id ->
-                val maxValue = share(id, findMax)
-                val minValue = share(id, findMin)
+            mooreGridWithProgram(size) { _ ->
+                val maxValue = share(localId, findMax)
+                val minValue = share(localId, findMin)
                 maxValue to minValue
             }
         repeat(size) {
