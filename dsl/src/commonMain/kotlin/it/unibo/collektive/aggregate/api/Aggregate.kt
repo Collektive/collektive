@@ -1,8 +1,13 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 package it.unibo.collektive.aggregate.api
 
-import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchange
-import it.unibo.collektive.aggregate.api.Aggregate.Companion.exchanging
-import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
 import it.unibo.collektive.field.Field
 import kotlinx.serialization.serializer
 
@@ -14,7 +19,7 @@ typealias YieldingScope<Initial, Return> = YieldingContext<Initial, Return>.(Ini
  */
 @RequiresOptIn(level = RequiresOptIn.Level.ERROR)
 @Retention(AnnotationRetention.BINARY)
-@Target(AnnotationTarget.FUNCTION)
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY, AnnotationTarget.CLASS)
 annotation class DelicateCollektiveApi
 
 /**
@@ -34,81 +39,46 @@ interface Aggregate<ID : Any> {
     val localId: ID
 
     /**
-     * The [exchange] function manages the computation of values between neighbors in a specific context.
-     * It computes a [body] function starting from the [initial] value and the messages received from other neighbors,
-     * then sends the results from the evaluation to specific neighbors or to everyone,
-     * it is contingent upon the origin of the calculated value, whether it was received from a neighbor or if it
-     * constituted the initial value.
+     * Serialization-aware version of the [exchanging] function.
      *
-     * ## Example
-     * ```
-     * exchange(0) { f ->
-     *  f.mapField { _, v -> if (v % 2 == 0) v + 1 else v * 2 }
-     * }
-     * ```
-     * The result of the exchange function is a field with as messages a map with key the id of devices across the
-     * network and the result of the computation passed as relative local values.
+     * This function is not intended to be used directly.
+     * Use the [exchanging] function instead.
      */
+    @Suppress("FunctionName")
     @DelicateCollektiveApi
-    fun <Initial> exchange(
-        initial: Initial,
-        dataSharingMethod: DataSharingMethod<Initial>,
-        body: (Field<ID, Initial>) -> Field<ID, Initial>,
-    ): Field<ID, Initial>
-
-    /**
-     * Same behavior of [exchange] but this function can yield a [Field] of [Return] value.
-     *
-     * ## Example
-     * ```
-     * exchanging(initial = 1) {
-     *   val fieldResult = it + 1
-     *   fieldResult.yielding { fieldResult.map { value -> "return: $value" } }
-     * }
-     * ```
-     */
-    @DelicateCollektiveApi
-    fun <Initial, Return> exchanging(
-        initial: Initial,
-        dataSharingMethod: DataSharingMethod<Initial>,
-        body: YieldingScope<Field<ID, Initial>, Field<ID, Return>>,
-    ): Field<ID, Return>
+    fun <Shared, Returned> InternalAPI.`_ serialization aware exchanging`(
+        initial: Shared,
+        dataSharingMethod: DataSharingMethod<Shared>,
+        body: YieldingScope<Field<ID, Shared>, Field<ID, Returned>>,
+    ): Field<ID, Returned>
 
     /**
      * Iteratively updates the value computing the [transform] expression at each device using the last
      * computed value or the [initial].
      */
-    fun <Initial> evolve(initial: Initial, transform: (Initial) -> Initial): Initial
+    fun <Stored> evolve(initial: Stored, transform: (Stored) -> Stored): Stored
 
     /**
      * Iteratively updates the value computing the [transform] expression from a [YieldingContext]
      * at each device using the last computed value or the [initial].
      */
-    fun <Initial, Return> evolving(initial: Initial, transform: YieldingScope<Initial, Return>): Return
+    fun <Stored, Returned> evolving(initial: Stored, transform: YieldingScope<Stored, Returned>): Returned
 
     /**
-     * Observes the value of an expression [local] across neighbours.
+     * Serialization-aware version of the [neighboring] function.
      *
-     * ## Example
-     *
-     * ```kotlin
-     * val field = neighboring(0)
-     * ```
-     *
-     * The field returned has as local value the value passed as input (0 in this example).
-     *
-     * ```kotlin
-     * val field = neighboring({ 2 * 2 })
-     * ```
-     *
-     * In this case, the field returned has the computation as a result,
-     * in form of a field of functions with type `() -> Int`.
+     * This function is not intended to be used directly.
+     * Use the [neighboring] function instead.
      */
+    @Suppress("FunctionName")
     @DelicateCollektiveApi
-    fun <Scalar> neighboring(local: Scalar, dataSharingMethod: DataSharingMethod<Scalar>): Field<ID, Scalar>
+    fun <Shared> InternalAPI.`_ serialization aware neighboring`(
+        local: Shared,
+        dataSharingMethod: DataSharingMethod<Shared>,
+    ): Field<ID, Shared>
 
     /**
-     * Alignment function that pushes in the stack the pivot, executes the body and pop the last
+     * Alignment function, which pushes in the stack the pivot, executes the body and pop the last
      * element of the stack after it is called.
      * Returns the body's return element.
      */
@@ -125,10 +95,11 @@ interface Aggregate<ID : Any> {
     fun dealign()
 
     /**
-     * Contains the inlined version of the [Aggregate.exchange],
+     * Contains the inlined version of the [Aggregate],
      * [Aggregate.exchanging], [Aggregate.neighboring] functions.
      */
     companion object {
+
         /**
          * Inline access to the data serialization method of an [Aggregate].
          * This method is used to avoid building serializers for in-memory-only contexts.
@@ -137,33 +108,13 @@ interface Aggregate<ID : Any> {
             inMemoryOnly -> InMemory
             else -> Serialize(serializer())
         }
-
-        /**
-         * Inlined version of the [Aggregate.exchange] function.
-         */
-
-        inline fun <ID : Any, reified Initial> Aggregate<ID>.exchange(
-            initial: Initial,
-            noinline body: (Field<ID, Initial>) -> Field<ID, Initial>,
-        ): Field<ID, Initial> =
-            @OptIn(DelicateCollektiveApi::class)
-            exchange(initial, dataSharingMethod(), body)
-
-        /**
-         * Inlined version of the [Aggregate.exchanging] function.
-         */
-        inline fun <ID : Any, reified Initial, Return> Aggregate<ID>.exchanging(
-            initial: Initial,
-            noinline body: YieldingScope<Field<ID, Initial>, Field<ID, Return>>,
-        ): Field<ID, Return> =
-            @OptIn(DelicateCollektiveApi::class)
-            exchanging(initial, dataSharingMethod(), body)
-
-        /**
-         * Inlined version of the [Aggregate.neighboring] function.
-         */
-        inline fun <ID : Any, reified Scalar> Aggregate<ID>.neighboring(local: Scalar): Field<ID, Scalar> =
-            @OptIn(DelicateCollektiveApi::class)
-            neighboring(local, dataSharingMethod())
     }
+
+    /**
+     * Internal API for Collektive.
+     * This API is not intended to be used directly.
+     * Use the [exchanging] and [neighboring] functions directly instead.
+     */
+    @DelicateCollektiveApi
+    object InternalAPI
 }

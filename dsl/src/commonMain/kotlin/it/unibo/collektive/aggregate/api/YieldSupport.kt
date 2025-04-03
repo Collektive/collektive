@@ -1,35 +1,26 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 package it.unibo.collektive.aggregate.api
 
 /**
  * Context for yielding operations (exchanging, sharing).
- * Yielding operations means operate on an [Initial] value (usually exchanged with neighbors),
- * but return a possibly different value [Return] to the caller.
+ * Yielding operations operate on a [Shared] value (usually exchanged with neighbors),
+ * but return a differently typed value [Returned] to the caller.
  */
-class YieldingContext<Initial, Return> {
+class YieldingContext<Shared, Returned> {
     /**
      * Computes [toReturn] after the data exchange operation is complete.
-     * ## Example
-     * ```
-     * sharing(0) { // Sent to neighbors: kotlin.Int
-     *     it.max(Int.MIN_VALUE).yielding { it.toString() }
-     * }
-     * result // result: kotlin.String
-     * ```
-     * ```
-     * val result = sharing(0) {
-     *     val max = it.max(Int.MIN_VALUE)
-     *     max.yielding { max.toString().takeIf { max > 1 } }
-     * }
-     * result // result: kotlin.String?
-     * ```
-     * Calling [yielding] in the body effectively performs the information exchange with neighbors,
-     * preparing the local [Initial] value (from the extension receiver) to be sent away,
-     * but returns the value produced by [toReturn].
      */
-    fun Initial.yielding(toReturn: () -> Return): YieldingResult<Initial, Return> = YieldingResult(this, toReturn())
+    fun Shared.yielding(toReturn: () -> Returned): YieldingResult<Shared, Returned> = YieldingResult(this, toReturn())
 }
 
 /**
  * Specifies the value [toSend] and the value [toReturn] of a yielding operator.
  */
-data class YieldingResult<Initial, Return>(val toSend: Initial, val toReturn: Return)
+data class YieldingResult<Shared, Return>(val toSend: Shared, val toReturn: Return)

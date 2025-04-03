@@ -2332,7 +2332,7 @@
 * **dsl:** added optional parameters to aggregate ([ed912a0](https://github.com/Collektive/collektive/commit/ed912a08dd23857f8ecd2908a265438473e893db))
 * **dsl:** fixed aggregate function layout ([d7aae31](https://github.com/Collektive/collektive/commit/d7aae31f1dc9d6d1c39c53d66afa2df7d18c7920))
 * **dsl:** fixed main ([552c118](https://github.com/Collektive/collektive/commit/552c118be736f8bb632482d947c61b9bc11dde9a))
-* **dsl:** fixed sharing behaviour ([d7191ec](https://github.com/Collektive/collektive/commit/d7191ec4f45dae7c24c12f8988c88dbcba4a531f))
+* **dsl:** fixed sharing Behavior ([d7191ec](https://github.com/Collektive/collektive/commit/d7191ec4f45dae7c24c12f8988c88dbcba4a531f))
 * **dsl:** remove useless comments ([14e5d3b](https://github.com/Collektive/collektive/commit/14e5d3b356389dc681bba4ae531d1052080f1a36))
 * **dsl:** removed default parameters ([3b1a685](https://github.com/Collektive/collektive/commit/3b1a68597487eec1b118b93f75aaafb12fcf3e8b))
 * **dsl:** removed main ([7b44a0b](https://github.com/Collektive/collektive/commit/7b44a0b8a41c24948b015b0fd9f5e5be2cd2b0f0))
@@ -2484,7 +2484,7 @@
 * **aggregate:** added test for neighbouring ([2da93d7](https://github.com/Collektive/collektive/commit/2da93d76987bfbc8e7be6807bc142383ea828e76))
 * **aggregate:** added test for neighbouring successful and failing ([8c6b37a](https://github.com/Collektive/collektive/commit/8c6b37abf329ac4273383477433eb70104194169))
 * **aggregate:** added tests for sharing ([80b8ccc](https://github.com/Collektive/collektive/commit/80b8ccc34b89eb309248aa5093b1ac0695028b0e))
-* **branch:** added tests to verify the correct behaviour of if, else and when blocks ([e08d113](https://github.com/Collektive/collektive/commit/e08d1135bd858e8b3837309684dcbec2ce5be97d))
+* **branch:** added tests to verify the correct Behavior of if, else and when blocks ([e08d113](https://github.com/Collektive/collektive/commit/e08d1135bd858e8b3837309684dcbec2ce5be97d))
 * **branch:** fixed test mistakes in branches tests ([79d57f7](https://github.com/Collektive/collektive/commit/79d57f73ddbd0678e0016da3b58fa6e1d003ddf9))
 * **field:** adapted get by id test to catch the exception ([937b70c](https://github.com/Collektive/collektive/commit/937b70c7f07adc522d5269759ec958cbab3711b0))
 * **field:** added test for field with and without messages from other connected devices ([44a89a8](https://github.com/Collektive/collektive/commit/44a89a8d38fed633e726e6d8b86499ae10704520))
@@ -2512,7 +2512,7 @@
 * **repeating:** added test for the usage of repeating once and more than once times ([64ab58b](https://github.com/Collektive/collektive/commit/64ab58bae49ec257a4f231a219e30f78c18cad09))
 * **repeating:** added usage of event ([06be2a4](https://github.com/Collektive/collektive/commit/06be2a4117599db10e3f10c2e90b67261037c0e1))
 * **stack:** commented stack's test ([4febf2a](https://github.com/Collektive/collektive/commit/4febf2a5633236936f7836173c2439d284a15155))
-* **stack:** created test to verify the stack behaviour ([9d7ad78](https://github.com/Collektive/collektive/commit/9d7ad788f90240d540ff5bdc978c2f917bfcfc2f))
+* **stack:** created test to verify the stack Behavior ([9d7ad78](https://github.com/Collektive/collektive/commit/9d7ad788f90240d540ff5bdc978c2f917bfcfc2f))
 * **stack:** fixed stack tests ([a9673a2](https://github.com/Collektive/collektive/commit/a9673a26243291b2e9d6ba56074c5de0c5cdc335))
 
 

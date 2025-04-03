@@ -9,8 +9,8 @@
 package it.unibo.collektive.stdlib.spreading
 
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
-import it.unibo.collektive.aggregate.api.operators.share
+import it.unibo.collektive.aggregate.api.neighboring
+import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.operations.minBy
 import it.unibo.collektive.stdlib.util.coerceIn
