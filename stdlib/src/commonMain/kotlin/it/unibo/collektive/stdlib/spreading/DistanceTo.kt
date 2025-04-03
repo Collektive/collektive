@@ -57,4 +57,4 @@ inline fun <reified ID : Any, reified Distance : Comparable<Distance>> Aggregate
  */
 @JvmOverloads
 inline fun <reified ID : Any> Aggregate<ID>.hopDistanceTo(source: Boolean, maxPaths: Int = Int.MAX_VALUE): Int =
-    distanceTo(source, 0, Int.MAX_VALUE, maxPaths, Int::plus) { neighboring(1) }
+    hopGradientCast(source = source, local = 0, maxPaths = maxPaths)
