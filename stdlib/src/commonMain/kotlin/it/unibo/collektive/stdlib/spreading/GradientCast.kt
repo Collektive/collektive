@@ -25,52 +25,6 @@ import kotlin.jvm.JvmName
 import kotlin.jvm.JvmOverloads
 
 /**
- * Compute the distance from the closest [source], using [Double]s.
- *
- * The distance between neighboring devices is computed using the [metric] function,
- * and defaults to the hop distance.
- */
-@JvmOverloads
-inline fun <reified ID : Any> Aggregate<ID>.distanceTo(
-    source: Boolean,
-    maxPaths: Int = Int.MAX_VALUE,
-    crossinline metric: () -> Field<ID, Double> = { neighboring(1.0) },
-): Double = distanceTo(source, 0.0, Double.POSITIVE_INFINITY, maxPaths, Double::plus, metric)
-
-/**
- * Compute the [Distance] from the closest [source], starting from [bottom] and up to [top].
- *
- * the [Distance] between neighboring devices is computed using the [metric] function,
- * the distance summation is governed by the [accumulateDistance] function.
- */
-inline fun <reified ID : Any, reified Distance : Comparable<Distance>> Aggregate<ID>.distanceTo(
-    source: Boolean,
-    bottom: Distance,
-    top: Distance,
-    maxPaths: Int = Int.MAX_VALUE,
-    noinline accumulateDistance: (Distance, Distance) -> Distance,
-    crossinline metric: () -> Field<ID, Distance>,
-): Distance = gradientCast(
-    source = source,
-    local = if (source) bottom else top,
-    bottom = bottom,
-    top = top,
-    maxPaths = maxPaths,
-    accumulateData = { neighborToSource, hereToNeighbor, _ ->
-        accumulateDistance(neighborToSource, hereToNeighbor)
-    },
-    accumulateDistance = accumulateDistance,
-    metric = metric,
-)
-
-/**
- * Computes the hop distance from the closest [source].
- */
-@JvmOverloads
-inline fun <reified ID : Any> Aggregate<ID>.hopDistanceTo(source: Boolean, maxPaths: Int = Int.MAX_VALUE): Int =
-    distanceTo(source, 0, Int.MAX_VALUE, maxPaths, Int::plus) { neighboring(1) }
-
-/**
  * Propagate [local] values across a spanning tree starting from the closest [source].
  *
  * If there are no sources and no neighbors, default to [local] value.
