@@ -238,9 +238,11 @@ inline fun <reified ID : Any, reified Type> Aggregate<ID>.gradientCast(
 
 /**
  * Propagate [local] values across multiple spanning trees starting from all the devices in which [source] holds,
- * retaining the value of the closest source, using the hop count as distance metric.
+ * retaining the value of the closest source.
  *
  * If there are no sources, default to [local] value.
+ * The [metric] function is used to compute the distance between devices in form of a field of [Int]s,
+ * [accumulateDistance] is used to accumulate distances, defaulting to a plain sum.
  * [accumulateData] is used to modify data from neighbors on the fly, and defaults to the identity function.
  *
  * This function features *fast repair*, and it is **not** subject to the *rising value problem*,
