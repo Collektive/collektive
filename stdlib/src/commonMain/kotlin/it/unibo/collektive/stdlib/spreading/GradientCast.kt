@@ -10,18 +10,17 @@ package it.unibo.collektive.stdlib.spreading
 
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
-import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.aggregate.api.sharing
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.Field.Companion.fold
 import it.unibo.collektive.field.operations.minBy
 import it.unibo.collektive.stdlib.util.coerceIn
+import it.unibo.collektive.stdlib.util.hops
 import kotlinx.serialization.Serializable
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import kotlin.jvm.JvmName
 import kotlin.jvm.JvmOverloads
 
 /**
@@ -68,6 +67,28 @@ inline fun <reified ID, reified Value, reified Distance> Aggregate<ID>.bellmanFo
         }
     }.second // return the data
 }
+
+/**
+ * Propagate [local] values across a spanning tree starting from the closest [source].
+ *
+ * If there are no sources and no neighbors, default to [local] value.
+ * The [metric] function is used to compute the distance between devices in form of a field of [Double]s,
+ * [accumulateDistance] is used to sum distances.
+ * [accumulateData] is used to modify data from neighbors on the fly, and defaults to the identity function.
+ *
+ * This function features *incremental repair*, and it is subject to the *rising value problem*,
+ * see [Fast self-healing gradients](https://doi.org/10.1145/1363686.1364163).
+ */
+@JvmOverloads
+inline fun <reified ID, reified Value> Aggregate<ID>.bellmanFordGradientCast(
+    source: Boolean,
+    local: Value,
+    noinline accumulateData: (fromSource: Double, toNeighbor: Double, data: Value) -> Value =
+        { _, _, data -> data },
+    crossinline accumulateDistance: (fromSource: Double, toNeighbor: Double) -> Double = Double::plus,
+    crossinline metric: () -> Field<ID, Double>,
+): Value where ID : Any =
+    bellmanFordGradientCast(source, local, 0.0, Double.POSITIVE_INFINITY, accumulateData, accumulateDistance, metric)
 
 /**
  * Propagate [local] values across multiple spanning trees starting from all the devices in which [source] holds,
@@ -145,7 +166,7 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
             list
         }.values.sorted()
         /*
-         * Keep at most maxPaths paths, unless it is source (in which case, it is maxPaths -1).
+         * Keep at most maxPaths paths, unless it is a source (in which case, it is maxPaths -1).
          */
         val sharedPaths = fromLocalSource + when {
             // We can keep all paths
@@ -155,16 +176,16 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
                 ArrayList<GradientPath<ID, Value, Distance>>(maxPaths).apply {
                     /*
                      * Pick the paths by priority:
-                     * 1. prepare a list of results, large at most multipaths;
+                     * 1. prepare a list of results, large at most multi-paths;
                      * 2. classify them by source in a Map<ID, List<UpdatedGradientPath>>;
                      * 3. pick the shortest for each source, removing it from the list;
-                     * 4. sort the selected ones by distance, and pick at most multipaths of them.
+                     * 4. sort the selected ones by distance, and pick at most multi-paths of them.
                      * 5. if there are more slots, goto 2.
                      */
                     val pathsBySource = mutableMapOf<ID, MutableList<UpdatedGradientPath<ID, Value, Distance>>>()
                     // Equivalent to a groupBy, but presumably faster with large networks
                     candidatePaths.forEach {
-                        // Since the source collection is sorted, the sub-collections will be sorted as well
+                        // Since the source collection is sorted, the subcollections will be sorted as well
                         pathsBySource.getOrPut(it.path.source) { mutableListOf() }.apply { add(it) }
                     }
                     while (size < maxPaths) {
@@ -182,11 +203,19 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
 }
 
 /**
- * Propagate [local] values across a spanning tree starting from the closest [source].
+ * Propagate [local] values across multiple spanning trees starting from all the devices in which [source] holds,
+ * retaining the value of the closest source.
  *
- * If there are no sources and no neighbors, default to [local] value.
- * The [metric] function is used to compute the distance between devices in form of a field of [Double]s.
+ * If there are no sources, default to [local] value.
+ * The [metric] function is used to compute the distance between devices in form of a field of [Double]s,
+ * [accumulateDistance] is used to accumulate distances, defaulting to a plain sum.
  * [accumulateData] is used to modify data from neighbors on the fly, and defaults to the identity function.
+ *
+ * This function features *fast repair*, and it is **not** subject to the *rising value problem*,
+ * see [Fast self-healing gradients](https://doi.org/10.1145/1363686.1364163).
+ *
+ * On the other hand, it requires larger messages and more processing than the classic
+ * [bellmanFordGradientCast].
  */
 @JvmOverloads
 inline fun <reified ID : Any, reified Type> Aggregate<ID>.gradientCast(
@@ -194,15 +223,55 @@ inline fun <reified ID : Any, reified Type> Aggregate<ID>.gradientCast(
     local: Type,
     maxPaths: Int = Int.MAX_VALUE,
     noinline accumulateData: (fromSource: Double, toNeighbor: Double, data: Type) -> Type = { _, _, data -> data },
-    crossinline metric: () -> Field<ID, Double> = { neighboring(1.0) },
-): Type = gradientCast(source, local, 0.0, Double.POSITIVE_INFINITY, maxPaths, accumulateData, Double::plus, metric)
+    crossinline accumulateDistance: (fromSource: Double, toNeighbor: Double) -> Double = Double::plus,
+    crossinline metric: () -> Field<ID, Double>,
+): Type = gradientCast(
+    source,
+    local,
+    0.0,
+    Double.POSITIVE_INFINITY,
+    maxPaths,
+    accumulateData,
+    accumulateDistance,
+    metric,
+)
 
 /**
- * Propagate [local] values across a spanning tree starting from the closest [source].
+ * Propagate [local] values across multiple spanning trees starting from all the devices in which [source] holds,
+ * retaining the value of the closest source, using the hop count as distance metric.
  *
- * If there are no sources and no neighbors, default to [local] value.
- * The [metric] function is used to compute the distance between devices in form of a field of [Int]s.
+ * If there are no sources, default to [local] value.
  * [accumulateData] is used to modify data from neighbors on the fly, and defaults to the identity function.
+ *
+ * This function features *fast repair*, and it is **not** subject to the *rising value problem*,
+ * see [Fast self-healing gradients](https://doi.org/10.1145/1363686.1364163).
+ *
+ * On the other hand, it requires larger messages and more processing than the classic
+ * [bellmanFordGradientCast].
+ */
+@JvmOverloads
+inline fun <reified ID : Any, reified Type> Aggregate<ID>.hopGradientCast(
+    source: Boolean,
+    local: Type,
+    maxPaths: Int = Int.MAX_VALUE,
+    noinline accumulateData: (fromSource: Int, toNeighbor: Int, data: Type) -> Type = { _, _, data -> data },
+): Type = // Int.MAX_VALUE - 1 avoids overflow in the case of raising value problem
+    intGradientCast(source, local, maxPaths, accumulateData, Int::plus, ::hops)
+
+/**
+ * Propagate [local] values across multiple spanning trees starting from all the devices in which [source] holds,
+ * retaining the value of the closest source.
+ *
+ * If there are no sources, default to [local] value.
+ * The [metric] function is used to compute the distance between devices in form of a field of [Int]s,
+ * [accumulateDistance] is used to accumulate distances, defaulting to a plain sum.
+ * [accumulateData] is used to modify data from neighbors on the fly, and defaults to the identity function.
+ *
+ * This function features *fast repair*, and it is **not** subject to the *rising value problem*,
+ * see [Fast self-healing gradients](https://doi.org/10.1145/1363686.1364163).
+ *
+ * On the other hand, it requires larger messages and more processing than the classic
+ * [bellmanFordGradientCast].
  */
 @JvmOverloads
 inline fun <reified ID : Any, reified Type> Aggregate<ID>.intGradientCast(
@@ -210,9 +279,10 @@ inline fun <reified ID : Any, reified Type> Aggregate<ID>.intGradientCast(
     local: Type,
     maxPaths: Int = Int.MAX_VALUE,
     noinline accumulateData: (fromSource: Int, toNeighbor: Int, data: Type) -> Type = { _, _, data -> data },
-    crossinline metric: () -> Field<ID, Int> = { neighboring(1) },
+    crossinline accumulateDistance: (fromSource: Int, toNeighbor: Int) -> Int = Int::plus,
+    crossinline metric: () -> Field<ID, Int>,
 ): Type = // Int.MAX_VALUE - 1 avoids overflow in the case of raising value problem
-    gradientCast(source, local, 0, Int.MAX_VALUE - 1, maxPaths, accumulateData, Int::plus, metric)
+    gradientCast(source, local, 0, Int.MAX_VALUE - 1, maxPaths, accumulateData, accumulateDistance, metric)
 
 /**
  * Provided a list of [sources], propagates information from each, collecting it in a map.
@@ -246,20 +316,17 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
  * [accumulateData] is used to modify data from neighbors on the fly, and defaults to the identity function.
  */
 @JvmOverloads
-@JvmName("multiGradientCastDouble")
 inline fun <reified ID : Any, reified Value> Aggregate<ID>.multiGradientCast(
     sources: Iterable<ID>,
     local: Value,
     maxPaths: Int = Int.MAX_VALUE,
     noinline accumulateData: (fromSource: Double, toNeighbor: Double, data: Value) -> Value = { _, _, data -> data },
-    crossinline metric: () -> Field<ID, Double> = { neighboring(1.0) },
+    crossinline metric: () -> Field<ID, Double>,
 ): Map<ID, Value> = sources.associateWith { source ->
     alignedOn(source) {
         gradientCast(
             source = source == localId,
             local = local,
-            bottom = 0.0,
-            top = Double.POSITIVE_INFINITY,
             maxPaths = maxPaths,
             accumulateData,
             Double::plus,
@@ -276,20 +343,17 @@ inline fun <reified ID : Any, reified Value> Aggregate<ID>.multiGradientCast(
  * [accumulateData] is used to modify data from neighbors on the fly, and defaults to the identity function.
  */
 @JvmOverloads
-@JvmName("multiGradientCastInt")
-inline fun <reified ID : Any, reified Value> Aggregate<ID>.multiGradientCast(
+inline fun <reified ID : Any, reified Value> Aggregate<ID>.multiIntGradientCast(
     sources: Iterable<ID>,
     local: Value,
     maxPaths: Int = Int.MAX_VALUE,
     noinline accumulateData: (fromSource: Int, toNeighbor: Int, data: Value) -> Value = { _, _, data -> data },
-    crossinline metric: () -> Field<ID, Int> = { neighboring(1) },
+    crossinline metric: () -> Field<ID, Int> = ::hops,
 ): Map<ID, Value> = sources.associateWith { source ->
     alignedOn(source) {
-        gradientCast(
+        intGradientCast(
             source = source == localId,
             local = local,
-            bottom = Int.MIN_VALUE,
-            top = Int.MAX_VALUE,
             maxPaths = maxPaths,
             accumulateData = accumulateData,
             accumulateDistance = Int::plus,
@@ -322,7 +386,7 @@ data class GradientPath<ID : Any, Value, Distance : Comparable<Distance>>(
  * to which it arrives through [path].
  *
  * This class is meant to be used internally by the [gradientCast] function,
- * and it is not intended to be used outside of it.
+ * and it is not intended to be used outside it.
  */
 @DelicateCollektiveApi
 data class UpdatedGradientPath<ID : Any, Value, Distance : Comparable<Distance>>(
