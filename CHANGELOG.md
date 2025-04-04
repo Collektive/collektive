@@ -1,3 +1,18 @@
+## [19.0.0](https://github.com/Collektive/collektive/compare/18.0.0...19.0.0) (2025-04-04)
+
+### ⚠ BREAKING CHANGES
+
+* **stdlib:** refactor all spreading operators (#841)
+
+### Features
+
+* **stdlib:** refactor all spreading operators ([#841](https://github.com/Collektive/collektive/issues/841)) ([be9c094](https://github.com/Collektive/collektive/commit/be9c09491523c2683ec7336c919c3633c40b5f34))
+
+### Build and continuous integration
+
+* allow ten seconds for js tests ([cbb4589](https://github.com/Collektive/collektive/commit/cbb458931e287fe830a9a83d9ab97225123fbe66))
+* remove multijvm from buildSrc ([7cefd4a](https://github.com/Collektive/collektive/commit/7cefd4adac98710f42c99494696957613d68d128))
+
 ## [18.0.0](https://github.com/Collektive/collektive/compare/17.2.2...18.0.0) (2025-04-03)
 
 ### ⚠ BREAKING CHANGES
