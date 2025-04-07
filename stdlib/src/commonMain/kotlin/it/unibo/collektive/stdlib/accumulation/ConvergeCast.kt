@@ -5,24 +5,23 @@
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
  * as described in the LICENSE file in this project's repository's top directory.
  */
-@file:UseSerializers(OptionSerializer::class)
-
 package it.unibo.collektive.stdlib.accumulation
 
 import arrow.core.None
-import arrow.core.Option
 import arrow.core.Some
-import arrow.core.serialization.OptionSerializer
+import arrow.core.none
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.exchanging
+import it.unibo.collektive.aggregate.api.mapNeighborhood
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.Field.Companion.fold
 import it.unibo.collektive.field.operations.collectIDs
 import it.unibo.collektive.field.operations.minWithId
 import it.unibo.collektive.stdlib.spreading.hopDistanceTo
-import it.unibo.collektive.stdlib.util.merge
-import kotlinx.serialization.UseSerializers
+import it.unibo.collektive.stdlib.util.Maybe
+import it.unibo.collektive.stdlib.util.Maybe.Companion.merge
+import it.unibo.collektive.stdlib.util.Maybe.Companion.some
 import kotlin.contracts.ExperimentalContracts
 import kotlin.jvm.JvmOverloads
 
@@ -38,25 +37,23 @@ inline fun <reified ID : Any, reified Data, reified Potential : Comparable<Poten
     potential: Field<ID, Potential>,
     selectParent: Comparator<Pair<ID, Potential>> = defaultComparator(),
     crossinline accumulateData: (Data, Data) -> Data,
-): Data = exchanging<ID, Option<Data>, Data>(None) { data: Field<ID, Option<Data>> ->
-    val localValue: Option<Data> = data.fold<ID, Option<Data>, Option<Data>>(Some(local)) { curData, newData ->
-        curData.merge(newData, accumulateData)
+): Data = exchanging<ID, Maybe<Data>, Data>(Maybe.none) { data: Field<ID, Maybe<Data>> ->
+    val localValue: Maybe<Data> = data
+        .fold(some(local)) { current, new -> current.merge(new, accumulateData) }
+    check(localValue.option is Some) {
+        "Bug in the implementation of convergeCast. A reduction using as base value ${some(local)} produced $None"
     }
-    check(localValue is Some) {
-        "Bug in the implementation of convergeCast. A reduction using as base value ${Some(local)} produced $None"
-    }
-    val parent = findParent(potential, selectParent)
+    val parent: ID = findParent(potential, selectParent)
     // This anisotropic field contains the values to be sent to neighbors,
     // namely, it is a field for which solely the parents receive the local value
-    neighboring(0.toByte()).mapWithId { id, _ ->
+    val messages: Field<ID, Maybe<Data>> = mapNeighborhood { id ->
         when {
-            parent == localId -> None // I'm the leader, I don't contribute to feeding data to other devices
+            parent == localId -> Maybe.none // I'm the leader, I don't contribute to feeding data to other devices
             id == parent -> localValue // this is my parent, I'm sending them data
-            else -> None // "sibling" device
+            else -> Maybe.none // "sibling" device
         }
-    }.yielding {
-        localValue.value
     }
+    messages.yielding { localValue.option.value }
 }
 
 /**
