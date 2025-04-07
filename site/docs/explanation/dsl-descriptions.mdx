@@ -24,6 +24,11 @@ Device with ID `0` has a local value of `5`,
 device with ID `1` has a local value of `10`,
 and device with ID `2` has a local value of `15`.
 
+Considering the following `exchange` program:
+```kotlin
+exchange(initialValue) { field -> field }
+```
+
 These are the fields that each device perceives:
 ```
 ϕ(localId=0, localValue=5, neighbors={1=10, 2=15}) // field perceived by device 0
@@ -37,7 +42,7 @@ Now, let's consider a more complex scenario with four devices, where the device 
 
 ![](/img/four-devices.svg)
 
-The fields perceived by each device are:
+With the same `exchange` program as before, the fields perceived by each device are:
 ```
 ϕ(localId=0, localValue=5, neighbors={1=10, 2=15, 3=20}) // field perceived by device 0
 ϕ(localId=1, localValue=10, neighbors={0=5, 2=15}) // field perceived by device 1
@@ -67,12 +72,25 @@ It models the space-time evolution of the device.
 
 #### Example
 
+
 ```kotlin
-
-exchange(localId) { field ->
-
+// when the id of the device is even,
+// add 1 to the value perceived, else double the value.
+exchange(initialValue) { field ->
+    field.mapWithId { id, value ->
+        if (id % 2 == 0) value + 1 else value * 2
+    }
 }
 ```
+After each iteration of every device, the resultant fields are the following:
+
+```
+ϕ(localId=0, localValue=5, neighbors={})
+ϕ(localId=1, localValue=10, neighbors={0=6})
+ϕ(localId=2, localValue=15, neighbors={0=6, 1=20})
+ϕ(localId=3, localValue=20, neighbors={0=6, 1=20, 2=16})
+```
+
 
 [^3]: G. Audrito, R. Casadei, F. Damiani, G. Salvaneschi, and M. Viroli "The eXchange Calculus (XC): A functional programming language design for distributed collective systems."
 
