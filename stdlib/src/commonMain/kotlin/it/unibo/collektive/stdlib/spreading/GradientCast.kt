@@ -112,19 +112,16 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
     local: Value,
     bottom: Distance,
     top: Distance,
+    metric: Field<ID, Distance>,
     maxPaths: Int = Int.MAX_VALUE,
-    noinline accumulateData: (fromSource: Distance, toNeighbor: Distance, data: Value) -> Value =
+    noinline accumulateData: (fromSource: Distance, toNeighbor: Distance, neighborData: Value) -> Value =
         { _, _, data -> data },
     crossinline accumulateDistance: (fromSource: Distance, toNeighbor: Distance) -> Distance,
-    crossinline metric: () -> Field<ID, Distance>,
 ): Value {
-    contract {
-        callsInPlace(metric, InvocationKind.EXACTLY_ONCE)
-    }
     require(maxPaths > 0) {
         "Computing the gradient requires at least one-path memory"
     }
-    val coercedMetric = metric().coerceIn(bottom, top)
+    val coercedMetric = metric.coerceIn(bottom, top)
     val fromLocalSource = if (source) listOf(GradientPath(bottom, localId, localId, local)) else emptyList()
     return sharing(fromLocalSource) { neighborData: Field<ID, List<GradientPath<ID, Value, Distance>>> ->
         /*
@@ -221,19 +218,19 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
 inline fun <reified ID : Any, reified Type> Aggregate<ID>.gradientCast(
     source: Boolean,
     local: Type,
+    metric: Field<ID, Double>,
     maxPaths: Int = Int.MAX_VALUE,
     noinline accumulateData: (fromSource: Double, toNeighbor: Double, data: Type) -> Type = { _, _, data -> data },
     crossinline accumulateDistance: (fromSource: Double, toNeighbor: Double) -> Double = Double::plus,
-    crossinline metric: () -> Field<ID, Double>,
 ): Type = gradientCast(
     source,
     local,
     0.0,
     Double.POSITIVE_INFINITY,
+    metric,
     maxPaths,
     accumulateData,
     accumulateDistance,
-    metric,
 )
 
 /**
@@ -255,6 +252,7 @@ inline fun <reified ID : Any, reified Type> Aggregate<ID>.gradientCast(
 inline fun <reified ID : Any, reified Type> Aggregate<ID>.intGradientCast(
     source: Boolean,
     local: Type,
+    metric: Field<ID, Int>,
     maxPaths: Int = Int.MAX_VALUE,
     noinline accumulateData: (fromSource: Int, toNeighbor: Int, data: Type) -> Type = { _, _, data -> data },
     crossinline accumulateDistance: (fromSource: Int, toNeighbor: Int) -> Int = { fromSource, toNeighbor ->
@@ -263,8 +261,7 @@ inline fun <reified ID : Any, reified Type> Aggregate<ID>.intGradientCast(
             else -> Int.MAX_VALUE
         }
     },
-    crossinline metric: () -> Field<ID, Int>,
-): Type = gradientCast(source, local, 0, Int.MAX_VALUE, maxPaths, accumulateData, accumulateDistance, metric)
+): Type = gradientCast(source, local, 0, Int.MAX_VALUE, metric, maxPaths, accumulateData, accumulateDistance)
 
 /**
  * Propagate [local] values across multiple spanning trees starting from all the devices in which [source] holds,
@@ -285,7 +282,7 @@ inline fun <reified ID : Any, reified Type> Aggregate<ID>.hopGradientCast(
     local: Type,
     maxPaths: Int = Int.MAX_VALUE,
     noinline accumulateData: (fromSource: Int, toNeighbor: Int, data: Type) -> Type = { _, _, data -> data },
-): Type = intGradientCast(source, local, maxPaths, accumulateData, Int::plus, ::hops)
+): Type = intGradientCast(source, local, hops(), maxPaths, accumulateData, Int::plus)
 
 /**
  * Provided a list of [sources], propagates information from each, collecting it in a map.
@@ -300,14 +297,14 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
     local: Value,
     bottom: Distance,
     top: Distance,
+    metric: Field<ID, Distance>,
     maxPaths: Int = Int.MAX_VALUE,
     noinline accumulateData: (fromSource: Distance, toNeighbor: Distance, data: Value) -> Value =
         { _, _, data -> data },
     crossinline accumulateDistance: (Distance, Distance) -> Distance,
-    crossinline metric: () -> Field<ID, Distance>,
 ): Map<ID, Value> = sources.associateWith { source ->
     alignedOn(source) {
-        gradientCast(source == localId, local, bottom, top, maxPaths, accumulateData, accumulateDistance, metric)
+        gradientCast(source == localId, local, bottom, top, metric, maxPaths, accumulateData, accumulateDistance)
     }
 }
 
@@ -322,18 +319,18 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
 inline fun <reified ID : Any, reified Value> Aggregate<ID>.multiGradientCast(
     sources: Iterable<ID>,
     local: Value,
+    metric: Field<ID, Double>,
     maxPaths: Int = Int.MAX_VALUE,
     noinline accumulateData: (fromSource: Double, toNeighbor: Double, data: Value) -> Value = { _, _, data -> data },
-    crossinline metric: () -> Field<ID, Double>,
 ): Map<ID, Value> = sources.associateWith { source ->
     alignedOn(source) {
         gradientCast(
             source = source == localId,
             local = local,
+            metric = metric,
             maxPaths = maxPaths,
             accumulateData,
             Double::plus,
-            metric,
         )
     }
 }
@@ -349,18 +346,18 @@ inline fun <reified ID : Any, reified Value> Aggregate<ID>.multiGradientCast(
 inline fun <reified ID : Any, reified Value> Aggregate<ID>.multiIntGradientCast(
     sources: Iterable<ID>,
     local: Value,
+    metric: Field<ID, Int> = hops(),
     maxPaths: Int = Int.MAX_VALUE,
     noinline accumulateData: (fromSource: Int, toNeighbor: Int, data: Value) -> Value = { _, _, data -> data },
-    crossinline metric: () -> Field<ID, Int> = ::hops,
 ): Map<ID, Value> = sources.associateWith { source ->
     alignedOn(source) {
         intGradientCast(
             source = source == localId,
             local = local,
+            metric = metric,
             maxPaths = maxPaths,
             accumulateData = accumulateData,
             accumulateDistance = Int::plus,
-            metric = metric,
         )
     }
 }

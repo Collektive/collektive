@@ -41,7 +41,7 @@ class DistanceToTest {
     private fun mooreGridWithGradient(size: Int) =
         mooreGrid<Double>(size, size, { _, _ -> Double.NaN }) { environment ->
             val localPosition = environment.positionOf(localId)
-            distanceTo(localId == 0) { euclideanDistance3D(localPosition.toTriple()) }
+            distanceTo(localId == 0, metric = euclideanDistance3D(localPosition.toTriple()))
         }.apply {
             assertEquals(size * size, nodes.size)
             val initial = status().values.distinct()
