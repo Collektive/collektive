@@ -84,8 +84,14 @@ interface OutboundEnvelope<ID : Any> {
                     }
                 }
 
-                override fun prepareMessageFor(receiverId: ID, factory: MessageFactory<ID, *>): Message<ID, Any?> =
-                    factory(senderId, overrides[receiverId]?.toMap() ?: defaults)
+                override fun prepareMessageFor(receiverId: ID, factory: MessageFactory<ID, *>): Message<ID, Any?> {
+                    val overridesForId = overrides[receiverId].orEmpty()
+                    val payloads = when {
+                        overridesForId.isEmpty() -> defaults
+                        else -> defaults + overridesForId
+                    }
+                    return factory(senderId, payloads)
+                }
 
                 override fun isEmpty(): Boolean = defaults.isEmpty()
 
