@@ -1,3 +1,13 @@
+## [19.1.0](https://github.com/Collektive/collektive/compare/19.0.0...19.1.0) (2025-04-07)
+
+### Features
+
+* **dsl:** generalize `exchanging` ([#850](https://github.com/Collektive/collektive/issues/850)) ([e961a35](https://github.com/Collektive/collektive/commit/e961a35c55c19f3ea9d89bf21f5b9bea4058c2f8))
+
+### Build and continuous integration
+
+* **deps:** update github/codeql-action action to v3.28.14 ([82f3a90](https://github.com/Collektive/collektive/commit/82f3a90b1ca3c3e7ea053b68d5af08cafc7e755f))
+
 ## [19.0.0](https://github.com/Collektive/collektive/compare/18.0.0...19.0.0) (2025-04-04)
 
 ### ⚠ BREAKING CHANGES
