@@ -46,6 +46,11 @@ open class Environment<R>(
     }
 
     /**
+     * Returns the node with the given [id], or throws exception if not found.
+     */
+    operator fun get(id: Int) = positions.keys.single { id == it.id }
+
+    /**
      * Retrieves the position of a [node].
      */
     fun positionOf(node: Node<R>) = positions.getValue(node)
