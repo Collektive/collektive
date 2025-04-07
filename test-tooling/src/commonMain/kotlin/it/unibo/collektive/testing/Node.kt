@@ -73,7 +73,7 @@ class Node<R>(
         override fun deliverableFor(outboundMessage: OutboundEnvelope<Int>) = environment
             .neighborsOf(this@Node)
             .forEach { neighbor ->
-                val timedMessage = TimedMessage(outboundMessage.prepareMessageFor(id) to neighbor.lastcycle)
+                val timedMessage = TimedMessage(outboundMessage.prepareMessageFor(neighbor.id) to neighbor.lastcycle)
                 neighbor.network.messageBuffer += id to timedMessage
             }
 
