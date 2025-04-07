@@ -155,15 +155,15 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
          */
         val candidatePaths = distanceUpdatedPaths.fold(
             mutableMapOf<Pair<ID, ID>, UpdatedGradientPath<ID, Value, Distance>>(),
-        ) { list, paths ->
+        ) { accumulator, paths ->
             paths.forEach { path ->
                 val key = path.source to path.neighbor
-                val previous = list.getOrPut(key) { path }
+                val previous = accumulator.getOrPut(key) { path }
                 if (previous.totalDistance > path.totalDistance) {
-                    list[key] = path
+                    accumulator[key] = path
                 }
             }
-            list
+            accumulator
         }.values.sorted()
         /*
          * Keep at most maxPaths paths, unless it is a source (in which case, it is maxPaths -1).
