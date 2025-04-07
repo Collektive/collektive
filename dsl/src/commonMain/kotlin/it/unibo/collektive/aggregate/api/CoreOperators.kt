@@ -34,8 +34,8 @@ import it.unibo.collektive.field.Field
  */
 inline fun <ID : Any, reified Shared, Returned> Aggregate<ID>.exchanging(
     initial: Shared,
-    noinline body: YieldingScope<Field<ID, Shared>, Field<ID, Returned>>,
-): Field<ID, Returned> =
+    noinline body: YieldingScope<Field<ID, Shared>, Returned>,
+): Returned =
     @OptIn(DelicateCollektiveApi::class)
     InternalAPI.`_ serialization aware exchanging`(initial, dataSharingMethod(), body)
 
