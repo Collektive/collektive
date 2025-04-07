@@ -11,7 +11,8 @@ package it.unibo.collektive.aggregate.api
 import it.unibo.collektive.field.Field
 import kotlinx.serialization.serializer
 
-typealias YieldingScope<Initial, Return> = YieldingContext<Initial, Return>.(Initial) -> YieldingResult<Initial, Return>
+typealias YieldingScope<Shared, Returned> =
+    YieldingContext<Shared, Returned>.(Shared) -> YieldingResult<Shared, Returned>
 
 /**
  * Represents methods intended to be used internally only.
@@ -49,8 +50,8 @@ interface Aggregate<ID : Any> {
     fun <Shared, Returned> InternalAPI.`_ serialization aware exchanging`(
         initial: Shared,
         dataSharingMethod: DataSharingMethod<Shared>,
-        body: YieldingScope<Field<ID, Shared>, Field<ID, Returned>>,
-    ): Field<ID, Returned>
+        body: YieldingScope<Field<ID, Shared>, Returned>,
+    ): Returned
 
     /**
      * Iteratively updates the value computing the [transform] expression at each device using the last

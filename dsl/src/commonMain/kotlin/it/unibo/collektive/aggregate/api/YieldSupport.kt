@@ -17,7 +17,8 @@ class YieldingContext<Shared, Returned> {
     /**
      * Computes [toReturn] after the data exchange operation is complete.
      */
-    fun Shared.yielding(toReturn: () -> Returned): YieldingResult<Shared, Returned> = YieldingResult(this, toReturn())
+    fun Shared.yielding(toReturn: Shared.() -> Returned): YieldingResult<Shared, Returned> =
+        YieldingResult(this, this.toReturn())
 }
 
 /**

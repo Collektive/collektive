@@ -56,22 +56,22 @@ internal class AggregateContext<ID : Any>(
     private fun <T> newField(localValue: T, others: Map<ID, T>): Field<ID, T> = Field(localId, localValue, others)
 
     @DelicateCollektiveApi
-    override fun <Initial, Ret> InternalAPI.`_ serialization aware exchanging`(
-        initial: Initial,
-        dataSharingMethod: DataSharingMethod<Initial>,
-        body: YieldingScope<Field<ID, Initial>, Field<ID, Ret>>,
-    ): Field<ID, Ret> {
+    override fun <Shared, Returned> InternalAPI.`_ serialization aware exchanging`(
+        initial: Shared,
+        dataSharingMethod: DataSharingMethod<Shared>,
+        body: YieldingScope<Field<ID, Shared>, Returned>,
+    ): Returned {
         val path: Path = stack.currentPath()
-        val messages = inboundMessage.dataAt<Initial>(path, dataSharingMethod)
+        val messages = inboundMessage.dataAt<Shared>(path, dataSharingMethod)
         val previous = stateAt(path, initial)
-        val subject = newField(previous, messages)
-        val context = YieldingContext<Field<ID, Initial>, Field<ID, Ret>>()
-        return body(context, subject)
+        val subject: Field<ID, Shared> = newField(previous, messages)
+        val context = YieldingContext<Field<ID, Shared>, Returned>()
+        return context.body(subject)
             .also {
                 val message = SharedData(
                     it.toSend.localValue,
                     when (it.toSend) {
-                        is ConstantField<ID, Initial> -> emptyMap()
+                        is ConstantField<ID, Shared> -> emptyMap()
                         else -> it.toSend.excludeSelf()
                     },
                 )
