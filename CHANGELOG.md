@@ -1,3 +1,9 @@
+## [20.1.0](https://github.com/Collektive/collektive/compare/20.0.0...20.1.0) (2025-04-08)
+
+### Features
+
+* **stdlib:** implement convergeCast ([#848](https://github.com/Collektive/collektive/issues/848)) ([ac15a7c](https://github.com/Collektive/collektive/commit/ac15a7ce0b61e9e648180ea90756a7a70e3fb0cb))
+
 ## [20.0.0](https://github.com/Collektive/collektive/compare/19.1.0...20.0.0) (2025-04-08)
 
 ### ⚠ BREAKING CHANGES
