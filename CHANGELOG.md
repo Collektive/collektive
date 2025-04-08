@@ -1,3 +1,9 @@
+## [20.2.1](https://github.com/Collektive/collektive/compare/20.2.0...20.2.1) (2025-04-08)
+
+### Bug Fixes
+
+* **alchemist-incarnation-collektive:** make the DSL and the stdlib API-level dependencies to simplify the import ([#866](https://github.com/Collektive/collektive/issues/866)) ([893e988](https://github.com/Collektive/collektive/commit/893e9888fd91c21a56634cdaa148d78602bcae43))
+
 ## [20.2.0](https://github.com/Collektive/collektive/compare/20.1.0...20.2.0) (2025-04-08)
 
 ### Features
