@@ -1,3 +1,34 @@
+## [20.0.0](https://github.com/Collektive/collektive/compare/19.1.0...20.0.0) (2025-04-08)
+
+### ⚠ BREAKING CHANGES
+
+* **stdlib:** fix hop-distance metric and general metric usage in gradient casts (#857)
+
+### Features
+
+* **dsl:** add `collect` and `collectDistinct` to the field reduction operations ([#852](https://github.com/Collektive/collektive/issues/852)) ([f00f386](https://github.com/Collektive/collektive/commit/f00f386ce8104b3d448c06e4af41579b6913a5f3))
+* **test-tooling:** add quick node-access method to `Environment` ([#855](https://github.com/Collektive/collektive/issues/855)) ([08c1610](https://github.com/Collektive/collektive/commit/08c1610ab89a7aab7393920a6bd2653b667c7d39))
+
+### Dependency updates
+
+* **deps:** update dependency react-router-dom to v7.5.0 ([04f9832](https://github.com/Collektive/collektive/commit/04f98325cdbabebccfd02f7d9356409cd5b6c531))
+* **deps:** update dependency typescript to v5.8.3 ([7a87937](https://github.com/Collektive/collektive/commit/7a8793743595c7644b5d941d6f024c8e8433d1f8))
+
+### Bug Fixes
+
+* **dsl:** fix bugged management of overrides, with undesired misalignment in case of `exchange` ([#853](https://github.com/Collektive/collektive/issues/853)) ([f4f87f3](https://github.com/Collektive/collektive/commit/f4f87f35c1c364cd72db1127dbb0b31ed0289711))
+* **stdlib:** fix hop-distance metric and general metric usage in gradient casts ([#857](https://github.com/Collektive/collektive/issues/857)) ([685137c](https://github.com/Collektive/collektive/commit/685137c5b48781b07df54a2f2cc049d96dc89199))
+* **test-tooling:** fix bugged message preparation ignoring `exchange`d messages ([#854](https://github.com/Collektive/collektive/issues/854)) ([a18542f](https://github.com/Collektive/collektive/commit/a18542fb67413e1e9cb3f0310fdf59a1b2f95938))
+
+### Build and continuous integration
+
+* **deps:** update github/codeql-action action to v3.28.15 ([292cb9f](https://github.com/Collektive/collektive/commit/292cb9f253bd7c45fc804e73d7e6fa02d989e1f2))
+
+### Style improvements
+
+* **dsl:** sort `Field` members ([#851](https://github.com/Collektive/collektive/issues/851)) ([5169c27](https://github.com/Collektive/collektive/commit/5169c2767ac42f83466c05810d024332a013ce84))
+* **stdlib:** fix linguistic antipattern ([#856](https://github.com/Collektive/collektive/issues/856)) ([48c2bc7](https://github.com/Collektive/collektive/commit/48c2bc773c2dc78b17d0b101cdd396ebdccf1b3c))
+
 ## [19.1.0](https://github.com/Collektive/collektive/compare/19.0.0...19.1.0) (2025-04-07)
 
 ### Features
