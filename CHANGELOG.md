@@ -1,3 +1,13 @@
+## [20.2.0](https://github.com/Collektive/collektive/compare/20.1.0...20.2.0) (2025-04-08)
+
+### Features
+
+* **stdlib:** implement `boundedElection` ([9c4e693](https://github.com/Collektive/collektive/commit/9c4e693fe794d204c74ce3fc80e0c869414ddd7f))
+
+### Dependency updates
+
+* **deps:** update plugin publishoncentral to v8.0.6 ([13b2e17](https://github.com/Collektive/collektive/commit/13b2e1788cebd67f463e3d1a20f799c3e3cba2fb))
+
 ## [20.1.0](https://github.com/Collektive/collektive/compare/20.0.0...20.1.0) (2025-04-08)
 
 ### Features
