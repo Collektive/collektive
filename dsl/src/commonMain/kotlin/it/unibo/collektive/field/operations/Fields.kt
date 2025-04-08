@@ -10,6 +10,7 @@
 
 package it.unibo.collektive.field.operations
 
+import arrow.core.Predicate
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.Field.Companion.fold
 import it.unibo.collektive.field.Field.Companion.foldWithId
@@ -275,13 +276,13 @@ inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.minBy(base: T, crossinl
  * Check if none of the elements in the field satisfy the [predicate],
  * ignoring the local value.
  */
-inline fun <ID : Any, T> Field<ID, T>.none(crossinline predicate: (T) -> Boolean): Boolean = !any(predicate)
+inline fun <ID : Any, T> Field<ID, T>.none(crossinline predicate: Predicate<T>): Boolean = !any(predicate)
 
 /**
  * Check if none of the elements in the field satisfy the [predicate],
  * including the local value.
  */
-inline fun <ID : Any, T> Field<ID, T>.noneWithSelf(crossinline predicate: (T) -> Boolean): Boolean =
+inline fun <ID : Any, T> Field<ID, T>.noneWithSelf(crossinline predicate: Predicate<T>): Boolean =
     !anyWithSelf(predicate)
 
 /**
@@ -297,5 +298,5 @@ inline fun <ID : Any, T> Field<ID, T>.replaceMatchingWithId(
  */
 inline fun <ID : Any, T> Field<ID, T>.replaceMatching(
     replaceWith: T,
-    crossinline predicate: (T) -> Boolean,
+    crossinline predicate: Predicate<T>,
 ): Field<ID, T> = replaceMatchingWithId(replaceWith) { _, value -> predicate(value) }
