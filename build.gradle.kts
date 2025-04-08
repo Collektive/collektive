@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 @file:OptIn(ExperimentalKotlinGradlePluginApi::class)
 
 import de.aaschmid.gradle.plugins.cpd.Cpd
@@ -23,12 +31,18 @@ val reportMerge by tasks.registering(ReportMergeTask::class) {
     output = project.layout.buildDirectory.file("reports/merge.sarif")
 }
 
+gitSemVer {
+    rootProject.version = computeVersion()
+}
+
 allprojects {
     group = "it.unibo.${rootProject.name}"
 
     repositories {
         mavenCentral()
     }
+
+    project.version = rootProject.version
 
     with(rootProject.libs.plugins) {
         apply(plugin = dokka.id)
