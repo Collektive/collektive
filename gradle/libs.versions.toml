@@ -1,5 +1,6 @@
 [versions]
 alchemist = "42.0.5"
+arrow = "2.0.1"
 build-config = "5.6.2"
 dokka = "2.0.0"
 kotest = "6.0.0.M2"
@@ -10,7 +11,8 @@ serialization = "1.8.1"
 alchemist = { module = "it.unibo.alchemist:alchemist", version.ref = "alchemist" }
 alchemist-api = { module = "it.unibo.alchemist:alchemist-api", version.ref = "alchemist" }
 alchemist-euclidean-geometry = { module = "it.unibo.alchemist:alchemist-euclidean-geometry", version.ref = "alchemist" }
-arrow-core = "io.arrow-kt:arrow-core:2.0.1"
+arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
+arrow-core-serialization = { module = "io.arrow-kt:arrow-core-serialization", version.ref = "arrow" }
 caffeine = "com.github.ben-manes.caffeine:caffeine:3.2.0"
 hash-sha3 = "org.kotlincrypto.hash:sha3:0.7.0"
 javap = "com.perfma.wrapped:com.sun.tools:1.8.0_jdk8u275-b01_linux_x64"

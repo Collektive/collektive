@@ -39,6 +39,7 @@ kotlinMultiplatform {
             dependencies {
                 implementation(project(":dsl"))
                 implementation(rootProject.libs.kotlinx.serialization.core)
+                implementation(rootProject.libs.arrow.core.serialization)
             }
             kotlin.srcDirs(collektivizeKotlinStdlibTask)
         }
