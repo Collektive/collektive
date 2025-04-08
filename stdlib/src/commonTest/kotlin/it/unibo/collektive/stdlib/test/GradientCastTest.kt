@@ -13,11 +13,13 @@ import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.stdlib.spreading.GradientPath
 import it.unibo.collektive.stdlib.spreading.bellmanFordGradientCast
 import it.unibo.collektive.stdlib.spreading.gradientCast
+import it.unibo.collektive.stdlib.spreading.hopDistanceTo
 import it.unibo.collektive.stdlib.util.euclideanDistance3D
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.EnvironmentWithMeshNetwork
 import it.unibo.collektive.testing.Position
 import it.unibo.collektive.testing.SerializingMailbox
+import it.unibo.collektive.testing.vonNeumannGrid
 import kotlin.math.nextDown
 import kotlin.math.nextUp
 import kotlin.test.Test
@@ -67,7 +69,8 @@ class GradientCastTest {
             gradientCast(
                 source = localId == 0,
                 local = y,
-            ) { euclideanDistance3D(env.positionOf(localId).toTriple()) }
+                metric = euclideanDistance3D(env.positionOf(localId).toTriple()),
+            )
         }.apply {
             stabilizeAndDropSource()
             repeat(4) { cycleInRandomOrder() }
@@ -89,6 +92,20 @@ class GradientCastTest {
             stabilizeAndDropSource()
             repeat(100) { cycleInRandomOrder() }
             assertTrue(nodes.all { it.value == 0.0 })
+        }
+    }
+
+    @Test
+    fun `the hop count in a Von Neumann grid is the Manhattan distance`() {
+        vonNeumannGrid(10, 10, { _, _ -> Int.MIN_VALUE }) {
+            hopDistanceTo(localId == 0)
+        }.apply {
+            cycleInOrder()
+            nodes.forEach { node ->
+                val (x, y) = positionOf(node.id)
+                val manhattanDistance = x + y
+                assertEquals(manhattanDistance.toInt(), node.value, "Node $node has not the expected distance")
+            }
         }
     }
 }

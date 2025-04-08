@@ -154,7 +154,12 @@ value class Point3D(private val coordinates: Triple<Double, Double, Double>) {
 /**
  * Returns a field containing 1 for each aligned neighbor.
  */
-fun <ID : Any> Aggregate<ID>.hops(): Field<ID, Int> = neighboring(1)
+fun <ID : Any> Aggregate<ID>.hops(): Field<ID, Int> = neighboring(0.toByte()).mapWithId { id, _ ->
+    when {
+        id == localId -> 0
+        else -> 1
+    }
+}
 
 /**
  * Returns a field containing the Euclidean distance from the local node to each neighbor.
