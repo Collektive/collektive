@@ -25,21 +25,22 @@ import it.unibo.collektive.networking.NeighborsData
 import it.unibo.collektive.networking.NoNeighborsData
 import it.unibo.collektive.networking.OutboundEnvelope
 import it.unibo.collektive.path.Path
+import org.apache.commons.math3.random.RandomGenerator
 
 /**
- * Representation of a Collektive device in Alchemist.
- * [P] is the position type, the [environment] property represent the environment in which the device is located,
- * the [node] property represent a node in the environment, [retainMessagesFor] is the time for which messages
- * are retained.
+ * Representation of a Collektive device (as a [node]) in an Alchemist [environment] with a [randomGenerator].
+ * [P] is the position type,
+ * [retainMessagesFor] is the time for which messages are retained.
  */
 class CollektiveDevice<P>(
-    private val environment: Environment<Any?, P>,
+    val randomGenerator: RandomGenerator,
+    val environment: Environment<Any?, P>,
     override val node: Node<Any?>,
     private val retainMessagesFor: Time? = null,
 ) : NodeProperty<Any?>,
     Mailbox<Int>,
-    EnvironmentVariables,
-    DistanceSensor where P : Position<P> {
+    EnvironmentVariables
+    where P : Position<P> {
     private data class TimedMessage(val receivedAt: Time, val payload: Message<Int, *>)
 
     override val inMemory: Boolean = true
@@ -48,6 +49,7 @@ class CollektiveDevice<P>(
      * The current time.
      */
     var currentTime: Time = Time.ZERO
+        private set
 
     /**
      * The ID of the node (alias of [localId]).
@@ -65,16 +67,17 @@ class CollektiveDevice<P>(
         validMessages += TimedMessage(time, message)
     }
 
-    override fun <ID : Any> Aggregate<ID>.distances(): Field<ID, Double> =
-        environment.getPosition(node).let { nodePosition ->
-            neighboring(nodePosition.coordinates).map { position ->
-                // TODO: call makePosition(DoubleArray) in the simulator as the new version arrives
-                nodePosition.distanceTo(environment.makePosition(position.toList()))
-            }
+    /**
+     * Returns the distances to the neighboring nodes.
+     */
+    fun <ID : Any> Aggregate<ID>.distances(): Field<ID, Double> = environment.getPosition(node).let { nodePosition ->
+        neighboring(nodePosition.coordinates).map { position ->
+            nodePosition.distanceTo(environment.makePosition(position))
         }
+    }
 
     override fun cloneOnNewNode(node: Node<Any?>): NodeProperty<Any?> =
-        CollektiveDevice(environment, node, retainMessagesFor)
+        CollektiveDevice(randomGenerator, environment, node, retainMessagesFor)
 
     override fun deliverableFor(outboundMessage: OutboundEnvelope<Int>) {
         if (outboundMessage.isNotEmpty()) {
