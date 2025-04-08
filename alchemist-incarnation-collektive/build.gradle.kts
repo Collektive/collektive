@@ -30,7 +30,7 @@ kotlinJvm {
             dependencies {
                 api(project(":dsl"))
                 api(project(":stdlib"))
-                implementation("it.unibo.collektive:compiler-plugin")
+                implementation("it.unibo.collektive:compiler-plugin:${project.version}")
                 implementation(project(":compiler-embeddable"))
                 implementation(kotlin("reflect"))
                 implementation(libs.bundles.alchemist)
