@@ -34,6 +34,25 @@ inline fun <ID : Any, reified Shared> Aggregate<ID>.exchange(
 ): Field<ID, Shared> = exchanging(initial) { field -> body(field).yielding { this } }
 
 /**
+ * Observes the value of an expression [local] across neighbors.
+ * Builds a [Field] with minimal communication, using only the minimal machinery required to verify the alignment state.
+ * This function is recommended over
+ *
+ * ```kotlin
+ * neighboring(<constant value>)
+ * ```
+ *
+ * as it does not actually share the constant with neighbors.
+ */
+inline fun <ID : Any, T> Aggregate<ID>.mapNeighborhood(crossinline local: (ID) -> T): Field<ID, T> =
+    neighborhood().mapWithId { id, _ -> local(id) }
+
+/**
+ * builds a [Field] of aligned [ID]s with minimal communication.
+ */
+fun <ID : Any> Aggregate<ID>.neighborhood(): Field<ID, *> = neighboring(0.toByte())
+
+/**
  * [share] implements efficient stateful data sharing.
  *
  * Namely, starting from an [initial] value of [Shared], it computes a [Field] of [Shared],

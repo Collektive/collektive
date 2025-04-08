@@ -116,36 +116,62 @@ sealed interface Field<ID : Any, out T> {
         ): Field<ID, T> = ArrayBasedField(localId, localValue, others.map { it.toPair() })
 
         /**
-         * Reduce the elements of the field using the [transform] function,
+         * Reduce the elements of the field using the [reduce] function,
          * returning the [default] value if the field to transform is empty.
          * The local value is not considered.
          */
-        inline fun <ID : Any, T> Field<ID, T>.hood(default: T, crossinline transform: (T, T) -> T): T =
-            hoodWithId(default) { (_, accumulator), (id, value) -> id to transform(accumulator, value) }
+        inline fun <ID : Any, T> Field<ID, T>.hood(default: T, crossinline reduce: (T, T) -> T): T =
+            hoodWithId(default) { (_, accumulator), (id, value) -> id to reduce(accumulator, value) }
 
         /**
-         * Reduce the elements of the field using the [transform] function,
+         * Reduce the elements of the field using the [reduce] function,
          * returning the [default] value if the field to transform is empty.
          * The local value is not considered.
          *
-         * The [transform] function takes two pairs: the former represents the accumulated value (including the [ID]),
+         * The [reduce] function takes two pairs: the former represents the accumulated value (including the [ID]),
          * while the latter represents the current entry of the neighboring field that should be combined.
          *
          * Use this function when the [ID] should be propagated during the reduce operation.
          */
         inline fun <ID : Any, T> Field<ID, T>.hoodWithId(
             default: T,
-            crossinline transform: (Pair<ID, T>, Pair<ID, T>) -> Pair<ID, T>,
-        ): T {
+            crossinline reduce: (Pair<ID, T>, Pair<ID, T>) -> Pair<ID, T>,
+        ): T = hoodWithId(default, reduce) { second }
+
+        /**
+         * Reduce the entries of the field using the [reduce] function,
+         * and finally transforming them to a [R]esult using [select].
+         *
+         * The [default] value is returned if the field to transform is empty.
+         * The local value is not considered.
+         */
+        inline fun <ID : Any, T, R> Field<ID, T>.hoodWithId(
+            default: R,
+            crossinline reduce: (Pair<ID, T>, Pair<ID, T>) -> Pair<ID, T>,
+            crossinline select: Pair<ID, T>.() -> R,
+        ): R = hoodWithId(default, ::Pair, reduce, select)
+
+        /**
+         * Reduce the elements of the field by transforming them to [I]intermediates
+         * selecting the [I]ntermediates using the [reduce] function,
+         * and finally transforming the [I]ntermediates to [R]esults using [select].
+         *
+         * The [default] value is returned if the field to transform is empty.
+         * The local value is not considered.
+         */
+        inline fun <ID : Any, T, I, R> Field<ID, T>.hoodWithId(
+            default: R,
+            crossinline transform: (ID, T) -> I,
+            crossinline reduce: (I, I) -> I,
+            crossinline select: I.() -> R,
+        ): R {
             val neighbors = excludeSelf()
             return when {
                 neighbors.isEmpty() -> default
-                else ->
-                    neighbors.entries
-                        .asSequence()
-                        .map { it.toPair() }
-                        .reduce { accumulator, value -> transform(accumulator, value) }
-                        .second
+                else -> neighbors.entries.asSequence()
+                    .map { (id, v) -> transform(id, v) }
+                    .reduce { accumulator, value -> reduce(accumulator, value) }
+                    .select()
             }
         }
 
