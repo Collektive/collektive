@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 package it.unibo.collektive.field
 
 /**
@@ -13,6 +21,16 @@ sealed interface Field<ID : Any, out T> {
      * The value associated with the [localId].
      */
     val localValue: T
+
+    /**
+     * Returns the number of neighbors in the field.
+     */
+    val neighborsCount: Int get() = excludeSelf().size
+
+    /**
+     * Returns the [ID]s of all neighbors in this field.
+     */
+    val neighbors: Collection<ID>
 
     /**
      * Returns a [Map] with the neighboring values of this field (namely, all values but self).
@@ -65,16 +83,6 @@ sealed interface Field<ID : Any, out T> {
      * The resulting map _will contain the local value_.
      */
     fun toMap(): Map<ID, T>
-
-    /**
-     * Returns the number of neighbors of the field.
-     */
-    val neighborsCount: Int get() = excludeSelf().size
-
-    /**
-     * Returns the [ID]s of all neighbors in this field.
-     */
-    val neighbors: Collection<ID>
 
     /**
      * Base operations on [Field]s.
