@@ -97,7 +97,7 @@ class GradientCastTest {
 
     @Test
     fun `the hop count in a Von Neumann grid is the Manhattan distance`() {
-        vonNeumannGrid(10, 10, { _, _ -> Int.MIN_VALUE }) {
+        vonNeumannGrid(10, 10, Int.MIN_VALUE) {
             hopDistanceTo(localId == 0)
         }.apply {
             cycleInOrder()

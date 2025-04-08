@@ -15,8 +15,10 @@ import it.unibo.collektive.aggregate.api.sharing
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.Field.Companion.fold
 import it.unibo.collektive.field.operations.minBy
+import it.unibo.collektive.stdlib.util.Accumulator
 import it.unibo.collektive.stdlib.util.coerceIn
 import it.unibo.collektive.stdlib.util.hops
+import it.unibo.collektive.stdlib.util.nonOverflowingPlus
 import kotlinx.serialization.Serializable
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -43,7 +45,7 @@ inline fun <reified ID, reified Value, reified Distance> Aggregate<ID>.bellmanFo
     top: Distance,
     noinline accumulateData: (fromSource: Distance, toNeighbor: Distance, data: Value) -> Value =
         { _, _, data -> data },
-    crossinline accumulateDistance: (fromSource: Distance, toNeighbor: Distance) -> Distance,
+    crossinline accumulateDistance: Accumulator<Distance>,
     crossinline metric: () -> Field<ID, Distance>,
 ): Value where ID : Any, Distance : Comparable<Distance> {
     contract {
@@ -116,7 +118,7 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
     maxPaths: Int = Int.MAX_VALUE,
     noinline accumulateData: (fromSource: Distance, toNeighbor: Distance, neighborData: Value) -> Value =
         { _, _, data -> data },
-    crossinline accumulateDistance: (fromSource: Distance, toNeighbor: Distance) -> Distance,
+    crossinline accumulateDistance: Accumulator<Distance>,
 ): Value {
     require(maxPaths > 0) {
         "Computing the gradient requires at least one-path memory"
@@ -221,7 +223,7 @@ inline fun <reified ID : Any, reified Type> Aggregate<ID>.gradientCast(
     metric: Field<ID, Double>,
     maxPaths: Int = Int.MAX_VALUE,
     noinline accumulateData: (fromSource: Double, toNeighbor: Double, data: Type) -> Type = { _, _, data -> data },
-    crossinline accumulateDistance: (fromSource: Double, toNeighbor: Double) -> Double = Double::plus,
+    crossinline accumulateDistance: Accumulator<Double> = Double::plus,
 ): Type = gradientCast(
     source,
     local,
@@ -255,12 +257,7 @@ inline fun <reified ID : Any, reified Type> Aggregate<ID>.intGradientCast(
     metric: Field<ID, Int>,
     maxPaths: Int = Int.MAX_VALUE,
     noinline accumulateData: (fromSource: Int, toNeighbor: Int, data: Type) -> Type = { _, _, data -> data },
-    crossinline accumulateDistance: (fromSource: Int, toNeighbor: Int) -> Int = { fromSource, toNeighbor ->
-        when (val sum = fromSource + toNeighbor) {
-            in 0..Int.MAX_VALUE -> sum
-            else -> Int.MAX_VALUE
-        }
-    },
+    crossinline accumulateDistance: Accumulator<Int> = Int::nonOverflowingPlus,
 ): Type = gradientCast(source, local, 0, Int.MAX_VALUE, metric, maxPaths, accumulateData, accumulateDistance)
 
 /**
@@ -301,7 +298,7 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
     maxPaths: Int = Int.MAX_VALUE,
     noinline accumulateData: (fromSource: Distance, toNeighbor: Distance, data: Value) -> Value =
         { _, _, data -> data },
-    crossinline accumulateDistance: (Distance, Distance) -> Distance,
+    crossinline accumulateDistance: Accumulator<Distance>,
 ): Map<ID, Value> = sources.associateWith { source ->
     alignedOn(source) {
         gradientCast(source == localId, local, bottom, top, metric, maxPaths, accumulateData, accumulateDistance)
@@ -357,7 +354,7 @@ inline fun <reified ID : Any, reified Value> Aggregate<ID>.multiIntGradientCast(
             metric = metric,
             maxPaths = maxPaths,
             accumulateData = accumulateData,
-            accumulateDistance = Int::plus,
+            accumulateDistance = Int::nonOverflowingPlus,
         )
     }
 }
