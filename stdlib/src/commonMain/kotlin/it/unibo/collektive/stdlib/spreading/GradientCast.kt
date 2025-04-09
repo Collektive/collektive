@@ -102,7 +102,6 @@ inline fun <reified ID, reified Value> Aggregate<ID>.bellmanFordGradientCast(
  * [bellmanFordGradientCast].
  */
 @OptIn(DelicateCollektiveApi::class, ExperimentalContracts::class)
-@Suppress("CyclomaticComplexMethod")
 @JvmOverloads
 inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Distance>> Aggregate<ID>.gradientCast(
     source: Boolean,
@@ -192,25 +191,35 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
                                 .map { it.toLocalPath(accumulateData) }
                             addAll(toAdd)
                         }
-                        else -> {
-                            // If there are multiple sources, alternate to preserve information
-                            while (size < toTake) {
-                                val toIterate = pathsBySource.values.iterator()
-                                while (toIterate.hasNext() && size < toTake) {
-                                    val pathsForSource = toIterate.next()
-                                    val path = pathsForSource.removeFirst()
-                                    if (pathsForSource.isEmpty()) {
-                                        toIterate.remove()
-                                    }
-                                    add(path.toLocalPath(accumulateData))
-                                }
-                            }
-                        }
+                        else -> fillAlternated(toTake, pathsBySource.values) { toLocalPath(accumulateData) }
                     }
                 }
             }
         }
         sharedPaths.yielding { sharedPaths.firstOrNull()?.data ?: local }
+    }
+}
+
+/**
+ * Fills [this] list with alternate elements from [sources] until it reaches [toTake] elements,
+ * transforming each one with [transform].
+ */
+@PublishedApi
+internal inline fun <Initial, Transformed> ArrayList<Transformed>.fillAlternated(
+    toTake: Int,
+    sources: MutableCollection<MutableList<Initial>>,
+    crossinline transform: Initial.() -> Transformed,
+) {
+    while (size < toTake) {
+        val toIterate = sources.iterator()
+        while (toIterate.hasNext() && size < toTake) {
+            val pathsForSource = toIterate.next()
+            val path = pathsForSource.removeFirst()
+            if (pathsForSource.isEmpty()) {
+                toIterate.remove()
+            }
+            add(path.transform())
+        }
     }
 }
 
