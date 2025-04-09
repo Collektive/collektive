@@ -189,6 +189,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
     ): Node<Any?> = GenericNode(environment).also { genericNode ->
         genericNode.addProperty(
             CollektiveDevice(
+                randomGenerator,
                 environment,
                 genericNode,
                 when (parameter) {
