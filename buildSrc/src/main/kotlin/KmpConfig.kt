@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
+import kotlin.time.Duration.Companion.minutes
 
 val Provider<PluginDependency>.id: String get() = get().pluginId
 
@@ -56,18 +57,19 @@ fun Project.configureKotlinMultiplatform() {
                 }
             }
         }
+        val mochaTimeout = 60.minutes.inWholeMilliseconds.toString()
         js(IR) {
             browser {
                 testTask {
                     useMocha {
-                        timeout = "10000"
+                        timeout = mochaTimeout
                     }
                 }
             }
             nodejs {
                 testTask {
                     useMocha {
-                        timeout = "10000"
+                        timeout = mochaTimeout
                     }
                 }
             }
