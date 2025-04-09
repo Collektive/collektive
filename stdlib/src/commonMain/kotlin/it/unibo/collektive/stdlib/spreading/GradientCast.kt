@@ -20,7 +20,6 @@ import it.unibo.collektive.stdlib.util.coerceIn
 import it.unibo.collektive.stdlib.util.hops
 import it.unibo.collektive.stdlib.util.nonOverflowingPlus
 import kotlinx.serialization.Serializable
-import kotlin.contracts.ExperimentalContracts
 import kotlin.jvm.JvmOverloads
 
 /**
@@ -101,7 +100,7 @@ inline fun <reified ID, reified Value> Aggregate<ID>.bellmanFordGradientCast(
  * On the other hand, it requires larger messages and more processing than the classic
  * [bellmanFordGradientCast].
  */
-@OptIn(DelicateCollektiveApi::class, ExperimentalContracts::class)
+@OptIn(DelicateCollektiveApi::class)
 @JvmOverloads
 inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Distance>> Aggregate<ID>.gradientCast(
     source: Boolean,
@@ -147,10 +146,10 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
          * Take one path per source and neighbor (the one with the shortest distance).
          */
         val candidatePaths = distanceUpdatedPaths.fold(
-            mutableMapOf<Pair<ID, ID>, UpdatedGradientPath<ID, Value, Distance>>(),
+            mutableMapOf<ID, UpdatedGradientPath<ID, Value, Distance>>(),
         ) { accumulator, paths ->
             paths.forEach { path ->
-                val key = path.source to path.neighbor
+                val key = path.source
                 val previous = accumulator.getOrPut(key) { path }
                 if (previous.totalDistance > path.totalDistance) {
                     accumulator[key] = path
@@ -159,67 +158,16 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
             accumulator
         }.values.sorted()
         /*
-         * Keep at most maxPaths paths, unless it is a source (in which case, it is maxPaths -1).
+         * Keep at most maxPaths paths, including the local source.
          */
-        val toTake = maxPaths - fromLocalSource.size
-        val sharedPaths = fromLocalSource + when {
-            // We can keep all paths
-            candidatePaths.size <= toTake ->
-                candidatePaths.map { it.toLocalPath(accumulateData) }
-            else -> {
-                ArrayList<GradientPath<ID, Value, Distance>>(maxPaths).apply {
-                    /*
-                     * Pick the paths by priority:
-                     * 1. prepare a list of results, large at most multi-paths;
-                     * 2. classify them by source in a Map<ID, List<UpdatedGradientPath>>;
-                     * 3. pick the shortest for each source, removing it from the list;
-                     * 4. sort the selected ones by distance, and pick at most multi-paths of them.
-                     * 5. if there are more slots, goto 2.
-                     */
-                    val pathsBySource = mutableMapOf<ID, MutableList<UpdatedGradientPath<ID, Value, Distance>>>()
-                    // Equivalent to a groupBy, but presumably faster with large networks
-                    candidatePaths.forEach {
-                        // Since the source collection is sorted, the subcollections will be sorted as well
-                        pathsBySource.getOrPut(it.path.source) { mutableListOf() }.apply { add(it) }
-                    }
-                    when {
-                        pathsBySource.size == 1 -> {
-                            // If there is only one source, take as many paths as necessary from there
-                            val toAdd = pathsBySource.values.single()
-                                .asSequence()
-                                .take(toTake)
-                                .map { it.toLocalPath(accumulateData) }
-                            addAll(toAdd)
-                        }
-                        else -> fillAlternated(toTake, pathsBySource.values) { toLocalPath(accumulateData) }
-                    }
-                }
-            }
+        val topCandidates = candidatePaths.asSequence()
+            .take(maxPaths - fromLocalSource.size)
+            .map { it.toLocalPath(accumulateData) }
+        val shared = fromLocalSource + topCandidates
+        check(shared.size <= maxPaths) {
+            "Bug in gradientCast: the number of paths exceeds the maximum allowed: ${shared.size} > $maxPaths."
         }
-        sharedPaths.yielding { sharedPaths.firstOrNull()?.data ?: local }
-    }
-}
-
-/**
- * Fills [this] list with alternate elements from [sources] until it reaches [toTake] elements,
- * transforming each one with [transform].
- */
-@PublishedApi
-internal inline fun <Initial, Transformed> ArrayList<Transformed>.fillAlternated(
-    toTake: Int,
-    sources: MutableCollection<MutableList<Initial>>,
-    crossinline transform: Initial.() -> Transformed,
-) {
-    while (size < toTake) {
-        val toIterate = sources.iterator()
-        while (toIterate.hasNext() && size < toTake) {
-            val pathsForSource = toIterate.next()
-            val path = pathsForSource.removeFirst()
-            if (pathsForSource.isEmpty()) {
-                toIterate.remove()
-            }
-            add(path.transform())
-        }
+        shared.yielding { firstOrNull()?.data ?: local }
     }
 }
 
@@ -415,7 +363,12 @@ data class UpdatedGradientPath<ID : Any, Value, Distance : Comparable<Distance>>
     val path: GradientPath<ID, Value, Distance>,
 ) : Comparable<UpdatedGradientPath<ID, Value, Distance>> {
 
-    val source = path.source
+    val source get() = path.source
+
+    /**
+     * The neighbor's neighbor from which this gradient information is coming.
+     */
+    val neighborsNeighbor get() = path.through
 
     override fun compareTo(other: UpdatedGradientPath<ID, Value, Distance>): Int =
         totalDistance.compareTo(other.totalDistance)
