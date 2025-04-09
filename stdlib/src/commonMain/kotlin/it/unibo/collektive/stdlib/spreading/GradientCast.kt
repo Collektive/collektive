@@ -21,8 +21,6 @@ import it.unibo.collektive.stdlib.util.hops
 import it.unibo.collektive.stdlib.util.nonOverflowingPlus
 import kotlinx.serialization.Serializable
 import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
 import kotlin.jvm.JvmOverloads
 
 /**
@@ -36,7 +34,6 @@ import kotlin.jvm.JvmOverloads
  * This function features *incremental repair*, and it is subject to the *rising value problem*,
  * see [Fast self-healing gradients](https://doi.org/10.1145/1363686.1364163).
  */
-@OptIn(ExperimentalContracts::class)
 @JvmOverloads
 inline fun <reified ID, reified Value, reified Distance> Aggregate<ID>.bellmanFordGradientCast(
     source: Boolean,
@@ -46,13 +43,10 @@ inline fun <reified ID, reified Value, reified Distance> Aggregate<ID>.bellmanFo
     noinline accumulateData: (fromSource: Distance, toNeighbor: Distance, data: Value) -> Value =
         { _, _, data -> data },
     crossinline accumulateDistance: Accumulator<Distance>,
-    crossinline metric: () -> Field<ID, Distance>,
+    metric: Field<ID, Distance>,
 ): Value where ID : Any, Distance : Comparable<Distance> {
-    contract {
-        callsInPlace(metric, InvocationKind.EXACTLY_ONCE)
-    }
     val topValue = top to local
-    val distances = metric().coerceIn(bottom, top)
+    val distances = metric.coerceIn(bottom, top)
     return share(topValue) { neighborData ->
         val paths = neighborData.alignedMap(distances) { (fromSource, data), toNeighbor ->
             val totalDistance = accumulateDistance(fromSource, toNeighbor).coerceIn(bottom, top)
@@ -88,7 +82,7 @@ inline fun <reified ID, reified Value> Aggregate<ID>.bellmanFordGradientCast(
     noinline accumulateData: (fromSource: Double, toNeighbor: Double, data: Value) -> Value =
         { _, _, data -> data },
     crossinline accumulateDistance: (fromSource: Double, toNeighbor: Double) -> Double = Double::plus,
-    crossinline metric: () -> Field<ID, Double>,
+    metric: Field<ID, Double>,
 ): Value where ID : Any =
     bellmanFordGradientCast(source, local, 0.0, Double.POSITIVE_INFINITY, accumulateData, accumulateDistance, metric)
 
