@@ -1,3 +1,14 @@
+## [20.2.2](https://github.com/Collektive/collektive/compare/20.2.1...20.2.2) (2025-04-09)
+
+### Bug Fixes
+
+* **release:** force dependencies on the compiler-plugin to use the same version of the project ([#868](https://github.com/Collektive/collektive/issues/868)) ([bc01603](https://github.com/Collektive/collektive/commit/bc016031d9e31f2c9efb8c85c6a50cf2fa439c91))
+
+### Build and continuous integration
+
+* **deps:** bump estree-util-value-to-estree in /site ([c1afb97](https://github.com/Collektive/collektive/commit/c1afb979d7ff18847bd90448e528a8b7fdeba4b1))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.15 ([4beb361](https://github.com/Collektive/collektive/commit/4beb361aff51796eccd22b8b82a99dfcf5a5e619))
+
 ## [20.2.1](https://github.com/Collektive/collektive/compare/20.2.0...20.2.1) (2025-04-08)
 
 ### Bug Fixes
