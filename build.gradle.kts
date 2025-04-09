@@ -32,7 +32,11 @@ val reportMerge by tasks.registering(ReportMergeTask::class) {
 }
 
 gitSemVer {
-    rootProject.version = computeVersion()
+    assignGitSemanticVersion()
+}
+
+subprojects {
+    project.version = rootProject.version
 }
 
 allprojects {
@@ -41,8 +45,6 @@ allprojects {
     repositories {
         mavenCentral()
     }
-
-    project.version = rootProject.version
 
     with(rootProject.libs.plugins) {
         apply(plugin = dokka.id)
