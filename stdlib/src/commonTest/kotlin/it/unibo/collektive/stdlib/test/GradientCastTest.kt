@@ -20,6 +20,8 @@ import it.unibo.collektive.testing.EnvironmentWithMeshNetwork
 import it.unibo.collektive.testing.Position
 import it.unibo.collektive.testing.SerializingMailbox
 import it.unibo.collektive.testing.vonNeumannGrid
+import kotlin.math.abs
+import kotlin.math.min
 import kotlin.math.nextDown
 import kotlin.math.nextUp
 import kotlin.test.Test
@@ -96,16 +98,53 @@ class GradientCastTest {
         }
     }
 
-    @Test
-    fun `the hop count in a Von Neumann grid is the Manhattan distance`() {
-        vonNeumannGrid(10, 10, Int.MIN_VALUE) {
-            hopDistanceTo(localId == 0)
-        }.apply {
+    fun testManhattanDistance(program: Aggregate<Int>.(Environment<Int>) -> Int) {
+        vonNeumannGrid(10, 10, Int.MIN_VALUE, program).apply {
             cycleInOrder()
             nodes.forEach { node ->
                 val (x, y) = positionOf(node.id)
                 val manhattanDistance = x + y
                 assertEquals(manhattanDistance.toInt(), node.value, "Node $node has not the expected distance")
+            }
+        }
+    }
+
+    @Test
+    fun `the hop count in a Von Neumann grid is the Manhattan distance`() {
+        testManhattanDistance {
+            hopDistanceTo(localId == 0)
+        }
+    }
+
+    @Test
+    fun `gradientCast keeps working when paths are limited`() {
+        for (maxPaths in 1..5) {
+            testManhattanDistance {
+                hopDistanceTo(localId == 0, maxPaths = maxPaths)
+            }
+        }
+    }
+
+    @Test
+    fun `gradientCast supports multiple sources`() {
+        val maxPaths = listOf(1, 2, 3, 5, Int.MAX_VALUE)
+        vonNeumannGrid(10, 10, generateSequence { Int.MAX_VALUE }.take(maxPaths.size).toList()) {
+            maxPaths.map {
+                alignedOn(it) {
+                    hopDistanceTo(localId == 0 || localId == 99, maxPaths = it)
+                }
+            }
+        }.apply {
+            repeat(10) {
+                // In a diameter cycles all information should have been propagated
+                cycleInOrder()
+            }
+            nodes.forEach { node ->
+                val (x, y) = positionOf(node.id)
+                val manhattanDistance = min(x + y, abs(9 - x) + abs(9 - y))
+                val distances = node.value.toSet()
+                assertEquals(1, distances.size)
+                assertEquals(manhattanDistance.toInt(), distances.single(), "Node $node has not the expected distance")
             }
         }
     }

@@ -102,6 +102,7 @@ inline fun <reified ID, reified Value> Aggregate<ID>.bellmanFordGradientCast(
  * [bellmanFordGradientCast].
  */
 @OptIn(DelicateCollektiveApi::class, ExperimentalContracts::class)
+@Suppress("CyclomaticComplexMethod")
 @JvmOverloads
 inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Distance>> Aggregate<ID>.gradientCast(
     source: Boolean,
@@ -161,9 +162,10 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
         /*
          * Keep at most maxPaths paths, unless it is a source (in which case, it is maxPaths -1).
          */
+        val toTake = maxPaths - fromLocalSource.size
         val sharedPaths = fromLocalSource + when {
             // We can keep all paths
-            candidatePaths.size + fromLocalSource.size <= maxPaths ->
+            candidatePaths.size <= toTake ->
                 candidatePaths.map { it.toLocalPath(accumulateData) }
             else -> {
                 ArrayList<GradientPath<ID, Value, Distance>>(maxPaths).apply {
@@ -181,12 +183,29 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
                         // Since the source collection is sorted, the subcollections will be sorted as well
                         pathsBySource.getOrPut(it.path.source) { mutableListOf() }.apply { add(it) }
                     }
-                    while (size < maxPaths) {
-                        val candidates = pathsBySource.values
-                            .mapNotNull { it.removeFirstOrNull() }
-                            .take(maxPaths - size - fromLocalSource.size)
-                            .map { it.toLocalPath(accumulateData) }
-                        addAll(candidates)
+                    when {
+                        pathsBySource.size == 1 -> {
+                            // If there is only one source, take as many paths as necessary from there
+                            val toAdd = pathsBySource.values.single()
+                                .asSequence()
+                                .take(toTake)
+                                .map { it.toLocalPath(accumulateData) }
+                            addAll(toAdd)
+                        }
+                        else -> {
+                            // If there are multiple sources, alternate to preserve information
+                            while (size < toTake) {
+                                val toIterate = pathsBySource.values.iterator()
+                                while (toIterate.hasNext() && size < toTake) {
+                                    val pathsForSource = toIterate.next()
+                                    val path = pathsForSource.removeFirst()
+                                    if (pathsForSource.isEmpty()) {
+                                        toIterate.remove()
+                                    }
+                                    add(path.toLocalPath(accumulateData))
+                                }
+                            }
+                        }
                     }
                 }
             }
