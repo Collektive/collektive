@@ -87,7 +87,8 @@ class GradientCastTest {
             bellmanFordGradientCast(
                 source = localId == 0,
                 local = y,
-            ) { euclideanDistance3D(env.positionOf(localId).toTriple()) }
+                metric = euclideanDistance3D(env.positionOf(localId).toTriple()),
+            )
         }.apply {
             stabilizeAndDropSource()
             repeat(100) { cycleInRandomOrder() }
