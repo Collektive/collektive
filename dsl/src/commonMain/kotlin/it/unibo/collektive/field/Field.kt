@@ -30,7 +30,7 @@ sealed interface Field<ID : Any, out T> {
     /**
      * Returns the [ID]s of all neighbors in this field.
      */
-    val neighbors: Collection<ID>
+    val neighbors: Set<ID>
 
     /**
      * Returns a [Map] with the neighboring values of this field (namely, all values but self).
@@ -209,6 +209,7 @@ sealed interface Field<ID : Any, out T> {
 
 internal abstract class AbstractField<ID : Any, T>(override val localId: ID, override val localValue: T) :
     Field<ID, T> {
+
     private val asMap: Map<ID, T> by lazy {
         val result: Map<ID, T> = neighborsMap() + (localId to localValue)
         result
@@ -249,7 +250,7 @@ internal abstract class AbstractField<ID : Any, T>(override val localId: ID, ove
 internal class ArrayBasedField<ID : Any, T>(localId: ID, localValue: T, private val others: List<Pair<ID, T>>) :
     AbstractField<ID, T>(localId, localValue) {
     override val neighborsCount: Int get() = others.size
-    override val neighbors: Collection<ID> by lazy { others.map { it.first } }
+    override val neighbors: Set<ID> by lazy { others.mapTo(mutableSetOf()) { it.first } }
 
     override fun neighborValueOf(id: ID): T = when {
         others.size <= MAP_OVER_LIST_PERFORMANCE_CROSSING_POINT -> others.first { it.first == id }.second
@@ -272,7 +273,7 @@ internal class SequenceBasedField<ID : Any, T>(localId: ID, localValue: T, priva
     AbstractField<ID, T>(localId, localValue) {
     override val neighborsCount get() = neighbors.size
 
-    override val neighbors: Collection<ID> by lazy { others.map { it.first }.toList() }
+    override val neighbors: Set<ID> by lazy { others.mapTo(mutableSetOf()) { it.first } }
 
     override fun asSequence(): Sequence<Pair<ID, T>> = others + (localId to localValue)
 
@@ -288,7 +289,7 @@ internal class ConstantField<ID : Any, T>(localId: ID, localValue: T, private va
     AbstractField<ID, T>(localId, localValue) {
     override val neighborsCount: Int = neighborsIds.size
 
-    override val neighbors: Collection<ID> = neighborsIds
+    override val neighbors: Set<ID> = neighborsIds
 
     private val reified by lazy {
         reifiedList.toMap()
