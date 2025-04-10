@@ -1,3 +1,28 @@
+## [20.2.3](https://github.com/Collektive/collektive/compare/20.2.2...20.2.3) (2025-04-10)
+
+### Dependency updates
+
+* **deps:** update alchemist to v42.0.6 ([8c4fe20](https://github.com/Collektive/collektive/commit/8c4fe206ee237532087957e71442c1628fa9efcc))
+* **deps:** update alchemist to v42.0.7 ([c19f8f6](https://github.com/Collektive/collektive/commit/c19f8f638b98ca3b6e7b8f6a3958eeaf905cf57b))
+* **deps:** update plugin com.gradle.develocity to v4 ([cacd8f0](https://github.com/Collektive/collektive/commit/cacd8f0fc25246e64c55c4d7eebfe81d97ed53f6))
+* **deps:** update plugin gitsemver to v4.0.6-dev09-12b3ab5 ([5c3e720](https://github.com/Collektive/collektive/commit/5c3e72058b07746a771b8c45ead5dc9942932078))
+
+### Bug Fixes
+
+* **alchemist-incarnation-collektive:** provide access to the random generator and simplify the API ([#869](https://github.com/Collektive/collektive/issues/869)) ([7eb6f1b](https://github.com/Collektive/collektive/commit/7eb6f1be9ccb3d0bb9d00da5dce1404d69465f9c))
+* **deps:** early-force the project version ([c701be8](https://github.com/Collektive/collektive/commit/c701be861b88bfcb0344646f778e1e0ef0e39591))
+* **stdlib:** improve `gradientCast` multi-path multi-source management when the maximum path count is constrained ([#873](https://github.com/Collektive/collektive/issues/873)) ([988866d](https://github.com/Collektive/collektive/commit/988866d1205c898da32e8187bbe1667f40b213c5))
+* **stdlib:** improve and greatly simplify `gradientCast` ([#879](https://github.com/Collektive/collektive/issues/879)) ([e17def8](https://github.com/Collektive/collektive/commit/e17def8b4bbbc32d689bd3c575bdcfa866b73064))
+* **stdlib:** pass a metric `Field` to `bellmanFordGradientCast` instead of a function ([#876](https://github.com/Collektive/collektive/issues/876)) ([7f887a3](https://github.com/Collektive/collektive/commit/7f887a3b7da33d254ccf80bbaed54458b53c6d8b))
+
+### Build and continuous integration
+
+* raise significantly the Mocha timeouts, as stdlib tests require time on js ([04ec446](https://github.com/Collektive/collektive/commit/04ec4469ef16ea0ef68dfc9716057ca42bb622e9))
+
+### Style improvements
+
+* **stdlib:** prefer the `Accumulator` typealias in `distanceTo` ([#875](https://github.com/Collektive/collektive/issues/875)) ([68d7b6b](https://github.com/Collektive/collektive/commit/68d7b6b2ae8fffb97bdff7398e8fd3a897387c9f))
+
 ## [20.2.2](https://github.com/Collektive/collektive/compare/20.2.1...20.2.2) (2025-04-09)
 
 ### Bug Fixes
