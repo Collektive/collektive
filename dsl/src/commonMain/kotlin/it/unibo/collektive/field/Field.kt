@@ -295,7 +295,7 @@ internal class ConstantField<ID : Any, T>(localId: ID, localValue: T, private va
     }
 
     private val reifiedList by lazy {
-        neighborsIds.map { id -> id to localValue }.toList()
+        neighborsIds.map { id -> id to localValue }
     }
 
     override fun <R> mapOthersAsSequence(transform: (ID, T) -> R): Sequence<Pair<ID, R>> =
