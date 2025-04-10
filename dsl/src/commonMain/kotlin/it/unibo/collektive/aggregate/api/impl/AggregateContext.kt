@@ -72,7 +72,7 @@ internal class AggregateContext<ID : Any>(
                     it.toSend.localValue,
                     when (it.toSend) {
                         is ConstantField<ID, Shared> -> emptyMap()
-                        else -> it.toSend.excludeSelf()
+                        else -> it.toSend.excludeSelf().filterNot { (_, value) -> value == it.toSend.localValue }
                     },
                 )
                 toBeSent.addData(path, message, dataSharingMethod)
