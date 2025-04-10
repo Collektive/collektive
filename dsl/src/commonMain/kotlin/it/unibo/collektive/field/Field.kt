@@ -257,7 +257,7 @@ internal class ArrayBasedField<ID : Any, T>(localId: ID, localValue: T, private 
     }
 
     override fun <R> mapOthersAsSequence(transform: (ID, T) -> R): Sequence<Pair<ID, R>> =
-        others.map { (id, value) -> id to transform(id, value) }.asSequence()
+        others.asSequence().map { (id, value) -> id to transform(id, value) }
 
     override fun neighborsMap(): Map<ID, T> = others.toMap()
 
