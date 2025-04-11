@@ -1,3 +1,32 @@
+## [21.0.0](https://github.com/Collektive/collektive/compare/20.2.3...21.0.0) (2025-04-11)
+
+### ⚠ BREAKING CHANGES
+
+* **dsl:** make `Field.neighbors` a `Set` (#888)
+
+### Dependency updates
+
+* **deps:** update plugin org.gradle.toolchains.foojay-resolver-convention to v0.10.0 ([5a4fe34](https://github.com/Collektive/collektive/commit/5a4fe34fa3e1f00cd5dc2b55ae214a25b10ed685))
+
+### Bug Fixes
+
+* **alchemist-incarnation-collektive:** fix a bug preventing `exchanging` to work as expected ([#887](https://github.com/Collektive/collektive/issues/887)) ([da40234](https://github.com/Collektive/collektive/commit/da40234fd12093a9d6b88f6d8ce13ebbddde5552))
+
+### Performance improvements
+
+* **dsl:** make `Field.neighbors` a `Set` ([#888](https://github.com/Collektive/collektive/issues/888)) ([e63552b](https://github.com/Collektive/collektive/commit/e63552b7b44f11bdeb602f0d074420d579e58535))
+* **dsl:** minimize the data customization when `exchanging` ([#885](https://github.com/Collektive/collektive/issues/885)) ([01c5312](https://github.com/Collektive/collektive/commit/01c531236aeb1eb3c0a4015839f903d127d8d46e))
+* **dsl:** remove useless `toList()` transformation of a `List` ([#890](https://github.com/Collektive/collektive/issues/890)) ([ebb99bb](https://github.com/Collektive/collektive/commit/ebb99bb3c33bbf8f65e51474e6bc470bd00da0f2))
+* **dsl:** transform array-backed fields to sequences before mapping ([#889](https://github.com/Collektive/collektive/issues/889)) ([f69df8c](https://github.com/Collektive/collektive/commit/f69df8c04e23118457aa667a1833848adc6aa69b))
+
+### Tests
+
+* **stdlib:** add a convergcast test on collections with custom distance metric ([#886](https://github.com/Collektive/collektive/issues/886)) ([3329f7e](https://github.com/Collektive/collektive/commit/3329f7efb0af1089239bd5dbdb9c089a256a3ea7))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.16 ([d486e63](https://github.com/Collektive/collektive/commit/d486e63c9e4ed0bfda8da789896fedf30c20cdae))
+
 ## [20.2.3](https://github.com/Collektive/collektive/compare/20.2.2...20.2.3) (2025-04-10)
 
 ### Dependency updates
