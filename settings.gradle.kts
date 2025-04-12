@@ -12,7 +12,7 @@ pluginManagement {
         google()
         mavenCentral()
     }
-    includeBuild("gradle-plugin")
+    includeBuild("collektive-gradle-plugin")
 }
 
 plugins {
@@ -39,12 +39,12 @@ gitHooks {
 
 rootProject.name = "collektive"
 
-includeBuild("compiler-plugin")
+includeBuild("collektive-compiler-plugin")
 include(
     "alchemist-incarnation-collektive",
-    "compiler-embeddable",
-    "compiler-plugin-test",
-    "dsl",
-    "stdlib",
-    "test-tooling"
+    "collektive-compiler-embeddable",
+    "collektive-compiler-plugin-test",
+    "collektive-dsl",
+    "collektive-stdlib",
+    "collektive-test-tooling"
 )

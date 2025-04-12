@@ -169,8 +169,8 @@ allprojects {
 
 dependencies {
     listOf(
-        "dsl",
-        "stdlib",
+        "collektive-dsl",
+        "collektive-stdlib",
         "alchemist-incarnation-collektive",
     ).forEach {
         kover(project(":$it"))
