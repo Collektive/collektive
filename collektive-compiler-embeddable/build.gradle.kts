@@ -29,20 +29,16 @@ kotlinJvm {
     sourceSets {
         val main by getting {
             dependencies {
-                implementation("it.unibo.collektive:compiler-plugin:${project.version}")
+                implementation("it.unibo.collektive:collektive-compiler-plugin:${project.version}")
                 implementation(libs.bundles.kotlin.compiler)
                 implementation(libs.slf4j)
             }
         }
         val test by getting {
             dependencies {
-                implementation(project(":dsl"))
-                implementation(project(":compiler-embeddable"))
-                implementation(kotlin("test"))
+                implementation(project(":collektive-dsl"))
                 implementation(rootProject.libs.kotest.runner.junit5.jvm)
                 implementation(libs.javap)
-                implementation(libs.kotlinpoet)
-                implementation(libs.subjekt)
             }
         }
     }
@@ -53,11 +49,7 @@ kotlinJvm {
         useJUnitPlatform()
         testLogging {
             showExceptions = true
-            events =
-                setOf(
-                    TestLogEvent.FAILED,
-                    TestLogEvent.PASSED,
-                )
+            events = setOf(TestLogEvent.FAILED, TestLogEvent.PASSED)
             exceptionFormat = TestExceptionFormat.FULL
         }
     }
@@ -66,15 +58,5 @@ kotlinJvm {
 tasks.withType<KotlinCompile>().configureEach {
     compilerOptions {
         freeCompilerArgs = listOf("-Xcontext-receivers")
-    }
-}
-
-tasks {
-    // Prevent publishing this module since it is a test-only module
-    withType<AbstractPublishToMaven>().configureEach {
-        enabled = false
-    }
-    withType<GenerateModuleMetadata>().configureEach {
-        enabled = false
     }
 }

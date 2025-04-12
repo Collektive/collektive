@@ -24,7 +24,7 @@ dependencies {
 
 buildConfig {
     packageName(group.toString())
-    buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"$group.compiler-plugin\"")
+    buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"$group.collektive-compiler-plugin\"")
 }
 
 tasks.withType<KotlinCompilationTask<*>>().configureEach {

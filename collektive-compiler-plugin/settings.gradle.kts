@@ -6,7 +6,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "gradle-plugin"
+rootProject.name = "collektive-compiler-plugin"
 
 plugins {
     id("com.gradle.develocity") version "4.0"
@@ -21,5 +21,3 @@ develocity {
         uploadInBackground = !System.getenv("CI").toBoolean()
     }
 }
-
-includeBuild("../compiler-plugin")
