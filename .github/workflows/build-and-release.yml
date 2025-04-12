@@ -76,7 +76,7 @@ jobs:
             NEXT_VERSION="${{ needs.precompute-next-version.outputs.next-version }}"
             OVERRIDE_VERSION=$([[ "$NEXT_VERSION" != "" ]] && echo "-PforceVersion=$(echo $NEXT_VERSION)" || echo "")
             # Compute all tasks to be executed
-            projects=( "" ":compiler-plugin:" ":gradle-plugin:" )
+            projects=( "" ":collektive-compiler-plugin:" ":collektive-gradle-plugin:" )
             tasks=( "uploadAllToMavenCentralNexus" )
             GRADLE_TASKS=()
             for p in "${projects[@]}"; do
