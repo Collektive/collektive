@@ -1,3 +1,13 @@
+## [22.0.0](https://github.com/Collektive/collektive/compare/21.0.0...22.0.0) (2025-04-12)
+
+### ⚠ BREAKING CHANGES
+
+* add collektive- prefix to all the modules in the project (#892)
+
+### Build and continuous integration
+
+* add collektive- prefix to all the modules in the project ([#892](https://github.com/Collektive/collektive/issues/892)) ([682584a](https://github.com/Collektive/collektive/commit/682584a12e7ab83e494baf945d85ffbba0530e97))
+
 ## [21.0.0](https://github.com/Collektive/collektive/compare/20.2.3...21.0.0) (2025-04-11)
 
 ### ⚠ BREAKING CHANGES
