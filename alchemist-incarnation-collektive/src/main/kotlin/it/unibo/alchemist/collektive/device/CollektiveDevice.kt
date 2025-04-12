@@ -36,11 +36,9 @@ class CollektiveDevice<P>(
     val randomGenerator: RandomGenerator,
     val environment: Environment<Any?, P>,
     override val node: Node<Any?>,
-    private val  retainMessagesFor: Time? = null,
-) : NodeProperty<Any?>,
-    Mailbox<Int>,
-    EnvironmentVariables
-        where P : Position<P> {
+    private val retainMessagesFor: Time? = null,
+) : NodeProperty<Any?>, Mailbox<Int>, EnvironmentVariables where P : Position<P> {
+
     private data class TimedMessage(val receivedAt: Time, val payload: Message<Int, *>)
 
     override val inMemory: Boolean = true
