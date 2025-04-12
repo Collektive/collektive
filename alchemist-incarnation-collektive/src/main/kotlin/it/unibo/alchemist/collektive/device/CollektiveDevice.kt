@@ -36,11 +36,11 @@ class CollektiveDevice<P>(
     val randomGenerator: RandomGenerator,
     val environment: Environment<Any?, P>,
     override val node: Node<Any?>,
-    private val retainMessagesFor: Time? = null,
+    private val  retainMessagesFor: Time? = null,
 ) : NodeProperty<Any?>,
     Mailbox<Int>,
     EnvironmentVariables
-    where P : Position<P> {
+        where P : Position<P> {
     private data class TimedMessage(val receivedAt: Time, val payload: Message<Int, *>)
 
     override val inMemory: Boolean = true
@@ -48,8 +48,8 @@ class CollektiveDevice<P>(
     /**
      * The current time.
      */
-    var currentTime: Time = Time.ZERO
-        private set
+    val currentTime: Time
+        get() = environment.simulation?.time ?: Time.ZERO
 
     /**
      * The ID of the node (alias of [localId]).
@@ -61,10 +61,10 @@ class CollektiveDevice<P>(
      */
     val localId = node.id
 
-    private val validMessages: MutableList<TimedMessage> = mutableListOf()
+    private val validMessages: MutableMap<Int, TimedMessage> = mutableMapOf()
 
     private fun receiveMessage(time: Time, message: Message<Int, *>) {
-        validMessages += TimedMessage(time, message)
+        validMessages += message.senderId to TimedMessage(time, message)
     }
 
     /**
@@ -89,7 +89,7 @@ class CollektiveDevice<P>(
                         node.properties.firstOrNull { it is CollektiveDevice<*> } as? CollektiveDevice<P>
                     }
                 neighborhood.forEach { neighbor ->
-                    neighbor.deliverableReceived(outboundMessage.prepareMessageFor(neighbor.id))
+                    neighbor.deliverableReceived(outboundMessage.prepareMessageFor(node.id))
                 }
             }
         }
@@ -103,21 +103,20 @@ class CollektiveDevice<P>(
         if (validMessages.isEmpty()) {
             return NoNeighborsData()
         }
-        val messages: List<Message<Int, *>> =
+        val messages: Map<Int, Message<Int, *>> =
             when {
-                retainMessagesFor == null -> validMessages.map { it.payload }.also { validMessages.clear() }
+                retainMessagesFor == null -> validMessages.mapValues { it.value.payload }.also { validMessages.clear() }
                 else -> {
-                    validMessages.retainAll { it.receivedAt + retainMessagesFor >= currentTime }
-                    validMessages.map { it.payload }
+                    validMessages.values.retainAll { it.receivedAt + retainMessagesFor >= currentTime }
+                    validMessages.mapValues { it.value.payload }
                 }
             }
         return object : NeighborsData<Int> {
-            override val neighbors: Set<Int> by lazy { messages.map { it.senderId }.toSet() }
+            override val neighbors: Set<Int> get() = messages.keys
 
             @Suppress("UNCHECKED_CAST")
             override fun <Value> dataAt(path: Path, dataSharingMethod: DataSharingMethod<Value>): Map<Int, Value> =
                 messages
-                    .associateBy { it.senderId }
                     .mapValues { (_, message) ->
                         message.sharedData.getOrElse(path) { NoValue } as Value
                     }.filter { it.value != NoValue }
