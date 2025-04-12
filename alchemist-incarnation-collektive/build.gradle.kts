@@ -28,10 +28,10 @@ kotlinJvm {
     sourceSets {
         val main by getting {
             dependencies {
-                api(project(":dsl"))
-                api(project(":stdlib"))
-                implementation("it.unibo.collektive:compiler-plugin:${project.version}")
-                implementation(project(":compiler-embeddable"))
+                api(project(":collektive-dsl"))
+                api(project(":collektive-stdlib"))
+                implementation("it.unibo.collektive:collektive-compiler-plugin:${project.version}")
+                implementation(project(":collektive-compiler-embeddable"))
                 implementation(kotlin("reflect"))
                 implementation(libs.bundles.alchemist)
                 implementation(libs.bundles.kotlin.compiler)
