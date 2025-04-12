@@ -36,8 +36,8 @@ kotlinJvm {
         }
         val test by getting {
             dependencies {
-                implementation(project(":collektive-dsl"))
-                implementation(project(":collektive-compiler-embeddable"))
+                implementation(collektive("dsl"))
+                implementation(collektive("compiler-embeddable"))
                 implementation(kotlin("test"))
                 implementation(rootProject.libs.kotest.runner.junit5.jvm)
                 implementation(libs.javap)

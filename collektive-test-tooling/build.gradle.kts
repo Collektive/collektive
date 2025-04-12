@@ -10,7 +10,7 @@ kotlinMultiplatform {
                 implementation(rootProject.libs.kotlinx.serialization.core)
                 implementation(rootProject.libs.kotlinx.serialization.json)
                 implementation(rootProject.libs.kotlinx.serialization.protobuf)
-                implementation(project(":collektive-dsl"))
+                implementation(collektive("dsl"))
             }
         }
     }

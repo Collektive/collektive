@@ -36,7 +36,7 @@ kotlinJvm {
         }
         val test by getting {
             dependencies {
-                implementation(project(":collektive-dsl"))
+                implementation(collektive("dsl"))
                 implementation(rootProject.libs.kotest.runner.junit5.jvm)
                 implementation(libs.javap)
             }
