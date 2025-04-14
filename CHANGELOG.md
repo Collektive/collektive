@@ -1,3 +1,17 @@
+## [22.0.1](https://github.com/Collektive/collektive/compare/22.0.0...22.0.1) (2025-04-14)
+
+### Dependency updates
+
+* **deps:** update alchemist to v42.0.8 ([287c5ef](https://github.com/Collektive/collektive/commit/287c5ef954581f8e66848151fad61ecec8b247d6))
+
+### Bug Fixes
+
+* **alchemist-incarnation-collektive:** adjust the retention messages and fix internal time ([#891](https://github.com/Collektive/collektive/issues/891)) ([2bee997](https://github.com/Collektive/collektive/commit/2bee997c6f1093bd78c218d1ca959dbea5d8a0b5))
+
+### Build and continuous integration
+
+* **deps:** update actions/setup-node action to v4.4.0 ([7e55f32](https://github.com/Collektive/collektive/commit/7e55f32dd15cdbb97fa79c06e388dea9528be345))
+
 ## [22.0.0](https://github.com/Collektive/collektive/compare/21.0.0...22.0.0) (2025-04-12)
 
 ### ⚠ BREAKING CHANGES
