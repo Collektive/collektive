@@ -89,7 +89,7 @@ class CollektiveDevice<P>(
                         node.properties.firstOrNull { it is CollektiveDevice<*> } as? CollektiveDevice<P>
                     }
                 neighborhood.forEach { neighbor ->
-                    neighbor.deliverableReceived(outboundMessage.prepareMessageFor(node.id))
+                    neighbor.deliverableReceived(outboundMessage.prepareMessageFor(neighbor.id))
                 }
             }
         }
