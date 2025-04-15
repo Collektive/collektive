@@ -1,3 +1,25 @@
+## [22.1.0](https://github.com/Collektive/collektive/compare/22.0.1...22.1.0) (2025-04-15)
+
+### Features
+
+* provide better alignment clash errors ([#897](https://github.com/Collektive/collektive/issues/897)) ([7b42339](https://github.com/Collektive/collektive/commit/7b42339e8877a494481b6df7aefed3c0a4256c09))
+
+### Dependency updates
+
+* **deps:** update plugin gitsemver to v5 ([e987aea](https://github.com/Collektive/collektive/commit/e987aea32350542bb2ebfe3c22cec80a298b5b21))
+
+### Bug Fixes
+
+* **alchemist-incarnation-collektive:** support Boolean properties ([#898](https://github.com/Collektive/collektive/issues/898)) ([6a4e23e](https://github.com/Collektive/collektive/commit/6a4e23eeebab5a058890359b7e5126b452a6820c))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.17 ([c9c4d49](https://github.com/Collektive/collektive/commit/c9c4d49fb03097620e8b57032be08149a5a1d1b8))
+
+### Style improvements
+
+* **dsl:** rename `evolv`/`e`/`ing` type arguments ([#899](https://github.com/Collektive/collektive/issues/899)) ([de2bc52](https://github.com/Collektive/collektive/commit/de2bc525719f8d9a9e51bed1096f26f2bdd89357))
+
 ## [22.0.1](https://github.com/Collektive/collektive/compare/22.0.0...22.0.1) (2025-04-14)
 
 ### Dependency updates
