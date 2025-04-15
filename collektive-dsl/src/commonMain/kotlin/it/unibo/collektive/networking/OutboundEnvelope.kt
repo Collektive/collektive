@@ -8,6 +8,7 @@
 
 package it.unibo.collektive.networking
 
+import it.unibo.collektive.aggregate.AlignmentClashException
 import it.unibo.collektive.aggregate.api.DataSharingMethod
 import it.unibo.collektive.path.Path
 
@@ -64,14 +65,8 @@ interface OutboundEnvelope<ID : Any> {
                     data: SharedData<ID, Value>,
                     dataSharingMethod: DataSharingMethod<Value>,
                 ) {
-                    check(!defaults.containsKey(path)) {
-                        """
-                        Aggregate alignment clash originated at the same path: $path.
-                        Possible causes are:
-                            - compiler plugin is not enabled,
-                            - multiple aligned calls. The most likely cause is an aggregate function call within a loop without proper manual alignment.
-                        If none of the above, please open an issue at https://github.com/Collektive/collektive/issues .
-                        """.trimIndent()
+                    if (defaults.containsKey(path)) {
+                        throw AlignmentClashException(path, defaults[path], data)
                     }
                     @Suppress("UNCHECKED_CAST")
                     defaults[path] =
