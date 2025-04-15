@@ -109,6 +109,7 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
     top: Distance,
     metric: Field<ID, Distance>,
     maxPaths: Int = Int.MAX_VALUE,
+    isRiemannianManifold: Boolean = true,
     noinline accumulateData: (fromSource: Distance, toNeighbor: Distance, neighborData: Value) -> Value =
         { _, _, data -> data },
     crossinline accumulateDistance: Accumulator<Distance>,
@@ -119,27 +120,21 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
     val coercedMetric = metric.coerceIn(bottom, top)
     val fromLocalSource = if (source) listOf(GradientPath(bottom, localId, localId, local)) else emptyList()
     return sharing(fromLocalSource) { neighborData: Field<ID, List<GradientPath<ID, Value, Distance>>> ->
-        /*
-         * Multi-path gradient repair: share a set of paths, invalidate those for which the last step contains
-         * this node or any neighbor.
-         * Respecting the max size (maxPaths), find the shortest path towards each source
-         * and alternative paths towards the same source.
-         */
-        val neighbors = neighborData.neighbors
-        val validPaths =
-            neighborData.mapWithId { neighbor: ID, paths ->
-                paths.filter { (_, neighborsNeighbor: ID, source: ID, _) ->
-                    neighbor == source || neighborsNeighbor != localId && neighborsNeighbor !in neighbors
+        val distanceUpdatedPaths = neighborData.alignedMapWithId(coercedMetric) { neighbor, paths, distanceToNeighbor ->
+            paths.mapNotNull { path ->
+                when {
+                    // Previous data, discarded anyway when reducing, or loopback to self
+                    neighbor == localId || path.through == localId -> null
+                    /*
+                     * In Riemannian manifolds, the distance is always positive and the triangle inequality holds.
+                     * Thus, we can safely discard paths that pass through a direct neighbor
+                     * (except for neighbors that are sources),
+                     * as the distance will be always larger than getting to the neighbor directly.
+                     */
+                    isRiemannianManifold && !path.comesFromSource && path.through in neighborData.neighbors -> null
+                    // Keep the path
+                    else -> path.updateDistance(neighbor, distanceToNeighbor, bottom, top, accumulateDistance)
                 }
-            }
-        val distanceUpdatedPaths = validPaths.alignedMapWithId(coercedMetric) { id, paths, distanceToNeighbor ->
-            paths.map { path ->
-                val totalDistance = accumulateDistance(path.distance, distanceToNeighbor).coerceIn(bottom, top)
-                check(totalDistance >= path.distance) {
-                    "The provided distance accumulation function violates the triangle inequality: " +
-                        "accumulating ${path.distance} and $distanceToNeighbor produced $totalDistance"
-                }
-                UpdatedGradientPath(id, totalDistance, distanceToNeighbor, path)
             }
         }
         /*
@@ -192,6 +187,7 @@ inline fun <reified ID : Any, reified Type> Aggregate<ID>.gradientCast(
     local: Type,
     metric: Field<ID, Double>,
     maxPaths: Int = Int.MAX_VALUE,
+    isRiemannianManifold: Boolean = true,
     noinline accumulateData: (fromSource: Double, toNeighbor: Double, data: Type) -> Type = { _, _, data -> data },
     crossinline accumulateDistance: Accumulator<Double> = Double::plus,
 ): Type = gradientCast(
@@ -201,6 +197,7 @@ inline fun <reified ID : Any, reified Type> Aggregate<ID>.gradientCast(
     Double.POSITIVE_INFINITY,
     metric,
     maxPaths,
+    isRiemannianManifold,
     accumulateData,
     accumulateDistance,
 )
@@ -226,9 +223,20 @@ inline fun <reified ID : Any, reified Type> Aggregate<ID>.intGradientCast(
     local: Type,
     metric: Field<ID, Int>,
     maxPaths: Int = Int.MAX_VALUE,
+    isRiemannianManifold: Boolean = true,
     noinline accumulateData: (fromSource: Int, toNeighbor: Int, data: Type) -> Type = { _, _, data -> data },
     crossinline accumulateDistance: Accumulator<Int> = Int::nonOverflowingPlus,
-): Type = gradientCast(source, local, 0, Int.MAX_VALUE, metric, maxPaths, accumulateData, accumulateDistance)
+): Type = gradientCast(
+    source,
+    local,
+    0,
+    Int.MAX_VALUE,
+    metric,
+    maxPaths,
+    isRiemannianManifold,
+    accumulateData,
+    accumulateDistance,
+)
 
 /**
  * Propagate [local] values across multiple spanning trees starting from all the devices in which [source] holds,
@@ -249,7 +257,7 @@ inline fun <reified ID : Any, reified Type> Aggregate<ID>.hopGradientCast(
     local: Type,
     maxPaths: Int = Int.MAX_VALUE,
     noinline accumulateData: (fromSource: Int, toNeighbor: Int, data: Type) -> Type = { _, _, data -> data },
-): Type = intGradientCast(source, local, hops(), maxPaths, accumulateData, Int::plus)
+): Type = intGradientCast(source, local, hops(), maxPaths, true, accumulateData, Int::plus)
 
 /**
  * Provided a list of [sources], propagates information from each, collecting it in a map.
@@ -266,12 +274,23 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
     top: Distance,
     metric: Field<ID, Distance>,
     maxPaths: Int = Int.MAX_VALUE,
+    isRiemannianManifold: Boolean = true,
     noinline accumulateData: (fromSource: Distance, toNeighbor: Distance, data: Value) -> Value =
         { _, _, data -> data },
     crossinline accumulateDistance: Accumulator<Distance>,
 ): Map<ID, Value> = sources.associateWith { source ->
     alignedOn(source) {
-        gradientCast(source == localId, local, bottom, top, metric, maxPaths, accumulateData, accumulateDistance)
+        gradientCast(
+            source == localId,
+            local,
+            bottom,
+            top,
+            metric,
+            maxPaths,
+            isRiemannianManifold,
+            accumulateData,
+            accumulateDistance,
+        )
     }
 }
 
@@ -288,6 +307,7 @@ inline fun <reified ID : Any, reified Value> Aggregate<ID>.multiGradientCast(
     local: Value,
     metric: Field<ID, Double>,
     maxPaths: Int = Int.MAX_VALUE,
+    isRiemannianManifold: Boolean = true,
     noinline accumulateData: (fromSource: Double, toNeighbor: Double, data: Value) -> Value = { _, _, data -> data },
 ): Map<ID, Value> = sources.associateWith { source ->
     alignedOn(source) {
@@ -296,6 +316,7 @@ inline fun <reified ID : Any, reified Value> Aggregate<ID>.multiGradientCast(
             local = local,
             metric = metric,
             maxPaths = maxPaths,
+            isRiemannianManifold = isRiemannianManifold,
             accumulateData,
             Double::plus,
         )
@@ -315,6 +336,7 @@ inline fun <reified ID : Any, reified Value> Aggregate<ID>.multiIntGradientCast(
     local: Value,
     metric: Field<ID, Int> = hops(),
     maxPaths: Int = Int.MAX_VALUE,
+    isRiemannianManifold: Boolean = true,
     noinline accumulateData: (fromSource: Int, toNeighbor: Int, data: Value) -> Value = { _, _, data -> data },
 ): Map<ID, Value> = sources.associateWith { source ->
     alignedOn(source) {
@@ -323,6 +345,7 @@ inline fun <reified ID : Any, reified Value> Aggregate<ID>.multiIntGradientCast(
             local = local,
             metric = metric,
             maxPaths = maxPaths,
+            isRiemannianManifold = isRiemannianManifold,
             accumulateData = accumulateData,
             accumulateDistance = Int::nonOverflowingPlus,
         )
@@ -343,7 +366,33 @@ data class GradientPath<ID : Any, Value, Distance : Comparable<Distance>>(
     val through: ID,
     val source: ID,
     val data: Value,
-)
+) {
+
+    /**
+     * Returns `true` if this path has been directly provided by a source
+     * (namely, [source] == [through]).
+     */
+    val comesFromSource get() = source == through
+
+    /**
+     * Updates this path adding information about the local device.
+     */
+    @OptIn(DelicateCollektiveApi::class)
+    inline fun updateDistance(
+        neighbor: ID,
+        distanceToNeighbor: Distance,
+        bottom: Distance,
+        top: Distance,
+        crossinline accumulateDistance: Accumulator<Distance>,
+    ): UpdatedGradientPath<ID, Value, Distance> {
+        val totalDistance = accumulateDistance(distance, distanceToNeighbor).coerceIn(bottom, top)
+        check(totalDistance >= distance && totalDistance >= distanceToNeighbor) {
+            "The provided distance accumulation function violates the triangle inequality: " +
+                "accumulating $distance and $distanceToNeighbor produced $totalDistance"
+        }
+        return UpdatedGradientPath(neighbor, totalDistance, distanceToNeighbor, this)
+    }
+}
 
 /**
  * A two-segment path along a potential field that reaches the current device,
