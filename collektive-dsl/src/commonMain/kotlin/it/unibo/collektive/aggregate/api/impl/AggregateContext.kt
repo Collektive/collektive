@@ -80,7 +80,7 @@ internal class AggregateContext<ID : Any>(
             }.toReturn
     }
 
-    override fun <Initial, Return> evolving(initial: Initial, transform: YieldingScope<Initial, Return>): Return {
+    override fun <Stored, Return> evolving(initial: Stored, transform: YieldingScope<Stored, Return>): Return {
         val path = stack.currentPath()
         return transform(YieldingContext(), stateAt(path, initial))
             .also {
@@ -102,7 +102,7 @@ internal class AggregateContext<ID : Any>(
         return newField(local, neighborValues)
     }
 
-    override fun <Initial> evolve(initial: Initial, transform: (Initial) -> Initial): Initial = evolving(initial) {
+    override fun <Stored> evolve(initial: Stored, transform: (Stored) -> Stored): Stored = evolving(initial) {
         val res = transform(it)
         YieldingResult(res, res)
     }
