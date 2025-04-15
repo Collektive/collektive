@@ -20,7 +20,7 @@ sealed interface DataSharingMethod<in DataType>
  * In-memory share. No serialization. Working only across multiple nodes hosted on the same operating system
  * (for instance, in simulation).
  */
-object InMemory : DataSharingMethod<Any?>
+data object InMemory : DataSharingMethod<Any?>
 
 /**
  * Serialization-based share using kotlinx.serialization.

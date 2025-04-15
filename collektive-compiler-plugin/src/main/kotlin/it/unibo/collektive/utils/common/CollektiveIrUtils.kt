@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 package it.unibo.collektive.utils.common
 
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -20,10 +28,12 @@ internal fun IrType.isAssignableFrom(other: IrType): Boolean = classifierOrNull?
     } == true
 } == true
 
-internal fun List<IrType?>.stringified(prefix: String = "(", postfix: String = ")"): String =
-    joinToString(",", prefix = prefix, postfix = postfix) {
-        it?.classFqName?.asString() ?: "?"
+private fun List<IrType?>.stringified(prefix: String = "(", postfix: String = ")"): String = when {
+    isEmpty() -> ""
+    else -> joinToString(",", prefix = prefix, postfix = postfix) {
+        it?.classFqName?.asString()?.withBetterSymbols() ?: "*"
     }
+}
 
 @OptIn(UnsafeDuringIrConstructionAPI::class)
 internal fun IrCall.getAlignmentToken(): String {
@@ -32,7 +42,30 @@ internal fun IrCall.getAlignmentToken(): String {
     val generics = typeArguments.stringified("<", ">")
     return when {
         symbolOwner.name.isSpecial -> "λ"
-        else -> symbolOwner.kotlinFqName.asString() + generics + arguments
+        else -> symbolOwner.kotlinFqName.asString().withBetterSymbols() + generics + arguments
+    }
+}
+
+private val replacements = listOf(
+    "it.unibo.alchemist." to "⚗️",
+    "it.unibo.collektive.aggregate.api.Aggregate._ serialization aware neighboring" to "↔",
+    "it.unibo.collektive.aggregate.api.Aggregate._ serialization aware exchanging" to "🔄",
+    "it.unibo.collektive.aggregate.api.Aggregate.InternalAPI" to "🔐",
+    "it.unibo.collektive.aggregate.api.DataSharingMethod" to "💾",
+    "it.unibo.collektive.field.Field" to "φ",
+    "kotlin.Function" to "ƒ_",
+)
+
+private val removedPrefixes = listOf(
+    "kotlin.",
+    "it.unibo.collektive.",
+)
+
+private fun String.withBetterSymbols(): String {
+    val clean = replacements.fold(this) { current, (replaced, replacement) -> current.replace(replaced, replacement) }
+    return when {
+        removedPrefixes.any { clean.startsWith(it) } -> "\u200B${clean.substringAfterLast('.')}"
+        else -> clean
     }
 }
 
