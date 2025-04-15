@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 package it.unibo.collektive.path
 
 import kotlinx.serialization.KSerializer
@@ -12,7 +20,13 @@ import kotlin.jvm.JvmInline
  * The point in the AS is identified as a sequence of tokens.
  */
 @Serializable(with = PathSerializer::class)
-sealed interface Path
+sealed interface Path {
+
+    /**
+     * Returns a multiline string representation of the path.
+     */
+    fun toMultilineString(separator: String = "\n"): String = toString()
+}
 
 /**
  * Non-serializable, list-based, high performance path intended for use in simulated environments.
@@ -29,7 +43,14 @@ data class FullPath(private val path: List<Any?>) : Path {
         else -> hash == other.hashCode() && path == other.path
     }
 
-    override fun toString(): String = path.joinToString(separator = "/")
+    override fun toMultilineString(separator: String): String = path
+        .mapIndexed { i, path ->
+            when {
+                i == 0 -> path
+                else -> "${generateSequence("") { "  " }.take(i).joinToString("")}↸ $path"
+            }
+        }
+        .joinToString(separator = separator)
 
     /**
      * Utility companion object.
