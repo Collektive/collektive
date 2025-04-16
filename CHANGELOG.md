@@ -1,3 +1,9 @@
+## [22.2.0](https://github.com/Collektive/collektive/compare/22.1.0...22.2.0) (2025-04-16)
+
+### Features
+
+* **stdlib:** add support for non-Riemann manifolds in `gradientCast` and `distanceTo` ([#900](https://github.com/Collektive/collektive/issues/900)) ([2915f6f](https://github.com/Collektive/collektive/commit/2915f6fdcb7fcc72182501021f8d44bd532306c8))
+
 ## [22.1.0](https://github.com/Collektive/collektive/compare/22.0.1...22.1.0) (2025-04-15)
 
 ### Features
