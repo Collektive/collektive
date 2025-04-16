@@ -25,8 +25,9 @@ import kotlin.jvm.JvmOverloads
 inline fun <reified ID : Any> Aggregate<ID>.distanceTo(
     source: Boolean,
     maxPaths: Int = Int.MAX_VALUE,
+    isRiemannianManifold: Boolean = true,
     metric: Field<ID, Double> = hops().toDouble(),
-): Double = distanceTo(source, 0.0, Double.POSITIVE_INFINITY, metric, maxPaths, Double::plus)
+): Double = distanceTo(source, 0.0, Double.POSITIVE_INFINITY, metric, maxPaths, isRiemannianManifold, Double::plus)
 
 /**
  * Compute the [Distance] from the closest [source], starting from [bottom] and up to [top].
@@ -40,6 +41,7 @@ inline fun <reified ID : Any, reified Distance : Comparable<Distance>> Aggregate
     top: Distance,
     metric: Field<ID, Distance>,
     maxPaths: Int = Int.MAX_VALUE,
+    isRiemannianManifold: Boolean = true,
     noinline accumulateDistance: Accumulator<Distance>,
 ): Distance = gradientCast(
     source = source,
@@ -48,6 +50,7 @@ inline fun <reified ID : Any, reified Distance : Comparable<Distance>> Aggregate
     top = top,
     metric = metric,
     maxPaths = maxPaths,
+    isRiemannianManifold = isRiemannianManifold,
     accumulateData = { neighborToSource, hereToNeighbor, _ ->
         accumulateDistance(neighborToSource, hereToNeighbor)
     },
