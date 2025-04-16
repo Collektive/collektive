@@ -1,3 +1,9 @@
+## [22.3.0](https://github.com/Collektive/collektive/compare/22.2.0...22.3.0) (2025-04-16)
+
+### Features
+
+* **dsl:** when possible, present the neighbors sorted when stringifying a `Field` ([#901](https://github.com/Collektive/collektive/issues/901)) ([f5568d0](https://github.com/Collektive/collektive/commit/f5568d041115f3d6f667a4f3cd6132d4af2ed8b8))
+
 ## [22.2.0](https://github.com/Collektive/collektive/compare/22.1.0...22.2.0) (2025-04-16)
 
 ### Features

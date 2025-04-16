@@ -220,6 +220,21 @@ internal abstract class AbstractField<ID : Any, T>(override val localId: ID, ove
     }
     private val neighborhood: Map<ID, T> by lazy { neighborsMap() }
 
+    private val stringRepresentation: String by lazy {
+        val neighborsData = neighborsMap()
+        val neighborsList = neighborsData.toList()
+        val sortedEntries = neighborsList.sortedWith { (id1, v1), (id2, v2) ->
+            when (val byId = tryCompare(id1, id2)) {
+                0 -> tryCompare(v1, v2)
+                else -> byId
+            }
+        }
+        val sortedString = sortedEntries.joinToString(separator = ", ", prefix = "{", postfix = "}") { (id, value) ->
+            "$id=$value"
+        }
+        "ϕ(localId=$localId, localValue=$localValue, neighbors=$sortedString)"
+    }
+
     final override fun toMap(): Map<ID, T> = asMap
 
     final override fun excludeSelf(): Map<ID, T> = neighborhood
@@ -248,7 +263,17 @@ internal abstract class AbstractField<ID : Any, T>(override val localId: ID, ove
 
     protected abstract fun <R> mapOthersAsSequence(transform: (ID, T) -> R): Sequence<Pair<ID, R>>
 
-    final override fun toString() = "ϕ(localId=$localId, localValue=$localValue, neighbors=${neighborsMap()})"
+    private fun <T> tryCompare(a: T, b: T): Int = when {
+        a is Comparable<*> && b is Comparable<*> -> {
+            runCatching {
+                @Suppress("UNCHECKED_CAST")
+                (a as Comparable<T>).compareTo(b)
+            }.getOrDefault(0)
+        }
+        else -> 0
+    }
+
+    final override fun toString() = stringRepresentation
 }
 
 internal class ArrayBasedField<ID : Any, T>(localId: ID, localValue: T, private val others: List<Pair<ID, T>>) :
