@@ -1,0 +1,23 @@
+name: "Unnecessary use of constructs"
+
+config:
+  codePreamble: |-
+    /**
+      * This file has been auto-generated with Subjekt (https://github.com/mini-roostico/subjekt).
+    */
+    import it.unibo.collektive.aggregate.api.neighboring
+    import it.unibo.collektive.aggregate.api.Aggregate
+    import it.unibo.collektive.field.operations.max
+
+parameters:
+  - name: MAPPING_ON_NEIGHBORING
+    values:
+      - |-
+        neighboring(0).toMap().map { it }
+
+subjects:
+  - name: ProperUse${{ prettify(MAPPING_ON_NEIGHBORING) }}Mapping
+    code: |-
+      fun Aggregate<Int>.entry() {
+          ${{ MAPPING_ON_NEIGHBORING }}
+      }
