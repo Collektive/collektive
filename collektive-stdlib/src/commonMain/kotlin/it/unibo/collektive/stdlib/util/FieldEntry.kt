@@ -8,6 +8,7 @@
 
 package it.unibo.collektive.stdlib.util
 
+import it.unibo.collektive.aggregate.Field
 import kotlin.jvm.JvmInline
 
 /**
@@ -60,3 +61,5 @@ fun <ID : Any, T> Map.Entry<ID, T>.toFieldEntry(): FieldEntry<ID, T> = FieldEntr
  * Converts a [Pair] to a [FieldEntry].
  */
 fun <ID : Any, T> Pair<ID, T>.toFieldEntry(): FieldEntry<ID, T> = FieldEntry(this)
+
+fun <ID : Any, T> Field<ID, T>.local(): FieldEntry<ID, T> = FieldEntry(localId, localValue)

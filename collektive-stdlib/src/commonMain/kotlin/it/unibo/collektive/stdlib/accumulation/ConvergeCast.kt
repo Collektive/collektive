@@ -16,8 +16,8 @@ import it.unibo.collektive.aggregate.api.exchanging
 import it.unibo.collektive.aggregate.api.mapNeighborhood
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.stdlib.fields.collectIDs
-import it.unibo.collektive.stdlib.fields.minWith
 import it.unibo.collektive.stdlib.spreading.hopDistanceTo
+import it.unibo.collektive.stdlib.util.FieldEntry
 import it.unibo.collektive.stdlib.util.Maybe
 import it.unibo.collektive.stdlib.util.Maybe.Companion.merge
 import it.unibo.collektive.stdlib.util.Maybe.Companion.some
@@ -34,7 +34,7 @@ import kotlin.jvm.JvmOverloads
 inline fun <reified ID : Any, reified Data, reified Potential : Comparable<Potential>> Aggregate<ID>.convergeCast(
     local: Data,
     potential: Field<ID, Potential>,
-    selectParent: Comparator<Pair<ID, Potential>> = defaultComparator(),
+    selectParent: Comparator<FieldEntry<ID, Potential>> = defaultComparator(),
     crossinline accumulateData: (Data, Data) -> Data,
 ): Data = exchanging<ID, Maybe<Data>, Data>(Maybe.none) { data: Field<ID, Maybe<Data>> ->
     val localValue: Maybe<Data> = data
@@ -66,7 +66,7 @@ inline fun <reified ID : Any, reified Data, reified Potential : Comparable<Poten
 inline fun <reified ID : Any, reified Data, reified Potential : Comparable<Potential>> Aggregate<ID>.convergeCast(
     local: Data,
     potential: Potential,
-    selectParent: Comparator<Pair<ID, Potential>> = defaultComparator(),
+    selectParent: Comparator<FieldEntry<ID, Potential>> = defaultComparator(),
     crossinline accumulateData: (Data, Data) -> Data,
 ): Data = convergeCast(local, neighboring(potential), selectParent, accumulateData)
 
@@ -89,7 +89,7 @@ inline fun <reified ID : Any, reified Data> Aggregate<ID>.convergeCast(
 inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggregate<ID>.convergeMean(
     local: Double,
     potential: Field<ID, Potential>,
-    selectParent: Comparator<Pair<ID, Potential>> = defaultComparator(),
+    selectParent: Comparator<FieldEntry<ID, Potential>> = defaultComparator(),
 ): Double = convergeSum(local, potential, selectParent) / countDevices(potential, selectParent)
 
 /**
@@ -100,7 +100,7 @@ inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggrega
 inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggregate<ID>.convergeMean(
     local: Double,
     potential: Potential,
-    selectParent: Comparator<Pair<ID, Potential>> = defaultComparator(),
+    selectParent: Comparator<FieldEntry<ID, Potential>> = defaultComparator(),
 ): Double = convergeMean(local, neighboring(potential), selectParent)
 
 /**
@@ -119,7 +119,7 @@ inline fun <reified ID : Any> Aggregate<ID>.convergeMean(local: Double, sink: Bo
 inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggregate<ID>.convergeSum(
     local: Int,
     potential: Field<ID, Potential>,
-    selectParent: Comparator<Pair<ID, Potential>> = defaultComparator(),
+    selectParent: Comparator<FieldEntry<ID, Potential>> = defaultComparator(),
 ): Int = convergeCast(local, potential, selectParent, Int::plus)
 
 /**
@@ -131,7 +131,7 @@ inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggrega
 inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggregate<ID>.convergeSum(
     local: Double,
     potential: Field<ID, Potential>,
-    selectParent: Comparator<Pair<ID, Potential>> = defaultComparator(),
+    selectParent: Comparator<FieldEntry<ID, Potential>> = defaultComparator(),
 ): Double = convergeCast(local, potential, selectParent, Double::plus)
 
 /**
@@ -143,7 +143,7 @@ inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggrega
 inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggregate<ID>.convergeSum(
     local: Int,
     potential: Potential,
-    selectParent: Comparator<Pair<ID, Potential>> = defaultComparator(),
+    selectParent: Comparator<FieldEntry<ID, Potential>> = defaultComparator(),
 ): Int = convergeSum(local, neighboring(potential), selectParent)
 
 /**
@@ -155,7 +155,7 @@ inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggrega
 inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggregate<ID>.convergeSum(
     local: Double,
     potential: Potential,
-    selectParent: Comparator<Pair<ID, Potential>> = defaultComparator(),
+    selectParent: Comparator<FieldEntry<ID, Potential>> = defaultComparator(),
 ): Double = convergeSum(local, neighboring(potential), selectParent)
 
 /**
@@ -181,7 +181,7 @@ inline fun <reified ID : Any> Aggregate<ID>.convergeSum(local: Double, sink: Boo
 @OptIn(ExperimentalContracts::class)
 inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggregate<ID>.countDevices(
     potential: Field<ID, Potential>,
-    selectParent: Comparator<Pair<ID, Potential>> = defaultComparator(),
+    selectParent: Comparator<FieldEntry<ID, Potential>> = defaultComparator(),
 ): Int = convergeSum(1, potential, selectParent)
 
 /**
@@ -193,7 +193,7 @@ inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggrega
 @OptIn(ExperimentalContracts::class)
 inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggregate<ID>.countDevices(
     potential: Potential,
-    selectParent: Comparator<Pair<ID, Potential>> = defaultComparator(),
+    selectParent: Comparator<FieldEntry<ID, Potential>> = defaultComparator(),
 ): Int = countDevices(neighboring(potential), selectParent)
 
 /**
@@ -205,8 +205,8 @@ inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggrega
 inline fun <reified ID : Any> Aggregate<ID>.countDevices(sink: Boolean): Int = countDevices(hopDistanceTo(sink))
 
 @PublishedApi
-internal inline fun <reified ID : Any, reified P : Comparable<P>> defaultComparator(): Comparator<Pair<ID, P>> =
-    compareBy<Pair<ID, P>> { it.second }
+internal inline fun <reified ID : Any, reified P : Comparable<P>> defaultComparator(): Comparator<FieldEntry<ID, P>> =
+    compareBy<FieldEntry<ID, P>> { it.value }
 
 /**
  * Find the best neighbor of the current device along a [potential] field,
@@ -219,8 +219,8 @@ internal inline fun <reified ID : Any, reified P : Comparable<P>> defaultCompara
 @JvmOverloads
 inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggregate<ID>.findParent(
     potential: Field<ID, Potential>,
-    comparator: Comparator<Pair<ID, Potential>> = compareBy<Pair<ID, Potential>> { it.second },
-): ID = potential.minWith(localId to potential.localValue, comparator).first
+    comparator: Comparator<FieldEntry<ID, Potential>> = defaultComparator(),
+): ID = potential.minIDWith(localId to potential.localValue, comparator).id
 
 /**
  * Find the best neighbor of the current device along a [potential] field,
@@ -233,7 +233,7 @@ inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggrega
 @JvmOverloads
 inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggregate<ID>.findParent(
     potential: Potential,
-    comparator: Comparator<Pair<ID, Potential>> = compareBy<Pair<ID, Potential>> { it.second },
+    comparator: Comparator<FieldEntry<ID, Potential>> = defaultComparator(),
 ): ID = findParent(neighboring(potential), comparator)
 
 /**

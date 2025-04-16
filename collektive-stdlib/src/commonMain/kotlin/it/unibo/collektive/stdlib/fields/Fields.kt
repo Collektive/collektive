@@ -16,40 +16,35 @@ import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.stdlib.util.Accumulator
 import it.unibo.collektive.stdlib.util.ExcludingSelf
 import it.unibo.collektive.stdlib.util.FieldEntry
+import it.unibo.collektive.stdlib.util.IncludingSelf
 import it.unibo.collektive.stdlib.util.Reducer
 import it.unibo.collektive.stdlib.util.ReductionType
+import it.unibo.collektive.stdlib.util.initTo
+import it.unibo.collektive.stdlib.util.local
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.jvm.JvmOverloads
 
 /**
- * Check if all the elements in the field satisfy the [predicate],
- * ignoring the local value.
+ * Check if all the elements in the field satisfy the [predicate].
+ * The local value is included in the check if [reductionType] is [it.unibo.collektive.stdlib.util.IncludingSelf],
+ * but defaulting to [ExcludingSelf].
  */
-inline fun <ID : Any, T> Field<ID, T>.all(crossinline predicate: (T) -> Boolean): Boolean =
-    fold(true) { acc, value -> acc && predicate(value) }
+inline fun <ID : Any, T> Field<ID, T>.all(
+    reductionType: ReductionType = ExcludingSelf,
+    crossinline predicate: Predicate<FieldEntry<ID, T>>,
+): Boolean = fold(reductionType.initTo(true, predicate)) { acc, value -> acc && predicate(value) }
 
 /**
- * Check if all the elements in the field satisfy the [predicate],
- * including the local value.
+ * Check if any of the elements in the field satisfy the [predicate].
+ * The local value is included in the check if [reductionType] is [it.unibo.collektive.stdlib.util.IncludingSelf],
+ * but defaulting to [ExcludingSelf].
  */
-inline fun <ID : Any, T> Field<ID, T>.allWithSelf(crossinline predicate: (T) -> Boolean): Boolean =
-    all(predicate) && predicate(localValue)
-
-/**
- * Check if any of the elements in the field satisfy the [predicate],
- * ignoring the local value.
- */
-inline fun <ID : Any, T> Field<ID, T>.any(crossinline predicate: (T) -> Boolean): Boolean =
-    fold(false) { acc, value -> acc || predicate(value) }
-
-/**
- * Check if any of the elements in the field satisfy the [predicate],
- * including the local value.
- */
-inline fun <ID : Any, T> Field<ID, T>.anyWithSelf(crossinline predicate: (T) -> Boolean): Boolean =
-    predicate(localValue) || any(predicate)
+inline fun <ID : Any, T> Field<ID, T>.any(
+    reductionType: ReductionType = ExcludingSelf,
+    crossinline predicate: Predicate<FieldEntry<ID, T>>,
+): Boolean = fold(reductionType.initTo(false, predicate)) { acc, value -> acc || predicate(value) }
 
 /**
  * Returns the [Collection] of field elements that satisfy the [predicate],
@@ -60,19 +55,19 @@ inline fun <ID : Any, T> Field<ID, T>.anyWithSelf(crossinline predicate: (T) -> 
 @PublishedApi
 internal inline fun <ID : Any, T, R, C : MutableCollection<R>> Field<ID, T>.genericCollect(
     produceAccumulator: (Int) -> C,
-    includeSelf: Boolean,
-    crossinline predicate: (ID, T) -> Boolean,
-    crossinline transform: (ID, T) -> R,
+    reductionType: ReductionType,
+    crossinline predicate: Predicate<FieldEntry<ID, T>>,
+    crossinline transform: (FieldEntry<ID, T>) -> R,
 ): C {
     contract {
         callsInPlace(produceAccumulator, InvocationKind.EXACTLY_ONCE)
     }
-    val collected = produceAccumulator(neighborsCount + if (includeSelf) 1 else 0)
-    if (includeSelf && predicate(localId, localValue)) {
-        collected.add(transform(localId, localValue))
+    val collected = produceAccumulator(neighborsCount + reductionType.initTo(0, 1))
+    if (reductionType.initTo(false, predicate)) {
+        collected.add(transform(local()))
     }
-    foldWithId(collected) { _, id, element: T ->
-        if (predicate(id, element)) collected.add(transform(id, element))
+    fold(collected) { _, entry ->
+        if (predicate(entry)) collected.add(transform(entry))
         collected
     }
     return collected
@@ -85,12 +80,12 @@ internal inline fun <ID : Any, T, R, C : MutableCollection<R>> Field<ID, T>.gene
  */
 @PublishedApi
 internal inline fun <ID : Any, T, R, C : MutableCollection<R>> Field<ID, T>.collectInternal(
-    includeSelf: Boolean,
-    crossinline predicate: (ID, T) -> Boolean,
-    crossinline transform: (ID, T) -> R,
+    reductionType: ReductionType,
+    crossinline predicate: Predicate<FieldEntry<ID, T>>,
+    crossinline transform: (FieldEntry<ID, T>) -> R,
 ): List<R> = genericCollect(
     produceAccumulator = { ArrayList(it) },
-    includeSelf = includeSelf,
+    reductionType = reductionType,
     predicate = predicate,
     transform = transform,
 )
@@ -102,15 +97,19 @@ internal inline fun <ID : Any, T, R, C : MutableCollection<R>> Field<ID, T>.coll
  */
 @PublishedApi
 internal inline fun <ID : Any, T, R> Field<ID, T>.collectDistinctInternal(
-    includeSelf: Boolean,
-    crossinline predicate: (ID, T) -> Boolean,
-    crossinline transform: (ID, T) -> R,
+    reductionType: ReductionType,
+    crossinline predicate: Predicate<FieldEntry<ID, T>>,
+    crossinline transform: (FieldEntry<ID, T>) -> R,
 ): Set<R> = genericCollect(
     produceAccumulator = { mutableSetOf() },
-    includeSelf = includeSelf,
+    reductionType = reductionType,
     predicate = predicate,
     transform = transform,
 )
+
+
+// TODO DAnilo continue here
+
 
 /**
  * Returns the list of field elements that satisfy the [predicate],
@@ -213,7 +212,7 @@ inline fun <ID : Any, T> Field<ID, T>.collectWithSelf(
  * value in field.withoutSelf().values
  * ```
  */
-operator fun <ID : Any, T> Field<ID, T>.contains(value: T): Boolean = anyWithSelf { it == value }
+operator fun <ID : Any, T> Field<ID, T>.contains(value: T): Boolean = any(IncludingSelf) { it == value }
 
 /**
  * Check if the field contains the [targetId], **including the local id**.
@@ -234,7 +233,7 @@ fun <ID : Any, T> Field<ID, T>.containsId(targetId: ID): Boolean = targetId == l
 inline fun <ID : Any, T> Field<ID, T>.countMatching(
     reductionType: ReductionType = ExcludingSelf,
     crossinline predicate: Predicate<FieldEntry<ID, T>>,
-): Int = fold(reductionType.initial(0, 1)) { acc, value -> if (predicate(value)) acc + 1 else acc }
+): Int = fold(reductionType.initTo(0, 1)) { acc, value -> if (predicate(value)) acc + 1 else acc }
 
 /**
  * Counts the number of elements in the field that satisfy the [predicate],
@@ -316,45 +315,84 @@ inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.maxValueBy(
 /**
  * Returns the element yielding the largest value of the given [comparator].
  * In case multiple elements are maximal, there is no guarantee which one will be returned.
+ * If the field contains only the local value, the result is `null`.
  */
-fun <ID : Any, T> Field<ID, T>.maxValueWith(base: T, comparator: Comparator<T>): T =
-    minValueWith(base, comparator.reversed())
+fun <ID : Any, T> Field<ID, T>.maxWith(comparator: Comparator<FieldEntry<ID, T>>): FieldEntry<ID, T>? =
+    reduce { a, b -> maxOf(a, b, comparator) }
+
+/**
+ * Returns the element yielding the largest value of the given [comparator].
+ * In case multiple elements are maximal, there is no guarantee which one will be returned.
+ * If the field contains only the local value, the result is `null`.
+ */
+fun <ID : Any, T> Field<ID, T>.maxValueWith(comparator: Comparator<FieldEntry<ID, T>>): T? = maxWith(comparator)?.value
+
+/**
+ * Returns the ID of the element yielding the largest value of the given [comparator].
+ * In case multiple elements are maximal, there is no guarantee which one will be returned.
+ * If the field contains only the local value, the result is `null`.
+ */
+fun <ID : Any, T> Field<ID, T>.maxIDWith(comparator: Comparator<FieldEntry<ID, T>>): ID? = maxWith(comparator)?.id
+
+/**
+ * Returns the element yielding the smallest value of the given [selector],
+ * excluding the local value.
+ * In case multiple elements are minimal, there is no guarantee which one will be returned.
+ * If the field contains only the local value, the result is `null`.
+ */
+inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.minBy(
+    crossinline selector: (FieldEntry<ID, T>) -> R,
+): FieldEntry<ID, T>? = reduce { a, b -> minOf(a, b, compareBy(selector)) }
+
+/**
+ * Returns the id of the element yielding the smallest value of the given [selector],
+ * excluding the local value.
+ * In case multiple elements are minimal, there is no guarantee which one will be returned.
+ * If the field contains only the local value, the result is `null`.
+ */
+inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.minIDBy(crossinline selector: (FieldEntry<ID, T>) -> R): ID? =
+    minBy(selector)?.id
+
+/**
+ * Returns the value yielding the smallest value of the given [selector],
+ * excluding the local value.
+ * In case multiple elements are minimal, there is no guarantee which one will be returned.
+ * If the field contains only the local value, the result is `null`.
+ */
+inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.minValueBy(
+    crossinline selector: (FieldEntry<ID, T>) -> R,
+): T? = minBy(selector)?.value
 
 /**
  * Returns the element yielding the smallest value of the given [comparator].
  * In case multiple elements are minimal, there is no guarantee which one will be returned.
+ * If the field contains only the local value, the result is `null`.
  */
-fun <ID : Any, T> Field<ID, T>.minValueWith(base: T, comparator: Comparator<T>): T =
-    fold(base) { current, (_, new) -> minOf(current, new, comparator) }
+fun <ID : Any, T> Field<ID, T>.minWith(comparator: Comparator<FieldEntry<ID, T>>): FieldEntry<ID, T>? =
+    maxWith(comparator.reversed())
 
 /**
  * Returns the element yielding the smallest value of the given [comparator].
  * In case multiple elements are minimal, there is no guarantee which one will be returned.
+ * If the field contains only the local value, the result is `null`.
  */
-fun <ID : Any, T> Field<ID, T>.minWith(
-    base: FieldEntry<ID, T>,
-    comparator: Comparator<FieldEntry<ID, T>>,
-): FieldEntry<ID, T> = fold(base) { current, new -> minOf(current, new, comparator) }
+fun <ID : Any, T> Field<ID, T>.minValueWith(comparator: Comparator<FieldEntry<ID, T>>): T? = minWith(comparator)?.value
 
 /**
- * Returns the element yielding the smallest value of the given [selector].
+ * Returns the ID of the element yielding the smallest value of the given [comparator].
  * In case multiple elements are minimal, there is no guarantee which one will be returned.
+ * If the field contains only the local value, the result is `null`.
  */
-inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.minBy(base: T, crossinline selector: (T) -> R): T =
-    minValueWith(base, compareBy(selector))
+fun <ID : Any, T> Field<ID, T>.minIDWith(comparator: Comparator<FieldEntry<ID, T>>): ID? = minWith(comparator)?.id
 
 /**
  * Check if none of the elements in the field satisfy the [predicate],
  * ignoring the local value.
  */
-inline fun <ID : Any, T> Field<ID, T>.none(crossinline predicate: Predicate<T>): Boolean = !any(predicate)
-
-/**
- * Check if none of the elements in the field satisfy the [predicate],
- * including the local value.
- */
-inline fun <ID : Any, T> Field<ID, T>.noneWithSelf(crossinline predicate: Predicate<T>): Boolean =
-    !anyWithSelf(predicate)
+inline fun <ID : Any, T> Field<ID, T>.none(
+    reductionType: ReductionType = ExcludingSelf,
+    crossinline predicate: Predicate<FieldEntry<ID, T>>,
+): Boolean = !any(reductionType, predicate)
 
 /**
  * Reduces the field entries to a single value using the provided [reducer] function,
@@ -384,17 +422,17 @@ inline fun <ID : Any, T> Field<ID, T>.reduceValues(crossinline reducer: Reducer<
     excludeSelf().values.reduceOrNull(reducer)
 
 /**
- * Returns a new field containing [replaceWith] for each element that satisfies the [predicate].
+ * Returns a new field containing [replacement] for each element that satisfies the [predicate].
  */
-inline fun <ID : Any, T> Field<ID, T>.replaceMatchingWithId(
-    replaceWith: T,
-    crossinline predicate: (ID, T) -> Boolean,
-): Field<ID, T> = mapWithId { id, value -> if (predicate(id, value)) replaceWith else value }
+inline fun <ID : Any, T> Field<ID, T>.replaceMatchingValues(
+    replacement: T,
+    crossinline predicate: Predicate<T>,
+): Field<ID, T> = replaceMatching(replacement, { (_, value) -> predicate(value) })
 
 /**
- * Returns a new field containing [replaceWith] for each element that satisfies the [predicate].
+ * Returns a new field containing [replacement] for each element that satisfies the [predicate].
  */
 inline fun <ID : Any, T> Field<ID, T>.replaceMatching(
-    replaceWith: T,
-    crossinline predicate: Predicate<T>,
-): Field<ID, T> = replaceMatchingWithId(replaceWith) { _, value -> predicate(value) }
+    replacement: T,
+    crossinline predicate: Predicate<FieldEntry<ID, T>>,
+): Field<ID, T> = mapWithId { id, value -> if (predicate(FieldEntry(id, value))) replacement else value }

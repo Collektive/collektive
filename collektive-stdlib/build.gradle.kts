@@ -2,7 +2,6 @@
 
 import it.unibo.collektive.collektivize.CollektivizeTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
     alias(libs.plugins.collektivize)
