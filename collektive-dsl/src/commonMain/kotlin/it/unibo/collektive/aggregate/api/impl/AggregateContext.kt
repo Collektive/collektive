@@ -119,6 +119,8 @@ internal class AggregateContext<ID : Any>(
     override fun dealign() = stack.dealign()
 
     private fun <T> stateAt(path: Path, default: T): T = previousState.getTyped(path, default)
+
+    override fun toString() = "${this::class.simpleName}@$localId"
 }
 
 /**
