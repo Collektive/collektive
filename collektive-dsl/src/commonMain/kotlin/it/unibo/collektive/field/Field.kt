@@ -113,7 +113,11 @@ sealed interface Field<ID : Any, out T> {
             localId: ID,
             localValue: T,
             others: Map<ID, T> = emptyMap(),
-        ): Field<ID, T> = ArrayBasedField(localId, localValue, others.map { it.toPair() })
+        ): Field<ID, T> = when {
+            others.isEmpty() -> PointwiseField(localId, localValue)
+            others.values.all { it == localValue } -> ConstantField(localId, localValue, others.keys)
+            else -> ArrayBasedField(localId, localValue, others.map { it.toPair() })
+        }
 
         /**
          * Reduce the elements of the field using the [reduce] function,
@@ -287,9 +291,9 @@ internal class SequenceBasedField<ID : Any, T>(localId: ID, localValue: T, priva
 
 internal class ConstantField<ID : Any, T>(localId: ID, localValue: T, private val neighborsIds: Set<ID>) :
     AbstractField<ID, T>(localId, localValue) {
-    override val neighborsCount: Int = neighborsIds.size
+    override val neighborsCount: Int get() = neighborsIds.size
 
-    override val neighbors: Set<ID> = neighborsIds
+    override val neighbors: Set<ID> get() = neighborsIds
 
     private val reified by lazy {
         reifiedList.toMap()
@@ -307,4 +311,18 @@ internal class ConstantField<ID : Any, T>(localId: ID, localValue: T, private va
     override fun neighborsMap(): Map<ID, T> = reified
 
     override fun asSequence(): Sequence<Pair<ID, T>> = reifiedList.asSequence() + (localId to localValue)
+}
+
+internal class PointwiseField<ID : Any, T>(localId: ID, localValue: T) : AbstractField<ID, T>(localId, localValue) {
+    override val neighborsCount: Int = 0
+
+    override val neighbors: Set<ID> get() = emptySet()
+
+    override fun <R> mapOthersAsSequence(transform: (ID, T) -> R): Sequence<Pair<ID, R>> = emptySequence()
+
+    override fun neighborValueOf(id: ID): T = error("$this is a pointwise field with no neighbors")
+
+    override fun neighborsMap(): Map<ID, T> = emptyMap()
+
+    override fun asSequence(): Sequence<Pair<ID, T>> = sequenceOf(localId to localValue)
 }
