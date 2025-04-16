@@ -10,9 +10,9 @@ sidebar_position: 2
 fun Aggregate<Int>.neighborCounter(): Int = neighboring(1).count()
 ```
 
-The library function [neighboring](./dsl-descriptions.mdx?search=neighboring) is a **aggregate operator** and is used to observe the value of an expression [local] across neighboring nodes.
+The library function [neighboring](../explanation/dsl-descriptions.mdx?search=neighboring) is a **aggregate operator** and is used to observe the value of an expression [local] across neighboring nodes.
 
-The returned field has as its local value the value passed as input (1 in this example). Using the [count](./dsl-descriptions.mdx?search=count) function, you count the values ​​in the field, thus obtaining the number of neighbors of a node.
+The returned field has as its local value the value passed as input (1 in this example). Using the count function, you count the values in the field, thus obtaining the number of neighbors of a node.
 
 ## Example
 
@@ -25,19 +25,11 @@ This first part code demonstrates how devices, through mutual communication, are
  * Identify the maximum ID values among the neighboring nodes.
 */
 
-fun Aggregate<Int>.maxNeighborID(environment: EnvironmentVariables): Int {
-    // Step 1: Exchange the localId with neighbors and obtain a field of values
-    val neighborValues = neighboring(local = localId)
-
-    // Step 2: Find the maximum value among neighbors (including self)
-    val maxValue = neighborValues.max(base = localId)
-
-    return maxValue
-}
-
+fun Aggregate<Int>.maxNeighborID(environment: EnvironmentVariables): Int =
+    neighboring(local = localId).max(base = localId)
 ```
 
-With the [max](./dsl-descriptions.mdx?search=max) function the maximum value of a field that includes the local value of the node is identified.
+With the max function the maximum value of a field that includes the local value of the node is identified.
 
 ### Second part
 
@@ -50,14 +42,7 @@ This second part represents a variation of the previous one. Building upon the l
 
 fun Aggregate<Int>.maxNetworkID(environment: EnvironmentVariables): Int {
     val maxLocalValue = maxNeighborID()
-
-    // Step 1: Exchange the maxNeighborID with neighbors and obtain a field of values
-    val neighborValues = neighboring(local = maxLocalValue)
-
-    // Step 2: Find the maximum value among neighbors (including self)
-    val maxValue = neighborValues.max(base = maxLocalValue)
-    
-    return maxValue
+    return neighboring(local = maxLocalValue).max(base = maxLocalValue)
 }
 
 // Function of the previous part
@@ -99,19 +84,14 @@ fun Aggregate<Int>.subnetdiameter(sourceID: Int, distanceToSource: Int): SourceD
 }
 
 fun Aggregate<Int>.maxNetworkID(environment: EnvironmentVariables): Int {
-    
-    ...
-
-    // Preliminary step: the distance from the nearest source is calculated using the hopDistanceTo library function 
+    // Preliminary step: the distance from the nearest source is calculated using the hopDistanceTo library function
     distanceToSource = hopDistanceTo(localId == maxValue)
-
     // Calculate subnets diameter 
     val subnetDiameterValue = subnetdiameter(maxValue, distanceToSource).distance
 
-    ...
 }
 ```
 
-The [maxBy](./dsl-descriptions.mdx?search=maxBy) function is a variant of the max function (used in previous parts) that calculates the maximum value in the field according to specifications. In particular, in this part, maxBy is used to specify towards which source the shared distance has been calculated. In such a way as to count in the identification of the maximum only the distances towards a specific source.
+The maxBy function is a variant of the max function (used in previous parts) that calculates the maximum value in the field according to specifications. In particular, in this part, maxBy is used to specify towards which source the shared distance has been calculated. In such a way as to count in the identification of the maximum only the distances towards a specific source.
 
 The distance in terms of hops to the nearest source is calculated using the [hopDistanceTo](./stdlib-descriptions.mdx?search=hopDistanceTo) function.
