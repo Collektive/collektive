@@ -10,7 +10,7 @@ sidebar_position: 2
 fun Aggregate<Int>.neighborCounter(): Int = neighboring(1).count()
 ```
 
-The library function [neighboring](../explanation/dsl-descriptions.mdx?search=neighboring) is a **aggregate operator** and is used to observe the value of an expression [local] across neighboring nodes.
+The library function neighboring is a **aggregate operator** and is used to observe the value of an expression [local] across neighboring nodes.
 
 The returned field has as its local value the value passed as input (1 in this example). Using the count function, you count the values in the field, thus obtaining the number of neighbors of a node.
 
@@ -33,7 +33,8 @@ With the max function the maximum value of a field that includes the local value
 
 ### Second part
 
-This second part represents a variation of the previous one. Building upon the local maximum computation introduced in the first part, the code presented here extends the process through a second layer of communication among nodes, enabling convergence toward the global maximum of the network. 
+This second part represents a variation of the previous one. Building upon the local maximum computation introduced in the first part,
+the code presented here extends the process through a second layer of communication among nodes, enabling convergence toward the global maximum of the network.
 
 ```kotlin
 /**
@@ -59,9 +60,11 @@ Specifically, in this first two part, the use of aggregated operators and operat
 
 ### Third part
 
-In this final part, we extend the previous exercise by considering dividing the network into multiple subnets. The goal is to determine the diameter in relation to the source, which corresponds to the maximum value of the subnetworks.
+In this final part, we extend the previous exercise by considering dividing the network into multiple subnets.
+The goal is to determine the diameter in relation to the source, which corresponds to the maximum value of the subnetworks.
 
-In other words, we aim to find the maximum distance (measured in terms of hops) from a non-source node to the nearest source node. The source nodes are those with the highest ID values in the network, and each source node identifies a separate subnetwork.
+In other words, we aim to find the maximum distance (measured in terms of hops) from a non-source node to the nearest source node.
+The source nodes are those with the highest ID values in the network, and each source node identifies a separate subnetwork.
 
 ```kotlin
 /**
@@ -94,4 +97,4 @@ fun Aggregate<Int>.maxNetworkID(environment: EnvironmentVariables): Int {
 
 The maxBy function is a variant of the max function (used in previous parts) that calculates the maximum value in the field according to specifications. In particular, in this part, maxBy is used to specify towards which source the shared distance has been calculated. In such a way as to count in the identification of the maximum only the distances towards a specific source.
 
-The distance in terms of hops to the nearest source is calculated using the [hopDistanceTo](./stdlib-descriptions.mdx?search=hopDistanceTo) function.
+The distance in terms of hops to the nearest source is calculated using the hopDistanceTo function.
