@@ -18,7 +18,7 @@ import kotlin.jvm.JvmInline
  * @property pair a pair version of this entry
  */
 @JvmInline
-value class FieldEntry<ID: Any, T>(val pair: Pair<ID, T>) {
+value class FieldEntry<ID : Any, T>(val pair: Pair<ID, T>) {
 
     /**
      * Creates a new [FieldEntry] with the given [id] and [value].
@@ -51,5 +51,12 @@ value class FieldEntry<ID: Any, T>(val pair: Pair<ID, T>) {
     operator fun component2(): T = value
 }
 
-fun <ID: Any, T> Map.Entry<ID, T>.toFieldEntry(): FieldEntry<ID, T> = FieldEntry(this.key, this.value)
-fun <ID: Any, T> Pair<ID, T>.toFieldEntry(): FieldEntry<ID, T> = FieldEntry(this)
+/**
+ * Converts a [Map.Entry] to a [FieldEntry].
+ */
+fun <ID : Any, T> Map.Entry<ID, T>.toFieldEntry(): FieldEntry<ID, T> = FieldEntry(this.key, this.value)
+
+/**
+ * Converts a [Pair] to a [FieldEntry].
+ */
+fun <ID : Any, T> Pair<ID, T>.toFieldEntry(): FieldEntry<ID, T> = FieldEntry(this)

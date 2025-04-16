@@ -18,6 +18,7 @@ import it.unibo.collektive.aggregate.Field
  */
 sealed interface ReductionType {
 
+    context(_: Field<ID, T>)
     /**
      * The initial value of the reduction.
      *
@@ -25,8 +26,7 @@ sealed interface ReductionType {
      * @param self a function that takes the local ID and the local value and returns the initial value
      * @return the initial value of the reduction
      */
-    context(_: Field<ID, T>)
-    fun <ID: Any, T, R> initial(default: R, self: (ID, T) -> R): R
+    fun <ID : Any, T, R> initial(default: R, self: (ID, T) -> R): R
 
     /**
      * The initial value of the reduction.
@@ -46,7 +46,7 @@ data object IncludingSelf : ReductionType {
     context(_: Field<ID, T>)
     override fun <ID : Any, T, R> initial(default: R, self: (ID, T) -> R): R = self(this.localId, field.localValue)
 
-    override fun <R> initial(default: R, self: R): R  = self
+    override fun <R> initial(default: R, self: R): R = self
 }
 
 /**
@@ -56,5 +56,5 @@ data object ExcludingSelf : ReductionType {
     context(field: Field<ID, T>)
     override fun <ID : Any, T, R> initial(default: R, self: (ID, T) -> R): R = default
 
-    override fun <R> initial(default: R, self: R): R  = default
+    override fun <R> initial(default: R, self: R): R = default
 }

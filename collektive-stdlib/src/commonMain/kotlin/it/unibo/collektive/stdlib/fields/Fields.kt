@@ -223,8 +223,7 @@ operator fun <ID : Any, T> Field<ID, T>.contains(value: T): Boolean = anyWithSel
  * id in field.withoutSelf().keys
  * ```
  */
-fun <ID : Any, T> Field<ID, T>.containsId(targetId: ID): Boolean =
-    targetId == localId || targetId in excludeSelf().keys
+fun <ID : Any, T> Field<ID, T>.containsId(targetId: ID): Boolean = targetId == localId || targetId in excludeSelf().keys
 
 /**
  * Counts the number of elements in the field that satisfy the [predicate],
@@ -235,8 +234,7 @@ fun <ID : Any, T> Field<ID, T>.containsId(targetId: ID): Boolean =
 inline fun <ID : Any, T> Field<ID, T>.countMatching(
     reductionType: ReductionType = ExcludingSelf,
     crossinline predicate: Predicate<FieldEntry<ID, T>>,
-): Int =
-    fold(reductionType.initial(0, 1)) { acc, value -> if (predicate(value)) acc + 1 else acc }
+): Int = fold(reductionType.initial(0, 1)) { acc, value -> if (predicate(value)) acc + 1 else acc }
 
 /**
  * Counts the number of elements in the field that satisfy the [predicate],
@@ -246,9 +244,8 @@ inline fun <ID : Any, T> Field<ID, T>.countMatching(
 @JvmOverloads
 inline fun <T> Field<*, T>.countMatchingValues(
     reductionType: ReductionType = ExcludingSelf,
-    crossinline predicate: Predicate<T>
-): Int =
-    countMatching(reductionType) { (_, value) -> predicate(value) }
+    crossinline predicate: Predicate<T>,
+): Int = countMatching(reductionType) { (_, value) -> predicate(value) }
 
 /**
  * Counts the number of ids in the field that satisfy the [predicate],,
@@ -258,7 +255,7 @@ inline fun <T> Field<*, T>.countMatchingValues(
 @JvmOverloads
 inline fun <ID : Any> Field<ID, *>.countMatchingIDs(
     reductionType: ReductionType = ExcludingSelf,
-    crossinline predicate: Predicate<ID>
+    crossinline predicate: Predicate<ID>,
 ): Int = countMatching(reductionType) { (id, _) -> predicate(id) }
 
 /**
@@ -266,8 +263,10 @@ inline fun <ID : Any> Field<ID, *>.countMatchingIDs(
  * excluding the local value.
  */
 @JvmOverloads
-inline fun <ID : Any, T, R> Field<ID, T>.fold(initial: R, crossinline accumulator: Accumulator<R, FieldEntry<ID, T>>): R =
-    excludeSelf().fold(initial) { current, (id, value) -> accumulator(current, FieldEntry(id, value)) }
+inline fun <ID : Any, T, R> Field<ID, T>.fold(
+    initial: R,
+    crossinline accumulator: Accumulator<R, FieldEntry<ID, T>>,
+): R = excludeSelf().fold(initial) { current, (id, value) -> accumulator(current, FieldEntry(id, value)) }
 
 /**
  * Starting from the [initial] value, applies the [accumulator] function to each id in the field,
@@ -292,8 +291,8 @@ inline fun <T, R> Field<*, T>.foldValues(initial: R, crossinline accumulator: Ac
  * If the field contains only the local value, the result is `null`.
  */
 inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.maxBy(
-    crossinline selector: (FieldEntry<ID, T>) -> R
-): FieldEntry<ID, T>? = reduce{ a, b -> maxOf(a, b, compareBy(selector)) }
+    crossinline selector: (FieldEntry<ID, T>) -> R,
+): FieldEntry<ID, T>? = reduce { a, b -> maxOf(a, b, compareBy(selector)) }
 
 /**
  * Returns the id yielding the largest value of the given [selector],
@@ -301,9 +300,8 @@ inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.maxBy(
  * In case multiple elements are maximal, there is no guarantee which one will be returned.
  * If the field contains only the local value, the result is `null`.
  */
-inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.maxIDBy(
-    crossinline selector: (FieldEntry<ID, T>) -> R
-): ID? = maxBy(selector)?.id
+inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.maxIDBy(crossinline selector: (FieldEntry<ID, T>) -> R): ID? =
+    maxBy(selector)?.id
 
 /**
  * Returns the value yielding the largest value of the given [selector],
@@ -312,7 +310,7 @@ inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.maxIDBy(
  * If the field contains only the local value, the result is `null`.
  */
 inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.maxValueBy(
-    crossinline selector: (FieldEntry<ID, T>) -> R
+    crossinline selector: (FieldEntry<ID, T>) -> R,
 ): T? = maxBy(selector)?.value
 
 /**
@@ -333,8 +331,10 @@ fun <ID : Any, T> Field<ID, T>.minValueWith(base: T, comparator: Comparator<T>):
  * Returns the element yielding the smallest value of the given [comparator].
  * In case multiple elements are minimal, there is no guarantee which one will be returned.
  */
-fun <ID : Any, T> Field<ID, T>.minWith(base: FieldEntry<ID, T>, comparator: Comparator<FieldEntry<ID, T>>): FieldEntry<ID, T> =
-    fold(base) { current, new -> minOf(current, new, comparator) }
+fun <ID : Any, T> Field<ID, T>.minWith(
+    base: FieldEntry<ID, T>,
+    comparator: Comparator<FieldEntry<ID, T>>,
+): FieldEntry<ID, T> = fold(base) { current, new -> minOf(current, new, comparator) }
 
 /**
  * Returns the element yielding the smallest value of the given [selector].
