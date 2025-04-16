@@ -5,9 +5,12 @@
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
  * as described in the LICENSE file in this project's repository's top directory.
  */
-
 package it.unibo.collektive.aggregate.api.impl
 
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.none
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.Aggregate.InternalAPI
 import it.unibo.collektive.aggregate.api.DataSharingMethod
@@ -57,14 +60,17 @@ internal class AggregateContext<ID : Any>(
 
     @DelicateCollektiveApi
     override fun <Shared, Returned> InternalAPI.`_ serialization aware exchanging`(
-        initial: Shared,
+        initial: Field<ID, Shared>,
         dataSharingMethod: DataSharingMethod<Shared>,
         body: YieldingScope<Field<ID, Shared>, Returned>,
     ): Returned {
         val path: Path = stack.currentPath()
         val messages = inboundMessage.dataAt<Shared>(path, dataSharingMethod)
-        val previous = stateAt(path, initial)
-        val subject: Field<ID, Shared> = newField(previous, messages)
+        val previous: Option<Shared> = stateAt(path, none())
+        val subject: Field<ID, Shared> = when (previous) {
+            is None -> initial
+            is Some<Shared> -> newField(previous.value, messages)
+        }
         val context = YieldingContext<Field<ID, Shared>, Returned>()
         return context.body(subject)
             .also {
@@ -79,6 +85,13 @@ internal class AggregateContext<ID : Any>(
                 state += path to it.toSend.localValue
             }.toReturn
     }
+
+    @DelicateCollektiveApi
+    override fun <Shared, Returned> InternalAPI.`_ serialization aware exchanging`(
+        initial: Shared,
+        dataSharingMethod: DataSharingMethod<Shared>,
+        body: YieldingScope<Field<ID, Shared>, Returned>,
+    ) = `_ serialization aware exchanging`(newField(initial, emptyMap()), dataSharingMethod, body)
 
     override fun <Stored, Return> evolving(initial: Stored, transform: YieldingScope<Stored, Return>): Return {
         val path = stack.currentPath()

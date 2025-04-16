@@ -48,6 +48,20 @@ interface Aggregate<ID : Any> {
     @Suppress("FunctionName")
     @DelicateCollektiveApi
     fun <Shared, Returned> InternalAPI.`_ serialization aware exchanging`(
+        initial: Field<ID, Shared>,
+        dataSharingMethod: DataSharingMethod<Shared>,
+        body: YieldingScope<Field<ID, Shared>, Returned>,
+    ): Returned
+
+    /**
+     * Serialization-aware version of the [exchanging] function.
+     *
+     * This function is not intended to be used directly.
+     * Use the [exchanging] function instead.
+     */
+    @Suppress("FunctionName")
+    @DelicateCollektiveApi
+    fun <Shared, Returned> InternalAPI.`_ serialization aware exchanging`(
         initial: Shared,
         dataSharingMethod: DataSharingMethod<Shared>,
         body: YieldingScope<Field<ID, Shared>, Returned>,

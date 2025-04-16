@@ -33,6 +33,33 @@ import it.unibo.collektive.field.Field
  * rather, from the previously computed local field value.
  */
 inline fun <ID : Any, reified Shared, Returned> Aggregate<ID>.exchanging(
+    initial: Field<ID, Shared>,
+    noinline body: YieldingScope<Field<ID, Shared>, Returned>,
+): Returned =
+    @OptIn(DelicateCollektiveApi::class)
+    InternalAPI.`_ serialization aware exchanging`(initial, dataSharingMethod(), body)
+
+/**
+ * [exchange] implements *anisotropic* data sharing
+ * (the field information looks different depending on the direction from which you are observing it).
+ *
+ * Starting from an [initial] value, it computes a [Field] of [Shared] values
+ * containing the local value and the values of all neighbors.
+ *
+ * It computes a [body] function based on such [Field],
+ * and expects another [Field] of [Shared] as a result.
+ *
+ * The resulting [Field] is then used to send custom messages to known neighbors,
+ * with their [Field] value used as message content.
+ *
+ * Then, the [body] must return a [Returned] by calling [YieldingContext.yielding] on the [Shared] [Field].
+ *
+ * Results are [Aggregate.evolve]d across rounds,
+ * namely, this function also stores the local value of the field as state,
+ * and later invocations in successive rounds will not start from the provided [initial] value,
+ * rather, from the previously computed local field value.
+ */
+inline fun <ID : Any, reified Shared, Returned> Aggregate<ID>.exchanging(
     initial: Shared,
     noinline body: YieldingScope<Field<ID, Shared>, Returned>,
 ): Returned =
