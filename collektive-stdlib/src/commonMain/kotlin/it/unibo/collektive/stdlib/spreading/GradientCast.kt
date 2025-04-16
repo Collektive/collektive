@@ -8,14 +8,14 @@
 
 package it.unibo.collektive.stdlib.spreading
 
+import it.unibo.collektive.aggregate.Field
+import it.unibo.collektive.aggregate.Field.Companion.fold
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
 import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.aggregate.api.sharing
-import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.Field.Companion.fold
-import it.unibo.collektive.field.operations.minBy
-import it.unibo.collektive.stdlib.util.Accumulator
+import it.unibo.collektive.stdlib.fields.minBy
+import it.unibo.collektive.stdlib.util.Reducer
 import it.unibo.collektive.stdlib.util.coerceIn
 import it.unibo.collektive.stdlib.util.hops
 import it.unibo.collektive.stdlib.util.nonOverflowingPlus
@@ -41,7 +41,7 @@ inline fun <reified ID, reified Value, reified Distance> Aggregate<ID>.bellmanFo
     top: Distance,
     noinline accumulateData: (fromSource: Distance, toNeighbor: Distance, data: Value) -> Value =
         { _, _, data -> data },
-    crossinline accumulateDistance: Accumulator<Distance>,
+    crossinline accumulateDistance: Reducer<Distance>,
     metric: Field<ID, Distance>,
 ): Value where ID : Any, Distance : Comparable<Distance> {
     val topValue = top to local
@@ -112,7 +112,7 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
     isRiemannianManifold: Boolean = true,
     noinline accumulateData: (fromSource: Distance, toNeighbor: Distance, neighborData: Value) -> Value =
         { _, _, data -> data },
-    crossinline accumulateDistance: Accumulator<Distance>,
+    crossinline accumulateDistance: Reducer<Distance>,
 ): Value {
     require(maxPaths > 0) {
         "Computing the gradient requires at least one-path memory"
@@ -189,7 +189,7 @@ inline fun <reified ID : Any, reified Type> Aggregate<ID>.gradientCast(
     maxPaths: Int = Int.MAX_VALUE,
     isRiemannianManifold: Boolean = true,
     noinline accumulateData: (fromSource: Double, toNeighbor: Double, data: Type) -> Type = { _, _, data -> data },
-    crossinline accumulateDistance: Accumulator<Double> = Double::plus,
+    crossinline accumulateDistance: Reducer<Double> = Double::plus,
 ): Type = gradientCast(
     source,
     local,
@@ -225,7 +225,7 @@ inline fun <reified ID : Any, reified Type> Aggregate<ID>.intGradientCast(
     maxPaths: Int = Int.MAX_VALUE,
     isRiemannianManifold: Boolean = true,
     noinline accumulateData: (fromSource: Int, toNeighbor: Int, data: Type) -> Type = { _, _, data -> data },
-    crossinline accumulateDistance: Accumulator<Int> = Int::nonOverflowingPlus,
+    crossinline accumulateDistance: Reducer<Int> = Int::nonOverflowingPlus,
 ): Type = gradientCast(
     source,
     local,
@@ -277,7 +277,7 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
     isRiemannianManifold: Boolean = true,
     noinline accumulateData: (fromSource: Distance, toNeighbor: Distance, data: Value) -> Value =
         { _, _, data -> data },
-    crossinline accumulateDistance: Accumulator<Distance>,
+    crossinline accumulateDistance: Reducer<Distance>,
 ): Map<ID, Value> = sources.associateWith { source ->
     alignedOn(source) {
         gradientCast(
@@ -383,7 +383,7 @@ data class GradientPath<ID : Any, Value, Distance : Comparable<Distance>>(
         distanceToNeighbor: Distance,
         bottom: Distance,
         top: Distance,
-        crossinline accumulateDistance: Accumulator<Distance>,
+        crossinline accumulateDistance: Reducer<Distance>,
     ): UpdatedGradientPath<ID, Value, Distance> {
         val totalDistance = accumulateDistance(distance, distanceToNeighbor).coerceIn(bottom, top)
         check(totalDistance >= distance && totalDistance >= distanceToNeighbor) {

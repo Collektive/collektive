@@ -12,11 +12,10 @@ import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.aggregate.api.sharing
-import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.operations.max
-import it.unibo.collektive.field.operations.min
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
+import it.unibo.collektive.stdlib.fields.max
+import it.unibo.collektive.stdlib.fields.min
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.test.Test

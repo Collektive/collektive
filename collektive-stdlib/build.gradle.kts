@@ -2,6 +2,7 @@
 
 import it.unibo.collektive.collektivize.CollektivizeTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
     alias(libs.plugins.collektivize)
@@ -36,6 +37,7 @@ tasks.withType<SourceTask>().configureEach {
 kotlinMultiplatform {
     sourceSets {
         commonMain {
+            languageSettings.enableLanguageFeature("ContextParameters")
             dependencies {
                 implementation(collektive("dsl"))
                 implementation(rootProject.libs.kotlinx.serialization.core)

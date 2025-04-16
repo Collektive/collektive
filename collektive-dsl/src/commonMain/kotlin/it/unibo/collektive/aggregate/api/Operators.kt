@@ -8,7 +8,7 @@
 
 package it.unibo.collektive.aggregate.api
 
-import it.unibo.collektive.field.Field
+import it.unibo.collektive.aggregate.Field
 
 /**
  * [exchange] implements *anisotropic* data sharing

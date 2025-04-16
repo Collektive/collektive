@@ -6,7 +6,7 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
-package it.unibo.collektive.field
+package it.unibo.collektive.aggregate
 
 /**
  * A field is a map of messages where the key is the [ID] of a node and [T] the associated value.
@@ -41,8 +41,16 @@ sealed interface Field<ID : Any, out T> {
      * Combines this field with another (aligned) one considering the [ID] when combining the values.
      */
     fun <B, R> alignedMapWithId(other: Field<ID, B>, transform: (ID, T, B) -> R): Field<ID, R> {
-        checkAligned(this, other)
+        // checkAligned(this, other)
         return mapWithId { id, value -> transform(id, value, other[id]) }
+    }
+
+    /**
+     * Combines this field with other two (aligned) fields based on the [ID]s when.
+     */
+    fun <B, C, R> alignedMapWithId(f1: Field<ID, B>, f2: Field<ID, C>, transform: (ID, T, B, C) -> R): Field<ID, R> {
+        // checkAligned(this, f1, f2)
+        return mapWithId { id, value -> transform(id, value, f1[id], f2[id]) }
     }
 
     /**
@@ -50,6 +58,12 @@ sealed interface Field<ID : Any, out T> {
      */
     fun <B, R> alignedMap(other: Field<ID, B>, transform: (T, B) -> R): Field<ID, R> =
         alignedMapWithId(other) { _, value, otherValue -> transform(value, otherValue) }
+
+    /**
+     * Combines this field with other two (aligned) fields based on the [ID]s when.
+     */
+    fun <B, C, R> alignedMap(f1: Field<ID, B>, f2: Field<ID, C>, transform: (T, B, C) -> R): Field<ID, R> =
+        alignedMapWithId(f1, f2) { _, value, f1Value, f2Value -> transform(value, f1Value, f2Value) }
 
     /**
      * Map the field using the [transform] function.
@@ -120,6 +134,8 @@ sealed interface Field<ID : Any, out T> {
          * returning the [default] value if the field to transform is empty.
          * The local value is not considered.
          */
+        @Deprecated("Use the standard library version")
+        @Suppress("DEPRECATION")
         inline fun <ID : Any, T> Field<ID, T>.hood(default: T, crossinline reduce: (T, T) -> T): T =
             hoodWithId(default) { (_, accumulator), (id, value) -> id to reduce(accumulator, value) }
 
@@ -133,6 +149,8 @@ sealed interface Field<ID : Any, out T> {
          *
          * Use this function when the [ID] should be propagated during the reduce operation.
          */
+        @Deprecated("Use the standard library version")
+        @Suppress("DEPRECATION")
         inline fun <ID : Any, T> Field<ID, T>.hoodWithId(
             default: T,
             crossinline reduce: (Pair<ID, T>, Pair<ID, T>) -> Pair<ID, T>,
@@ -145,6 +163,8 @@ sealed interface Field<ID : Any, out T> {
          * The [default] value is returned if the field to transform is empty.
          * The local value is not considered.
          */
+        @Deprecated("Use the standard library version")
+        @Suppress("DEPRECATION")
         inline fun <ID : Any, T, R> Field<ID, T>.hoodWithId(
             default: R,
             crossinline reduce: (Pair<ID, T>, Pair<ID, T>) -> Pair<ID, T>,
@@ -159,6 +179,7 @@ sealed interface Field<ID : Any, out T> {
          * The [default] value is returned if the field to transform is empty.
          * The local value is not considered.
          */
+        @Deprecated("Use the standard library version")
         inline fun <ID : Any, T, I, R> Field<ID, T>.hoodWithId(
             default: R,
             crossinline transform: (ID, T) -> I,
@@ -182,6 +203,8 @@ sealed interface Field<ID : Any, out T> {
          * The local value of the field is not considered.
          * Returns the [default] if the field to transform is empty.
          */
+        @Suppress("DEPRECATION")
+        @Deprecated("Use the standard library version")
         inline fun <ID : Any, T> Field<ID, T>.hoodWithId(default: T, crossinline transform: (T, ID, T) -> T): T =
             hoodWithId(default) { (_, accumulator), (id, value) -> id to transform(accumulator, id, value) }
 
@@ -189,6 +212,8 @@ sealed interface Field<ID : Any, out T> {
          * Accumulates the elements of a field starting from an [initial] through a [transform] function.
          * The local value of the field is not considered.
          */
+        @Suppress("DEPRECATION")
+        @Deprecated("Use the standard library version")
         inline fun <ID : Any, T, R> Field<ID, T>.fold(initial: R, crossinline transform: (R, T) -> R): R =
             foldWithId(initial) { accumulator, _, value -> transform(accumulator, value) }
 
@@ -197,6 +222,7 @@ sealed interface Field<ID : Any, out T> {
          * [transform] function that includes the [ID] of the element.
          * The local value of the field is not considered.
          */
+        @Deprecated("Use the standard library version")
         inline fun <ID : Any, T, R> Field<ID, T>.foldWithId(initial: R, crossinline transform: (R, ID, T) -> R): R {
             var accumulator = initial
             for (entry in excludeSelf()) {

@@ -8,6 +8,8 @@
 
 package it.unibo.collektive.aggregate.api.impl
 
+import it.unibo.collektive.aggregate.ConstantField
+import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.Aggregate.InternalAPI
 import it.unibo.collektive.aggregate.api.DataSharingMethod
@@ -17,8 +19,6 @@ import it.unibo.collektive.aggregate.api.YieldingResult
 import it.unibo.collektive.aggregate.api.YieldingScope
 import it.unibo.collektive.aggregate.api.impl.stack.Stack
 import it.unibo.collektive.aggregate.api.neighborhood
-import it.unibo.collektive.field.ConstantField
-import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.NeighborsData
 import it.unibo.collektive.networking.OutboundEnvelope
 import it.unibo.collektive.networking.OutboundEnvelope.SharedData

@@ -9,11 +9,9 @@
 package it.unibo.collektive.aggregate
 
 import it.unibo.collektive.Collektive.Companion.aggregate
+import it.unibo.collektive.aggregate.Field.Companion.fold
 import it.unibo.collektive.aggregate.api.exchange
 import it.unibo.collektive.aggregate.api.exchanging
-import it.unibo.collektive.field.ConstantField
-import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.Field.Companion.fold
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.test.Test

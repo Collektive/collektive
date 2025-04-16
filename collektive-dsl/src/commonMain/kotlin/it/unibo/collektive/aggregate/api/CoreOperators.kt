@@ -8,9 +8,9 @@
 
 package it.unibo.collektive.aggregate.api
 
+import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate.Companion.dataSharingMethod
 import it.unibo.collektive.aggregate.api.Aggregate.InternalAPI
-import it.unibo.collektive.field.Field
 
 /**
  * [exchange] implements *anisotropic* data sharing

@@ -8,7 +8,7 @@
 
 package it.unibo.collektive.stdlib.util
 
-import it.unibo.collektive.field.Field
+import it.unibo.collektive.aggregate.Field
 
 /**
  * Coerce this value to be in the range between [min] and [max].

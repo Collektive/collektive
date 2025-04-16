@@ -9,10 +9,10 @@
 package it.unibo.collektive.alignment
 
 import it.unibo.collektive.Collektive.Companion.aggregate
+import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.aggregate.api.share
-import it.unibo.collektive.field.Field
 import it.unibo.collektive.matchers.assertNotAligned
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
 import kotlin.test.Test

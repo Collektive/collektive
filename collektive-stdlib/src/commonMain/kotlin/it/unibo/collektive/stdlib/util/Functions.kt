@@ -9,9 +9,9 @@
 package it.unibo.collektive.stdlib.util
 
 /**
- * A function that takes two arguments of the same type and returns a value of the same type.
+ * A function that takes two arguments of different types and returns a value of the first type.
  */
-typealias Accumulator<T> = (T, T) -> T
+typealias Accumulator<Destination, T> = (Destination, T) -> Destination
 
 /**
  * A function that takes two arguments and returns a boolean value.
@@ -21,9 +21,9 @@ typealias BiPredicate<X, Y> = (X, Y) -> Boolean
 /**
  * A function that takes three arguments of different types and returns a value of the first type.
  */
-typealias BiReducer<Destination, X, Y> = (Destination, X, Y) -> Destination
+typealias BiAccumulator<Destination, X, Y> = (Destination, X, Y) -> Destination
 
 /**
- * A function that takes two arguments of different types and returns a value of the first type.
+ * A function that takes two arguments of the same type and returns a value of the same type.
  */
-typealias Reducer<Destination, T> = (Destination, T) -> Destination
+typealias Reducer<T> = Accumulator<T, T>

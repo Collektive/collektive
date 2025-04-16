@@ -40,6 +40,7 @@ gitHooks {
 rootProject.name = "collektive"
 
 includeBuild("collektive-compiler-plugin")
+includeBuild("collektivize")
 include(
     "alchemist-incarnation-collektive",
     "collektive-compiler-embeddable",

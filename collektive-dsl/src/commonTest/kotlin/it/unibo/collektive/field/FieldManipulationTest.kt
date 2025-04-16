@@ -10,12 +10,12 @@ package it.unibo.collektive.field
 
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.neighboring
-import it.unibo.collektive.field.operations.max
-import it.unibo.collektive.field.operations.maxWithSelf
-import it.unibo.collektive.field.operations.min
-import it.unibo.collektive.field.operations.minWithSelf
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
+import it.unibo.collektive.stdlib.fields.max
+import it.unibo.collektive.stdlib.fields.maxWithSelf
+import it.unibo.collektive.stdlib.fields.min
+import it.unibo.collektive.stdlib.fields.minWithSelf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

@@ -11,8 +11,7 @@ package it.unibo.collektive.aggregate
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.neighboring
-import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.operations.all
+import it.unibo.collektive.stdlib.fields.all
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.test.Test

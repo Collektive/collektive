@@ -8,12 +8,16 @@
 
 @file:Suppress("TooManyFunctions")
 
-package it.unibo.collektive.field.operations
+package it.unibo.collektive.stdlib.fields
 
 import arrow.core.Predicate
-import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.Field.Companion.fold
-import it.unibo.collektive.field.Field.Companion.foldWithId
+import arrow.core.fold
+import it.unibo.collektive.aggregate.Field
+import it.unibo.collektive.stdlib.util.Accumulator
+import it.unibo.collektive.stdlib.util.ExcludingSelf
+import it.unibo.collektive.stdlib.util.FieldEntry
+import it.unibo.collektive.stdlib.util.Reducer
+import it.unibo.collektive.stdlib.util.ReductionType
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -220,57 +224,124 @@ operator fun <ID : Any, T> Field<ID, T>.contains(value: T): Boolean = anyWithSel
  * ```
  */
 fun <ID : Any, T> Field<ID, T>.containsId(targetId: ID): Boolean =
-    foldWithId(localId == targetId) { current, id, _ -> current || id == targetId }
+    targetId == localId || targetId in excludeSelf().keys
 
 /**
- * Count the number of elements in the field that satisfy the [predicate],
- * ignoring the local value.
+ * Counts the number of elements in the field that satisfy the [predicate],
+ * cosidering the local value if [reductionType] is [it.unibo.collektive.stdlib.util.IncludingSelf],
+ * but defaulting to [it.unibo.collektive.stdlib.util.ExcludingSelf].
  */
 @JvmOverloads
-inline fun <ID : Any, T> Field<ID, T>.count(crossinline predicate: (T) -> Boolean = { true }): Int =
-    fold(0) { acc, value -> if (predicate(value)) acc + 1 else acc }
+inline fun <ID : Any, T> Field<ID, T>.countMatching(
+    reductionType: ReductionType = ExcludingSelf,
+    crossinline predicate: Predicate<FieldEntry<ID, T>>,
+): Int =
+    fold(reductionType.initial(0, 1)) { acc, value -> if (predicate(value)) acc + 1 else acc }
 
 /**
- * Count the number of elements in the field that satisfy the [predicate],
- * including the local value.
+ * Counts the number of elements in the field that satisfy the [predicate],
+ *  * cosidering the local value if [reductionType] is [it.unibo.collektive.stdlib.util.IncludingSelf],
+ *  * but defaulting to [it.unibo.collektive.stdlib.util.ExcludingSelf].
  */
 @JvmOverloads
-inline fun <ID : Any, T> Field<ID, T>.countWithSelf(crossinline predicate: (T) -> Boolean = { true }): Int =
-    count(predicate) + if (predicate(localValue)) 1 else 0
+inline fun <T> Field<*, T>.countMatchingValues(
+    reductionType: ReductionType = ExcludingSelf,
+    crossinline predicate: Predicate<T>
+): Int =
+    countMatching(reductionType) { (_, value) -> predicate(value) }
 
 /**
- * Returns the element yielding the largest value of the given [selector].
+ * Counts the number of ids in the field that satisfy the [predicate],,
+ *  * cosidering the local value if [reductionType] is [it.unibo.collektive.stdlib.util.IncludingSelf],
+ *  * but defaulting to [it.unibo.collektive.stdlib.util.ExcludingSelf].
+ */
+@JvmOverloads
+inline fun <ID : Any> Field<ID, *>.countMatchingIDs(
+    reductionType: ReductionType = ExcludingSelf,
+    crossinline predicate: Predicate<ID>
+): Int = countMatching(reductionType) { (id, _) -> predicate(id) }
+
+/**
+ * Starting from the [initial] value, applies the [accumulator] function to each element in the field,
+ * excluding the local value.
+ */
+@JvmOverloads
+inline fun <ID : Any, T, R> Field<ID, T>.fold(initial: R, crossinline accumulator: Accumulator<R, FieldEntry<ID, T>>): R =
+    excludeSelf().fold(initial) { current, (id, value) -> accumulator(current, FieldEntry(id, value)) }
+
+/**
+ * Starting from the [initial] value, applies the [accumulator] function to each id in the field,
+ * excluding the local value.
+ */
+@JvmOverloads
+inline fun <ID : Any, R> Field<ID, *>.foldIDs(initial: R, crossinline accumulator: Accumulator<R, ID>): R =
+    fold(initial) { current, (id, _) -> accumulator(current, id) }
+
+/**
+ * Starting from the [initial] value, applies the [accumulator] function to each element in the field,
+ * excluding the local value.
+ */
+@JvmOverloads
+inline fun <T, R> Field<*, T>.foldValues(initial: R, crossinline accumulator: Accumulator<R, T>): R =
+    fold(initial) { current, (_, value) -> accumulator(current, value) }
+
+/**
+ * Returns the element yielding the largest value of the given [selector],
+ * excluding the local value.
  * In case multiple elements are maximal, there is no guarantee which one will be returned.
+ * If the field contains only the local value, the result is `null`.
  */
-inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.maxBy(base: T, crossinline selector: (T) -> R): T =
-    maxWith(base, compareBy(selector))
+inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.maxBy(
+    crossinline selector: (FieldEntry<ID, T>) -> R
+): FieldEntry<ID, T>? = reduce{ a, b -> maxOf(a, b, compareBy(selector)) }
+
+/**
+ * Returns the id yielding the largest value of the given [selector],
+ * excluding the local value.
+ * In case multiple elements are maximal, there is no guarantee which one will be returned.
+ * If the field contains only the local value, the result is `null`.
+ */
+inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.maxIDBy(
+    crossinline selector: (FieldEntry<ID, T>) -> R
+): ID? = maxBy(selector)?.id
+
+/**
+ * Returns the value yielding the largest value of the given [selector],
+ * excluding the local value.
+ * In case multiple elements are maximal, there is no guarantee which one will be returned.
+ * If the field contains only the local value, the result is `null`.
+ */
+inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.maxValueBy(
+    crossinline selector: (FieldEntry<ID, T>) -> R
+): T? = maxBy(selector)?.value
 
 /**
  * Returns the element yielding the largest value of the given [comparator].
  * In case multiple elements are maximal, there is no guarantee which one will be returned.
  */
-fun <ID : Any, T> Field<ID, T>.maxWith(base: T, comparator: Comparator<T>): T = minWith(base, comparator.reversed())
+fun <ID : Any, T> Field<ID, T>.maxValueWith(base: T, comparator: Comparator<T>): T =
+    minValueWith(base, comparator.reversed())
 
 /**
  * Returns the element yielding the smallest value of the given [comparator].
  * In case multiple elements are minimal, there is no guarantee which one will be returned.
  */
-fun <ID : Any, T> Field<ID, T>.minWith(base: T, comparator: Comparator<T>): T =
-    fold(base) { acc, value -> if (comparator.compare(acc, value) < 0) acc else value }
+fun <ID : Any, T> Field<ID, T>.minValueWith(base: T, comparator: Comparator<T>): T =
+    fold(base) { current, (_, new) -> minOf(current, new, comparator) }
 
 /**
  * Returns the element yielding the smallest value of the given [comparator].
  * In case multiple elements are minimal, there is no guarantee which one will be returned.
  */
-fun <ID : Any, T> Field<ID, T>.minWithId(base: Pair<ID, T>, comparator: Comparator<Pair<ID, T>>): Pair<ID, T> =
-    foldWithId(base) { acc, id, value -> minOf(acc, id to value, comparator) }
+fun <ID : Any, T> Field<ID, T>.minWith(base: FieldEntry<ID, T>, comparator: Comparator<FieldEntry<ID, T>>): FieldEntry<ID, T> =
+    fold(base) { current, new -> minOf(current, new, comparator) }
 
 /**
  * Returns the element yielding the smallest value of the given [selector].
  * In case multiple elements are minimal, there is no guarantee which one will be returned.
  */
 inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.minBy(base: T, crossinline selector: (T) -> R): T =
-    minWith(base, compareBy(selector))
+    minValueWith(base, compareBy(selector))
 
 /**
  * Check if none of the elements in the field satisfy the [predicate],
@@ -284,6 +355,33 @@ inline fun <ID : Any, T> Field<ID, T>.none(crossinline predicate: Predicate<T>):
  */
 inline fun <ID : Any, T> Field<ID, T>.noneWithSelf(crossinline predicate: Predicate<T>): Boolean =
     !anyWithSelf(predicate)
+
+/**
+ * Reduces the field entries to a single value using the provided [reducer] function,
+ * _excluding the local value_.
+ * If the field is empty, the result is `null`.
+ */
+@JvmOverloads
+inline fun <ID : Any, T> Field<ID, T>.reduce(crossinline reducer: Reducer<FieldEntry<ID, T>>): FieldEntry<ID, T>? =
+    excludeSelf().entries.asSequence().map(::FieldEntry).reduceOrNull(reducer)
+
+/**
+ * Reduces the field ids to a single value using the provided [reducer] function,
+ * _excluding the local value_.
+ * If the field is empty, the result is `null`.
+ */
+@JvmOverloads
+inline fun <ID : Any> Field<ID, *>.reduceIDs(crossinline reducer: Reducer<ID>): ID? =
+    excludeSelf().keys.reduceOrNull(reducer)
+
+/**
+ * Reduces the field values to a single value using the provided [reducer] function,
+ * _excluding the local value_.
+ * If the field is empty, the result is `null`.
+ */
+@JvmOverloads
+inline fun <ID : Any, T> Field<ID, T>.reduceValues(crossinline reducer: Reducer<T>): T? =
+    excludeSelf().values.reduceOrNull(reducer)
 
 /**
  * Returns a new field containing [replaceWith] for each element that satisfies the [predicate].

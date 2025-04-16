@@ -9,13 +9,13 @@
 package it.unibo.collektive.alignment
 
 import it.unibo.collektive.Collektive.Companion.aggregate
+import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.exchange
 import it.unibo.collektive.aggregate.api.neighboring
-import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.operations.min
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
+import it.unibo.collektive.stdlib.fields.min
 import it.unibo.collektive.stdlib.ints.FieldedInts.minus
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
 import kotlin.test.Test

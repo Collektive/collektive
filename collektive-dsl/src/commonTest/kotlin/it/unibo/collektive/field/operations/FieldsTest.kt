@@ -8,7 +8,13 @@
 
 package it.unibo.collektive.field.operations
 
-import it.unibo.collektive.field.Field
+import it.unibo.collektive.aggregate.Field
+import it.unibo.collektive.stdlib.fields.all
+import it.unibo.collektive.stdlib.fields.allWithSelf
+import it.unibo.collektive.stdlib.fields.contains
+import it.unibo.collektive.stdlib.fields.containsId
+import it.unibo.collektive.stdlib.fields.none
+import it.unibo.collektive.stdlib.fields.noneWithSelf
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -20,7 +26,7 @@ class FieldsTest {
 
     @Test
     fun `empty fields contain self`() {
-        assertTrue(10 in emptyField)
+        assertTrue(10 contains emptyField)
         assertFalse(0 in emptyField)
         assertTrue(emptyField.containsId(0))
     }

@@ -8,11 +8,12 @@
 
 package it.unibo.collektive.field
 
-import it.unibo.collektive.field.Field.Companion.fold
-import it.unibo.collektive.field.Field.Companion.foldWithId
-import it.unibo.collektive.field.Field.Companion.hood
-import it.unibo.collektive.field.Field.Companion.hoodWithId
-import it.unibo.collektive.field.operations.replaceMatching
+import it.unibo.collektive.aggregate.Field
+import it.unibo.collektive.aggregate.Field.Companion.fold
+import it.unibo.collektive.aggregate.Field.Companion.foldWithId
+import it.unibo.collektive.aggregate.Field.Companion.hood
+import it.unibo.collektive.aggregate.Field.Companion.hoodWithId
+import it.unibo.collektive.stdlib.fields.replaceMatching
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith

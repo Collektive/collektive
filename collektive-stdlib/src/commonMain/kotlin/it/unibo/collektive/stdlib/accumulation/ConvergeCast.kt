@@ -9,15 +9,14 @@ package it.unibo.collektive.stdlib.accumulation
 
 import arrow.core.None
 import arrow.core.Some
-import arrow.core.none
+import it.unibo.collektive.aggregate.Field
+import it.unibo.collektive.aggregate.Field.Companion.fold
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.exchanging
 import it.unibo.collektive.aggregate.api.mapNeighborhood
 import it.unibo.collektive.aggregate.api.neighboring
-import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.Field.Companion.fold
-import it.unibo.collektive.field.operations.collectIDs
-import it.unibo.collektive.field.operations.minWithId
+import it.unibo.collektive.stdlib.fields.collectIDs
+import it.unibo.collektive.stdlib.fields.minWith
 import it.unibo.collektive.stdlib.spreading.hopDistanceTo
 import it.unibo.collektive.stdlib.util.Maybe
 import it.unibo.collektive.stdlib.util.Maybe.Companion.merge
@@ -221,7 +220,7 @@ internal inline fun <reified ID : Any, reified P : Comparable<P>> defaultCompara
 inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggregate<ID>.findParent(
     potential: Field<ID, Potential>,
     comparator: Comparator<Pair<ID, Potential>> = compareBy<Pair<ID, Potential>> { it.second },
-): ID = potential.minWithId(localId to potential.localValue, comparator).first
+): ID = potential.minWith(localId to potential.localValue, comparator).first
 
 /**
  * Find the best neighbor of the current device along a [potential] field,

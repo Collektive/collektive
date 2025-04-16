@@ -17,10 +17,10 @@
 
 package it.unibo.collektive.stdlib.spreading
 
+import it.unibo.collektive.aggregate.Field.Companion.fold
+import it.unibo.collektive.aggregate.Field.Companion.foldWithId
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.share
-import it.unibo.collektive.field.Field.Companion.fold
-import it.unibo.collektive.field.Field.Companion.foldWithId
 import kotlinx.serialization.Serializable
 
 /**

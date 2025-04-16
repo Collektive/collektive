@@ -12,10 +12,10 @@ import it.unibo.collektive.Collektive
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.aggregate.api.share
-import it.unibo.collektive.field.operations.min
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.stdlib.doubles.FieldedDoubles.plus
+import it.unibo.collektive.stdlib.fields.min
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

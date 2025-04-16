@@ -9,9 +9,9 @@
 package it.unibo.collektive.entrypoint
 
 import it.unibo.collektive.Collektive
+import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.exchange
-import it.unibo.collektive.field.Field
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 import kotlin.test.Test
