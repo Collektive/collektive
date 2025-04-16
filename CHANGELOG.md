@@ -1,3 +1,9 @@
+## [22.3.1](https://github.com/Collektive/collektive/compare/22.3.0...22.3.1) (2025-04-16)
+
+### Documentation
+
+* change structure into divio ([#902](https://github.com/Collektive/collektive/issues/902)) ([9d35d6d](https://github.com/Collektive/collektive/commit/9d35d6d76d15ff6fc1caa06f2202a6b805f24e5f))
+
 ## [22.3.0](https://github.com/Collektive/collektive/compare/22.2.0...22.3.0) (2025-04-16)
 
 ### Features
