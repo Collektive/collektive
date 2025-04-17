@@ -11,7 +11,7 @@ package it.unibo.collektive.aggregate
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.neighboring
-import it.unibo.collektive.stdlib.fields.all
+import it.unibo.collektive.stdlib.fields.allValues
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.test.Test
@@ -30,7 +30,7 @@ class NeighboringTest {
         aggregate(0) {
             val field = neighboring(1)
             assertContains(field.toMap().values, 1)
-            assertEquals(1, field.localValue)
+            assertEquals(1, field.local.value)
         }
     }
 
@@ -39,7 +39,7 @@ class NeighboringTest {
         aggregate(0) {
             val field = neighboring(1)
             assertContains(field.toMap().values, 1)
-            assertEquals(1, field.localValue)
+            assertEquals(1, field.local.value)
         }
     }
 
@@ -53,8 +53,8 @@ class NeighboringTest {
             environment.cycleInOrder()
         }
         environment.status().forEach { (_, field) ->
-            assertEquals(1, field.localValue)
-            assertTrue(field.all { it == 1 })
+            assertEquals(1, field.local.value)
+            assertTrue(field.allValues { it == 1 })
         }
     }
 
@@ -66,8 +66,8 @@ class NeighboringTest {
             environment.cycleInOrder()
         }
         environment.status().forEach { (_, field) ->
-            assertEquals(1, field.localValue)
-            assertTrue(field.all { it == 1 })
+            assertEquals(1, field.local.value)
+            assertTrue(field.allValues { it == 1 })
         }
     }
 
@@ -88,11 +88,11 @@ class NeighboringTest {
         }
         environment.status().forEach { (id, field) ->
             if (condition(id)) {
-                assertEquals(1, field.localValue)
-                assertTrue(field.all { it == 1 })
+                assertEquals(1, field.local.value)
+                assertTrue(field.allValues { it == 1 })
             } else {
-                assertEquals(2, field.localValue)
-                assertTrue(field.all { it == 2 })
+                assertEquals(2, field.local.value)
+                assertTrue(field.allValues { it == 2 })
             }
         }
     }
@@ -107,8 +107,8 @@ class NeighboringTest {
         }
         environment.status().forEach { (id, field) ->
             val expectedValue = if (condition(id)) 1 else 2
-            assertEquals(expectedValue, field.localValue)
-            assertTrue(field.all { it == expectedValue })
+            assertEquals(expectedValue, field.local.value)
+            assertTrue(field.allValues { it == expectedValue })
         }
     }
 }

@@ -11,57 +11,68 @@ package it.unibo.collektive.stdlib.util
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.FieldEntry
 
-/**
- * A type that indicates whether the local value should be included in the reduction or not.
+/*
+ * TODO: use context parameters, once available, to make this entity cleaner:
  *
- * @param ID device identifier type
- * @param T the type of the value
+ * context(field: Field<ID, T>)
+ * inline fun <ID : Any, T, R> ReductionType.initWith(default: R, crossinline self: (ID, T) -> R): R = when (this) {
+ *     IncludingSelf -> self(field.local.id, field.local.value)
+ *     ExcludingSelf -> default
+ * }
+ */
+
+/**
+ * A marker interface representing whether the local value should be included in a reduction.
  */
 sealed interface ReductionType
 
 /**
- * A reduction type that includes the local value in the reduction.
+ * A [ReductionType] that includes the local value in the reduction.
  */
 data object IncludingSelf : ReductionType
 
 /**
- * A reduction type that excludes the local value from the reduction.
+ * A [ReductionType] that excludes the local value from the reduction.
  */
 data object ExcludingSelf : ReductionType
 
-context(field: Field<ID, T>)
 /**
- * The initial value of the reduction.
+ * Computes the initial value for a reduction, depending on whether the local value is included.
  *
- * @param default the default value
- * @param self a function that takes the local ID and the local value and returns the initial value
- * @return the initial value of the reduction
+ * @param field the field from which to extract the local ID and value.
+ * @param default the value to use if the local value is excluded.
+ * @param self a function that computes the initial value from the local ID and value.
+ * @return the result of [self] if this is [IncludingSelf], or [default] if [ExcludingSelf].
  */
-inline fun <ID : Any, T, R> ReductionType.initTo(default: R, crossinline self: (ID, T) -> R): R = when (this) {
-    IncludingSelf -> self(field.localId, field.localValue)
-    ExcludingSelf -> default
-}
-
-context(field: Field<ID, T>)
-/**
- * The initial value of the reduction.
- *
- * @param default the default value
- * @param self a function that takes the local ID and the local value and returns the initial value
- * @return the initial value of the reduction
- */
-inline fun <ID : Any, T, R> ReductionType.initTo(default: R, crossinline self: (FieldEntry<ID, T>) -> R): R =
+inline fun <ID : Any, T, R> ReductionType.init(field: Field<ID, T>, default: R, crossinline self: (ID, T) -> R): R =
     when (this) {
-        IncludingSelf -> self(FieldEntry(field.localId, field.localValue))
+        IncludingSelf -> self(field.local.id, field.local.value)
         ExcludingSelf -> default
     }
 
 /**
- * The initial value of the reduction.
+ * Computes the initial value for a reduction using a [FieldEntry], based on whether the local value is included.
  *
- * @param default the default value
- * @param self the local value
- * @return the initial value of the reduction
+ * @param field the field from which to extract the local entry.
+ * @param default the value to use if the local value is excluded.
+ * @param self a function that computes the initial value from the local [FieldEntry].
+ * @return the result of [self] if this is [IncludingSelf], or [default] if [ExcludingSelf].
+ */
+inline fun <ID : Any, T, R> ReductionType.init(
+    field: Field<ID, T>,
+    default: R,
+    crossinline self: (FieldEntry<ID, T>) -> R,
+): R = when (this) {
+    IncludingSelf -> self(FieldEntry(field.local.id, field.local.value))
+    ExcludingSelf -> default
+}
+
+/**
+ * Selects the initial value for a reduction based on whether the local value is included.
+ *
+ * @param default the value to use if the local value is excluded.
+ * @param self the value to use if the local value is included.
+ * @return [self] if this is [IncludingSelf], or [default] if [ExcludingSelf].
  */
 fun <R> ReductionType.initTo(default: R, self: R): R = when (this) {
     IncludingSelf -> self

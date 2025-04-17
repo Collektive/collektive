@@ -9,12 +9,11 @@
 package it.unibo.collektive.stdlib.spreading
 
 import it.unibo.collektive.aggregate.Field
-import it.unibo.collektive.aggregate.Field.Companion.fold
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
 import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.aggregate.api.sharing
-import it.unibo.collektive.stdlib.fields.minValueBy
+import it.unibo.collektive.stdlib.fields.foldValues
 import it.unibo.collektive.stdlib.util.Reducer
 import it.unibo.collektive.stdlib.util.coerceIn
 import it.unibo.collektive.stdlib.util.hops
@@ -58,7 +57,8 @@ inline fun <reified ID, reified Value, reified Distance> Aggregate<ID>.bellmanFo
         }
         when {
             source -> bottom to local
-            else -> paths.minValueBy { it.value.first } ?: topValue // sort by distance from the nearest source
+            else ->
+                TODO() // paths.minValueBy { it.value.first } ?: topValue // sort by distance from the nearest source
         }
     }.second // return the data
 }
@@ -140,7 +140,7 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
         /*
          * Take one path per source and neighbor (the one with the shortest distance).
          */
-        val candidatePaths = distanceUpdatedPaths.fold(
+        val candidatePaths = distanceUpdatedPaths.foldValues(
             mutableMapOf<ID, UpdatedGradientPath<ID, Value, Distance>>(),
         ) { accumulator, paths ->
             paths.forEach { path ->

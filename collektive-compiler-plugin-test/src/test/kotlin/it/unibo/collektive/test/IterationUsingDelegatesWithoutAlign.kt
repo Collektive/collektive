@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2024-2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -52,7 +52,7 @@ class IterationUsingDelegatesWithoutAlign {
             without explicit alignment.
             The same path may generate interactions more than once, leading to ambiguous alignment.
             
-            Consider to wrap the function into the 'alignedOn' method with a unique element, either at the call site
+            Consider wrapping the function into the 'alignedOn' method with a unique element, either at the call site
             or inside the 'delegate' function declaration, wrapping the involved aggregate calls.
             """.trimIndent()
     }

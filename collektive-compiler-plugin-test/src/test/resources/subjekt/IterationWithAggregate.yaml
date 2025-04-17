@@ -29,7 +29,7 @@ subjects:
         Aggregate function '${{ AGGREGATE }}' has been called inside a loop construct without explicit alignment.
         The same path may generate interactions more than once, leading to ambiguous alignment.
         
-        Consider to wrap the function into the 'alignedOn' method with a unique element.
+        Consider wrapping the function into the 'alignedOn' method with a unique element.
 
   - name: IterationExtAlign${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
     code: |-
@@ -41,7 +41,7 @@ subjects:
         Aggregate function '${{ AGGREGATE }}' has been called inside a loop construct without explicit alignment.
         The same path may generate interactions more than once, leading to ambiguous alignment.
         
-        Consider to wrap the function into the 'alignedOn' method with a unique element.
+        Consider wrapping the function into the 'alignedOn' method with a unique element.
 
   - name: IterationAlign${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
     code: |-

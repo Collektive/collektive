@@ -30,7 +30,7 @@ subjects:
         construct without explicit alignment.
         The same path may generate interactions more than once, leading to ambiguous alignment.
 
-        Consider to wrap the function into the 'alignedOn' method with a unique element, either at the call site
+        Consider wrapping the function into the 'alignedOn' method with a unique element, either at the call site
         or inside the '${{ AGGREGATE }}' function declaration, wrapping the involved aggregate calls.
 
   - name: IterationDelegateAlign${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
@@ -58,7 +58,7 @@ subjects:
         construct without explicit alignment.
         The same path may generate interactions more than once, leading to ambiguous alignment.
 
-        Consider to wrap the function into the 'alignedOn' method with a unique element, either at the call site
+        Consider wrapping the function into the 'alignedOn' method with a unique element, either at the call site
         or inside the '${{ AGGREGATE }}' function declaration, wrapping the involved aggregate calls.
 
   - name: IterationDelegateWithNestedFun${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
@@ -92,7 +92,7 @@ subjects:
         construct without explicit alignment.
         The same path may generate interactions more than once, leading to ambiguous alignment.
 
-        Consider to wrap the function into the 'alignedOn' method with a unique element, either at the call site
+        Consider wrapping the function into the 'alignedOn' method with a unique element, either at the call site
         or inside the '${{ AGGREGATE }}' function declaration, wrapping the involved aggregate calls.
 
   - name: IterationRecursiveDelegateAlign${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
@@ -145,7 +145,7 @@ subjects:
         construct without explicit alignment.
         The same path may generate interactions more than once, leading to ambiguous alignment.
 
-        Consider to wrap the function into the 'alignedOn' method with a unique element, either at the call site
+        Consider wrapping the function into the 'alignedOn' method with a unique element, either at the call site
         or inside the '${{ AGGREGATE }}' function declaration, wrapping the involved aggregate calls.
 
   - name: IterationDelegatedNestedFunAlign${{ prettify(AGGREGATE, loop(AGGREGATE)) }}

@@ -90,7 +90,7 @@ class SerializationTest {
 
     private fun <T, K> cantSerializeBecauseOfMissingInlining(t: T, k: K) = aggregate(0, SerializingMailbox(Json)) {
         share(MaySerialize(t, k)) {
-            it.localValue
+            it.local.value
         }
     }
 

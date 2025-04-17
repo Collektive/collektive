@@ -78,6 +78,23 @@ sealed interface Field<ID : Any, out T> {
         alignedMap(f1, f2) { _, value, f1Value, f2Value -> transform(value, f1Value, f2Value) }
 
     /**
+     * Checks if a specified entry is contained within the current field.
+     *
+     * @param entry The FieldEntry object to check for existence in the current field.
+     * @return `true` if the entry is equal to [local] or exists in the neighborhood; `false` otherwise.
+     */
+    operator fun contains(entry: FieldEntry<ID, *>): Boolean =
+        entry == local || entry in excludeSelf().entries.asSequence().map { it.toFieldEntry() }
+
+    /**
+     * Checks if the given ID is present in the field, including [local].
+     *
+     * @param id the identifier to check for presence
+     * @return `true` if the ID matches the local ID or is found in the neighbors, `false` otherwise
+     */
+    fun containsId(id: ID): Boolean = local.id == id || id in neighbors
+
+    /**
      * Map the field using the [transform] function.
      */
     fun <B> map(transform: (FieldEntry<ID, T>) -> B): Field<ID, B>
@@ -225,7 +242,13 @@ sealed interface Field<ID : Any, out T> {
          * The local value of the field is not considered.
          */
         @Suppress("DEPRECATION")
-        @Deprecated("Use the standard library version")
+        @Deprecated(
+            "Use the standard library version",
+            replaceWith = ReplaceWith(
+                "this.foldValues(initial, transform)",
+                "it.unibo.collektive.stdlib.fields.foldValues",
+            ),
+        )
         inline fun <ID : Any, T, R> Field<ID, T>.fold(initial: R, crossinline transform: (R, T) -> R): R =
             foldWithId(initial) { accumulator, _, value -> transform(accumulator, value) }
 

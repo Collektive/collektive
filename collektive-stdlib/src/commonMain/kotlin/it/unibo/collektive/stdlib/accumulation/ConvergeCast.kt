@@ -8,15 +8,17 @@
 package it.unibo.collektive.stdlib.accumulation
 
 import arrow.core.None
+import arrow.core.Predicate
 import arrow.core.Some
 import it.unibo.collektive.aggregate.Field
-import it.unibo.collektive.aggregate.Field.Companion.fold
 import it.unibo.collektive.aggregate.FieldEntry
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.exchanging
 import it.unibo.collektive.aggregate.api.mapNeighborhood
 import it.unibo.collektive.aggregate.api.neighboring
-import it.unibo.collektive.stdlib.fields.collectIDs
+import it.unibo.collektive.stdlib.fields.collectIDsMatching
+import it.unibo.collektive.stdlib.fields.foldValues
+import it.unibo.collektive.stdlib.fields.minWith
 import it.unibo.collektive.stdlib.spreading.hopDistanceTo
 import it.unibo.collektive.stdlib.util.Maybe
 import it.unibo.collektive.stdlib.util.Maybe.Companion.merge
@@ -38,7 +40,7 @@ inline fun <reified ID : Any, reified Data, reified Potential : Comparable<Poten
     crossinline accumulateData: (Data, Data) -> Data,
 ): Data = exchanging<ID, Maybe<Data>, Data>(Maybe.none) { data: Field<ID, Maybe<Data>> ->
     val localValue: Maybe<Data> = data
-        .fold(some(local)) { current, new -> current.merge(new, accumulateData) }
+        .foldValues(some(local)) { current, new -> current.merge(new, accumulateData) }
     check(localValue.option is Some) {
         "Bug in the implementation of convergeCast. A reduction using as base value ${some(local)} produced $None"
     }
@@ -220,7 +222,7 @@ internal inline fun <reified ID : Any, reified P : Comparable<P>> defaultCompara
 inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggregate<ID>.findParent(
     potential: Field<ID, Potential>,
     comparator: Comparator<FieldEntry<ID, Potential>> = defaultComparator(),
-): ID = potential.minIDWith(localId to potential.localValue, comparator).id
+): ID = potential.minWith(comparator)?.id ?: localId
 
 /**
  * Find the best neighbor of the current device along a [potential] field,
@@ -244,8 +246,8 @@ inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggrega
 @JvmOverloads
 inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggregate<ID>.findParents(
     potential: Field<ID, Potential>,
-    crossinline isParent: (id: ID, potential: Potential) -> Boolean = { _, other -> potential.localValue > other },
-): Set<ID> = potential.collectIDs(isParent)
+    crossinline isParent: Predicate<FieldEntry<ID, Potential>> = { potential.local.value > it.value },
+): Set<ID> = potential.collectIDsMatching(predicate = isParent)
 
 /**
  * Find the parents of the current device along a [potential] field.
@@ -255,5 +257,5 @@ inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggrega
 @JvmOverloads
 inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggregate<ID>.findParents(
     potential: Potential,
-    crossinline isParent: (id: ID, potential: Potential) -> Boolean = { _, other -> potential > other },
+    crossinline isParent: Predicate<FieldEntry<ID, Potential>> = { potential > it.value },
 ): Set<ID> = findParents(neighboring(potential), isParent)

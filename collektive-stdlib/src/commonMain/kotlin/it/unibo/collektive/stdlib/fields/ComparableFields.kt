@@ -9,37 +9,66 @@
 package it.unibo.collektive.stdlib.fields
 
 import it.unibo.collektive.aggregate.Field
-import it.unibo.collektive.aggregate.Field.Companion.fold
 import it.unibo.collektive.aggregate.FieldEntry
 
 /**
- * Get the minimum value of a field, excluding the local value, starting from [base].
- * To consider the local value, explicitly provide it as [base].
+ * Returns the entry with the maximum value in the field,
+ * excluding the local entry.
+ *
+ * If the field contains only the local entry, the result is `null`.
+ *
+ * @return the entry with the highest value, or `null` if no neighbors exist.
  */
-fun <ID : Any, T : Comparable<T>> Field<ID, T>.min(base: T): T =
-    fold(base) { acc, value -> if (value < acc) value else acc }
+fun <ID : Any, T : Comparable<T>> Field<ID, T>.max(): FieldEntry<ID, T>? = maxBy { it.value }
 
 /**
- * Get the minimum value of a field, including the local value.
- */
-fun <ID : Any, T : Comparable<T>> Field<ID, T>.minWithSelf(): T = min(localValue)
-
-/**
- * Get the maximum value of a field, excluding the local value, starting from [base].
- * To consider the local value, explicitly provide it as [base].
- */
-fun <ID : Any, T : Comparable<T>> Field<ID, T>.max(base: T): T =
-    fold(base) { acc, value -> if (value > acc) value else acc }
-
-/**
- * Returns the element yielding the largest value of the given [selector],
+ * Returns the maximum value in the field,
  * excluding the local value.
- * In case multiple elements are maximal, there is no guarantee which one will be returned.
- * If the field contains only the local value, the result is `null`.
+ *
+ * If the field contains only the local entry, the result is `null`.
+ *
+ * @return the highest value in the field, or `null` if no neighbors exist.
  */
-fun <ID : Any, T : Comparable<T>> Field<ID, T>.maxByValue(): FieldEntry<ID, T>? = maxBy { it.value }
+fun <ID : Any, T : Comparable<T>> Field<ID, T>.maxValue(): T? = max()?.value
 
 /**
- * Get the maximum value of a field, including the local value.
+ * Returns the maximum between [base] and the maximum value found in the field,
+ * excluding the local value.
+ *
+ * The [base] value is always considered in the comparison, even if the field is empty.
+ *
+ * @param base the reference value to compare against the maximum field value.
+ * @return the greater of [base] and the maximum field value, or [base] if no neighbors exist.
  */
-fun <ID : Any, T : Comparable<T>> Field<ID, T>.maxWithSelf(): T = max(localValue)
+fun <ID : Any, T : Comparable<T>> Field<ID, T>.maxValue(base: T): T = maxOf(base, maxValue() ?: base)
+
+/**
+ * Returns the entry with the minimum value in the field,
+ * excluding the local entry.
+ *
+ * If the field contains only the local entry, the result is `null`.
+ *
+ * @return the entry with the lowest value, or `null` if no neighbors exist.
+ */
+fun <ID : Any, T : Comparable<T>> Field<ID, T>.min(): FieldEntry<ID, T>? = minBy { it.value }
+
+/**
+ * Returns the minimum value in the field,
+ * excluding the local value.
+ *
+ * If the field contains only the local entry, the result is `null`.
+ *
+ * @return the lowest value in the field, or `null` if no neighbors exist.
+ */
+fun <ID : Any, T : Comparable<T>> Field<ID, T>.minValue(): T? = min()?.value
+
+/**
+ * Returns the minimum between [base] and the minimum value found in the field,
+ * excluding the local value.
+ *
+ * The [base] value is always considered in the comparison, even if the field is empty.
+ *
+ * @param base the reference value to compare against the minimum field value.
+ * @return the lesser of [base] and the minimum field value, or [base] if no neighbors exist.
+ */
+fun <ID : Any, T : Comparable<T>> Field<ID, T>.minValue(base: T): T = minOf(base, minValue() ?: base)

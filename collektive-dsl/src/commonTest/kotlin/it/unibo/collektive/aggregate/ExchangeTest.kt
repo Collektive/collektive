@@ -9,9 +9,9 @@
 package it.unibo.collektive.aggregate
 
 import it.unibo.collektive.Collektive.Companion.aggregate
-import it.unibo.collektive.aggregate.Field.Companion.fold
 import it.unibo.collektive.aggregate.api.exchange
 import it.unibo.collektive.aggregate.api.exchanging
+import it.unibo.collektive.stdlib.fields.foldValues
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.test.Test
@@ -21,13 +21,13 @@ import kotlin.test.assertTrue
 
 class ExchangeTest {
     private val increaseOrDouble: (Field<Int, Int>) -> Field<Int, Int> = { f ->
-        f.map { _, v -> if (v % 2 == 0) v + 1 else v * 2 }
+        f.map { (_, v) -> if (v % 2 == 0) v + 1 else v * 2 }
     }
 
     private fun mooreGridWithIncreaseOrDouble(size: Int) = mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }) { _ ->
         exchange(1) { field ->
-            field.mapValues { field.fold(localId) { acc, value -> acc + value } }
-        }.localValue
+            field.mapValues { field.foldValues(localId) { acc, value -> acc + value } }
+        }.local.value
     }.also {
         assertEquals(size * size, it.nodes.size)
     }
@@ -45,14 +45,14 @@ class ExchangeTest {
         mooreGrid<Int>(size, size, { _, _ -> Int.MIN_VALUE }) { _ ->
             val res =
                 exchange(0) { field ->
-                    field.map { id, value ->
+                    field.map { (id, _) ->
                         when (id) {
                             0 -> 0
                             else -> 1
                         }
                     }
                 }
-            res.fold(res.localValue, Int::plus)
+            res.neighborsValues.sum() + res.local.value
         }.also {
             assertEquals(size * size, it.nodes.size)
         }
@@ -62,7 +62,7 @@ class ExchangeTest {
         val result =
             aggregate(0) {
                 val res = exchange(1, increaseOrDouble)
-                assertEquals(2, res.localValue)
+                assertEquals(2, res.local.value)
             }
         val messages = result.toSend.prepareMessageFor(1).sharedData
         assertEquals(1, messages.size)
@@ -128,7 +128,7 @@ class ExchangeTest {
         val result = environment.status()
         assertEquals(1, result.values.distinct().size)
         assertTrue(result.values.all { it is ConstantField })
-        assertEquals(listOf(10, 10, 10, 10), result.values.map { it.localValue })
+        assertEquals(listOf(10, 10, 10, 10), result.values.map { it.local.value })
     }
 
     @Test
