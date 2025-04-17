@@ -15,7 +15,7 @@ import arrow.core.fold
 import arrow.core.identity
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.FieldEntry
-import it.unibo.collektive.aggregate.local
+import it.unibo.collektive.aggregate.toFieldEntry
 import it.unibo.collektive.stdlib.util.Accumulator
 import it.unibo.collektive.stdlib.util.ExcludingSelf
 import it.unibo.collektive.stdlib.util.IncludingSelf
@@ -28,24 +28,64 @@ import kotlin.contracts.contract
 import kotlin.jvm.JvmOverloads
 
 /**
- * Check if all the elements in the field satisfy the [predicate].
+ * Checks if all the elements in the field satisfy the [predicate].
  * The local value is included in the check if [reductionType] is [it.unibo.collektive.stdlib.util.IncludingSelf],
  * but defaulting to [ExcludingSelf].
  */
 inline fun <ID : Any, T> Field<ID, T>.all(
     reductionType: ReductionType = ExcludingSelf,
     crossinline predicate: Predicate<FieldEntry<ID, T>>,
-): Boolean = fold(reductionType.initTo(true, predicate)) { acc, value -> acc && predicate(value) }
+): Boolean = reductionType.initTo(true, predicate) && excludeSelf().all { predicate(it.toFieldEntry()) }
 
 /**
- * Check if any of the elements in the field satisfy the [predicate].
+ * Checks if all the values in the field satisfy the [predicate].
+ * The local value is included in the check if [reductionType] is [it.unibo.collektive.stdlib.util.IncludingSelf],
+ * but defaulting to [ExcludingSelf].
+ */
+inline fun <T> Field<*, T>.allValues(
+    reductionType: ReductionType = ExcludingSelf,
+    crossinline predicate: Predicate<T>,
+): Boolean = reductionType.initTo(true) { predicate(local.value) } && neighborsValues.all(predicate)
+
+/**
+ * Checks if all the IDs in the field satisfy the [predicate].
+ * The local value is included in the check if [reductionType] is [it.unibo.collektive.stdlib.util.IncludingSelf],
+ * but defaulting to [ExcludingSelf].
+ */
+inline fun <ID : Any> Field<ID, *>.allIDs(
+    reductionType: ReductionType = ExcludingSelf,
+    crossinline predicate: Predicate<ID>,
+): Boolean = reductionType.initTo(true) { predicate(local.id) } && neighbors.all(predicate)
+
+/**
+ * Checks if any of the elements in the field satisfies the [predicate].
  * The local value is included in the check if [reductionType] is [it.unibo.collektive.stdlib.util.IncludingSelf],
  * but defaulting to [ExcludingSelf].
  */
 inline fun <ID : Any, T> Field<ID, T>.any(
     reductionType: ReductionType = ExcludingSelf,
     crossinline predicate: Predicate<FieldEntry<ID, T>>,
-): Boolean = fold(reductionType.initTo(false, predicate)) { acc, value -> acc || predicate(value) }
+): Boolean = reductionType.initTo(false, predicate) || excludeSelf().any { predicate(it.toFieldEntry()) }
+
+/**
+ * Checks if any of the values in the field satisfies the [predicate].
+ * The local value is included in the check if [reductionType] is [it.unibo.collektive.stdlib.util.IncludingSelf],
+ * but defaulting to [ExcludingSelf].
+ */
+inline fun <T> Field<*, T>.anyValue(
+    reductionType: ReductionType = ExcludingSelf,
+    crossinline predicate: Predicate<T>,
+): Boolean = reductionType.initTo(false) { predicate(it.value) } || neighborsValues.any(predicate)
+
+/**
+ * Checks if any of IDs in the field satisfies the [predicate].
+ * The local value is included in the check if [reductionType] is [it.unibo.collektive.stdlib.util.IncludingSelf],
+ * but defaulting to [ExcludingSelf].
+ */
+inline fun <ID : Any> Field<ID, *>.anyID(
+    reductionType: ReductionType = ExcludingSelf,
+    crossinline predicate: Predicate<ID>,
+): Boolean = reductionType.initTo(false) { predicate(it.id) } || neighbors.any(predicate)
 
 /**
  * Returns the [Collection] of field elements that satisfy the [predicate],
@@ -124,6 +164,116 @@ inline fun <ID : Any, T, R> Field<ID, T>.collectDistinctMatchingMapped(
     transform = transform,
 )
 
+/*
+ * Schema: collect[Distinct|IDs|DistinctValues][Matching[IDs|Values]]
+ * All expected functions sorted lexicographically:
+ * x collect (use field.entries)
+ * - collectDistinctMatching
+ * - collectDistinctMatchingIDs
+ * - collectDistinctMatchingValues
+ * - collectDistinctValues
+ * - collectDistinctValuesMatchingIDs
+ * - collectDistinctValuesMatchingValues
+ * x collectIDs (use field.keys)
+ * - collectIDsMatching
+ * - collectIDsMatchingValues
+ * x collectIDsMatchingIDs (field.keys.filter)
+ * - collectMatching
+ * - collectMatchingIDs
+ * - collectMatchingValues
+ * x collectValues (use field.values)
+ * - collectValuesMatching
+ * - collectValuesMatchingIDs
+ * x collectValuesMatchingValues (field.values.filter)
+ */
+
+/**
+ * Returns the [Set] of field elements that satisfy the [predicate].
+ * The local value is included in the check if [reductionType] is [it.unibo.collektive.stdlib.util.IncludingSelf],
+ * but defaulting to [ExcludingSelf].
+ */
+@JvmOverloads
+inline fun <ID : Any, T> Field<ID, T>.collectDistinctMatching(
+    reductionType: ReductionType = ExcludingSelf,
+    crossinline predicate: Predicate<FieldEntry<ID, T>>,
+): Set<FieldEntry<ID, T>> = collectDistinctMatchingMapped(reductionType, predicate, ::identity)
+
+/**
+ * Returns the [Set] of field elements whose ID satisfies the [predicate].
+ * The local value is included in the check if [reductionType] is [it.unibo.collektive.stdlib.util.IncludingSelf],
+ * but defaulting to [ExcludingSelf].
+ */
+@JvmOverloads
+inline fun <ID : Any, T> Field<ID, T>.collectDistinctMatchingIDs(
+    reductionType: ReductionType = ExcludingSelf,
+    crossinline predicate: Predicate<ID>,
+): Set<FieldEntry<ID, T>> = collectDistinctMatchingMapped(reductionType, { predicate(it.id) }, ::identity)
+
+/**
+ * Returns the [Set] of field elements whose values satisfies the [predicate].
+ * The local value is included in the check if [reductionType] is [it.unibo.collektive.stdlib.util.IncludingSelf],
+ * but defaulting to [ExcludingSelf].
+ */
+@JvmOverloads
+inline fun <ID : Any, T> Field<ID, T>.collectDistinctMatchingValues(
+    reductionType: ReductionType = ExcludingSelf,
+    crossinline predicate: Predicate<T>,
+): Set<FieldEntry<ID, T>> = collectDistinctMatchingMapped(reductionType, { predicate(it.value) }, ::identity)
+
+/**
+ * Returns the [Set] of field values.
+ * The local value is included in the check if [reductionType] is [it.unibo.collektive.stdlib.util.IncludingSelf],
+ * but defaulting to [ExcludingSelf].
+ */
+@JvmOverloads
+fun <ID : Any, T> Field<ID, T>.collectDistinctValues(
+    reductionType: ReductionType = ExcludingSelf,
+): Set<T> = collectDistinctValuesMatchingIDs { true }
+
+/**
+ * Returns the [Set] of field values whose entry ID matches the [predicate].
+ * The local value is included in the check if [reductionType] is [it.unibo.collektive.stdlib.util.IncludingSelf],
+ * but defaulting to [ExcludingSelf].
+ */
+@JvmOverloads
+inline fun <ID : Any, T> Field<ID, T>.collectDistinctValuesMatchingIDs(
+    reductionType: ReductionType = ExcludingSelf,
+    crossinline predicate: Predicate<ID>,
+): Set<T> = collectDistinctMatchingMapped(reductionType, { predicate(it.id) }) { it.value }
+
+/**
+ * Returns the [Set] of field values whose entry ID matches the [predicate].
+ * The local value is included in the check if [reductionType] is [it.unibo.collektive.stdlib.util.IncludingSelf],
+ * but defaulting to [ExcludingSelf].
+ */
+@JvmOverloads
+inline fun <ID : Any, T> Field<ID, T>.collectDistinctValuesMatchingValues(
+    reductionType: ReductionType = ExcludingSelf,
+    crossinline predicate: Predicate<T>,
+): Set<T> = collectDistinctMatchingMapped(reductionType, { predicate(it.value) }) { it.value }
+
+/**
+ * Returns the IDs of the field whose entry satisfies the [predicate].
+ * The local value is included in the check if [reductionType] is [it.unibo.collektive.stdlib.util.IncludingSelf],
+ * but defaulting to [ExcludingSelf].
+ */
+@JvmOverloads
+inline fun <ID : Any, T> Field<ID, T>.collectIDsMatching(
+    reductionType: ReductionType = ExcludingSelf,
+    crossinline predicate: Predicate<FieldEntry<ID, T>>,
+): Set<ID> = collectDistinctMatchingMapped(reductionType, predicate) { it.id }
+
+/**
+ * Returns the IDs of the field whose entry satisfies the [predicate].
+ * The local value is included in the check if [reductionType] is [it.unibo.collektive.stdlib.util.IncludingSelf],
+ * but defaulting to [ExcludingSelf].
+ */
+@JvmOverloads
+inline fun <ID : Any, T> Field<ID, T>.collectIDsMatchingValues(
+    reductionType: ReductionType = ExcludingSelf,
+    crossinline predicate: Predicate<T>,
+): Set<ID> = collectDistinctMatchingMapped(reductionType, { predicate(it.value) }) { it.id }
+
 /**
  * Returns the list of field elements that satisfy the [predicate].
  * The local value is included in the check if [reductionType] is [it.unibo.collektive.stdlib.util.IncludingSelf],
@@ -135,79 +285,80 @@ inline fun <ID : Any, T> Field<ID, T>.collectMatching(
     crossinline predicate: Predicate<FieldEntry<ID, T>>,
 ): List<FieldEntry<ID, T>> = collectMatchingMapped(reductionType, predicate, ::identity)
 
+
 /**
- * Returns the [Set] of field elements that satisfy the [predicate],
- * ignoring the local value.
+ * Returns the list of field elements whose IDs satisfy the [predicate].
+ * The local value is included in the check if [reductionType] is [it.unibo.collektive.stdlib.util.IncludingSelf],
+ * but defaulting to [ExcludingSelf].
  */
 @JvmOverloads
-inline fun <ID : Any, T> Field<ID, T>.collectDistinctMatching(
+inline fun <ID : Any, T> Field<ID, T>.collectMatchingIDs(
+    reductionType: ReductionType = ExcludingSelf,
+    crossinline predicate: Predicate<ID>,
+): List<FieldEntry<ID, T>> = collectMatching(reductionType) { predicate(it.id) }
+
+/**
+ * Returns the list of field elements whose values satisfy the [predicate].
+ * The local value is included in the check if [reductionType] is [it.unibo.collektive.stdlib.util.IncludingSelf],
+ * but defaulting to [ExcludingSelf].
+ */
+@JvmOverloads
+inline fun <ID : Any, T> Field<ID, T>.collectMatchingValues(
+    reductionType: ReductionType = ExcludingSelf,
+    crossinline predicate: Predicate<T>,
+): List<FieldEntry<ID, T>> = collectMatching(reductionType) { predicate(it.value) }
+
+/**
+ * Returns the values of the field whose entry satisfies the [predicate].
+ * The local value is included in the check if [reductionType] is [it.unibo.collektive.stdlib.util.IncludingSelf],
+ * but defaulting to [ExcludingSelf].
+ */
+@JvmOverloads
+inline fun <ID : Any, T> Field<ID, T>.collectValuesMatching(
     reductionType: ReductionType = ExcludingSelf,
     crossinline predicate: Predicate<FieldEntry<ID, T>>,
-): Set<FieldEntry<ID, T>> = collectDistinctMatchingMapped(reductionType, predicate, ::identity)
+): List<T> = collectMatchingMapped(reductionType, predicate) { it.value }
 
 /**
- * Returns the list of field elements that satisfy the [predicate].
- * ignoring the local value.
- */
-fun <ID : Any, T> Field<ID, T>.collect(reductionType: ReductionType = ExcludingSelf): List<FieldEntry<ID, T>> =
-    collectMatching(reductionType) { true }
-
-/**
- * Returns the [Set] of field elements that satisfy the [predicate],
- * ignoring the local value.
+ * Returns the values of the field whose entry satisfies the [predicate].
+ * The local value is included in the check if [reductionType] is [it.unibo.collektive.stdlib.util.IncludingSelf],
+ * but defaulting to [ExcludingSelf].
  */
 @JvmOverloads
-inline fun <ID : Any, T> Field<ID, T>.collectDistinctMatching(
+inline fun <ID : Any, T> Field<ID, T>.collectValuesMatchingIDs(
     reductionType: ReductionType = ExcludingSelf,
-    crossinline predicate: Predicate<FieldEntry<ID, T>>,
-): Set<FieldEntry<ID, T>> = collectDistinctMatchingMapped(reductionType, predicate, ::identity)
+    crossinline predicate: Predicate<ID>,
+): List<T> = collectMatchingMapped(reductionType, { predicate(it.id) }) { it.value }
 
 /**
- * Returns the [Set] of neighbor [ID]s whose field entries satisfy the [predicate].
- * ignoring the local value.
- */
-@JvmOverloads
-inline fun <ID : Any, T> Field<ID, T>.collectIDs(
-    crossinline predicate: (ID, T) -> Boolean = { _, _ -> true },
-): Set<ID> = collectDistinct(predicate) { id, _ -> id }
-
-/**
- * Returns the [Set] of neighbor [ID]s whose field entries satisfy the [predicate].
- * ignoring the local value.
- */
-@JvmOverloads
-inline fun <ID : Any, T> Field<ID, T>.collectIDsWithSelf(
-    crossinline predicate: (ID, T) -> Boolean = { _, _ -> true },
-): Set<ID> = collectDistinctWithSelf(predicate) { id, _ -> id }
-
-/**
- * Returns the list of field elements that satisfy the [predicate],
- * transformed using the [transform] function.
- * including the local value.
- */
-inline fun <ID : Any, T, R> Field<ID, T>.collectWithSelf(
-    crossinline predicate: (ID, T) -> Boolean = { _, _ -> true },
-    crossinline transform: (ID, T) -> R,
-): List<R> = collectMatching(true, predicate, transform)
-
-/**
- * Returns the list of field elements that satisfy the [predicate].
- * including the local value.
- */
-@JvmOverloads
-inline fun <ID : Any, T> Field<ID, T>.collectWithSelf(
-    crossinline predicate: (ID, T) -> Boolean = { _, _ -> true },
-): List<T> = collectWithSelf(predicate) { _, value -> value }
-
-/**
- * Check if the field contains the [value], **including the local value**.
+ * Check if the field contains the [entry], **including [Field.local]**.
  * If you need to exclude the local value, use instead:
  *
  * ```kotlin
  * value in field.withoutSelf().values
  * ```
  */
-operator fun <ID : Any, T> Field<ID, T>.contains(value: T): Boolean = any(IncludingSelf) { it == value }
+operator fun <ID : Any, T> Field<ID, T>.contains(entry: FieldEntry<ID, T>): Boolean = any(IncludingSelf) { it == entry }
+
+/**
+ * Check if the field contains the [value], **including [Field.local]**.
+ * If you need to exclude the local value, use instead:
+ *
+ * ```kotlin
+ * value in field.withoutSelf().values
+ * ```
+ */
+operator fun <T> Field<*, T>.contains(value: T): Boolean = anyValue(IncludingSelf) { it == value }
+
+/**
+ * Check if the field contains the [id], **including [Field.local]**.
+ * If you need to exclude the local value, use instead:
+ *
+ * ```kotlin
+ * value in field.withoutSelf().values
+ * ```
+ */
+operator fun <ID: Any> Field<ID, *>.contains(id: ID): Boolean = anyID(IncludingSelf) { it == id }
 
 /**
  * Check if the field contains the [targetId], **including the local id**.
@@ -430,4 +581,4 @@ inline fun <ID : Any, T> Field<ID, T>.replaceMatchingValues(
 inline fun <ID : Any, T> Field<ID, T>.replaceMatching(
     replacement: T,
     crossinline predicate: Predicate<FieldEntry<ID, T>>,
-): Field<ID, T> = map { id, value -> if (predicate(FieldEntry(id, value))) replacement else value }
+): Field<ID, T> = map { (id, value) -> if (predicate(FieldEntry(id, value))) replacement else value }
