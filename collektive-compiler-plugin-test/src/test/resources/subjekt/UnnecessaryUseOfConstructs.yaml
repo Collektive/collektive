@@ -45,7 +45,7 @@ parameters:
       - |-
         exchanging(0) { 
           val field = neighboring(0)
-          field.yielding { field.map { it + 1 }}
+          field.yielding { field.mapValues { it + 1 }}
         }
       - |-
         sharing(initial) {
@@ -68,7 +68,7 @@ parameters:
         }
       - |-
         share(initial) {
-          it.maxBy(0) { v -> v }
+          it.maxValue(0)
         }
       - |-
         evolving(initial) {
@@ -96,7 +96,7 @@ parameters:
       - |-
         exchange(initial) { 
           val field = neighboring(0)
-          field.map { it + 1 }
+          field.mapValues { it + 1 }
         }
       - |-
         neighboring {
@@ -105,12 +105,12 @@ parameters:
       - |-
         share(initial) {
           val field = neighboring(0)
-          field.map { it }.localValue
+          field.mapValues { it }.localValue
         }
       - |-
         evolving(initial) {
           val field = neighboring(0)
-          field.map { it }.localValue.yielding { 0 }
+          field.mapValues { it }.localValue.yielding { 0 }
         }
       - |-
         neighboring {
@@ -119,12 +119,12 @@ parameters:
       - |-
         exchanging(initial) {
           val field = neighboring(0)
-          field.map { it }.yielding { field }
+          field.mapValues { it }.yielding { field }
         }
       - |-
         sharing(initial) {
           val field = neighboring(0)
-          field.map { it }.localValue.yielding { "Test" }
+          field.mapValues { it }.localValue.yielding { "Test" }
         }
 
   - name: CONSTRUCT_EXPLICIT
@@ -135,7 +135,7 @@ parameters:
         }
       - |-
         exchange(initial) { field ->
-          field.map { it + 1 }
+          field.mapValues { it + 1 }
         }
       - |-
         neighboring {
@@ -151,7 +151,7 @@ parameters:
         }
       - |-
         exchanging(0) { field ->
-            field.yielding { field.map { it + 1 }}
+            field.yielding { field.mapValues { it + 1 }}
         }
       - |-
         neighboring {

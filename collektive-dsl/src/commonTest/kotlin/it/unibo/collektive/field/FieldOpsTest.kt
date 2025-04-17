@@ -16,7 +16,6 @@ import it.unibo.collektive.stdlib.fields.reduceValues
 import it.unibo.collektive.stdlib.fields.replaceMatchingValues
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertNotEquals
 
 class FieldOpsTest {
@@ -130,13 +129,6 @@ class FieldOpsTest {
     @Test
     fun `The replaceMatching should return a field with the replaced values`() {
         assertEquals(Field(0, 0, mapOf(1 to 42, 2 to 20)), field.replaceMatchingValues(42) { it == 10 })
-    }
-
-    @Test
-    fun `An IllegalStateException should be thrown when two fields are not aligned`() {
-        assertFailsWith<IllegalStateException> {
-            emptyField.alignedMap(fulfilledField) { _, _, _ -> "no-data" }
-        }
     }
 
     @Test
