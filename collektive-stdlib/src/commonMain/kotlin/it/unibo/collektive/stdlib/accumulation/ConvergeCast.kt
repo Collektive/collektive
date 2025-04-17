@@ -11,13 +11,13 @@ import arrow.core.None
 import arrow.core.Some
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.Field.Companion.fold
+import it.unibo.collektive.aggregate.FieldEntry
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.exchanging
 import it.unibo.collektive.aggregate.api.mapNeighborhood
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.stdlib.fields.collectIDs
 import it.unibo.collektive.stdlib.spreading.hopDistanceTo
-import it.unibo.collektive.stdlib.util.FieldEntry
 import it.unibo.collektive.stdlib.util.Maybe
 import it.unibo.collektive.stdlib.util.Maybe.Companion.merge
 import it.unibo.collektive.stdlib.util.Maybe.Companion.some

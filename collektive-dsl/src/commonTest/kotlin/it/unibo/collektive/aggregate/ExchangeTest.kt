@@ -21,12 +21,12 @@ import kotlin.test.assertTrue
 
 class ExchangeTest {
     private val increaseOrDouble: (Field<Int, Int>) -> Field<Int, Int> = { f ->
-        f.mapWithId { _, v -> if (v % 2 == 0) v + 1 else v * 2 }
+        f.map { _, v -> if (v % 2 == 0) v + 1 else v * 2 }
     }
 
     private fun mooreGridWithIncreaseOrDouble(size: Int) = mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }) { _ ->
         exchange(1) { field ->
-            field.map { field.fold(localId) { acc, value -> acc + value } }
+            field.mapValues { field.fold(localId) { acc, value -> acc + value } }
         }.localValue
     }.also {
         assertEquals(size * size, it.nodes.size)
@@ -35,7 +35,7 @@ class ExchangeTest {
     private fun mooreGridWithConstantFieldResult(size: Int) =
         mooreGrid<Field<Int, Int>>(size, size, { _, _ -> Field.invoke(0, 0, emptyMap()) }) { _ ->
             exchange(1) { field ->
-                field.mapToConstantField(10)
+                field.mapToConstant(10)
             }
         }.also {
             assertEquals(size * size, it.nodes.size)
@@ -45,7 +45,7 @@ class ExchangeTest {
         mooreGrid<Int>(size, size, { _, _ -> Int.MIN_VALUE }) { _ ->
             val res =
                 exchange(0) { field ->
-                    field.mapWithId { id, value ->
+                    field.map { id, value ->
                         when (id) {
                             0 -> 0
                             else -> 1
@@ -93,7 +93,7 @@ class ExchangeTest {
                 val xcRes =
                     exchanging(1) {
                         val fieldResult = it + 1
-                        fieldResult.yielding { fieldResult.map { value -> "return: $value" } }
+                        fieldResult.yielding { fieldResult.mapValues { value -> "return: $value" } }
                     }
                 assertEquals(mapOf(0 to "return: 2"), xcRes.toMap())
             }
@@ -109,7 +109,7 @@ class ExchangeTest {
                 val xcRes =
                     exchanging(1) {
                         val fieldResult = it + 1
-                        fieldResult.yielding { fieldResult.map { value -> value.takeIf { value > 10 } } }
+                        fieldResult.yielding { fieldResult.mapValues { value -> value.takeIf { value > 10 } } }
                     }
                 assertEquals(mapOf(0 to null), xcRes.toMap())
             }

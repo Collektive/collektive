@@ -6,9 +6,8 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
-package it.unibo.collektive.stdlib.util
+package it.unibo.collektive.aggregate
 
-import it.unibo.collektive.aggregate.Field
 import kotlin.jvm.JvmInline
 
 /**
@@ -19,7 +18,7 @@ import kotlin.jvm.JvmInline
  * @property pair a pair version of this entry
  */
 @JvmInline
-value class FieldEntry<ID : Any, T>(val pair: Pair<ID, T>) {
+value class FieldEntry<ID : Any, out T>(val pair: Pair<ID, T>) {
 
     /**
      * Creates a new [FieldEntry] with the given [id] and [value].
@@ -50,6 +49,16 @@ value class FieldEntry<ID : Any, T>(val pair: Pair<ID, T>) {
      * The [value].
      */
     operator fun component2(): T = value
+
+    /**
+     * Returns a [FieldEntry] with the same [id] and a transformed [value].
+     */
+    fun <R> map(transform: (FieldEntry<ID, T>) -> R): FieldEntry<ID, R> = FieldEntry(id, transform(this))
+
+    /**
+     * Returns a [FieldEntry] with the same [id] and a transformed [value].
+     */
+    fun <R> mapValue(transform: (T) -> R): FieldEntry<ID, R> = FieldEntry(id, transform(value))
 }
 
 /**
@@ -61,5 +70,3 @@ fun <ID : Any, T> Map.Entry<ID, T>.toFieldEntry(): FieldEntry<ID, T> = FieldEntr
  * Converts a [Pair] to a [FieldEntry].
  */
 fun <ID : Any, T> Pair<ID, T>.toFieldEntry(): FieldEntry<ID, T> = FieldEntry(this)
-
-fun <ID : Any, T> Field<ID, T>.local(): FieldEntry<ID, T> = FieldEntry(localId, localValue)

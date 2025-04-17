@@ -9,6 +9,7 @@
 package it.unibo.collektive.stdlib.util
 
 import it.unibo.collektive.aggregate.Field
+import it.unibo.collektive.aggregate.FieldEntry
 
 /**
  * A type that indicates whether the local value should be included in the reduction or not.

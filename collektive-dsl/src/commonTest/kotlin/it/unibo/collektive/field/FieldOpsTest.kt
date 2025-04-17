@@ -57,17 +57,17 @@ class FieldOpsTest {
 
     @Test
     fun `An empty field when mapped only the local value should be transformed`() {
-        assertEquals(Field(0, "localVal-mapped", mapOf()), emptyField.map { "$it-mapped" })
+        assertEquals(Field(0, "localVal-mapped", mapOf()), emptyField.mapValues { "$it-mapped" })
     }
 
     @Test
     fun `A field can be mapped on its values with a given function`() {
-        assertEquals(Field(0, 3, mapOf(1 to 13, 2 to 23)), field.map { it + 3 })
+        assertEquals(Field(0, 3, mapOf(1 to 13, 2 to 23)), field.mapValues { it + 3 })
     }
 
     @Test
     fun `A field can be mapped on its values with a given function and the id`() {
-        assertEquals(Field(0, "0-0", mapOf(1 to "1-10", 2 to "2-20")), field.mapWithId { id, value -> "$id-$value" })
+        assertEquals(Field(0, "0-0", mapOf(1 to "1-10", 2 to "2-20")), field.map { id, value -> "$id-$value" })
     }
 
     @Test
@@ -113,20 +113,20 @@ class FieldOpsTest {
     @Test
     fun `An IllegalStateException should be thrown when two fields are not aligned`() {
         assertFailsWith<IllegalStateException> {
-            emptyField.alignedMapWithId(fulfilledField) { _, _, _ -> "no-data" }
+            emptyField.alignedMap(fulfilledField) { _, _, _ -> "no-data" }
         }
     }
 
     @Test
     fun `An empty field should return an empty field when aligned mapped with another empty field`() {
-        assertEquals(Field(0, "no-data", emptyMap()), emptyField.alignedMapWithId(emptyField) { _, _, _ -> "no-data" })
+        assertEquals(Field(0, "no-data", emptyMap()), emptyField.alignedMap(emptyField) { _, _, _ -> "no-data" })
     }
 
     @Test
     fun `A field should return a field with the mapped values when aligned mapped with another field`() {
         assertEquals(
             Field(0, 1, mapOf(1 to 11, 2 to 21, 3 to 16)),
-            fulfilledField.alignedMapWithId(fulfilledCompatibleField) { _, value, other -> value + other },
+            fulfilledField.alignedMap(fulfilledCompatibleField) { _, value, other -> value + other },
         )
     }
 

@@ -130,11 +130,13 @@ publishOnCentral {
 }
 
 val importDsl by tasks.registering(Copy::class) {
-    from(
-        rootProject.rootDir.resolve("../collektive-dsl/src/commonMain/kotlin/").walkTopDown().single {
-            it.name == "Field.kt"
-        },
-    )
+    listOf("Field", "FieldEntry").forEach { file ->
+        from(
+            rootProject.rootDir.resolve("../collektive-dsl/src/commonMain/kotlin/").walkTopDown().single {
+                it.name == "$file.kt"
+            },
+        )
+    }
     into(dslSource)
 }
 

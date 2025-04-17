@@ -10,7 +10,7 @@ package it.unibo.collektive.stdlib.fields
 
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.Field.Companion.fold
-import it.unibo.collektive.stdlib.util.FieldEntry
+import it.unibo.collektive.aggregate.FieldEntry
 
 /**
  * Get the minimum value of a field, excluding the local value, starting from [base].

@@ -15,12 +15,19 @@ sealed interface Field<ID : Any, out T> {
     /**
      * The [ID] of the local node.
      */
+    @Deprecated("Use local.value instead", replaceWith = ReplaceWith("local.id"))
     val localId: ID
 
     /**
      * The value associated with the [localId].
      */
+    @Deprecated("Use local.value instead", replaceWith = ReplaceWith("local.value"))
     val localValue: T
+
+    /**
+     * The [FieldEntry] of the local node.
+     */
+    val local: FieldEntry<ID, T>
 
     /**
      * Returns the number of neighbors in the field.
@@ -33,6 +40,11 @@ sealed interface Field<ID : Any, out T> {
     val neighbors: Set<ID>
 
     /**
+     * Returns the values of all neighbors in this field.
+     */
+    val neighborsValues: List<T> // get() = excludeSelf().values
+
+    /**
      * Returns a [Map] with the neighboring values of this field (namely, all values but self).
      */
     fun excludeSelf(): Map<ID, T>
@@ -40,45 +52,45 @@ sealed interface Field<ID : Any, out T> {
     /**
      * Combines this field with another (aligned) one considering the [ID] when combining the values.
      */
-    fun <B, R> alignedMapWithId(other: Field<ID, B>, transform: (ID, T, B) -> R): Field<ID, R> {
+    fun <B, R> alignedMap(other: Field<ID, B>, transform: (ID, T, B) -> R): Field<ID, R> {
         // checkAligned(this, other)
-        return mapWithId { id, value -> transform(id, value, other[id]) }
+        return map { transform(it.id, it.value, other[it.id]) }
     }
 
     /**
      * Combines this field with other two (aligned) fields based on the [ID]s when.
      */
-    fun <B, C, R> alignedMapWithId(f1: Field<ID, B>, f2: Field<ID, C>, transform: (ID, T, B, C) -> R): Field<ID, R> {
+    fun <B, C, R> alignedMap(f1: Field<ID, B>, f2: Field<ID, C>, transform: (ID, T, B, C) -> R): Field<ID, R> {
         // checkAligned(this, f1, f2)
-        return mapWithId { id, value -> transform(id, value, f1[id], f2[id]) }
+        return map { (id, value) -> transform(id, value, f1[id], f2[id]) }
     }
 
     /**
      * Combines this field with another (aligned) one.
      */
-    fun <B, R> alignedMap(other: Field<ID, B>, transform: (T, B) -> R): Field<ID, R> =
-        alignedMapWithId(other) { _, value, otherValue -> transform(value, otherValue) }
+    fun <B, R> alignedMapValues(other: Field<ID, B>, transform: (T, B) -> R): Field<ID, R> =
+        alignedMap(other) { _, value, otherValue -> transform(value, otherValue) }
 
     /**
      * Combines this field with other two (aligned) fields based on the [ID]s when.
      */
-    fun <B, C, R> alignedMap(f1: Field<ID, B>, f2: Field<ID, C>, transform: (T, B, C) -> R): Field<ID, R> =
-        alignedMapWithId(f1, f2) { _, value, f1Value, f2Value -> transform(value, f1Value, f2Value) }
+    fun <B, C, R> alignedMapValues(f1: Field<ID, B>, f2: Field<ID, C>, transform: (T, B, C) -> R): Field<ID, R> =
+        alignedMap(f1, f2) { _, value, f1Value, f2Value -> transform(value, f1Value, f2Value) }
 
     /**
      * Map the field using the [transform] function.
      */
-    fun <B> mapWithId(transform: (ID, T) -> B): Field<ID, B>
+    fun <B> map(transform: (FieldEntry<ID, T>) -> B): Field<ID, B>
 
     /**
      * Map the field using the [transform] function.
      */
-    fun <B> map(transform: (T) -> B): Field<ID, B> = mapWithId { _, value -> transform(value) }
+    fun <B> mapValues(transform: (T) -> B): Field<ID, B> = map { (_, value) -> transform(value) }
 
     /**
      * Map the field resulting in a new one where the value for the local and the neighbors is [singleton].
      */
-    fun <B> mapToConstantField(singleton: B): Field<ID, B> = ConstantField(localId, singleton, excludeSelf().keys)
+    fun <B> mapToConstant(singleton: B): Field<ID, B> = ConstantField(local.id, singleton, excludeSelf().keys)
 
     /**
      * Get the value associated with the [id].
@@ -89,7 +101,7 @@ sealed interface Field<ID : Any, out T> {
     /**
      * Transform the field into a sequence of pairs containing the [ID] and the associated value.
      */
-    fun asSequence(): Sequence<Pair<ID, T>>
+    fun asSequence(): Sequence<FieldEntry<ID, T>>
 
     /**
      * Converts the Field into a [Map].
@@ -127,7 +139,7 @@ sealed interface Field<ID : Any, out T> {
             localId: ID,
             localValue: T,
             others: Map<ID, T> = emptyMap(),
-        ): Field<ID, T> = ArrayBasedField(localId, localValue, others.map { it.toPair() })
+        ): Field<ID, T> = ArrayBasedField(localId, localValue, others.map { it.toFieldEntry() })
 
         /**
          * Reduce the elements of the field using the [reduce] function,
@@ -233,11 +245,18 @@ sealed interface Field<ID : Any, out T> {
     }
 }
 
-internal abstract class AbstractField<ID : Any, T>(override val localId: ID, override val localValue: T) :
-    Field<ID, T> {
+internal abstract class AbstractField<ID : Any, T>(override val local: FieldEntry<ID, T>) : Field<ID, T> {
+
+    @Deprecated("Use local.value instead", replaceWith = ReplaceWith("local.id"))
+    override val localId: ID get() = local.id
+
+    @Deprecated("Use local.value instead", replaceWith = ReplaceWith("local.value"))
+    override val localValue: T get() = local.value
+
+    constructor(localID: ID, localValue: T) : this(FieldEntry(localID, localValue))
 
     private val asMap: Map<ID, T> by lazy {
-        val result: Map<ID, T> = neighborsMap() + (localId to localValue)
+        val result: Map<ID, T> = neighborsMap() + (local.id to local.value)
         result
     }
     private val neighborhood: Map<ID, T> by lazy { neighborsMap() }
@@ -254,7 +273,7 @@ internal abstract class AbstractField<ID : Any, T>(override val localId: ID, ove
         val sortedString = sortedEntries.joinToString(separator = ", ", prefix = "{", postfix = "}") { (id, value) ->
             "$id=$value"
         }
-        "ϕ(localId=$localId, localValue=$localValue, neighbors=$sortedString)"
+        "ϕ(localId=${local.id}, localValue=${local.value}, neighbors=$sortedString)"
     }
 
     final override fun toMap(): Map<ID, T> = asMap
@@ -272,18 +291,18 @@ internal abstract class AbstractField<ID : Any, T>(override val localId: ID, ove
     final override fun hashCode(): Int = toMap().hashCode()
 
     final override operator fun get(id: ID): T = when {
-        id == localId -> localValue
+        id == local.id -> local.value
         else -> neighborValueOf(id)
     }
 
-    final override fun <B> mapWithId(transform: (ID, T) -> B): Field<ID, B> =
-        SequenceBasedField(localId, transform(localId, localValue), mapOthersAsSequence(transform))
+    final override fun <B> map(transform: (FieldEntry<ID, T>) -> B): Field<ID, B> =
+        SequenceBasedField(local.id, transform(local), mapOthersAsSequence(transform))
 
     protected abstract fun neighborsMap(): Map<ID, T>
 
     protected abstract fun neighborValueOf(id: ID): T
 
-    protected abstract fun <R> mapOthersAsSequence(transform: (ID, T) -> R): Sequence<Pair<ID, R>>
+    protected abstract fun <R> mapOthersAsSequence(transform: (FieldEntry<ID, T>) -> R): Sequence<FieldEntry<ID, R>>
 
     private fun <T> tryCompare(a: T, b: T): Int = when {
         a is Comparable<*> && b is Comparable<*> -> {
@@ -298,42 +317,57 @@ internal abstract class AbstractField<ID : Any, T>(override val localId: ID, ove
     final override fun toString() = stringRepresentation
 }
 
-internal class ArrayBasedField<ID : Any, T>(localId: ID, localValue: T, private val others: List<Pair<ID, T>>) :
+internal class ArrayBasedField<ID : Any, T>(localId: ID, localValue: T, private val others: List<FieldEntry<ID, T>>) :
     AbstractField<ID, T>(localId, localValue) {
     override val neighborsCount: Int get() = others.size
-    override val neighbors: Set<ID> by lazy { others.mapTo(mutableSetOf()) { it.first } }
+    override val neighbors: Set<ID> by lazy { others.mapTo(mutableSetOf()) { it.id } }
+    override val neighborsValues by lazy { others.mapTo(ArrayList(neighborsCount)) { it.value } }
 
     override fun neighborValueOf(id: ID): T = when {
-        others.size <= MAP_OVER_LIST_PERFORMANCE_CROSSING_POINT -> others.first { it.first == id }.second
+        others.size <= MAP_OVER_LIST_PERFORMANCE_CROSSING_POINT -> others.first { it.id == id }.value
         else -> excludeSelf().getValue(id)
     }
 
-    override fun <R> mapOthersAsSequence(transform: (ID, T) -> R): Sequence<Pair<ID, R>> =
-        others.asSequence().map { (id, value) -> id to transform(id, value) }
+    override fun <R> mapOthersAsSequence(transform: (FieldEntry<ID, T>) -> R): Sequence<FieldEntry<ID, R>> =
+        others.asSequence().map { it.map(transform) }
 
-    override fun neighborsMap(): Map<ID, T> = others.toMap()
+    override fun neighborsMap(): Map<ID, T> = others.groupingBy { it.id }.fold(
+        initialValueSelector = { _, (_, value) -> value },
+        operation = { id, previousEntry, newEntry -> error("Duplicate entry at id $id: $previousEntry and $newEntry") },
+    ).toMap()
 
-    override fun asSequence(): Sequence<Pair<ID, T>> = others.asSequence() + (localId to localValue)
+    override fun asSequence(): Sequence<FieldEntry<ID, T>> = others.asSequence() + local
 
     private companion object {
         const val MAP_OVER_LIST_PERFORMANCE_CROSSING_POINT = 16
     }
 }
 
-internal class SequenceBasedField<ID : Any, T>(localId: ID, localValue: T, private val others: Sequence<Pair<ID, T>>) :
-    AbstractField<ID, T>(localId, localValue) {
+internal class SequenceBasedField<ID : Any, T>(
+    localId: ID,
+    localValue: T,
+    private val others: Sequence<FieldEntry<ID, T>>,
+) : AbstractField<ID, T>(localId, localValue) {
+
     override val neighborsCount get() = neighbors.size
 
-    override val neighbors: Set<ID> by lazy { others.mapTo(mutableSetOf()) { it.first } }
+    override val neighbors: Set<ID> by lazy { others.mapTo(mutableSetOf()) { it.id } }
 
-    override fun asSequence(): Sequence<Pair<ID, T>> = others + (localId to localValue)
+    override val neighborsValues: List<T> by lazy { others.mapTo(ArrayList(neighborsCount)) { it.value } }
 
-    override fun neighborsMap(): Map<ID, T> = others.toMap()
+    override fun asSequence(): Sequence<FieldEntry<ID, T>> = others + local
+
+    override fun neighborsMap(): Map<ID, T> = others.groupingBy { it.id }.fold(
+        initialValueSelector = { _, (_, value) -> value },
+        operation = { id, previousEntry, newEntry ->
+            error("Duplicate entry for id $id: $previousEntry and $newEntry")
+        },
+    )
 
     override fun neighborValueOf(id: ID): T = excludeSelf().getValue(id)
 
-    override fun <R> mapOthersAsSequence(transform: (ID, T) -> R): Sequence<Pair<ID, R>> =
-        others.map { (id, value) -> id to transform(id, value) }
+    override fun <R> mapOthersAsSequence(transform: (FieldEntry<ID, T>) -> R): Sequence<FieldEntry<ID, R>> =
+        others.map { it.map(transform) }
 }
 
 internal class ConstantField<ID : Any, T>(localId: ID, localValue: T, private val neighborsIds: Set<ID>) :
@@ -341,6 +375,12 @@ internal class ConstantField<ID : Any, T>(localId: ID, localValue: T, private va
     override val neighborsCount: Int = neighborsIds.size
 
     override val neighbors: Set<ID> = neighborsIds
+
+    override val neighborsValues: List<T> by lazy {
+        buildList(neighborsIds.size) {
+            repeat(neighborsIds.size) { add(localValue) }
+        }
+    }
 
     private val reified by lazy {
         reifiedList.toMap()
@@ -350,12 +390,13 @@ internal class ConstantField<ID : Any, T>(localId: ID, localValue: T, private va
         neighborsIds.map { id -> id to localValue }
     }
 
-    override fun <R> mapOthersAsSequence(transform: (ID, T) -> R): Sequence<Pair<ID, R>> =
-        reifiedList.asSequence().map { (id, _) -> id to transform(id, localValue) }
+    override fun <R> mapOthersAsSequence(transform: (FieldEntry<ID, T>) -> R): Sequence<FieldEntry<ID, R>> =
+        neighbors.asSequence().map { FieldEntry(it, local.value).map(transform) }
 
-    override fun neighborValueOf(id: ID): T = localValue
+    override fun neighborValueOf(id: ID): T = local.value
 
     override fun neighborsMap(): Map<ID, T> = reified
 
-    override fun asSequence(): Sequence<Pair<ID, T>> = reifiedList.asSequence() + (localId to localValue)
+    override fun asSequence(): Sequence<FieldEntry<ID, T>> =
+        neighborsIds.asSequence().map { FieldEntry(it, local.value) } + local
 }

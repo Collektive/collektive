@@ -92,7 +92,7 @@ class EvolvingTest {
                 exchange(0) { field ->
                     evolving(field) {
                         val result = it + 1
-                        result.yielding { field.map { it + 2 } }
+                        result.yielding { field.mapValues { it + 2 } }
                     }
                 }
             }

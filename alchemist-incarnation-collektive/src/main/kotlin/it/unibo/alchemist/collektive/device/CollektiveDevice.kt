@@ -71,7 +71,7 @@ class CollektiveDevice<P>(
      * Returns the distances to the neighboring nodes.
      */
     fun <ID : Any> Aggregate<ID>.distances(): Field<ID, Double> = environment.getPosition(node).let { nodePosition ->
-        neighboring(nodePosition.coordinates).map { position ->
+        neighboring(nodePosition.coordinates).mapValues { position ->
             nodePosition.distanceTo(environment.makePosition(position))
         }
     }

@@ -132,9 +132,9 @@ class BranchAlignmentTest {
             with(it) {
                 with(localId % 2 == 0) {
                     if (this) {
-                        alignedMap(neighboring(1)) { a, b -> a + b }
+                        alignedMapValues(neighboring(1)) { a, b -> a + b }
                     } else {
-                        alignedMap(neighboring(1)) { a, b -> a - b }
+                        alignedMapValues(neighboring(1)) { a, b -> a - b }
                     }
                 }
             }

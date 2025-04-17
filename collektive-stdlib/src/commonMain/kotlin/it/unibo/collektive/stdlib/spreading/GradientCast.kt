@@ -14,7 +14,7 @@ import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
 import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.aggregate.api.sharing
-import it.unibo.collektive.stdlib.fields.minBy
+import it.unibo.collektive.stdlib.fields.minValueBy
 import it.unibo.collektive.stdlib.util.Reducer
 import it.unibo.collektive.stdlib.util.coerceIn
 import it.unibo.collektive.stdlib.util.hops
@@ -44,10 +44,10 @@ inline fun <reified ID, reified Value, reified Distance> Aggregate<ID>.bellmanFo
     crossinline accumulateDistance: Reducer<Distance>,
     metric: Field<ID, Distance>,
 ): Value where ID : Any, Distance : Comparable<Distance> {
-    val topValue = top to local
+    val topValue: Pair<Distance, Value> = top to local
     val distances = metric.coerceIn(bottom, top)
     return share(topValue) { neighborData ->
-        val paths = neighborData.alignedMap(distances) { (fromSource, data), toNeighbor ->
+        val paths = neighborData.alignedMapValues(distances) { (fromSource, data), toNeighbor ->
             val totalDistance = accumulateDistance(fromSource, toNeighbor).coerceIn(bottom, top)
             check(totalDistance >= fromSource && totalDistance >= toNeighbor) {
                 "The provided distance accumulation function violates the triangle inequality: " +
@@ -58,7 +58,7 @@ inline fun <reified ID, reified Value, reified Distance> Aggregate<ID>.bellmanFo
         }
         when {
             source -> bottom to local
-            else -> paths.minBy(base = topValue) { it.first } // sort by distance from the nearest source
+            else -> paths.minValueBy { it.value.first } ?: topValue // sort by distance from the nearest source
         }
     }.second // return the data
 }
@@ -120,7 +120,7 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
     val coercedMetric = metric.coerceIn(bottom, top)
     val fromLocalSource = if (source) listOf(GradientPath(bottom, localId, localId, local)) else emptyList()
     return sharing(fromLocalSource) { neighborData: Field<ID, List<GradientPath<ID, Value, Distance>>> ->
-        val distanceUpdatedPaths = neighborData.alignedMapWithId(coercedMetric) { neighbor, paths, distanceToNeighbor ->
+        val distanceUpdatedPaths = neighborData.alignedMap(coercedMetric) { neighbor, paths, distanceToNeighbor ->
             paths.mapNotNull { path ->
                 when {
                     // Previous data, discarded anyway when reducing, or loopback to self

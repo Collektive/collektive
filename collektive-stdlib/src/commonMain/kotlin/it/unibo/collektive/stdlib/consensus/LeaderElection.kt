@@ -40,7 +40,7 @@ inline fun <reified ID, reified Distance, reified Strength> Aggregate<ID>.bounde
 ): ID where ID : Any, Distance : Comparable<Distance>, Strength : Comparable<Strength> {
     val local = Candidacy(localId, bottom, strength)
     return sharing(local) { candidacies ->
-        val localCandidates = candidacies.alignedMap(metric) { candidacy, distance ->
+        val localCandidates = candidacies.alignedMapValues(metric) { candidacy, distance ->
             // Update the distance of the candidacies
             candidacy.copy(distance = accumulateDistance(candidacy.distance, distance))
         }

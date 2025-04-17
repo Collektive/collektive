@@ -53,13 +53,13 @@ object KotlinPoetUtils {
                 when (isReceiverField) {
                     true ->
                         addStatement(
-                            "return ${firstFieldParameter.name}.%N·{·$namedParameter,·receiver·->·receiver.%N }",
+                            "return ${firstFieldParameter.name}.%N·{·($namedParameter,·receiver)·->·receiver.%N }",
                             FIELD_MAP_WITH_ID,
                             callable.name,
                         )
                     false ->
                         addStatement(
-                            "return ${candidateParameter?.name}.%N·{·$namedParameter,·receiver·->·this.%N }",
+                            "return ${candidateParameter?.name}.%N·{·($namedParameter,·receiver)·->·this.%N }",
                             FIELD_MAP_WITH_ID,
                             callable.name,
                         )
@@ -69,7 +69,7 @@ object KotlinPoetUtils {
                 when (isReceiverField) {
                     true ->
                         addStatement(
-                            "return ${firstFieldParameter.name}.%N·{·$namedParameter,·receiver·->·receiver.%N(${
+                            "return ${firstFieldParameter.name}.%N·{·($namedParameter,·receiver)·->·receiver.%N(${
                                 arguments.joinToString(
                                     separator = ",·",
                                 )
@@ -79,7 +79,7 @@ object KotlinPoetUtils {
                         )
                     false ->
                         addStatement(
-                            "return ${candidateParameter?.name}.%N·{·$namedParameter,·receiver·->·this.%N(${
+                            "return ${candidateParameter?.name}.%N·{·($namedParameter,·receiver)·->·this.%N(${
                                 arguments.joinToString(
                                     separator = ",·",
                                 )

@@ -26,7 +26,7 @@ class CollektiveTest {
     val initV3 = 3
 
     val increaseOrDouble: (Field<Int, Int>) -> Field<Int, Int> = { f ->
-        f.mapWithId { _, v -> if (v % 2 == 0) v + 1 else v * 2 }
+        f.map { _, v -> if (v % 2 == 0) v + 1 else v * 2 }
     }
 
     val computeFunctionDevice0: Aggregate<Int>.() -> Int = {

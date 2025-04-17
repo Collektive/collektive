@@ -62,21 +62,21 @@ internal class AggregateContext<ID : Any>(
         body: YieldingScope<Field<ID, Shared>, Returned>,
     ): Returned {
         val path: Path = stack.currentPath()
-        val messages = inboundMessage.dataAt<Shared>(path, dataSharingMethod)
+        val messages = inboundMessage.dataAt(path, dataSharingMethod)
         val previous = stateAt(path, initial)
         val subject: Field<ID, Shared> = newField(previous, messages)
         val context = YieldingContext<Field<ID, Shared>, Returned>()
         return context.body(subject)
             .also {
                 val message = SharedData(
-                    it.toSend.localValue,
+                    it.toSend.local.value,
                     when (it.toSend) {
                         is ConstantField<ID, Shared> -> emptyMap()
-                        else -> it.toSend.excludeSelf().filterNot { (_, value) -> value == it.toSend.localValue }
+                        else -> it.toSend.excludeSelf().filterNot { (_, value) -> value == it.toSend.local.value }
                     },
                 )
                 toBeSent.addData(path, message, dataSharingMethod)
-                state += path to it.toSend.localValue
+                state += path to it.toSend.local.value
             }.toReturn
     }
 
@@ -141,7 +141,7 @@ fun <ID : Any, T> Aggregate<ID>.project(field: Field<ID, T>): Field<ID, T> {
     val others = neighborhood()
     return when {
         field.neighborsCount == others.neighborsCount -> field
-        field.neighborsCount > others.neighborsCount -> others.mapWithId { id, _ -> field[id] }
+        field.neighborsCount > others.neighborsCount -> others.map { (id, _) -> field[id] }
         else ->
             error(
                 """
