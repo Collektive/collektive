@@ -285,8 +285,7 @@ internal abstract class AbstractField<ID : Any, T>(override val local: FieldEntr
     private val neighborhood: Map<ID, T> by lazy { neighborsMap() }
 
     private val stringRepresentation: String by lazy {
-        val neighborsData = neighborsMap()
-        val neighborsList = neighborsData.toList()
+        val neighborsList = asMap.toList()
         val sortedEntries = neighborsList.sortedWith { (id1, v1), (id2, v2) ->
             when (val byId = tryCompare(id1, id2)) {
                 0 -> tryCompare(v1, v2)
@@ -354,10 +353,7 @@ internal class ArrayBasedField<ID : Any, T>(localId: ID, localValue: T, private 
     override fun <R> mapOthersAsSequence(transform: (FieldEntry<ID, T>) -> R): Sequence<FieldEntry<ID, R>> =
         others.asSequence().map { it.map(transform) }
 
-    override fun neighborsMap(): Map<ID, T> = others.groupingBy { it.id }.fold(
-        initialValueSelector = { _, (_, value) -> value },
-        operation = { id, previousEntry, newEntry -> error("Duplicate entry at id $id: $previousEntry and $newEntry") },
-    ).toMap()
+    override fun neighborsMap(): Map<ID, T> = buildMap { others.forEach { this[it.id] = it.value } }
 
     override fun asSequence(): Sequence<FieldEntry<ID, T>> = others.asSequence() + local
 
@@ -380,12 +376,7 @@ internal class SequenceBasedField<ID : Any, T>(
 
     override fun asSequence(): Sequence<FieldEntry<ID, T>> = others + local
 
-    override fun neighborsMap(): Map<ID, T> = others.groupingBy { it.id }.fold(
-        initialValueSelector = { _, (_, value) -> value },
-        operation = { id, previousEntry, newEntry ->
-            error("Duplicate entry for id $id: $previousEntry and $newEntry")
-        },
-    )
+    override fun neighborsMap(): Map<ID, T> = buildMap { putAll(others.map { it.pair }) }
 
     override fun neighborValueOf(id: ID): T = excludeSelf().getValue(id)
 
