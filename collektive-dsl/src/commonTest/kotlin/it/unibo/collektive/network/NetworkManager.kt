@@ -23,7 +23,7 @@ class NetworkManager {
      * Adds the [envelope] to the message buffer.
      */
     fun send(senderId: Int, envelope: OutboundEnvelope<Int>) {
-        val neighborsIds = messageBuffer.keys
+        val neighborsIds = messageBuffer.keys - senderId
         neighborsIds.forEach { neighborId ->
             val message = envelope.prepareMessageFor(senderId)
             messageBuffer[neighborId]?.let { neighborMessages ->

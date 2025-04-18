@@ -156,7 +156,19 @@ sealed interface Field<ID : Any, out T> {
             localId: ID,
             localValue: T,
             others: Map<ID, T> = emptyMap(),
-        ): Field<ID, T> = ArrayBasedField(localId, localValue, others.map { it.toFieldEntry() })
+        ): Field<ID, T> {
+            check(localId !in others) {
+                "A field cannot be constructed with local id '$localId', " +
+                    "local value '$localValue'," +
+                    "and neighborhood values '$others' " +
+                    "as the local id is also present among the neighbors"
+            }
+            return when {
+                others.isEmpty() -> PointwiseField(localId, localValue)
+                others.values.all { it == localValue } -> ConstantField(localId, localValue, others.keys)
+                else -> ArrayBasedField(localId, localValue, others.map { it.toFieldEntry() })
+            }
+        }
 
         /**
          * Reduce the elements of the field using the [reduce] function,
@@ -341,6 +353,7 @@ internal abstract class AbstractField<ID : Any, T>(override val local: FieldEntr
 
 internal class ArrayBasedField<ID : Any, T>(localId: ID, localValue: T, private val others: List<FieldEntry<ID, T>>) :
     AbstractField<ID, T>(localId, localValue) {
+
     override val neighborsCount: Int get() = others.size
     override val neighbors: Set<ID> by lazy {
         others.mapTo(mutableSetOf()) {
@@ -440,6 +453,25 @@ internal class ConstantField<ID : Any, T>(localId: ID, localValue: T, override v
 
     override fun asSequence(): Sequence<FieldEntry<ID, T>> =
         neighbors.asSequence().map { FieldEntry(checkNotLocal(it), local.value) } + local
+}
+
+internal class PointwiseField<ID : Any, T>(localId: ID, localValue: T) : AbstractField<ID, T>(localId, localValue) {
+
+    override fun neighborsMap(): Map<ID, T> = emptyMap()
+
+    override fun neighborValueOf(id: ID): T = local.value.also {
+        check(id == local.id) {
+            "A pointwise field $this was required to provide a value for id $id"
+        }
+    }
+
+    override fun <R> mapOthersAsSequence(transform: (FieldEntry<ID, T>) -> R): Sequence<FieldEntry<ID, R>> =
+        emptySequence()
+
+    override val neighbors: Set<ID> get() = emptySet()
+    override val neighborsValues: List<T> get() = emptyList()
+
+    override fun asSequence(): Sequence<FieldEntry<ID, T>> = sequenceOf(FieldEntry(local.id, local.value))
 }
 
 private fun <ID : Any> Field<ID, *>.checkNotLocal(id: ID): ID {
