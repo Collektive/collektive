@@ -12,20 +12,21 @@ import it.unibo.collektive.Collektive
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.aggregate.api.share
-import it.unibo.collektive.field.operations.min
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.stdlib.doubles.FieldedDoubles.plus
+import it.unibo.collektive.stdlib.fields.minValue
+import kotlin.Double.Companion.POSITIVE_INFINITY
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class NestedCallsTest {
     fun Aggregate<Int>.foo(id: Int) = neighboring(id.toDouble())
 
-    fun Aggregate<Int>.bar(): Double = share(Double.POSITIVE_INFINITY) { dist ->
+    fun Aggregate<Int>.bar(): Double = share(POSITIVE_INFINITY) { dist ->
         when (localId) {
             0 -> 0.0
-            else -> (foo(localId) + dist).min(Double.POSITIVE_INFINITY)
+            else -> (foo(localId) + dist).minValue(POSITIVE_INFINITY)
         }
     }
 

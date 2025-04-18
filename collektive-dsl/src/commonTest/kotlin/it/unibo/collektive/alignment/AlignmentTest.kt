@@ -9,10 +9,10 @@
 package it.unibo.collektive.alignment
 
 import it.unibo.collektive.Collektive.Companion.aggregate
+import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.aggregate.api.share
-import it.unibo.collektive.field.Field
 import it.unibo.collektive.matchers.assertNotAligned
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
 import kotlin.test.Test
@@ -27,8 +27,8 @@ class AlignmentTest {
             aggregate(0) {
                 neighboring(10) // path -> [neighboring.1] = 10
                 share(5) {
-                    requireNotNull(neighboring(20).localValue) // path -> [share.1, neighboring.2] = 20
-                    it.localValue
+                    requireNotNull(neighboring(20).local.value) // path -> [share.1, neighboring.2] = 20
+                    it.local.value
                 } // path -> [sharing.1] = 5
                 neighboring(30) // path -> [neighboring.3] = 30
                 5

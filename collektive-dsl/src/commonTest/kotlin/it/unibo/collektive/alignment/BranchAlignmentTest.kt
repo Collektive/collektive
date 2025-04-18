@@ -9,13 +9,13 @@
 package it.unibo.collektive.alignment
 
 import it.unibo.collektive.Collektive.Companion.aggregate
+import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.exchange
 import it.unibo.collektive.aggregate.api.neighboring
-import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.operations.min
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
+import it.unibo.collektive.stdlib.fields.minValue
 import it.unibo.collektive.stdlib.ints.FieldedInts.minus
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
 import kotlin.test.Test
@@ -82,7 +82,7 @@ class BranchAlignmentTest {
                     } else {
                         assertEquals((id - 1) / 2, neighboring(1).neighborsCount)
                         neighboring(1) - outerField
-                        outerField.min(Int.MAX_VALUE)
+                        outerField.minValue(Int.MAX_VALUE)
                     }
                 }
             }
@@ -130,11 +130,11 @@ class BranchAlignmentTest {
     fun `A field should be projected when it is a non-direct receiver issue 171`() {
         exchangeWithThreeDevices {
             with(it) {
-                with(localId % 2 == 0) {
+                with(local.id % 2 == 0) {
                     if (this) {
-                        alignedMap(neighboring(1)) { a, b -> a + b }
+                        alignedMapValues(neighboring(1)) { a, b -> a + b }
                     } else {
-                        alignedMap(neighboring(1)) { a, b -> a - b }
+                        alignedMapValues(neighboring(1)) { a, b -> a - b }
                     }
                 }
             }

@@ -8,6 +8,8 @@
 
 package it.unibo.collektive.aggregate.api.impl
 
+import it.unibo.collektive.aggregate.ConstantField
+import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.Aggregate.InternalAPI
 import it.unibo.collektive.aggregate.api.DataSharingMethod
@@ -17,8 +19,6 @@ import it.unibo.collektive.aggregate.api.YieldingResult
 import it.unibo.collektive.aggregate.api.YieldingScope
 import it.unibo.collektive.aggregate.api.impl.stack.Stack
 import it.unibo.collektive.aggregate.api.neighborhood
-import it.unibo.collektive.field.ConstantField
-import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.NeighborsData
 import it.unibo.collektive.networking.OutboundEnvelope
 import it.unibo.collektive.networking.OutboundEnvelope.SharedData
@@ -29,7 +29,7 @@ import it.unibo.collektive.state.impl.getTyped
 
 /**
  * Context for managing aggregate computation.
- * It represents the [localId] of the device, the [inboundMessage] received from the neighbours,
+ * It represents the [localId] of the device, the [inboundMessage] received from the neighbors,
  * and the [previousState] of the device.
  */
 internal class AggregateContext<ID : Any>(
@@ -62,21 +62,21 @@ internal class AggregateContext<ID : Any>(
         body: YieldingScope<Field<ID, Shared>, Returned>,
     ): Returned {
         val path: Path = stack.currentPath()
-        val messages = inboundMessage.dataAt<Shared>(path, dataSharingMethod)
+        val messages = inboundMessage.dataAt(path, dataSharingMethod)
         val previous = stateAt(path, initial)
         val subject: Field<ID, Shared> = newField(previous, messages)
         val context = YieldingContext<Field<ID, Shared>, Returned>()
         return context.body(subject)
             .also {
                 val message = SharedData(
-                    it.toSend.localValue,
+                    it.toSend.local.value,
                     when (it.toSend) {
                         is ConstantField<ID, Shared> -> emptyMap()
-                        else -> it.toSend.excludeSelf().filterNot { (_, value) -> value == it.toSend.localValue }
+                        else -> it.toSend.excludeSelf().filterNot { (_, value) -> value == it.toSend.local.value }
                     },
                 )
                 toBeSent.addData(path, message, dataSharingMethod)
-                state += path to it.toSend.localValue
+                state += path to it.toSend.local.value
             }.toReturn
     }
 
@@ -141,7 +141,7 @@ fun <ID : Any, T> Aggregate<ID>.project(field: Field<ID, T>): Field<ID, T> {
     val others = neighborhood()
     return when {
         field.neighborsCount == others.neighborsCount -> field
-        field.neighborsCount > others.neighborsCount -> others.mapWithId { id, _ -> field[id] }
+        field.neighborsCount > others.neighborsCount -> others.map { (id, _) -> field[id] }
         else ->
             error(
                 """

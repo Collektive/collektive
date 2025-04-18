@@ -8,11 +8,11 @@
 
 package it.unibo.collektive.stdlib.consensus
 
+import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.sharing
-import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.Field.Companion.fold
-import it.unibo.collektive.stdlib.util.Accumulator
+import it.unibo.collektive.stdlib.fields.foldValues
+import it.unibo.collektive.stdlib.util.Reducer
 import it.unibo.collektive.stdlib.util.hops
 import it.unibo.collektive.stdlib.util.nonOverflowingPlus
 import kotlinx.serialization.Serializable
@@ -35,16 +35,16 @@ inline fun <reified ID, reified Distance, reified Strength> Aggregate<ID>.bounde
     bound: Distance,
     metric: Field<ID, Distance>,
     bottom: Distance,
-    crossinline accumulateDistance: Accumulator<Distance>,
-    crossinline selectBest: Accumulator<Candidacy<ID, Distance, Strength>> = ::maxOf,
+    crossinline accumulateDistance: Reducer<Distance>,
+    crossinline selectBest: Reducer<Candidacy<ID, Distance, Strength>> = ::maxOf,
 ): ID where ID : Any, Distance : Comparable<Distance>, Strength : Comparable<Strength> {
     val local = Candidacy(localId, bottom, strength)
     return sharing(local) { candidacies ->
-        val localCandidates = candidacies.alignedMap(metric) { candidacy, distance ->
+        val localCandidates = candidacies.alignedMapValues(metric) { candidacy, distance ->
             // Update the distance of the candidacies
             candidacy.copy(distance = accumulateDistance(candidacy.distance, distance))
         }
-        localCandidates.fold(local) { current, next ->
+        localCandidates.foldValues(local) { current, next ->
             when {
                 next.candidate == localId -> current // I have better information about myself
                 next.distance > bound -> current // This candidate is past the bound
@@ -73,8 +73,8 @@ inline fun <reified ID, reified Distance> Aggregate<ID>.boundedElection(
     bound: Distance,
     metric: Field<ID, Distance>,
     bottom: Distance,
-    crossinline accumulateDistance: Accumulator<Distance>,
-    crossinline selectBest: Accumulator<Candidacy<ID, Distance, ID>> = ::maxOf,
+    crossinline accumulateDistance: Reducer<Distance>,
+    crossinline selectBest: Reducer<Candidacy<ID, Distance, ID>> = ::maxOf,
 ): ID where ID : Comparable<ID>, Distance : Comparable<Distance> =
     boundedElection(localId, bound, metric, bottom, accumulateDistance, selectBest)
 
@@ -91,7 +91,7 @@ inline fun <reified ID, reified Strength> Aggregate<ID>.boundedElection(
     strength: Strength,
     bound: Double,
     metric: Field<ID, Double>,
-    crossinline selectBest: Accumulator<Candidacy<ID, Double, Strength>> = ::maxOf,
+    crossinline selectBest: Reducer<Candidacy<ID, Double, Strength>> = ::maxOf,
 ): ID where ID : Any, Strength : Comparable<Strength> =
     boundedElection<ID, Double, Strength>(strength, bound, metric, 0.0, Double::plus, selectBest)
 
@@ -109,7 +109,7 @@ inline fun <reified ID, reified Strength> Aggregate<ID>.boundedElection(
     strength: Strength,
     bound: Int,
     metric: Field<ID, Int> = hops(),
-    crossinline selectBest: Accumulator<Candidacy<ID, Int, Strength>> = ::maxOf,
+    crossinline selectBest: Reducer<Candidacy<ID, Int, Strength>> = ::maxOf,
 ): ID where ID : Any, Strength : Comparable<Strength> =
     boundedElection<ID, Int, Strength>(strength, bound, metric, 0, Int::nonOverflowingPlus, selectBest)
 
@@ -126,7 +126,7 @@ inline fun <reified ID, reified Strength> Aggregate<ID>.boundedElection(
 inline fun <reified ID> Aggregate<ID>.boundedElection(
     bound: Double,
     metric: Field<ID, Double>,
-    crossinline selectBest: Accumulator<Candidacy<ID, Double, ID>> = ::maxOf,
+    crossinline selectBest: Reducer<Candidacy<ID, Double, ID>> = ::maxOf,
 ): ID where ID : Comparable<ID> = boundedElection(localId, bound, metric, selectBest)
 
 /**
@@ -143,7 +143,7 @@ inline fun <reified ID> Aggregate<ID>.boundedElection(
 inline fun <reified ID> Aggregate<ID>.boundedElection(
     bound: Int,
     metric: Field<ID, Int> = hops(),
-    crossinline selectBest: Accumulator<Candidacy<ID, Int, ID>> = ::maxOf,
+    crossinline selectBest: Reducer<Candidacy<ID, Int, ID>> = ::maxOf,
 ): ID where ID : Comparable<ID> = boundedElection(localId, bound, metric, selectBest)
 
 /**
@@ -158,7 +158,7 @@ inline fun <reified ID> Aggregate<ID>.boundedElection(
 inline fun <reified ID, reified Strength> Aggregate<ID>.globalElection(
     strength: Strength,
     metric: Field<ID, Int> = hops(),
-    crossinline selectBest: Accumulator<Candidacy<ID, Int, Strength>> = ::maxOf,
+    crossinline selectBest: Reducer<Candidacy<ID, Int, Strength>> = ::maxOf,
 ): ID where ID : Any, Strength : Comparable<Strength> = boundedElection(strength, Int.MAX_VALUE, metric, selectBest)
 
 /**

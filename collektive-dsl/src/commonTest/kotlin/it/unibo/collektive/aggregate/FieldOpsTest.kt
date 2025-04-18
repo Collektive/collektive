@@ -6,16 +6,15 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
-package it.unibo.collektive.field
+package it.unibo.collektive.aggregate
 
-import it.unibo.collektive.field.Field.Companion.fold
-import it.unibo.collektive.field.Field.Companion.foldWithId
-import it.unibo.collektive.field.Field.Companion.hood
-import it.unibo.collektive.field.Field.Companion.hoodWithId
-import it.unibo.collektive.field.operations.replaceMatching
+import it.unibo.collektive.stdlib.fields.fold
+import it.unibo.collektive.stdlib.fields.foldValues
+import it.unibo.collektive.stdlib.fields.reduce
+import it.unibo.collektive.stdlib.fields.reduceValues
+import it.unibo.collektive.stdlib.fields.replaceMatchingValues
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertNotEquals
 
 class FieldOpsTest {
@@ -26,47 +25,69 @@ class FieldOpsTest {
 
     @Test
     fun `An empty field should return the default value value when is hooded`() {
-        assertEquals("default", emptyField.hood("default") { acc, elem -> acc + elem })
+        assertEquals("default", emptyField.reduceValues { acc, elem -> acc + elem } ?: "default")
     }
 
     @Test
     fun `A non-empty field should not be hooded on default value`() {
-        assertEquals(30, field.hood(42) { acc, elem -> acc + elem })
+        assertEquals(30, field.reduceValues { acc, elem -> acc + elem })
     }
 
     @Test
     fun `A non-empty field hooded with Id should return a punctual value related to an evaluation over the id`() {
-        assertEquals(15, fulfilledField.hoodWithId(42) { acc, id, elem -> if (id % 2 == 0) acc + elem else acc - elem })
+        assertEquals(
+            15,
+            fulfilledField.reduce { acc, (id, elem) ->
+                acc.mapValue {
+                    if (id % 2 == 0) {
+                        it + elem
+                    } else {
+                        it - elem
+                    }
+                }
+            }?.value,
+        )
     }
 
     @Test
     fun `An empty field should return the self value value when is folded`() {
-        assertEquals("localVal", emptyField.fold(emptyField.localValue) { acc, elem -> acc + elem })
+        assertEquals("localVal", emptyField.foldValues(emptyField.local.value) { acc, elem -> acc + elem })
     }
 
     @Test
     fun `A non-empty field should return the accumulated value when is folded excluding self`() {
-        assertEquals(72, field.fold(42) { acc, elem -> acc + elem })
+        assertEquals(72, field.foldValues(42) { acc, elem -> acc + elem })
     }
 
     @Test
     fun `A non-empty field folded with Id should return a punctual value related to an evaluation over the id`() {
-        assertEquals(37, fulfilledField.foldWithId(42) { acc, id, elem -> if (id % 2 == 0) acc + elem else acc - elem })
+        assertEquals(
+            37,
+            fulfilledField.fold(42) { acc: Int, (id: Int, elem: Int) ->
+                if (id % 2 ==
+                    0
+                ) {
+                    acc + elem
+                } else {
+                    acc - elem
+                }
+            },
+        )
     }
 
     @Test
     fun `An empty field when mapped only the local value should be transformed`() {
-        assertEquals(Field(0, "localVal-mapped", mapOf()), emptyField.map { "$it-mapped" })
+        assertEquals(Field(0, "localVal-mapped", mapOf()), emptyField.mapValues { "$it-mapped" })
     }
 
     @Test
     fun `A field can be mapped on its values with a given function`() {
-        assertEquals(Field(0, 3, mapOf(1 to 13, 2 to 23)), field.map { it + 3 })
+        assertEquals(Field(0, 3, mapOf(1 to 13, 2 to 23)), field.mapValues { it + 3 })
     }
 
     @Test
     fun `A field can be mapped on its values with a given function and the id`() {
-        assertEquals(Field(0, "0-0", mapOf(1 to "1-10", 2 to "2-20")), field.mapWithId { id, value -> "$id-$value" })
+        assertEquals(Field(0, "0-0", mapOf(1 to "1-10", 2 to "2-20")), field.map { (id, value) -> "$id-$value" })
     }
 
     @Test
@@ -91,41 +112,34 @@ class FieldOpsTest {
 
     @Test
     fun `A field should return a sequence containing all the values`() {
-        assertEquals(sequenceOf(0 to 0, 1 to 10, 2 to 20).toSet(), field.asSequence().toSet())
+        assertEquals(sequenceOf(0 to 0, 1 to 10, 2 to 20).toSet(), field.asSequence().map { it.pair }.toSet())
     }
 
     @Test
     fun `The replaceMatching on an empty field should return an empty field`() {
-        assertEquals(emptyField, emptyField.replaceMatching("replaced") { it == "no-data" })
+        assertEquals(emptyField, emptyField.replaceMatchingValues("replaced") { it == "no-data" })
     }
 
     @Test
     fun `The replaceMatching should return the same field if the predicate is not satisfied`() {
-        assertEquals(field, field.replaceMatching(Int.MAX_VALUE) { it == 42 })
+        assertEquals(field, field.replaceMatchingValues(Int.MAX_VALUE) { it == 42 })
     }
 
     @Test
     fun `The replaceMatching should return a field with the replaced values`() {
-        assertEquals(Field(0, 0, mapOf(1 to 42, 2 to 20)), field.replaceMatching(42) { it == 10 })
-    }
-
-    @Test
-    fun `An IllegalStateException should be thrown when two fields are not aligned`() {
-        assertFailsWith<IllegalStateException> {
-            emptyField.alignedMapWithId(fulfilledField) { _, _, _ -> "no-data" }
-        }
+        assertEquals(Field(0, 0, mapOf(1 to 42, 2 to 20)), field.replaceMatchingValues(42) { it == 10 })
     }
 
     @Test
     fun `An empty field should return an empty field when aligned mapped with another empty field`() {
-        assertEquals(Field(0, "no-data", emptyMap()), emptyField.alignedMapWithId(emptyField) { _, _, _ -> "no-data" })
+        assertEquals(Field(0, "no-data", emptyMap()), emptyField.alignedMap(emptyField) { _, _, _ -> "no-data" })
     }
 
     @Test
     fun `A field should return a field with the mapped values when aligned mapped with another field`() {
         assertEquals(
             Field(0, 1, mapOf(1 to 11, 2 to 21, 3 to 16)),
-            fulfilledField.alignedMapWithId(fulfilledCompatibleField) { _, value, other -> value + other },
+            fulfilledField.alignedMap(fulfilledCompatibleField) { _, value, other -> value + other },
         )
     }
 

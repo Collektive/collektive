@@ -8,10 +8,10 @@
 
 package it.unibo.collektive.stdlib.spreading
 
+import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.field.Field
 import it.unibo.collektive.stdlib.ints.FieldedInts.toDouble
-import it.unibo.collektive.stdlib.util.Accumulator
+import it.unibo.collektive.stdlib.util.Reducer
 import it.unibo.collektive.stdlib.util.hops
 import kotlin.jvm.JvmOverloads
 
@@ -42,7 +42,7 @@ inline fun <reified ID : Any, reified Distance : Comparable<Distance>> Aggregate
     metric: Field<ID, Distance>,
     maxPaths: Int = Int.MAX_VALUE,
     isRiemannianManifold: Boolean = true,
-    noinline accumulateDistance: Accumulator<Distance>,
+    noinline accumulateDistance: Reducer<Distance>,
 ): Distance = gradientCast(
     source = source,
     local = if (source) bottom else top,

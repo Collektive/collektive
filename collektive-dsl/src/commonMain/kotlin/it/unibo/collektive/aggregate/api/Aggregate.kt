@@ -8,7 +8,7 @@
 
 package it.unibo.collektive.aggregate.api
 
-import it.unibo.collektive.field.Field
+import it.unibo.collektive.aggregate.Field
 import kotlinx.serialization.serializer
 
 typealias YieldingScope<Shared, Returned> =

@@ -8,7 +8,7 @@
 
 package it.unibo.collektive.stdlib.util
 
-import it.unibo.collektive.field.Field
+import it.unibo.collektive.aggregate.Field
 
 /**
  * Coerce this value to be in the range between [min] and [max].
@@ -23,10 +23,11 @@ fun <T : Comparable<T>> T.coerceIn(range: ClosedRange<T>): T = minOf(range.endIn
 /**
  * Coerce all field values to be in the range between [min] and [max].
  */
-fun <ID : Any, T : Comparable<T>> Field<ID, T>.coerceIn(min: T, max: T): Field<ID, T> = map { it.coerceIn(min, max) }
+fun <ID : Any, T : Comparable<T>> Field<ID, T>.coerceIn(min: T, max: T): Field<ID, T> =
+    mapValues { it.coerceIn(min, max) }
 
 /**
  * Coerces all field values in a [range].
  */
 fun <ID : Any, T : Comparable<T>> Field<ID, T>.coerceIn(range: ClosedRange<T>): Field<ID, T> =
-    map { it.coerceIn(range) }
+    mapValues { it.coerceIn(range) }

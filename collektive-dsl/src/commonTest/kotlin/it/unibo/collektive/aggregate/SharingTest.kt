@@ -12,11 +12,10 @@ import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.aggregate.api.sharing
-import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.operations.max
-import it.unibo.collektive.field.operations.min
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
+import it.unibo.collektive.stdlib.fields.maxValue
+import it.unibo.collektive.stdlib.fields.minValue
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.test.Test
@@ -25,8 +24,8 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class SharingTest {
-    val findMax: (Field<*, Int>) -> Int = { e -> e.max(e.localValue) }
-    val findMin: (Field<*, Int>) -> Int = { e -> e.min(e.localValue) }
+    val findMax: (Field<*, Int>) -> Int = { e -> e.maxValue(e.local.value) }
+    val findMin: (Field<*, Int>) -> Int = { e -> e.minValue(e.local.value) }
 
     private fun mooreGridWithProgram(
         size: Int,
@@ -65,7 +64,7 @@ class SharingTest {
         aggregate(1, testNetwork) {
             val result =
                 share(1) {
-                    it.max(it.localValue)
+                    it.maxValue(it.local.value)
                 }
             assertEquals(1, result)
         }
@@ -78,7 +77,7 @@ class SharingTest {
         aggregate(1, testNetwork) {
             val res =
                 sharing(1) {
-                    val min = it.max(it.localValue)
+                    val min = it.maxValue(it.local.value)
                     min.yielding { "A string" }
                 }
             assertEquals("A string", res)
@@ -92,7 +91,7 @@ class SharingTest {
         aggregate(1, testNetwork) {
             val res =
                 sharing(1) {
-                    val min = it.min(it.localValue)
+                    val min = it.minValue(it.local.value)
                     min.yielding { "Hello".takeIf { min > 1 } }
                 }
             assertNull(res)
