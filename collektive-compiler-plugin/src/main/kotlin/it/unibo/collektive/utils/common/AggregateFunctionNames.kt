@@ -8,10 +8,24 @@
 
 package it.unibo.collektive.utils.common
 
+import it.unibo.collektive.aggregate.Field
+import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.YieldingContext
+
 /**
  * The names of the aggregate functions used in the plugin.
  */
 object AggregateFunctionNames {
+    /**
+     * The simple name of the aggregate class.
+     */
+    val AGGREGATE_CLASS_NAME = Aggregate::class.simpleName
+
+    /**
+     * The FQ name of the aggregate class.
+     */
+    val AGGREGATE_CLASS_FQ_NAME = checkNotNull(Aggregate::class.qualifiedName)
+
     /**
      * The simple name of the function that is used to align a block.
      */
@@ -20,42 +34,32 @@ object AggregateFunctionNames {
     /**
      * The FQ name of the function that is used to align a block.
      */
-    const val ALIGNED_ON_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.alignedOn"
+    val ALIGNED_ON_FUNCTION_FQ_NAME = "$AGGREGATE_CLASS_FQ_NAME.$ALIGNED_ON_FUNCTION_NAME"
 
     /**
      * The simple name of the function that is used to start an alignment delimitation.
      */
-    const val ALIGN_FUNCTION_NAME = "align"
+    val ALIGN_FUNCTION_NAME = Aggregate<*>::align.name
 
     /**
      * The FQ name of the function that is used to start an alignment delimitation.
      */
-    const val ALIGN_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.align"
+    val ALIGN_FUNCTION_FQ_NAME = "$AGGREGATE_CLASS_FQ_NAME.$ALIGN_FUNCTION_NAME"
 
     /**
      * The name of the function that is used to stop an alignment delimitation.
      */
-    const val DEALIGN_FUNCTION_NAME = "dealign"
+    val DEALIGN_FUNCTION_NAME = Aggregate<*>::dealign.name
 
     /**
      * The FQ name of the function that is used to stop an alignment delimitation.
      */
-    const val DEALIGN_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.dealign"
-
-    /**
-     * The simple name of the aggregate class.
-     */
-    const val AGGREGATE_CLASS_NAME = "Aggregate"
-
-    /**
-     * The FQ name of the aggregate class.
-     */
-    const val AGGREGATE_CLASS_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate"
+    val DEALIGN_FUNCTION_FQ_NAME = "$AGGREGATE_CLASS_FQ_NAME.$DEALIGN_FUNCTION_NAME"
 
     /**
      * The FQ name of the field class.
      */
-    const val FIELD_CLASS = "it.unibo.collektive.field.Field"
+    val FIELD_CLASS = checkNotNull(Field::class.qualifiedName)
 
     /**
      * The name of the function that is used to project the fields.
@@ -80,7 +84,7 @@ object AggregateFunctionNames {
     /**
      * The FQ name of the `evolve` function.
      */
-    const val EVOLVE_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.evolve"
+    val EVOLVE_FUNCTION_FQ_NAME = "$AGGREGATE_CLASS_FQ_NAME.evolve"
 
     /**
      * The FQ name of the `exchanging` function.
@@ -95,10 +99,10 @@ object AggregateFunctionNames {
     /**
      * The FQ name of the `evolving` function.
      */
-    const val EVOLVING_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.Aggregate.evolving"
+    val EVOLVING_FUNCTION_FQ_NAME = "${AGGREGATE_CLASS_FQ_NAME}.evolving"
 
     /**
      * The FQ name of the `yielding` function.
      */
-    const val YIELDING_FUNCTION_FQ_NAME = "it.unibo.collektive.aggregate.api.YieldingContext.yielding"
+    val YIELDING_FUNCTION_FQ_NAME = "${checkNotNull(YieldingContext::class.qualifiedName)}.yielding"
 }

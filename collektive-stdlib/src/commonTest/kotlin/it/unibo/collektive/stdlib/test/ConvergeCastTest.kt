@@ -19,23 +19,29 @@ import kotlin.Int.Companion.MIN_VALUE
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 class ConvergeCastTest {
     @Test
     fun `convergeCast can count devices`() {
-        val environment = mooreGrid<Int>(10, 10, { _, _ -> MIN_VALUE }) {
+        val size = 10
+        val environment = mooreGrid<Int>(size, size, { _, _ -> MIN_VALUE }) {
             countDevices(localId == 0)
         }
         environment.cycleInOrder()
         assertTrue(environment.nodes.all { it.value == 1 })
         var valueAtSink = 1
-        repeat(9) {
+        repeat(size - 1) {
             environment.cycleInOrder()
             val currentValueAtSink = environment[0].value
             assertTrue(currentValueAtSink > valueAtSink)
             valueAtSink = currentValueAtSink
+            environment.nodes.forEach {
+                assertFalse(it.value > environment.nodes.size)
+                assertFalse(it.value > valueAtSink)
+            }
         }
         assertEquals(environment.nodes.size, valueAtSink)
     }

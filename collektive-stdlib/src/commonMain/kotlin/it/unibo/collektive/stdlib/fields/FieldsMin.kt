@@ -10,81 +10,100 @@ package it.unibo.collektive.stdlib.fields
 
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.FieldEntry
+import it.unibo.collektive.stdlib.util.ExcludingSelf
+import it.unibo.collektive.stdlib.util.IncludingSelf
+import it.unibo.collektive.stdlib.util.ReductionType
+import kotlin.jvm.JvmOverloads
 
 /**
- * Returns the entry that yields the smallest value according to the given [selector],
- * excluding the local entry.
+ * Returns the entry that yields the smallest value according to the given [selector].
  *
- * If multiple entries produce the same minimal value, the result is undefined.
- * If the field contains only the local entry, the result is `null`.
+ * By default, the local entry is excluded from the comparison.
+ * It is included only if [reductionType] is [IncludingSelf].
  *
+ * If multiple entries produce the same minimal value, one is returned arbitrarily.
+ * If the field contains no applicable entries, the result is `null`.
+ *
+ * @param reductionType specifies whether to include the local entry in the comparison (default is [ExcludingSelf]).
  * @param selector a function that maps each entry to a comparable value.
  * @return the entry with the lowest value as determined by [selector], or `null` if none.
  */
+@JvmOverloads
 inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.minBy(
+    reductionType: ReductionType = ExcludingSelf,
     crossinline selector: (FieldEntry<ID, T>) -> R,
-): FieldEntry<ID, T>? = reduce { a, b -> minOf(a, b, compareBy(selector)) }
+): FieldEntry<ID, T>? = minWith(reductionType, compareBy(selector))
 
 /**
- * Returns the ID of the entry that yields the smallest value according to the given [selector],
- * excluding the local entry.
+ * Returns the ID of the entry that yields the smallest value according to the given [selector].
  *
- * If multiple entries produce the same minimal value, the result is undefined.
- * If the field contains only the local entry, the result is `null`.
- *
+ * @param reductionType specifies whether to include the local entry in the comparison (default is [ExcludingSelf]).
  * @param selector a function that maps each entry to a comparable value.
  * @return the ID of the entry with the lowest value, or `null` if none.
  */
-inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.minIDBy(crossinline selector: (FieldEntry<ID, T>) -> R): ID? =
-    minBy(selector)?.id
+@JvmOverloads
+inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.minIDBy(
+    reductionType: ReductionType = ExcludingSelf,
+    crossinline selector: (FieldEntry<ID, T>) -> R,
+): ID? = minBy(reductionType, selector)?.id
 
 /**
- * Returns the value of the entry that yields the smallest value according to the given [selector],
- * excluding the local entry.
+ * Returns the value of the entry that yields the smallest value according to the given [selector].
  *
- * If multiple entries produce the same minimal value, the result is undefined.
- * If the field contains only the local entry, the result is `null`.
- *
+ * @param reductionType specifies whether to include the local entry in the comparison (default is [ExcludingSelf]).
  * @param selector a function that maps each entry to a comparable value.
  * @return the value of the entry with the lowest score, or `null` if none.
  */
+@JvmOverloads
 inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.minValueBy(
+    reductionType: ReductionType = ExcludingSelf,
     crossinline selector: (FieldEntry<ID, T>) -> R,
-): T? = minBy(selector)?.value
+): T? = minBy(reductionType, selector)?.value
 
 /**
- * Returns the entry that yields the smallest value according to the given [comparator],
- * excluding the local entry.
+ * Returns the entry that yields the smallest value according to the given [comparator].
  *
- * If multiple entries are considered equal under the comparator, one is returned arbitrarily.
- * If the field contains only the local entry, the result is `null`.
+ * By default, the local entry is excluded from the comparison.
+ * It is included only if [reductionType] is [IncludingSelf].
  *
+ * If multiple entries are considered equal under the comparator, one of them is returned arbitrarily.
+ * If the field contains no applicable entries, the result is `null`.
+ *
+ * @param reductionType specifies whether to include the local entry in the comparison (default is [ExcludingSelf]).
  * @param comparator a comparator that defines the ordering of entries.
  * @return the entry with the lowest value by [comparator], or `null` if none.
  */
-fun <ID : Any, T> Field<ID, T>.minWith(comparator: Comparator<FieldEntry<ID, T>>): FieldEntry<ID, T>? =
-    maxWith(comparator.reversed())
+@JvmOverloads
+fun <ID : Any, T> Field<ID, T>.minWith(
+    reductionType: ReductionType = ExcludingSelf,
+    comparator: Comparator<FieldEntry<ID, T>>,
+): FieldEntry<ID, T>? = when (reductionType) {
+    ExcludingSelf -> reduce { a, b -> minOf(a, b, comparator) }
+    IncludingSelf -> fold(local) { a, b -> minOf(a, b, comparator) }
+}
 
 /**
- * Returns the value of the entry that yields the smallest value according to the given [comparator],
- * excluding the local entry.
+ * Returns the value of the entry that yields the smallest value according to the given [comparator].
  *
- * If multiple entries are considered equal under the comparator, one is returned arbitrarily.
- * If the field contains only the local entry, the result is `null`.
- *
+ * @param reductionType specifies whether to include the local entry in the comparison (default is [ExcludingSelf]).
  * @param comparator a comparator that defines the ordering of entries.
  * @return the value of the entry with the lowest ordering, or `null` if none.
  */
-fun <ID : Any, T> Field<ID, T>.minValueWith(comparator: Comparator<FieldEntry<ID, T>>): T? = minWith(comparator)?.value
+@JvmOverloads
+fun <ID : Any, T> Field<ID, T>.minValueWith(
+    reductionType: ReductionType = ExcludingSelf,
+    comparator: Comparator<FieldEntry<ID, T>>,
+): T? = minWith(reductionType, comparator)?.value
 
 /**
- * Returns the ID of the entry that yields the smallest value according to the given [comparator],
- * excluding the local entry.
+ * Returns the ID of the entry that yields the smallest value according to the given [comparator].
  *
- * If multiple entries are considered equal under the comparator, one is returned arbitrarily.
- * If the field contains only the local entry, the result is `null`.
- *
+ * @param reductionType specifies whether to include the local entry in the comparison (default is [ExcludingSelf]).
  * @param comparator a comparator that defines the ordering of entries.
  * @return the ID of the entry with the lowest ordering, or `null` if none.
  */
-fun <ID : Any, T> Field<ID, T>.minIDWith(comparator: Comparator<FieldEntry<ID, T>>): ID? = minWith(comparator)?.id
+@JvmOverloads
+fun <ID : Any, T> Field<ID, T>.minIDWith(
+    reductionType: ReductionType = ExcludingSelf,
+    comparator: Comparator<FieldEntry<ID, T>>,
+): ID? = minWith(reductionType, comparator)?.id

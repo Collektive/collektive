@@ -29,7 +29,7 @@ import it.unibo.collektive.state.impl.getTyped
 
 /**
  * Context for managing aggregate computation.
- * It represents the [localId] of the device, the [inboundMessage] received from the neighbours,
+ * It represents the [localId] of the device, the [inboundMessage] received from the neighbors,
  * and the [previousState] of the device.
  */
 internal class AggregateContext<ID : Any>(

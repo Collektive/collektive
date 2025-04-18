@@ -20,6 +20,7 @@ import it.unibo.collektive.stdlib.fields.collectIDsMatching
 import it.unibo.collektive.stdlib.fields.foldValues
 import it.unibo.collektive.stdlib.fields.minWith
 import it.unibo.collektive.stdlib.spreading.hopDistanceTo
+import it.unibo.collektive.stdlib.util.IncludingSelf
 import it.unibo.collektive.stdlib.util.Maybe
 import it.unibo.collektive.stdlib.util.Maybe.Companion.merge
 import it.unibo.collektive.stdlib.util.Maybe.Companion.some
@@ -222,7 +223,7 @@ internal inline fun <reified ID : Any, reified P : Comparable<P>> defaultCompara
 inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggregate<ID>.findParent(
     potential: Field<ID, Potential>,
     comparator: Comparator<FieldEntry<ID, Potential>> = defaultComparator(),
-): ID = potential.minWith(comparator)?.id ?: localId
+): ID = potential.minWith(IncludingSelf, comparator)?.id ?: localId
 
 /**
  * Find the best neighbor of the current device along a [potential] field,
