@@ -14,6 +14,7 @@ import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
 import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.aggregate.api.sharing
 import it.unibo.collektive.stdlib.fields.foldValues
+import it.unibo.collektive.stdlib.fields.minValueBy
 import it.unibo.collektive.stdlib.util.Reducer
 import it.unibo.collektive.stdlib.util.coerceIn
 import it.unibo.collektive.stdlib.util.hops
@@ -58,7 +59,7 @@ inline fun <reified ID, reified Value, reified Distance> Aggregate<ID>.bellmanFo
         when {
             source -> bottom to local
             else ->
-                TODO() // paths.minValueBy { it.value.first } ?: topValue // sort by distance from the nearest source
+                paths.minValueBy { it.value.first } ?: topValue // sort by distance from the nearest source
         }
     }.second // return the data
 }

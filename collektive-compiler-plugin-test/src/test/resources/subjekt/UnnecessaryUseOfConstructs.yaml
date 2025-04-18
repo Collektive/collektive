@@ -11,6 +11,7 @@ config:
     import it.unibo.collektive.aggregate.api.exchanging
     import it.unibo.collektive.stdlib.fields.max
     import it.unibo.collektive.stdlib.fields.maxBy
+    import it.unibo.collektive.stdlib.fields.maxValue
     import it.unibo.collektive.aggregate.api.neighboring
     import it.unibo.collektive.aggregate.api.share
     import it.unibo.collektive.aggregate.api.sharing
@@ -59,8 +60,8 @@ parameters:
           it + 1
         }
       - |-
-        exchange(initial) {
-          it.map { it + 1 }
+        exchange(initial) { field ->
+          field.mapValues { it + 1 }
         }
       - |-
         neighboring {
@@ -79,12 +80,12 @@ parameters:
           initial
         }
       - |-
-        exchanging(initial) {
-          it.yielding { it.map { it + 1 }}
+        exchanging(initial) { field ->
+          field.yielding { field.mapValues { it + 1 }}
         }
       - |-
         sharing(initial) {
-          it.max(it.localValue).yielding { "Test" }
+          it.maxValue(it.local.value).yielding { "Test" }
         }
 
   - name: CONSTRUCT_IMPLICIT_SHADOWED
@@ -143,7 +144,7 @@ parameters:
         }
       - |-
         share(initial) { field ->
-          field.maxBy(0) { v -> v }
+          field.maxValue(0)
         }
       - |-
         evolving(initial) { field ->
@@ -159,7 +160,7 @@ parameters:
         }
       - |-
         sharing(initial) { field ->
-            field.max(field.localValue).yielding { "Test" }
+            field.maxValue(field.local.value).yielding { "Test" }
         }
 
 subjects:

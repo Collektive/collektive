@@ -285,7 +285,7 @@ internal abstract class AbstractField<ID : Any, T>(override val local: FieldEntr
     private val neighborhood: Map<ID, T> by lazy { neighborsMap() }
 
     private val stringRepresentation: String by lazy {
-        val neighborsList = asMap.toList()
+        val neighborsList = excludeSelf().toList()
         val sortedEntries = neighborsList.sortedWith { (id1, v1), (id2, v2) ->
             when (val byId = tryCompare(id1, id2)) {
                 0 -> tryCompare(v1, v2)
@@ -342,7 +342,12 @@ internal abstract class AbstractField<ID : Any, T>(override val local: FieldEntr
 internal class ArrayBasedField<ID : Any, T>(localId: ID, localValue: T, private val others: List<FieldEntry<ID, T>>) :
     AbstractField<ID, T>(localId, localValue) {
     override val neighborsCount: Int get() = others.size
-    override val neighbors: Set<ID> by lazy { others.mapTo(mutableSetOf()) { it.id } }
+    override val neighbors: Set<ID> by lazy {
+        others.mapTo(mutableSetOf()) {
+            checkNotLocal(it.id)
+            it.id
+        }
+    }
     override val neighborsValues by lazy { others.mapTo(ArrayList(neighborsCount)) { it.value } }
 
     override fun neighborValueOf(id: ID): T = when {
@@ -351,9 +356,14 @@ internal class ArrayBasedField<ID : Any, T>(localId: ID, localValue: T, private 
     }
 
     override fun <R> mapOthersAsSequence(transform: (FieldEntry<ID, T>) -> R): Sequence<FieldEntry<ID, R>> =
-        others.asSequence().map { it.map(transform) }
+        others.asSequence().map {
+            checkNotLocal(it.id)
+            it.map(transform)
+        }
 
-    override fun neighborsMap(): Map<ID, T> = buildMap { others.forEach { this[it.id] = it.value } }
+    override fun neighborsMap(): Map<ID, T> = buildMap {
+        others.forEach { this[checkNotLocal(it.id)] = it.value }
+    }
 
     override fun asSequence(): Sequence<FieldEntry<ID, T>> = others.asSequence() + local
 
@@ -370,29 +380,46 @@ internal class SequenceBasedField<ID : Any, T>(
 
     override val neighborsCount get() = neighbors.size
 
-    override val neighbors: Set<ID> by lazy { others.mapTo(mutableSetOf()) { it.id } }
+    override val neighbors: Set<ID> by lazy {
+        others.mapTo(mutableSetOf()) { checkNotLocal(it.id) }
+    }
 
-    override val neighborsValues: List<T> by lazy { others.mapTo(ArrayList(neighborsCount)) { it.value } }
+    override val neighborsValues: List<T> by lazy {
+        others.mapTo(ArrayList(neighborsCount)) {
+            checkNotLocal(it.id)
+            it.value
+        }
+    }
 
     override fun asSequence(): Sequence<FieldEntry<ID, T>> = others + local
 
-    override fun neighborsMap(): Map<ID, T> = buildMap { putAll(others.map { it.pair }) }
+    override fun neighborsMap(): Map<ID, T> = buildMap {
+        putAll(
+            others.map {
+                checkNotLocal(it.id)
+                it.pair
+            },
+        )
+    }
 
     override fun neighborValueOf(id: ID): T = excludeSelf().getValue(id)
 
     override fun <R> mapOthersAsSequence(transform: (FieldEntry<ID, T>) -> R): Sequence<FieldEntry<ID, R>> =
-        others.map { it.map(transform) }
+        others.map {
+            checkNotLocal(it.id)
+            it.map(transform)
+        }
 }
 
-internal class ConstantField<ID : Any, T>(localId: ID, localValue: T, private val neighborsIds: Set<ID>) :
+internal class ConstantField<ID : Any, T>(localId: ID, localValue: T, override val neighbors: Set<ID>) :
     AbstractField<ID, T>(localId, localValue) {
-    override val neighborsCount: Int = neighborsIds.size
-
-    override val neighbors: Set<ID> = neighborsIds
+    override val neighborsCount: Int = neighbors.size
 
     override val neighborsValues: List<T> by lazy {
-        buildList(neighborsIds.size) {
-            repeat(neighborsIds.size) { add(localValue) }
+        buildList(neighbors.size) {
+            repeat(neighbors.size) {
+                add(localValue)
+            }
         }
     }
 
@@ -401,16 +428,23 @@ internal class ConstantField<ID : Any, T>(localId: ID, localValue: T, private va
     }
 
     private val reifiedList by lazy {
-        neighborsIds.map { id -> id to localValue }
+        neighbors.map { id -> checkNotLocal(id) to localValue }
     }
 
     override fun <R> mapOthersAsSequence(transform: (FieldEntry<ID, T>) -> R): Sequence<FieldEntry<ID, R>> =
-        neighbors.asSequence().map { FieldEntry(it, local.value).map(transform) }
+        neighbors.asSequence().map { FieldEntry(checkNotLocal(it), local.value).map(transform) }
 
     override fun neighborValueOf(id: ID): T = local.value
 
     override fun neighborsMap(): Map<ID, T> = reified
 
     override fun asSequence(): Sequence<FieldEntry<ID, T>> =
-        neighborsIds.asSequence().map { FieldEntry(it, local.value) } + local
+        neighbors.asSequence().map { FieldEntry(checkNotLocal(it), local.value) } + local
+}
+
+private fun <ID : Any> Field<ID, *>.checkNotLocal(id: ID): ID {
+    check(id != local.id) {
+        "Local value $id is both local and neighboring. This is a bug in ${this::class.simpleName}"
+    }
+    return id
 }

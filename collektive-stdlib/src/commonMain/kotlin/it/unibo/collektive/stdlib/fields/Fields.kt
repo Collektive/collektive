@@ -12,7 +12,7 @@ import it.unibo.collektive.aggregate.Field
 
 /**
  * Checks whether the given [value] is present in the field, including the local value.
- *
+ *.
  * This function returns `true` if [value] is equal to the local value or is contained
  * in the values of the neighboring entries.
  *
