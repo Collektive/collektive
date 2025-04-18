@@ -28,6 +28,7 @@ class GradientTest {
             simulation.environment.addTerminator(AfterTime(DoubleTime(10.0)))
             simulation.play()
             simulation.run()
+            simulation.error.ifPresent { exception -> throw exception }
             assertEquals(10, simulation.environment.nodes.size)
             val moleculeToRead = SimpleMolecule("Gradient")
             val sourceNode = simulation.environment.nodes.first { node ->
