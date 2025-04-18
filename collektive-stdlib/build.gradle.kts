@@ -65,18 +65,3 @@ kotlinMultiplatform {
 //        freeCompilerArgs.add("-Xcontext-parameters")
 //    }
 // }
-
-powerAssert {
-    functions =
-        listOf(
-            "assert",
-            "check",
-            "checkNotNull",
-            "require",
-            "requireNotNull",
-            "test.assertTrue",
-            "test.assertEquals",
-            "test.assertNull",
-        ).map { "kotlin.$it" }
-    includedSourceSets = listOf("commonMain", "commonTest")
-}
