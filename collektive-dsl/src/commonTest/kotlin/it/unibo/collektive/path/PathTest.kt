@@ -32,7 +32,7 @@ class PathTest {
 
     @Test
     fun `alignment errors with full paths are decently readable`() {
-        @Suppress("UNCHECKED_CAST")
+        @Suppress("AGGREGATE_FUNCTION_INSIDE_ITERATION")
         fun Aggregate<Int>.baz() = listOf(1, 2).map { neighboring(it) }
         fun Aggregate<Int>.bar() = baz()
         fun Aggregate<Int>.foo() = bar()
