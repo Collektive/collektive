@@ -282,7 +282,7 @@ sealed interface Field<ID : Any, out T> {
 
 internal abstract class AbstractField<ID : Any, T>(override val local: FieldEntry<ID, T>) : Field<ID, T> {
 
-    @Deprecated("Use local.value instead", replaceWith = ReplaceWith("local.id"))
+    @Deprecated("Use local.id instead", replaceWith = ReplaceWith("local.id"))
     override val localId: ID get() = local.id
 
     @Deprecated("Use local.value instead", replaceWith = ReplaceWith("local.value"))
