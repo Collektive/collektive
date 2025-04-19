@@ -1,3 +1,13 @@
+## [23.0.0](https://github.com/Collektive/collektive/compare/22.3.2...23.0.0) (2025-04-19)
+
+### ⚠ BREAKING CHANGES
+
+* rethink fields and field reduction operations (#914)
+
+### Refactoring
+
+* rethink fields and field reduction operations ([#914](https://github.com/Collektive/collektive/issues/914)) ([4456ab3](https://github.com/Collektive/collektive/commit/4456ab361670b3dd149100354f2d42c35ab017ef))
+
 ## [22.3.2](https://github.com/Collektive/collektive/compare/22.3.1...22.3.2) (2025-04-19)
 
 ### Dependency updates
