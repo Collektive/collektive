@@ -15,7 +15,7 @@ sealed interface Field<ID : Any, out T> {
     /**
      * The [ID] of the local node.
      */
-    @Deprecated("Use local.value instead", replaceWith = ReplaceWith("local.id"))
+    @Deprecated("Use local.id instead", replaceWith = ReplaceWith("local.id"))
     val localId: ID
 
     /**
