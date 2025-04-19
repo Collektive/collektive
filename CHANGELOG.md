@@ -1,3 +1,26 @@
+## [22.3.2](https://github.com/Collektive/collektive/compare/22.3.1...22.3.2) (2025-04-19)
+
+### Dependency updates
+
+* **deps:** update plugin multijvmtesting to v3.4.0 ([8a0cdf9](https://github.com/Collektive/collektive/commit/8a0cdf9d225d042a5bd9f6b191621983de264255))
+
+### Bug Fixes
+
+* **compiler-plugin:** fix wording of some warnings ([#912](https://github.com/Collektive/collektive/issues/912)) ([fcff127](https://github.com/Collektive/collektive/commit/fcff1271fc7c01266d4b234f7aed252f240a985e))
+
+### Tests
+
+* **alchemist-incarnation-collektive:** throw exception on simulation failure ([#913](https://github.com/Collektive/collektive/issues/913)) ([35329c9](https://github.com/Collektive/collektive/commit/35329c983d04bd99032b88982d4d76c2e8dadcbb))
+* **dsl:** fix the network so that it does not send messages to self ([#908](https://github.com/Collektive/collektive/issues/908)) ([a0d1f26](https://github.com/Collektive/collektive/commit/a0d1f26cdda78eee43d2c6cbf2f441b3258da0eb))
+
+### Build and continuous integration
+
+* **collektive-gradle-plugin:** prefer `assignGitSemanticVersion()` over custom methods ([#906](https://github.com/Collektive/collektive/issues/906)) ([a3a1db9](https://github.com/Collektive/collektive/commit/a3a1db9203788fec2693569df60f0ffd76b82cee))
+
+### Style improvements
+
+* **dsl:** fix incorrect suppression ([#907](https://github.com/Collektive/collektive/issues/907)) ([bf4b939](https://github.com/Collektive/collektive/commit/bf4b939544f6e9bb16f637e0ac47ebd0152e2a24))
+
 ## [22.3.1](https://github.com/Collektive/collektive/compare/22.3.0...22.3.1) (2025-04-16)
 
 ### Documentation
