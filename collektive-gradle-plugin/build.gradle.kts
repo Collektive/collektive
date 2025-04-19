@@ -27,8 +27,7 @@ dependencies {
 }
 
 gitSemVer {
-    val forceVersion: String? by project
-    version = forceVersion ?: computeVersion()
+    assignGitSemanticVersion()
 }
 
 buildConfig {
