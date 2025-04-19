@@ -8,7 +8,7 @@
 
 package it.unibo.collektive.aggregate.api
 
-import it.unibo.collektive.field.Field
+import it.unibo.collektive.aggregate.Field
 
 /**
  * [exchange] implements *anisotropic* data sharing
@@ -45,7 +45,7 @@ inline fun <ID : Any, reified Shared> Aggregate<ID>.exchange(
  * as it does not actually share the constant with neighbors.
  */
 inline fun <ID : Any, T> Aggregate<ID>.mapNeighborhood(crossinline local: (ID) -> T): Field<ID, T> =
-    neighborhood().mapWithId { id, _ -> local(id) }
+    neighborhood().map { (id, _) -> local(id) }
 
 /**
  * builds a [Field] of aligned [ID]s with minimal communication.
@@ -86,6 +86,6 @@ inline fun <ID : Any, reified Shared, Returned> Aggregate<ID>.sharing(
 ): Returned = exchanging(initial) { field: Field<ID, Shared> ->
     with(YieldingContext<Shared, Returned>()) {
         val result: YieldingResult<Shared, Returned> = body(field)
-        field.mapToConstantField(result.toSend).yielding { result.toReturn }
+        field.mapToConstant(result.toSend).yielding { result.toReturn }
     }
 }

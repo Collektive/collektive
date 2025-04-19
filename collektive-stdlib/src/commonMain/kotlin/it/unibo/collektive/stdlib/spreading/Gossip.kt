@@ -19,8 +19,8 @@ package it.unibo.collektive.stdlib.spreading
 
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.share
-import it.unibo.collektive.field.Field.Companion.fold
-import it.unibo.collektive.field.Field.Companion.foldWithId
+import it.unibo.collektive.stdlib.fields.fold
+import it.unibo.collektive.stdlib.fields.foldValues
 import kotlinx.serialization.Serializable
 
 /**
@@ -53,7 +53,7 @@ inline fun <reified ID : Comparable<ID>, reified Value> Aggregate<ID>.gossipMax(
     return share(localGossip) { gossip ->
         val neighbors = gossip.neighbors.toSet()
         val result =
-            gossip.foldWithId(localGossip) { current, id, next ->
+            gossip.fold(localGossip) { current, (id, next) ->
                 val valid =
                     next.path
                         .asReversed()
@@ -114,7 +114,7 @@ inline fun <reified ID : Comparable<ID>> Aggregate<ID>.isHappeningAnywhere(condi
 inline fun <ID : Any, reified Value> Aggregate<ID>.nonStabilizingGossip(
     value: Value,
     noinline aggregation: (Value, Value) -> Value,
-): Value = share(value) { it.fold(value, aggregation) }
+): Value = share(value) { it.foldValues(value, aggregation) }
 
 /**
  * A **non-self-stabilizing** function returning `true` if at any point in time a certain [condition] happened.

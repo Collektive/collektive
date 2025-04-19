@@ -14,11 +14,11 @@ import it.unibo.alchemist.model.NodeProperty
 import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Time
 import it.unibo.alchemist.model.molecules.SimpleMolecule
+import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.DataSharingMethod
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
-import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.Mailbox
 import it.unibo.collektive.networking.Message
 import it.unibo.collektive.networking.NeighborsData
@@ -71,7 +71,7 @@ class CollektiveDevice<P>(
      * Returns the distances to the neighboring nodes.
      */
     fun <ID : Any> Aggregate<ID>.distances(): Field<ID, Double> = environment.getPosition(node).let { nodePosition ->
-        neighboring(nodePosition.coordinates).map { position ->
+        neighboring(nodePosition.coordinates).mapValues { position ->
             nodePosition.distanceTo(environment.makePosition(position))
         }
     }

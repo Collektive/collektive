@@ -8,10 +8,10 @@
 
 package it.unibo.collektive.stdlib.util
 
+import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.mapNeighborhood
 import it.unibo.collektive.aggregate.api.neighboring
-import it.unibo.collektive.field.Field
 import kotlinx.serialization.Serializable
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -168,7 +168,7 @@ inline fun <ID : Any> Aggregate<ID>.euclideanDistance2D(
 ): Field<ID, Double> {
     contract { callsInPlace(extractPosition, InvocationKind.EXACTLY_ONCE) }
     val myPosition = extractPosition(localId)
-    return neighboring(myPosition).map { it.distanceTo(myPosition) }
+    return neighboring(myPosition).mapValues { it.distanceTo(myPosition) }
 }
 
 /**
@@ -177,7 +177,7 @@ inline fun <ID : Any> Aggregate<ID>.euclideanDistance2D(
  * @param localPosition a function that extracts the position of a node given its ID.
  */
 fun <ID : Any> Aggregate<ID>.euclideanDistance2D(localPosition: Point2D): Field<ID, Double> =
-    neighboring(localPosition).map { it.distanceTo(localPosition) }
+    neighboring(localPosition).mapValues { it.distanceTo(localPosition) }
 
 /**
  * Returns a field containing the Euclidean distance from the local node to each neighbor.
@@ -185,7 +185,7 @@ fun <ID : Any> Aggregate<ID>.euclideanDistance2D(localPosition: Point2D): Field<
  * @param localPosition a function that extracts the position of a node given its ID.
  */
 fun <ID : Any> Aggregate<ID>.euclideanDistance2D(localPosition: Pair<Double, Double>): Field<ID, Double> =
-    Point2D(localPosition).let { neighboring(it).map { other -> other.distanceTo(it) } }
+    Point2D(localPosition).let { neighboring(it).mapValues { other -> other.distanceTo(it) } }
 
 /**
  * Returns a field containing the Euclidean distance from the local node to each neighbor.
@@ -198,7 +198,7 @@ inline fun <ID : Any> Aggregate<ID>.euclideanDistance3D(
 ): Field<ID, Double> {
     contract { callsInPlace(extractPosition, InvocationKind.EXACTLY_ONCE) }
     val myPosition = extractPosition(localId)
-    return neighboring(myPosition).map { it.distanceTo(myPosition) }
+    return neighboring(myPosition).mapValues { it.distanceTo(myPosition) }
 }
 
 /**
@@ -207,7 +207,7 @@ inline fun <ID : Any> Aggregate<ID>.euclideanDistance3D(
  * @param localPosition a function that extracts the position of a node given its ID.
  */
 fun <ID : Any> Aggregate<ID>.euclideanDistance3D(localPosition: Point3D): Field<ID, Double> =
-    neighboring(localPosition).map { it.distanceTo(localPosition) }
+    neighboring(localPosition).mapValues { it.distanceTo(localPosition) }
 
 /**
  * Returns a field containing the Euclidean distance from the local node to each neighbor.
@@ -215,4 +215,4 @@ fun <ID : Any> Aggregate<ID>.euclideanDistance3D(localPosition: Point3D): Field<
  * @param localPosition a function that extracts the position of a node given its ID.
  */
 fun <ID : Any> Aggregate<ID>.euclideanDistance3D(localPosition: Triple<Double, Double, Double>): Field<ID, Double> =
-    Point3D(localPosition).let { neighboring(it).map { other -> other.distanceTo(it) } }
+    Point3D(localPosition).let { neighboring(it).mapValues { other -> other.distanceTo(it) } }
