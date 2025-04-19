@@ -9,9 +9,9 @@
 package it.unibo.collektive.entrypoint
 
 import it.unibo.collektive.Collektive
+import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.exchange
-import it.unibo.collektive.field.Field
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 import kotlin.test.Test
@@ -26,14 +26,14 @@ class CollektiveTest {
     val initV3 = 3
 
     val increaseOrDouble: (Field<Int, Int>) -> Field<Int, Int> = { f ->
-        f.mapWithId { _, v -> if (v % 2 == 0) v + 1 else v * 2 }
+        f.map { (_, v) -> if (v % 2 == 0) v + 1 else v * 2 }
     }
 
     val computeFunctionDevice0: Aggregate<Int>.() -> Int = {
-        exchange(initV2, increaseOrDouble).localValue
+        exchange(initV2, increaseOrDouble).local.value
     }
 
-    fun Aggregate<Int>.computeFunctionDevice1(): Int = exchange(initV3, increaseOrDouble).localValue
+    fun Aggregate<Int>.computeFunctionDevice1(): Int = exchange(initV3, increaseOrDouble).local.value
 
     @Test
     fun `One Collektive device with cycle as entrypoint should work fine`() {
@@ -41,7 +41,7 @@ class CollektiveTest {
         val network0 = NetworkImplTest(networkManager, id0)
         val collectiveDevice =
             Collektive(id0, network0) {
-                exchange(initV1, increaseOrDouble).localValue
+                exchange(initV1, increaseOrDouble).local.value
             }
 
         val result = collectiveDevice.cycle()
@@ -54,7 +54,7 @@ class CollektiveTest {
         val network0 = NetworkImplTest(networkManager, id0)
         val collectiveDevice =
             Collektive(id0, network0) {
-                exchange(initV1, increaseOrDouble).localValue
+                exchange(initV1, increaseOrDouble).local.value
             }
 
         val result = collectiveDevice.cycleWhile { it.result < 10 }
@@ -114,11 +114,11 @@ class CollektiveTest {
         val network1 = NetworkImplTest(networkManager, id1)
         val collektiveDevice0 =
             Collektive(id0, network0) {
-                exchange(1, increaseOrDouble).localValue
+                exchange(1, increaseOrDouble).local.value
             }
         val collektiveDevice1 =
             Collektive(id1, network1) {
-                exchange(2, increaseOrDouble).localValue
+                exchange(2, increaseOrDouble).local.value
             }
         // from its initial value 1, apply increaseOrDouble, then sends to device1
         assertEquals(2, collektiveDevice0.cycle())

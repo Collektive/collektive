@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 @file:OptIn(ExperimentalKotlinGradlePluginApi::class)
 
 import it.unibo.collektive.collektivize.CollektivizeTask
@@ -36,6 +44,7 @@ tasks.withType<SourceTask>().configureEach {
 kotlinMultiplatform {
     sourceSets {
         commonMain {
+//            languageSettings.enableLanguageFeature("ContextParameters")
             dependencies {
                 implementation(collektive("dsl"))
                 implementation(rootProject.libs.kotlinx.serialization.core)
@@ -51,17 +60,8 @@ kotlinMultiplatform {
     }
 }
 
-powerAssert {
-    functions =
-        listOf(
-            "assert",
-            "check",
-            "checkNotNull",
-            "require",
-            "requireNotNull",
-            "test.assertTrue",
-            "test.assertEquals",
-            "test.assertNull",
-        ).map { "kotlin.$it" }
-    includedSourceSets = listOf("commonMain", "commonTest")
-}
+// tasks.withType<KotlinCompilationTask<*>>().configureEach {
+//    compilerOptions {
+//        freeCompilerArgs.add("-Xcontext-parameters")
+//    }
+// }

@@ -9,7 +9,8 @@ else
 fi
 git -C site/build push || exit 4
 ./gradlew -PforceVersion=\${nextRelease.version} collektive-gradle-plugin:publishPlugins -Pgradle.publish.key=$GRADLE_PUBLISH_KEY -Pgradle.publish.secret=$GRADLE_PUBLISH_SECRET || exit 5
-./gradlew -PstagingRepositoryId=\${process.env.STAGING_REPO_ID} releaseStagingRepositoryOnMavenCentral || exit 6
+./gradlew -PforceVersion=\${nextRelease.version} collektivize:publishPlugins -Pgradle.publish.key=$GRADLE_PUBLISH_KEY -Pgradle.publish.secret=$GRADLE_PUBLISH_SECRET || exit 6
+./gradlew -PstagingRepositoryId=\${process.env.STAGING_REPO_ID} releaseStagingRepositoryOnMavenCentral || exit 7
 `;
 
 import config from 'semantic-release-preconfigured-conventional-commits' with {type: 'json'}

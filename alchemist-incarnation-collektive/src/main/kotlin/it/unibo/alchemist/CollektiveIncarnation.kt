@@ -314,7 +314,8 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
                 }
             }
             check(!messages.hasErrors() && result == ExitCode.OK) {
-                "Compilation of Collektive program $name failed:\n$finalCode"
+                "Compilation of Collektive program $name failed:\n$finalCode\n\n" +
+                    messages[ERROR].joinToString(separator = "\n")
             }
             return messages to result
         }

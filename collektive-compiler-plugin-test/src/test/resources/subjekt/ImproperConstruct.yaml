@@ -7,52 +7,53 @@ config:
     */
     import it.unibo.collektive.aggregate.api.neighboring
     import it.unibo.collektive.aggregate.api.Aggregate
-    import it.unibo.collektive.field.operations.max
+    import it.unibo.collektive.stdlib.fields.max
+    import it.unibo.collektive.stdlib.fields.maxValue
 
 parameters:
   - name: IMPROPER_CONSTRUCT_EXPLICIT
     values:
       - |-
         evolve(0) { value ->
-            neighboring(value).max(0)
+            neighboring(value).maxValue(0)
         }
       - |-
         evolving(0) { value ->
-            neighboring(value).max(0).yielding { "test" }
+            neighboring(value).maxValue(0).yielding { "test" }
         }
   - name: IMPROPER_CONSTRUCT_IMPLICIT
     values:
       - |-
         evolve(0) {
-            neighboring(it).max(0)
+            neighboring(it).maxValue(0)
         }
       - |-
         evolving(0) {
-            neighboring(it).max(0).yielding { "test" }
+            neighboring(it).maxValue(0).yielding { "test" }
         }
   - name: IMPROPER_CONSTRUCT_DELEGATED_FIELD_EXPLICIT
     values:
       - |-
         evolve(0) { value ->
             val newValue = value + 1
-            neighboring(newValue).max(0)
+            neighboring(newValue).maxValue(0)
         }
       - |-
         evolving(0) { value ->
             val newValue = value + 1
-            neighboring(newValue).max(0).yielding { "test" }
+            neighboring(newValue).maxValue(0).yielding { "test" }
         }
   - name: IMPROPER_CONSTRUCT_DELEGATED_FIELD_IMPLICIT
     values:
       - |-
         evolve(0) {
             val newValue = it + 1
-            neighboring(newValue).max(0)
+            neighboring(newValue).maxValue(0)
         }
       - |-
         evolving(0) { 
             val newValue = it + 1
-            neighboring(newValue).max(0).yielding { "test" }
+            neighboring(newValue).maxValue(0).yielding { "test" }
         }
   - name: PROPER_CONSTRUCT_EXPLICIT
     values:

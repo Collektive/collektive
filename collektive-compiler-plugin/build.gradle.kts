@@ -1,4 +1,17 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
+import de.aaschmid.gradle.plugins.cpd.Cpd
+import io.gitlab.arturbosch.detekt.Detekt
+import org.jetbrains.dokka.gradle.tasks.DokkaGenerateTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 
 plugins {
     alias(libs.plugins.dokka)
@@ -20,6 +33,7 @@ repositories {
 dependencies {
     compileOnly(libs.kotlin.compiler.embeddable)
     implementation(libs.kotlin.reflect)
+    implementation(libs.kotlinx.serialization.core)
 }
 
 buildConfig {
@@ -93,3 +107,53 @@ publishOnCentral {
         }
     }
 }
+
+val dslSource = rootProject.layout.buildDirectory.dir("dsl-api")
+
+sourceSets {
+    main {
+        kotlin {
+            srcDir(dslSource)
+        }
+    }
+}
+
+val importDsl by tasks.registering(Copy::class) {
+    listOf(
+        "Aggregate",
+        "DataSharingMethod",
+        "Field",
+        "FieldEntry",
+        "YieldSupport",
+    ).forEach { file ->
+        from(
+            rootProject.rootDir.resolve("../collektive-dsl/src/commonMain/kotlin/").walkTopDown().single {
+                it.name == "$file.kt"
+            },
+        )
+    }
+    into(dslSource)
+}
+
+inline fun <reified T : Task> dependOnDslSource() {
+    tasks.withType<T>().configureEach {
+        dependsOn(importDsl)
+    }
+}
+
+tasks.withType<Detekt>().configureEach {
+    setSource("src/main/kotlin")
+}
+
+tasks.detektTest.configure {
+    // Tests are performed in a dedicated project
+    enabled = false
+}
+
+dependOnDslSource<Cpd>()
+dependOnDslSource<DokkaGenerateTask>()
+dependOnDslSource<KotlinCompilationTask<*>>()
+dependOnDslSource<KtLintFormatTask>()
+dependOnDslSource<KtLintCheckTask>()
+dependOnDslSource<Jar>()
+dependOnDslSource<org.gradle.jvm.tasks.Jar>()
