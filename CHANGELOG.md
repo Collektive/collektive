@@ -1,3 +1,14 @@
+## [23.0.1](https://github.com/Collektive/collektive/compare/23.0.0...23.0.1) (2025-04-20)
+
+### Dependency updates
+
+* **deps:** update alchemist to v42.0.9 ([54f1bbe](https://github.com/Collektive/collektive/commit/54f1bbe3f0c9d6774e79e453dd314a7da1ae68ef))
+* **deps:** update dependency react-router-dom to v7.5.1 ([da5d48c](https://github.com/Collektive/collektive/commit/da5d48c6c51cdded37580ec9d0e5bca63cd66a83))
+
+### Documentation
+
+* **website:** propose a logo for Collektivize ([#919](https://github.com/Collektive/collektive/issues/919)) ([824d106](https://github.com/Collektive/collektive/commit/824d106e494dd98855a59847b1cf4bd1a20980db))
+
 ## [23.0.0](https://github.com/Collektive/collektive/compare/22.3.2...23.0.0) (2025-04-19)
 
 ### ⚠ BREAKING CHANGES
