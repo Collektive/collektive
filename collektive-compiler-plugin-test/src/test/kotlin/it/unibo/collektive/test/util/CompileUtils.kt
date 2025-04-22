@@ -1,7 +1,16 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 package it.unibo.collektive.test.util
 
 import it.unibo.collektive.compiler.CollektiveK2JVMCompiler
 import it.unibo.collektive.compiler.logging.CollectingMessageCollector
+import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import java.io.File
 import java.io.FileNotFoundException
@@ -13,7 +22,8 @@ object CompileUtils {
         val fileName: String,
         val program: String,
     ) {
-        infix fun shouldCompileWith(compilationCheck: (CollectingMessageCollector) -> Unit) {
+
+        fun compile(): Pair<ExitCode, CollectingMessageCollector> {
             val collector = CollectingMessageCollector()
             val tempDir =
                 createTempDirectory("collektive-test").toFile().also {
@@ -23,8 +33,12 @@ object CompileUtils {
                 tempDir.resolve(fileName).apply {
                     writeText(program)
                 }
-            CollektiveK2JVMCompiler.compile(listOf(programFile), collector)
+            return CollektiveK2JVMCompiler.compile(listOf(programFile), collector) to collector
+        }
+
+        infix fun shouldCompileWith(compilationCheck: (CollectingMessageCollector) -> Unit) {
             // Ensure no compilation errors (excluding "-Werror" warnings treated as errors)
+            val (_, collector) = compile()
             val errorMessages = collector[CompilerMessageSeverity.ERROR].filterNot { it.message.contains("-Werror") }
             assertTrue(errorMessages.isEmpty(), "Compilation errors found: $errorMessages")
             // Apply the provided compilation check
