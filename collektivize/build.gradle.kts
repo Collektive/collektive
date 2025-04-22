@@ -29,7 +29,7 @@ group = "it.unibo.collektive"
 val githubSlug = "collektive/collektive"
 
 class ProjectInfo {
-    val longName = "Collektivize: Collketive Code Generator"
+    val longName = "Collektivize: Collektive Code Generator"
     val description = "This plugin generates a \"fielded\" version of any Kotlin library."
     val website = "https://collektive.github.io/"
     val vcsUrl = "https://github.com/$githubSlug.git"
