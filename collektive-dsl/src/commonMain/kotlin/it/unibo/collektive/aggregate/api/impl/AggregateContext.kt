@@ -138,6 +138,8 @@ internal class AggregateContext<ID : Any>(
  */
 @DelicateCollektiveApi
 fun <ID : Any, T> Aggregate<ID>.project(field: Field<ID, T>): Field<ID, T> {
+    // Equivalent to `mapNeighborhood { field[it] }`,
+    // but avoids the operation entirely if there has been no restriction.
     val others = neighborhood()
     return when {
         field.neighborsCount == others.neighborsCount -> field
