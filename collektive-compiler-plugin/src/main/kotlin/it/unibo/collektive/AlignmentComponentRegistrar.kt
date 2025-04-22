@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 package it.unibo.collektive
 
 import it.unibo.collektive.frontend.CollektiveFrontendExtensionRegistrar
@@ -22,16 +30,23 @@ class AlignmentComponentRegistrar : CompilerPluginRegistrar() {
 
     override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
         val logger = configuration.get(CommonConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE)
-        configuration.requireConfiguration(CommonConfigurationKeys.USE_FIR, true, logger) {
-            "The IR verification has been explicitly disabled, but the Collektive compiler plugin requires it"
-        }
         if (configuration.get(AlignmentCommandLineProcessor.ARG_ENABLED) != false) {
             IrGenerationExtension.registerExtension(AlignmentIrGenerationExtension(logger))
             FirExtensionRegistrarAdapter.registerExtension(CollektiveFrontendExtensionRegistrar())
         }
     }
 
-    private fun <T> CompilerConfiguration.requireConfiguration(
+    /**
+     * Ensures that a specific configuration key in the CompilerConfiguration is set to the required value.
+     * If the key is not present or its value does not match the expected value, the configuration is
+     * updated (if not finalized), or an error is raised based on specified conditions.
+     *
+     * @param key The configuration key to be checked or updated.
+     * @param value The value that must be associated with the specified key.
+     * @param logger A MessageCollector used for logging warnings or informational messages.
+     * @param messageOnError A lambda function that provides a custom error message given the configuration key.
+     */
+    fun <T> CompilerConfiguration.requireConfiguration(
         key: CompilerConfigurationKey<T>,
         value: T,
         logger: MessageCollector,
