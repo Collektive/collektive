@@ -1,3 +1,9 @@
+## [23.0.2](https://github.com/Collektive/collektive/compare/23.0.1...23.0.2) (2025-04-22)
+
+### Bug Fixes
+
+* typo in project name ([#921](https://github.com/Collektive/collektive/issues/921)) ([ba510f8](https://github.com/Collektive/collektive/commit/ba510f8cfc3378ad389d9a1ba5845d3b3ef6b136))
+
 ## [23.0.1](https://github.com/Collektive/collektive/compare/23.0.0...23.0.1) (2025-04-20)
 
 ### Dependency updates
