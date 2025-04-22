@@ -1,3 +1,10 @@
+## [23.0.3](https://github.com/Collektive/collektive/compare/23.0.2...23.0.3) (2025-04-22)
+
+### Bug Fixes
+
+* **collektivize:** add plugin project description ([#923](https://github.com/Collektive/collektive/issues/923)) ([9776084](https://github.com/Collektive/collektive/commit/9776084c534b99bfb27e384bc245cc0cf0ad3a1e))
+* **compiler-plugin:** fail with error when branching constructs return fields ([#922](https://github.com/Collektive/collektive/issues/922)) ([1860e70](https://github.com/Collektive/collektive/commit/1860e708b745a0fced4d9ced9fb6dd480c4f1937))
+
 ## [23.0.2](https://github.com/Collektive/collektive/compare/23.0.1...23.0.2) (2025-04-22)
 
 ### Bug Fixes
