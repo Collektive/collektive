@@ -1,10 +1,17 @@
 ---
-title: Aggregate Programming and Field Calculus 
+title: Aggregate Programming and Field Calculus
+sidebar_position: 1
 ---
 
-# The Challenge of Maintaining Distributed Systems 
+# The Challenge of Building Resilient Systems
 
-The **progressive increase** in the number of interconnected devices, leads to a **rise in the costs** associated with maintaining distributed systems. This creates **significant challenges** in implementing software services on a **global scale** using the traditional approach of individually programming each agent. This situation drives the search for solutions aimed at improving the **autonomy** of computing systems and **reducing their complexity**.
+The **progressive increase** in the number of interconnected devices leads to a **rise in the costs**
+associated with maintaining distributed systems.
+This creates **significant challenges**
+in implementing software services on a **global scale**
+using the traditional approach of individually programming each agent.
+This situation drives the search for solutions
+aimed at improving the **autonomy** of computing systems and **reducing their complexity**.
 
 ## Aggregate Programming as a Relevant Approach
 
@@ -42,74 +49,6 @@ Aggregate Programming has demonstrated its versatility in solving complex coordi
 These examples highlight how Aggregate Programming simplifies the design and implementation of robust, scalable, and adaptive behaviors in dynamic and decentralized systems.
 
 ---
-
-## Levels of Abstraction in Aggregate Programming
-
-Through multiple levels of abstraction, aggregate programming mitigates the complexity involved in distributed coordination within IoT network environments:
-
-![Aggregated levels of abstraction in aggregate programming](/img/multiple-levels-of-abstraction-ag.png)
-
-### Field Calculus Constructs  
-
-This layer represents the interface where aggregate programming interacts with the external environment. It is composed of device infrastructure and non-aggregated software services, which together form the system's lowest layer. As depicted in the figure, this is the second layer from the bottom.  
-
-A key abstraction provided by **Field Calculus** is the notion of a *field*, inspired by physical phenomena. 
-
-In this abstraction, each networked device contributes a local value, forming a distributed structure over the system. 
-
-For example, temperature sensors might define a field of ambient temperature values, while smartphones might contribute fields of movement directions or displayed notifications.  
-
-Field manipulation and creation rely on fundamental constructs that enable:  
-
-- **Computation over distributed data**: functions allow the execution of operations on data distributed across the system, including both built-in and user-defined logic. These computations can represent readings from sensors or outputs to actuators.  
-- **State evolution over time**: mechanisms are provided to model how a device's local state evolves, based on previous states and new inputs from the environment or the system.  
-- **Interaction with neighbors**: constructs enable devices to collect and aggregate information from neighboring devices, supporting spatial computations like detecting the closest node or propagating values across the network. Notably, value propagation requires a combination of state management mechanisms (for maintaining state across computation rounds) and neighbor interaction constructs (for accessing neighbors' values), enabling the definition of distributed algorithms such as gradient formation or information spreading.  
-- **Conditional branching in the network**: conditional mechanisms allow devices to behave differently based on local or global conditions, partitioning the network into distinct regions that execute different operations.  
-
-Together, these constructs enable the creation of robust and flexible behaviors that emerge from the aggregation of local device interactions and computations.
-
----
-
-### Resilient Coordination Operators  
-
-The next level of abstraction introduces a set of **resilient coordination operators** designed for robust distributed computations. 
-
-These operators enable the system to adapt reactively to changes in network structure or input values, ensuring self-stabilization and resilience.  
-
-Key operators include:  
-
-- **Gradient formation and value propagation**: operations that calculate distance fields and propagate values across the network based on these gradients. These operators are crucial for tasks like broadcasting, projection, or region-based computations, where spatial relationships between nodes are important.
-- **Cumulative information gathering**: mechanisms for aggregating information along gradients, such as summing values or collecting information towards specific regions of interest.  
-- **Flexible temporal decay**: constructs that manage countdown processes or decay functions, enabling time-based coordination that adapts to changing rates or conditions.  
-
-These operators abstract common coordination patterns, simplifying the development of distributed applications by allowing developers to focus on high-level behavior and global objectives, rather than low-level implementation details. 
-
----
-
-### Developer APIs  
-
-Libraries developed using fundamental operators can leverage and combine these operators to create a pragmatic and user-friendly **API** (Application Programming Interface). These libraries represent the penultimate layer in the structure illustrated in the figure, on which application code is based.  
-
-Many distributed actions and information diffusion processes can be abstracted into high-level API functions that encapsulate the complexity of the underlying coordination logic.  
-
-#### Example: Gradient Computation  
-
-The following example demonstrates a simple API function for computing a **distance gradient**. This function calculates the minimum distance from a set of source devices within a dynamic network. Gradients are a foundational construct in aggregate programming, enabling behaviors like distance estimation and value propagation.
-
-**Note**: when defining new aggregate functions, it is recommended to use extension functions on the aggregate interface. This promotes reusability and consistency as follows:
-
-```kotlin
-fun Aggregate<Int>.gradient(distanceSensor: DistanceSensor, source: Boolean): Double =
-    share(POSITIVE_INFINITY) {
-        val dist = distances()
-        when {
-            source -> 0.0
-            else -> (it + dist).min(POSITIVE_INFINITY)
-        }
-    }
-```
-
-These APIs enable developers to implement sophisticated behaviors within dynamic networks without needing to delve into the low-level details of aggregate computations.  
 
 [^1]: J. Beal, D. Pianini, and M. Viroli, “Aggregate Programming for the Internet of Things,” Computer, vol. 48, no. 9, pp. 22–30, 2015, doi: 10.1109/MC.2015.261.
 [^2]: A. Cortecchia, D. Pianini, G. Ciatto, and R. Casadei, “An Aggregate Vascular Morphogenesis Controller for Engineered Self-Organising Spatial Structures,” in 2024 IEEE International Conference on Autonomic Computing and Self-Organizing Systems (ACSOS), 2024, pp. 133–138. doi: 10.1109/ACSOS61780.2024.00032.
