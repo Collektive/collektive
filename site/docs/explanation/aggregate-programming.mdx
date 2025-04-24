@@ -1,17 +1,27 @@
 ---
-title: Aggregate Programming and Field Calculus
+title: Building Resilient Systems with Aggregate Programming
 sidebar_position: 1
 ---
 
 # The Challenge of Building Resilient Systems
 
-The **progressive increase** in the number of interconnected devices leads to a **rise in the costs**
-associated with maintaining distributed systems.
-This creates **significant challenges**
-in implementing software services on a **global scale**
-using the traditional approach of individually programming each agent.
-This situation drives the search for solutions
-aimed at improving the **autonomy** of computing systems and **reducing their complexity**.
+In most of distributed systems and **Internet of Things** (IoT) applications,
+the **dynamic nature** of the environment and the **unpredictable behavior** of individual devices pose significant challenges.
+Often these systems are composed of **heterogeneous** and **resource-constrained** devices,
+which may be **mobile** or **static**, and are subject to **frequent failures** and **topology changes**.
+Also,
+it is common to assume that the devices must be connected to Internet to perform their tasks,
+but this is not always the case.
+For example, in **smart cities** or **smart agriculture** applications,
+the devices may be deployed in remote areas with limited connectivity,
+or in **disaster recovery** scenarios where the network infrastructure is damaged.
+
+The heterogeneity of the devices can lead to different communication protocols and implementation of the same functionalities,
+which can make it difficult to achieve **interoperability** and **scalability**.
+Ideally,
+we would like to have a single program that can run on all devices;
+with this purpose in mind,
+we can leverage on the **Aggregate Programming** paradigm.
 
 ## Aggregate Programming as a Relevant Approach
 
@@ -50,9 +60,9 @@ These examples highlight how Aggregate Programming simplifies the design and imp
 
 ---
 
-[^1]: [J. Beal, D. Pianini, and M. Viroli, “Aggregate Programming for the Internet of Things,” 2015](http://dx.doi.org/10.1109/MC.2015.261).
-[^2]: [A. Cortecchia, D. Pianini, G. Ciatto, and R. Casadei, “An Aggregate Vascular Morphogenesis Controller for Engineered Self-Organising Spatial Structures,” 2024](https://doi.org/10.1109/ACSOS61780.2024.00032).
-[^3]: [G. Audrito, J. Beal, F. Damiani, and M. Viroli, “Space-Time Universality of Field Calculus” 2018](https://doi.org/10.1007/978-3-319-92408-3_1).
-[^4]: [G. Aguzzi, G. Audrito, R. Casadei, F. Damiani, G. Torta, and M. Viroli, “A field-based computing approach to sensing-driven clustering in robot swarms,” 2022](https://doi.org/10.1007/s11721-022-00215-y).
-[^5]: [B. Anzengruber, D. Pianini, J. Nieminen, and A. Ferscha, “Predicting Social Density in Mass Events to Prevent Crowd Disasters,” 2013](https://doi.org/10.1007/978-3-319-03260-3_18).
+[^1]: [J. Beal, D. Pianini, and M. Viroli, “Aggregate Programming for the Internet of Things”, 2015](http://dx.doi.org/10.1109/MC.2015.261).
+[^2]: [A. Cortecchia, D. Pianini, G. Ciatto, and R. Casadei, “An Aggregate Vascular Morphogenesis Controller for Engineered Self-Organising Spatial Structures”, 2024](https://doi.org/10.1109/ACSOS61780.2024.00032).
+[^3]: [G. Audrito, J. Beal, F. Damiani, and M. Viroli, “Space-Time Universality of Field Calculus”, 2018](https://doi.org/10.1007/978-3-319-92408-3_1).
+[^4]: [G. Aguzzi, G. Audrito, R. Casadei, F. Damiani, G. Torta, and M. Viroli, “A field-based computing approach to sensing-driven clustering in robot swarms”, 2022](https://doi.org/10.1007/s11721-022-00215-y).
+[^5]: [B. Anzengruber, D. Pianini, J. Nieminen, and A. Ferscha, “Predicting Social Density in Mass Events to Prevent Crowd Disasters”, 2013](https://doi.org/10.1007/978-3-319-03260-3_18).
 
