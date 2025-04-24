@@ -15,6 +15,12 @@ import TabItem from '@theme/TabItem';
 - The _compiler plugin_ used to automatically devise the communication protocol based on the program's structure.
 - The _stdlib_ (Standard Library) providing common functionalities and data structures.
 
+**Collektive** is designed to be used in a **multiplatform** environment,
+allowing you to run the same code on different platforms (JVM, JS, Native) with minimal changes,
+and uses **Gradle** as build system.
+Even though **Collektive** is designed to be used in a multiplatform environment,
+it can also be used in a single platform environment (e.g., JVM only).
+
 ## Compiler plugin setup
 
 To use **Collektive** in your project, first add the **compiler plugin** to your `build.gradle.kts` file:
@@ -75,4 +81,9 @@ Currently, the following platforms are supported:
 - **JVM**
 - **JS** (node.js and browser)
 - **Native** (iOS, macOS, Linux, Windows)
+:::
+
+:::info[Note]
+Collektive is a language and as such it must be executed in an environment that supports it.
+We suggest getting familiar with the tool by starting with one of our [template repositories](../../references/#template-repositories).
 :::
