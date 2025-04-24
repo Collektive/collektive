@@ -10,7 +10,7 @@ some sections may be incomplete or missing,
 sorry for the inconvenience.
 
 If you find any bugs or suggestions, 
-please feel free to fix them through a [PR](https://github.com/Collektive/collektive/pulls) :)
+please feel free to open an issue or fix them through a [PR](https://github.com/Collektive/collektive/pulls) :)
 :::
 
 ## Index
