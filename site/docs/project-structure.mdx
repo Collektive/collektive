@@ -1,18 +1,19 @@
 ---
 title: Project Structure
+sidebar_position: 6
 ---
 
 ## Project submodules
 
 The Collektive project is organized into several submodules, each serving a distinct role:
 
-- **collektive-compiler-plugin** is divided into two components:
-    - **frontend**: checks for dangerous or inappropriate code written using the Collektive DSL
-    - **backend**: a compiler plugin that modifies a data structure used to track the runtime stack.
-        Each time a function is called, its name is registered in this structure.
 - **collektive-dsl**: the core implementation of the Domain-Specific Language (DSL) for aggregate computing,
     exposing the operators and logic for this programming paradigm.
 - **collektive-stdlib**: a standard library providing essential functions and utilities to support aggregate computing operations.
+- **collektive-compiler-plugin** is divided into two components:
+  - **frontend**: checks for dangerous or inappropriate code written using the Collektive DSL
+  - **backend**: a compiler plugin that modifies a data structure used to track the runtime stack.
+        Each time a function is called, its name is registered in this structure.
 - **collektive-compiler-embeddable**:
   - **compiler-embedded**: an embeddable version of the compiler designed for integration into other projects.
     This allows developers to leverage the compiler’s capabilities directly within their applications,
