@@ -65,6 +65,6 @@ kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.85.0"
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kover = "org.jetbrains.kotlinx.kover:0.9.1"
 power-assert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = "kotlin" }
-multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:3.4.0"
+multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:3.4.1"
 publishOnCentral = "org.danilopianini.publish-on-central:8.0.6"
 taskTree = "com.dorongold.task-tree:4.0.1"
