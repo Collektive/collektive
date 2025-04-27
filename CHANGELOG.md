@@ -1,3 +1,40 @@
+## [23.0.4](https://github.com/Collektive/collektive/compare/23.0.3...23.0.4) (2025-04-27)
+
+### Dependency updates
+
+* **deps:** update alchemist to v42.1.0 ([9ae3458](https://github.com/Collektive/collektive/commit/9ae3458b92d45b25f5db542f992c8eeabc184902))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5.6.3 ([776b60b](https://github.com/Collektive/collektive/commit/776b60be3b6d073461006eb99dd43802bde82bf4))
+* **deps:** update dependency gradle to v8.14 ([bcba0ab](https://github.com/Collektive/collektive/commit/bcba0ab3616b7f4d4326b69091f3496bc186e800))
+* **deps:** update dependency react-router-dom to v7.5.2 ([e9c47fe](https://github.com/Collektive/collektive/commit/e9c47fef573115edfda45c141d78a9dfcd8c6315))
+* **deps:** update node.js to 22.15 ([6d9674c](https://github.com/Collektive/collektive/commit/6d9674c686917d2cf23a14619b1f0ef8f50ffc7f))
+* **deps:** update plugin com.gradle.develocity to v4.0.1 ([58749a3](https://github.com/Collektive/collektive/commit/58749a3f51d330c2735a41f1ac824347fd481b9b))
+* **deps:** update plugin gitsemver to v5.1.2 ([92e1db6](https://github.com/Collektive/collektive/commit/92e1db6bca23adf3ea9016ba939f1681cafd8016))
+* **deps:** update plugin kotlin-qa to v0.86.1 ([5b31a81](https://github.com/Collektive/collektive/commit/5b31a81e798aebcfe509c2a87002e21d744f643c))
+* **deps:** update plugin multijvmtesting to v3.4.1 ([be0fc40](https://github.com/Collektive/collektive/commit/be0fc40ded74043650360895a29c1b3d3c460ed9))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.23 ([8ce5999](https://github.com/Collektive/collektive/commit/8ce5999db7265c7609ddd9e95523575439da9982))
+
+### Bug Fixes
+
+* **alchemist-incarnation:** fix broken gradient ([#942](https://github.com/Collektive/collektive/issues/942)) ([b8173d5](https://github.com/Collektive/collektive/commit/b8173d58c1360229dde1d032cc6f95b7b98926f4))
+* **stdlib:** fix broken Bellman-Ford gradient ([#940](https://github.com/Collektive/collektive/issues/940)) ([bab1945](https://github.com/Collektive/collektive/commit/bab19458e253d4536317e4362e97c489760f216a))
+
+### Documentation
+
+* fix and improve documentation ([#927](https://github.com/Collektive/collektive/issues/927)) ([ff38a22](https://github.com/Collektive/collektive/commit/ff38a2270a9962a1fac7897a389b5cec305bb35c))
+* **readme:** rewrite the readme file ([#944](https://github.com/Collektive/collektive/issues/944)) ([42c0b42](https://github.com/Collektive/collektive/commit/42c0b4279fdde76af9e5ef59ae981e705239287d))
+* **readme:** update the maven coordinates ([#936](https://github.com/Collektive/collektive/issues/936)) ([d528774](https://github.com/Collektive/collektive/commit/d5287744870d00c6644ed1ab6f2ed4654da8c0e2))
+
+### Build and continuous integration
+
+* **deps:** update actions/download-artifact action to v4.3.0 ([970306b](https://github.com/Collektive/collektive/commit/970306b35678460ab6acdea5cabdede9cf5c2764))
+* **deps:** update github/codeql-action action to v3.28.16 ([70cfdae](https://github.com/Collektive/collektive/commit/70cfdae6a6fdc9804cf3fc68e320b322c917c4dd))
+* run the Kotlin compiler in-process to facilitate debugging inside the IDE ([#939](https://github.com/Collektive/collektive/issues/939)) ([7523aca](https://github.com/Collektive/collektive/commit/7523acac2dfed9ae1752ca72056cbbbe201edb73))
+
+### Style improvements
+
+* **dsl:** sort members in `OutboundEnvelope` ([#943](https://github.com/Collektive/collektive/issues/943)) ([2530b1f](https://github.com/Collektive/collektive/commit/2530b1fd92beac0c94df5f37b7881b79acbfd1b9))
+* update copyright header in KotlinPoetUtils.kt ([#941](https://github.com/Collektive/collektive/issues/941)) ([306c5d5](https://github.com/Collektive/collektive/commit/306c5d5fbceda56d95b70e7560701f94d3cc03ec))
+
 ## [23.0.3](https://github.com/Collektive/collektive/compare/23.0.2...23.0.3) (2025-04-22)
 
 ### Bug Fixes
