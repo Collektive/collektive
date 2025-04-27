@@ -1,0 +1,622 @@
+---
+title: Project Structure
+sidebar_position: 6
+---
+
+## Project submodules
+
+The Collektive project is organized into several submodules, each serving a distinct role:
+
+- **collektive-dsl**: the core implementation of the Domain-Specific Language (DSL) for aggregate computing,
+    exposing the operators and logic for this programming paradigm.
+- **collektive-stdlib**: a standard library providing essential functions and utilities to support aggregate computing operations.
+- **collektive-compiler-plugin** is divided into two components:
+  - **frontend**: checks for dangerous or inappropriate code written using the Collektive DSL
+  - **backend**: a compiler plugin that modifies a data structure used to track the runtime stack.
+        Each time a function is called, its name is registered in this structure.
+- **collektive-compiler-embeddable**:
+  - **compiler-embedded**: an embeddable version of the compiler designed for integration into other projects.
+    This allows developers to leverage the compiler’s capabilities directly within their applications,
+    making it easier to extend and customize compilation features.
+- **collektive-gradle-plugin**: a necessary plugin that allows Gradle projects to include and apply the compiler plugin.
+- **alchemist-incarnation-collektive**: an incarnation of Collektive for the Alchemist simulator,
+  which is a simulation framework for distributed systems.
+
+[//]: # (    - **compiler-plugin**: a compiler plugin that modifies a data structure used to track the runtime stack.)
+
+[//]: # (        Each time a function is called, its name is registered in this structure.)
+
+[//]: # (    - **gradle-plugin**: a necessary plugin that allows Gradle projects to include and apply the compiler plugin.)
+
+
+[//]: # (## Project structure)
+
+[//]: # (export const nodeData = {)
+
+[//]: # (  name: 'Collektive',)
+
+[//]: # (  type: 'folder',)
+
+[//]: # (  children: [)
+
+[//]: # (      { name: 'stdlib', type: 'folder', children: [)
+
+[//]: # (          { name: 'src', type: 'folder', children:[)
+
+[//]: # (            { name: 'commonMain', type: 'folder', children:[)
+
+[//]: # (                { name: 'spreading', type: 'folder', children:[ )
+
+[//]: # (                    { name: 'Gossip.kt', type: 'file' },)
+
+[//]: # (                    { name: 'Spreading.kt', type: 'file' })
+
+[//]: # (                  ])
+
+[//]: # (                },)
+
+[//]: # (                { name: 'util', type: 'folder', children:[ )
+
+[//]: # (                    { name: 'Comparables.kt', type: 'file' })
+
+[//]: # (                  ])
+
+[//]: # (                })
+
+[//]: # (              ])
+
+[//]: # (            },)
+
+[//]: # (            { name: 'commonTest', type: 'folder', children:[)
+
+[//]: # (                { name: 'DistanceToTest.kt', type: 'file' },)
+
+[//]: # (                { name: 'GossipTest.kt', type: 'file' })
+
+[//]: # (              ])
+
+[//]: # (            })
+
+[//]: # (          ])
+
+[//]: # (        })
+
+[//]: # (      ])
+
+[//]: # (    },)
+
+[//]: # (    { name: 'dsl', type: 'folder', children: [)
+
+[//]: # (          { name: 'src', type: 'folder', children:[)
+
+[//]: # (            { name: 'commonMain', type: 'folder', children:[)
+
+[//]: # (                { name: 'Collektive.kt', type: 'file' },)
+
+[//]: # (                { name: 'aggregate', type: 'folder', children:[ )
+
+[//]: # (                    { name: 'AggregateResult.kt', type: 'file' },)
+
+[//]: # (                    { name: 'api', type: 'folder', children:[)
+
+[//]: # (                        { name: 'Aggregate.kt', type: 'file' },)
+
+[//]: # (                        { name: 'DataSharingMethod.kt', type: 'file' },)
+
+[//]: # (                        { name: 'YieldSupport.kt', type: 'file' },)
+
+[//]: # (                        { name: 'impl', type: 'folder', children:[)
+
+[//]: # (                            { name: 'AggregateContext.kt', type: 'file' },)
+
+[//]: # (                            { name: 'stack', type: 'folder', children:[)
+
+[//]: # (                                { name: 'Stack.kt', type: 'file' },)
+
+[//]: # (                                { name: 'StackDeque.kt', type: 'file' })
+
+[//]: # (                              ])
+
+[//]: # (                            })
+
+[//]: # (                          ] )
+
+[//]: # (                        })
+
+[//]: # (                      ] )
+
+[//]: # (                    })
+
+[//]: # (                  ])
+
+[//]: # (                },)
+
+[//]: # (                { name: 'field', type: 'folder', children:[)
+
+[//]: # (                    { name: 'Field.kt', type: 'file' },)
+
+[//]: # (                    { name: 'operations', type: 'folder', children:[)
+
+[//]: # (                        { name: 'BooleanFields.kt', type: 'file' },)
+
+[//]: # (                        { name: 'ComparableFields.kt', type: 'file' },)
+
+[//]: # (                        { name: 'Fields.kt', type: 'file' })
+
+[//]: # (                      ])
+
+[//]: # (                    })
+
+[//]: # (                  ])
+
+[//]: # (                },)
+
+[//]: # (                { name: 'networking', type: 'folder', children:[)
+
+[//]: # (                    { name: 'Mailbox.kt', type: 'file' },)
+
+[//]: # (                    { name: 'Message.kt', type: 'file' },)
+
+[//]: # (                    { name: 'MessageFactory.kt', type: 'file' },)
+
+[//]: # (                    { name: 'NeighborsData.kt', type: 'file' },)
+
+[//]: # (                    { name: 'OutboundEnvelope.kt', type: 'file' },)
+
+[//]: # (                    { name: 'PayloadRepresentation.kt', type: 'file' })
+
+[//]: # (                  ])
+
+[//]: # (                },)
+
+[//]: # (                { name: 'path', type: 'folder', children:[)
+
+[//]: # (                    { name: 'DigestHashingFactory.kt', type: 'file' },)
+
+[//]: # (                    { name: 'FullPathFactory.kt', type: 'file' },)
+
+[//]: # (                    { name: 'Path.kt', type: 'file' },)
+
+[//]: # (                    { name: 'PathFactory.kt', type: 'file' })
+
+[//]: # (                  ])
+
+[//]: # (                },)
+
+[//]: # (                { name: 'path', type: 'folder', children:[)
+
+[//]: # (                    { name: 'State.kt', type: 'file' },)
+
+[//]: # (                    { name: 'impl', type: 'folder', children:[)
+
+[//]: # (                        { name: 'StateOperations.kt', type: 'file' },)
+
+[//]: # (                      ])
+
+[//]: # (                    })
+
+[//]: # (                  ])
+
+[//]: # (                })
+
+[//]: # (              ])
+
+[//]: # (            },)
+
+[//]: # (            { name: 'commonTest', type: 'folder', children:[)
+
+[//]: # (                { name: 'aggregate', type: 'folder', children:[)
+
+[//]: # (                    { name: 'EvolvingTest.kt', type: 'file' },)
+
+[//]: # (                    { name: 'ExchangeTest.kt', type: 'file' },)
+
+[//]: # (                    { name: 'NeighboringTest.kt', type: 'file' },)
+
+[//]: # (                    { name: 'NestedCallsTest.kt', type: 'file' },)
+
+[//]: # (                    { name: 'SharingTest.kt', type: 'file' })
+
+[//]: # (                  ] )
+
+[//]: # (                },)
+
+[//]: # (                { name: 'alignment', type: 'folder', children:[)
+
+[//]: # (                    { name: 'AlignmentTest.kt', type: 'file' },)
+
+[//]: # (                    { name: 'BranchAlignmentTest.kt', type: 'file' })
+
+[//]: # (                  ] )
+
+[//]: # (                },)
+
+[//]: # (                { name: 'branch', type: 'folder', children:[)
+
+[//]: # (                    { name: 'ifConditionTest.kt', type: 'file' },)
+
+[//]: # (                    { name: 'ifElseBlockTest.kt', type: 'file' },)
+
+[//]: # (                    { name: 'ifElseSingleExpressionTest.kt', type: 'file' },)
+
+[//]: # (                    { name: 'WhenTest.kt', type: 'file' })
+
+[//]: # (                  ])
+
+[//]: # (                },)
+
+[//]: # (                { name: 'entrypoint', type: 'folder', children:[)
+
+[//]: # (                    { name: 'CollektiveTest.kt', type: 'file' })
+
+[//]: # (                  ])
+
+[//]: # (                },)
+
+[//]: # (                { name: 'field', type: 'folder', children:[)
+
+[//]: # (                    { name: 'FieldManipulationTest.kt', type: 'file' },)
+
+[//]: # (                    { name: 'FieldOpsTest.kt', type: 'file' },)
+
+[//]: # (                    { name: 'FieldTest.kt', type: 'file' },)
+
+[//]: # (                    { name: 'operations', type: 'folder', children:[)
+
+[//]: # (                        { name: 'FieldsTest.kt', type: 'file' })
+
+[//]: # (                      ])
+
+[//]: # (                    })
+
+[//]: # (                  ])
+
+[//]: # (                },)
+
+[//]: # (                { name: 'matchers', type: 'folder', children:[)
+
+[//]: # (                    { name: 'AggregateResultMatchers.kt', type: 'file' })
+
+[//]: # (                  ])
+
+[//]: # (                },)
+
+[//]: # (                { name: 'network', type: 'folder', children:[)
+
+[//]: # (                    { name: 'NetworkImplTest.kt', type: 'file' },)
+
+[//]: # (                    { name: 'NetworkManager.kt', type: 'file' })
+
+[//]: # (                  ])
+
+[//]: # (                },)
+
+[//]: # (                { name: 'networking', type: 'folder', children:[)
+
+[//]: # (                    { name: 'SerializationTest.kt', type: 'file' },)
+
+[//]: # (                    { name: 'SerializerNetworkTest.kt', type: 'file' })
+
+[//]: # (                  ])
+
+[//]: # (                },)
+
+[//]: # (                { name: 'path', type: 'folder', children:[)
+
+[//]: # (                    { name: 'PathTest.kt', type: 'file' })
+
+[//]: # (                  ])
+
+[//]: # (                })
+
+[//]: # (              ])
+
+[//]: # (            })
+
+[//]: # (          ])
+
+[//]: # (        })
+
+[//]: # (      ])
+
+[//]: # (    },)
+
+[//]: # (    { name: 'compiler-plugin', type: 'folder', children:[)
+
+[//]: # (        { name: 'src', type: 'folder', children:[)
+
+[//]: # (            { name: 'main', type: 'folder', children:[)
+
+[//]: # (                { name: 'kotlin', type: 'folder', children:[)
+
+[//]: # (                    { name: 'AlignmentCommandLineProcessor.kt', type: 'file' },)
+
+[//]: # (                    { name: 'AlignmentComponentRegistrar.kt', type: 'file' },)
+
+[//]: # (                    { name: 'AlignmentlrGenerationExtension.kt', type: 'file' },)
+
+[//]: # (                    { name: 'backend', type: 'folder', children:[)
+
+[//]: # (                        { name: 'transformes', type: 'folder', children:[)
+
+[//]: # (                            { name: 'AggregateCallTransformer.kt', type: 'file' },)
+
+[//]: # (                            { name: 'AlignmentTransformer.kt', type: 'file' },)
+
+[//]: # (                            { name: 'FieldProjectionTransformer.kt', type: 'file' },)
+
+[//]: # (                            { name: 'FieldTransformer.kt', type: 'file' })
+
+[//]: # (                          ])
+
+[//]: # (                        },)
+
+[//]: # (                        { name: 'visitors', type: 'folder', children:[)
+
+[//]: # (                             { name: 'AggregateRefChildrenVisitor.kt', type: 'file' },)
+
+[//]: # (                          ])
+
+[//]: # (                        })
+
+[//]: # (                      ])
+
+[//]: # (                    },)
+
+[//]: # (                    { name: 'fronted', type: 'folder', children:[)
+
+[//]: # (                        { name: 'CollektiveExtension.kt', type: 'file' },)
+
+[//]: # (                        { name: 'CollektiveFrontendExtensionRegistrar.kt', type: 'file' },)
+
+[//]: # (                        { name: 'checkers', type: 'folder', children:[)
+
+[//]: # (                            { name: 'CheckersUtility.kt', type: 'file' },)
+
+[//]: # (                            { name: 'ExplicitAlignDealign.kt', type: 'file' },)
+
+[//]: # (                            { name: 'FirCollektiveErrors.kt', type: 'file' },)
+
+[//]: # (                            { name: 'ImproperConstruct.kt', type: 'file' },)
+
+[//]: # (                            { name: 'KtDefaultErrorMessagesCollektive.kt', type: 'file' },)
+
+[//]: # (                            { name: 'NoAlignInsideLoop.kt', type: 'file' },)
+
+[//]: # (                            { name: 'UnnecessaryUseOfConstructs.kt', type: 'file' },)
+
+[//]: # (                            { name: 'UnnecessaryYielding.kt', type: 'file' })
+
+[//]: # (                          ])
+
+[//]: # (                        },)
+
+[//]: # (                        { name: 'visitors', type: 'folder', children:[)
+
+[//]: # (                            { name: 'ConstructCallVisitor.kt', type: 'file' },)
+
+[//]: # (                            { name: 'EmptyReturnVisitor.kt', type: 'file' },)
+
+[//]: # (                            { name: 'FunctionCallWithAggregateParVisitor.kt', type: 'file' },)
+
+[//]: # (                            { name: 'ImproperConstructVisitor.kt', type: 'file' },)
+
+[//]: # (                            { name: 'YieldingUnnecessaryUsageVisitor.kt', type: 'file' })
+
+[//]: # (                          ])
+
+[//]: # (                        })
+
+[//]: # (                      ])
+
+[//]: # (                    }, )
+
+[//]: # (                    { name: 'utils', type: 'folder', children:[)
+
+[//]: # (                        { name: 'common', type: 'folder', children:[)
+
+[//]: # (                            { name: 'AggregateFunctionNames.kt', type: 'file' },)
+
+[//]: # (                            { name: 'AggregateReferenceUtils.kt', type: 'file' },)
+
+[//]: # (                            { name: 'CollektivelrUtils.kt', type: 'file' })
+
+[//]: # (                          ])
+
+[//]: # (                        },)
+
+[//]: # (                        { name: 'logging', type: 'folder', children:[)
+
+[//]: # (                            { name: 'MessageCollectorOps.kt', type: 'file' })
+
+[//]: # (                          ])
+
+[//]: # (                        }, )
+
+[//]: # (                        { name: 'stack', type: 'folder', children:[)
+
+[//]: # (                            { name: 'StackFunctionCall.kt', type: 'file' })
+
+[//]: # (                          ])
+
+[//]: # (                        })
+
+[//]: # (                      ])
+
+[//]: # (                    })
+
+[//]: # (                  ])
+
+[//]: # (                },)
+
+[//]: # (                { name: 'resources', type: 'folder', children:[)
+
+[//]: # (                    { name: 'org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor', type: 'file' },)
+
+[//]: # (                    { name: 'org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar', type: 'file' },)
+
+[//]: # (                  ])
+
+[//]: # (                })
+
+[//]: # (              ])
+
+[//]: # (            })
+
+[//]: # (          ])
+
+[//]: # (        })
+
+[//]: # (      ])
+
+[//]: # (    },)
+
+[//]: # (    { name: 'compiler-plugin-test', type: 'folder', children:[)
+
+[//]: # (        { name: 'src', type: 'folder', children:[)
+
+[//]: # (            { name: 'test', type: 'folder', children:[)
+
+[//]: # (                { name: 'kotlin', type: 'folder', children:[)
+
+[//]: # (                    { name: 'ExplicitAlignTest.kt', type: 'file' },)
+
+[//]: # (                    { name: 'ImproperConstructSpec.kt', type: 'file' },)
+
+[//]: # (                    { name: 'IterationUsingDelegatesWithoutAlign.kt', type: 'file' },)
+
+[//]: # (                    { name: 'IterationWithoutAlign.kt', type: 'file' },)
+
+[//]: # (                    { name: 'UnnecessaryUseOfConstructsSpec.kt', type: 'file' },)
+
+[//]: # (                    { name: 'UnnecessaryYieldingSpec.kt', type: 'file' },)
+
+[//]: # (                    { name: 'util', type: 'folder', children:[)
+
+[//]: # (                        { name: 'CompileUtilis.kt', type: 'file' })
+
+[//]: # (                      ])
+
+[//]: # (                    })
+
+[//]: # (                  ])
+
+[//]: # (                },)
+
+[//]: # (                { name: 'resources', type: 'folder', children:[)
+
+[//]: # (                    { name: 'Macros.yaml', type: 'file' },)
+
+[//]: # (                    { name: 'ImproperConstruct.yaml', type: 'file' },)
+
+[//]: # (                    { name: 'IterationWithAggregate.yaml', type: 'file' },)
+
+[//]: # (                    { name: 'IterationWithDelegatedAggregate', type: 'file' },)
+
+[//]: # (                    { name: 'UnnecessaryUseOfConstructs.yaml', type: 'file' },)
+
+[//]: # (                    { name: 'UnnecessaryYieldingContext.yaml', type: 'file' })
+
+[//]: # (                  ])
+
+[//]: # (                })
+
+[//]: # (              ])
+
+[//]: # (            })
+
+[//]: # (          ])
+
+[//]: # (        })
+
+[//]: # (      ])
+
+[//]: # (    },)
+
+[//]: # (    { name: 'gradle-plugin', type: 'folder', children:[)
+
+[//]: # (        { name: 'src', type: 'folder', children:[)
+
+[//]: # (            { name: 'GradleExtension.kt', type: 'file' },)
+
+[//]: # (            { name: 'GradlePlugin.kt', type: 'file' })
+
+[//]: # (          ])
+
+[//]: # (        })
+
+[//]: # (      ])
+
+[//]: # (    },)
+
+[//]: # (    { name: 'compiler-embedded', type: 'folder', children:[)
+
+[//]: # (        { name: 'src', type: 'folder', children:[)
+
+[//]: # (            { name: 'main', type: 'folder', children:[)
+
+[//]: # (                { name: 'logging', type: 'folder', children:[)
+
+[//]: # (                    { name: 'CollectingMessageCollector.kt', type: 'file' },)
+
+[//]: # (                    { name: 'CompilerMessage.kt', type: 'file' },)
+
+[//]: # (                    { name: 'SLF4JMessageCollector.kt', type: 'file' })
+
+[//]: # (                  ])
+
+[//]: # (                },)
+
+[//]: # (                { name: 'util', type: 'folder', children:[)
+
+[//]: # (                    { name: 'CollektiveJVMCompiler.kt', type: 'file' },)
+
+[//]: # (                    { name: 'CollektiveK2JVMCompiler.kt', type: 'file' })
+
+[//]: # (                  ])
+
+[//]: # (                })
+
+[//]: # (              ])
+
+[//]: # (            },)
+
+[//]: # (            { name: 'test', type: 'folder', children:[)
+
+[//]: # (                { name: 'kotlin', type: 'folder', children:[)
+
+[//]: # (                    { name: 'CompileStringTest.kt', type: 'file' })
+
+[//]: # (                  ])
+
+[//]: # (                }, )
+
+[//]: # (                { name: 'resources', type: 'folder', children:[)
+
+[//]: # (                    { name: 'ScriptTest.kt', type: 'file' })
+
+[//]: # (                  ])
+
+[//]: # (                })
+
+[//]: # (              ])
+
+[//]: # (            })
+
+[//]: # (          ])
+
+[//]: # (        })
+
+[//]: # (      ])
+
+[//]: # (    })
+
+[//]: # (  ])
+
+[//]: # (};)
+
+[//]: # ()
+[//]: # (<TreeNode node={nodeData} />)
+
+[//]: # ()
+[//]: # ()
