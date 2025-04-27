@@ -31,13 +31,6 @@ interface OutboundEnvelope<ID : Any> {
     fun <Value> addData(path: Path, data: SharedData<ID, Value>, dataSharingMethod: DataSharingMethod<Value>)
 
     /**
-     * Extract the message for the [receiverId] through the given [factory].
-     *
-     * One the [OutboundEnvelope] is created, this method extracts the message to send to the [receiverId].
-     */
-    fun prepareMessageFor(receiverId: ID, factory: MessageFactory<ID, *> = InMemoryMessageFactory()): Message<ID, Any?>
-
-    /**
      * Returns `true` if the envelope is empty.
      */
     fun isEmpty(): Boolean
@@ -48,6 +41,13 @@ interface OutboundEnvelope<ID : Any> {
     fun isNotEmpty(): Boolean
 
     /**
+     * Extract the message for the [receiverId] through the given [factory].
+     *
+     * One the [OutboundEnvelope] is created, this method extracts the message to send to the [receiverId].
+     */
+    fun prepareMessageFor(receiverId: ID, factory: MessageFactory<ID, *> = InMemoryMessageFactory()): Message<ID, Any?>
+
+    /**
      * Utilities for [OutboundEnvelope].
      */
     companion object {
@@ -56,6 +56,7 @@ interface OutboundEnvelope<ID : Any> {
          */
         internal operator fun <ID : Any> invoke(senderId: ID, expectedSize: Int): OutboundEnvelope<ID> =
             object : OutboundEnvelope<ID> {
+
                 private val defaults: MutableMap<Path, PayloadRepresentation<Any?>> = LinkedHashMap(expectedSize * 2)
                 private val overrides: MutableMap<ID, MutableList<Pair<Path, PayloadRepresentation<Any?>>>> =
                     LinkedHashMap(expectedSize * 2)
@@ -79,6 +80,10 @@ interface OutboundEnvelope<ID : Any> {
                     }
                 }
 
+                override fun isEmpty(): Boolean = defaults.isEmpty()
+
+                override fun isNotEmpty(): Boolean = defaults.isNotEmpty()
+
                 override fun prepareMessageFor(receiverId: ID, factory: MessageFactory<ID, *>): Message<ID, Any?> {
                     val overridesForId = overrides[receiverId].orEmpty()
                     val payloads = when {
@@ -87,10 +92,6 @@ interface OutboundEnvelope<ID : Any> {
                     }
                     return factory(senderId, payloads)
                 }
-
-                override fun isEmpty(): Boolean = defaults.isEmpty()
-
-                override fun isNotEmpty(): Boolean = defaults.isNotEmpty()
             }
     }
 }
