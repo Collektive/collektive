@@ -47,7 +47,7 @@ inline fun <reified ID, reified Value, reified Distance> Aggregate<ID>.bellmanFo
     val topValue: Pair<Distance, Value> = top to local
     val distances = metric.coerceIn(bottom, top)
     return share(topValue) { neighborData ->
-        val paths = neighborData.alignedMapValues(distances) { (fromSource, data), toNeighbor ->
+        val pathsThroughNeighbors = neighborData.alignedMapValues(distances) { (fromSource, data), toNeighbor ->
             val totalDistance = accumulateDistance(fromSource, toNeighbor).coerceIn(bottom, top)
             check(totalDistance >= fromSource && totalDistance >= toNeighbor) {
                 "The provided distance accumulation function violates the triangle inequality: " +
@@ -56,10 +56,10 @@ inline fun <reified ID, reified Value, reified Distance> Aggregate<ID>.bellmanFo
             val newData = accumulateData(fromSource, toNeighbor, data)
             totalDistance to newData
         }
+        val bestThroughNeighbors = pathsThroughNeighbors.minValueBy { it.value.first } ?: topValue
         when {
             source -> bottom to local
-            else ->
-                paths.minValueBy { it.value.first } ?: topValue // sort by distance from the nearest source
+            else -> bestThroughNeighbors
         }
     }.second // return the data
 }
