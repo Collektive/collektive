@@ -8,6 +8,8 @@
 
 package it.unibo.collektive.aggregate
 
+import io.mockk.mockk
+import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.stdlib.fields.all
 import it.unibo.collektive.stdlib.fields.allValues
 import it.unibo.collektive.stdlib.fields.containsValue
@@ -18,9 +20,9 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class FieldsTest {
-    private val emptyField = Field(0, 10)
-    private val fullField = Field(0, 1, mapOf(1 to 1, 2 to 2, 3 to 3))
-    private val charField = Field(0, 'a', mapOf(1 to 'b', 2 to 'c', 3 to 'd'))
+    private val mockedContext = mockk<Aggregate<Int>>(relaxed = true)
+    private val emptyField = Field(mockedContext, 0, 10)
+    private val fullField = Field(mockedContext, 0, 1, mapOf(1 to 1, 2 to 2, 3 to 3))
 
     @Test
     fun `empty fields contain self`() {

@@ -9,6 +9,7 @@
 package it.unibo.collektive.stdlib.fields
 
 import it.unibo.collektive.aggregate.Field
+import it.unibo.collektive.aggregate.api.PurelyLocal
 
 /**
  * Checks whether the given [value] is present in the field, including the local value.
@@ -19,4 +20,5 @@ import it.unibo.collektive.aggregate.Field
  * @param value the value to look for.
  * @return `true` if [value] is present in the field, `false` otherwise.
  */
+@PurelyLocal
 fun <T> Field<*, T>.containsValue(value: T): Boolean = local.value == value || neighborsValues.contains(value)

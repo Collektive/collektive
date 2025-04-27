@@ -11,6 +11,7 @@ package it.unibo.collektive.stdlib.fields
 import arrow.core.Predicate
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.FieldEntry
+import it.unibo.collektive.aggregate.api.PurelyLocal
 import it.unibo.collektive.aggregate.toFieldEntry
 import it.unibo.collektive.stdlib.util.ExcludingSelf
 import it.unibo.collektive.stdlib.util.ReductionType
@@ -26,6 +27,7 @@ import it.unibo.collektive.stdlib.util.init
  * @param predicate the condition to test for each field entry.
  * @return `true` if all applicable entries satisfy the predicate, `false` otherwise.
  */
+@PurelyLocal
 inline fun <ID : Any, T> Field<ID, T>.all(
     reductionType: ReductionType = ExcludingSelf,
     crossinline predicate: Predicate<FieldEntry<ID, T>>,
@@ -41,6 +43,7 @@ inline fun <ID : Any, T> Field<ID, T>.all(
  * @param predicate the condition to test for each value.
  * @return `true` if all applicable values satisfy the predicate, `false` otherwise.
  */
+@PurelyLocal
 inline fun <T> Field<*, T>.allValues(
     reductionType: ReductionType = ExcludingSelf,
     crossinline predicate: Predicate<T>,
@@ -56,6 +59,7 @@ inline fun <T> Field<*, T>.allValues(
  * @param predicate the condition to test for each ID.
  * @return `true` if all applicable IDs satisfy the predicate, `false` otherwise.
  */
+@PurelyLocal
 inline fun <ID : Any> Field<ID, *>.allIDs(
     reductionType: ReductionType = ExcludingSelf,
     crossinline predicate: Predicate<ID>,

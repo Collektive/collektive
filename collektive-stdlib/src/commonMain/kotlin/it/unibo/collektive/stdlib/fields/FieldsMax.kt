@@ -10,6 +10,7 @@ package it.unibo.collektive.stdlib.fields
 
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.FieldEntry
+import it.unibo.collektive.aggregate.api.PurelyLocal
 import it.unibo.collektive.stdlib.util.ExcludingSelf
 import it.unibo.collektive.stdlib.util.IncludingSelf
 import it.unibo.collektive.stdlib.util.ReductionType
@@ -73,6 +74,7 @@ inline fun <ID : Any, T, R : Comparable<R>> Field<ID, T>.maxValueBy(
  * @param comparator the comparator used to determine ordering between entries.
  * @return the entry with the greatest value, or `null` if none.
  */
+@PurelyLocal
 @JvmOverloads
 fun <ID : Any, T> Field<ID, T>.maxWith(
     reductionType: ReductionType = ExcludingSelf,

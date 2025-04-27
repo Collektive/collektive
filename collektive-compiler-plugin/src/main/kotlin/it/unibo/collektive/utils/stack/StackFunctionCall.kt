@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 package it.unibo.collektive.utils.stack
 
 /**
@@ -5,22 +13,14 @@ package it.unibo.collektive.utils.stack
  */
 class StackFunctionCall {
     private val stack = ArrayDeque<String>()
-    private val occurrences = mutableMapOf<String, Int>()
 
     /**
      * Pushes a new function call to the stack.
      */
     fun push(name: String) {
-        val counter = occurrences[name]?.let { it + 1 } ?: 1
-        occurrences[name] = counter
-        val candidateToken = "$name.$counter"
-        stack.addFirst(candidateToken)
+        stack.add(name)
     }
 
-    /**
-     * Pops the last function call from the stack.
-     */
-    fun pop(): String? = stack.removeFirstOrNull()
-
-    override fun toString(): String = stack.joinToString(separator = ",")
+    override fun toString(): String =
+        if (stack.isEmpty()) "" else stack.joinToString(prefix = "", separator = "|", postfix = "|")
 }

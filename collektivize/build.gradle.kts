@@ -70,6 +70,7 @@ dependencies {
     implementation(kotlin("reflect"))
     implementation(gradleApi())
     implementation(gradleKotlinDsl())
+    implementation(rootProject.libs.kotlinx.serialization.core)
     implementation(rootProject.libs.kotlinpoet)
     implementation(rootProject.libs.slf4j)
 }
@@ -138,7 +139,14 @@ publishOnCentral {
 }
 
 val importDsl by tasks.registering(Copy::class) {
-    listOf("Field", "FieldEntry").forEach { file ->
+    listOf(
+        "Aggregate",
+        "DataSharingMethod",
+        "Field",
+        "FieldEntry",
+        "PurelyLocal",
+        "YieldSupport",
+    ).forEach { file ->
         from(
             rootProject.rootDir.resolve("../collektive-dsl/src/commonMain/kotlin/").walkTopDown().single {
                 it.name == "$file.kt"

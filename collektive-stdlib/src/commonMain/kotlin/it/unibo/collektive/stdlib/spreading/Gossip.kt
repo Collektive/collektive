@@ -38,6 +38,11 @@ data class GossipValue<ID : Comparable<ID>, Value>(
      * TODO.
      */
     fun base(id: ID) = GossipValue(local, local, listOf(id))
+
+    /**
+     * TODO.
+     */
+    fun addHop(local: Value, id: ID) = GossipValue(best, local, path + id)
 }
 
 /**
@@ -50,26 +55,23 @@ inline fun <reified ID : Comparable<ID>, reified Value> Aggregate<ID>.gossipMax(
     comparator: Comparator<Value>,
 ): Value {
     val localGossip = GossipValue<ID, Value>(best = local, local = local)
-    return share(localGossip) { gossip ->
+    val maxGossip = share(localGossip) { gossip ->
         val neighbors = gossip.neighbors.toSet()
-        val result =
-            gossip.fold(localGossip) { current, (id, next) ->
-                val valid =
-                    next.path
-                        .asReversed()
-                        .asSequence()
-                        .drop(1)
-                        .none { it == localId || it in neighbors }
-                val actualNext = if (valid) next else next.base(id)
-                val candidateValue = comparator.compare(current.best, actualNext.best)
-                when {
-                    candidateValue > 0 -> current
-                    candidateValue == 0 -> listOf(current, next).minBy { it.path.size }
-                    else -> actualNext
-                }
+        val result = gossip.fold(localGossip) { current, (id, next) ->
+            val valid = next.path.asReversed().asSequence()
+                .drop(1)
+                .none { it == localId || it in neighbors }
+            val actualNext = if (valid) next else next.base(id)
+            val candidateValue = comparator.compare(current.best, actualNext.best)
+            when {
+                candidateValue > 0 -> current
+                candidateValue == 0 -> listOf(current, next).minBy { it.path.size }
+                else -> actualNext
             }
-        GossipValue(result.best, local, result.path + localId)
-    }.best
+        }
+        result.addHop(local, localId)
+    }
+    return maxGossip.best
 }
 
 /**
