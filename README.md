@@ -31,7 +31,7 @@ Then, add the dependency to the project:
     
 ```kotlin
 dependencies {
-    implementation("it.unibo.collektive:dsl:<latest version>")
+    implementation("it.unibo.collektive:collektive-dsl:<latest version>")
 }
 ```
 
