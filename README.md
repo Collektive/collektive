@@ -1,5 +1,5 @@
 [![CI/CD](https://github.com/Collektive/collektive/actions/workflows/dispatcher.yml/badge.svg)](https://github.com/Collektive/collektive/actions/workflows/dispatcher.yml)
-[![Maven Central](https://img.shields.io/maven-central/v/it.unibo.collektive/dsl)]()
+[![Maven Central](https://img.shields.io/maven-central/v/it.unibo.collektive/collektive-dsl)]()
 [![codecov](https://codecov.io/gh/Collektive/collektive/graph/badge.svg?token=U94AUOB5OK)](https://codecov.io/gh/Collektive/collektive)
 [![semantic-release: conventional-commits](https://img.shields.io/badge/semantic--release-conventional_commits-e10098?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
 ![GitHub](https://img.shields.io/github/license/Collektive/collektive)
@@ -8,15 +8,27 @@
 
 ## Goal
 
-The main goal of this project is to provide a DSL that allows
-take easily advantage of aggregate computing, which is a paradigm
-that takes full opportunity of the high availability of computational
-devices by the means of computational fields.
+Collektive is a Kotlin multiplatform implementation of [Aggregate Programming](https://cris.unibo.it/bitstream/11585/520779/4/paper-short.pdf),
+built from the experience gained with
+[Protelis](https://github.com/Protelis/Protelis)
+and [Scala Fields (Scafi)](https://github.com/scafi/scafi)
 
-Using Kotlin Multiplatform allows the DSL to be used in Native, JS and
-JVM environments.
+Documentation for Collektive is (will) be available at https://collektive.github.io/
 
-## Usage
+## Idea
+
+Collektive builds on the idea of implementing the
+[core mechanisms of the field calculus](https://doi.org/10.1145/3285956),
+including [exchange](https://doi.org/10.1016/j.jss.2024.111976),
+directly into the Kotlin compiler,
+so that aggregate programs can get written in plain Kotlin.
+
+To do so, we use a compiler plugin that changes the behavior of the Kotlin compiler,
+annotating the points in code where a program may need to "align",
+and "projecting" fields when branching (or boolean short-circuiting operations)
+are detected.
+
+## Importing the project
 
 First of all, add the following plugin to your `build.gradle.kts` file:
 
@@ -26,27 +38,28 @@ plugins {
 }
 ```
 
-This plugin is used to apply the Kotlin compiler plugin used for the alignment of aggregate operator.
-Then, add the dependency to the project:
-    
+Then import the domain-specific language and the standard library.
+
+JVM:
+
 ```kotlin
 dependencies {
     implementation("it.unibo.collektive:collektive-dsl:<latest version>")
+    implementation("it.unibo.collektive:collektive-stdlib:<latest version>")
 }
 ```
 
-## Project structure
+Multiplatform:
 
-Currently, the project is composed by three submodules:
-
-- **plugin**: it is divided in:
-    - **compiler-plugin**: the compiler plugin is used modify a data
-      structure used to keep track of the stack at runtime. For each function,
-      when its called, its name is registered in the data structure;
-    - **gradle-plugin**: necessary plugin that a gradle project uses in
-      order to include the compiler plugin;
-- **dsl**: the actual DSL, where the logic is implemented and that
-  exposes the operator of the aggregate computing;
-- **collektive-test**: this folder contains a test that allows to calculate
-  the gradient between nodes using the simulation environment offered by
-  [Alchemist Simulator](https://alchemistsimulator.github.io/).
+```kotlin
+kotlin {
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation("it.unibo.collektive:collektive-dsl:<latest version>")
+                implementation("it.unibo.collektive:collektive-stdlib:<latest version>")
+            }
+        }
+    }
+}
+```
