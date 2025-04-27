@@ -21,9 +21,10 @@ _pool: &program
         fun Aggregate<Int>.gradient(distanceSensor: CollektiveDevice<*>, source: Boolean): Double =
             share(POSITIVE_INFINITY) {
                 val dist = distanceSensor.run { distances() }
+                val throughNeighbor = (it + dist).minValue(POSITIVE_INFINITY)
                 when {
                     source -> 0.0
-                    else -> (it + dist).minValue(POSITIVE_INFINITY)
+                    else -> throughNeighbor
                 }
           }
 
