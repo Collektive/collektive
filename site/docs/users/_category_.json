@@ -1,9 +1,0 @@
-{
-  "label": "Who is using the system",
-  "position": 7,
-  "link": {
-    "type": "generated-index",
-    "description": "This tutorial is designed to help you get started with Collektive. Through this tutorial, you'll learn: how to set up Collektive in a basic project, the key functions and features of the library and how to configure and use Collektive to implement a simple aggregate behavior."
-  }
-}
-
