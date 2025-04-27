@@ -109,7 +109,7 @@ internal class ProjectFieldOnAccessTransformer(
                 .orEmpty()
             if (typeArguments.size == 2) {
                 putTypeArgument(0, typeArguments[0])
-                putTypeArgument(0, typeArguments[1])
+                putTypeArgument(1, typeArguments[1])
             }
             putArgument(projectFunction.valueParameters.single(), fieldExpression)
         }
