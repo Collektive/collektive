@@ -71,7 +71,6 @@ object KotlinPoetUtils {
                 }
                 val fieldsToPassAsArguments = fieldParameters.drop(1).joinToString(separator = ",·") { it.name }
                 val fieldArguments = if (fieldsToPassAsArguments.isEmpty()) "" else "($fieldsToPassAsArguments)"
-//                val fieldParameterNames = fieldParameters.map { it.name }
                 val lambdaNames = when {
                     fieldParameters.size == 1 -> ""
                     else -> fieldParameters.joinToString(separator = ",·", postfix = "·->·") { it.fieldElementName() }
