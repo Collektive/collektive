@@ -11,6 +11,7 @@ package it.unibo.collektive.stdlib.fields
 import arrow.core.Predicate
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.FieldEntry
+import it.unibo.collektive.aggregate.api.CollektiveIgnore
 import it.unibo.collektive.aggregate.toFieldEntry
 import it.unibo.collektive.stdlib.util.ExcludingSelf
 import it.unibo.collektive.stdlib.util.ReductionType
@@ -26,6 +27,11 @@ import it.unibo.collektive.stdlib.util.init
  * @param predicate the condition to test for each field entry.
  * @return `true` if at least one matching entry exists, `false` otherwise.
  */
+@CollektiveIgnore(
+    """
+    Uses a short-circuiting boolean operation, equivalent to a branch, to decide whether to consider the local entry.
+    """,
+)
 inline fun <ID : Any, T> Field<ID, T>.any(
     reductionType: ReductionType = ExcludingSelf,
     crossinline predicate: Predicate<FieldEntry<ID, T>>,
@@ -41,6 +47,11 @@ inline fun <ID : Any, T> Field<ID, T>.any(
  * @param predicate the condition to test for each value.
  * @return `true` if at least one matching value exists, `false` otherwise.
  */
+@CollektiveIgnore(
+    """
+    Uses a short-circuiting boolean operation, equivalent to a branch, to decide whether to consider the local entry.
+    """,
+)
 inline fun <T> Field<*, T>.anyValue(
     reductionType: ReductionType = ExcludingSelf,
     crossinline predicate: Predicate<T>,
@@ -56,6 +67,11 @@ inline fun <T> Field<*, T>.anyValue(
  * @param predicate the condition to test for each ID.
  * @return `true` if at least one matching ID exists, `false` otherwise.
  */
+@CollektiveIgnore(
+    """
+    Uses a short-circuiting boolean operation, equivalent to a branch, to decide whether to consider the local entry.
+    """,
+)
 inline fun <ID : Any> Field<ID, *>.anyID(
     reductionType: ReductionType = ExcludingSelf,
     crossinline predicate: Predicate<ID>,

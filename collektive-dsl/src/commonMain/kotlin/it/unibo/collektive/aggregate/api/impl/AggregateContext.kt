@@ -12,13 +12,13 @@ import it.unibo.collektive.aggregate.ConstantField
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.Aggregate.InternalAPI
+import it.unibo.collektive.aggregate.api.CollektiveIgnore
 import it.unibo.collektive.aggregate.api.DataSharingMethod
 import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
 import it.unibo.collektive.aggregate.api.YieldingContext
 import it.unibo.collektive.aggregate.api.YieldingResult
 import it.unibo.collektive.aggregate.api.YieldingScope
 import it.unibo.collektive.aggregate.api.impl.stack.Stack
-import it.unibo.collektive.aggregate.api.neighborhood
 import it.unibo.collektive.networking.NeighborsData
 import it.unibo.collektive.networking.OutboundEnvelope
 import it.unibo.collektive.networking.OutboundEnvelope.SharedData
@@ -53,8 +53,18 @@ internal class AggregateContext<ID : Any>(
      */
     fun newState(): State = state
 
-    private fun <T> newField(localValue: T, others: Map<ID, T>): Field<ID, T> = Field(localId, localValue, others)
+    @CollektiveIgnore(
+        """
+        This Is a wrapper for the field construction, and must thus not be projected or aligned.
+        """,
+    )
+    private fun <T> newField(localValue: T, others: Map<ID, T>): Field<ID, T> = Field(this, localId, localValue, others)
 
+    @CollektiveIgnore(
+        """
+        This API internal is not meant to be called directly, and the calling function is always aligned and projected
+        """,
+    )
     @DelicateCollektiveApi
     override fun <Shared, Returned> InternalAPI.`_ serialization aware exchanging`(
         initial: Shared,
@@ -91,6 +101,11 @@ internal class AggregateContext<ID : Any>(
             }.toReturn
     }
 
+    @CollektiveIgnore(
+        """
+        This API internal is not meant to be called directly, and the calling function is always aligned and projected
+        """,
+    )
     @DelicateCollektiveApi
     override fun <Scalar> InternalAPI.`_ serialization aware neighboring`(
         local: Scalar,
@@ -121,36 +136,4 @@ internal class AggregateContext<ID : Any>(
     private fun <T> stateAt(path: Path, default: T): T = previousState.getTyped(path, default)
 
     override fun toString() = "${this::class.simpleName}@$localId"
-}
-
-/**
- * Projects the field into the current context, restricting the field to the current context.
- *
- * A field may be misaligned if captured by a sub-scope which contains an alignment operation.
- * This function takes such [field] and restricts it to be aligned with the current neighbors.
- *
- * This method is meant to be used internally by the Collektive compiler plugin
- * and should never be called from the outside.
- *
- * If you happen to call it, be aware that you are probably building a terrible kludge that will
- * break sooner or later.
- *
- */
-@DelicateCollektiveApi
-fun <ID : Any, T> Aggregate<ID>.project(field: Field<ID, T>): Field<ID, T> {
-    // Equivalent to `mapNeighborhood { field[it] }`,
-    // but avoids the operation entirely if there has been no restriction.
-    val others = neighborhood()
-    return when {
-        field.neighborsCount == others.neighborsCount -> field
-        field.neighborsCount > others.neighborsCount -> others.map { (id, _) -> field[id] }
-        else ->
-            error(
-                """
-                Collektive is in an inconsistent state, this is most likely a bug in the implementation.
-                Field $field with ${field.neighborsCount} neighbors has been projected into a context
-                with more neighbors, ${others.neighborsCount}: ${others.excludeSelf().keys}.
-                """.trimIndent().replace(Regex("'\\R"), " "),
-            )
-    }
 }

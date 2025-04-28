@@ -10,6 +10,7 @@ package it.unibo.collektive.collektivize.utils
 
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.ParameterSpec
+import org.gradle.internal.extensions.stdlib.capitalized
 import kotlin.reflect.KCallable
 import kotlin.reflect.KProperty
 
@@ -41,61 +42,52 @@ object KotlinPoetUtils {
         parameters: List<ParameterSpec>,
         isReceiverField: Boolean,
     ) {
-        val functionParameters = parameters.drop(1)
-        val candidateParameter = functionParameters.firstOrNull { it.isField() }
-        val firstFieldParameter = parameters.first { it.isField() }
-        val arguments =
-            functionParameters.map {
-                when (it.type.toString().contains("Field")) {
-                    true -> "${it.name}[id]"
-                    false -> it.name
+        when {
+            callable.isProperty() -> {
+                check(isReceiverField) {
+                    "Bug in Collektivize expanding ${callable.name}"
                 }
+                addStatement(
+                    "return ${parameters.first().name}.%N·{·receiver·->·receiver.%N }",
+                    FIELD_MAP,
+                    callable.name,
+                )
             }
-        val namedParameter = if (arguments.any { it.contains("id") }) "id" else "_"
-        val toCheckAligned = parameters.filter { it.isField() }
-        if (toCheckAligned.size > 1) {
-            addStatement("%M(${toCheckAligned.joinToString(separator = ",·") { it.name }})", CHECK_ALIGNED)
-        }
-        when (callable.isProperty()) {
-            true ->
-                when (isReceiverField) {
-                    true ->
-                        addStatement(
-                            "return ${firstFieldParameter.name}.%N·{·($namedParameter,·receiver)·->·receiver.%N }",
-                            FIELD_MAP_WITH_ID,
-                            callable.name,
-                        )
-                    false ->
-                        addStatement(
-                            "return ${candidateParameter?.name}.%N·{·($namedParameter,·receiver)·->·this.%N }",
-                            FIELD_MAP_WITH_ID,
-                            callable.name,
-                        )
+            else -> {
+                /*
+                 * Find the first field parameter, it will be the receiver of the alignedMap call.
+                 * Then, find all the other field parameters, which will be passed as arguments to the alignedMap
+                 * call.
+                 * Also, their names mapped with a leading underscore will be used as lambda parameter names.
+                 * Non-field parameters will be passed as is.
+                 */
+                fun ParameterSpec.fieldElementName() = "local${name.capitalized()}"
+                val fieldParameters = parameters.filter { it.isField() }
+                val receiverField = fieldParameters.first().name
+                val receiver = when {
+                    !isReceiverField -> parameters.first().name
+                    fieldParameters.size == 1 -> "it"
+                    else -> fieldParameters.first().fieldElementName()
                 }
-
-            else ->
-                when (isReceiverField) {
-                    true ->
-                        addStatement(
-                            "return ${firstFieldParameter.name}.%N·{·($namedParameter,·receiver)·->·receiver.%N(${
-                                arguments.joinToString(
-                                    separator = ",·",
-                                )
-                            })·}",
-                            FIELD_MAP_WITH_ID,
-                            callable.name,
-                        )
-                    false ->
-                        addStatement(
-                            "return ${candidateParameter?.name}.%N·{·($namedParameter,·receiver)·->·this.%N(${
-                                arguments.joinToString(
-                                    separator = ",·",
-                                )
-                            })·}",
-                            FIELD_MAP_WITH_ID,
-                            callable.name,
-                        )
+                val fieldsToPassAsArguments = fieldParameters.drop(1).joinToString(separator = ",·") { it.name }
+                val fieldArguments = if (fieldsToPassAsArguments.isEmpty()) "" else "($fieldsToPassAsArguments)"
+                val lambdaNames = when {
+                    fieldParameters.size == 1 -> ""
+                    else -> fieldParameters.joinToString(separator = ",·", postfix = "·->·") { it.fieldElementName() }
                 }
+                val arguments = parameters.drop(1).joinToString(separator = ",·") {
+                    when {
+                        !it.isField() -> it.name
+                        fieldParameters.size == 1 -> "it"
+                        else -> it.fieldElementName()
+                    }
+                }
+                addStatement(
+                    "return $receiverField.%N$fieldArguments·{·$lambdaNames$receiver.%N($arguments)·}",
+                    if (fieldArguments.isEmpty()) FIELD_MAP else ALIGNED_MAP_VALUES,
+                    callable.name,
+                )
+            }
         }
     }
 }

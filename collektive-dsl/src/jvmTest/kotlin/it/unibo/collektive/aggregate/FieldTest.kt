@@ -8,11 +8,14 @@
 
 package it.unibo.collektive.aggregate
 
+import io.mockk.mockk
+import it.unibo.collektive.aggregate.api.Aggregate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class FieldTest {
+    private val mockedContext = mockk<Aggregate<Int>>(relaxed = true)
     private val myId = 0
     private val myValue: String = "myValue"
     private val connectedId = 1
@@ -20,14 +23,14 @@ class FieldTest {
 
     @Test
     fun createFieldWithoutMessages() {
-        val field: Field<Int, String> = Field(myId, myValue)
+        val field: Field<Int, String> = Field(mockedContext, myId, myValue)
         assertTrue(field.toMap().containsKey(myId))
         assertEquals(1, field.toMap().size)
     }
 
     @Test
     fun createFieldWithMessages() {
-        val field: Field<Int, String> = Field(myId, myValue, mapOf(connectedId to connectedValue))
+        val field: Field<Int, String> = Field(mockedContext, myId, myValue, mapOf(connectedId to connectedValue))
         assertTrue(field.toMap().containsKey(myId))
         assertTrue(field.toMap().containsKey(connectedId))
         assertEquals(2, field.toMap().size)
@@ -35,7 +38,7 @@ class FieldTest {
 
     @Test
     fun getFieldValueById() {
-        val field: Field<Int, String> = Field(myId, myValue, mapOf(connectedId to connectedValue))
+        val field: Field<Int, String> = Field(mockedContext, myId, myValue, mapOf(connectedId to connectedValue))
         assertEquals(myValue, field[myId])
         assertEquals(connectedValue, field[connectedId])
     }

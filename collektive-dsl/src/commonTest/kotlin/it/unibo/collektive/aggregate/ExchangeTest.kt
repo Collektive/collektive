@@ -32,14 +32,13 @@ class ExchangeTest {
         assertEquals(size * size, it.nodes.size)
     }
 
-    private fun mooreGridWithConstantFieldResult(size: Int) =
-        mooreGrid<Field<Int, Int>>(size, size, { _, _ -> Field.invoke(0, 0, emptyMap()) }) { _ ->
-            exchange(1) { field ->
-                field.mapToConstant(10)
-            }
-        }.also {
-            assertEquals(size * size, it.nodes.size)
+    private fun mooreGridWithConstantFieldResult(size: Int) = mooreGrid<Field<Int, Int>?>(size, size, null) { _ ->
+        exchange(1) { field ->
+            field.mapToConstant(10)
         }
+    }.also {
+        assertEquals(size * size, it.nodes.size)
+    }
 
     private fun mooreGridWithDedicatedNeighborValues(size: Int) =
         mooreGrid<Int>(size, size, { _, _ -> Int.MIN_VALUE }) { _ ->
@@ -128,7 +127,7 @@ class ExchangeTest {
         val result = environment.status()
         assertEquals(1, result.values.distinct().size)
         assertTrue(result.values.all { it is ConstantField })
-        assertEquals(listOf(10, 10, 10, 10), result.values.map { it.local.value })
+        assertEquals(listOf(10, 10, 10, 10), result.values.mapNotNull { it?.local?.value })
     }
 
     @Test
