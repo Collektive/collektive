@@ -1,3 +1,17 @@
+## [24.0.0](https://github.com/Collektive/collektive/compare/23.0.4...24.0.0) (2025-04-28)
+
+### ⚠ BREAKING CHANGES
+
+* fix broken field projection and partial alignment (#938)
+
+### Dependency updates
+
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.126 ([9062d0b](https://github.com/Collektive/collektive/commit/9062d0b3b6f75c788c3ce3c00bc374d201acbf9f))
+
+### Bug Fixes
+
+* fix broken field projection and partial alignment ([#938](https://github.com/Collektive/collektive/issues/938)) ([e37b0d5](https://github.com/Collektive/collektive/commit/e37b0d52ca7b8c821be42f0dc998a3ad106de13c))
+
 ## [23.0.4](https://github.com/Collektive/collektive/compare/23.0.3...23.0.4) (2025-04-27)
 
 ### Dependency updates
