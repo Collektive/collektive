@@ -105,6 +105,8 @@ interface Aggregate<ID : Any> {
          * Inline access to the data serialization method of an [Aggregate].
          * This method is used to avoid building serializers for in-memory-only contexts.
          */
+        @DelicateCollektiveApi
+        @CollektiveIgnore("This method is used to avoid building serializers for in-memory-only contexts.")
         inline fun <reified T> Aggregate<*>.dataSharingMethod(): DataSharingMethod<T> = when {
             inMemoryOnly -> InMemory
             else -> Serialize(serializer())

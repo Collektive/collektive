@@ -8,6 +8,7 @@
 
 package it.unibo.collektive.aggregate
 
+import io.mockk.mockk
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.neighboring
@@ -20,8 +21,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class NeighboringTest {
+
     private fun mooreGrid(size: Int, program: Aggregate<Int>.(Environment<Field<Int, Int>>) -> Field<Int, Int>) =
-        mooreGrid(size, size, { _, _ -> Field(Int.MAX_VALUE, 0) }, program).also {
+        mooreGrid(size, size, Field(mockk<Aggregate<Int>>(relaxed = true), Int.MAX_VALUE, 0), program).also {
             assertEquals(size * size, it.nodes.size)
         }
 

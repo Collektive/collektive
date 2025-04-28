@@ -50,7 +50,7 @@ fun <R> mooreGrid(
     sizeY: Int,
     initial: R,
     program: Aggregate<Int>.(Environment<R>) -> R,
-): EnvironmentWithMeshNetwork<R> = mooreGrid(sizeX, sizeY, { _, _ -> initial }, program)
+): EnvironmentWithMeshNetwork<R> = mooreGrid<R>(sizeX, sizeY, { _, _ -> initial }, program)
 
 /**
  * Creates a grid environment with Von Neumann connections between nodes.
@@ -66,4 +66,4 @@ fun <R> vonNeumannGrid(
  * Creates a grid environment with Von Neumann connections between nodes.
  */
 fun <R> vonNeumannGrid(sizeX: Int, sizeY: Int, initial: R, program: Aggregate<Int>.(Environment<R>) -> R) =
-    vonNeumannGrid(sizeX, sizeY, { _, _ -> initial }, program)
+    vonNeumannGrid<R>(sizeX, sizeY, { _, _ -> initial }, program)

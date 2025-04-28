@@ -41,6 +41,6 @@ class PathTest {
                 foo()
             }
         }
-        assertEquals(5, error.path.toMultilineString().lines().count())
+        assertEquals(6, error.path.toMultilineString().lines().count())
     }
 }
