@@ -10,7 +10,7 @@ package it.unibo.collektive.backend.transformers
 
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.utils.common.AggregateFunctionNames.FIELD_CLASS
-import it.unibo.collektive.utils.common.isAnnotatedAsPurelyLocal
+import it.unibo.collektive.utils.common.hasAnnotationDisablingPlugin
 import it.unibo.collektive.utils.logging.debug
 import it.unibo.collektive.utils.logging.debugPrint
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -62,13 +62,13 @@ internal class ProjectFieldOnAccessTransformer(
 ) : IrElementTransformerVoid() {
 
     override fun visitFunction(declaration: IrFunction): IrStatement = when {
-        declaration.isAnnotatedAsPurelyLocal() -> declaration
+        declaration.hasAnnotationDisablingPlugin() -> declaration
         else -> super.visitFunction(declaration)
     }
 
     @OptIn(UnsafeDuringIrConstructionAPI::class)
     override fun visitFunctionAccess(expression: IrFunctionAccessExpression): IrExpression = when {
-        expression.symbol.owner.isAnnotatedAsPurelyLocal() -> expression
+        expression.symbol.owner.hasAnnotationDisablingPlugin() -> expression
         else -> super.visitFunctionAccess(expression)
     }
 

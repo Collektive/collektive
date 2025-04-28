@@ -12,9 +12,9 @@ import it.unibo.collektive.aggregate.ConstantField
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.Aggregate.InternalAPI
+import it.unibo.collektive.aggregate.api.CollektiveIgnore
 import it.unibo.collektive.aggregate.api.DataSharingMethod
 import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
-import it.unibo.collektive.aggregate.api.PurelyLocal
 import it.unibo.collektive.aggregate.api.YieldingContext
 import it.unibo.collektive.aggregate.api.YieldingResult
 import it.unibo.collektive.aggregate.api.YieldingScope
@@ -53,10 +53,18 @@ internal class AggregateContext<ID : Any>(
      */
     fun newState(): State = state
 
-    @PurelyLocal
+    @CollektiveIgnore(
+        """
+        This Is a wrapper for the field construction, and must thus not be projected or aligned.
+        """,
+    )
     private fun <T> newField(localValue: T, others: Map<ID, T>): Field<ID, T> = Field(this, localId, localValue, others)
 
-    @PurelyLocal
+    @CollektiveIgnore(
+        """
+        This API internal is not meant to be called directly, and the calling function is always aligned and projected
+        """,
+    )
     @DelicateCollektiveApi
     override fun <Shared, Returned> InternalAPI.`_ serialization aware exchanging`(
         initial: Shared,
@@ -93,7 +101,11 @@ internal class AggregateContext<ID : Any>(
             }.toReturn
     }
 
-    @PurelyLocal
+    @CollektiveIgnore(
+        """
+        This API internal is not meant to be called directly, and the calling function is always aligned and projected
+        """,
+    )
     @DelicateCollektiveApi
     override fun <Scalar> InternalAPI.`_ serialization aware neighboring`(
         local: Scalar,

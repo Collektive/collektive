@@ -9,7 +9,7 @@
 package it.unibo.collektive.stdlib.fields
 
 import it.unibo.collektive.aggregate.Field
-import it.unibo.collektive.aggregate.api.PurelyLocal
+import it.unibo.collektive.aggregate.api.CollektiveIgnore
 
 /**
  * Checks whether the given [value] is present in the field, including the local value.
@@ -20,5 +20,12 @@ import it.unibo.collektive.aggregate.api.PurelyLocal
  * @param value the value to look for.
  * @return `true` if [value] is present in the field, `false` otherwise.
  */
-@PurelyLocal
+@CollektiveIgnore(
+"""
+    Uses a short-circuiting boolean operation, equivalent to a branch, to speed up the verification,
+    avoiding field->map transformations if the element is local.
+    Applying projection would make neighborsValue restricted, and aligned solely with those neighbors
+    for which the localValue is not the provided value. 
+    """,
+)
 fun <T> Field<*, T>.containsValue(value: T): Boolean = local.value == value || neighborsValues.contains(value)

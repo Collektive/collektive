@@ -25,4 +25,4 @@ package it.unibo.collektive.aggregate.api
  * - **File**: Globally disables alignment injection for the entire file.
  */
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS, AnnotationTarget.FILE)
-annotation class PurelyLocal(val explanation: String = "")
+annotation class CollektiveIgnore(val explanation: String)

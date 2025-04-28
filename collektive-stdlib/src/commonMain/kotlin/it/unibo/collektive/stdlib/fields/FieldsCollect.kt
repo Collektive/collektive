@@ -12,7 +12,7 @@ import arrow.core.Predicate
 import arrow.core.identity
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.FieldEntry
-import it.unibo.collektive.aggregate.api.PurelyLocal
+import it.unibo.collektive.aggregate.api.CollektiveIgnore
 import it.unibo.collektive.stdlib.util.ExcludingSelf
 import it.unibo.collektive.stdlib.util.ReductionType
 import it.unibo.collektive.stdlib.util.init
@@ -58,7 +58,11 @@ import kotlin.jvm.JvmOverloads
  * @param transform the mapping function applied to each matching entry.
  * @return a mutable collection containing the transformed matching entries.
  */
-@PurelyLocal
+@CollektiveIgnore(
+    """
+    Uses a short-circuiting boolean operation, equivalent to a branch, to decide whether to consider the local entry.
+    """,
+)
 @JvmOverloads
 @OptIn(ExperimentalContracts::class)
 inline fun <ID : Any, T, R, C : MutableCollection<R>> Field<ID, T>.collectInto(

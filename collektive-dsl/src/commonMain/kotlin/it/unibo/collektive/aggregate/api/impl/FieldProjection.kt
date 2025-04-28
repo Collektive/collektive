@@ -9,8 +9,8 @@
 package it.unibo.collektive.aggregate.api.impl
 
 import it.unibo.collektive.aggregate.Field
+import it.unibo.collektive.aggregate.api.CollektiveIgnore
 import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
-import it.unibo.collektive.aggregate.api.PurelyLocal
 import it.unibo.collektive.aggregate.api.neighborhood
 
 /**
@@ -26,7 +26,11 @@ import it.unibo.collektive.aggregate.api.neighborhood
  * break sooner or later.
  *
  */
-@PurelyLocal
+@CollektiveIgnore(
+    """
+        Projecting the projection function would inevitably lead to an infinite loop.
+        """,
+)
 @DelicateCollektiveApi
 fun <ID : Any, T> project(field: Field<ID, T>): Field<ID, T> = field.context.alignedOn("<field-projection>") {
     // Manually-aligned.

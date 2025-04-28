@@ -10,7 +10,7 @@ package it.unibo.collektive.utils.common
 
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.PurelyLocal
+import it.unibo.collektive.aggregate.api.CollektiveIgnore
 import it.unibo.collektive.aggregate.api.YieldingContext
 
 /**
@@ -69,8 +69,8 @@ object AggregateFunctionNames {
     /** Fully-qualified name of the `neighboring(...)` function for building neighbor views. */
     const val NEIGHBORING_FUNCTION_FQ_NAME: String = "it.unibo.collektive.aggregate.api.neighboring"
 
-    /** Fully-qualified name of the [PurelyLocal] annotation used to suppress automatic alignment. */
-    val PURELY_LOCAL_ANNOTATION_FQ_NAME: String = checkNotNull(PurelyLocal::class.qualifiedName)
+    /** Fully-qualified name of the [CollektiveIgnore] annotation used to suppress automatic alignment. */
+    val IGNORE_FUNCTION_ANNOTATION_FQ_NAME: String = checkNotNull(CollektiveIgnore::class.qualifiedName)
 
     /** Name of the `project(...)` function for field projections. */
     const val PROJECT_FUNCTION: String = "project"

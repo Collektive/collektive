@@ -10,8 +10,8 @@ package it.unibo.collektive.utils.common
 
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.PurelyLocal
-import it.unibo.collektive.utils.common.AggregateFunctionNames.PURELY_LOCAL_ANNOTATION_FQ_NAME
+import it.unibo.collektive.aggregate.api.CollektiveIgnore
+import it.unibo.collektive.utils.common.AggregateFunctionNames.IGNORE_FUNCTION_ANNOTATION_FQ_NAME
 import it.unibo.collektive.utils.logging.debug
 import it.unibo.collektive.utils.logging.debugPrint
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -135,7 +135,7 @@ private fun IrExpression.findFirstCapturedVariableOfType(targetType: IrClass): I
  *
  * A function is considered aggregate-aware if:
  * - It operates on an [Aggregate] or a [Field] via receiver or parameters
- * - It is **not** annotated with [PurelyLocal]
+ * - It is **not** annotated with [CollektiveIgnore]
  *
  * This is used during the alignment phase to detect functions
  * that should be transformed into aggregate computations.
@@ -146,7 +146,7 @@ private fun IrExpression.findFirstCapturedVariableOfType(targetType: IrClass): I
  * @return `true` if the function is aggregate-aware, `false` otherwise
  */
 fun IrFunction.isAggregate(aggregateClass: IrClass, fieldClass: IrClass, logger: MessageCollector? = null): Boolean =
-    !isAnnotatedAsPurelyLocal(logger) &&
+    !hasAnnotationDisablingPlugin(logger) &&
         listOf(aggregateClass, fieldClass).any { irClass: IrClass ->
             val type = irClass.defaultType
             extensionReceiverParameter?.type?.isAssignableFrom(type)
@@ -156,16 +156,16 @@ fun IrFunction.isAggregate(aggregateClass: IrClass, fieldClass: IrClass, logger:
 
 /**
  * Checks whether this [IrFunction] or any of its enclosing declarations
- * are annotated with [PurelyLocal].
+ * are annotated with [CollektiveIgnore].
  *
- * Functions or classes marked with [PurelyLocal] are excluded
+ * Functions or classes marked with [CollektiveIgnore] are excluded
  * from alignment and treated as purely local computations.
  *
  * @param logger an optional [MessageCollector] for debug output
- * @return `true` if the function or a parent is annotated with [PurelyLocal]
+ * @return `true` if the function or a parent is annotated with [CollektiveIgnore]
  */
-fun IrFunction.isAnnotatedAsPurelyLocal(logger: MessageCollector? = null): Boolean {
+fun IrFunction.hasAnnotationDisablingPlugin(logger: MessageCollector? = null): Boolean {
     val allAnnotations = annotations + parents.flatMap { (it as? IrAnnotationContainer)?.annotations.orEmpty() }
     logger?.debug("Detected annotations: $allAnnotations")
-    return allAnnotations.any { it.type.classFqName?.asString() == PURELY_LOCAL_ANNOTATION_FQ_NAME }
+    return allAnnotations.any { it.type.classFqName?.asString() == IGNORE_FUNCTION_ANNOTATION_FQ_NAME }
 }

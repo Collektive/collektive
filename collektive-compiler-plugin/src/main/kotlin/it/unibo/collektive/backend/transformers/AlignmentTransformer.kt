@@ -9,7 +9,6 @@
 package it.unibo.collektive.backend.transformers
 
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.PurelyLocal
 import it.unibo.collektive.utils.common.findAggregateReference
 import it.unibo.collektive.utils.common.irStatement
 import it.unibo.collektive.utils.common.simpleFunctionName
@@ -72,7 +71,7 @@ import kotlin.concurrent.atomics.ExperimentalAtomicApi
  * the token is annotated with a count (`N|`) to distinguish instances.
  *
  * ## Special Cases:
- * - Functions explicitly annotated with [PurelyLocal] are **excluded** from alignment.
+ * - Functions explicitly annotated with [CollektiveIgnore] are **excluded** from alignment.
  * - Internal operations like accessing a `Field.context`, `alignRaw`, and `dealign` themselves are also **excluded**.
  *
  * @property pluginContext the plugin context used for constructing IR nodes

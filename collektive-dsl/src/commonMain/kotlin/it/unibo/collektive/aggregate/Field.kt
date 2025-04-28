@@ -6,12 +6,12 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
-@file:PurelyLocal
+@file:CollektiveIgnore("The implementation of field must not be internally projected")
 
 package it.unibo.collektive.aggregate
 
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.PurelyLocal
+import it.unibo.collektive.aggregate.api.CollektiveIgnore
 
 /**
  * A [Field] represents the local view of distributed values across a network of nodes.
@@ -623,7 +623,6 @@ internal class PointwiseField<ID : Any, T>(context: Aggregate<ID>, localId: ID, 
     override fun asSequence(): Sequence<FieldEntry<ID, T>> = sequenceOf(FieldEntry(local.id, local.value))
 }
 
-@PurelyLocal
 private fun <ID : Any> Field<ID, *>.checkNotLocal(id: ID): ID {
     check(id != local.id) {
         "Local value $id is both local and neighboring. This is a bug in ${this::class.simpleName}"
