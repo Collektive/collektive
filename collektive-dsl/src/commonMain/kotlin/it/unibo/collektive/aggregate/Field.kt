@@ -6,12 +6,35 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
+@file:CollektiveIgnore("The implementation of field must not be internally projected")
+
 package it.unibo.collektive.aggregate
 
+import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.CollektiveIgnore
+
 /**
- * A field is a map of messages where the key is the [ID] of a node and [T] the associated value.
+ * A [Field] represents the local view of distributed values across a network of nodes.
+ *
+ * Each field consists of:
+ * - A local entry, associated with the node executing the aggregate computation.
+ * - A set of neighboring entries, each identified by a unique [ID].
+ *
+ * The field provides functional operators for aggregation, projection, and transformation,
+ * supporting key aggregate computing patterns. Fields are expected to be aligned when
+ * used together—i.e., they share the same neighborhood structure.
+ *
+ * @param ID the type used to identify nodes in the aggregate space.
+ * @param T the type of value carried by each entry in the field.
  */
+@Suppress("TooManyFunctions")
 sealed interface Field<ID : Any, out T> {
+
+    /**
+     * The [Aggregate] execution context this field belongs to.
+     */
+    val context: Aggregate<ID>
+
     /**
      * The [ID] of the local node.
      */
@@ -25,7 +48,7 @@ sealed interface Field<ID : Any, out T> {
     val localValue: T
 
     /**
-     * The [FieldEntry] of the local node.
+     * The entry representing the local node in the field.
      */
     val local: FieldEntry<ID, T>
 
@@ -35,17 +58,17 @@ sealed interface Field<ID : Any, out T> {
     val neighborsCount: Int get() = excludeSelf().size
 
     /**
-     * Returns the [ID]s of all neighbors in this field.
+     * Returns the set of [ID]s of neighboring nodes (excluding self).
      */
     val neighbors: Set<ID>
 
     /**
-     * Returns the values of all neighbors in this field.
+     * Returns a list of the values from neighboring nodes.
      */
     val neighborsValues: List<T> // get() = excludeSelf().values
 
     /**
-     * Returns a [Map] with the neighboring values of this field (namely, all values but self).
+     * Returns a map of entries excluding the local node.
      */
     fun excludeSelf(): Map<ID, T>
 
@@ -53,16 +76,74 @@ sealed interface Field<ID : Any, out T> {
      * Combines this field with another (aligned) one considering the [ID] when combining the values.
      */
     fun <B, R> alignedMap(other: Field<ID, B>, transform: (ID, T, B) -> R): Field<ID, R> {
-        // checkAligned(this, other)
+        checkAligned(this, other)
         return map { transform(it.id, it.value, other[it.id]) }
     }
 
     /**
-     * Combines this field with other two (aligned) fields based on the [ID]s when.
+     * Combines this field with other two (aligned) fields based on the [ID]s.
      */
     fun <B, C, R> alignedMap(f1: Field<ID, B>, f2: Field<ID, C>, transform: (ID, T, B, C) -> R): Field<ID, R> {
-        // checkAligned(this, f1, f2)
+        checkAligned(this, f1, f2)
         return map { (id, value) -> transform(id, value, f1[id], f2[id]) }
+    }
+
+    /**
+     * Combines this field with other three (aligned) fields based on the [ID]s.
+     */
+    fun <B, C, D, R> alignedMap(
+        f1: Field<ID, B>,
+        f2: Field<ID, C>,
+        f3: Field<ID, D>,
+        transform: (ID, T, B, C, D) -> R,
+    ): Field<ID, R> {
+        checkAligned(this, f1, f2, f3)
+        return map { (id, value) -> transform(id, value, f1[id], f2[id], f3[id]) }
+    }
+
+    /**
+     * Combines this field with other four (aligned) fields based on the [ID]s.
+     */
+    fun <B, C, D, E, R> alignedMap(
+        f1: Field<ID, B>,
+        f2: Field<ID, C>,
+        f3: Field<ID, D>,
+        f4: Field<ID, E>,
+        transform: (ID, T, B, C, D, E) -> R,
+    ): Field<ID, R> {
+        checkAligned(this, f1, f2, f3, f4)
+        return map { (id, value) -> transform(id, value, f1[id], f2[id], f3[id], f4[id]) }
+    }
+
+    /**
+     * Combines this field with other five (aligned) fields based on the [ID]s.
+     */
+    fun <B, C, D, E, F, R> alignedMap(
+        f1: Field<ID, B>,
+        f2: Field<ID, C>,
+        f3: Field<ID, D>,
+        f4: Field<ID, E>,
+        f5: Field<ID, F>,
+        transform: (ID, T, B, C, D, E, F) -> R,
+    ): Field<ID, R> {
+        checkAligned(this, f1, f2, f3, f4, f5)
+        return map { (id, value) -> transform(id, value, f1[id], f2[id], f3[id], f4[id], f5[id]) }
+    }
+
+    /**
+     * Combines this field with other six (aligned) fields based on the [ID]s.
+     */
+    fun <B, C, D, E, F, G, R> alignedMap(
+        f1: Field<ID, B>,
+        f2: Field<ID, C>,
+        f3: Field<ID, D>,
+        f4: Field<ID, E>,
+        f5: Field<ID, F>,
+        f6: Field<ID, G>,
+        transform: (ID, T, B, C, D, E, F, G) -> R,
+    ): Field<ID, R> {
+        checkAligned(this, f1, f2, f3, f4, f5, f6)
+        return map { (id, value) -> transform(id, value, f1[id], f2[id], f3[id], f4[id], f5[id], f6[id]) }
     }
 
     /**
@@ -72,10 +153,64 @@ sealed interface Field<ID : Any, out T> {
         alignedMap(other) { _, value, otherValue -> transform(value, otherValue) }
 
     /**
-     * Combines this field with other two (aligned) fields based on the [ID]s when.
+     * Combines this field with other two (aligned) fields based on the [ID]s.
      */
     fun <B, C, R> alignedMapValues(f1: Field<ID, B>, f2: Field<ID, C>, transform: (T, B, C) -> R): Field<ID, R> =
         alignedMap(f1, f2) { _, value, f1Value, f2Value -> transform(value, f1Value, f2Value) }
+
+    /**
+     * Combines this field with other three (aligned) fields based on the [ID]s.
+     */
+    fun <B, C, D, R> alignedMapValues(
+        f1: Field<ID, B>,
+        f2: Field<ID, C>,
+        f3: Field<ID, D>,
+        transform: (T, B, C, D) -> R,
+    ): Field<ID, R> =
+        alignedMap(f1, f2, f3) { _, value, f1Value, f2Value, f3Value -> transform(value, f1Value, f2Value, f3Value) }
+
+    /**
+     * Combines this field with other four (aligned) fields based on the [ID]s.
+     */
+    fun <B, C, D, E, R> alignedMapValues(
+        f1: Field<ID, B>,
+        f2: Field<ID, C>,
+        f3: Field<ID, D>,
+        f4: Field<ID, E>,
+        transform: (T, B, C, D, E) -> R,
+    ): Field<ID, R> = alignedMap(f1, f2, f3, f4) { _, value, f1Value, f2Value, f3Value, f4Value ->
+        transform(value, f1Value, f2Value, f3Value, f4Value)
+    }
+
+    /**
+     * Combines this field with other five (aligned) fields based on the [ID]s.
+     */
+    fun <B, C, D, E, F, R> alignedMapValues(
+        f1: Field<ID, B>,
+        f2: Field<ID, C>,
+        f3: Field<ID, D>,
+        f4: Field<ID, E>,
+        f5: Field<ID, F>,
+        transform: (T, B, C, D, E, F) -> R,
+    ): Field<ID, R> = alignedMap(f1, f2, f3, f4, f5) { _, value, f1Value, f2Value, f3Value, f4Value, f5Value ->
+        transform(value, f1Value, f2Value, f3Value, f4Value, f5Value)
+    }
+
+    /**
+     * Combines this field with other six (aligned) fields based on the [ID]s.
+     */
+    fun <B, C, D, E, F, G, R> alignedMapValues(
+        f1: Field<ID, B>,
+        f2: Field<ID, C>,
+        f3: Field<ID, D>,
+        f4: Field<ID, E>,
+        f5: Field<ID, F>,
+        f6: Field<ID, G>,
+        transform: (T, B, C, D, E, F, G) -> R,
+    ): Field<ID, R> =
+        alignedMap(f1, f2, f3, f4, f5, f6) { _, value, f1Value, f2Value, f3Value, f4Value, f5Value, f6Value ->
+            transform(value, f1Value, f2Value, f3Value, f4Value, f5Value, f6Value)
+        }
 
     /**
      * Checks if a specified entry is contained within the current field.
@@ -107,7 +242,7 @@ sealed interface Field<ID : Any, out T> {
     /**
      * Map the field resulting in a new one where the value for the local and the neighbors is [singleton].
      */
-    fun <B> mapToConstant(singleton: B): Field<ID, B> = ConstantField(local.id, singleton, excludeSelf().keys)
+    fun <B> mapToConstant(singleton: B): Field<ID, B> = ConstantField(context, local.id, singleton, excludeSelf().keys)
 
     /**
      * Get the value associated with the [id].
@@ -153,6 +288,7 @@ sealed interface Field<ID : Any, out T> {
          * Build a field from a [localId], [localValue] and [others] neighbours values.
          */
         internal operator fun <ID : Any, T> invoke(
+            context: Aggregate<ID>,
             localId: ID,
             localValue: T,
             others: Map<ID, T> = emptyMap(),
@@ -164,9 +300,9 @@ sealed interface Field<ID : Any, out T> {
                     "as the local id is also present among the neighbors"
             }
             return when {
-                others.isEmpty() -> PointwiseField(localId, localValue)
-                others.values.all { it == localValue } -> ConstantField(localId, localValue, others.keys)
-                else -> ArrayBasedField(localId, localValue, others.map { it.toFieldEntry() })
+                others.isEmpty() -> PointwiseField(context, localId, localValue)
+                others.values.all { it == localValue } -> ConstantField(context, localId, localValue, others.keys)
+                else -> ArrayBasedField(context, localId, localValue, others.map { it.toFieldEntry() })
             }
         }
 
@@ -280,7 +416,10 @@ sealed interface Field<ID : Any, out T> {
     }
 }
 
-internal abstract class AbstractField<ID : Any, T>(override val local: FieldEntry<ID, T>) : Field<ID, T> {
+internal abstract class AbstractField<ID : Any, T>(
+    final override val context: Aggregate<ID>,
+    final override val local: FieldEntry<ID, T>,
+) : Field<ID, T> {
 
     @Deprecated("Use local.id instead", replaceWith = ReplaceWith("local.id"))
     override val localId: ID get() = local.id
@@ -288,7 +427,7 @@ internal abstract class AbstractField<ID : Any, T>(override val local: FieldEntr
     @Deprecated("Use local.value instead", replaceWith = ReplaceWith("local.value"))
     override val localValue: T get() = local.value
 
-    constructor(localID: ID, localValue: T) : this(FieldEntry(localID, localValue))
+    constructor(context: Aggregate<ID>, localID: ID, localValue: T) : this(context, FieldEntry(localID, localValue))
 
     private val asMap: Map<ID, T> by lazy {
         val result: Map<ID, T> = neighborsMap() + (local.id to local.value)
@@ -330,7 +469,7 @@ internal abstract class AbstractField<ID : Any, T>(override val local: FieldEntr
     }
 
     final override fun <B> map(transform: (FieldEntry<ID, T>) -> B): Field<ID, B> =
-        SequenceBasedField(local.id, transform(local), mapOthersAsSequence(transform))
+        SequenceBasedField(context, local.id, transform(local), mapOthersAsSequence(transform))
 
     protected abstract fun neighborsMap(): Map<ID, T>
 
@@ -351,8 +490,12 @@ internal abstract class AbstractField<ID : Any, T>(override val local: FieldEntr
     final override fun toString() = stringRepresentation
 }
 
-internal class ArrayBasedField<ID : Any, T>(localId: ID, localValue: T, private val others: List<FieldEntry<ID, T>>) :
-    AbstractField<ID, T>(localId, localValue) {
+internal class ArrayBasedField<ID : Any, T>(
+    context: Aggregate<ID>,
+    localId: ID,
+    localValue: T,
+    private val others: List<FieldEntry<ID, T>>,
+) : AbstractField<ID, T>(context, localId, localValue) {
 
     override val neighborsCount: Int get() = others.size
     override val neighbors: Set<ID> by lazy {
@@ -386,10 +529,11 @@ internal class ArrayBasedField<ID : Any, T>(localId: ID, localValue: T, private 
 }
 
 internal class SequenceBasedField<ID : Any, T>(
+    context: Aggregate<ID>,
     localId: ID,
     localValue: T,
     private val others: Sequence<FieldEntry<ID, T>>,
-) : AbstractField<ID, T>(localId, localValue) {
+) : AbstractField<ID, T>(context, localId, localValue) {
 
     override val neighborsCount get() = neighbors.size
 
@@ -424,8 +568,12 @@ internal class SequenceBasedField<ID : Any, T>(
         }
 }
 
-internal class ConstantField<ID : Any, T>(localId: ID, localValue: T, override val neighbors: Set<ID>) :
-    AbstractField<ID, T>(localId, localValue) {
+internal class ConstantField<ID : Any, T>(
+    context: Aggregate<ID>,
+    localId: ID,
+    localValue: T,
+    override val neighbors: Set<ID>,
+) : AbstractField<ID, T>(context, localId, localValue) {
     override val neighborsCount: Int = neighbors.size
 
     override val neighborsValues: List<T> by lazy {
@@ -455,7 +603,8 @@ internal class ConstantField<ID : Any, T>(localId: ID, localValue: T, override v
         neighbors.asSequence().map { FieldEntry(checkNotLocal(it), local.value) } + local
 }
 
-internal class PointwiseField<ID : Any, T>(localId: ID, localValue: T) : AbstractField<ID, T>(localId, localValue) {
+internal class PointwiseField<ID : Any, T>(context: Aggregate<ID>, localId: ID, localValue: T) :
+    AbstractField<ID, T>(context, localId, localValue) {
 
     override fun neighborsMap(): Map<ID, T> = emptyMap()
 

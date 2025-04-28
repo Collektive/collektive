@@ -8,6 +8,8 @@
 
 package it.unibo.collektive.aggregate
 
+import io.mockk.mockk
+import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.stdlib.fields.fold
 import it.unibo.collektive.stdlib.fields.foldValues
 import it.unibo.collektive.stdlib.fields.reduce
@@ -18,10 +20,11 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
 class FieldOpsTest {
-    private val emptyField = Field(0, "localVal")
-    private val field = Field(0, 0, mapOf(1 to 10, 2 to 20))
-    private val fulfilledField = Field(0, 0, mapOf(1 to 10, 2 to 20, 3 to 15))
-    private val fulfilledCompatibleField = Field(0, 1, mapOf(1 to 1, 2 to 1, 3 to 1))
+    private val mockedContext = mockk<Aggregate<Int>>(relaxed = true)
+    private val emptyField = Field(mockedContext, 0, "localVal")
+    private val field = Field(mockedContext, 0, 0, mapOf(1 to 10, 2 to 20))
+    private val fulfilledField = Field(mockedContext, 0, 0, mapOf(1 to 10, 2 to 20, 3 to 15))
+    private val fulfilledCompatibleField = Field(mockedContext, 0, 1, mapOf(1 to 1, 2 to 1, 3 to 1))
 
     @Test
     fun `An empty field should return the default value value when is hooded`() {
@@ -77,17 +80,22 @@ class FieldOpsTest {
 
     @Test
     fun `An empty field when mapped only the local value should be transformed`() {
-        assertEquals(Field(0, "localVal-mapped", mapOf()), emptyField.mapValues { "$it-mapped" })
+        assertEquals(Field(mockedContext, 0, "localVal-mapped", mapOf()), emptyField.mapValues { "$it-mapped" })
     }
 
     @Test
     fun `A field can be mapped on its values with a given function`() {
-        assertEquals(Field(0, 3, mapOf(1 to 13, 2 to 23)), field.mapValues { it + 3 })
+        assertEquals(Field(mockedContext, 0, 3, mapOf(1 to 13, 2 to 23)), field.mapValues { it + 3 })
     }
 
     @Test
     fun `A field can be mapped on its values with a given function and the id`() {
-        assertEquals(Field(0, "0-0", mapOf(1 to "1-10", 2 to "2-20")), field.map { (id, value) -> "$id-$value" })
+        assertEquals(
+            Field(mockedContext, 0, "0-0", mapOf(1 to "1-10", 2 to "2-20")),
+            field.map { (id, value) ->
+                "$id-$value"
+            },
+        )
     }
 
     @Test
@@ -97,17 +105,17 @@ class FieldOpsTest {
 
     @Test
     fun `Two field are equals if they contains the same values`() {
-        assertEquals(Field(0, 0, mapOf(1 to 10, 2 to 20)), field)
+        assertEquals(Field(mockedContext, 0, 0, mapOf(1 to 10, 2 to 20)), field)
     }
 
     @Test
     fun `Two fields are not equals if they contains different values`() {
-        assertNotEquals(field, Field(0, 0, mapOf(1 to -1, 2 to -1)))
+        assertNotEquals(field, Field(mockedContext, 0, 0, mapOf(1 to -1, 2 to -1)))
     }
 
     @Test
     fun `Two field are not equals if the contains the same neighboring values but the local id is different`() {
-        assertNotEquals(field, Field(10, 0, mapOf(1 to 10, 2 to 20)))
+        assertNotEquals(field, Field(mockedContext, 10, 0, mapOf(1 to 10, 2 to 20)))
     }
 
     @Test
@@ -127,18 +135,23 @@ class FieldOpsTest {
 
     @Test
     fun `The replaceMatching should return a field with the replaced values`() {
-        assertEquals(Field(0, 0, mapOf(1 to 42, 2 to 20)), field.replaceMatchingValues(42) { it == 10 })
+        assertEquals(Field(mockedContext, 0, 0, mapOf(1 to 42, 2 to 20)), field.replaceMatchingValues(42) { it == 10 })
     }
 
     @Test
     fun `An empty field should return an empty field when aligned mapped with another empty field`() {
-        assertEquals(Field(0, "no-data", emptyMap()), emptyField.alignedMap(emptyField) { _, _, _ -> "no-data" })
+        assertEquals(
+            Field(mockedContext, 0, "no-data", emptyMap()),
+            emptyField.alignedMap(emptyField) { _, _, _ ->
+                "no-data"
+            },
+        )
     }
 
     @Test
     fun `A field should return a field with the mapped values when aligned mapped with another field`() {
         assertEquals(
-            Field(0, 1, mapOf(1 to 11, 2 to 21, 3 to 16)),
+            Field(mockedContext, 0, 1, mapOf(1 to 11, 2 to 21, 3 to 16)),
             fulfilledField.alignedMap(fulfilledCompatibleField) { _, value, other -> value + other },
         )
     }

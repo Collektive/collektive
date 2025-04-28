@@ -36,9 +36,10 @@ import kotlin.reflect.typeOf
 
 internal val FIELD_INTERFACE = Field::class.asClassName()
 internal val FIELD_COMPANION = Field.Companion::class.asClassName()
-internal val CHECK_ALIGNED = FIELD_COMPANION.member("checkAligned")
+
+// internal val CHECK_ALIGNED = FIELD_COMPANION.member("checkAligned")
 internal val FIELD_MAP = FIELD_INTERFACE.member("mapValues")
-internal val FIELD_MAP_WITH_ID = FIELD_INTERFACE.member("map")
+internal val ALIGNED_MAP_VALUES = FIELD_INTERFACE.member("alignedMapValues")
 internal val ID_BOUNDED_TYPE = TypeVariableName("ID", Any::class.asTypeName())
 internal val operatorNotReturningField = listOf("compareTo", "contains")
 
