@@ -1,0 +1,68 @@
+---
+title: Building Resilient Systems with Aggregate Programming
+sidebar_position: 1
+---
+
+# The Challenge of Building Resilient Systems
+
+In most of distributed systems and **Internet of Things** (IoT) applications,
+the **dynamic nature** of the environment and the **unpredictable behavior** of individual devices pose significant challenges.
+Often these systems are composed of **heterogeneous** and **resource-constrained** devices,
+which may be **mobile** or **static**, and are subject to **frequent failures** and **topology changes**.
+Also,
+it is common to assume that the devices must be connected to Internet to perform their tasks,
+but this is not always the case.
+For example, in **smart cities** or **smart agriculture** applications,
+the devices may be deployed in remote areas with limited connectivity,
+or in **disaster recovery** scenarios where the network infrastructure is damaged.
+
+The heterogeneity of the devices can lead to different communication protocols and implementation of the same functionalities,
+which can make it difficult to achieve **interoperability** and **scalability**.
+Ideally,
+we would like to have a single program that can run on all devices;
+with this purpose in mind,
+we can leverage on the **Aggregate Programming** paradigm.
+
+## Aggregate Programming as a Relevant Approach
+
+In this context, **Aggregate Programming**[^1] (AP) emerges as a **relevant macroprogramming approach**. It is based on the **functional composition** of **reusable collective behavior blocks**, with the goal of efficiently achieving **complex** and **resilient behaviors** in **dynamic networks**.
+
+### Key Properties of Aggregate Programming
+
+- **Self-organization**: the system as a whole is capable of achieving globally coordinated behaviors through decentralized interactions among individual devices.
+    - **Self-coordination**: devices autonomously exchange information and adapt their behavior to maintain coherence, even in the absence of centralized control;
+    - **Self-stabilization**: the system naturally converges to a desired stable state despite transient disruptions or changes in the network.
+- **Resilience**: the system is inherently robust to node failures, dynamic topology changes, and unpredictable environmental conditions (e.g., wireless interference, sudden weather changes affecting sensor networks, or physical obstacles disrupting communication), ensuring continued functionality under adverse circumstances.
+- **Scalability**: the system can efficiently handle a growing number of devices while maintaining low communication overhead and computational efficiency. As the network size increases, the system continues to provide predictable response times and stable resource consumption, ensuring overall performance in terms of latency, throughput, and fault tolerance.
+
+Aggregate programming finds its conceptual roots in **Field Calculus**[^3](FC), a minimal functional programming language designed for the specification and composition of collective behaviors. FC provides a formal framework for expressing distributed algorithms in terms of computational fields, enabling concise and declarative descriptions of large-scale system behaviors.
+
+Building on this foundation, Aggregate Programming defines **basic building blocks**, which serve as foundational mechanisms for collective behavior. 
+
+For example, **broadcasting** and **gradient formation** are widely applied in sensor networks to propagate information efficiently. 
+
+**Event detection** and **consensus** play a crucial role in distributed monitoring systems, enabling nodes to agree on the occurrence of specific conditions despite local disruptions. 
+
+Similarly, **clustering** and **leader election** are essential in ad-hoc mobile networks to establish hierarchical structures and coordinate actions. 
+
+These building blocks lay the groundwork for more advanced and resilient applications across dynamic and large-scale environments.
+
+### Practical Applications of Aggregate Programming
+
+Aggregate Programming has demonstrated its versatility in solving complex coordination problems in distributed systems. Practical use cases include:
+
+- **Robot Swarms**[^4]: AP enables coordinated behavior in fleets of autonomous robot, such as formation control, coverage, and search-and-rescue operations, where dynamic and resilient coordination is required.
+- **Crowd Management**[^5]: AP supports applications for monitoring and controlling crowds, including density estimation, anomaly detection, and safe dispersal strategies in large-scale events or emergency scenarios.
+- **Environmental Monitoring**: sensor networks employing AP can collectively estimate parameters like pollution levels, temperature gradients, or wildfire spread by aggregating local measurements efficiently.
+- **Vascular Morphogenesis**[^2]: an early application of AP was demonstrated in the context of vascular morphogenesis, where Collektive was used to model self-organizing biological patterns.
+
+These examples highlight how Aggregate Programming simplifies the design and implementation of robust, scalable, and adaptive behaviors in dynamic and decentralized systems.
+
+---
+
+[^1]: [J. Beal, D. Pianini, and M. Viroli, “Aggregate Programming for the Internet of Things”, 2015](http://dx.doi.org/10.1109/MC.2015.261).
+[^2]: [A. Cortecchia, D. Pianini, G. Ciatto, and R. Casadei, “An Aggregate Vascular Morphogenesis Controller for Engineered Self-Organising Spatial Structures”, 2024](https://doi.org/10.1109/ACSOS61780.2024.00032).
+[^3]: [G. Audrito, J. Beal, F. Damiani, and M. Viroli, “Space-Time Universality of Field Calculus”, 2018](https://doi.org/10.1007/978-3-319-92408-3_1).
+[^4]: [G. Aguzzi, G. Audrito, R. Casadei, F. Damiani, G. Torta, and M. Viroli, “A field-based computing approach to sensing-driven clustering in robot swarms”, 2022](https://doi.org/10.1007/s11721-022-00215-y).
+[^5]: [B. Anzengruber, D. Pianini, J. Nieminen, and A. Ferscha, “Predicting Social Density in Mass Events to Prevent Crowd Disasters”, 2013](https://doi.org/10.1007/978-3-319-03260-3_18).
+

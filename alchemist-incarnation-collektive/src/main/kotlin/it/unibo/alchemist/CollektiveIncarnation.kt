@@ -74,6 +74,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
             is Double -> interpreted
             is Number -> interpreted.toDouble()
             is String -> interpreted.toDoubleOrNull() ?: Double.NaN
+            is Boolean -> if (interpreted) 1.0 else 0.0
             else -> Double.NaN
         }
     }
@@ -313,7 +314,8 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
                 }
             }
             check(!messages.hasErrors() && result == ExitCode.OK) {
-                "Compilation of Collektive program $name failed:\n$finalCode"
+                "Compilation of Collektive program $name failed:\n$finalCode\n\n" +
+                    messages[ERROR].joinToString(separator = "\n")
             }
             return messages to result
         }

@@ -1,3 +1,161 @@
+## [23.0.4](https://github.com/Collektive/collektive/compare/23.0.3...23.0.4) (2025-04-27)
+
+### Dependency updates
+
+* **deps:** update alchemist to v42.1.0 ([9ae3458](https://github.com/Collektive/collektive/commit/9ae3458b92d45b25f5db542f992c8eeabc184902))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5.6.3 ([776b60b](https://github.com/Collektive/collektive/commit/776b60be3b6d073461006eb99dd43802bde82bf4))
+* **deps:** update dependency gradle to v8.14 ([bcba0ab](https://github.com/Collektive/collektive/commit/bcba0ab3616b7f4d4326b69091f3496bc186e800))
+* **deps:** update dependency react-router-dom to v7.5.2 ([e9c47fe](https://github.com/Collektive/collektive/commit/e9c47fef573115edfda45c141d78a9dfcd8c6315))
+* **deps:** update node.js to 22.15 ([6d9674c](https://github.com/Collektive/collektive/commit/6d9674c686917d2cf23a14619b1f0ef8f50ffc7f))
+* **deps:** update plugin com.gradle.develocity to v4.0.1 ([58749a3](https://github.com/Collektive/collektive/commit/58749a3f51d330c2735a41f1ac824347fd481b9b))
+* **deps:** update plugin gitsemver to v5.1.2 ([92e1db6](https://github.com/Collektive/collektive/commit/92e1db6bca23adf3ea9016ba939f1681cafd8016))
+* **deps:** update plugin kotlin-qa to v0.86.1 ([5b31a81](https://github.com/Collektive/collektive/commit/5b31a81e798aebcfe509c2a87002e21d744f643c))
+* **deps:** update plugin multijvmtesting to v3.4.1 ([be0fc40](https://github.com/Collektive/collektive/commit/be0fc40ded74043650360895a29c1b3d3c460ed9))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.23 ([8ce5999](https://github.com/Collektive/collektive/commit/8ce5999db7265c7609ddd9e95523575439da9982))
+
+### Bug Fixes
+
+* **alchemist-incarnation:** fix broken gradient ([#942](https://github.com/Collektive/collektive/issues/942)) ([b8173d5](https://github.com/Collektive/collektive/commit/b8173d58c1360229dde1d032cc6f95b7b98926f4))
+* **stdlib:** fix broken Bellman-Ford gradient ([#940](https://github.com/Collektive/collektive/issues/940)) ([bab1945](https://github.com/Collektive/collektive/commit/bab19458e253d4536317e4362e97c489760f216a))
+
+### Documentation
+
+* fix and improve documentation ([#927](https://github.com/Collektive/collektive/issues/927)) ([ff38a22](https://github.com/Collektive/collektive/commit/ff38a2270a9962a1fac7897a389b5cec305bb35c))
+* **readme:** rewrite the readme file ([#944](https://github.com/Collektive/collektive/issues/944)) ([42c0b42](https://github.com/Collektive/collektive/commit/42c0b4279fdde76af9e5ef59ae981e705239287d))
+* **readme:** update the maven coordinates ([#936](https://github.com/Collektive/collektive/issues/936)) ([d528774](https://github.com/Collektive/collektive/commit/d5287744870d00c6644ed1ab6f2ed4654da8c0e2))
+
+### Build and continuous integration
+
+* **deps:** update actions/download-artifact action to v4.3.0 ([970306b](https://github.com/Collektive/collektive/commit/970306b35678460ab6acdea5cabdede9cf5c2764))
+* **deps:** update github/codeql-action action to v3.28.16 ([70cfdae](https://github.com/Collektive/collektive/commit/70cfdae6a6fdc9804cf3fc68e320b322c917c4dd))
+* run the Kotlin compiler in-process to facilitate debugging inside the IDE ([#939](https://github.com/Collektive/collektive/issues/939)) ([7523aca](https://github.com/Collektive/collektive/commit/7523acac2dfed9ae1752ca72056cbbbe201edb73))
+
+### Style improvements
+
+* **dsl:** sort members in `OutboundEnvelope` ([#943](https://github.com/Collektive/collektive/issues/943)) ([2530b1f](https://github.com/Collektive/collektive/commit/2530b1fd92beac0c94df5f37b7881b79acbfd1b9))
+* update copyright header in KotlinPoetUtils.kt ([#941](https://github.com/Collektive/collektive/issues/941)) ([306c5d5](https://github.com/Collektive/collektive/commit/306c5d5fbceda56d95b70e7560701f94d3cc03ec))
+
+## [23.0.3](https://github.com/Collektive/collektive/compare/23.0.2...23.0.3) (2025-04-22)
+
+### Bug Fixes
+
+* **collektivize:** add plugin project description ([#923](https://github.com/Collektive/collektive/issues/923)) ([9776084](https://github.com/Collektive/collektive/commit/9776084c534b99bfb27e384bc245cc0cf0ad3a1e))
+* **compiler-plugin:** fail with error when branching constructs return fields ([#922](https://github.com/Collektive/collektive/issues/922)) ([1860e70](https://github.com/Collektive/collektive/commit/1860e708b745a0fced4d9ced9fb6dd480c4f1937))
+
+## [23.0.2](https://github.com/Collektive/collektive/compare/23.0.1...23.0.2) (2025-04-22)
+
+### Bug Fixes
+
+* typo in project name ([#921](https://github.com/Collektive/collektive/issues/921)) ([ba510f8](https://github.com/Collektive/collektive/commit/ba510f8cfc3378ad389d9a1ba5845d3b3ef6b136))
+
+## [23.0.1](https://github.com/Collektive/collektive/compare/23.0.0...23.0.1) (2025-04-20)
+
+### Dependency updates
+
+* **deps:** update alchemist to v42.0.9 ([54f1bbe](https://github.com/Collektive/collektive/commit/54f1bbe3f0c9d6774e79e453dd314a7da1ae68ef))
+* **deps:** update dependency react-router-dom to v7.5.1 ([da5d48c](https://github.com/Collektive/collektive/commit/da5d48c6c51cdded37580ec9d0e5bca63cd66a83))
+
+### Documentation
+
+* **website:** propose a logo for Collektivize ([#919](https://github.com/Collektive/collektive/issues/919)) ([824d106](https://github.com/Collektive/collektive/commit/824d106e494dd98855a59847b1cf4bd1a20980db))
+
+## [23.0.0](https://github.com/Collektive/collektive/compare/22.3.2...23.0.0) (2025-04-19)
+
+### ⚠ BREAKING CHANGES
+
+* rethink fields and field reduction operations (#914)
+
+### Refactoring
+
+* rethink fields and field reduction operations ([#914](https://github.com/Collektive/collektive/issues/914)) ([4456ab3](https://github.com/Collektive/collektive/commit/4456ab361670b3dd149100354f2d42c35ab017ef))
+
+## [22.3.2](https://github.com/Collektive/collektive/compare/22.3.1...22.3.2) (2025-04-19)
+
+### Dependency updates
+
+* **deps:** update plugin multijvmtesting to v3.4.0 ([8a0cdf9](https://github.com/Collektive/collektive/commit/8a0cdf9d225d042a5bd9f6b191621983de264255))
+
+### Bug Fixes
+
+* **compiler-plugin:** fix wording of some warnings ([#912](https://github.com/Collektive/collektive/issues/912)) ([fcff127](https://github.com/Collektive/collektive/commit/fcff1271fc7c01266d4b234f7aed252f240a985e))
+
+### Tests
+
+* **alchemist-incarnation-collektive:** throw exception on simulation failure ([#913](https://github.com/Collektive/collektive/issues/913)) ([35329c9](https://github.com/Collektive/collektive/commit/35329c983d04bd99032b88982d4d76c2e8dadcbb))
+* **dsl:** fix the network so that it does not send messages to self ([#908](https://github.com/Collektive/collektive/issues/908)) ([a0d1f26](https://github.com/Collektive/collektive/commit/a0d1f26cdda78eee43d2c6cbf2f441b3258da0eb))
+
+### Build and continuous integration
+
+* **collektive-gradle-plugin:** prefer `assignGitSemanticVersion()` over custom methods ([#906](https://github.com/Collektive/collektive/issues/906)) ([a3a1db9](https://github.com/Collektive/collektive/commit/a3a1db9203788fec2693569df60f0ffd76b82cee))
+
+### Style improvements
+
+* **dsl:** fix incorrect suppression ([#907](https://github.com/Collektive/collektive/issues/907)) ([bf4b939](https://github.com/Collektive/collektive/commit/bf4b939544f6e9bb16f637e0ac47ebd0152e2a24))
+
+## [22.3.1](https://github.com/Collektive/collektive/compare/22.3.0...22.3.1) (2025-04-16)
+
+### Documentation
+
+* change structure into divio ([#902](https://github.com/Collektive/collektive/issues/902)) ([9d35d6d](https://github.com/Collektive/collektive/commit/9d35d6d76d15ff6fc1caa06f2202a6b805f24e5f))
+
+## [22.3.0](https://github.com/Collektive/collektive/compare/22.2.0...22.3.0) (2025-04-16)
+
+### Features
+
+* **dsl:** when possible, present the neighbors sorted when stringifying a `Field` ([#901](https://github.com/Collektive/collektive/issues/901)) ([f5568d0](https://github.com/Collektive/collektive/commit/f5568d041115f3d6f667a4f3cd6132d4af2ed8b8))
+
+## [22.2.0](https://github.com/Collektive/collektive/compare/22.1.0...22.2.0) (2025-04-16)
+
+### Features
+
+* **stdlib:** add support for non-Riemann manifolds in `gradientCast` and `distanceTo` ([#900](https://github.com/Collektive/collektive/issues/900)) ([2915f6f](https://github.com/Collektive/collektive/commit/2915f6fdcb7fcc72182501021f8d44bd532306c8))
+
+## [22.1.0](https://github.com/Collektive/collektive/compare/22.0.1...22.1.0) (2025-04-15)
+
+### Features
+
+* provide better alignment clash errors ([#897](https://github.com/Collektive/collektive/issues/897)) ([7b42339](https://github.com/Collektive/collektive/commit/7b42339e8877a494481b6df7aefed3c0a4256c09))
+
+### Dependency updates
+
+* **deps:** update plugin gitsemver to v5 ([e987aea](https://github.com/Collektive/collektive/commit/e987aea32350542bb2ebfe3c22cec80a298b5b21))
+
+### Bug Fixes
+
+* **alchemist-incarnation-collektive:** support Boolean properties ([#898](https://github.com/Collektive/collektive/issues/898)) ([6a4e23e](https://github.com/Collektive/collektive/commit/6a4e23eeebab5a058890359b7e5126b452a6820c))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.17 ([c9c4d49](https://github.com/Collektive/collektive/commit/c9c4d49fb03097620e8b57032be08149a5a1d1b8))
+
+### Style improvements
+
+* **dsl:** rename `evolv`/`e`/`ing` type arguments ([#899](https://github.com/Collektive/collektive/issues/899)) ([de2bc52](https://github.com/Collektive/collektive/commit/de2bc525719f8d9a9e51bed1096f26f2bdd89357))
+
+## [22.0.1](https://github.com/Collektive/collektive/compare/22.0.0...22.0.1) (2025-04-14)
+
+### Dependency updates
+
+* **deps:** update alchemist to v42.0.8 ([287c5ef](https://github.com/Collektive/collektive/commit/287c5ef954581f8e66848151fad61ecec8b247d6))
+
+### Bug Fixes
+
+* **alchemist-incarnation-collektive:** adjust the retention messages and fix internal time ([#891](https://github.com/Collektive/collektive/issues/891)) ([2bee997](https://github.com/Collektive/collektive/commit/2bee997c6f1093bd78c218d1ca959dbea5d8a0b5))
+
+### Build and continuous integration
+
+* **deps:** update actions/setup-node action to v4.4.0 ([7e55f32](https://github.com/Collektive/collektive/commit/7e55f32dd15cdbb97fa79c06e388dea9528be345))
+
+## [22.0.0](https://github.com/Collektive/collektive/compare/21.0.0...22.0.0) (2025-04-12)
+
+### ⚠ BREAKING CHANGES
+
+* add collektive- prefix to all the modules in the project (#892)
+
+### Build and continuous integration
+
+* add collektive- prefix to all the modules in the project ([#892](https://github.com/Collektive/collektive/issues/892)) ([682584a](https://github.com/Collektive/collektive/commit/682584a12e7ab83e494baf945d85ffbba0530e97))
+
 ## [21.0.0](https://github.com/Collektive/collektive/compare/20.2.3...21.0.0) (2025-04-11)
 
 ### ⚠ BREAKING CHANGES

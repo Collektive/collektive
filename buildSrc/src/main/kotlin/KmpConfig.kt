@@ -7,11 +7,14 @@
  */
 
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ProjectDependency
+import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.project
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugin.use.PluginDependency
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
@@ -19,6 +22,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import kotlin.time.Duration.Companion.minutes
@@ -31,6 +35,10 @@ inline fun <reified ProjectType : KotlinProjectExtension> Project.kotlin(configu
 fun Project.kotlinJvm(configuration: KotlinJvmProjectExtension.() -> Unit) = kotlin(configuration)
 
 fun Project.kotlinMultiplatform(configuration: KotlinMultiplatformExtension.() -> Unit) = kotlin(configuration)
+
+fun KotlinDependencyHandler.collektive(project: String): ProjectDependency = project(":collektive-$project")
+
+fun DependencyHandler.collektive(project: String) = project(":collektive-$project")
 
 @OptIn(ExperimentalKotlinGradlePluginApi::class)
 fun Project.configureKotlinMultiplatform() {

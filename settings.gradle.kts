@@ -12,12 +12,12 @@ pluginManagement {
         google()
         mavenCentral()
     }
-    includeBuild("gradle-plugin")
+    includeBuild("collektive-gradle-plugin")
 }
 
 plugins {
-    id("com.gradle.develocity") version "4.0"
-    id("org.danilopianini.gradle-pre-commit-git-hooks") version "2.0.22"
+    id("com.gradle.develocity") version "4.0.1"
+    id("org.danilopianini.gradle-pre-commit-git-hooks") version "2.0.23"
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.10.0"
 }
 
@@ -39,12 +39,13 @@ gitHooks {
 
 rootProject.name = "collektive"
 
-includeBuild("compiler-plugin")
+includeBuild("collektive-compiler-plugin")
+includeBuild("collektivize")
 include(
     "alchemist-incarnation-collektive",
-    "compiler-embeddable",
-    "compiler-plugin-test",
-    "dsl",
-    "stdlib",
-    "test-tooling"
+    "collektive-compiler-embeddable",
+    "collektive-compiler-plugin-test",
+    "collektive-dsl",
+    "collektive-stdlib",
+    "collektive-test-tooling"
 )

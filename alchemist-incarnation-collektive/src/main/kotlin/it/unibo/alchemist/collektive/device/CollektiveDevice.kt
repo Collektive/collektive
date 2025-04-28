@@ -14,11 +14,11 @@ import it.unibo.alchemist.model.NodeProperty
 import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Time
 import it.unibo.alchemist.model.molecules.SimpleMolecule
+import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.DataSharingMethod
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
-import it.unibo.collektive.field.Field
 import it.unibo.collektive.networking.Mailbox
 import it.unibo.collektive.networking.Message
 import it.unibo.collektive.networking.NeighborsData
@@ -39,8 +39,8 @@ class CollektiveDevice<P>(
     private val retainMessagesFor: Time? = null,
 ) : NodeProperty<Any?>,
     Mailbox<Int>,
-    EnvironmentVariables
-    where P : Position<P> {
+    EnvironmentVariables where P : Position<P> {
+
     private data class TimedMessage(val receivedAt: Time, val payload: Message<Int, *>)
 
     override val inMemory: Boolean = true
@@ -48,8 +48,8 @@ class CollektiveDevice<P>(
     /**
      * The current time.
      */
-    var currentTime: Time = Time.ZERO
-        private set
+    val currentTime: Time
+        get() = environment.simulationOrNull?.time ?: Time.ZERO
 
     /**
      * The ID of the node (alias of [localId]).
@@ -61,17 +61,17 @@ class CollektiveDevice<P>(
      */
     val localId = node.id
 
-    private val validMessages: MutableList<TimedMessage> = mutableListOf()
+    private val validMessages: MutableMap<Int, TimedMessage> = mutableMapOf()
 
     private fun receiveMessage(time: Time, message: Message<Int, *>) {
-        validMessages += TimedMessage(time, message)
+        validMessages += message.senderId to TimedMessage(time, message)
     }
 
     /**
      * Returns the distances to the neighboring nodes.
      */
     fun <ID : Any> Aggregate<ID>.distances(): Field<ID, Double> = environment.getPosition(node).let { nodePosition ->
-        neighboring(nodePosition.coordinates).map { position ->
+        neighboring(nodePosition.coordinates).mapValues { position ->
             nodePosition.distanceTo(environment.makePosition(position))
         }
     }
@@ -103,21 +103,20 @@ class CollektiveDevice<P>(
         if (validMessages.isEmpty()) {
             return NoNeighborsData()
         }
-        val messages: List<Message<Int, *>> =
+        val messages: Map<Int, Message<Int, *>> =
             when {
-                retainMessagesFor == null -> validMessages.map { it.payload }.also { validMessages.clear() }
+                retainMessagesFor == null -> validMessages.mapValues { it.value.payload }.also { validMessages.clear() }
                 else -> {
-                    validMessages.retainAll { it.receivedAt + retainMessagesFor >= currentTime }
-                    validMessages.map { it.payload }
+                    validMessages.values.retainAll { it.receivedAt + retainMessagesFor >= currentTime }
+                    validMessages.mapValues { it.value.payload }
                 }
             }
         return object : NeighborsData<Int> {
-            override val neighbors: Set<Int> by lazy { messages.map { it.senderId }.toSet() }
+            override val neighbors: Set<Int> get() = messages.keys
 
             @Suppress("UNCHECKED_CAST")
             override fun <Value> dataAt(path: Path, dataSharingMethod: DataSharingMethod<Value>): Map<Int, Value> =
                 messages
-                    .associateBy { it.senderId }
                     .mapValues { (_, message) ->
                         message.sharedData.getOrElse(path) { NoValue } as Value
                     }.filter { it.value != NoValue }

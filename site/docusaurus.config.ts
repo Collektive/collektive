@@ -84,12 +84,24 @@ const config: Config = {
                     position: 'left',
                     items: [
                         {
-                            label: 'dsl',
-                            href: 'https://javadoc.io/doc/it.unibo.collektive/dsl/latest/index.html',
+                            label: 'collektive-dsl',
+                            href: 'https://javadoc.io/doc/it.unibo.collektive/collektive-dsl',
                         },
                         {
-                            label: 'stdlib',
-                            href: 'https://javadoc.io/doc/it.unibo.collektive/stdlib/latest/index.html',
+                            label: 'collektive-stdlib',
+                            href: 'https://javadoc.io/doc/it.unibo.collektive/collektive-stdlib',
+                        },
+                        {
+                            label: 'collektive-compiler-plugin',
+                            href: 'https://javadoc.io/doc/it.unibo.collektive/collektive-compiler-plugin',
+                        },
+                        {
+                            label: 'alchemist-incarnation-collektive',
+                            href: 'https://javadoc.io/doc/it.unibo.collektive/alchemist-incarnation-collektive',
+                        },
+                        {
+                            label: 'all the modules',
+                            href: 'https://javadoc.io/doc/it.unibo.collektive',
                         },
                     ],
                 },

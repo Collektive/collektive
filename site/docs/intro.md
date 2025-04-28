@@ -4,15 +4,29 @@ sidebar_position: 0
 
 # Collektive Documentation
 
+:::warning
+This documentation is still a work in progress, 
+some sections may be incomplete or missing,
+sorry for the inconvenience.
+
+If you find any bugs or suggestions, 
+please feel free to open an issue or fix them through a [PR](https://github.com/Collektive/collektive/pulls) :)
+:::
+
 ## Index
-1. [Getting Started](/docs/gettingstarted/)
-2. [Introduction](/docs/category/introduction/)
-    - [Aggregate Programming](../introduction/aggregate-programming/)
-    - [What is Collektive](../introduction/what-is-collektive/)
-3. [Tutorial](/docs/category/tutorial/)
-    - [Basic Usage](../tutorials/basic-usage/)
-    - [Using Collektive with Alchemist Simulator](../tutorials/collektive-and-alchemist/)
-    - [Aggregate Operators and Field Operations](../tutorials/dsl-descriptions/)
-    - [Standard Library Functions](../tutorials/stdlib-descriptions/)
-4. [Simulation Setup and Execution](/docs/category/simulation-setup-and-execution/)
-5. [Library Structure](/docs/about-the-structure/)
+1. [Introduction](/docs/category/introduction/)
+   - [What is Collektive?](introduction/what-is-collektive.mdx)
+2. [Tutorials](/docs/category/tutorials/)
+   - [Getting Started](tutorials/getting-started.mdx)
+   - [Basic Usage](tutorials/basic-usage.mdx)
+   - [Common Mistakes](tutorials/common-mistakes.mdx)
+   - [Integration with Simulator](tutorials/collektive-and-alchemist.mdx)
+3. [Explanation](/docs/category/explanation/)
+   - [Aggregate Programming and Field Calculus](explanation/aggregate-programming.mdx)
+   - [Levels of Abstraction](explanation/levels-of-abstractions.mdx)
+   - [Aggregate Operators and Field Operations](explanation/dsl-descriptions.mdx)
+   - [Standard Library](explanation/stdlib-descriptions.mdx)
+5. [Reference guides](references.mdx)
+6. [Project structure](project-structure.mdx)
+
+[//]: # (3. [How-to guides]&#40;/docs/category/how-to-guides/&#41;)
