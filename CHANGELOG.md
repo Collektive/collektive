@@ -1,3 +1,14 @@
+## [24.0.1](https://github.com/Collektive/collektive/compare/24.0.0...24.0.1) (2025-04-30)
+
+### Dependency updates
+
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5.6.4 ([bbee20e](https://github.com/Collektive/collektive/commit/bbee20edc6d6bcf0a8a00a295d59a52ae2637cf8))
+* **deps:** update dependency io.mockk:mockk to v1.14.2 ([e4e8690](https://github.com/Collektive/collektive/commit/e4e86909876db9f10499d70f3551f1529709f8a6))
+
+### Documentation
+
+* **site:** update collektive logo and minors ([3d40ff6](https://github.com/Collektive/collektive/commit/3d40ff6ad71042a69301fba0025dde61fdbffecd))
+
 ## [24.0.0](https://github.com/Collektive/collektive/compare/23.0.4...24.0.0) (2025-04-28)
 
 ### ⚠ BREAKING CHANGES
