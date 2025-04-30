@@ -3,14 +3,21 @@ import Heading from '@theme/Heading';
 import CodeBlock from '@theme/CodeBlock';
 import styles from './styles.module.css';
 
-const codeNeighbor = `fun Aggregate<Int>.gradient(distanceSensor: DistanceSensor, source: Boolean): Double =
-    share(POSITIVE_INFINITY) {
-        val dist = distances()
-        when {
-            source -> 0.0
-            else -> (it + dist).min(POSITIVE_INFINITY)
-        }
+const codeNeighbor = `/** Each node computes the distance
+ * from the source node.
+ */
+fun Aggregate<Int>.gradient(
+    distanceSensor: DistanceSensor,
+    source: Boolean,
+): Double = share(POSITIVE_INFINITY) {
+    val dist = distances()
+    val minValue =
+        (it + dist).min(POSITIVE_INFINITY)
+    when {
+        source -> 0.0
+        else -> minValue
     }
+}
 `
 
 const KotlinLogo = require('@site/static/img/KotlinLogo.svg').default
