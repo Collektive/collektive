@@ -7,7 +7,7 @@ import Heading from '@theme/Heading';
 
 import styles from './index.module.css';
 
-const SvgLogo = require('@site/static/img/collektive-logo-white.svg').default
+const SvgLogo = require('@site/static/img/collektive-logo-white-no-background.svg').default
 
 function HomepageHeader() {
     const {siteConfig} = useDocusaurusContext();
