@@ -1,3 +1,10 @@
+## [24.0.2](https://github.com/Collektive/collektive/compare/24.0.1...24.0.2) (2025-05-01)
+
+### Documentation
+
+* re-design homepage ([16ded32](https://github.com/Collektive/collektive/commit/16ded32d72d851bf449831d7e68b7c5e99135ec6))
+* set collektive logo with rounded background for navbar and favicon ([5c41e6f](https://github.com/Collektive/collektive/commit/5c41e6f0157e4188764ea9a550e3618efd334592))
+
 ## [24.0.1](https://github.com/Collektive/collektive/compare/24.0.0...24.0.1) (2025-04-30)
 
 ### Dependency updates
