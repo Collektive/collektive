@@ -9,32 +9,70 @@
  * Darkest Collektive's logo color is #7f52ff
  */
 
-/* You can override the default Infima variables here. */
-[data-theme='light'] {
-    --ifm-color-primary: #7f52ff;
-    --ifm-color-primary-dark: #935ae6;
-    --ifm-color-primary-darker: #a765cc;
-    --ifm-color-primary-darkest: #bb6fb3;
-    --ifm-color-primary-light: #6f4be0;
-    --ifm-color-primary-lighter: #5f43d9;
-    --ifm-color-primary-lightest: #4f3bd3;
-    --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.3);
-    fill: var(--ifm-color-primary);
-    background-color: #ffffff;
+:root {
+    /* Primary and secondary colors */
+    --ifm-color-primary: #4ea3f1;
+    --ifm-color-primary-dark: #3a8dd4;
+    --ifm-color-primary-darker: #317bbd;
+    --ifm-color-primary-light: #68b5f9;
+    --ifm-color-primary-lighter: #8cc9fc;
+    --ifm-color-primary-lightest: #d1ecff;
+
+    --ifm-color-secondary: #a280ff;
+
+    /* Backgrounds */
+    --ifm-background-color: #ffffff;
+    --ifm-background-surface-color: #f9f9f9;
+
+    /* Typography */
+    --ifm-font-color-base: #1e1e1e;
+    --ifm-heading-color: #111111;
+
+    /* Code blocks */
+    --ifm-code-background: #f2f2f2;
+
+    /* Navbar */
+    --ifm-navbar-background-color: #ffffff;
+    --ifm-navbar-link-color: #1e1e1e;
+
+    /* Links */
+    --ifm-link-color: var(--ifm-color-primary);
+
+    /* Borders */
+    --ifm-border-color: #e0e0e0;
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-    --ifm-color-primary: #a646b1;
-    --ifm-color-primary-dark: #a646b1;
-    --ifm-color-primary-darker: #933e9f;
-    --ifm-color-primary-darkest: #80368d;
-    --ifm-color-primary-light: #c85dd5;
-    --ifm-color-primary-lighter: #d76de7;
-    --ifm-color-primary-lightest: #e67cf9;
-    --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
-    fill: var(--ifm-color-primary);
-    background-color: #121212;
+    /* Primary and secondary colors */
+    --ifm-color-primary: #4ea3f1;
+    --ifm-color-primary-dark: #2c7dd2;
+    --ifm-color-primary-darker: #2168b8;
+    --ifm-color-primary-light: #70b9f9;
+    --ifm-color-primary-lighter: #91cefc;
+    --ifm-color-primary-lightest: #c0e6ff;
+
+    --ifm-color-secondary: #c2a3ff;
+
+    /* Backgrounds */
+    --ifm-background-color: #1e1e1e;
+    --ifm-background-surface-color: #2a2a2a;
+
+    /* Typography */
+    --ifm-font-color-base: #f4f4f4;
+    --ifm-heading-color: #ffffff;
+
+    /* Code blocks */
+    --ifm-code-background: #2f2f2f;
+
+    /* Navbar */
+    --ifm-navbar-background-color: #1e1e1e;
+    --ifm-navbar-link-color: #f4f4f4;
+
+    /* Links */
+    --ifm-link-color: #70b9f9;
+
+    /* Borders */
+    --ifm-border-color: #333333;
 }
 
 .header-github-link:hover {

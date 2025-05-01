@@ -1,0 +1,22 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
+.codeSection {
+    padding: 4rem 4rem;
+    background: var(--ifm-code-background);
+}
+
+.codeBlock {
+    /*background-color: var(--ifm-color-content);*/
+    border-radius: 22px;
+    overflow: auto;
+    font-size: 1.2rem;
+    width: fit-content;
+    max-width: 100%; /* Ensures it doesn't overflow the container */
+    margin: 0 auto; /* Centers the section */
+}
