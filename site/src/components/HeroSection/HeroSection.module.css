@@ -1,0 +1,65 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
+.heroModern {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 4rem 2rem;
+    background: linear-gradient(90deg, #eaeaea 50%, #f5f5f5 50%);
+    color: white;
+}
+
+@media screen and (max-width: 996px) {
+    .heroModern {
+        flex-direction: column;
+        padding: 2rem 1rem;
+        background: var(--ifm-background-surface-color);
+        color: white;
+    }
+}
+
+[data-theme='dark'] {
+    .heroModern {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 4rem 2rem;
+        background: linear-gradient(90deg, #191919 50%, #1f1f1f 50%);
+        color: white;
+    }
+
+    @media screen and (max-width: 996px) {
+        .heroModern {
+            flex-direction: column;
+            padding: 2rem 1rem;
+            background: #191919;
+            color: white;
+        }
+    }
+}
+
+
+.heroContent {
+    /*flex: 1;*/
+    padding: 2rem;
+}
+
+/*.heroImage {*/
+/*    flex: 1;*/
+/*    text-align: center;*/
+/*}*/
+
+.heroImage {
+    flex: 1;
+    text-align: center;
+    height: 240px;
+    width: 240px;
+    object-fit: contain;
+    margin: 0 auto; /* Center the image */
+}
