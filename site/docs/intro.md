@@ -18,6 +18,7 @@ please feel free to open an issue or fix them through a [PR](https://github.com/
    - [What is Collektive?](introduction/what-is-collektive.mdx)
 2. [Tutorials](/docs/category/tutorials/)
    - [Getting Started](tutorials/getting-started.mdx)
+   - [First Collektive Program](tutorials/first-collektive-program.mdx)
    - [Basic Usage](tutorials/basic-usage.mdx)
    - [Common Mistakes](tutorials/common-mistakes.mdx)
    - [Integration with Simulator](tutorials/collektive-and-alchemist.mdx)
@@ -26,7 +27,7 @@ please feel free to open an issue or fix them through a [PR](https://github.com/
    - [Levels of Abstraction](explanation/levels-of-abstractions.mdx)
    - [Aggregate Operators and Field Operations](explanation/dsl-descriptions.mdx)
    - [Standard Library](explanation/stdlib-descriptions.mdx)
-5. [Reference guides](references.mdx)
-6. [Project structure](project-structure.mdx)
+4. [Reference guides](references.mdx)
+5. [Project structure](project-structure.mdx)
 
 [//]: # (3. [How-to guides]&#40;/docs/category/how-to-guides/&#41;)
