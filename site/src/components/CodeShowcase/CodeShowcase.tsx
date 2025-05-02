@@ -17,7 +17,7 @@ const codeNeighbor = `/**
  */
 fun Aggregate<Int>.gradient(distanceSensor: DistanceSensor, source: Boolean): Double =
     share(POSITIVE_INFINITY) {
-        val dist = distances()
+        val dist = with(distanceSensor) { distances() }
         val minValue = (it + dist).min(POSITIVE_INFINITY)
         when {
             source -> 0.0
