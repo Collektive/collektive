@@ -8,8 +8,8 @@ import CTASection from '../components/CTASection/CTASection';
 export default function Home(): JSX.Element {
     return (
         <Layout
-            title="KotlinX Framework"
-            description="A modern Kotlin framework for building reactive and distributed systems.">
+            title="Collektive"
+            description="A modern Kotlin framework for building aggregate applications">
             <HeroSection />
             <FeatureStrip />
             <CodeShowcase />

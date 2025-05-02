@@ -12,13 +12,14 @@ import styles from './CTASection.module.css';
 import Link from '@docusaurus/Link';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faGithub} from "@fortawesome/free-brands-svg-icons";
+import Heading from "@theme/Heading";
 
 export default function CTASection() {
     return (
         <section className={clsx('container', styles.ctaSection)}>
             <div className="row">
                 <div className="col col--8 col--offset-2 text--center">
-                    <h2>Join the Collektive Community</h2>
+                    <Heading as={"h2"}>Join the Collektive Community</Heading>
                     <p>Contribute, ask questions, and help shape the next-gen Aggregate framework.</p>
                     <Link className="button button--secondary button--lg" href="https://github.com/Collektive">
                         <FontAwesomeIcon icon={faGithub} size="lg" /> Join on GitHub
