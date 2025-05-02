@@ -7,10 +7,5 @@
  */
 
 .featureStrip {
-    padding: 4rem 0;
-}
-
-.icon {
-    height: 64px;
-    margin-bottom: 1rem;
+    padding: 4rem 1rem;
 }
