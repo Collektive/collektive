@@ -23,7 +23,7 @@ const features = [
     {
         title: 'Fully Multiplatform',
         icon: <FontAwesomeIcon icon={faArrowsLeftRight} size="5x" color="var(--ifm-font-color-base)" />,
-        description: 'Run on JVM, JS, Native, Android, and iOS. Write once, run anywhere.',
+        description: 'Run on JVM, JS, Native, Android, and iOS. Write once, run everywhere.',
     },
     {
         title: 'Composable Architecture',
