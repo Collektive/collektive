@@ -1,3 +1,15 @@
+## [24.0.3](https://github.com/Collektive/collektive/compare/24.0.2...24.0.3) (2025-05-02)
+
+### Dependency updates
+
+* **deps:** update dependency react-router-dom to v7.5.3 ([d09e0f7](https://github.com/Collektive/collektive/commit/d09e0f71ffad74e17ef2811fb0a192fe0a06c501))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.127 ([1275873](https://github.com/Collektive/collektive/commit/12758736b1700224f3f0e858955eaad08d494128))
+
+### Documentation
+
+* **site:** fix typo ([8a9b0e8](https://github.com/Collektive/collektive/commit/8a9b0e8c62e27fc25991eb15afca3801b16bdc92))
+* **site:** minor restyling on the home page ([1b4b381](https://github.com/Collektive/collektive/commit/1b4b38141f8df909642afe03b140dfb30fba3308))
+
 ## [24.0.2](https://github.com/Collektive/collektive/compare/24.0.1...24.0.2) (2025-05-01)
 
 ### Documentation
