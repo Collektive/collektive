@@ -1,3 +1,18 @@
+## [24.0.4](https://github.com/Collektive/collektive/compare/24.0.3...24.0.4) (2025-05-04)
+
+### Dependency updates
+
+* **deps:** update plugin publishoncentral to v8.0.7 ([3cfe522](https://github.com/Collektive/collektive/commit/3cfe522a241d0ba818e35ce4efbc53f56d37dc95))
+
+### Bug Fixes
+
+* **dsl:** forbid fields inside fields, fixes [#958](https://github.com/Collektive/collektive/issues/958) ([#959](https://github.com/Collektive/collektive/issues/959)) ([c28e629](https://github.com/Collektive/collektive/commit/c28e629f52f76f45db9798df63fd36222a7dcf74))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.18 ([f693484](https://github.com/Collektive/collektive/commit/f693484fd132514ec0d2c36dc36e21369646b31f))
+* **deps:** update github/codeql-action action to v3.28.17 ([64971bd](https://github.com/Collektive/collektive/commit/64971bdf14913c1a58315eceb58115fd84d5b437))
+
 ## [24.0.3](https://github.com/Collektive/collektive/compare/24.0.2...24.0.3) (2025-05-02)
 
 ### Dependency updates
