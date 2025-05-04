@@ -125,6 +125,15 @@ internal class AggregateContext<ID : Any>(
     override fun <R> alignedOn(pivot: Any?, body: () -> R): R {
         stack.alignRaw(pivot)
         return body().also {
+            check(it !is Field<*, *>) {
+                """
+                alignedOn operations cannot return fields to prevent misalignment.
+                See the following example to understand why:
+                
+                val x = alignedOn(random()) { mapNeighborhood { 1 } }
+                x + mapNeighborhood { 1 } // almost-guaranteed misalignment
+                """.trimIndent()
+            }
             stack.dealign()
         }
     }
