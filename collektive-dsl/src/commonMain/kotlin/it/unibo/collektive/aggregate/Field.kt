@@ -606,10 +606,10 @@ internal class ConstantField<ID : Any, T>(
 
     override fun <R> mapOthersAsSequence(transform: (FieldEntry<ID, T>) -> R): Sequence<FieldEntry<ID, R>> =
         neighbors.asSequence().map {
+            // `it` here represents an ID of a neighboring node, as expected by `context.alignedOn`.
             context.alignedOn(it) {
                 FieldEntry(checkNotLocal(it), local.value).map(transform)
             }
-        }
 
     override fun neighborValueOf(id: ID): T = local.value
 
