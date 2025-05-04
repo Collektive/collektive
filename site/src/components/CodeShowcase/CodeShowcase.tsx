@@ -15,9 +15,9 @@ import Heading from "@theme/Heading";
 const codeNeighbor = `/**
  * Each node computes the distance from the source node.
  */
-fun Aggregate<Int>.gradient(distanceSensor: DistanceSensor, source: Boolean): Double =
+fun Aggregate<Int>.gradient(collektiveDevice: CollektiveDevice<*>, source: Boolean): Double =
     share(POSITIVE_INFINITY) {
-        val dist = with(distanceSensor) { distances() }
+        val dist = with(collektiveDevice) { distances() }
         val minValue = (it + dist).min(POSITIVE_INFINITY)
         when {
             source -> 0.0
