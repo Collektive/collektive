@@ -476,8 +476,12 @@ internal abstract class AbstractField<ID : Any, T>(
         else -> neighborValueOf(id)
     }
 
-    final override fun <B> map(transform: (FieldEntry<ID, T>) -> B): Field<ID, B> =
-        SequenceBasedField(context, local.id, transform(local), mapOthersAsSequence(transform))
+    final override fun <B> map(transform: (FieldEntry<ID, T>) -> B): Field<ID, B> = SequenceBasedField(
+        context,
+        local.id,
+        context.alignedOn(local.id) { transform(local) },
+        mapOthersAsSequence(transform),
+    )
 
     protected abstract fun neighborsMap(): Map<ID, T>
 
@@ -522,7 +526,7 @@ internal class ArrayBasedField<ID : Any, T>(
     override fun <R> mapOthersAsSequence(transform: (FieldEntry<ID, T>) -> R): Sequence<FieldEntry<ID, R>> =
         others.asSequence().map {
             checkNotLocal(it.id)
-            it.map(transform)
+            context.alignedOn(it.id) { it.map(transform) }
         }
 
     override fun neighborsMap(): Map<ID, T> = buildMap {
@@ -572,7 +576,7 @@ internal class SequenceBasedField<ID : Any, T>(
     override fun <R> mapOthersAsSequence(transform: (FieldEntry<ID, T>) -> R): Sequence<FieldEntry<ID, R>> =
         others.map {
             checkNotLocal(it.id)
-            it.map(transform)
+            context.alignedOn(it.id) { it.map(transform) }
         }
 }
 
@@ -601,7 +605,11 @@ internal class ConstantField<ID : Any, T>(
     }
 
     override fun <R> mapOthersAsSequence(transform: (FieldEntry<ID, T>) -> R): Sequence<FieldEntry<ID, R>> =
-        neighbors.asSequence().map { FieldEntry(checkNotLocal(it), local.value).map(transform) }
+        neighbors.asSequence().map {
+            context.alignedOn(it) {
+                FieldEntry(checkNotLocal(it), local.value).map(transform)
+            }
+        }
 
     override fun neighborValueOf(id: ID): T = local.value
 
