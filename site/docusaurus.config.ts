@@ -6,7 +6,7 @@ import {codeImport} from 'remark-code-import'
 const config: Config = {
     title: 'Collektive',
     tagline: 'Aggregate Computing in Kotlin Multiplatform',
-    favicon: 'img/collektive-logo.svg',
+    favicon: 'img/collektive-logo-white-background-round.svg',
 
     // Set the production url of your site here
     url: 'https://collektive.github.io',
@@ -64,12 +64,12 @@ const config: Config = {
             contextualSearch: true,
         },
         // Replace with your project's social card
-        image: 'img/collektive-logo.svg',
+        image: 'img/collektive-logo-white-no-background.svg',
         navbar: {
             title: 'Collektive',
             logo: {
                 alt: 'Collektive Logo',
-                src: 'img/collektive-logo.svg',
+                src: 'img/collektive-logo-white-background-round.svg',
             },
             items: [
                 {
@@ -169,7 +169,7 @@ const config: Config = {
                     '@type': 'Organization',
                     name: 'Collektive Org.',
                     url: 'https://collektive.github.io/',
-                    logo: 'https://collective.github.io/img/collektive-logo.svg',
+                    logo: 'https://collective.github.io/img/collektive-logo-white.svg',
                 }),
             },
         ],

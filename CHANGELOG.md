@@ -1,3 +1,68 @@
+## [24.0.5](https://github.com/Collektive/collektive/compare/24.0.4...24.0.5) (2025-05-05)
+
+### Documentation
+
+* add first collektive program section ([#962](https://github.com/Collektive/collektive/issues/962)) ([1fd4b44](https://github.com/Collektive/collektive/commit/1fd4b4474078f7e65eb54aebd996a61c075cf826))
+
+## [24.0.4](https://github.com/Collektive/collektive/compare/24.0.3...24.0.4) (2025-05-04)
+
+### Dependency updates
+
+* **deps:** update plugin publishoncentral to v8.0.7 ([3cfe522](https://github.com/Collektive/collektive/commit/3cfe522a241d0ba818e35ce4efbc53f56d37dc95))
+
+### Bug Fixes
+
+* **dsl:** forbid fields inside fields, fixes [#958](https://github.com/Collektive/collektive/issues/958) ([#959](https://github.com/Collektive/collektive/issues/959)) ([c28e629](https://github.com/Collektive/collektive/commit/c28e629f52f76f45db9798df63fd36222a7dcf74))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.18 ([f693484](https://github.com/Collektive/collektive/commit/f693484fd132514ec0d2c36dc36e21369646b31f))
+* **deps:** update github/codeql-action action to v3.28.17 ([64971bd](https://github.com/Collektive/collektive/commit/64971bdf14913c1a58315eceb58115fd84d5b437))
+
+## [24.0.3](https://github.com/Collektive/collektive/compare/24.0.2...24.0.3) (2025-05-02)
+
+### Dependency updates
+
+* **deps:** update dependency react-router-dom to v7.5.3 ([d09e0f7](https://github.com/Collektive/collektive/commit/d09e0f71ffad74e17ef2811fb0a192fe0a06c501))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.127 ([1275873](https://github.com/Collektive/collektive/commit/12758736b1700224f3f0e858955eaad08d494128))
+
+### Documentation
+
+* **site:** fix typo ([8a9b0e8](https://github.com/Collektive/collektive/commit/8a9b0e8c62e27fc25991eb15afca3801b16bdc92))
+* **site:** minor restyling on the home page ([1b4b381](https://github.com/Collektive/collektive/commit/1b4b38141f8df909642afe03b140dfb30fba3308))
+
+## [24.0.2](https://github.com/Collektive/collektive/compare/24.0.1...24.0.2) (2025-05-01)
+
+### Documentation
+
+* re-design homepage ([16ded32](https://github.com/Collektive/collektive/commit/16ded32d72d851bf449831d7e68b7c5e99135ec6))
+* set collektive logo with rounded background for navbar and favicon ([5c41e6f](https://github.com/Collektive/collektive/commit/5c41e6f0157e4188764ea9a550e3618efd334592))
+
+## [24.0.1](https://github.com/Collektive/collektive/compare/24.0.0...24.0.1) (2025-04-30)
+
+### Dependency updates
+
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5.6.4 ([bbee20e](https://github.com/Collektive/collektive/commit/bbee20edc6d6bcf0a8a00a295d59a52ae2637cf8))
+* **deps:** update dependency io.mockk:mockk to v1.14.2 ([e4e8690](https://github.com/Collektive/collektive/commit/e4e86909876db9f10499d70f3551f1529709f8a6))
+
+### Documentation
+
+* **site:** update collektive logo and minors ([3d40ff6](https://github.com/Collektive/collektive/commit/3d40ff6ad71042a69301fba0025dde61fdbffecd))
+
+## [24.0.0](https://github.com/Collektive/collektive/compare/23.0.4...24.0.0) (2025-04-28)
+
+### ⚠ BREAKING CHANGES
+
+* fix broken field projection and partial alignment (#938)
+
+### Dependency updates
+
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.126 ([9062d0b](https://github.com/Collektive/collektive/commit/9062d0b3b6f75c788c3ce3c00bc374d201acbf9f))
+
+### Bug Fixes
+
+* fix broken field projection and partial alignment ([#938](https://github.com/Collektive/collektive/issues/938)) ([e37b0d5](https://github.com/Collektive/collektive/commit/e37b0d52ca7b8c821be42f0dc998a3ad106de13c))
+
 ## [23.0.4](https://github.com/Collektive/collektive/compare/23.0.3...23.0.4) (2025-04-27)
 
 ### Dependency updates

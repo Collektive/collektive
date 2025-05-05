@@ -67,7 +67,7 @@ jobs:
         uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
-      - uses: DanySK/build-check-deploy-gradle-action@3.7.17
+      - uses: DanySK/build-check-deploy-gradle-action@3.7.18
         with:
           check-command: |
             ./gradlew check koverXmlReport :collektive-compiler-plugin:check :collektive-gradle-plugin:check :collektivize:check --parallel
@@ -93,7 +93,7 @@ jobs:
           maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
           signing-key: ${{ secrets.GPG_PRIVATEKEY }}
           signing-password: ${{ secrets.GPG_PASSPHRASE }}
-      - uses: github/codeql-action/upload-sarif@v3.28.16
+      - uses: github/codeql-action/upload-sarif@v3.28.17
         if: always() && runner.os == 'Linux'
         with:
           sarif_file: build/reports/merge.sarif
@@ -160,7 +160,7 @@ jobs:
         uses: actions/setup-node@v4.4.0
         with:
           node-version-file: package.json
-      - uses: DanySK/build-check-deploy-gradle-action@3.7.17
+      - uses: DanySK/build-check-deploy-gradle-action@3.7.18
         env:
           STAGING_REPO_ID: ${{ needs.staging-repo.outputs.staging-repo-id }}
           ORG_GRADLE_PROJECT_releaseStage: true

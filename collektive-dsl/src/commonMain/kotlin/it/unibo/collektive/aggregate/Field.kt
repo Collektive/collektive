@@ -284,6 +284,10 @@ sealed interface Field<ID : Any, out T> {
             }
         }
 
+        private fun noFieldsInFields(id: Any, value: Any?) = check(value !is Field<*, *>) {
+            "Fields cannot contain other fields as values. The provided local value at id '$id' is: '$value'."
+        }
+
         /**
          * Build a field from a [localId], [localValue] and [others] neighbours values.
          */
@@ -293,12 +297,16 @@ sealed interface Field<ID : Any, out T> {
             localValue: T,
             others: Map<ID, T> = emptyMap(),
         ): Field<ID, T> {
-            check(localId !in others) {
-                "A field cannot be constructed with local id '$localId', " +
-                    "local value '$localValue'," +
-                    "and neighborhood values '$others' " +
-                    "as the local id is also present among the neighbors"
+            others.forEach { (id, value) ->
+                check(localId != id) {
+                    "A field cannot be constructed with local id '$localId', " +
+                        "local value '$localValue'," +
+                        "and neighborhood values '$others' " +
+                        "as the local id is also present among the neighbors"
+                }
+                noFieldsInFields(id, value)
             }
+            noFieldsInFields(localId, localValue)
             return when {
                 others.isEmpty() -> PointwiseField(context, localId, localValue)
                 others.values.all { it == localValue } -> ConstantField(context, localId, localValue, others.keys)

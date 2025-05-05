@@ -1,7 +1,7 @@
 [versions]
 alchemist = "42.1.0"
 arrow = "2.0.1"
-build-config = "5.6.3"
+build-config = "5.6.4"
 dokka = "2.0.0"
 kotest = "6.0.0.M2"
 kotlin = "2.1.20"
@@ -30,7 +30,7 @@ kotlinpoet = "com.squareup:kotlinpoet:2.1.0"
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "serialization" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 kotlinx-serialization-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-serialization-protobuf", version.ref = "serialization" }
-mockk = "io.mockk:mockk:1.14.0"
+mockk = "io.mockk:mockk:1.14.2"
 slf4j = "org.slf4j:slf4j-api:2.0.17"
 subjekt = "io.github.freshmag:subjekt-api:1.1.5"
 
@@ -67,5 +67,5 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 kover = "org.jetbrains.kotlinx.kover:0.9.1"
 power-assert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = "kotlin" }
 multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:3.4.1"
-publishOnCentral = "org.danilopianini.publish-on-central:8.0.6"
+publishOnCentral = "org.danilopianini.publish-on-central:8.0.7"
 taskTree = "com.dorongold.task-tree:4.0.1"
