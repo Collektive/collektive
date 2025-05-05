@@ -12,7 +12,7 @@ that uses a [hopDistance](https://javadoc.io/doc/it.unibo.collektive/collektive-
 It is based on the [convergeCast](https://javadoc.io/doc/it.unibo.collektive/collektive-stdlib/latest/collektive-stdlib/it.unibo.collektive.stdlib.accumulation/converge-cast.html)
 function that accumulates the computed values in the root device.
 
-```kotlin file=<rootDir>/static/code/firstCollektiveProgram.kt#L1-L8
+```kotlin file=<rootDir>/static/code/FirstCollektiveProgram.kt#L1-L8
 ```
 
 :::note
@@ -25,12 +25,12 @@ How?
 By broadcasting the value with the [gradientCast](https://javadoc.io/doc/it.unibo.collektive/collektive-stdlib/latest/collektive-stdlib/it.unibo.collektive.stdlib.spreading/gradient-cast.html),
 that propagates it across multiple spanning trees starting from the root.
 
-```kotlin file=<rootDir>/static/code/firstCollektiveProgram.kt#L10-L19
+```kotlin file=<rootDir>/static/code/FirstCollektiveProgram.kt#L10-L19
 ```
 
 The program that the device will execute is the following:
 
-```kotlin file=<rootDir>/static/code/firstCollektiveProgram.kt#L21-L31
+```kotlin file=<rootDir>/static/code/FirstCollektiveProgram.kt#L21-L31
 ```
 
 Now all the devices in the network will know how many devices are connected in the network.
@@ -50,7 +50,7 @@ In this case,
 we use the [boundedElection](https://javadoc.io/doc/it.unibo.collektive/collektive-stdlib/latest/collektive-stdlib/it.unibo.collektive.stdlib.consensus/bounded-election.html)
 function from the standard library.
 
-```kotlin file=<rootDir>/static/code/firstCollektiveProgram.kt#L33-L44
+```kotlin file=<rootDir>/static/code/FirstCollektiveProgram.kt#L33-L44
 ```
 
 :::tip[Success]
