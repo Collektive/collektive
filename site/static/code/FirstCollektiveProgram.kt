@@ -4,13 +4,13 @@
  * Other devices hold the number of devices in their subtree towards the network edge, inlcuding themselves.
  * A leaf node (with no outward neighbors) will hold 1.
  */
-fun Aggregate<Int>.deviceCounter(): Int = countDevices(sink = localId == 0)
+fun Aggregate<Int>.countDevicesEntrypoint(): Int = countDevices(sink = localId == 0)
 
 /**
  * Broadcast from the [source] the number of devices connected to the network.
  * Requires a [distances] field to be used as metric for computing the distance from the source to the target.
  */
-fun Aggregate<Int>.broadcastDevices(distances: Field<Int, Double>, source: Boolean): Int =
+fun Aggregate<Int>.broadcastCountDevices(distances: Field<Int, Double>, source: Boolean): Int =
     gradientCast(
         metric = distances,
         source = source,
@@ -23,8 +23,8 @@ fun Aggregate<Int>.broadcastDevices(distances: Field<Int, Double>, source: Boole
  * such as the [distances] method, which returns a field of distances from the neighboring nodes.
  * In this case, the source is the device with [localId] equal to 0.
  */
-fun Aggregate<Int>.broadcastDevicesEntrypoint(collektiveDevice: CollektiveDevice<*>): Int =
-    broadcastDevices(
+fun Aggregate<Int>.broadcastCountDevicesEntrypoint(collektiveDevice: CollektiveDevice<*>): Int =
+    broadcastCountDevices(
         distances = with(collektiveDevice) { distances() },
         source = localId == 0,
     )
@@ -33,7 +33,7 @@ fun Aggregate<Int>.broadcastDevicesEntrypoint(collektiveDevice: CollektiveDevice
  * Counts and broadcast the number of devices in the network using a leader election.
  * If the network is segmented, each connected component elects a leader to act as root.
  */
-fun Aggregate<Int>.broadcastDevicesWithLeaderElectionEntrypoint(
+fun Aggregate<Int>.broadcastCountDevicesWithLeaderElectionEntrypoint(
     collektiveDevice: CollektiveDevice<*>,
 ): Int {
     val leaderId = boundedElection(bound)
