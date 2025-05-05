@@ -3,9 +3,63 @@ title: First Collektive Program
 sidebar_position: 2
 ---
 
+### Device Counter
+Let's create a program where *each device* learns the total number of devices in the network.
 
+We can use the [countDevices](https://javadoc.io/doc/it.unibo.collektive/collektive-stdlib/latest/collektive-stdlib/it.unibo.collektive.stdlib.accumulation/count-devices.html)
+function from the standard library,
+which relies on a [hopDistance](https://javadoc.io/doc/it.unibo.collektive/collektive-stdlib/latest/collektive-stdlib/it.unibo.collektive.stdlib.spreading/hop-distance-to.html) metric.
+This function is based on the [convergeCast](https://javadoc.io/doc/it.unibo.collektive/collektive-stdlib/latest/collektive-stdlib/it.unibo.collektive.stdlib.accumulation/converge-cast.html) operation,
+which aggregates values towards the root device in the network.
 
+```kotlin file=<rootDir>/static/code/FirstCollektiveProgram.kt#L1-L7
+```
 
 :::note
-Work in progress, sorry for the inconvenience.
+With our goal in mind,
+this implementation has a limitation: only the root device will know the number of devices in the network.
+:::
+
+We now need to propagate the information accumulated by the root device to all other devices in the network.
+How?
+By broadcasting the value with the [gradientCast](https://javadoc.io/doc/it.unibo.collektive/collektive-stdlib/latest/collektive-stdlib/it.unibo.collektive.stdlib.spreading/gradient-cast.html) function,
+which propagates it across multiple spanning trees,
+starting from the root.
+
+```kotlin file=<rootDir>/static/code/FirstCollektiveProgram.kt#L9-L18
+```
+
+The following is the program that each device will execute:
+
+```kotlin file=<rootDir>/static/code/FirstCollektiveProgram.kt#L20-L30
+```
+
+Now all the devices in the network will know how many devices are currently connected.
+
+:::caution
+What happens if a group of devices or the root gets disconnected from the network,
+or the network becomes segmented?
+:::
+
+In such a case,
+the subnetwork that still contains the root device will continue to compute the updated number of devices.
+However,
+any subnetworks that no longer include the root will not be able to do so.
+
+How can we address this issue?
+We can use a **leader election algorithm**,
+which allows us to dynamically elect a new root device within each connected component of the network.
+In this tutorial,
+we use the [boundedElection](https://javadoc.io/doc/it.unibo.collektive/collektive-stdlib/latest/collektive-stdlib/it.unibo.collektive.stdlib.consensus/bounded-election.html) function from the standard library.
+
+```kotlin file=<rootDir>/static/code/FirstCollektiveProgram.kt#L32-L44
+```
+
+:::tip[Success]
+Now we're all set!
+The final program will recompute the number of devices in the network, even if the network becomes segmented.
+:::
+
+:::info
+The code above can be found and executed in the [collektive examples repository](https://github.com/Collektive/collektive-examples/blob/master/simulation/src/main/kotlin/it/unibo/collektive/examples/counter/Counter.kt).
 :::
