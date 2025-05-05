@@ -1,3 +1,9 @@
+## [24.0.5](https://github.com/Collektive/collektive/compare/24.0.4...24.0.5) (2025-05-05)
+
+### Documentation
+
+* add first collektive program section ([#962](https://github.com/Collektive/collektive/issues/962)) ([1fd4b44](https://github.com/Collektive/collektive/commit/1fd4b4474078f7e65eb54aebd996a61c075cf826))
+
 ## [24.0.4](https://github.com/Collektive/collektive/compare/24.0.3...24.0.4) (2025-05-04)
 
 ### Dependency updates
