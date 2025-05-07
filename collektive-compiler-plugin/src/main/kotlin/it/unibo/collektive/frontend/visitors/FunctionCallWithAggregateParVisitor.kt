@@ -9,7 +9,6 @@
 package it.unibo.collektive.frontend.visitors
 
 import it.unibo.collektive.frontend.checkers.CheckersUtility.fqName
-import it.unibo.collektive.frontend.checkers.CheckersUtility.hasAggregateArgument
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isAggregate
 import it.unibo.collektive.utils.common.AggregateFunctionNames.ALIGNED_ON_FUNCTION_FQ_NAME
 import org.jetbrains.kotlin.fir.FirElement
@@ -23,8 +22,10 @@ import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
 /**
  * This visitor is used for functions that takes an aggregate argument, checking whether any aggregate call inside that
  * function's body is used without a wrapping `alignedOn` call.
+ *
+ * @param context The [CheckerContext] used for checking.
  */
-class FunctionCallWithAggregateParVisitor(private val context: CheckerContext) : FirVisitorVoid() {
+class FunctionCallWithAggregateParVisitor(val context: CheckerContext) : FirVisitorVoid() {
     private var found = false
     private var insideAlignedOn = false
     private var functionCounter = 0
@@ -38,7 +39,7 @@ class FunctionCallWithAggregateParVisitor(private val context: CheckerContext) :
     private fun isInsideAlignedOnOrNestedFun(): Boolean = insideAlignedOn || insideNestedFun
 
     override fun visitFunctionCall(functionCall: FirFunctionCall) {
-        if (functionCall.isAggregate(context.session)) {
+        if (functionCall.isAggregate(context)) {
             if (functionCall.fqName() == ALIGNED_ON_FUNCTION_FQ_NAME) {
                 insideAlignedOn = true
                 functionCall.acceptChildren(this)
@@ -46,9 +47,9 @@ class FunctionCallWithAggregateParVisitor(private val context: CheckerContext) :
             } else if (!isInsideAlignedOnOrNestedFun()) {
                 found = true
             }
-        } else if (functionCall.hasAggregateArgument() && !isInsideAlignedOnOrNestedFun()) {
-            val visitor = FunctionCallWithAggregateParVisitor(context)
-            found = visitor.visitSuspiciousFunctionCallDeclaration(functionCall)
+//        } else if (functionCall.hasAggregateArgument() && !isInsideAlignedOnOrNestedFun()) {
+//            val visitor = FunctionCallWithAggregateParVisitor(context)
+//            found = visitor.visitSuspiciousFunctionCallDeclaration(functionCall)
         }
     }
 

@@ -36,7 +36,7 @@ object KtDefaultErrorMessagesCollektive : BaseDiagnosticRendererFactory() {
                 """
                     This when or if construct returns a field.
                     This branching construct returns a ''{0}'',
-                    but returning instances of ${AggregateFunctionNames.FIELD_CLASS} from branches is forbidden,
+                    but returning instances of ${AggregateFunctionNames.FIELD_CLASS_FQ_NAME} from branches is forbidden,
                     as it can break alignment.
                     
                     Consider building the field before the branch, then mapping it:

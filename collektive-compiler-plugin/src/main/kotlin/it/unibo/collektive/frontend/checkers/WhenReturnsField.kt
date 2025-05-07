@@ -9,7 +9,7 @@
 package it.unibo.collektive.frontend.checkers
 
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isInsideAggregateFunction
-import it.unibo.collektive.utils.common.AggregateFunctionNames.FIELD_CLASS
+import it.unibo.collektive.utils.common.AggregateFunctionNames.FIELD_CLASS_FQ_NAME
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
@@ -57,7 +57,7 @@ import org.jetbrains.kotlin.fir.types.type
  * ```
  *
  * @see org.jetbrains.kotlin.fir.analysis.checkers.expression.FirWhenExpressionChecker
- * @see it.unibo.collektive.utils.common.AggregateFunctionNames.FIELD_CLASS
+ * @see it.unibo.collektive.utils.common.AggregateFunctionNames.FIELD_CLASS_FQ_NAME
  */
 object WhenReturnsField : FirWhenExpressionChecker(MppCheckerKind.Common) {
     override fun check(expression: FirWhenExpression, context: CheckerContext, reporter: DiagnosticReporter) {
@@ -65,7 +65,7 @@ object WhenReturnsField : FirWhenExpressionChecker(MppCheckerKind.Common) {
             reporter.reportOn(
                 expression.source,
                 FirCollektiveErrors.BRANCH_RETURNS_FIELD,
-                FIELD_CLASS + expression.resolvedType.typeArguments.joinToString(
+                FIELD_CLASS_FQ_NAME + expression.resolvedType.typeArguments.joinToString(
                     prefix = "<",
                     postfix = ">",
                     separator = ", ",
@@ -75,11 +75,11 @@ object WhenReturnsField : FirWhenExpressionChecker(MppCheckerKind.Common) {
         }
     }
 
-    private fun FirWhenExpression.returnsAField() = FIELD_CLASS == returnType()
+    private fun FirWhenExpression.returnsAField() = FIELD_CLASS_FQ_NAME == returnType()
 
     private fun FirWhenExpression.returnType() = resolvedType.classId?.asFqNameString()
 
-    private fun FirTypeRef.isField() = FIELD_CLASS == coneType.classId?.asFqNameString()
+    private fun FirTypeRef.isField() = FIELD_CLASS_FQ_NAME == coneType.classId?.asFqNameString()
 
     private fun FirValueParameter.isField() = returnTypeRef.isField()
 

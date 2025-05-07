@@ -48,8 +48,7 @@ class IterationUsingDelegatesWithoutAlign {
     companion object {
         private val expectedWarning: String =
             """
-            Function 'delegate', that accepts and uses an aggregate argument, has been called inside a loop construct 
-            without explicit alignment.
+            Aggregate function 'delegate' has been called inside a loop construct without explicit alignment.
             The same path may generate interactions more than once, leading to ambiguous alignment.
             
             Consider wrapping the function into the 'alignedOn' method with a unique element, either at the call site

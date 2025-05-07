@@ -1,66 +1,100 @@
 package it.unibo.collektive.frontend.checkers
 
+import it.unibo.collektive.aggregate.api.CollektiveIgnore
 import it.unibo.collektive.utils.common.AggregateFunctionNames.AGGREGATE_CLASS_FQ_NAME
-import it.unibo.collektive.utils.common.AggregateFunctionNames.AGGREGATE_CLASS_NAME
+import it.unibo.collektive.utils.common.AggregateFunctionNames.FIELD_CLASS_FQ_NAME
+import it.unibo.collektive.utils.common.AggregateFunctionNames.IGNORE_FUNCTION_ANNOTATION_FQ_NAME
+import org.jetbrains.kotlin.fir.FirAnnotationContainer
 import org.jetbrains.kotlin.fir.FirElement
-import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
-import org.jetbrains.kotlin.fir.analysis.checkers.getContainingClassSymbol
-import org.jetbrains.kotlin.fir.analysis.checkers.toClassLikeSymbol
-import org.jetbrains.kotlin.fir.declarations.FirReceiverParameter
+import org.jetbrains.kotlin.fir.declarations.FirFunction
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
+import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 import org.jetbrains.kotlin.fir.expressions.FirAnonymousFunctionExpression
 import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.FirReturnExpression
-import org.jetbrains.kotlin.fir.expressions.toResolvedCallableSymbol
 import org.jetbrains.kotlin.fir.expressions.unwrapExpression
 import org.jetbrains.kotlin.fir.references.toResolvedFunctionSymbol
 import org.jetbrains.kotlin.fir.references.toResolvedNamedFunctionSymbol
 import org.jetbrains.kotlin.fir.render
+import org.jetbrains.kotlin.fir.resolve.getContainingClass
+import org.jetbrains.kotlin.fir.resolve.providers.firProvider
+import org.jetbrains.kotlin.fir.symbols.SymbolInternals
+import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.fir.types.classId
+import org.jetbrains.kotlin.fir.types.coneType
+import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
-import org.jetbrains.kotlin.name.ClassId
-import org.jetbrains.kotlin.name.FqName
+import kotlin.collections.orEmpty
 
 /**
- * Collection of utilities for FIR checkers.
+ * Collection of utility functions for FIR-based static checks in the Collektive frontend compiler plugin.
+ *
+ * This object provides helpers for inspecting the FIR (Frontend Intermediate Representation) tree,
+ * particularly in the context of identifying and handling aggregate functions and expressions
+ * that interact with aggregate programming constructs.
  */
 object CheckersUtility {
-    /**
-     * Checks is a specific receiver parameter is [Aggregate][it.unibo.collektive.aggregate.api.Aggregate]
-     * (`Aggregate<ID>.example()`).
-     * It uses the [session] of the [CheckerContext] in which this check is performed to get the class symbol of the
-     * parameter.
-     *
-     * It returns **true** if it's an `Aggregate` function, **false** otherwise.
-     */
-    fun FirReceiverParameter.isAggregate(session: FirSession): Boolean =
-        typeRef.toClassLikeSymbol(session)?.name?.asString() == AGGREGATE_CLASS_NAME
+
+    private val aggregateTypes = listOf(AGGREGATE_CLASS_FQ_NAME, FIELD_CLASS_FQ_NAME)
 
     /**
-     * Checks if the function that is called is an [Aggregate][it.unibo.collektive.aggregate.api.Aggregate] one
-     * (i.e. is an extension of `Aggregate` or it's a method of the `Aggregate` class).
-     * It uses the [session] of the [CheckerContext] in which this check is performed to get the class symbol of the
-     * receiver parameter.
+     * Checks if any of the types in the sequence represents an aggregate type.
      *
-     * It returns **true** if it's an `Aggregate` function, **false** otherwise.
+     * @return `true` if at least one type in the sequence is an aggregate type, `false` otherwise.
      */
-    fun FirFunctionCall.isAggregate(session: FirSession): Boolean {
-        val callableSymbol = toResolvedCallableSymbol()
-        return callableSymbol?.receiverParameter?.isAggregate(session) == true ||
-            callableSymbol?.getContainingClassSymbol()?.name?.asString() == AGGREGATE_CLASS_NAME
+    private fun Sequence<ConeKotlinType>.anyIsAggregate(): Boolean = any { it.isAggregate() }
+
+    /**
+     * Checks whether the receiver type corresponds to a recognized aggregate type.
+     *
+     * @receiver a [ConeKotlinType] to analyse
+     * @return `true` if the type is an aggregate or field type, `false` otherwise
+     */
+    fun ConeKotlinType.isAggregate(): Boolean = this.classId?.asFqNameString() in aggregateTypes
+
+    /**
+     * Determines whether a given [FirFunctionCall] involves aggregate-typed receivers or arguments.
+     */
+    fun FirFunctionCall?.isAggregate(context: CheckerContext): Boolean = when (this) {
+        null -> false
+        else -> !hasAnnotationDisablingPlugin(context) &&
+            this.calleeReference.toResolvedNamedFunctionSymbol().isAggregate(context)
     }
 
     /**
-     * Checks if the current [CheckerContext] is wrapped inside an
-     * [Aggregate][it.unibo.collektive.aggregate.api.Aggregate] function.
+     * Determines whether this function symbol represents an aggregate function.
      *
-     * It returns **true** if it is wrapped inside an `Aggregate` function, **false** otherwise.
+     * A function is considered aggregate if:
+     * - It is not annotated with any annotation that disables the Collektive plugin.
+     * - At least one of its receivers or arguments is of an aggregate-related type.
+     *
+     * @receiver the [FirFunctionSymbol] to analyze (nullable)
+     * @param context the [CheckerContext], used to access the current compilation context
+     * @return `true` if the function should be treated as aggregate, `false` otherwise
+     */
+    @OptIn(SymbolInternals::class)
+    fun FirFunctionSymbol<*>?.isAggregate(context: CheckerContext): Boolean = this?.fir.isAggregate(context)
+
+    /**
+     * Determines whether a given [FirFunction] involves aggregate-typed receivers or parameters.
+     */
+    fun FirFunction?.isAggregate(context: CheckerContext): Boolean = when (this) {
+        null -> false
+        else -> !hasAnnotationDisablingPlugin(context) &&
+            receiversAndArgumentsTypes().anyIsAggregate()
+    }
+
+    /**
+     * Checks whether the current context is enclosed within an aggregate function.
+     *
+     * @receiver the [CheckerContext] to inspect
+     * @return `true` if inside a function whose receiver or parameters are aggregate-typed
      */
     fun CheckerContext.isInsideAggregateFunction(): Boolean =
-        containingElements.any { (it as? FirSimpleFunction)?.receiverParameter?.isAggregate(session) == true }
+        containingElements.any { (it as? FirSimpleFunction).isAggregate(this) }
 
     /**
      * Returns wrapping [FirElement]s until it finds the element that satisfies the predicate (which is
@@ -165,28 +199,34 @@ object CheckersUtility {
     }
 
     /**
-     * Returns a list of the arguments' types (in the form of [ConeKotlinType]) of the related function.
+     * Returns the types of receivers and arguments associated with this [FirFunction].
      */
-    fun FirFunctionCall.getArgumentsTypes(): List<ConeKotlinType>? = calleeReference
-        .toResolvedNamedFunctionSymbol()
-        ?.valueParameterSymbols
-        ?.map { parameter ->
-            parameter.resolvedReturnTypeRef.coneType
-        }
+    fun FirFunction.receiversAndArgumentsTypes() = symbol.receiversAndArgumentsTypes()
 
     /**
-     * Converts a string representing a fully-qualified name (e.g. `it.unibo.collektive.aggregate.api.Aggregate`)
-     * into a [FqName] object.
+     * Returns the types of receivers and arguments associated with this [FirFunctionCall].
      */
-    fun String.toFqNameUnsafe(): FqName = FqName(this)
+    fun FirFunctionCall.receiversAndArgumentsTypes(): Sequence<ConeKotlinType> =
+        calleeReference.toResolvedNamedFunctionSymbol()?.receiversAndArgumentsTypes().orEmpty()
 
     /**
-     * Checks whether if the called function accepts at least on argument of type
-     * [it.unibo.collektive.aggregate.api.Aggregate].
+     * Computes the complete list of receiver and argument types for a function symbol.
+     *
+     * This includes:
+     * - context parameters
+     * - value parameters
+     * - dispatch receiver
+     * - extension receiver
      */
-    fun FirFunctionCall.hasAggregateArgument(): Boolean = getArgumentsTypes()?.any {
-        it.classId == ClassId.topLevel(AGGREGATE_CLASS_FQ_NAME.toFqNameUnsafe())
-    } == true
+    fun FirFunctionSymbol<*>.receiversAndArgumentsTypes(): Sequence<ConeKotlinType> {
+        val valueParameters: Sequence<ConeKotlinType> = valueParameterSymbols.asSequence()
+            .map { it.resolvedReturnType }
+        val receiver = sequenceOf(resolvedReceiverTypeRef?.coneType).filterNotNull()
+        val dispatchReceiver = sequenceOf(dispatchReceiverType).filterNotNull()
+        val contextParameters: Sequence<ConeKotlinType> = resolvedContextParameters.asSequence()
+            .map { it.returnTypeRef.coneType }
+        return contextParameters + valueParameters + dispatchReceiver + receiver
+    }
 
     /**
      * Checks if the [FirExpression] is structurally equivalent to another [FirExpression].
@@ -216,3 +256,66 @@ object CheckersUtility {
         }
     }.extractReturnExpression()
 }
+
+/**
+ * Checks whether this [FirFunction] or any of its enclosing declarations
+ * are annotated with [CollektiveIgnore].
+ *
+ * Functions or classes marked with [CollektiveIgnore] are excluded
+ * from alignment and treated as purely local computations.
+ *
+ * @param context the [CheckerContext] used for the check
+ * @return `true` if the function or a parent is annotated with [CollektiveIgnore]
+ */
+fun FirAnnotationContainer?.hasAnnotationDisablingPlugin(context: CheckerContext): Boolean = when (this) {
+    null -> false
+    else -> annotations.any { it.disablesPlugin() } ||
+        context.hasAnnotationDisablingPlugin() ||
+        when (this) {
+            is FirFunction ->
+                getContainingClass().hasAnnotationDisablingPlugin(context) ||
+                    context.session.firProvider.getFirCallableContainerFile(this.symbol)
+                        .hasAnnotationDisablingPlugin(context)
+            else -> false
+        }
+}
+
+/**
+ * Checks whether this function symbol or its surrounding context is annotated to disable the Collektive plugin.
+ *
+ * This function returns `true` if either:
+ * - The function itself is annotated with a plugin-disabling annotation, or
+ * - Any of the surrounding elements in the given [context] are annotated to disable the plugin.
+ *
+ * @receiver the [FirFunctionSymbol] to inspect
+ * @param context the [CheckerContext] providing access to surrounding FIR elements
+ * @return `true` if plugin checks should be disabled, `false` otherwise
+ */
+fun FirFunctionSymbol<*>.hasAnnotationDisablingPlugin(context: CheckerContext): Boolean =
+    annotations.any { it.disablesPlugin() } || context.hasAnnotationDisablingPlugin()
+
+/**
+ * Checks whether any of the elements in the current [CheckerContext] contain an annotation
+ * that disables the Collektive compiler plugin.
+ *
+ * This function inspects all [FirAnnotation]s in the [containingElements] and returns `true`
+ * if any of them match the disabling annotation defined by [IGNORE_FUNCTION_ANNOTATION_FQ_NAME].
+ *
+ * @receiver the current [CheckerContext] during FIR analysis
+ * @return `true` if plugin execution should be disabled due to annotations, `false` otherwise
+ */
+fun CheckerContext.hasAnnotationDisablingPlugin(): Boolean = containingElements
+    .flatMap { (it as? FirAnnotationContainer)?.annotations.orEmpty() }
+    .any { it.disablesPlugin() }
+
+/**
+ * Checks whether this annotation disables the Collektive compiler plugin for the annotated function.
+ *
+ * This returns `true` if the annotation matches the fully qualified name defined in
+ * [IGNORE_FUNCTION_ANNOTATION_FQ_NAME], indicating that the function should be excluded
+ * from aggregate analysis and plugin checks.
+ *
+ * @receiver the [FirAnnotation] to inspect
+ * @return `true` if the annotation disables the plugin, `false` otherwise
+ */
+fun FirAnnotation.disablesPlugin() = resolvedType.classId?.asFqNameString() == IGNORE_FUNCTION_ANNOTATION_FQ_NAME
