@@ -9,7 +9,7 @@
 package it.unibo.collektive.backend.transformers
 
 import it.unibo.collektive.aggregate.Field
-import it.unibo.collektive.utils.common.AggregateFunctionNames.FIELD_CLASS
+import it.unibo.collektive.utils.common.AggregateFunctionNames.FIELD_CLASS_FQ_NAME
 import it.unibo.collektive.utils.common.hasAnnotationDisablingPlugin
 import it.unibo.collektive.utils.logging.debug
 import it.unibo.collektive.utils.logging.debugPrint
@@ -80,7 +80,7 @@ internal class ProjectFieldOnAccessTransformer(
      * @return the (potentially wrapped) [IrExpression]
      */
     override fun visitGetValue(expression: IrGetValue): IrExpression {
-        if (expression.type.classFqName == FqName(FIELD_CLASS)) {
+        if (expression.type.classFqName == FqName(FIELD_CLASS_FQ_NAME)) {
             logger.debug("This expression returns a field: $expression")
             debugPrint { "This expression returns a field: ${expression.dumpKotlinLike()}" }
             return wrapInProjectFunction(expression) // , aggregateReference)

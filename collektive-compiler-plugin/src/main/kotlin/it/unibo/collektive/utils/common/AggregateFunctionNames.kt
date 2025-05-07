@@ -52,7 +52,7 @@ object AggregateFunctionNames {
     val DEALIGN_FUNCTION_FQ_NAME: String = "$AGGREGATE_CLASS_FQ_NAME.$DEALIGN_FUNCTION_NAME"
 
     /** Fully-qualified name of the [Field] class. Used to identify field types in IR. */
-    val FIELD_CLASS: String = checkNotNull(Field::class.qualifiedName)
+    val FIELD_CLASS_FQ_NAME: String = checkNotNull(Field::class.qualifiedName)
 
     /** Fully-qualified name of the [Aggregate.evolve] function. */
     val EVOLVE_FUNCTION_FQ_NAME: String = "$AGGREGATE_CLASS_FQ_NAME.evolve"
