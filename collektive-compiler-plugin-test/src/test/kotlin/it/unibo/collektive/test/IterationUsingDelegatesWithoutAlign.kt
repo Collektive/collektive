@@ -31,11 +31,21 @@ class IterationUsingDelegatesWithoutAlign {
                 with(testSubjects) {
                     `iteration with warning`("IterationDelegate", functionName, iteration, expectedWarning)
                     `iteration without warning`("IterationAlignDelegate", functionName, iteration)
-                    `iteration without warning`("IterationDelegateAlign", functionName, iteration)
-                    `iteration without warning`("IterationDelegateWithNestedFun", functionName, iteration)
+                    `iteration with warning`("IterationDelegateAlign", functionName, iteration, expectedWarning)
+                    `iteration with warning`("IterationDelegateWithNestedFun", functionName, iteration, expectedWarning)
                     `iteration with warning`("IterationRecursiveDelegate", functionName, iteration, expectedWarning)
-                    `iteration without warning`("IterationAlignRecursiveDelegate", functionName, iteration)
-                    `iteration without warning`("IterationRecursiveDelegateAlign", functionName, iteration)
+                    `iteration with warning`(
+                        "IterationAlignRecursiveDelegate",
+                        functionName,
+                        iteration,
+                        expectedWarning,
+                    )
+                    `iteration with warning`(
+                        "IterationRecursiveDelegateAlign",
+                        functionName,
+                        iteration,
+                        expectedWarning,
+                    )
                     // Disabled tests
                     // `iteration with warning`("IterationDelegatedNestedFun", functionName, iteration, expectedWarning)
                     // `iteration without warning`("IterationAlignDelegatedNestedFun", functionName, iteration)
@@ -51,8 +61,7 @@ class IterationUsingDelegatesWithoutAlign {
             Aggregate function 'delegate' has been called inside a loop construct without explicit alignment.
             The same path may generate interactions more than once, leading to ambiguous alignment.
             
-            Consider wrapping the function into the 'alignedOn' method with a unique element, either at the call site
-            or inside the 'delegate' function declaration, wrapping the involved aggregate calls.
+            Consider wrapping the function into the 'alignedOn' method with a unique element.
             """.trimIndent()
     }
 }

@@ -19,6 +19,7 @@ import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirFunctionCallChecker
+import org.jetbrains.kotlin.fir.declarations.FirFunction
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.FirLoop
 import org.jetbrains.kotlin.fir.expressions.arguments
@@ -105,12 +106,25 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         isFunctionCallsWithName(AggregateFunctionNames.ALIGNED_ON_FUNCTION_NAME)(this)
 
     private fun CheckerContext.isIteratedWithoutAlignedOn(): Boolean {
-        val elements = containingElements.zipWithNext()
-        val elementsBeforeLoop = elements.takeWhile { (child, parent) -> !isInsideALoop(child, parent) }
-        val atLeastOneLoop = elementsBeforeLoop.size < elements.size
-        val alignedOn = elementsBeforeLoop.any { (child, _) -> child.isAlignedOn() } ||
-            elementsBeforeLoop.lastOrNull()?.second?.isAlignedOn() == true
-        return !alignedOn && atLeastOneLoop
+        // Find the most internal function definition, cut the rest
+        val elements = containingElements.reversed().takeWhile { it !is FirFunction }
+        // Drop the most external contexts until an aggregate context is found
+//
+//        val elements = containingElements.dropWhile {
+//            val isAggregate = when (it) {
+//                is FirFunctionCall -> it.isAggregate(this)
+//                is FirFunction -> it.isAggregate(this)
+//                else -> false
+//            }
+//        }.reversed().zipWithNext()
+        val elementPairs = elements.zipWithNext()
+        val elementsBeforeLoop = elementPairs.takeWhile { (child, parent) -> !isInsideALoop(child, parent) }
+        val atLeastOneLoop = elementsBeforeLoop.size < elementPairs.size
+        val alignedOn by lazy {
+            elementsBeforeLoop.any { (child, _) -> child.isAlignedOn() } ||
+                elementsBeforeLoop.lastOrNull()?.second?.isAlignedOn() == true
+        }
+        return atLeastOneLoop && !alignedOn
     }
 //    private fun CheckerContext.isIteratedWithoutAlignedOn(): Boolean =
 //        wrappingElementsUntil { isALoopInsideAnAggregateContext(it) }
