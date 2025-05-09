@@ -3,9 +3,31 @@ title: Using Collektive with Alchemist Simulator
 sidebar_position: 5
 ---
 
-[Alchemist Simulator](https://alchemistsimulator.github.io/) is a distributed systems simulation platform, particularly suited for aggregate programming. It allows you to model and simulate interactions between agents in complex environments, supporting different abstractions and programming paradigms.
+[Alchemist Simulator](https://alchemistsimulator.github.io/) is a distributed systems simulation platform,
+particularly suited for aggregate programming.
+It allows you to model and simulate interactions between agents in complex environments,
+supporting different abstractions and programming paradigms.
 
-Together, Alchemist and Collektive allow you to write aggregate programs in Kotlin that can be executed and simulated within dynamic and configurable environments through YAML files.
+Together,
+Alchemist and Collektive allow you to write aggregate programs in Kotlin that can be executed and simulated within dynamic and configurable environments through YAML files.
+
+:::warning
+In order to use the simulator, you need the following _Alchemist_ dependencies:
+```gradle
+dependencies {
+    implementation("it.unibo.alchemist:alchemist:<latest-version>")
+    implementation("it.unibo.alchemist:alchemist-swingui:<latest-version>")
+    implementation("it.unibo.alchemist:alchemist-euclidean-geometry:<latest-version>")
+}
+```
+And the **Collektive incarnation** dependency:
+```gradle
+dependencies {
+    implementation("it.unibo.collektive:alchemist-incarnation-collektive:<latest-version>")
+}
+```
+Note that Alchemist is a **JVM only** simulator.
+:::
 
 ## YAML configuration file for Collektive
 
@@ -21,19 +43,20 @@ incarnation: collektive
 
 ---
 
-### Network model
+### Specific configuration
 
-```yaml
-network-model:
-  type: ConnectWithinDistance
-  parameters: [2]
-```
-
-`network-model` defines how nodes communicate with each other. Here we use `ConnectWithinDistance`, a pattern that connects nodes that are at most 2 units apart.
+For further details on the configuration options,
+such as network configuration, node properties and deployment,
+please refer to the [Alchemist documentation](https://alchemistsimulator.github.io/).
 
 ---
 
 ### Program definition
+
+To run a Collektive program within Alchemist,
+you need to define the entrypoint of the program in the YAML file.
+The action type must be `RunCollektiveProgram`,
+and the parameters must be the fully qualified name of the program to be executed.
 
 ```yaml
 _pool: &program
@@ -43,425 +66,10 @@ _pool: &program
       - type: RunCollektiveProgram
         parameters: [it.unibo.collektive.examples.tutorialExample.TutorialExampleKt.maxID]
 ```
-
-This section defines the program to be executed. The program is executed as an `Event` with a time distribution of 1 unit. The executed action is the Collektive program `maxID`.
-
----
-
-### Nodes deploy
-
-```yaml
-deployments:
-  - type: GraphStreamDeployment
-    parameters: [20, 2, 0, PreferentialAttachment]
-    programs:
-      - *program
-```
-
-`GraphStreamDeployment` is used to create a network of 20 nodes with connectivity based on `PreferentialAttachment`. Each node runs the previously defined Collektive program.
+The program is executed as an `Event` with a time distribution, in this case, of 1 unit.
+The program executed is the function `maxID`, which is the entrypoint of the program.
 
 ---
-
-### Initial state of the nodes
-
-```yaml
-    contents:
-      - molecule: isMaxID
-        concentration: true
-      ...
-```
-
-`molecule` are variables associated with nodes, with an initial concentration. For example:
-
-- `isMaxID`: indicates whether the node has the maximum ID, the value of this variable is initialized to `true`, before starting the simulation all nodes will therefore have this variable equal to `true`.
-
----
-
-### Data export
-
-```yaml
-export:
-  - type: CSVExporter
-    parameters:
-      fileNameRoot: "tutorial-example"
-      exportPath: "data"
-```
-
-`CSVExporter` saves simulation data in CSV format, with an export interval of 1 time unit.
-
-<details 
-    style={{ backgroundColor: 'transparent', border: '1px solid purple', borderRadius: '5px', padding: '5px' }}
->
-    <summary>Click to view full YAML code</summary>
-    ```yml
-    incarnation: collektive
-
-    network-model:
-    type: ConnectWithinDistance
-    parameters: [2]
-
-    _pool: &program
-    - time-distribution: 1
-        type: Event
-        actions:
-        - type: RunCollektiveProgram
-            parameters: [it.unibo.collektive.examples.tutorialExample.TutorialExampleKt.maxID]
-
-    deployments:
-    - type: GraphStreamDeployment
-        parameters: [20, 2, 0, PreferentialAttachment]
-        programs:
-        - *program
-        contents:
-        - molecule: isMaxID
-            concentration: true
-        - molecule: isMaxLocalID
-            concentration: true
-        - molecule: localID
-            concentration: 0
-        - molecule: maxNeighborID
-            concentration: 0
-        - molecule: maxNetworkID
-            concentration: 0
-        - molecule: subnetDiameter
-            concentration: null
-        - molecule: distanceToSource
-            concentration: 0
-        - molecule: isSubnetDiameterDistance
-            concentration: true
-        - molecule: nothing
-            concentration: true
-        - molecule: subnetDiameterValue
-            concentration: 0
-
-    export:
-    - type: CSVExporter
-        parameters:
-        fileNameRoot: "tutorial-example"
-        interval: 1.0
-        exportPath: "data"
-        data:
-        - time
-        - molecule: subnetDiameterValue
-            aggregators: [ mean ]
-            value-filter: onlyfinite
-            precision: 1
-    ```
-</details>
-
-Once the YAML configuration file has been created, it is necessary to generate a corresponding JSON file, named identically to the configuration file, in order to specify the graphical effects that will be used to display the components described in the YAML configuration file.
-
-<details 
-    style={{ backgroundColor: 'transparent', border: '1px solid purple', borderRadius: '5px', padding: '5px' }}
->
-    <summary>Click to view effects code</summary>
-    ```json
-    [
-    {
-        "type": "class it.unibo.alchemist.boundary.gui.effects.DrawShape",
-        "curIncarnation": "collektive",
-        "mode": "FILL_ELLIPSE",
-        "red": {
-        "max": 255,
-        "min": 0,
-        "val": 250
-        },
-        "blue": {
-        "max": 255,
-        "min": 0,
-        "val": 200
-        },
-        "green": {
-        "max": 255,
-        "min": 0,
-        "val": 50
-        },
-        "alpha": {
-        "max": 255,
-        "min": 0,
-        "val": 255
-        },
-        "scaleFactor": {
-        "max": 100,
-        "min": 0,
-        "val": 50
-        },
-        "size": {
-        "max": 100,
-        "min": 0,
-        "val": 10
-        },
-        "molFilter": true,
-        "molString": "isSubnetDiameterDistance",
-        "molPropertyFilter": true,
-        "property": "if (it \u003d\u003d true) 1 else 0",
-        "writingPropertyValue": false,
-        "c": "ALPHA",
-        "reverse": false,
-        "propoom": {
-        "max": 10,
-        "min": -10,
-        "val": 0
-        },
-        "minprop": {
-        "max": 10,
-        "min": -10,
-        "val": 0
-        },
-        "maxprop": {
-        "max": 10,
-        "min": -10,
-        "val": 1
-        },
-        "colorCache": {
-        "value": -65536
-        }
-    },
-    {
-        "type": "class it.unibo.alchemist.boundary.gui.effects.DrawShape",
-        "curIncarnation": "collektive",
-        "mode": "FILL_ELLIPSE",
-        "red": {
-        "max": 255,
-        "min": 0,
-        "val": 0
-        },
-        "blue": {
-        "max": 255,
-        "min": 0,
-        "val": 255
-        },
-        "green": {
-        "max": 255,
-        "min": 0,
-        "val": 0
-        },
-        "alpha": {
-        "max": 255,
-        "min": 0,
-        "val": 255
-        },
-        "scaleFactor": {
-        "max": 100,
-        "min": 0,
-        "val": 50
-        },
-        "size": {
-        "max": 100,
-        "min": 0,
-        "val": 5
-        },
-        "molFilter": true,
-        "molString": "nothing",
-        "molPropertyFilter": true,
-        "property": "if (it \u003d\u003d true) 1 else 0",
-        "writingPropertyValue": false,
-        "c": "ALPHA",
-        "reverse": false,
-        "propoom": {
-        "max": 10,
-        "min": -10,
-        "val": 0
-        },
-        "minprop": {
-        "max": 10,
-        "min": -10,
-        "val": 0
-        },
-        "maxprop": {
-        "max": 10,
-        "min": -10,
-        "val": 1
-        },
-        "colorCache": {
-        "value": -65536
-        }
-    },
-    {
-        "type": "class it.unibo.alchemist.boundary.gui.effects.DrawShape",
-        "curIncarnation": "collektive",
-        "mode": "FILL_ELLIPSE",
-        "red": {
-        "max": 255,
-        "min": 0,
-        "val": 255
-        },
-        "blue": {
-        "max": 255,
-        "min": 0,
-        "val": 0
-        },
-        "green": {
-        "max": 255,
-        "min": 0,
-        "val": 0
-        },
-        "alpha": {
-        "max": 255,
-        "min": 0,
-        "val": 255
-        },
-        "scaleFactor": {
-        "max": 100,
-        "min": 0,
-        "val": 50
-        },
-        "size": {
-        "max": 100,
-        "min": 0,
-        "val": 15
-        },
-        "molFilter": true,
-        "molString": "isMaxLocalID",
-        "molPropertyFilter": true,
-        "property": "if (it \u003d\u003d true) 1 else 0",
-        "writingPropertyValue": false,
-        "c": "ALPHA",
-        "reverse": false,
-        "propoom": {
-        "max": 10,
-        "min": -10,
-        "val": 0
-        },
-        "minprop": {
-        "max": 10,
-        "min": -10,
-        "val": 0
-        },
-        "maxprop": {
-        "max": 10,
-        "min": -10,
-        "val": 1
-        },
-        "colorCache": {
-        "value": -65536
-        }
-    },
-    {
-        "type": "class it.unibo.alchemist.boundary.gui.effects.DrawShape",
-        "curIncarnation": "collektive",
-        "mode": "FILL_ELLIPSE",
-        "red": {
-        "max": 255,
-        "min": 0,
-        "val": 0
-        },
-        "blue": {
-        "max": 255,
-        "min": 0,
-        "val": 0
-        },
-        "green": {
-        "max": 255,
-        "min": 0,
-        "val": 255
-        },
-        "alpha": {
-        "max": 255,
-        "min": 0,
-        "val": 255
-        },
-        "scaleFactor": {
-        "max": 100,
-        "min": 0,
-        "val": 50
-        },
-        "size": {
-        "max": 100,
-        "min": 0,
-        "val": 15
-        },
-        "molFilter": true,
-        "molString": "isMaxID",
-        "molPropertyFilter": true,
-        "property": "if (it \u003d\u003d true) 1 else 0",
-        "writingPropertyValue": false,
-        "c": "ALPHA",
-        "reverse": false,
-        "propoom": {
-        "max": 10,
-        "min": -10,
-        "val": 0
-        },
-        "minprop": {
-        "max": 10,
-        "min": -10,
-        "val": 0
-        },
-        "maxprop": {
-        "max": 10,
-        "min": -10,
-        "val": 1
-        },
-        "colorCache": {
-        "value": -65536
-        }
-    },
-    {
-        "type": "class it.unibo.alchemist.boundary.gui.effects.DrawShape",
-        "curIncarnation": "collektive",
-        "mode": "DRAW_ELLIPSE",
-        "red": {
-        "max": 255,
-        "min": 0,
-        "val": 0
-        },
-        "blue": {
-        "max": 255,
-        "min": 0,
-        "val": 255
-        },
-        "green": {
-        "max": 255,
-        "min": 0,
-        "val": 115
-        },
-        "alpha": {
-        "max": 255,
-        "min": 0,
-        "val": 154
-        },
-        "scaleFactor": {
-        "max": 100,
-        "min": 0,
-        "val": 49
-        },
-        "size": {
-        "max": 100,
-        "min": 0,
-        "val": 5
-        },
-        "molFilter": true,
-        "molString": "it.unibo.collektive.examples.tutorialExample.TutorialExampleKt.maxID",
-        "molPropertyFilter": true,
-        "property": "",
-        "writingPropertyValue": true,
-        "c": "ALPHA",
-        "reverse": false,
-        "propoom": {
-        "max": 10,
-        "min": -10,
-        "val": 0
-        },
-        "minprop": {
-        "max": 10,
-        "min": -10,
-        "val": 0
-        },
-        "maxprop": {
-        "max": 10,
-        "min": -10,
-        "val": 10
-        },
-        "colorCache": {
-        "value": -1711246337
-        }
-    }
-    ]
-    ```
-</details>
-
-The codes illustrated represent the entire configuration used for the graphical simulation of the example examined in the previous section. Below is presented the graphical simulation obtained from the configuration.
 
 ## Graphical simulation
 
@@ -479,55 +87,39 @@ The molecules with Boolean concentration have been used to assign different colo
 
 ![](/img/collektive-and-alchemist-3.png)
 
-Selecting a node opens a window where it is possible to view the current value of the molecules and the value returned by the function specified in the parameters of the YAML configuration file.
+Clicking on a node opens a window displaying the molecule values for the selected node.
 
-<p align="center">
-    <img src="/img/collektive-and-alchemist-4.png" alt="Collektive and Alchemist 4" width="70%" />
-</p>
+Below is presented the example code.
 
-This graph shows the average of the maximum distance of the three subnets, which evolves over time as defined in the YAML configuration file. However, to generate this graph, it is not sufficient to specify it in the YAML configuration file. Its definition involves the creation of a CSV file, from which, through a Python script, the graph shown in the figure is generated.
-
-Below is presented the example code, including the logic for Alchemist Simulator.
+:::info
+The _EnvironmentVariables_ parameter is used to store and show the values of the molecules within the simulationi,
+it is a node property only related to the Alchemist simulator.
+A generic **Collektive** program **can** and **should** be written without the need to use the EnvironmentVariables.
+:::
 
 ```kotlin
-fun Aggregate<Int>.maxID(environment: EnvironmentVariables): Int {
+fun Aggregate<Int>.maxID(env: EnvironmentVariables): Int {
     val maxLocalValue = maxNeighborID()
-
-    // Collektive & Alchemist: Assign the result to a molecule
-    environment["localID"] = localId
-    environment["isMaxLocalID"] = localId == maxLocalValue
-    environment["maxNeighborID"] = maxLocalValue
-
-    // Step 1: Exchange the maxNeighborID with neighbors and obtain a field of values
+    // Shares the maxNeighborID with neighbors and obtain a field of values
     val neighborValues = neighboring(local = maxLocalValue)
-
-    // Step 2: Find the maximum value among neighbors (including self)
-    val maxValue = neighborValues.max(base = maxLocalValue)
-
-    // Collektive & Alchemist: Assign the result to a molecule 
-    environment["isMaxID"] = localId == maxValue
-    environment["maxNetworkID"] = maxValue
-
-    /* Third part */
-
-    // Preliminary step: the distance from the nearest source is calculated using the distanceTo library function 
-    environment["distanceToSource"] = distanceToSource(environment["isMaxID"])
-
+    // Find the maximum value among neighbors (including self)
+    val maxID = neighborValues.max(base = maxLocalValue)
+    // Evaluates the distance from the nearest source
+    val distToSource = distanceToSource(maxID == localId)
     // Calculate subnets diameter 
-    val subnetDiameterValue = subnetDiameter(environment["maxNetworkID"], environment["distanceToSource"])
-
-    // Collektive & Alchemist: Assign the result to a molecule
-    environment["subnetDiameter"] = subnetDiameterValue
-
+    val subnetDiameterValue = subnetDiameter(maxID, distToSource)
     val subnetDiameterDistance = subnetDiameter.distance
-
-    // Collektive & Alchemist: Assign the result to a molecule
-    environment["subnetDiameterValue"] = subnetDiameterDistance
-    environment["isSubnetDiameterDistance"] = subnetDiameterDistance == environment["distanceToSource"]
-    environment["nothing"] =  !(environment["isSubnetDiameterDistance"] || environment["isMaxID"] || environment["isMaxLocalID"])
-
+    // Assign the result to the molecules
+    env["localID"] = localId
+    env["isMaxLocalID"] = localId == maxLocalValue
+    env["maxNeighborID"] = maxLocalValue
+    env["isMaxID"] = localId == maxID
+    env["maxNetworkID"] = maxID
+    env["distanceToSource"] = distToSource
+    env["subnetDiameter"] = subnetDiameterValue
+    env["subnetDiameterValue"] = subnetDiameterDistance
+    env["isSubnetDiameterDistance"] = subnetDiameterDistance == env["distanceToSource"]
+    env["nothing"] =  !(env["isSubnetDiameterDistance"] || env["isMaxID"] || env["isMaxLocalID"])
     return maxValue
 }
 ```
-
-The results derived from the calculations are assigned to the molecules, thus updating the value of their concentration.
