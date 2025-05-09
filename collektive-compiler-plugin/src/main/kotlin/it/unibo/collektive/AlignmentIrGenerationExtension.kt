@@ -14,7 +14,7 @@ import it.unibo.collektive.backend.transformers.AggregateFunctionTransformer
 import it.unibo.collektive.utils.common.AggregateFunctionNames.AGGREGATE_CLASS_FQ_NAME
 import it.unibo.collektive.utils.common.AggregateFunctionNames.ALIGN_FUNCTION_NAME
 import it.unibo.collektive.utils.common.AggregateFunctionNames.DEALIGN_FUNCTION_NAME
-import it.unibo.collektive.utils.common.AggregateFunctionNames.FIELD_CLASS
+import it.unibo.collektive.utils.common.AggregateFunctionNames.FIELD_CLASS_FQ_NAME
 import it.unibo.collektive.utils.common.AggregateFunctionNames.PROJECT_FUNCTION
 import it.unibo.collektive.utils.logging.error
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
@@ -44,11 +44,11 @@ class AlignmentIrGenerationExtension(private val logger: MessageCollector) : IrG
             checkNotNull(pluginContext.referenceClass(ClassId.topLevel(FqName(AGGREGATE_CLASS_FQ_NAME)))) {
                 "Class $AGGREGATE_CLASS_FQ_NAME not found"
             }
-        val fieldClass = checkNotNull(pluginContext.referenceClass(ClassId.topLevel(FqName(FIELD_CLASS)))) {
-            "Class $FIELD_CLASS not found"
+        val fieldClass = checkNotNull(pluginContext.referenceClass(ClassId.topLevel(FqName(FIELD_CLASS_FQ_NAME)))) {
+            "Class $FIELD_CLASS_FQ_NAME not found"
         }
         val getContextSymbol = checkNotNull(fieldClass.getPropertyGetter("context")) {
-            "Property 'context' not found in class $FIELD_CLASS"
+            "Property 'context' not found in class $FIELD_CLASS_FQ_NAME"
         }
         val projectFunction = pluginContext.referenceFunctions(
             CallableId(

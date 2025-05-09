@@ -17,12 +17,21 @@ import kotlin.test.assertTrue
 
 class BranchesCannotReturnFieldTest {
 
-    @Test
-    fun `the compiler throws error on branches returning fields`() {
+    private val String.doesNotCompileBecauseBranchesReturnField get(): Unit {
         val collector = CollectingMessageCollector()
         val file = createTempFile(suffix = ".kt")
-        file.writeText(ClassLoader.getSystemResource("it/unibo/collektive/test/BrokenBranch.kt").readText())
+        file.writeText(ClassLoader.getSystemResource("it/unibo/collektive/test/$this.kt").readText())
         CollektiveK2JVMCompiler.compile(file.toFile(), collector)
         assertTrue(collector.hasErrors())
+    }
+
+    @Test
+    fun `the compiler throws error on branches returning fields`() {
+        "BrokenBranch".doesNotCompileBecauseBranchesReturnField
+    }
+
+    @Test
+    fun `the compiler throws error on branches returning fields with a sum`() {
+        "BrokenBranch2".doesNotCompileBecauseBranchesReturnField
     }
 }
