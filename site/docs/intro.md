@@ -29,5 +29,6 @@ please feel free to open an issue or fix them through a [PR](https://github.com/
    - [Standard Library](explanation/stdlib-descriptions.mdx)
 4. [Reference guides](references.mdx)
 5. [Project structure](project-structure.mdx)
+6. [Showcase](/docs/category/showcase/)
 
 [//]: # (3. [How-to guides]&#40;/docs/category/how-to-guides/&#41;)
