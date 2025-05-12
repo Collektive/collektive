@@ -1,14 +1,28 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 package it.unibo.collektive.frontend.checkers
 
 import it.unibo.collektive.aggregate.api.CollektiveIgnore
+import it.unibo.collektive.frontend.checkers.CheckersUtility.functionName
 import it.unibo.collektive.utils.common.AggregateFunctionNames.AGGREGATE_CLASS_FQ_NAME
 import it.unibo.collektive.utils.common.AggregateFunctionNames.FIELD_CLASS_FQ_NAME
 import it.unibo.collektive.utils.common.AggregateFunctionNames.IGNORE_FUNCTION_ANNOTATION_FQ_NAME
 import org.jetbrains.kotlin.fir.FirAnnotationContainer
 import org.jetbrains.kotlin.fir.FirElement
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
+import org.jetbrains.kotlin.fir.declarations.FirClassLikeDeclaration
+import org.jetbrains.kotlin.fir.declarations.FirDeclaration
+import org.jetbrains.kotlin.fir.declarations.FirFile
 import org.jetbrains.kotlin.fir.declarations.FirFunction
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
+import org.jetbrains.kotlin.fir.declarations.utils.classId
 import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 import org.jetbrains.kotlin.fir.expressions.FirAnonymousFunctionExpression
 import org.jetbrains.kotlin.fir.expressions.FirExpression
@@ -20,14 +34,16 @@ import org.jetbrains.kotlin.fir.references.toResolvedNamedFunctionSymbol
 import org.jetbrains.kotlin.fir.render
 import org.jetbrains.kotlin.fir.resolve.getContainingClass
 import org.jetbrains.kotlin.fir.resolve.providers.firProvider
+import org.jetbrains.kotlin.fir.resolve.toSymbol
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
+import org.jetbrains.kotlin.fir.symbols.impl.FirCallableSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.fir.types.classId
 import org.jetbrains.kotlin.fir.types.coneType
 import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
-import kotlin.collections.orEmpty
 
 /**
  * Collection of utility functions for FIR-based static checks in the Collektive frontend compiler plugin.
@@ -45,7 +61,7 @@ object CheckersUtility {
      *
      * @return `true` if at least one type in the sequence is an aggregate type, `false` otherwise.
      */
-    private fun Sequence<ConeKotlinType>.anyIsAggregate(): Boolean = any { it.isAggregate() }
+    private fun Sequence<ConeKotlinType>.anyIsAggregate(session: FirSession): Boolean = any { it.isAggregate(session) }
 
     /**
      * Checks whether the receiver type corresponds to a recognized aggregate type.
@@ -53,7 +69,26 @@ object CheckersUtility {
      * @receiver a [ConeKotlinType] to analyse
      * @return `true` if the type is an aggregate or field type, `false` otherwise
      */
-    fun ConeKotlinType.isAggregate(): Boolean = this.classId?.asFqNameString() in aggregateTypes
+    fun ConeKotlinType.isAggregate(session: FirSession): Boolean =
+        this.classId?.asFqNameString() in aggregateTypes || directSuperTypes(session).any { it.isAggregate(session) }
+
+    /**
+     * Retrieves the super types of this [ConeKotlinType] in the context of the given [session].
+     */
+    fun ConeKotlinType.directSuperTypes(session: FirSession): Set<ConeKotlinType> =
+        (toSymbol(session) as? FirClassSymbol)?.resolvedSuperTypes?.toSet().orEmpty()
+
+    /**
+     * Recursively retrieves all super types of this [ConeKotlinType] in the context of the given [session].
+     *
+     * @receiver a [ConeKotlinType] to analyse
+     * @param session the current [FirSession]
+     * @return a set of all super types of this type
+     */
+    fun ConeKotlinType.allSuperTypes(session: FirSession): Set<ConeKotlinType> {
+        val superTypes = directSuperTypes(session)
+        return superTypes + superTypes.flatMap { it.allSuperTypes(session) }
+    }
 
     /**
      * Determines whether a given [FirFunctionCall] involves aggregate-typed receivers or arguments.
@@ -81,10 +116,10 @@ object CheckersUtility {
     /**
      * Determines whether a given [FirFunction] involves aggregate-typed receivers or parameters.
      */
-    fun FirFunction?.isAggregate(context: CheckerContext): Boolean = when (this) {
+    fun FirDeclaration?.isAggregate(context: CheckerContext): Boolean = when (this) {
         null -> false
         else -> !hasAnnotationDisablingPlugin(context) &&
-            receiversAndArgumentsTypes().anyIsAggregate()
+            receiversAndArgumentsTypes().anyIsAggregate(context.session)
     }
 
     /**
@@ -201,7 +236,8 @@ object CheckersUtility {
     /**
      * Returns the types of receivers and arguments associated with this [FirFunction].
      */
-    fun FirFunction.receiversAndArgumentsTypes() = symbol.receiversAndArgumentsTypes()
+    fun FirDeclaration.receiversAndArgumentsTypes() =
+        (symbol as? FirCallableSymbol<*>)?.receiversAndArgumentsTypes().orEmpty()
 
     /**
      * Returns the types of receivers and arguments associated with this [FirFunctionCall].
@@ -218,9 +254,9 @@ object CheckersUtility {
      * - dispatch receiver
      * - extension receiver
      */
-    fun FirFunctionSymbol<*>.receiversAndArgumentsTypes(): Sequence<ConeKotlinType> {
-        val valueParameters: Sequence<ConeKotlinType> = valueParameterSymbols.asSequence()
-            .map { it.resolvedReturnType }
+    fun FirCallableSymbol<*>.receiversAndArgumentsTypes(): Sequence<ConeKotlinType> {
+        val valueParameters: Sequence<ConeKotlinType> = (this as? FirFunctionSymbol<*>)
+            ?.valueParameterSymbols?.asSequence()?.map { it.resolvedReturnType }.orEmpty()
         val receiver = sequenceOf(resolvedReceiverTypeRef?.coneType).filterNotNull()
         val dispatchReceiver = sequenceOf(dispatchReceiverType).filterNotNull()
         val contextParameters: Sequence<ConeKotlinType> = resolvedContextParameters.asSequence()
@@ -319,3 +355,20 @@ fun CheckerContext.hasAnnotationDisablingPlugin(): Boolean = containingElements
  * @return `true` if the annotation disables the plugin, `false` otherwise
  */
 fun FirAnnotation.disablesPlugin() = resolvedType.classId?.asFqNameString() == IGNORE_FUNCTION_ANNOTATION_FQ_NAME
+
+/**
+ * TODO: for debugging purposes.
+ */
+fun FirElement.niceString() = when (this) {
+    is FirFunctionCall -> functionName()
+    is FirSimpleFunction -> name.asString()
+    is FirClassLikeDeclaration -> classId.asString()
+    is FirClassSymbol<*> -> classId.asString()
+    is FirFile -> name
+    else ->
+        this::class.simpleName
+            ?.removePrefix("Fir")
+            ?.removeSuffix("Impl")
+            ?.removeSuffix("Expression")
+            ?: "Unknown"
+}

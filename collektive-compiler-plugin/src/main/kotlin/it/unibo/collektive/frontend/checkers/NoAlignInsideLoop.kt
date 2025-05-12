@@ -8,6 +8,7 @@
 
 package it.unibo.collektive.frontend.checkers
 
+import it.unibo.collektive.frontend.checkers.CheckersUtility.allSuperTypes
 import it.unibo.collektive.frontend.checkers.CheckersUtility.fqName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.functionName
 import it.unibo.collektive.frontend.checkers.CheckersUtility.isAggregate
@@ -16,15 +17,23 @@ import it.unibo.collektive.utils.common.AggregateFunctionNames
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.FirElement
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirFunctionCallChecker
-import org.jetbrains.kotlin.fir.declarations.FirFunction
+import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
+import org.jetbrains.kotlin.fir.expressions.FirArgumentList
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.FirLoop
-import org.jetbrains.kotlin.fir.expressions.arguments
+import org.jetbrains.kotlin.fir.expressions.FirReturnExpression
+import org.jetbrains.kotlin.fir.expressions.allReceiverExpressions
+import org.jetbrains.kotlin.fir.types.classId
+import org.jetbrains.kotlin.fir.types.resolvedType
 import kotlin.reflect.KClass
+import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
+import kotlin.reflect.KType
+import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.kotlinFunction
 
 /**
@@ -68,64 +77,159 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         }.map { it.name }
         .toSet()
 
-    /**
-     * Methods used inside collections to iterate their elements.
-     */
-    private val collectionMembers: Set<String> by lazy {
-        sequenceOf(
-            Class.forName("kotlin.collections.CollectionsKt"),
-            Collection::class.java,
-            Iterable::class.java,
-            List::class.java,
-            Map::class.java,
-            Sequence::class.java,
-            Set::class.java,
-        ).flatMap { it.methods.asSequence() }
-            .filter { method ->
-                // Trailing lambda support
-                method.parameters.lastOrNull()?.let { parameter ->
-                    parameter.parameterizedType.typeName.startsWith("kotlin.jvm.functions.Function") ||
-                        parameter.parameterizedType is Function<*>
-                } == true
-            }.map { it.name }
+    private val kotlinCollectionsExtensions: Set<KFunction<*>> =
+        sequenceOf("collections.CollectionsKt", "sequences.SequencesKt")
+            .map { Class.forName("kotlin.$it") }
+            .flatMap { it.methods.asSequence() }
+            .mapNotNull { it.kotlinFunction }
             .toSet()
+
+    private val collectionsTargetClasses = sequenceOf(
+        Collection::class,
+        IntRange::class,
+        Iterable::class,
+        List::class,
+        Map::class,
+        Sequence::class,
+        Set::class,
+    ).flatMap { it.functions }.toSet()
+
+    private val KType.typeName get() = (classifier as? KClass<*>)?.qualifiedName.orEmpty()
+
+    /**
+     * Maps every name of a collection method to its receiver types.
+     */
+    private val collectionMembers: Map<String, Set<String>> by lazy {
+        val allCandidates = collectionsTargetClasses + kotlinCollectionsExtensions
+        allCandidates
+            .filter { function ->
+                // At least the receiver and a trailing function
+                if (function.parameters.size > 1) {
+                    val parameterType = function.parameters.last().type.typeName
+                    parameterType.startsWith("kotlin.Function") || parameterType.startsWith("java.util.function.")
+                } else {
+                    false
+                }
+            }
+            .map { it.name to it.parameters.first().type.typeName }
+            .groupBy { it.first }
+            .mapValues { (_, value) -> value.map { it.second }.toSet() }
+//        collectionsTargetClasses.flatMap { it.java.methods.asSequence() }
+//            .filter { method ->
+//                // At least the receiver and a trailing function
+//                method.parameters.size > 1 &&
+//                    method.parameters.last().let { parameter ->
+//                        parameter.parameterizedType.typeName.startsWith("kotlin.jvm.functions.Function") ||
+//                            parameter.parameterizedType is Function<*>
+//                    }
+//            }
+//            .map { it.name to it.parameters.first().type.name }
+//            .groupBy { it.first }
+//            .mapValues { (_, value) -> value.map { it.second }.toSet() }
     }
 
-    private fun FirElement.isACallToALoopingCollectionsMethod(): Boolean =
-        this is FirFunctionCall && this.functionName() in collectionMembers
+    private fun FirElement.isACallToALoopingCollectionsMethod(session: FirSession): Boolean = this is FirFunctionCall &&
+        allReceiverExpressions.any { receiver ->
+            val type = receiver.resolvedType
+            val typeString = type.classId?.asFqNameString()
+            val supportedTypes = collectionMembers[functionName()].orEmpty()
+            typeString in supportedTypes ||
+                type.allSuperTypes(session).any { it.classId?.asFqNameString() in supportedTypes }
+        }
 
-    private fun FirElement.isLastArgumentOf(parent: FirElement): Boolean =
-        parent is FirFunctionCall && parent.arguments.lastOrNull() == this
+//    private fun FirElement.isLastArgumentOf(parent: FirElement): Boolean =
+//        this is FirArgumentList && parent is FirFunctionCall && parent.arguments.lastOrNull() == this
 
-    private fun isInsideALoop(child: FirElement, parent: FirElement): Boolean = child is FirLoop ||
-        parent is FirLoop ||
-        parent.isACallToALoopingCollectionsMethod() &&
-        child.isLastArgumentOf(parent)
+//    private fun isInsideALoop(child: FirElement, parent: FirElement): Boolean = child is FirLoop ||
+//        parent is FirLoop ||
+//        parent.isACallToALoopingCollectionsMethod() &&
+//        child.isLastArgumentOf(parent)
+
+//    private fun FirElement.isLoop() = this is FirLoop || this.isACallToALoopingCollectionsMethod()
 
     private fun FirElement.isAlignedOn() =
         isFunctionCallsWithName(AggregateFunctionNames.ALIGNED_ON_FUNCTION_NAME)(this)
 
     private fun CheckerContext.isIteratedWithoutAlignedOn(): Boolean {
-        // Find the most internal function definition, cut the rest
-        val elements = containingElements.reversed().takeWhile { it !is FirFunction }
+        // Find the outermost aggregate declaration
+        val outermostAggregateDeclaration = containingDeclarations.firstOrNull { it.isAggregate(this) }
+        // Find the most internal *named* function definition within the outermost aggregate declaration, cut the rest
+        val elements = containingElements
+            .takeLastWhile {
+                it !is FirReturnExpression && it !is FirSimpleFunction && it != outermostAggregateDeclaration
+            }
         // Drop the most external contexts until an aggregate context is found
-//
-//        val elements = containingElements.dropWhile {
-//            val isAggregate = when (it) {
-//                is FirFunctionCall -> it.isAggregate(this)
-//                is FirFunction -> it.isAggregate(this)
-//                else -> false
-//            }
-//        }.reversed().zipWithNext()
-        val elementPairs = elements.zipWithNext()
-        val elementsBeforeLoop = elementPairs.takeWhile { (child, parent) -> !isInsideALoop(child, parent) }
-        val atLeastOneLoop = elementsBeforeLoop.size < elementPairs.size
-        val alignedOn by lazy {
-            elementsBeforeLoop.any { (child, _) -> child.isAlignedOn() } ||
-                elementsBeforeLoop.lastOrNull()?.second?.isAlignedOn() == true
+        val scanner = elements.toMutableList()
+        var iteratedWithoutAlignedOn = false
+        while (scanner.isNotEmpty() && !iteratedWithoutAlignedOn) {
+            val next = scanner.removeLast()
+            when {
+                next.isAlignedOn() -> return false
+                next is FirLoop -> iteratedWithoutAlignedOn = true
+                next is FirArgumentList -> Unit
+                scanner.size >= 2 -> {
+                    // Check for a call to a looping collection method of which we are the last argument
+                    // For it to exist, we must be inside an argument list as the last element
+                    val argumentList = scanner.last() as? FirArgumentList
+                    if (argumentList != null && argumentList.arguments.last().source == next.source) {
+                        val functionCall = scanner[scanner.size - 2]
+                        if (functionCall.isACallToALoopingCollectionsMethod(session)) {
+                            iteratedWithoutAlignedOn = true
+                        }
+                    }
+                }
+            }
         }
-        return atLeastOneLoop && !alignedOn
+        return iteratedWithoutAlignedOn
     }
+
+//    private fun CheckerContext.isIteratedWithoutAlignedOn(): Boolean {
+//        // Find the outermost aggregate declaration
+//        val outermostAggregateDeclaration = containingDeclarations.firstOrNull { it.isAggregate(this) }
+//        // Find the most internal *named* function definition within the outermost aggregate declaration, cut the rest
+//        val elements = containingElements.reversed()
+//            .takeWhile { it !is FirSimpleFunction && it != outermostAggregateDeclaration }
+//        // Drop the most external contexts until an aggregate context is found
+// //
+// //        val elements = containingElements.dropWhile {
+// //            val isAggregate = when (it) {
+// //                is FirFunctionCall -> it.isAggregate(this)
+// //                is FirFunction -> it.isAggregate(this)
+// //                else -> false
+// //            }
+// //        }.reversed().zipWithNext()
+//        val scanner = elements.reversed().toMutableList()
+//        while (scanner.isNotEmpty()) {
+//            val next = scanner.removeLast()
+//            when {
+//                next.isAlignedOn() -> return false
+//                next is FirLoop -> return true
+//                next is FirArgumentList -> Unit
+//                scanner.size >= 2 -> {
+//                    // Check for a call to a looping collection method of which we are the last argument
+//                    // For it to exist, we must be inside an argument list as the last element
+//                    val argumentList = scanner.last() as? FirArgumentList
+//                    if (argumentList != null && argumentList.arguments.last() == next) {
+//                        val functionCall = scanner[scanner.size - 2]
+//                        if (functionCall.isACallToALoopingCollectionsMethod()) {
+//                            return true
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        return false
+// //        val elementPairs = elements.zipWithNext()
+// //        val elementsInsideLoop = elementPairs.takeWhile { (child, parent) -> !isInsideALoop(child, parent) }
+// //        val elementsInsideLoop = elements.takeWhile { !it.isLoop() }
+// //        val atLeastOneLoop = elementsInsideLoop.size < elements.size
+// //        val atLeastOneLoop = elementsInsideLoop.size < elementPairsPairs.size
+// //        val alignedOn by lazy {
+// //            elementsInsideLoop.any { (child, _) -> child.isAlignedOn() } ||
+// //                elementsInsideLoop.lastOrNull()?.second?.isAlignedOn() == true
+// //        }
+// //        return atLeastOneLoop && elementsInsideLoop.none { it.isAlignedOn() }
+//    }
 //    private fun CheckerContext.isIteratedWithoutAlignedOn(): Boolean =
 //        wrappingElementsUntil { isALoopInsideAnAggregateContext(it) }
 //            ?.discardIfFunctionDeclaration()
