@@ -9,13 +9,13 @@
 package it.unibo.collektive.backend.transformers
 
 import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.backend.utils.StackFunctionCall
 import it.unibo.collektive.utils.common.findAggregateReference
 import it.unibo.collektive.utils.common.irStatement
 import it.unibo.collektive.utils.common.simpleFunctionName
 import it.unibo.collektive.utils.common.toFunctionAlignmentToken
 import it.unibo.collektive.utils.logging.debugPrint
 import it.unibo.collektive.utils.logging.error
-import it.unibo.collektive.utils.stack.StackFunctionCall
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrElement

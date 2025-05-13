@@ -8,11 +8,11 @@
 
 package it.unibo.collektive.backend.transformers
 
+import it.unibo.collektive.backend.utils.StackFunctionCall
 import it.unibo.collektive.utils.common.isAggregate
 import it.unibo.collektive.utils.common.isConcrete
 import it.unibo.collektive.utils.logging.debug
 import it.unibo.collektive.utils.logging.debugPrint
-import it.unibo.collektive.utils.stack.StackFunctionCall
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrStatement
