@@ -17,6 +17,8 @@ import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirWhenExpressionChecker
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.FirValueParameter
+import org.jetbrains.kotlin.fir.expressions.FirBlock
+import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.FirWhenExpression
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.types.classId
@@ -61,23 +63,39 @@ import org.jetbrains.kotlin.fir.types.type
  */
 object WhenReturnsField : FirWhenExpressionChecker(MppCheckerKind.Common) {
     override fun check(expression: FirWhenExpression, context: CheckerContext, reporter: DiagnosticReporter) {
-        if (expression.returnsAField() && context.isInsideAggregateFunction() && !context.isAggregateProject()) {
-            reporter.reportOn(
-                expression.source,
-                FirCollektiveErrors.BRANCH_RETURNS_FIELD,
-                FIELD_CLASS_FQ_NAME + expression.resolvedType.typeArguments.joinToString(
-                    prefix = "<",
-                    postfix = ">",
-                    separator = ", ",
-                ) { (it.type?.classId?.shortClassName ?: it.type).toString() },
-                context,
-            )
+//        if (expression.returnsAField() && context.isInsideAggregateFunction() && !context.isAggregateProject()) {
+//            reporter.reportOn(
+//                expression.source,
+//                FirCollektiveErrors.BRANCH_RETURNS_FIELD,
+//                FIELD_CLASS_FQ_NAME + expression.resolvedType.typeArguments.joinToString(
+//                    prefix = "<",
+//                    postfix = ">",
+//                    separator = ", ",
+//                ) { (it.type?.classId?.shortClassName ?: it.type).toString() },
+//                context,
+//            )
+//        }
+        val isInsideAggregate by lazy { context.isInsideAggregateFunction() }
+        val isNotProject by lazy { !context.isAggregateProject() }
+        expression.branches.asSequence().map { it.result }.forEach { branch: FirBlock ->
+            if (branch.returnsAField() && isInsideAggregate && isNotProject) {
+                reporter.reportOn(
+                    branch.source,
+                    FirCollektiveErrors.BRANCH_RETURNS_FIELD,
+                    FIELD_CLASS_FQ_NAME + expression.resolvedType.typeArguments.joinToString(
+                        prefix = "<",
+                        postfix = ">",
+                        separator = ", ",
+                    ) { (it.type?.classId?.shortClassName ?: it.type).toString() },
+                    context,
+                )
+            }
         }
     }
 
-    private fun FirWhenExpression.returnsAField() = FIELD_CLASS_FQ_NAME == returnType()
+    private fun FirExpression.returnsAField() = FIELD_CLASS_FQ_NAME == returnType()
 
-    private fun FirWhenExpression.returnType() = resolvedType.classId?.asFqNameString()
+    private fun FirExpression.returnType() = resolvedType.classId?.asFqNameString()
 
     private fun FirTypeRef.isField() = FIELD_CLASS_FQ_NAME == coneType.classId?.asFqNameString()
 

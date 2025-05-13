@@ -106,12 +106,12 @@ parameters:
       - |-
         share(initial) {
           val field = neighboring(0)
-          field.mapValues { it }.localValue
+          field.mapValues { it }.local.value
         }
       - |-
         evolving(initial) {
           val field = neighboring(0)
-          field.mapValues { it }.localValue.yielding { 0 }
+          field.mapValues { it }.local.value.yielding { 0 }
         }
       - |-
         neighboring {
@@ -125,7 +125,7 @@ parameters:
       - |-
         sharing(initial) {
           val field = neighboring(0)
-          field.mapValues { it }.localValue.yielding { "Test" }
+          field.mapValues { it }.local.value.yielding { "Test" }
         }
 
   - name: CONSTRUCT_EXPLICIT

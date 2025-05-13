@@ -31,7 +31,12 @@ class BranchesCannotReturnFieldTest {
     }
 
     @Test
-    fun `the compiler throws error on branches returning fields with a sum`() {
+    fun `the compiler throws error on branches returning fields inside lambdas`() {
+        "BrokenBranch2".doesNotCompileBecauseBranchesReturnField
+    }
+
+    @Test
+    fun `even when the return type is Any, if one branch returns a field the compiler raises errors`() {
         "BrokenBranch2".doesNotCompileBecauseBranchesReturnField
     }
 }

@@ -8,11 +8,9 @@
 
 package it.unibo.collektive.aggregate
 
-import io.mockk.mockk
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.neighboring
-import it.unibo.collektive.stdlib.fields.allValues
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.test.Test
@@ -22,8 +20,8 @@ import kotlin.test.assertTrue
 
 class NeighboringTest {
 
-    private fun mooreGrid(size: Int, program: Aggregate<Int>.(Environment<Field<Int, Int>>) -> Field<Int, Int>) =
-        mooreGrid(size, size, Field(mockk<Aggregate<Int>>(relaxed = true), Int.MAX_VALUE, 0), program).also {
+    private fun mooreGrid(size: Int, program: Aggregate<Int>.(Environment<Map<Int, Int>>) -> Map<Int, Int>) =
+        mooreGrid(size, size, emptyMap(), program).also {
             assertEquals(size * size, it.nodes.size)
         }
 
@@ -45,7 +43,7 @@ class NeighboringTest {
         }
     }
 
-    private fun envWithNeihboring1(size: Int) = mooreGrid(size) { _ -> neighboring(1) }
+    private fun envWithNeihboring1(size: Int) = mooreGrid(size) { _ -> neighboring(1).toMap() }
 
     @Test
     fun `neighboring should build a field containing the values of the aligned neighbors`() {
@@ -54,9 +52,9 @@ class NeighboringTest {
         repeat(size - 1) {
             environment.cycleInOrder()
         }
-        environment.status().forEach { (_, field) ->
-            assertEquals(1, field.local.value)
-            assertTrue(field.allValues { it == 1 })
+        environment.status().forEach { (id, field) ->
+            assertEquals(1, field[id])
+            assertTrue(field.all { it.value == 1 })
         }
     }
 
@@ -67,17 +65,16 @@ class NeighboringTest {
         repeat(size - 1) {
             environment.cycleInOrder()
         }
-        environment.status().forEach { (_, field) ->
-            assertEquals(1, field.local.value)
-            assertTrue(field.allValues { it == 1 })
+        environment.status().forEach { (id, field) ->
+            assertEquals(1, field[id])
+            assertTrue(field.all { it.value == 1 })
         }
     }
 
     private fun envWithTwoNeighboringOpsInBranch(size: Int, condition: (Int) -> Boolean) = mooreGrid(size) { _ ->
         fun kingBehavior() = neighboring(1)
-
         fun queenBehavior() = neighboring(2)
-        if (condition(localId)) kingBehavior() else queenBehavior()
+        if (condition(localId)) kingBehavior().toMap() else queenBehavior().toMap()
     }
 
     @Test
@@ -90,11 +87,11 @@ class NeighboringTest {
         }
         environment.status().forEach { (id, field) ->
             if (condition(id)) {
-                assertEquals(1, field.local.value)
-                assertTrue(field.allValues { it == 1 })
+                assertEquals(1, field[id])
+                assertTrue(field.all { it.value == 1 })
             } else {
-                assertEquals(2, field.local.value)
-                assertTrue(field.allValues { it == 2 })
+                assertEquals(2, field[id])
+                assertTrue(field.all { it.value == 2 })
             }
         }
     }
@@ -109,8 +106,8 @@ class NeighboringTest {
         }
         environment.status().forEach { (id, field) ->
             val expectedValue = if (condition(id)) 1 else 2
-            assertEquals(expectedValue, field.local.value)
-            assertTrue(field.allValues { it == expectedValue })
+            assertEquals(expectedValue, field[id])
+            assertTrue(field.all { it.value == expectedValue })
         }
     }
 }

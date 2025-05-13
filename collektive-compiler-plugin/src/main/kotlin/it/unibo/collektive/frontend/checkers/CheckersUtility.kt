@@ -129,7 +129,7 @@ object CheckersUtility {
      * @return `true` if inside a function whose receiver or parameters are aggregate-typed
      */
     fun CheckerContext.isInsideAggregateFunction(): Boolean =
-        containingElements.any { (it as? FirSimpleFunction).isAggregate(this) }
+        containingElements.any { (it as? FirFunction).isAggregate(this) }
 
     /**
      * Returns wrapping [FirElement]s until it finds the element that satisfies the predicate (which is

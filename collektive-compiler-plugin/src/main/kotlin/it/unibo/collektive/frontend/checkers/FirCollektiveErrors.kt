@@ -39,12 +39,6 @@ object FirCollektiveErrors {
     val IMPROPER_EVOLVE_CONSTRUCT by warning1<KtNameReferenceExpression, String>()
 
     /**
-     * Warning raised when a function that has an aggregate parameter and uses it for making aggregate calls
-     * is called inside an iteration construct.
-     */
-    val FUNCTION_WITH_AGGREGATE_PARAMETER_INSIDE_ITERATION by warning1<KtNameReferenceExpression, String>()
-
-    /**
      * Warning raised when an aggregate call like `share`, `exchange`, `neighboring` or `evolve` is called without
      * using parameters inside the anonymous function, resulting in an unnecessary call.
      */

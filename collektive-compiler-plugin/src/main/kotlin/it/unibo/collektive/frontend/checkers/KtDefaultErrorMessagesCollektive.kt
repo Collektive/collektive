@@ -24,61 +24,42 @@ object KtDefaultErrorMessagesCollektive : BaseDiagnosticRendererFactory() {
             put(
                 FirCollektiveErrors.AGGREGATE_FUNCTION_INSIDE_ITERATION,
                 """
-                Aggregate function ''{0}'' has been called inside a loop construct without explicit alignment.
-                The same path may generate interactions more than once, leading to ambiguous alignment.
-                
-                Consider wrapping the function into the ''alignedOn'' method with a unique element.
+                Aggregate function ''{0}'' is called inside a loop without explicit alignment.  
+                This may cause the same execution path to trigger multiple interactions, resulting in ambiguous alignment.
+                Wrap the function call using ''alignedOn'' with a unique key to ensure consistent alignment.
                 """.trimIndent(),
                 CommonRenderers.STRING,
             )
             put(
                 BRANCH_RETURNS_FIELD,
                 """
-                    This when or if construct returns a field.
-                    This branching construct returns a ''{0}'',
-                    but returning instances of ${AggregateFunctionNames.FIELD_CLASS_FQ_NAME} from branches is forbidden,
-                    as it can break alignment.
-                    
-                    Consider building the field before the branch, then mapping it:
-                    
-                    if (X) neighboring(Y) else neighboring(Z)
-                    
-                    should be transformed into:
-                    
-                    neighboring(Y).alignedMapValues(neighboring(Z)) '{' _, y, z -> if (X) y else z '}'.
+                    This branch returns a ''{0}'', which is an instance of ${AggregateFunctionNames.FIELD_CLASS_FQ_NAME}.
+                    Returning fields from branches is disallowed, as it may break alignment: fields are projected within branches  
+                    and may be restricted to partial domains.
+                    Build the field before the branch and map it afterward.  
+                    For example, transform:
+                        if (X) neighboring(Y) else neighboring(Z)
+                    into:
+                       neighboring(Y).alignedMapValues(neighboring(Z)) '{' _, y, z -> if (X) y else z '}'.
                 """.trimIndent(),
                 CommonRenderers.STRING,
             )
             put(
                 FirCollektiveErrors.FORBIDDEN_FUNCTION_CALL,
-                "The function ''{0}'' should not be called explicitly",
-                CommonRenderers.STRING,
-            )
-            put(
-                FirCollektiveErrors.FUNCTION_WITH_AGGREGATE_PARAMETER_INSIDE_ITERATION,
-                """
-                Function ''{0}'', that accepts and uses an aggregate argument, has been called inside a loop construct 
-                without explicit alignment.
-                The same path may generate interactions more than once, leading to ambiguous alignment.
-                
-                Consider wrapping the function into the ''alignedOn'' method with a unique element, either at the call site
-                or inside the ''{0}'' function declaration, wrapping the involved aggregate calls.
-                """.trimIndent(),
+                "The function ''{0}'' must not be called explicitly",
                 CommonRenderers.STRING,
             )
             put(
                 FirCollektiveErrors.IMPROPER_EVOLVE_CONSTRUCT,
                 """
-                The ''{0}'' construct can be replaced with the `share` construct call. 
+                This ''{0}'' can be replaced with ''share'' for better performance.
                 """.trimIndent(),
                 CommonRenderers.STRING,
             )
             put(
                 FirCollektiveErrors.UNNECESSARY_CONSTRUCT_CALL,
                 """
-                The ''{0}'' construct may not be necessary for this use case, as the parameter of the provided anonymous 
-                function is unused within its body.
-                
+                This ''{0}'' appears unnecessary in this case, as the anonymous function''s parameter is unused.
                 Consider using a different construct or eliminating the call altogether.
                 """.trimIndent(),
                 CommonRenderers.STRING,
@@ -86,10 +67,8 @@ object KtDefaultErrorMessagesCollektive : BaseDiagnosticRendererFactory() {
             put(
                 FirCollektiveErrors.UNNECESSARY_YIELDING_CONTEXT,
                 """
-                The yielding block inside the ''{0}'' construct may not be necessary for this use case, as the 
-                expression that is exchanged is the same as the one yielded inside the ''yielding'' block.
-                
-                Consider switching to the same construct without the ''yielding'' block.
+                The ''yielding'' block inside ''{0}'' may be redundant, as the yielded expression is identical to the one being exchanged.
+                Consider using the non-ing (non-yielding) version of the same construct (e.g., ''share'' instead of ''sharing'').
                 """.trimIndent(),
                 CommonRenderers.STRING,
             )
