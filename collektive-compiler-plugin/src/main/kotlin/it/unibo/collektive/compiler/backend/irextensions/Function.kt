@@ -23,7 +23,6 @@ import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.parents
 
-
 /**
  * Returns `true` if this [IrFunction] is abstract (declared but not implemented).
  */
@@ -68,12 +67,11 @@ internal fun IrFunction.hasAnnotationDisablingPlugin(logger: MessageCollector? =
 internal fun IrFunction.isAggregate(
     aggregateClass: IrClass,
     fieldClass: IrClass,
-    logger: MessageCollector? = null
-): Boolean =
-    !hasAnnotationDisablingPlugin(logger) &&
-        listOf(aggregateClass, fieldClass).any { irClass: IrClass ->
-            val type = irClass.defaultType
-            extensionReceiverParameter?.type?.isAssignableFrom(type)
-                ?: dispatchReceiverParameter?.type?.isAssignableFrom(type)
-                ?: valueParameters.any { it.type.isAssignableFrom(type) }
-        }
+    logger: MessageCollector? = null,
+): Boolean = !hasAnnotationDisablingPlugin(logger) &&
+    listOf(aggregateClass, fieldClass).any { irClass: IrClass ->
+        val type = irClass.defaultType
+        extensionReceiverParameter?.type?.isAssignableFrom(type)
+            ?: dispatchReceiverParameter?.type?.isAssignableFrom(type)
+            ?: valueParameters.any { it.type.isAssignableFrom(type) }
+    }

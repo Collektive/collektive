@@ -11,7 +11,6 @@ package it.unibo.collektive.compiler.backend.irextensions
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 
-
 /**
  * Returns the fully qualified name of this [IrDeclarationParent] as a string.
  */

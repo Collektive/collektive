@@ -299,7 +299,6 @@ class AlignmentTransformer(
         const val CONTEXT_VARIABLE_NAME = "collektiveAggregateContext"
         const val ALIGNED_COMPUTATION_VARIABLE_NAME = "collektiveAlignedComputationResult"
 
-
         /**
          * Builds an IR statement using [IrBlockBodyBuilder] tied to the given function and expression.
          *

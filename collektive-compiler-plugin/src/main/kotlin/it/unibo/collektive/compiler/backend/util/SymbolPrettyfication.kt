@@ -8,7 +8,6 @@
 
 package it.unibo.collektive.compiler.backend.util
 
-
 private val replacements = listOf(
     "it.unibo.alchemist." to "⚗️",
     "it.unibo.collektive.aggregate.api.Aggregate._ serialization aware neighboring" to "↔",

@@ -14,7 +14,6 @@ import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.types.classifierOrNull
 
-
 /**
  * Extension function that checks if this [IrType] is assignable from another [IrType].
  *
@@ -29,7 +28,6 @@ internal fun IrType.isAssignableFrom(other: IrType): Boolean = classifierOrNull?
         FqNameEqualityChecker.areEqual(base, other)
     } == true
 } == true
-
 
 /**
  * Returns a string representation of a list of [IrType]s,

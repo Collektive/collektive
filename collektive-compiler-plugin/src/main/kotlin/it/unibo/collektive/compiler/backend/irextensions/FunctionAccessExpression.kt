@@ -17,7 +17,6 @@ import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.ir.util.receiverAndArgs
 
-
 /**
  * Returns `true` if this [IrFunctionAccessExpression] is a getter call.
  *
@@ -26,7 +25,6 @@ import org.jetbrains.kotlin.ir.util.receiverAndArgs
 @OptIn(UnsafeDuringIrConstructionAPI::class)
 internal val IrFunctionAccessExpression.isGetter
     get() = this is IrCall && symbol.owner.kotlinFqName.asString().substringAfterLast('.').startsWith("<get-")
-
 
 /**
  * Returns the simple name of the called function for this [IrFunctionAccessExpression].
