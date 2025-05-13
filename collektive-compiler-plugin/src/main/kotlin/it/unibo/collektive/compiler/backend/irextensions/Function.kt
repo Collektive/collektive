@@ -8,9 +8,6 @@
 
 package it.unibo.collektive.compiler.backend.irextensions
 
-import it.unibo.collektive.aggregate.Field
-import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.CollektiveIgnore
 import it.unibo.collektive.compiler.common.CollektiveNames.IGNORE_FUNCTION_ANNOTATION_FQ_NAME
 import it.unibo.collektive.compiler.common.debug
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -37,13 +34,13 @@ val IrFunction.isConcrete: Boolean
 
 /**
  * Checks whether this [IrFunction] or any of its enclosing declarations
- * are annotated with [CollektiveIgnore].
+ * are annotated with `CollektiveIgnore`.
  *
- * Functions or classes marked with [CollektiveIgnore] are excluded
+ * Functions or classes marked with `CollektiveIgnore` are excluded
  * from alignment and treated as purely local computations.
  *
  * @param logger an optional [MessageCollector] for debug output
- * @return `true` if the function or a parent is annotated with [CollektiveIgnore]
+ * @return `true` if the function or a parent is annotated with `CollektiveIgnore`
  */
 internal fun IrFunction.hasAnnotationDisablingPlugin(logger: MessageCollector? = null): Boolean {
     val allAnnotations = annotations + parents.flatMap { (it as? IrAnnotationContainer)?.annotations.orEmpty() }
@@ -55,8 +52,9 @@ internal fun IrFunction.hasAnnotationDisablingPlugin(logger: MessageCollector? =
  * Determines whether this [IrFunction] represents an aggregate-aware DSL operation.
  *
  * A function is considered aggregate-aware if:
- * - It operates on an [Aggregate] or a [Field] via receiver or parameters
- * - It is **not** annotated with [CollektiveIgnore]
+ * - It operates on an [it.unibo.collektive.compiler.common.CollektiveNames.AGGREGATE_CLASS_NAME] or a
+ *   [it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME] via receiver or parameters
+ * - It is **not** annotated with `CollektiveIgnore`
  *
  * This is used during the alignment phase to detect functions
  * that should be transformed into aggregate computations.

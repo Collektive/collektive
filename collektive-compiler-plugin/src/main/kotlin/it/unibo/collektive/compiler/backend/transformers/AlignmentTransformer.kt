@@ -8,7 +8,6 @@
 
 package it.unibo.collektive.compiler.backend.transformers
 
-import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.compiler.backend.irextensions.findAggregateReference
 import it.unibo.collektive.compiler.backend.irextensions.simpleFunctionName
 import it.unibo.collektive.compiler.backend.irextensions.toFunctionAlignmentToken
@@ -53,7 +52,8 @@ import kotlin.concurrent.atomics.ExperimentalAtomicApi
  * - Function calls
  * - Conditional branches
  *
- * in calls to `alignRaw` and `dealign`, ensuring that computations involving
+ * in calls to [it.unibo.collektive.compiler.common.CollektiveNames.ALIGN_FUNCTION_NAME] and
+ * [it.unibo.collektive.compiler.common.CollektiveNames.DEALIGN_FUNCTION_NAME], ensuring that computations involving
  * aggregate context are properly aligned across devices.
  *
  * ## Transformation Strategy:
@@ -71,17 +71,26 @@ import kotlin.concurrent.atomics.ExperimentalAtomicApi
  * the token is annotated with a count (`N|`) to distinguish instances.
  *
  * ## Special Cases:
- * - Functions explicitly annotated with [it.unibo.collektive.aggregate.api.CollektiveIgnore]
+ * - Functions explicitly annotated with
+ *   [it.unibo.collektive.compiler.common.CollektiveNames.IGNORE_FUNCTION_ANNOTATION_FQ_NAME]
  *   are **excluded** from alignment.
- * - Internal operations like accessing a `Field.context`, `alignRaw`, and `dealign` themselves are also **excluded**.
+ * - Internal operations like accessing a
+ *   [it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME]`.context`,
+ *   [it.unibo.collektive.compiler.common.CollektiveNames.ALIGN_FUNCTION_NAME],
+ *   and [it.unibo.collektive.compiler.common.CollektiveNames.DEALIGN_FUNCTION_NAME] themselves are also **excluded**.
  *
  * @property pluginContext the plugin context used for constructing IR nodes
- * @property aggregateClass the IR class symbol for `Aggregate<ID>`
- * @property fieldClass the IR class symbol for `Field<ID, *>`
+ * @property aggregateClass the IR class symbol for
+ *   [it.unibo.collektive.compiler.common.CollektiveNames.AGGREGATE_CLASS_FQ_NAME]
+ * @property fieldClass the IR class symbol for
+ *   [it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME]
  * @property functionToAlign the IR function being processed
- * @property alignRawFunction the IR function representing `Aggregate.alignRaw`
- * @property dealignFunction the IR function representing `Aggregate.dealign`
- * @property getContext the IR function representing `Field.context`
+ * @property alignRawFunction the IR function representing
+ *   [it.unibo.collektive.compiler.common.CollektiveNames.AGGREGATE_CLASS_FQ_NAME]`.alignRaw`
+ * @property dealignFunction the IR function representing
+ *   [it.unibo.collektive.compiler.common.CollektiveNames.AGGREGATE_CLASS_FQ_NAME]`.dealign`
+ * @property getContext the IR function representing
+ *   [it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME]`.context`
  * @property logger a [MessageCollector] used for debug and error reporting
  */
 class AlignmentTransformer(
@@ -147,7 +156,8 @@ class AlignmentTransformer(
     }
 
     /**
-     * Looks up the [Aggregate] execution context captured by this [IrFunctionAccessExpression].
+     * Looks up the [it.unibo.collektive.compiler.common.CollektiveNames.AGGREGATE_CLASS_NAME]
+     * execution context captured by this [IrFunctionAccessExpression].
      *
      * This is a shortcut that automatically uses the [AlignmentTransformer]'s
      * configured [pluginContext], [aggregateClass], [fieldClass], [getContext], and [logger].
@@ -164,7 +174,7 @@ class AlignmentTransformer(
      * Excludes calls to:
      * - [alignRawFunction]
      * - [dealignFunction], or
-     * - [it.unibo.collektive.aggregate.Field.context]
+     * - [it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME]
      */
     @OptIn(UnsafeDuringIrConstructionAPI::class)
     private fun IrFunctionAccessExpression.isNotAnAlignmentTarget(): Boolean = symbol.owner.let { owner ->
@@ -175,7 +185,7 @@ class AlignmentTransformer(
      * Visits function calls and injects alignment logic when necessary.
      *
      * If a call operates in an aggregate context:
-     * - Wraps it with `alignRaw` and `dealign`
+     * - Wraps it with [it.unibo.collektive.compiler.common.CollektiveNames.ALIGN_FUNCTION_NAME] and [it.unibo.collektive.compiler.common.CollektiveNames.DEALIGN_FUNCTION_NAME]
      * - Tracks alignment tokens
      * - Recurses into lambda arguments
      *
@@ -242,7 +252,7 @@ class AlignmentTransformer(
      * Generates an IR block that wraps a computation with:
      * - `align` before
      * - a Computation result captured
-     * - `dealign` after
+     * - [it.unibo.collektive.compiler.common.CollektiveNames.DEALIGN_FUNCTION_NAME] after
      *
      * This block guarantees alignment consistency for the duration of the computation.
      *
@@ -259,7 +269,7 @@ class AlignmentTransformer(
         expressionBody: IrExpression,
         alignmentToken: IrBlockBodyBuilder.() -> IrConst,
     ): IrContainerExpression = irStatement(pluginContext, function, expressionBody) {
-        // Call the `alignRaw` function before the body of the function to align
+        // Call the align function before the body of the function to align
         val generationId = counter.fetchAndAdd(1)
         irBlock {
             // ✅ Create a declared, scoped, bound variable from the context
@@ -282,7 +292,7 @@ class AlignmentTransformer(
                 irType = expressionBody.type,
                 nameHint = "$ALIGNED_COMPUTATION_VARIABLE_NAME$generationId",
             )
-            // Call the `dealign` function after the body of the function to align
+            // Call the delign function after the body of the function to align
             +irCall(dealignFunction).apply {
                 putArgument(
                     dealignFunction.dispatchReceiverParameter

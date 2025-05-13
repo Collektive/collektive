@@ -8,7 +8,6 @@
 
 package it.unibo.collektive.compiler.backend.irextensions
 
-import it.unibo.collektive.aggregate.Field
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.builders.IrSingleStatementBuilder
 import org.jetbrains.kotlin.ir.builders.Scope
@@ -21,18 +20,21 @@ import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.util.defaultType
 
 /**
- * Builds an [IrFunctionAccessExpression] that accesses the `context` property of a [Field].
+ * Builds an [IrFunctionAccessExpression] that accesses the `context` property of a
+ * [it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME].
  *
  * This utility constructs an IR call to the `context` getter on an [IrGetValue]
- * referencing a [Field] instance, returning the corresponding [Aggregate] context.
+ * referencing a [it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME] instance,
+ * returning the corresponding [it.unibo.collektive.compiler.common.CollektiveNames.AGGREGATE_CLASS_NAME] context.
  *
- * @receiver an [IrGetValue] referencing a [Field]
+ * @receiver an [IrGetValue] referencing a [it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME]
  * @param pluginContext the IR plugin context used to construct the IR
  * @param aggregateClass the IR class representing the `Aggregate<ID>` interface
  * @param fieldClass the IR class representing the `Field<ID, *>` interface
  * @param getContext the IR function symbol corresponding to the `context` property getter
  * @return an [IrFunctionAccessExpression] that retrieves the field's context
- * @throws IllegalStateException if the receiver is not assignable from [Field]
+ * @throws IllegalStateException if the receiver is not assignable from
+ *   [it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME]
  */
 internal fun IrGetValue.buildGetFieldContext(
     pluginContext: IrPluginContext,

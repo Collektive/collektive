@@ -8,7 +8,6 @@
 
 package it.unibo.collektive.compiler.backend.transformers
 
-import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.compiler.backend.irextensions.hasAnnotationDisablingPlugin
 import it.unibo.collektive.compiler.backend.util.debugPrint
 import it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME
@@ -33,17 +32,21 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.name.FqName
 
 /**
- * IR transformer that wraps accesses to [Field] values inside a `project` function call.
+ * IR transformer that wraps accesses to [it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME]
+ * values inside a [it.unibo.collektive.compiler.common.CollektiveNames.PROJECTION_FUNCTION_NAME] function call.
  *
  * ## Purpose
- * When a [Field] is accessed directly (i.e., its [IrGetValue] is used),
- * this transformer replaces the raw access with a call to the `project` function.
+ * When a [it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME] is accessed directly
+ * (i.e., its [IrGetValue] is used),
+ * this transformer replaces the raw access with a call to the
+ * [it.unibo.collektive.compiler.common.CollektiveNames.PROJECTION_FUNCTION_NAME] function.
  *
  * This ensures that field values are safely projected into local computations,
  * avoiding the need for projections after plugin-inserted alignment transformations.
  *
  * ## How It Works
- * - Detects [IrGetValue] expressions whose type matches [Field].
+ * - Detects [IrGetValue] expressions whose type matches
+ *   [it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME].
  * - Replaces them with a call to the provided [projectFunction].
  * - The resulting IR call has the same type as the original field access.
  *
@@ -53,7 +56,8 @@ import org.jetbrains.kotlin.name.FqName
  *
  * @property logger a [MessageCollector] used for debug logging
  * @property pluginContext the plugin context used to construct new IR nodes
- * @property projectFunction the IR symbol for the `project` helper function
+ * @property projectFunction the IR symbol for the
+ *   [it.unibo.collektive.compiler.common.CollektiveNames.PROJECTION_FUNCTION_NAME] helper function
  */
 internal class ProjectFieldOnAccessTransformer(
     private val logger: MessageCollector,
@@ -73,8 +77,9 @@ internal class ProjectFieldOnAccessTransformer(
     }
 
     /**
-     * Visits [IrGetValue] expressions and wraps [Field] accesses
-     * inside a call to the `project` function.
+     * Visits [IrGetValue] expressions and wraps
+     * [it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME] accesses
+     * inside a call to the [it.unibo.collektive.compiler.common.CollektiveNames.PROJECTION_FUNCTION_NAME] function.
      *
      * @param expression the [IrGetValue] IR node
      * @return the (potentially wrapped) [IrExpression]
@@ -89,7 +94,8 @@ internal class ProjectFieldOnAccessTransformer(
     }
 
     /**
-     * Wraps a [Field] access into a call to the `project` function.
+     * Wraps a [it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME] access into a call to the
+     * [it.unibo.collektive.compiler.common.CollektiveNames.PROJECTION_FUNCTION_NAME] function.
      *
      * @param fieldExpression the IR expression representing the field
      * @return a new IR call expression to `project(field)`

@@ -108,22 +108,12 @@ publishOnCentral {
     }
 }
 
-val dslSource = rootProject.layout.buildDirectory.dir("dsl-api")
-
-sourceSets {
-    main {
-        kotlin {
-            srcDir(dslSource)
-        }
-    }
-}
+val dslSource = rootProject.layout.buildDirectory.dir("resources/main/it/unibo/collektive/compiler/sources")
 
 val importDsl by tasks.registering(Copy::class) {
     listOf(
         "Aggregate",
-        "DataSharingMethod",
         "Field",
-        "FieldEntry",
         "CollektiveIgnore",
         "YieldSupport",
     ).forEach { file ->

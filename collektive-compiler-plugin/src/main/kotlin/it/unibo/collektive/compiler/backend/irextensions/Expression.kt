@@ -8,8 +8,6 @@
 
 package it.unibo.collektive.compiler.backend.irextensions
 
-import it.unibo.collektive.aggregate.Field
-import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.compiler.backend.util.debugPrint
 import it.unibo.collektive.compiler.common.debug
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -24,22 +22,26 @@ import org.jetbrains.kotlin.ir.util.dumpKotlinLike
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 
 /**
- * Attempts to locate a reference to the [Aggregate] execution context
- * within this [IrExpression].
+ * Attempts to locate a reference to the [it.unibo.collektive.compiler.common.CollektiveNames.AGGREGATE_CLASS_NAME]
+ * execution context within this [IrExpression].
  *
  * This function searches for captured variables of types:
- * - [Aggregate]: returned directly if found
- * - [Field]: used to derive the context via the `context` getter
+ * - [it.unibo.collektive.compiler.common.CollektiveNames.AGGREGATE_CLASS_NAME]: returned directly if found
+ * - [it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME]:
+ *   used to derive the context via the `context` getter
  *
- * If a [Field] is found, a synthetic IR call is injected to retrieve
- * the associated [Aggregate] context.
+ * If a [it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME] is found,
+ * a synthetic IR call is injected to retrieve
+ * the associated [it.unibo.collektive.compiler.common.CollektiveNames.AGGREGATE_CLASS_NAME] context.
  *
  * @param pluginContext the IR plugin context for constructing synthetic nodes
  * @param aggregateClass the IR class representing the `Aggregate<ID>` interface
- * @param fieldClass the IR class representing the `Field<ID, *>` interface
+ * @param fieldClass the IR class representing the
+ *   [it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME] interface
  * @param getContext the IR function symbol representing the `context` getter
  * @param logger an optional [MessageCollector] for debug output
- * @return an [IrExpression] accessing the [Aggregate] context, or `null` if none is found
+ * @return an [IrExpression] accessing the [it.unibo.collektive.compiler.common.CollektiveNames.AGGREGATE_CLASS_NAME]
+ *   context, or `null` if none is found
  */
 internal fun IrExpression.findAggregateReference(
     pluginContext: IrPluginContext,

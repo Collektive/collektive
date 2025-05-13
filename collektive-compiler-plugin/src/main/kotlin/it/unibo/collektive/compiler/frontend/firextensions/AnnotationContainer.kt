@@ -8,7 +8,6 @@
 
 package it.unibo.collektive.compiler.frontend.firextensions
 
-import it.unibo.collektive.aggregate.api.CollektiveIgnore
 import org.jetbrains.kotlin.fir.FirAnnotationContainer
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.declarations.FirFunction
@@ -17,13 +16,15 @@ import org.jetbrains.kotlin.fir.resolve.providers.firProvider
 
 /**
  * Checks whether this [FirFunction] or any of its enclosing declarations
- * are annotated with [CollektiveIgnore].
+ * are annotated with [it.unibo.collektive.compiler.common.CollektiveNames.IGNORE_FUNCTION_ANNOTATION_FQ_NAME].
  *
- * Functions or classes marked with [CollektiveIgnore] are excluded
+ * Functions or classes marked with
+ * [it.unibo.collektive.compiler.common.CollektiveNames.IGNORE_FUNCTION_ANNOTATION_FQ_NAME] are excluded
  * from alignment and treated as purely local computations.
  *
  * @param context the [CheckerContext] used for the check
- * @return `true` if the function or a parent is annotated with [CollektiveIgnore]
+ * @return `true` if the function or a parent is annotated with
+ *   [it.unibo.collektive.compiler.common.CollektiveNames.IGNORE_FUNCTION_ANNOTATION_FQ_NAME]
  */
 internal fun FirAnnotationContainer?.hasAnnotationDisablingPlugin(context: CheckerContext): Boolean = when (this) {
     null -> false
