@@ -11,9 +11,9 @@ package it.unibo.collektive.compiler.frontend.visitors
 import it.unibo.collektive.compiler.common.CollektiveNames.EVOLVING_FUNCTION_FQ_NAME
 import it.unibo.collektive.compiler.common.CollektiveNames.NEIGHBORING_FUNCTION_FQ_NAME
 import it.unibo.collektive.compiler.common.CollektiveNames.YIELDING_FUNCTION_FQ_NAME
-import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.extractReturnExpression
-import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.fqName
-import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.isStructurallyEquivalentTo
+import it.unibo.collektive.compiler.frontend.firextensions.extractReturnExpression
+import it.unibo.collektive.compiler.frontend.firextensions.fqName
+import it.unibo.collektive.compiler.frontend.firextensions.isStructurallyEquivalentTo
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.declarations.FirProperty
 import org.jetbrains.kotlin.fir.expressions.FirAnonymousFunctionExpression
@@ -26,10 +26,12 @@ import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
 
 /**
  * Visitor that checks if an `evolve` or `evolving` construct can be replaced with a `share` construct.
+ * Once the visit is complete, the [isReplaceable] property indicates whether the construct can be replaced.
  */
 class ImproperConstructVisitor(private val constructNameFQName: String) : FirVisitorVoid() {
     private var nestingLevel = 0
-    private var isReplaceable = false
+    var isReplaceable = false
+        private set
     private var markExpression = false
     private var isInsideNeighboring = false
     private var neighboringExpression: FirExpression? = null
@@ -47,7 +49,7 @@ class ImproperConstructVisitor(private val constructNameFQName: String) : FirVis
         }
 
         override fun visitFunctionCall(functionCall: FirFunctionCall) {
-            if (functionCall.fqName() == YIELDING_FUNCTION_FQ_NAME) {
+            if (functionCall.fqName == YIELDING_FUNCTION_FQ_NAME) {
                 returnExpression = functionCall.explicitReceiver
             }
         }
@@ -103,7 +105,7 @@ class ImproperConstructVisitor(private val constructNameFQName: String) : FirVis
     }
 
     override fun visitFunctionCall(functionCall: FirFunctionCall) {
-        val functionFqn = functionCall.fqName()
+        val functionFqn = functionCall.fqName
         isInsideNeighboring = functionFqn == NEIGHBORING_FUNCTION_FQ_NAME
         val firstArgument = functionCall.argumentList.arguments.firstOrNull()
         if (isInsideNeighboring && firstArgument is FirAnonymousFunctionExpression) {
@@ -142,14 +144,5 @@ class ImproperConstructVisitor(private val constructNameFQName: String) : FirVis
             }
             return
         }
-    }
-
-    /**
-     * Checks if this function call is an `evolve` or `evolving` construct that can be replaced with a `share`
-     * construct.
-     */
-    fun FirFunctionCall.isReplaceableWithShare(): Boolean {
-        visitElement(this)
-        return isReplaceable
     }
 }

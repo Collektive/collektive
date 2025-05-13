@@ -10,8 +10,9 @@ package it.unibo.collektive.compiler.frontend.checkers
 
 import it.unibo.collektive.compiler.common.CollektiveNames.EVOLVE_FUNCTION_FQ_NAME
 import it.unibo.collektive.compiler.common.CollektiveNames.EVOLVING_FUNCTION_FQ_NAME
-import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.fqName
-import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.functionName
+import it.unibo.collektive.compiler.frontend.CollektiveFrontendErrors
+import it.unibo.collektive.compiler.frontend.firextensions.fqName
+import it.unibo.collektive.compiler.frontend.firextensions.functionName
 import it.unibo.collektive.compiler.frontend.visitors.ImproperConstructVisitor
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
@@ -33,20 +34,21 @@ import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
  * The checker raises a warning because this operation can be replaced by using the more appropriate `share` construct.
  */
 object ImproperConstruct : FirFunctionCallChecker(MppCheckerKind.Common) {
-    private fun FirFunctionCall.isImproperEvolve(): Boolean = with(ImproperConstructVisitor(fqName())) {
-        isReplaceableWithShare()
+
+    private fun FirFunctionCall.isImproperEvolve(): Boolean {
+        val visitor = ImproperConstructVisitor(fqName)
+        visitor.visitElement(this)
+        return visitor.isReplaceable
     }
 
     override fun check(expression: FirFunctionCall, context: CheckerContext, reporter: DiagnosticReporter) {
-        if (expression
-                .fqName()
-                .run { this == EVOLVE_FUNCTION_FQ_NAME || this == EVOLVING_FUNCTION_FQ_NAME } &&
-            expression.isImproperEvolve()
+        val isEvolve = expression.fqName.run { this == EVOLVE_FUNCTION_FQ_NAME || this == EVOLVING_FUNCTION_FQ_NAME }
+        if (isEvolve && expression.isImproperEvolve()
         ) {
             reporter.reportOn(
                 expression.calleeReference.source,
-                FirCollektiveErrors.IMPROPER_EVOLVE_CONSTRUCT,
-                expression.functionName(),
+                CollektiveFrontendErrors.IMPROPER_EVOLVE_CONSTRUCT,
+                expression.functionName,
                 context,
             )
         }

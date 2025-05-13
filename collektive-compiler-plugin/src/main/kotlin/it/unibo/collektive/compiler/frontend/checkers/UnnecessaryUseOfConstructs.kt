@@ -9,10 +9,11 @@
 package it.unibo.collektive.compiler.frontend.checkers
 
 import it.unibo.collektive.compiler.common.CollektiveNames
-import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.fqName
-import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.functionName
+import it.unibo.collektive.compiler.frontend.CollektiveFrontendErrors
+import it.unibo.collektive.compiler.frontend.firextensions.fqName
+import it.unibo.collektive.compiler.frontend.firextensions.functionName
+import it.unibo.collektive.compiler.frontend.firextensions.returnsUnit
 import it.unibo.collektive.compiler.frontend.visitors.ConstructCallVisitor
-import it.unibo.collektive.compiler.frontend.visitors.EmptyReturnVisitor
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
@@ -37,32 +38,31 @@ import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
  * Should generate a warning indicating the unnecessary use of the `evolve` construct.
  */
 object UnnecessaryUseOfConstructs : FirFunctionCallChecker(MppCheckerKind.Common) {
-    private val constructs =
-        listOf(
-            CollektiveNames.NEIGHBORING_FUNCTION_FQ_NAME,
-            CollektiveNames.EXCHANGE_FUNCTION_FQ_NAME,
-            CollektiveNames.SHARE_FUNCTION_FQ_NAME,
-            CollektiveNames.EVOLVE_FUNCTION_FQ_NAME,
-            CollektiveNames.EXCHANGING_FUNCTION_FQ_NAME,
-            CollektiveNames.SHARING_FUNCTION_FQ_NAME,
-            CollektiveNames.EVOLVING_FUNCTION_FQ_NAME,
-        )
-
-    private fun FirFunctionCall.isConstructToCheck() = fqName() in constructs
-
-    private fun FirFunctionCall.doesNotUseParameter(): Boolean = when (fqName()) {
-        CollektiveNames.NEIGHBORING_FUNCTION_FQ_NAME -> with(EmptyReturnVisitor()) { hasEmptyReturn() }
-        else -> with(ConstructCallVisitor()) { doesNotContainValueParameterUsagesInAnonymousFunctionCall() }
-    }
+    private val constructs = listOf(
+        CollektiveNames.NEIGHBORING_FUNCTION_FQ_NAME,
+        CollektiveNames.EXCHANGE_FUNCTION_FQ_NAME,
+        CollektiveNames.SHARE_FUNCTION_FQ_NAME,
+        CollektiveNames.EVOLVE_FUNCTION_FQ_NAME,
+        CollektiveNames.EXCHANGING_FUNCTION_FQ_NAME,
+        CollektiveNames.SHARING_FUNCTION_FQ_NAME,
+        CollektiveNames.EVOLVING_FUNCTION_FQ_NAME,
+    )
 
     override fun check(expression: FirFunctionCall, context: CheckerContext, reporter: DiagnosticReporter) {
-        if (expression.isConstructToCheck() && expression.doesNotUseParameter()) {
+        if (expression.shouldBeChecked() && expression.doesNotUseParameter()) {
             reporter.reportOn(
                 expression.calleeReference.source,
-                FirCollektiveErrors.UNNECESSARY_CONSTRUCT_CALL,
-                expression.functionName(),
+                CollektiveFrontendErrors.UNNECESSARY_CONSTRUCT_CALL,
+                expression.functionName,
                 context,
             )
         }
+    }
+
+    private fun FirFunctionCall.shouldBeChecked() = fqName in constructs
+
+    private fun FirFunctionCall.doesNotUseParameter(): Boolean = when (fqName) {
+        CollektiveNames.NEIGHBORING_FUNCTION_FQ_NAME -> returnsUnit()
+        else -> ConstructCallVisitor.doesNotUseValueParameters(this)
     }
 }

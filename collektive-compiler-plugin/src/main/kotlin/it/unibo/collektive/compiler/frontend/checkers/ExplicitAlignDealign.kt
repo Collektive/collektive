@@ -9,8 +9,9 @@
 package it.unibo.collektive.compiler.frontend.checkers
 
 import it.unibo.collektive.compiler.common.CollektiveNames
-import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.fqName
-import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.isInsideAggregateFunction
+import it.unibo.collektive.compiler.frontend.CollektiveFrontendErrors
+import it.unibo.collektive.compiler.frontend.firextensions.fqName
+import it.unibo.collektive.compiler.frontend.firextensions.isInsideAggregateFunction
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
@@ -23,11 +24,11 @@ import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
  */
 object ExplicitAlignDealign : FirFunctionCallChecker(MppCheckerKind.Common) {
     override fun check(expression: FirFunctionCall, context: CheckerContext, reporter: DiagnosticReporter) {
-        val fqnCalleeName = expression.fqName()
+        val fqnCalleeName = expression.fqName
         if (fqnCalleeName in FORBIDDEN_FUNCTIONS && context.isInsideAggregateFunction()) {
             reporter.reportOn(
                 expression.calleeReference.source,
-                FirCollektiveErrors.FORBIDDEN_FUNCTION_CALL,
+                CollektiveFrontendErrors.FORBIDDEN_FUNCTION_CALL,
                 fqnCalleeName,
                 context,
             )

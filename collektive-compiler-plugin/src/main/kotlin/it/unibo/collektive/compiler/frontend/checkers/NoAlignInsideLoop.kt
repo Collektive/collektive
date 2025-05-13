@@ -9,11 +9,12 @@
 package it.unibo.collektive.compiler.frontend.checkers
 
 import it.unibo.collektive.compiler.common.CollektiveNames
-import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.allSuperTypes
-import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.fqName
-import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.functionName
-import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.isAggregate
-import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.isFunctionCallsWithName
+import it.unibo.collektive.compiler.frontend.CollektiveFrontendErrors
+import it.unibo.collektive.compiler.frontend.firextensions.allSuperTypes
+import it.unibo.collektive.compiler.frontend.firextensions.fqName
+import it.unibo.collektive.compiler.frontend.firextensions.functionName
+import it.unibo.collektive.compiler.frontend.firextensions.isAggregate
+import it.unibo.collektive.compiler.frontend.firextensions.isAlignedOn
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.FirElement
@@ -31,7 +32,6 @@ import org.jetbrains.kotlin.fir.types.classId
 import org.jetbrains.kotlin.fir.types.resolvedType
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
-import kotlin.reflect.KParameter
 import kotlin.reflect.KType
 import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.kotlinFunction
@@ -40,42 +40,13 @@ import kotlin.reflect.jvm.kotlinFunction
  * Checker that looks for aggregate functions called inside a loop without an explicit align operation.
  */
 object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
+
     private val safeOperators =
         listOf(
             CollektiveNames.ALIGNED_ON_FUNCTION_FQ_NAME,
             CollektiveNames.ALIGN_FUNCTION_FQ_NAME,
             CollektiveNames.DEALIGN_FUNCTION_FQ_NAME,
         )
-
-    /**
-     * Getter for all Collection members using Kotlin reflection, obtaining their names as a set.
-     */
-    @Deprecated(
-        """
-        This method currently raises an exception.
-        See https://youtrack.jetbrains.com/issue/KT-16479 for more details.
-        """,
-    )
-    @Suppress("UnusedPrivateMember")
-    private fun getCollectionMembersKotlin(): Set<String> = sequenceOf(
-        Class.forName("kotlin.collections.CollectionsKt").kotlin,
-        Collection::class,
-        Iterable::class,
-        List::class,
-        Map::class,
-        Sequence::class,
-        Set::class,
-    ).flatMap { clazz -> clazz.java.methods.mapNotNull { it.kotlinFunction } + clazz.members }
-        .filter {
-            fun KParameter.isFunctionType(): Boolean = (type.classifier as? KClass<*>)
-                ?.qualifiedName
-                ?.startsWith("kotlin.Function")
-                ?: false
-            it.parameters.any { parameter ->
-                parameter.isFunctionType()
-            }
-        }.map { it.name }
-        .toSet()
 
     private val kotlinCollectionsExtensions: Set<KFunction<*>> =
         sequenceOf("collections.CollectionsKt", "sequences.SequencesKt")
@@ -93,8 +64,6 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         Sequence::class,
         Set::class,
     ).flatMap { it.functions }.toSet()
-
-    private val KType.typeName get() = (classifier as? KClass<*>)?.qualifiedName.orEmpty()
 
     /**
      * Maps every name of a collection method to its receiver types.
@@ -116,16 +85,18 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
             .mapValues { (_, value) -> value.map { it.second }.toSet() }
     }
 
-    private fun FirElement.isACallToALoopingCollectionsMethod(session: FirSession): Boolean = this is FirFunctionCall &&
-        allReceiverExpressions.any { receiver ->
-            val type = receiver.resolvedType
-            val typeString = type.classId?.asFqNameString()
-            val supportedTypes = collectionMembers[functionName()].orEmpty()
-            typeString in supportedTypes ||
-                type.allSuperTypes(session).any { it.classId?.asFqNameString() in supportedTypes }
+    override fun check(expression: FirFunctionCall, context: CheckerContext, reporter: DiagnosticReporter) {
+        val calleeName = expression.functionName
+        if (expression.fqName in safeOperators) return
+        val error = when {
+            expression.isAggregate(context) && context.isIteratedWithoutAlignedOn() ->
+                CollektiveFrontendErrors.AGGREGATE_FUNCTION_INSIDE_ITERATION
+            else -> null
         }
-
-    private fun FirElement.isAlignedOn() = isFunctionCallsWithName(CollektiveNames.ALIGNED_ON_FUNCTION_NAME)(this)
+        error?.let {
+            reporter.reportOn(expression.calleeReference.source, it, calleeName, context)
+        }
+    }
 
     private fun CheckerContext.isIteratedWithoutAlignedOn(): Boolean {
         // Find the outermost aggregate declaration
@@ -160,17 +131,14 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         return iteratedWithoutAlignedOn
     }
 
-    override fun check(expression: FirFunctionCall, context: CheckerContext, reporter: DiagnosticReporter) {
-        val calleeName = expression.functionName()
-        if (expression.fqName() in safeOperators) return
-        val error =
-            when {
-                expression.isAggregate(context) && context.isIteratedWithoutAlignedOn() ->
-                    FirCollektiveErrors.AGGREGATE_FUNCTION_INSIDE_ITERATION
-                else -> null
-            }
-        error?.let {
-            reporter.reportOn(expression.calleeReference.source, it, calleeName, context)
+    private fun FirElement.isACallToALoopingCollectionsMethod(session: FirSession): Boolean = this is FirFunctionCall &&
+        allReceiverExpressions.any { receiver ->
+            val type = receiver.resolvedType
+            val typeString = type.classId?.asFqNameString()
+            val supportedTypes = collectionMembers[functionName].orEmpty()
+            typeString in supportedTypes ||
+                type.allSuperTypes(session).any { it.classId?.asFqNameString() in supportedTypes }
         }
-    }
+
+    private val KType.typeName get() = (classifier as? KClass<*>)?.qualifiedName.orEmpty()
 }

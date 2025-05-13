@@ -9,8 +9,8 @@
 package it.unibo.collektive.compiler.frontend.visitors
 
 import it.unibo.collektive.compiler.common.CollektiveNames.YIELDING_FUNCTION_FQ_NAME
-import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.fqName
-import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.isStructurallyEquivalentTo
+import it.unibo.collektive.compiler.frontend.firextensions.fqName
+import it.unibo.collektive.compiler.frontend.firextensions.isStructurallyEquivalentTo
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
@@ -21,7 +21,7 @@ import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
  * Visitor that checks if a [FirFunctionCall] contains an unnecessary yielding context. Look at the documentation of
  * [it.unibo.collektive.frontend.checkers.UnnecessaryYielding] for more information.
  */
-class YieldingUnnecessaryUsageVisitor : FirVisitorVoid() {
+object UnnecessaryYieldingVisitor : FirVisitorVoid() {
     private var containsUnnecessaryYielding = false
     private var yieldingReceiver: FirExpression? = null
     private var insideYielding = false
@@ -31,7 +31,7 @@ class YieldingUnnecessaryUsageVisitor : FirVisitorVoid() {
     }
 
     override fun visitFunctionCall(functionCall: FirFunctionCall) {
-        if (functionCall.fqName() == YIELDING_FUNCTION_FQ_NAME) {
+        if (functionCall.fqName == YIELDING_FUNCTION_FQ_NAME) {
             insideYielding = true
             yieldingReceiver = functionCall.explicitReceiver
             functionCall.argumentList.arguments.forEach(::visitElement)
@@ -54,8 +54,8 @@ class YieldingUnnecessaryUsageVisitor : FirVisitorVoid() {
      * Checks if the [FirFunctionCall] contains an unnecessary yielding context. Look at the documentation of
      * [it.unibo.collektive.frontend.checkers.UnnecessaryYielding] for more information.
      */
-    fun FirFunctionCall.containsUnnecessaryYielding(): Boolean {
-        visitElement(this)
+    fun containsUnnecessaryYielding(functionCall: FirFunctionCall): Boolean {
+        visitElement(functionCall)
         return containsUnnecessaryYielding
     }
 }

@@ -45,6 +45,9 @@ object CollektiveNames {
     /** Fully qualified name of the [Aggregate.align] function. */
     val ALIGN_FUNCTION_FQ_NAME: String = "$AGGREGATE_CLASS_FQ_NAME.$ALIGN_FUNCTION_NAME"
 
+    /** TODO. */
+    val COLLEKTIVE_API_PACKAGE: String = AGGREGATE_CLASS_FQ_NAME.substringBeforeLast('.')
+
     /** Name of the [Aggregate.dealign] function used to close an alignment block. */
     val DEALIGN_FUNCTION_NAME: String = Aggregate<*>::dealign.name
 
@@ -61,25 +64,28 @@ object CollektiveNames {
     val EVOLVING_FUNCTION_FQ_NAME: String = "$AGGREGATE_CLASS_FQ_NAME.evolving"
 
     /** Fully-qualified name of the `exchange(...)` function. */
-    const val EXCHANGE_FUNCTION_FQ_NAME: String = "it.unibo.collektive.aggregate.api.exchange"
+    val EXCHANGE_FUNCTION_FQ_NAME: String = "$COLLEKTIVE_API_PACKAGE.exchange"
 
     /** Fully-qualified name of the `exchanging(...)` function. */
-    const val EXCHANGING_FUNCTION_FQ_NAME: String = "it.unibo.collektive.aggregate.api.exchanging"
+    val EXCHANGING_FUNCTION_FQ_NAME: String = "$COLLEKTIVE_API_PACKAGE.exchanging"
 
     /** Fully-qualified name of the `neighboring(...)` function for building neighbor views. */
-    const val NEIGHBORING_FUNCTION_FQ_NAME: String = "it.unibo.collektive.aggregate.api.neighboring"
+    val NEIGHBORING_FUNCTION_FQ_NAME: String = "$COLLEKTIVE_API_PACKAGE.neighboring"
 
     /** Fully-qualified name of the [CollektiveIgnore] annotation used to suppress automatic alignment. */
     val IGNORE_FUNCTION_ANNOTATION_FQ_NAME: String = checkNotNull(CollektiveIgnore::class.qualifiedName)
 
     /** Name of the `project(...)` function for field projections. */
-    const val PROJECT_FUNCTION_NAME: String = "project"
+    const val PROJECTION_FUNCTION_NAME: String = "project"
+
+    /** Name of the `project(...)` function for field projections. */
+    val PROJECTION_FUNCTION_FQ_NAME: String = "$COLLEKTIVE_API_PACKAGE.impl.$PROJECTION_FUNCTION_NAME"
 
     /** Fully-qualified name of the `share(...)` function. */
-    const val SHARE_FUNCTION_FQ_NAME: String = "it.unibo.collektive.aggregate.api.share"
+    val SHARE_FUNCTION_FQ_NAME: String = "$COLLEKTIVE_API_PACKAGE.share"
 
     /** Fully-qualified name of the `sharing(...)` function for declarative data flow. */
-    const val SHARING_FUNCTION_FQ_NAME: String = "it.unibo.collektive.aggregate.api.sharing"
+    val SHARING_FUNCTION_FQ_NAME: String = "$COLLEKTIVE_API_PACKAGE.sharing"
 
     /** Fully-qualified name of the [YieldingContext.yielding] function within a [YieldingContext]. */
     val YIELDING_FUNCTION_FQ_NAME: String = "${checkNotNull(YieldingContext::class.qualifiedName)}.yielding"

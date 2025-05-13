@@ -15,7 +15,7 @@ import it.unibo.collektive.compiler.common.CollektiveNames.AGGREGATE_CLASS_FQ_NA
 import it.unibo.collektive.compiler.common.CollektiveNames.ALIGN_FUNCTION_NAME
 import it.unibo.collektive.compiler.common.CollektiveNames.DEALIGN_FUNCTION_NAME
 import it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME
-import it.unibo.collektive.compiler.common.CollektiveNames.PROJECT_FUNCTION_NAME
+import it.unibo.collektive.compiler.common.CollektiveNames.PROJECTION_FUNCTION_NAME
 import it.unibo.collektive.compiler.common.error
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -53,7 +53,7 @@ class CollektiveIrGenerationExtension(private val logger: MessageCollector) : Ir
         val projectFunction = pluginContext.referenceFunctions(
             CallableId(
                 FqName("it.unibo.collektive.aggregate.api.impl"),
-                Name.identifier(PROJECT_FUNCTION_NAME),
+                Name.identifier(PROJECTION_FUNCTION_NAME),
             ),
         ).firstOrNull() ?: return logger.error("Unable to find the 'project' function")
         // Function that handles the alignment

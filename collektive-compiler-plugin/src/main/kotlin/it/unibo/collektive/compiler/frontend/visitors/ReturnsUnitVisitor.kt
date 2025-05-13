@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.fir.visitors.FirVisitor
  * A visitor that checks if a function call has an empty return (i.e., no return statement,
  * resulting into a [FirUnitExpression] as return expression).
  */
-class EmptyReturnVisitor : FirVisitor<Unit, Boolean>() {
+object ReturnsUnitVisitor : FirVisitor<Unit, Boolean>() {
     private var hasReturn = true
 
     override fun visitElement(element: FirElement, data: Boolean) {
@@ -42,8 +42,8 @@ class EmptyReturnVisitor : FirVisitor<Unit, Boolean>() {
      * Check if the function call has an empty return (i.e., no return statement, resulting into a [FirUnitExpression]).
      * Returns `true` if the function call has an empty return, `false` otherwise.
      */
-    fun FirFunctionCall.hasEmptyReturn(): Boolean {
-        visitElement(this, false)
+    fun returnsUnit(functionCall: FirFunctionCall): Boolean {
+        visitElement(functionCall, false)
         return !hasReturn
     }
 }
