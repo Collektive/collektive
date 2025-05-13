@@ -35,19 +35,19 @@ import org.jetbrains.kotlin.name.FqName
 /**
  * IR transformer that wraps accesses to [Field] values inside a `project` function call.
  *
- * ## Purpose:
- * When a field is accessed directly (i.e., its [IrGetValue] is used),
+ * ## Purpose
+ * When a [Field] is accessed directly (i.e., its [IrGetValue] is used),
  * this transformer replaces the raw access with a call to the `project` function.
  *
  * This ensures that field values are safely projected into local computations,
  * avoiding the need for projections after plugin-inserted alignment transformations.
  *
- * ## How It Works:
+ * ## How It Works
  * - Detects [IrGetValue] expressions whose type matches [Field].
  * - Replaces them with a call to the provided [projectFunction].
  * - The resulting IR call has the same type as the original field access.
  *
- * ## Notes:
+ * ## Notes
  * This transformation is applied **before** the alignment phase,
  * ensuring that user-written branches and alignments work seamlessly.
  *
@@ -83,7 +83,7 @@ internal class ProjectFieldOnAccessTransformer(
         if (expression.type.classFqName == FqName(FIELD_CLASS_FQ_NAME)) {
             logger.debug("This expression returns a field: $expression")
             debugPrint { "This expression returns a field: ${expression.dumpKotlinLike()}" }
-            return wrapInProjectFunction(expression) // , aggregateReference)
+            return wrapInProjectFunction(expression)
         }
         return super.visitGetValue(expression)
     }
@@ -99,18 +99,17 @@ internal class ProjectFieldOnAccessTransformer(
         Scope(fieldExpression.symbol),
         fieldExpression.startOffset,
         fieldExpression.endOffset,
-    )
-        .irCall(projectFunction).apply {
-            debugPrint { "Projecting: ${fieldExpression.dumpKotlinLike()}" }
-            this.type = fieldExpression.type
-            val simpleType = fieldExpression.type as? IrSimpleType
-            val typeArguments = simpleType?.arguments
-                ?.mapNotNull { it.typeOrNull }
-                .orEmpty()
-            if (typeArguments.size == 2) {
-                putTypeArgument(0, typeArguments[0])
-                putTypeArgument(1, typeArguments[1])
-            }
-            putArgument(projectFunction.valueParameters.single(), fieldExpression)
+    ).irCall(projectFunction).apply {
+        debugPrint { "Projecting: ${fieldExpression.dumpKotlinLike()}" }
+        this.type = fieldExpression.type
+        val simpleType = fieldExpression.type as? IrSimpleType
+        val typeArguments = simpleType?.arguments
+            ?.mapNotNull { it.typeOrNull }
+            .orEmpty()
+        if (typeArguments.size == 2) {
+            putTypeArgument(0, typeArguments[0])
+            putTypeArgument(1, typeArguments[1])
         }
+        putArgument(projectFunction.valueParameters.single(), fieldExpression)
+    }
 }

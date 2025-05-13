@@ -26,12 +26,14 @@ import org.jetbrains.kotlin.ir.util.parents
 /**
  * Returns `true` if this [IrFunction] is abstract (declared but not implemented).
  */
-val IrFunction.isAbstract get() = this is IrSimpleFunction && modality == Modality.ABSTRACT
+val IrFunction.isAbstract: Boolean
+    get() = this is IrSimpleFunction && modality == Modality.ABSTRACT
 
 /**
  * Returns `true` if this [IrFunction] is concrete (i.e., implemented, not abstract).
  */
-val IrFunction.isConcrete get() = !isAbstract
+val IrFunction.isConcrete: Boolean
+    get() = !isAbstract
 
 /**
  * Checks whether this [IrFunction] or any of its enclosing declarations

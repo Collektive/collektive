@@ -11,8 +11,10 @@ package it.unibo.collektive.compiler.frontend
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrar
 
 /**
- * Extension registrar that adds frontend extensions to the compiler. It checks for dangerous or inappropriate code
- * written using the Collektive DSL
+ * FIR extension registrar for the Collektive compiler plugin.
+ *
+ * Registers the frontend extensions responsible for validating potentially dangerous
+ * or inappropriate usage of the Collektive DSL.
  */
 class CollektiveFrontendExtensionRegistrar : FirExtensionRegistrar() {
     override fun ExtensionRegistrarContext.configurePlugin() {

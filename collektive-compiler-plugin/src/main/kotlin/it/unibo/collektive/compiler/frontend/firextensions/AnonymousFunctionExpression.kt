@@ -15,7 +15,12 @@ import org.jetbrains.kotlin.fir.expressions.FirReturnExpression
 import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
 
 /**
- * Extracts the return expression from an anonymous function, or `null` if it is not found.
+ * Extracts the result of a `return` expression from this [FirAnonymousFunctionExpression], if present.
+ *
+ * This utility walks the anonymous function body and returns the first encountered return value,
+ * or `null` if no return expression is found.
+ *
+ * @return the returned [FirExpression] if available, or `null`
  */
 internal fun FirAnonymousFunctionExpression.extractReturnExpression(): FirExpression? = object : FirVisitorVoid() {
     private var returnExpression: FirExpression? = null
@@ -24,13 +29,10 @@ internal fun FirAnonymousFunctionExpression.extractReturnExpression(): FirExpres
         element.acceptChildren(this)
     }
 
-    override fun visitReturnExpression(expression: FirReturnExpression) {
-        returnExpression = expression.result
+    override fun visitReturnExpression(returnExpression: FirReturnExpression) {
+        this.returnExpression = returnExpression.result
     }
 
-    /**
-     * Extracts the return expression from the anonymous function.
-     */
     fun extractReturnExpression(): FirExpression? {
         visitElement(this@extractReturnExpression)
         return returnExpression

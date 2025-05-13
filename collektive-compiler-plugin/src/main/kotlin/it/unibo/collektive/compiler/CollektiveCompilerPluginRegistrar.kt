@@ -21,11 +21,13 @@ import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter
 
 /**
- * The component registrar registers the alignment generation extension if
- * the compiler plugin is enabled.
+ * Registers the Collektive compiler plugin components with the Kotlin compiler.
+ *
+ * This includes both IR-based and FIR-based extensions, depending on plugin settings.
  */
 @OptIn(ExperimentalCompilerApi::class)
 class CollektiveCompilerPluginRegistrar : CompilerPluginRegistrar() {
+
     override val supportsK2: Boolean = true
 
     override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
@@ -37,14 +39,19 @@ class CollektiveCompilerPluginRegistrar : CompilerPluginRegistrar() {
     }
 
     /**
-     * Ensures that a specific configuration key in the CompilerConfiguration is set to the required value.
-     * If the key is not present or its value does not match the expected value, the configuration is
-     * updated (if not finalized), or an error is raised based on specified conditions.
+     * Ensures that a [CompilerConfigurationKey] has a specific required value.
      *
-     * @param key The configuration key to be checked or updated.
-     * @param value The value that must be associated with the specified key.
-     * @param logger A MessageCollector used for logging warnings or informational messages.
-     * @param messageOnError A lambda function that provides a custom error message given the configuration key.
+     * If the key is absent:
+     * - If the configuration is mutable, it sets the value and logs an info message.
+     * - If the configuration is finalized, it logs a strong warning.
+     *
+     * If the key is present but holds a different value, an error is thrown.
+     *
+     * @param key The configuration key to validate or set.
+     * @param value The required value for the key.
+     * @param logger A [MessageCollector] used for logging diagnostics.
+     * @param messageOnError Provides a custom error message if the requirement is violated.
+     * @throws IllegalStateException if the key is present with a conflicting value.
      */
     fun <T> CompilerConfiguration.requireConfiguration(
         key: CompilerConfigurationKey<T>,
@@ -54,24 +61,20 @@ class CollektiveCompilerPluginRegistrar : CompilerPluginRegistrar() {
     ) {
         val returnedValue: T? = get(key)
         if (returnedValue == null) {
-            when {
-                isReadOnly ->
-                    logger.strongWarning(messageOnError(key) + " The compiler configuration has been finalized.")
-
-                else -> {
-                    requireNotNull(value) { "The value of the key '$key' cannot be null." }
-                    put(key, value).also {
-                        logger.info(
-                            """
-                            Implicitly enabled '$key' setting the value '$value'.
-                            It is required by the Collektive compiler plugin.
-                            """.trimIndent(),
-                        )
-                    }
+            if (isReadOnly) {
+                logger.strongWarning(messageOnError(key) + " The compiler configuration has been finalized.")
+            } else {
+                requireNotNull(value) { "The value for key '$key' cannot be null." }
+                put(key, value).also {
+                    logger.info(
+                        """
+                        Implicitly enabled '$key' by setting its value to '$value'.
+                        This setting is required by the Collektive compiler plugin.
+                        """.trimIndent(),
+                    )
                 }
             }
-        }
-        if (returnedValue != value) {
+        } else if (returnedValue != value) {
             error(messageOnError(key))
         }
     }

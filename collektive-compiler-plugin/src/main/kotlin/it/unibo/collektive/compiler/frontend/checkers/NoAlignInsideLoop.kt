@@ -37,10 +37,12 @@ import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.kotlinFunction
 
 /**
- * Checker that looks for aggregate functions called inside a loop without an explicit align operation.
+ * Checker that reports aggregate function calls made inside a loop or collection
+ * iteration without an explicit `alignedOn` operation.
  */
 object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
 
+    /** Functions that are explicitly safe and should not trigger this checker. */
     private val safeOperators =
         listOf(
             CollektiveNames.ALIGNED_ON_FUNCTION_FQ_NAME,
@@ -48,6 +50,7 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
             CollektiveNames.DEALIGN_FUNCTION_FQ_NAME,
         )
 
+    /** Kotlin collection extension methods used to identify looping constructs. */
     private val kotlinCollectionsExtensions: Set<KFunction<*>> =
         sequenceOf("collections.CollectionsKt", "sequences.SequencesKt")
             .map { Class.forName("kotlin.$it") }
@@ -55,6 +58,7 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
             .mapNotNull { it.kotlinFunction }
             .toSet()
 
+    /** Reflection-based collection targets that imply iteration. */
     private val collectionsTargetClasses = sequenceOf(
         Collection::class,
         IntRange::class,
@@ -66,19 +70,17 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
     ).flatMap { it.functions }.toSet()
 
     /**
-     * Maps every name of a collection method to its receiver types.
+     * Maps each collection method name to its set of receiver type names.
+     * Used to match against known looping constructs.
      */
     private val collectionMembers: Map<String, Set<String>> by lazy {
         val allCandidates = collectionsTargetClasses + kotlinCollectionsExtensions
         allCandidates
             .filter { function ->
-                // At least the receiver and a trailing function
-                if (function.parameters.size > 1) {
-                    val parameterType = function.parameters.last().type.typeName
-                    parameterType.startsWith("kotlin.Function") || parameterType.startsWith("java.util.function.")
-                } else {
-                    false
-                }
+                function.parameters.size > 1 &&
+                    function.parameters.last().type.typeName.let {
+                        it.startsWith("kotlin.Function") || it.startsWith("java.util.function.")
+                    }
             }
             .map { it.name to it.parameters.first().type.typeName }
             .groupBy { it.first }
@@ -98,15 +100,17 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         }
     }
 
+    /**
+     * Determines whether the current context represents an iteration
+     * lacking an explicit alignment boundary.
+     */
     private fun CheckerContext.isIteratedWithoutAlignedOn(): Boolean {
-        // Find the outermost aggregate declaration
         val outermostAggregateDeclaration = containingDeclarations.firstOrNull { it.isAggregate(this) }
-        // Find the most internal *named* function definition within the outermost aggregate declaration, cut the rest
         val elements = containingElements
             .takeLastWhile {
                 it !is FirReturnExpression && it !is FirSimpleFunction && it != outermostAggregateDeclaration
             }
-        // Drop the most external contexts until an aggregate context is found
+
         val scanner = elements.toMutableList()
         var iteratedWithoutAlignedOn = false
         while (scanner.isNotEmpty() && !iteratedWithoutAlignedOn) {
@@ -116,8 +120,6 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
                 next is FirLoop -> iteratedWithoutAlignedOn = true
                 next is FirArgumentList -> Unit
                 scanner.size >= 2 -> {
-                    // Check for a call to a looping collection method of which we are the last argument
-                    // For it to exist, we must be inside an argument list as the last element
                     val argumentList = scanner.last() as? FirArgumentList
                     if (argumentList != null && argumentList.arguments.last().source == next.source) {
                         val functionCall = scanner[scanner.size - 2]
@@ -131,6 +133,9 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         return iteratedWithoutAlignedOn
     }
 
+    /**
+     * Checks if this [FirElement] is a call to a known looping collection method.
+     */
     private fun FirElement.isACallToALoopingCollectionsMethod(session: FirSession): Boolean = this is FirFunctionCall &&
         allReceiverExpressions.any { receiver ->
             val type = receiver.resolvedType
@@ -140,5 +145,6 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
                 type.allSuperTypes(session).any { it.classId?.asFqNameString() in supportedTypes }
         }
 
+    /** Gets the fully qualified name of the type represented by this [KType]. */
     private val KType.typeName get() = (classifier as? KClass<*>)?.qualifiedName.orEmpty()
 }

@@ -15,13 +15,14 @@ import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.types.classifierOrNull
 
 /**
- * Extension function that checks if this [IrType] is assignable from another [IrType].
+ * Returns `true` if this [IrType] is assignable from the [other] type.
  *
- * Types are compared based on their classifier (symbolic name) equality.
+ * Types are compared by checking whether their classifiers (symbolic type references)
+ * are equal using [FqNameEqualityChecker].
  *
  * @receiver the base type
  * @param other the candidate type to assign
- * @return `true` if the types are considered assignable, `false` otherwise
+ * @return `true` if [other] can be assigned to this type; `false` otherwise
  */
 internal fun IrType.isAssignableFrom(other: IrType): Boolean = classifierOrNull?.let { base ->
     other.classifierOrNull?.let { other ->
@@ -30,13 +31,14 @@ internal fun IrType.isAssignableFrom(other: IrType): Boolean = classifierOrNull?
 } == true
 
 /**
- * Returns a string representation of a list of [IrType]s,
+ * Returns a stringified representation of a list of [IrType]s,
  * optionally surrounded by [prefix] and [postfix].
  *
- * Null types are represented as `*`.
+ * Null types are rendered as `"*"`.
  *
  * @param prefix a string to prepend (default: `"("`)
  * @param postfix a string to append (default: `")"`)
+ * @return a formatted string representing the list of types
  */
 internal fun List<IrType?>.stringified(prefix: String = "(", postfix: String = ")"): String = when {
     isEmpty() -> ""

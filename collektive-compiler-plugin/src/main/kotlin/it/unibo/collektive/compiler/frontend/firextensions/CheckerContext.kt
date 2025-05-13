@@ -17,33 +17,43 @@ import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 
 /**
- * Checks whether any of the elements in the current [CheckerContext] contain an annotation
- * that disables the Collektive compiler plugin.
+ * Checks whether any of the elements in the current [CheckerContext]
+ * are annotated to disable the Collektive compiler plugin.
  *
- * This function inspects all [FirAnnotation]s in the [containingElements] and returns `true`
- * if any of them match the disabling annotation defined by [IGNORE_FUNCTION_ANNOTATION_FQ_NAME].
+ * This inspects all [FirAnnotation]s in the [containingElements] and returns `true`
+ * if any annotation matches [IGNORE_FUNCTION_ANNOTATION_FQ_NAME].
  *
- * @receiver the current [CheckerContext] during FIR analysis
- * @return `true` if plugin execution should be disabled due to annotations, `false` otherwise
+ * @receiver the [CheckerContext] in FIR analysis
+ * @return `true` if plugin execution is disabled by annotation; `false` otherwise
  */
 internal fun CheckerContext.hasAnnotationDisablingPlugin(): Boolean = containingElements
     .flatMap { (it as? FirAnnotationContainer)?.annotations.orEmpty() }
     .any { it.disablesPlugin() }
 
+/**
+ * Determines whether the current context corresponds to a `project` helper call.
+ *
+ * This checks whether the top-level function in the context matches
+ * the Collektive `project(...)` function and has the expected structure.
+ *
+ * @receiver the [CheckerContext] in FIR analysis
+ * @return `true` if this is a call to the `project` function; `false` otherwise
+ */
 internal fun CheckerContext.isAggregateProjection() = containingElements
     .firstNotNullOfOrNull { it as? FirSimpleFunction }
     ?.run {
         symbol.callableId.asSingleFqName().toString() == CollektiveNames.PROJECTION_FUNCTION_FQ_NAME &&
-            this.valueParameters.size == 1 &&
+            valueParameters.size == 1 &&
             valueParameters.first().isField() &&
             returnTypeRef.isField()
     } == true
 
 /**
- * Checks whether the current context is enclosed within an aggregate function.
+ * Checks whether the current context is inside a function
+ * that operates over aggregate structures.
  *
  * @receiver the [CheckerContext] to inspect
- * @return `true` if inside a function whose receiver or parameters are aggregate-typed
+ * @return `true` if inside an aggregate-aware function; `false` otherwise
  */
 internal fun CheckerContext.isInsideAggregateFunction(): Boolean =
     containingElements.any { (it as? FirFunction).isAggregate(this) }

@@ -16,11 +16,11 @@ import it.unibo.collektive.aggregate.api.YieldingContext
 /**
  * Contains canonical names for aggregate-related functions, classes, and annotations.
  *
- * This object centralizes the string constants that represent:
- * - Fully-qualified names (FQNs) of DSL functions and types
+ * This object centralizes string constants representing:
+ * - Fully qualified names (FQNs) of DSL functions and types
  * - Function names used by the Collektive Kotlin compiler plugin
  *
- * These constants are useful for matching IR declarations, resolving symbols, and generating IR.
+ * These constants are used to match IR declarations, resolve symbols, and generate IR.
  */
 object CollektiveNames {
 
@@ -45,48 +45,48 @@ object CollektiveNames {
     /** Fully qualified name of the [Aggregate.align] function. */
     val ALIGN_FUNCTION_FQ_NAME: String = "$AGGREGATE_CLASS_FQ_NAME.$ALIGN_FUNCTION_NAME"
 
-    /** TODO. */
+    /** The base package for the Collektive DSL API. Derived from [Aggregate]'s package. */
     val COLLEKTIVE_API_PACKAGE: String = AGGREGATE_CLASS_FQ_NAME.substringBeforeLast('.')
 
     /** Name of the [Aggregate.dealign] function used to close an alignment block. */
     val DEALIGN_FUNCTION_NAME: String = Aggregate<*>::dealign.name
 
-    /** Fully-qualified name of the [Aggregate.dealign] function. */
+    /** Fully qualified name of the [Aggregate.dealign] function. */
     val DEALIGN_FUNCTION_FQ_NAME: String = "$AGGREGATE_CLASS_FQ_NAME.$DEALIGN_FUNCTION_NAME"
 
-    /** Fully-qualified name of the [Field] class. Used to identify field types in IR. */
+    /** Fully qualified name of the [Field] class. Used to identify field types in IR. */
     val FIELD_CLASS_FQ_NAME: String = checkNotNull(Field::class.qualifiedName)
 
-    /** Fully-qualified name of the [Aggregate.evolve] function. */
+    /** Fully qualified name of the [Aggregate.evolve] function. */
     val EVOLVE_FUNCTION_FQ_NAME: String = "$AGGREGATE_CLASS_FQ_NAME.evolve"
 
-    /** Fully-qualified name of the [Aggregate.evolving] function. */
+    /** Fully qualified name of the [Aggregate.evolving] function. */
     val EVOLVING_FUNCTION_FQ_NAME: String = "$AGGREGATE_CLASS_FQ_NAME.evolving"
 
-    /** Fully-qualified name of the `exchange(...)` function. */
+    /** Fully qualified name of the `exchange(...)` function. */
     val EXCHANGE_FUNCTION_FQ_NAME: String = "$COLLEKTIVE_API_PACKAGE.exchange"
 
-    /** Fully-qualified name of the `exchanging(...)` function. */
+    /** Fully qualified name of the `exchanging(...)` function. */
     val EXCHANGING_FUNCTION_FQ_NAME: String = "$COLLEKTIVE_API_PACKAGE.exchanging"
 
-    /** Fully-qualified name of the `neighboring(...)` function for building neighbor views. */
+    /** Fully qualified name of the `neighboring(...)` function for building neighbor views. */
     val NEIGHBORING_FUNCTION_FQ_NAME: String = "$COLLEKTIVE_API_PACKAGE.neighboring"
 
-    /** Fully-qualified name of the [CollektiveIgnore] annotation used to suppress automatic alignment. */
+    /** Fully qualified name of the [CollektiveIgnore] annotation used to suppress automatic alignment. */
     val IGNORE_FUNCTION_ANNOTATION_FQ_NAME: String = checkNotNull(CollektiveIgnore::class.qualifiedName)
 
     /** Name of the `project(...)` function for field projections. */
     const val PROJECTION_FUNCTION_NAME: String = "project"
 
-    /** Name of the `project(...)` function for field projections. */
+    /** Fully qualified name of the `project(...)` function for field projections. */
     val PROJECTION_FUNCTION_FQ_NAME: String = "$COLLEKTIVE_API_PACKAGE.impl.$PROJECTION_FUNCTION_NAME"
 
-    /** Fully-qualified name of the `share(...)` function. */
+    /** Fully qualified name of the `share(...)` function. */
     val SHARE_FUNCTION_FQ_NAME: String = "$COLLEKTIVE_API_PACKAGE.share"
 
-    /** Fully-qualified name of the `sharing(...)` function for declarative data flow. */
+    /** Fully qualified name of the `sharing(...)` function for declarative data flow. */
     val SHARING_FUNCTION_FQ_NAME: String = "$COLLEKTIVE_API_PACKAGE.sharing"
 
-    /** Fully-qualified name of the [YieldingContext.yielding] function within a [YieldingContext]. */
+    /** Fully qualified name of the [YieldingContext.yielding] function. */
     val YIELDING_FUNCTION_FQ_NAME: String = "${checkNotNull(YieldingContext::class.qualifiedName)}.yielding"
 }

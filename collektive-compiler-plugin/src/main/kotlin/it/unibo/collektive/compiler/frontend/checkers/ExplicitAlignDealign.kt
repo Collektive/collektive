@@ -20,7 +20,11 @@ import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirFunctionCallChec
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 
 /**
- * Checker that looks for usages of "align" and "dealign" methods inside Aggregate functions, generating a warning.
+ * Checker that detects usage of `align` and `dealign` methods inside aggregate functions.
+ *
+ * Emits a diagnostic warning when these functions are explicitly invoked
+ * from within aggregate DSL contexts, which is discouraged since alignment
+ * is managed automatically by the compiler plugin.
  */
 object ExplicitAlignDealign : FirFunctionCallChecker(MppCheckerKind.Common) {
     override fun check(expression: FirFunctionCall, context: CheckerContext, reporter: DiagnosticReporter) {

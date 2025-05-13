@@ -24,13 +24,13 @@ private val removedPrefixes = listOf(
 )
 
 /**
- * Improves the readability of a fully qualified name by replacing
- * well-known package prefixes and symbolic names with emojis or shorter symbols.
+ * Returns a symbolic and compact representation of a fully qualified name
+ * by replacing known package prefixes or internal types with emojis or short symbols.
  *
- * Used mainly to generate compact, user-friendly alignment tokens.
+ * Primarily used to improve the legibility of generated alignment tokens.
  *
  * @receiver the original fully qualified name
- * @return a compact and symbolic representation
+ * @return a shortened symbolic representation
  */
 fun String.withBetterSymbols(): String {
     val clean = replacements.fold(this) { current, (replaced, replacement) -> current.replace(replaced, replacement) }

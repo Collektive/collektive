@@ -15,10 +15,25 @@ import org.jetbrains.kotlin.fir.types.classId
 import org.jetbrains.kotlin.fir.types.resolvedType
 
 /**
- * Checks if the [FirExpression] is structurally equivalent to another [FirExpression].
+ * Checks whether this [FirExpression] is structurally equivalent to [other].
+ *
+ * Structural equivalence is determined by comparing the rendered source representations.
+ *
+ * @param other the expression to compare against
+ * @return `true` if the two expressions are structurally identical, `false` otherwise
  */
 internal fun FirExpression.isStructurallyEquivalentTo(other: FirExpression): Boolean = render() == other.render()
 
-internal fun FirExpression.returnsAField() = FIELD_CLASS_FQ_NAME == returnType()
+/**
+ * Determines whether this [FirExpression] returns a value of type `Field`.
+ *
+ * @return `true` if the return type corresponds to `Field`, `false` otherwise
+ */
+internal fun FirExpression.returnsAField(): Boolean = FIELD_CLASS_FQ_NAME == returnType()
 
-internal fun FirExpression.returnType() = resolvedType.classId?.asFqNameString()
+/**
+ * Retrieves the fully qualified name of the return type of this [FirExpression].
+ *
+ * @return the FQ name of the return type, or `null` if unavailable
+ */
+internal fun FirExpression.returnType(): String? = resolvedType.classId?.asFqNameString()

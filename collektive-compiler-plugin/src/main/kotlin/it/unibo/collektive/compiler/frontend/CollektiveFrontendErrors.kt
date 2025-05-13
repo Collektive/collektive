@@ -15,45 +15,49 @@ import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 
 /**
- * Error messages for the Collektive compiler plugin.
+ * Collection of diagnostic messages used by the Collektive compiler plugin.
  */
 object CollektiveFrontendErrors {
+
     /**
-     * Warning raised when an aggregate function is called inside an iteration construct.
+     * Warning raised when an aggregate function is called inside a loop or iteration construct
+     * without an explicit alignment boundary.
      */
     val AGGREGATE_FUNCTION_INSIDE_ITERATION by warning1<KtNameReferenceExpression, String>()
 
     /**
-     * Warning raised when a forbidden function is called.
+     * Warning raised when a forbidden function (e.g., `align`, `dealign`) is explicitly called
+     * within aggregate contexts.
      */
     val FORBIDDEN_FUNCTION_CALL by warning1<KtNameReferenceExpression, String>()
 
     /**
-     * Warning raised when a construct is used improperly (i.e., another more appropriate construct should be used
-     * instead).
+     * Warning raised when an `evolve`-like construct is used where a `share` would be more appropriate.
      *
-     * For example, when using an `evolve` construct with a nested `neighboring`:
-     * if what you share with your neighbours through `neighboring` depends on the state of the repeat but is different
-     * from what you return as the last value of the `evolve`, then the entire block can be replaced with a `share`.
+     * Example: using `evolve` to perform a `neighboring` operation when the returned value
+     * is equivalent across neighbors. This is semantically clearer and more performant with `share`.
      */
     val IMPROPER_EVOLVE_CONSTRUCT by warning1<KtNameReferenceExpression, String>()
 
     /**
-     * Warning raised when an aggregate call like `share`, `exchange`, `neighboring` or `evolve` is called without
-     * using parameters inside the anonymous function, resulting in an unnecessary call.
+     * Warning raised when a Collektive construct (like `share`, `exchange`, `neighboring`, `evolve`)
+     * is invoked with an unused lambda parameter, making the call unnecessary.
      */
     val UNNECESSARY_CONSTRUCT_CALL by warning1<KtNameReferenceExpression, String>()
 
     /**
-     * Warning raised when an aggregate call like `evolving`, `exchanging` or `sharing` is called and the expression
-     * that is exchanged is the same as the one that is yielded inside the `yielding` block, therefore resulting in
-     * an unnecessary yielding context that can be replaced with the same construct without it (`evolve`, `exchange` and
-     * `share`).
+     * Warning raised when a yielding context is unnecessary — i.e., the yielded value
+     * inside `yielding` is identical to the one passed to `sharing`, `evolving`, or `exchanging`.
+     *
+     * In such cases, the construct can be replaced by its non-yielding counterpart (`share`, `evolve`, `exchange`).
      */
     val UNNECESSARY_YIELDING_CONTEXT by warning1<KtNameReferenceExpression, String>()
 
     /**
-     * Error raised when a branch returns a [it.unibo.collektive.aggregate.Field].
+     * Error raised when a branch (e.g., in a `when` or `if` expression) returns a value
+     * of type [it.unibo.collektive.aggregate.Field].
+     *
+     * Returning fields from branches is disallowed due to potential misalignments across devices.
      */
     val BRANCH_RETURNS_FIELD by error1<KtExpression, String>()
 

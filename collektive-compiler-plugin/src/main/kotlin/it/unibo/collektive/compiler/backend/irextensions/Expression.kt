@@ -27,19 +27,19 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
  * Attempts to locate a reference to the [Aggregate] execution context
  * within this [IrExpression].
  *
- * This function looks for captured variables of types:
- * - [Aggregate], used directly if found
- * - [Field], from which the context is derived by calling the `context` getter
+ * This function searches for captured variables of types:
+ * - [Aggregate]: returned directly if found
+ * - [Field]: used to derive the context via the `context` getter
  *
- * If a [Field] is found instead of an [Aggregate], a synthetic IR call
- * is injected to retrieve the associated [Aggregate].
+ * If a [Field] is found, a synthetic IR call is injected to retrieve
+ * the associated [Aggregate] context.
  *
  * @param pluginContext the IR plugin context for constructing synthetic nodes
  * @param aggregateClass the IR class representing the `Aggregate<ID>` interface
  * @param fieldClass the IR class representing the `Field<ID, *>` interface
  * @param getContext the IR function symbol representing the `context` getter
  * @param logger an optional [MessageCollector] for debug output
- * @return an [IrExpression] accessing the [Aggregate] context, or `null` if none found
+ * @return an [IrExpression] accessing the [Aggregate] context, or `null` if none is found
  */
 internal fun IrExpression.findAggregateReference(
     pluginContext: IrPluginContext,
@@ -60,13 +60,13 @@ internal fun IrExpression.findAggregateReference(
         }
 
 /**
- * Traverses this [IrExpression] subtree and finds the first [IrGetValue]
- * whose type matches the provided [targetType].
+ * Traverses this [IrExpression] subtree to find the first [IrGetValue]
+ * whose type is assignable from the provided [targetType].
  *
- * Performs a depth-first search to locate the matching captured variable.
+ * Performs a depth-first search to locate a matching captured variable.
  *
- * @param targetType the target IR class type to match
- * @return the first matching [IrGetValue], or `null` if no match is found
+ * @param targetType the IR class whose type to match
+ * @return the first matching [IrGetValue], or `null` if none is found
  */
 internal fun IrExpression.findFirstCapturedVariableOfType(targetType: IrClass): IrGetValue? {
     var result: IrGetValue? = null

@@ -20,31 +20,33 @@ import org.jetbrains.kotlin.ir.util.receiverAndArgs
 /**
  * Returns `true` if this [IrFunctionAccessExpression] is a getter call.
  *
- * Recognizes synthetic Kotlin getter functions by their mangled name.
+ * Recognizes synthetic Kotlin getter functions by their mangled name,
+ * which typically start with `<get-`.
  */
 @OptIn(UnsafeDuringIrConstructionAPI::class)
-internal val IrFunctionAccessExpression.isGetter
+internal val IrFunctionAccessExpression.isGetter: Boolean
     get() = this is IrCall && symbol.owner.kotlinFqName.asString().substringAfterLast('.').startsWith("<get-")
 
 /**
- * Returns the simple name of the called function for this [IrFunctionAccessExpression].
+ * Returns the unmangled simple name of the function called by this [IrFunctionAccessExpression].
  *
  * Useful for logging, debugging, and token generation.
  */
 @OptIn(UnsafeDuringIrConstructionAPI::class)
-internal val IrFunctionAccessExpression.simpleFunctionName: String get() = symbol.owner.name.asString()
+internal val IrFunctionAccessExpression.simpleFunctionName: String
+    get() = symbol.owner.name.asString()
 
 /**
  * Computes a unique token that identifies this [IrFunctionAccessExpression]
  * for alignment purposes.
  *
- * The token encodes:
- * - the called function or constructor
- * - the type arguments
- * - the types of receivers and arguments
+ * The token includes:
+ * - the fully qualified name of the function or constructor
+ * - any type arguments (generic parameters)
+ * - the types of the receiver and all arguments
  *
  * @receiver the function or constructor call
- * @return a string token representing the call semantics
+ * @return a string token uniquely representing the call's semantics
  */
 @OptIn(UnsafeDuringIrConstructionAPI::class)
 internal fun IrFunctionAccessExpression.toFunctionAlignmentToken(): String {

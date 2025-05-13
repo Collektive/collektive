@@ -21,20 +21,26 @@ import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirWhenExpressionCh
 import org.jetbrains.kotlin.fir.analysis.extensions.FirAdditionalCheckersExtension
 
 /**
- * Extension that adds a series of checkers that looks for improper usages of the Collektive DSL.
+ * FIR extension that registers Collektive-specific DSL diagnostics.
+ *
+ * This extension adds custom [FirFunctionCallChecker]s and [FirWhenExpressionChecker]s
+ * to validate Collektive DSL usage at compile time. It helps detect:
+ * - Misuses of alignment primitives
+ * - Improper or redundant yield constructs
+ * - Use of aggregate-returning conditionals
+ * - Unused parameters in DSL lambdas
  */
 class CollektiveExtension(session: FirSession) : FirAdditionalCheckersExtension(session) {
     override val expressionCheckers: ExpressionCheckers =
         object : ExpressionCheckers() {
             override val functionCallCheckers: Set<FirFunctionCallChecker>
-                get() =
-                    setOf(
-                        ExplicitAlignDealign,
-                        ImproperConstruct,
-                        NoAlignInsideLoop,
-                        ConstructIgnoresParameter,
-                        UnnecessaryYielding,
-                    )
+                get() = setOf(
+                    ExplicitAlignDealign,
+                    ImproperConstruct,
+                    NoAlignInsideLoop,
+                    ConstructIgnoresParameter,
+                    UnnecessaryYielding,
+                )
 
             override val whenExpressionCheckers: Set<FirWhenExpressionChecker>
                 get() = setOf(

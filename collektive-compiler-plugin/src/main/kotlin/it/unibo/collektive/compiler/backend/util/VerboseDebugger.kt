@@ -9,13 +9,12 @@
 package it.unibo.collektive.compiler.backend.util
 
 /**
- * A flag that controls whether debugging actions should be performed.
+ * Flag that controls whether debug actions should be performed.
  *
- * When [PERFORM_ACTIONS] is set to `true`, debug messages are printed to standard output.
- * When set to `false`, debug messages are ignored, and no output is produced.
+ * When [PERFORM_ACTIONS] is `true`, debug messages are printed to standard output.
+ * When `false`, debug output is suppressed.
  *
- * This flag is typically used to toggle verbose logging during the development
- * or testing phases of the Collektive compiler plugin.
+ * Typically used to toggle verbose logging during development or testing.
  */
 private const val PERFORM_ACTIONS = false
 
@@ -23,10 +22,10 @@ private const val PERFORM_ACTIONS = false
  * Conditionally prints a debug message to standard output.
  *
  * If [PERFORM_ACTIONS] is `true`, the [message] is evaluated and printed.
- * Otherwise, the [message] is not evaluated and no action is performed.
+ * Otherwise, it is ignored.
  *
- * @param message A lazily evaluated function producing the message to log.
- * @return The debug message if printed, or `null` if suppressed.
+ * @param message a lazily evaluated function producing the message to log
+ * @return the message if printed, or `null` if suppressed
  *
  * @see PERFORM_ACTIONS
  */

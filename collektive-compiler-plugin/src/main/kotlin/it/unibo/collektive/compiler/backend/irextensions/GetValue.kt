@@ -24,13 +24,13 @@ import org.jetbrains.kotlin.ir.util.defaultType
  * Builds an [IrFunctionAccessExpression] that accesses the `context` property of a [Field].
  *
  * This utility constructs an IR call to the `context` getter on an [IrGetValue]
- * that references a [Field] instance.
+ * referencing a [Field] instance, returning the corresponding [Aggregate] context.
  *
  * @receiver an [IrGetValue] referencing a [Field]
- * @param pluginContext the IR plugin context used to build the IR
+ * @param pluginContext the IR plugin context used to construct the IR
  * @param aggregateClass the IR class representing the `Aggregate<ID>` interface
  * @param fieldClass the IR class representing the `Field<ID, *>` interface
- * @param getContext the IR function corresponding to the `context` property getter
+ * @param getContext the IR function symbol corresponding to the `context` property getter
  * @return an [IrFunctionAccessExpression] that retrieves the field's context
  * @throws IllegalStateException if the receiver is not assignable from [Field]
  */

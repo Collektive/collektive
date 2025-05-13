@@ -17,13 +17,19 @@ import org.jetbrains.kotlin.fir.declarations.utils.classId
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
 
-internal fun FirElement.isAlignedOn() =
+/**
+ * Returns `true` if this [FirElement] is a call to the `alignedOn` function.
+ */
+internal fun FirElement.isAlignedOn(): Boolean =
     this is FirFunctionCall && functionName == CollektiveNames.ALIGNED_ON_FUNCTION_NAME
 
 /**
- * TODO: for debugging purposes.
+ * Returns a readable, human-friendly string representation of the current [FirElement].
+ *
+ * This is used primarily for debugging or logging purposes to better understand
+ * the type or identity of a given FIR node.
  */
-internal fun FirElement.niceString() = when (this) {
+internal fun FirElement.niceString(): String = when (this) {
     is FirFunctionCall -> functionName
     is FirSimpleFunction -> name.asString()
     is FirClassLikeDeclaration -> classId.asString()

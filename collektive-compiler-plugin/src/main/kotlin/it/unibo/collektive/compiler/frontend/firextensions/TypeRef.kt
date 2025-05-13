@@ -13,4 +13,9 @@ import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.types.classId
 import org.jetbrains.kotlin.fir.types.coneType
 
-internal fun FirTypeRef.isField() = FIELD_CLASS_FQ_NAME == coneType.classId?.asFqNameString()
+/**
+ * Checks whether this [FirTypeRef] represents a `Field` type.
+ *
+ * @return `true` if the type is `Field`, `false` otherwise
+ */
+internal fun FirTypeRef.isField(): Boolean = FIELD_CLASS_FQ_NAME == coneType.classId?.asFqNameString()

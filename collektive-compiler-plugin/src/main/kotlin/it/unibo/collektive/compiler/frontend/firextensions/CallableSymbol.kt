@@ -14,13 +14,18 @@ import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.fir.types.coneType
 
 /**
- * Computes the complete list of receiver and argument types for a function symbol.
+ * Computes the full sequence of receiver and argument types for a given callable symbol.
  *
- * This includes:
- * - context parameters
- * - value parameters
- * - dispatch receiver
- * - extension receiver
+ * Includes, in order:
+ * - Context parameters
+ * - Value parameters
+ * - Dispatch receiver
+ * - Extension receiver
+ *
+ * Useful for checking type assignability or inspecting function signatures in FIR analysis.
+ *
+ * @receiver the [FirCallableSymbol] whose signature is to be inspected
+ * @return a [Sequence] of [ConeKotlinType]s representing all input types
  */
 internal fun FirCallableSymbol<*>.receiversAndArgumentsTypes(): Sequence<ConeKotlinType> {
     val valueParameters: Sequence<ConeKotlinType> = (this as? FirFunctionSymbol<*>)

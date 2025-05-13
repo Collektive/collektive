@@ -19,11 +19,11 @@ import org.jetbrains.kotlin.fir.types.classId
 private val aggregateTypes = listOf(AGGREGATE_CLASS_FQ_NAME, FIELD_CLASS_FQ_NAME)
 
 /**
- * Recursively retrieves all super types of this [ConeKotlinType] in the context of the given [session].
+ * Recursively retrieves all super types of this [ConeKotlinType] within the given [session].
  *
- * @receiver a [ConeKotlinType] to analyse
- * @param session the current [FirSession]
- * @return a set of all super types of this type
+ * @receiver the [ConeKotlinType] to analyze
+ * @param session the active [FirSession] for resolution
+ * @return a set of all recursively resolved super types
  */
 internal fun ConeKotlinType.allSuperTypes(session: FirSession): Set<ConeKotlinType> {
     val superTypes = directSuperTypes(session)
@@ -31,23 +31,32 @@ internal fun ConeKotlinType.allSuperTypes(session: FirSession): Set<ConeKotlinTy
 }
 
 /**
- * Retrieves the super types of this [ConeKotlinType] in the context of the given [session].
+ * Retrieves only the direct super types of this [ConeKotlinType] in the context of the provided [session].
+ *
+ * @receiver the [ConeKotlinType] to resolve
+ * @param session the active [FirSession] for resolution
+ * @return a set of directly inherited types, or an empty set if none
  */
 internal fun ConeKotlinType.directSuperTypes(session: FirSession): Set<ConeKotlinType> =
     (toSymbol(session) as? FirClassSymbol)?.resolvedSuperTypes?.toSet().orEmpty()
 
 /**
- * Checks whether the receiver type corresponds to a recognized aggregate type.
+ * Checks whether this type is an aggregate-aware type (either [Aggregate] or [Field]).
  *
- * @receiver a [ConeKotlinType] to analyse
- * @return `true` if the type is an aggregate or field type, `false` otherwise
+ * This includes both direct and inherited aggregate types.
+ *
+ * @receiver the [ConeKotlinType] to inspect
+ * @param session the active [FirSession] for resolution
+ * @return `true` if the type or any of its supertypes is an aggregate type, `false` otherwise
  */
 internal fun ConeKotlinType.isAggregate(session: FirSession): Boolean =
     this.classId?.asFqNameString() in aggregateTypes || directSuperTypes(session).any { it.isAggregate(session) }
 
 /**
- * Checks if any of the types in the sequence represents an aggregate type.
+ * Checks whether at least one type in the sequence is aggregate-related.
  *
- * @return `true` if at least one type in the sequence is an aggregate type, `false` otherwise.
+ * @receiver a sequence of [ConeKotlinType]s to inspect
+ * @param session the active [FirSession] for resolution
+ * @return `true` if any type in the sequence is an aggregate type, `false` otherwise
  */
 internal fun Sequence<ConeKotlinType>.anyIsAggregate(session: FirSession): Boolean = any { it.isAggregate(session) }

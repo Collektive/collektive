@@ -12,6 +12,10 @@ import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 
 /**
- * Returns the fully qualified name of this [IrDeclarationParent] as a string.
+ * Returns the fully qualified name of this [IrDeclarationParent] as a [String].
+ *
+ * This is equivalent to calling [kotlinFqName][org.jetbrains.kotlin.ir.util.kotlinFqName]
+ * and converting it to a string.
  */
-internal val IrDeclarationParent.fqString get() = this.kotlinFqName.asString()
+internal val IrDeclarationParent.fqString: String
+    get() = this.kotlinFqName.asString()

@@ -26,25 +26,23 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
  * IR transformer that identifies aggregate function definitions
  * and applies alignment transformations to their bodies.
  *
- * ## Purpose:
- * - Detects functions that operate over
- *   [it.unibo.collektive.aggregate.api.Aggregate]s or [it.unibo.collektive.aggregate.Field]s.
- * - Projects field values inside user-written branches and `alignOn` blocks.
- * - Injects `alignRaw` and `dealign` calls around aggregate computations
- *   using the [AlignmentTransformer].
+ * ## Purpose
+ * - Detects functions that operate on [it.unibo.collektive.aggregate.api.Aggregate]s
+ *   or [it.unibo.collektive.aggregate.Field]s.
+ * - Projects field values inside user-defined branches and `alignOn` blocks.
+ * - Wraps aggregate computations with `alignRaw` and `dealign` calls using the [AlignmentTransformer].
  *
- * ## Transformation Phases:
+ * ## Transformation Phases
  * 1. **Projection Phase**:
- *    Before aligning, the [ProjectionTransformer] is applied to pre-process
- *    fields inside branches and explicit `alignOn` calls.
+ *    The [ProjectionTransformer] is applied to pre-process fields
+ *    used inside conditional branches and `alignOn` blocks.
  * 2. **Alignment Phase**:
- *    After projection, the [AlignmentTransformer] wraps computations
- *    involving aggregates with appropriate alignment operations.
+ *    The [AlignmentTransformer] adds alignment boundaries around aggregate computations.
  *
- * ## Conditions:
+ * ## Conditions for Transformation
  * A function is transformed if:
  * - It is **concrete** (not abstract), and
- * - It is **aggregate-aware** (determined by parameter or receiver types).
+ * - It is **aggregate-aware**, as determined by its parameter or receiver types.
  *
  * @property pluginContext the plugin context used for IR construction
  * @property logger a [MessageCollector] used for debug and error reporting
@@ -80,6 +78,7 @@ class AggregateFunctionTransformer(
             debugPrint { "Aggregate function ${declaration.symbol.owner.name}" }
             val preProjection = debugPrint { declaration.dumpKotlinLike() }
             debugPrint { "Pre-alignment function: \n $preProjection" }
+
             /*
              * This transformation is needed to project fields inside branches and user-written `alignOn` operations.
              * Projection is performed before alignment to avoid unnecessary projections after every
@@ -96,7 +95,7 @@ class AggregateFunctionTransformer(
                 debugPrint { "Projected: $postProjection" }
             }
             /*
-             This transformation is needed to add the `alignRaw` and `dealign` function call to the aggregate functions.
+             * This transformation is needed to add the `alignRaw` and `dealign` calls to the aggregate functions.
              */
             declaration.transformChildren(
                 AlignmentTransformer(

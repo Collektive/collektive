@@ -10,4 +10,9 @@ package it.unibo.collektive.compiler.frontend.firextensions
 
 import org.jetbrains.kotlin.fir.declarations.FirValueParameter
 
-internal fun FirValueParameter.isField() = returnTypeRef.isField()
+/**
+ * Checks whether this [FirValueParameter] has a return type of `Field`.
+ *
+ * @return `true` if the parameter is of type `Field`, `false` otherwise
+ */
+internal fun FirValueParameter.isField(): Boolean = returnTypeRef.isField()

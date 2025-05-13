@@ -22,16 +22,20 @@ import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirFunctionCallChec
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 
 /**
- * Checker that looks for improper usages of the `evolve` method, generating a warning.
- * For example, in the following example:
+ * Checker that detects improper usage of the `evolve` or `evolving` constructs
+ * that could be more appropriately expressed using `share`.
+ *
+ * For example:
  *
  * ```kotlin
- * evolve(initial){ it ->
- *     val newValue = //same of `it`
- *     neighboring(newValue).operation //field reduction
+ * evolve(initial) { it ->
+ *     val newValue = // same as `it`
+ *     neighboring(newValue).operation // neighboring field is stored
  * }
  * ```
- * The checker raises a warning because this operation can be replaced by using the more appropriate `share` construct.
+ *
+ * This construct is flagged because it can typically be replaced with a `share` call,
+ * which is more semantically accurate and efficient for this pattern.
  */
 object ImproperConstruct : FirFunctionCallChecker(MppCheckerKind.Common) {
 
@@ -43,8 +47,7 @@ object ImproperConstruct : FirFunctionCallChecker(MppCheckerKind.Common) {
 
     override fun check(expression: FirFunctionCall, context: CheckerContext, reporter: DiagnosticReporter) {
         val isEvolve = expression.fqName.run { this == EVOLVE_FUNCTION_FQ_NAME || this == EVOLVING_FUNCTION_FQ_NAME }
-        if (isEvolve && expression.isImproperEvolve()
-        ) {
+        if (isEvolve && expression.isImproperEvolve()) {
             reporter.reportOn(
                 expression.calleeReference.source,
                 CollektiveFrontendErrors.IMPROPER_EVOLVE_CONSTRUCT,

@@ -16,9 +16,14 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
 
 /**
- * Visitor that checks for usages of value parameters inside an anonymous function call block.
+ * Visitor that detects whether the parameters of an anonymous function
+ * are actually used within its body.
+ *
+ * This is typically used to identify constructs that could be simplified or
+ * replaced, such as yielding the same input without modification.
  */
 class ConstructIgnoresParameterVisitor : FirVisitorVoid() {
+
     private var checkedParametersDeclarations = listOf<FirValueParameterSymbol>()
     private var found = true
     private var nestedAnonymousFunction = false
@@ -53,8 +58,12 @@ class ConstructIgnoresParameterVisitor : FirVisitorVoid() {
     }
 
     /**
-     * Checks for usages, inside an anonymous function call block, of its value parameters. This includes
-     * implicit parameters (i.e. `it`). Returns `true` if any of the value parameters is used, `false` otherwise.
+     * Checks whether the value parameters of an anonymous function are unused in its body.
+     *
+     * This includes both explicitly named and implicit parameters (e.g., `it`).
+     *
+     * @param call the [FirFunctionCall] containing the anonymous function block
+     * @return `true` if none of the value parameters are referenced; `false` otherwise
      */
     fun doesNotUseValueParameters(call: FirFunctionCall): Boolean {
         visitElement(call)

@@ -18,10 +18,15 @@ import org.jetbrains.kotlin.fir.expressions.FirReturnExpression
 import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
 
 /**
- * Visitor that checks if a [FirFunctionCall] contains an unnecessary yielding context. Look at the documentation of
- * [it.unibo.collektive.frontend.checkers.UnnecessaryYielding] for more information.
+ * Visitor that detects unnecessary yielding contexts in a [FirFunctionCall].
+ *
+ * A yielding context is considered unnecessary if the value passed to `yielding` is
+ * structurally identical to the receiver — meaning no transformation occurred.
+ *
+ * See also [it.unibo.collektive.compiler.frontend.checkers.UnnecessaryYielding].
  */
 class UnnecessaryYieldingVisitor : FirVisitorVoid() {
+
     private var containsUnnecessaryYielding = false
     private var yieldingReceiver: FirExpression? = null
     private var insideYielding = false
@@ -51,8 +56,10 @@ class UnnecessaryYieldingVisitor : FirVisitorVoid() {
     }
 
     /**
-     * Checks if the [FirFunctionCall] contains an unnecessary yielding context. Look at the documentation of
-     * [it.unibo.collektive.frontend.checkers.UnnecessaryYielding] for more information.
+     * Checks whether the given [functionCall] contains an unnecessary yielding block.
+     *
+     * @param functionCall the [FirFunctionCall] to inspect
+     * @return `true` if the yielded result is structurally identical to the receiver; `false` otherwise
      */
     fun containsUnnecessaryYielding(functionCall: FirFunctionCall): Boolean {
         visitElement(functionCall)

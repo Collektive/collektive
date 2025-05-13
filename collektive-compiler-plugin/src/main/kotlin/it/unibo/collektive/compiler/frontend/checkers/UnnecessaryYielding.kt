@@ -23,13 +23,13 @@ import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirFunctionCallChec
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 
 /**
- * Checker for unnecessary yielding contexts.
+ * Checker that identifies unnecessary yielding contexts.
  *
- * This checker is responsible for finding constructs like `evolving`, `exchanging` and `sharing` that are called with
- * a yielded expression that is the same as the one that is exchanged, resulting in an unnecessary yielding context.
+ * This checker detects cases where constructs like `evolving`, `exchanging`, or `sharing`
+ * are called with a yielded expression that simply returns the same value,
+ * making the use of `yielding` redundant.
  *
- * For example:
- *
+ * ### Example (flagged):
  * ```kotlin
  * sharing(initial) {
  *     // ...
@@ -37,16 +37,18 @@ import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
  * }
  * ```
  *
- * Should generate a warning indicating to switch to the `share` construct, as in the following:
+ * In the above, the yielding context is unnecessary and should be replaced with:
  *
+ * ### Preferred:
  * ```kotlin
  * share(initial) {
- *    // ...
- *    value
+ *     // ...
+ *     value
  * }
  * ```
  */
 object UnnecessaryYielding : FirFunctionCallChecker(MppCheckerKind.Common) {
+
     private val constructs =
         listOf(
             EVOLVING_FUNCTION_FQ_NAME,

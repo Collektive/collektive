@@ -16,11 +16,13 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 
 /**
- * The command line processor is used to define the expected command line
- * option, which enable or disable the plugin that is responsible for the alignment.
+ * Command line processor for the Collektive Kotlin compiler plugin.
+ *
+ * Defines the plugin's CLI options for enabling or disabling DSL-based alignment transformations.
  */
 @OptIn(ExperimentalCompilerApi::class)
 class CollektiveCommandLineProcessor : CommandLineProcessor {
+
     /**
      * The companion object is used to define the keys used by the compiler
      * to enable or disable the plugin, and other future options.
@@ -29,12 +31,12 @@ class CollektiveCommandLineProcessor : CommandLineProcessor {
         private const val OPTION_ENABLED = "collektiveEnabled"
 
         /**
-         * The key used by the compiler to enable or disable the plugin.
+         * Key used to enable or disable the plugin in the [CompilerConfiguration].
          */
         val ARG_ENABLED = CompilerConfigurationKey<Boolean>(OPTION_ENABLED)
 
         /**
-         * The plugin id used to identify the plugin in the compiler.
+         * The plugin ID used to identify the Collektive plugin in the compiler.
          */
         const val PLUGIN_ID = BuildConfig.KOTLIN_PLUGIN_ID
     }
@@ -46,14 +48,15 @@ class CollektiveCommandLineProcessor : CommandLineProcessor {
             CliOption(
                 optionName = OPTION_ENABLED,
                 valueDescription = "bool <true | false>",
-                description = "If the alignment plugin should be applied",
+                description = "Controls whether the Collektive alignment plugin should be applied.",
                 required = false,
             ),
         )
 
-    override fun processOption(option: AbstractCliOption, value: String, configuration: CompilerConfiguration) =
+    override fun processOption(option: AbstractCliOption, value: String, configuration: CompilerConfiguration) {
         when (option.optionName) {
             OPTION_ENABLED -> configuration.put(ARG_ENABLED, value.toBoolean())
             else -> throw IllegalArgumentException("Unexpected config option ${option.optionName}")
         }
+    }
 }
