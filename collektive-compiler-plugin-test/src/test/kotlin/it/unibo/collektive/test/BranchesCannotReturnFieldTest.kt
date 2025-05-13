@@ -37,6 +37,6 @@ class BranchesCannotReturnFieldTest {
 
     @Test
     fun `even when the return type is Any, if one branch returns a field the compiler raises errors`() {
-        "BrokenBranch2".doesNotCompileBecauseBranchesReturnField
+        "BrokenBranch3".doesNotCompileBecauseBranchesReturnField
     }
 }
