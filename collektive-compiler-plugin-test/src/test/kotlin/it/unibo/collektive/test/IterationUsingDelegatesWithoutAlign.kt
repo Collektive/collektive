@@ -29,27 +29,20 @@ class IterationUsingDelegatesWithoutAlign {
             val functionName = functionCall.substringBefore("(")
             for ((iteration, _) in formsOfIteration) {
                 with(testSubjects) {
-                    `iteration with warning`("IterationDelegate", functionName, iteration, expectedWarning)
                     `iteration without warning`("IterationAlignDelegate", functionName, iteration)
-                    `iteration with warning`("IterationDelegateAlign", functionName, iteration, expectedWarning)
-                    `iteration with warning`("IterationDelegateWithNestedFun", functionName, iteration, expectedWarning)
-                    `iteration with warning`("IterationRecursiveDelegate", functionName, iteration, expectedWarning)
-                    `iteration with warning`(
+                    listOf(
+                        "IterationDelegate",
+                        "IterationDelegateAlign",
+                        "IterationDelegateWithNestedFun",
+                        "IterationDelegatedNestedFun",
+                        "IterationRecursiveDelegate",
                         "IterationAlignRecursiveDelegate",
-                        functionName,
-                        iteration,
-                        expectedWarning,
-                    )
-                    `iteration with warning`(
                         "IterationRecursiveDelegateAlign",
-                        functionName,
-                        iteration,
-                        expectedWarning,
-                    )
-                    // Disabled tests
-                    // `iteration with warning`("IterationDelegatedNestedFun", functionName, iteration, expectedWarning)
-                    // `iteration without warning`("IterationAlignDelegatedNestedFun", functionName, iteration)
-                    // `iteration without warning`("IterationDelegatedNestedFunAlign", functionName, iteration)
+                        "IterationAlignDelegatedNestedFun",
+                        "IterationDelegatedNestedFunAlign",
+                    ).forEach {
+                        `iteration with warning`(it, functionName, iteration, expectedWarning)
+                    }
                 }
             }
         }
