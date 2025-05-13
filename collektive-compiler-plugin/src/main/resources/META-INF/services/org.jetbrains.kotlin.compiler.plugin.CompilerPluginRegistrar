@@ -6,4 +6,4 @@
 # as described in the LICENSE file in this project's repository's top directory.
 #
 
-it.unibo.collektive.compiler.AlignmentComponentRegistrar
+it.unibo.collektive.compiler.CollektiveCompilerPluginRegistrar

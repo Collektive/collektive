@@ -25,13 +25,13 @@ import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter
  * the compiler plugin is enabled.
  */
 @OptIn(ExperimentalCompilerApi::class)
-class AlignmentComponentRegistrar : CompilerPluginRegistrar() {
+class CollektiveCompilerPluginRegistrar : CompilerPluginRegistrar() {
     override val supportsK2: Boolean = true
 
     override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
         val logger = configuration.get(CommonConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE)
-        if (configuration.get(AlignmentCommandLineProcessor.ARG_ENABLED) != false) {
-            IrGenerationExtension.registerExtension(AlignmentIrGenerationExtension(logger))
+        if (configuration.get(CollektiveCommandLineProcessor.ARG_ENABLED) != false) {
+            IrGenerationExtension.registerExtension(CollektiveIrGenerationExtension(logger))
             FirExtensionRegistrarAdapter.registerExtension(CollektiveFrontendExtensionRegistrar())
         }
     }

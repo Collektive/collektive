@@ -103,9 +103,9 @@ object CollektiveJVMCompiler {
         configuration.addJvmClasspathRoot(KotlinJars.stdlib)
         // Add the Collektive plugin
         configuration.add(CompilerPluginRegistrar.COMPILER_PLUGIN_REGISTRARS, ScriptingK2CompilerPluginRegistrar())
-        configuration.add(CompilerPluginRegistrar.COMPILER_PLUGIN_REGISTRARS, AlignmentComponentRegistrar())
+        configuration.add(CompilerPluginRegistrar.COMPILER_PLUGIN_REGISTRARS, CollektiveCompilerPluginRegistrar())
         // Configure the Collektive plugin options available in the command line processor
-        configuration.put(AlignmentCommandLineProcessor.ARG_ENABLED, true)
+        configuration.put(CollektiveCommandLineProcessor.ARG_ENABLED, true)
         val environment =
             KotlinCoreEnvironment.createForProduction(
                 { },

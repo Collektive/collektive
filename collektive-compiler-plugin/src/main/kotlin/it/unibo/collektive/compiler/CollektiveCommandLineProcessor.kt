@@ -20,7 +20,7 @@ import org.jetbrains.kotlin.config.CompilerConfigurationKey
  * option, which enable or disable the plugin that is responsible for the alignment.
  */
 @OptIn(ExperimentalCompilerApi::class)
-class AlignmentCommandLineProcessor : CommandLineProcessor {
+class CollektiveCommandLineProcessor : CommandLineProcessor {
     /**
      * The companion object is used to define the keys used by the compiler
      * to enable or disable the plugin, and other future options.

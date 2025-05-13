@@ -36,7 +36,7 @@ import org.jetbrains.kotlin.name.Name
  * the IR using the function responsible for the alignment.
  */
 @OptIn(UnsafeDuringIrConstructionAPI::class)
-class AlignmentIrGenerationExtension(private val logger: MessageCollector) : IrGenerationExtension {
+class CollektiveIrGenerationExtension(private val logger: MessageCollector) : IrGenerationExtension {
 
     override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
         // Aggregate Context class that has the reference to the stack
