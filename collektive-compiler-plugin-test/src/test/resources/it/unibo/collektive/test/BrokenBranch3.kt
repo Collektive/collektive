@@ -12,7 +12,7 @@ import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
 
-fun exchangeWithThreeDevices(body: Aggregate<Int>.(Field<Int, Int>) -> Field<Int, Int>): Unit = TODO()
+fun exchangeWithThreeDevices(body: Aggregate<Int>.() -> Field<Int, Int>): Unit = TODO()
 
 fun asd() = exchangeWithThreeDevices {
     if (localId % 2 == 0) {
