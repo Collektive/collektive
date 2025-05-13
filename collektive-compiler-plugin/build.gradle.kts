@@ -37,7 +37,7 @@ dependencies {
 }
 
 buildConfig {
-    packageName(group.toString())
+    packageName("$group.compiler")
     buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"$group.collektive-compiler-plugin\"")
 }
 

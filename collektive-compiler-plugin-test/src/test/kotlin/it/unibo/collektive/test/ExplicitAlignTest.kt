@@ -9,9 +9,9 @@
 package it.unibo.collektive.test
 
 import io.kotest.core.spec.style.FreeSpec
+import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames
 import it.unibo.collektive.test.util.CompileUtils.asTestingProgram
 import it.unibo.collektive.test.util.CompileUtils.warningMessage
-import it.unibo.collektive.utils.common.AggregateFunctionNames
 
 class ExplicitAlignTest : FreeSpec({
     "The `align` function" - {
