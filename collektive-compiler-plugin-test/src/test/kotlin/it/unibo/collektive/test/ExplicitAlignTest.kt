@@ -9,7 +9,7 @@
 package it.unibo.collektive.test
 
 import io.kotest.core.spec.style.FreeSpec
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames
+import it.unibo.collektive.compiler.common.CollektiveNames
 import it.unibo.collektive.test.util.CompileUtils.asTestingProgram
 import it.unibo.collektive.test.util.CompileUtils.warningMessage
 
@@ -19,7 +19,7 @@ class ExplicitAlignTest : FreeSpec({
         "should produce a warning when used explicitly" - {
             code shouldCompileWith
                 warningMessage(
-                    EXPECTED_WARNING_MESSAGE.format(AggregateFunctionNames.ALIGN_FUNCTION_FQ_NAME),
+                    EXPECTED_WARNING_MESSAGE.format(CollektiveNames.ALIGN_FUNCTION_FQ_NAME),
                 )
         }
     }
@@ -28,7 +28,7 @@ class ExplicitAlignTest : FreeSpec({
         "should produce a warning when used explicitly" - {
             code shouldCompileWith
                 warningMessage(
-                    EXPECTED_WARNING_MESSAGE.format(AggregateFunctionNames.DEALIGN_FUNCTION_FQ_NAME),
+                    EXPECTED_WARNING_MESSAGE.format(CollektiveNames.DEALIGN_FUNCTION_FQ_NAME),
                 )
         }
     }

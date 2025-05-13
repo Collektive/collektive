@@ -9,18 +9,18 @@
 package it.unibo.collektive.compiler.backend.transformers
 
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.compiler.backend.utils.StackFunctionCall
-import it.unibo.collektive.compiler.utils.common.findAggregateReference
-import it.unibo.collektive.compiler.utils.common.irStatement
-import it.unibo.collektive.compiler.utils.common.simpleFunctionName
-import it.unibo.collektive.compiler.utils.common.toFunctionAlignmentToken
-import it.unibo.collektive.compiler.utils.logging.debugPrint
-import it.unibo.collektive.compiler.utils.logging.error
+import it.unibo.collektive.compiler.backend.irextensions.findAggregateReference
+import it.unibo.collektive.compiler.backend.irextensions.simpleFunctionName
+import it.unibo.collektive.compiler.backend.irextensions.toFunctionAlignmentToken
+import it.unibo.collektive.compiler.backend.util.StackFunctionCall
+import it.unibo.collektive.compiler.backend.util.debugPrint
+import it.unibo.collektive.compiler.common.error
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.builders.IrBlockBodyBuilder
+import org.jetbrains.kotlin.ir.builders.Scope
 import org.jetbrains.kotlin.ir.builders.createTmpVariable
 import org.jetbrains.kotlin.ir.builders.irBlock
 import org.jetbrains.kotlin.ir.builders.irBoolean
@@ -198,7 +198,7 @@ class AlignmentTransformer(
                     if (isTempVar && contextRefVar.name.asString().startsWith(CONTEXT_VARIABLE_NAME)) {
                         logger.error(
                             "Double alignment detected in ${
-                                expression.simpleFunctionName()
+                                expression.simpleFunctionName
                             }:\n${
                                 expression.dumpKotlinLike()
                             }",
@@ -298,5 +298,29 @@ class AlignmentTransformer(
     private companion object {
         const val CONTEXT_VARIABLE_NAME = "collektiveAggregateContext"
         const val ALIGNED_COMPUTATION_VARIABLE_NAME = "collektiveAlignedComputationResult"
+
+
+        /**
+         * Builds an IR statement using [IrBlockBodyBuilder] tied to the given function and expression.
+         *
+         * This function helps create IR blocks inside plugin transformations in a scoped and safe way.
+         *
+         * @param pluginContext the current plugin context
+         * @param functionToAlign the function under transformation
+         * @param expression the source IR element
+         * @param body the block-building lambda
+         * @return the constructed IR element
+         */
+        fun <T : IrElement> irStatement(
+            pluginContext: IrPluginContext,
+            functionToAlign: IrFunction,
+            expression: IrElement,
+            body: IrBlockBodyBuilder.() -> T,
+        ): T = IrBlockBodyBuilder(
+            pluginContext,
+            Scope(functionToAlign.symbol),
+            expression.startOffset,
+            expression.endOffset,
+        ).body()
     }
 }

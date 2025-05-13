@@ -8,12 +8,12 @@
 
 package it.unibo.collektive.compiler.frontend.checkers
 
+import it.unibo.collektive.compiler.common.CollektiveNames.EVOLVING_FUNCTION_FQ_NAME
+import it.unibo.collektive.compiler.common.CollektiveNames.EXCHANGING_FUNCTION_FQ_NAME
+import it.unibo.collektive.compiler.common.CollektiveNames.SHARING_FUNCTION_FQ_NAME
 import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.fqName
 import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.functionName
 import it.unibo.collektive.compiler.frontend.visitors.YieldingUnnecessaryUsageVisitor
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames.EVOLVING_FUNCTION_FQ_NAME
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames.EXCHANGING_FUNCTION_FQ_NAME
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames.SHARING_FUNCTION_FQ_NAME
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind

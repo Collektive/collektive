@@ -8,8 +8,8 @@
 
 package it.unibo.collektive.compiler.frontend.checkers
 
+import it.unibo.collektive.compiler.common.CollektiveNames
 import it.unibo.collektive.compiler.frontend.checkers.FirCollektiveErrors.BRANCH_RETURNS_FIELD
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames
 import org.jetbrains.kotlin.diagnostics.KtDiagnosticFactoryToRendererMap
 import org.jetbrains.kotlin.diagnostics.rendering.BaseDiagnosticRendererFactory
 import org.jetbrains.kotlin.diagnostics.rendering.CommonRenderers
@@ -33,7 +33,7 @@ object KtDefaultErrorMessagesCollektive : BaseDiagnosticRendererFactory() {
             put(
                 BRANCH_RETURNS_FIELD,
                 """
-                    This branch returns a ''{0}'', which is an instance of ${AggregateFunctionNames.FIELD_CLASS_FQ_NAME}.
+                    This branch returns a ''{0}'', which is an instance of ${CollektiveNames.FIELD_CLASS_FQ_NAME}.
                     Returning fields from branches is disallowed, as it may break alignment: fields are projected within branches  
                     and may be restricted to partial domains.
                     Build the field before the branch and map it afterward.  

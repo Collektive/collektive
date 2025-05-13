@@ -6,7 +6,7 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
-package it.unibo.collektive.compiler.utils.logging
+package it.unibo.collektive.compiler.backend.util
 
 /**
  * A flag that controls whether debugging actions should be performed.

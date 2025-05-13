@@ -8,12 +8,12 @@
 
 package it.unibo.collektive.compiler.frontend.visitors
 
+import it.unibo.collektive.compiler.common.CollektiveNames.EVOLVING_FUNCTION_FQ_NAME
+import it.unibo.collektive.compiler.common.CollektiveNames.NEIGHBORING_FUNCTION_FQ_NAME
+import it.unibo.collektive.compiler.common.CollektiveNames.YIELDING_FUNCTION_FQ_NAME
 import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.extractReturnExpression
 import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.fqName
 import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.isStructurallyEquivalentTo
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames.EVOLVING_FUNCTION_FQ_NAME
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames.NEIGHBORING_FUNCTION_FQ_NAME
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames.YIELDING_FUNCTION_FQ_NAME
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.declarations.FirProperty
 import org.jetbrains.kotlin.fir.expressions.FirAnonymousFunctionExpression

@@ -6,7 +6,7 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
-package it.unibo.collektive.compiler.backend.utils
+package it.unibo.collektive.compiler.backend.util
 
 /**
  * A stack that keeps track of the function calls in the code.

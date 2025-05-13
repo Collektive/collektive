@@ -8,12 +8,12 @@
 
 package it.unibo.collektive.compiler.frontend.checkers
 
+import it.unibo.collektive.compiler.common.CollektiveNames
 import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.allSuperTypes
 import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.fqName
 import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.functionName
 import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.isAggregate
 import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.isFunctionCallsWithName
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.FirElement
@@ -42,9 +42,9 @@ import kotlin.reflect.jvm.kotlinFunction
 object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
     private val safeOperators =
         listOf(
-            AggregateFunctionNames.ALIGNED_ON_FUNCTION_FQ_NAME,
-            AggregateFunctionNames.ALIGN_FUNCTION_FQ_NAME,
-            AggregateFunctionNames.DEALIGN_FUNCTION_FQ_NAME,
+            CollektiveNames.ALIGNED_ON_FUNCTION_FQ_NAME,
+            CollektiveNames.ALIGN_FUNCTION_FQ_NAME,
+            CollektiveNames.DEALIGN_FUNCTION_FQ_NAME,
         )
 
     /**
@@ -125,8 +125,7 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
                 type.allSuperTypes(session).any { it.classId?.asFqNameString() in supportedTypes }
         }
 
-    private fun FirElement.isAlignedOn() =
-        isFunctionCallsWithName(AggregateFunctionNames.ALIGNED_ON_FUNCTION_NAME)(this)
+    private fun FirElement.isAlignedOn() = isFunctionCallsWithName(CollektiveNames.ALIGNED_ON_FUNCTION_NAME)(this)
 
     private fun CheckerContext.isIteratedWithoutAlignedOn(): Boolean {
         // Find the outermost aggregate declaration

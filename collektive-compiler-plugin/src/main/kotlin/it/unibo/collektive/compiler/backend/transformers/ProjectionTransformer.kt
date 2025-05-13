@@ -8,9 +8,9 @@
 
 package it.unibo.collektive.compiler.backend.transformers
 
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames
-import it.unibo.collektive.compiler.utils.logging.debug
-import it.unibo.collektive.compiler.utils.logging.debugPrint
+import it.unibo.collektive.compiler.backend.util.debugPrint
+import it.unibo.collektive.compiler.common.CollektiveNames
+import it.unibo.collektive.compiler.common.debug
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.declarations.IrFunction
@@ -37,8 +37,8 @@ class ProjectionTransformer(
     @OptIn(UnsafeDuringIrConstructionAPI::class)
     override fun visitCall(expression: IrCall): IrExpression {
         val symbolName = expression.symbol.owner.name
-        val alignRawIdentifier = Name.identifier(AggregateFunctionNames.ALIGN_FUNCTION_NAME)
-        val alignedOnIdentifier = Name.identifier(AggregateFunctionNames.ALIGNED_ON_FUNCTION_NAME)
+        val alignRawIdentifier = Name.identifier(CollektiveNames.ALIGN_FUNCTION_NAME)
+        val alignedOnIdentifier = Name.identifier(CollektiveNames.ALIGNED_ON_FUNCTION_NAME)
         if (symbolName == alignRawIdentifier || symbolName == alignedOnIdentifier) {
             // alignedOn call: the fields need projection
             logger.debug("Found raw-align function call: $symbolName")

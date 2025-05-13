@@ -8,9 +8,9 @@
 
 package it.unibo.collektive.compiler.frontend.checkers
 
+import it.unibo.collektive.compiler.common.CollektiveNames
 import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.fqName
 import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.isInsideAggregateFunction
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
@@ -36,7 +36,7 @@ object ExplicitAlignDealign : FirFunctionCallChecker(MppCheckerKind.Common) {
 
     private val FORBIDDEN_FUNCTIONS =
         listOf(
-            AggregateFunctionNames.ALIGN_FUNCTION_FQ_NAME,
-            AggregateFunctionNames.DEALIGN_FUNCTION_FQ_NAME,
+            CollektiveNames.ALIGN_FUNCTION_FQ_NAME,
+            CollektiveNames.DEALIGN_FUNCTION_FQ_NAME,
         )
 }

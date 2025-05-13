@@ -9,10 +9,10 @@
 package it.unibo.collektive.compiler.frontend.checkers
 
 import it.unibo.collektive.aggregate.api.CollektiveIgnore
+import it.unibo.collektive.compiler.common.CollektiveNames.AGGREGATE_CLASS_FQ_NAME
+import it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME
+import it.unibo.collektive.compiler.common.CollektiveNames.IGNORE_FUNCTION_ANNOTATION_FQ_NAME
 import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.functionName
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames.AGGREGATE_CLASS_FQ_NAME
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames.FIELD_CLASS_FQ_NAME
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames.IGNORE_FUNCTION_ANNOTATION_FQ_NAME
 import org.jetbrains.kotlin.fir.FirAnnotationContainer
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession

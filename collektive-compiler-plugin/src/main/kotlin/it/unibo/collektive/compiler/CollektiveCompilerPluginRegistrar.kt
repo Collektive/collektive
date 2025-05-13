@@ -8,9 +8,9 @@
 
 package it.unibo.collektive.compiler
 
+import it.unibo.collektive.compiler.common.info
+import it.unibo.collektive.compiler.common.strongWarning
 import it.unibo.collektive.compiler.frontend.CollektiveFrontendExtensionRegistrar
-import it.unibo.collektive.compiler.utils.logging.info
-import it.unibo.collektive.compiler.utils.logging.strongWarning
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar

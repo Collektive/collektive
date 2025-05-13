@@ -8,9 +8,9 @@
 
 package it.unibo.collektive.compiler.frontend.visitors
 
+import it.unibo.collektive.compiler.common.CollektiveNames.YIELDING_FUNCTION_FQ_NAME
 import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.fqName
 import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.isStructurallyEquivalentTo
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames.YIELDING_FUNCTION_FQ_NAME
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall

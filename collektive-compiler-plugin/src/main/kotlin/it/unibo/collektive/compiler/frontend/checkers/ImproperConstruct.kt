@@ -8,11 +8,11 @@
 
 package it.unibo.collektive.compiler.frontend.checkers
 
+import it.unibo.collektive.compiler.common.CollektiveNames.EVOLVE_FUNCTION_FQ_NAME
+import it.unibo.collektive.compiler.common.CollektiveNames.EVOLVING_FUNCTION_FQ_NAME
 import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.fqName
 import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.functionName
 import it.unibo.collektive.compiler.frontend.visitors.ImproperConstructVisitor
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames.EVOLVE_FUNCTION_FQ_NAME
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames.EVOLVING_FUNCTION_FQ_NAME
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind

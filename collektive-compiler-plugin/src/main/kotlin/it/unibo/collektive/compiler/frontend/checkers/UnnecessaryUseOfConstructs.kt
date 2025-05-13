@@ -8,11 +8,11 @@
 
 package it.unibo.collektive.compiler.frontend.checkers
 
+import it.unibo.collektive.compiler.common.CollektiveNames
 import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.fqName
 import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.functionName
 import it.unibo.collektive.compiler.frontend.visitors.ConstructCallVisitor
 import it.unibo.collektive.compiler.frontend.visitors.EmptyReturnVisitor
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
@@ -39,19 +39,19 @@ import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 object UnnecessaryUseOfConstructs : FirFunctionCallChecker(MppCheckerKind.Common) {
     private val constructs =
         listOf(
-            AggregateFunctionNames.NEIGHBORING_FUNCTION_FQ_NAME,
-            AggregateFunctionNames.EXCHANGE_FUNCTION_FQ_NAME,
-            AggregateFunctionNames.SHARE_FUNCTION_FQ_NAME,
-            AggregateFunctionNames.EVOLVE_FUNCTION_FQ_NAME,
-            AggregateFunctionNames.EXCHANGING_FUNCTION_FQ_NAME,
-            AggregateFunctionNames.SHARING_FUNCTION_FQ_NAME,
-            AggregateFunctionNames.EVOLVING_FUNCTION_FQ_NAME,
+            CollektiveNames.NEIGHBORING_FUNCTION_FQ_NAME,
+            CollektiveNames.EXCHANGE_FUNCTION_FQ_NAME,
+            CollektiveNames.SHARE_FUNCTION_FQ_NAME,
+            CollektiveNames.EVOLVE_FUNCTION_FQ_NAME,
+            CollektiveNames.EXCHANGING_FUNCTION_FQ_NAME,
+            CollektiveNames.SHARING_FUNCTION_FQ_NAME,
+            CollektiveNames.EVOLVING_FUNCTION_FQ_NAME,
         )
 
     private fun FirFunctionCall.isConstructToCheck() = fqName() in constructs
 
     private fun FirFunctionCall.doesNotUseParameter(): Boolean = when (fqName()) {
-        AggregateFunctionNames.NEIGHBORING_FUNCTION_FQ_NAME -> with(EmptyReturnVisitor()) { hasEmptyReturn() }
+        CollektiveNames.NEIGHBORING_FUNCTION_FQ_NAME -> with(EmptyReturnVisitor()) { hasEmptyReturn() }
         else -> with(ConstructCallVisitor()) { doesNotContainValueParameterUsagesInAnonymousFunctionCall() }
     }
 

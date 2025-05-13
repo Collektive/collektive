@@ -11,12 +11,12 @@
 package it.unibo.collektive.compiler
 
 import it.unibo.collektive.compiler.backend.transformers.AggregateFunctionTransformer
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames.AGGREGATE_CLASS_FQ_NAME
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames.ALIGN_FUNCTION_NAME
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames.DEALIGN_FUNCTION_NAME
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames.FIELD_CLASS_FQ_NAME
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames.PROJECT_FUNCTION
-import it.unibo.collektive.compiler.utils.logging.error
+import it.unibo.collektive.compiler.common.CollektiveNames.AGGREGATE_CLASS_FQ_NAME
+import it.unibo.collektive.compiler.common.CollektiveNames.ALIGN_FUNCTION_NAME
+import it.unibo.collektive.compiler.common.CollektiveNames.DEALIGN_FUNCTION_NAME
+import it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME
+import it.unibo.collektive.compiler.common.CollektiveNames.PROJECT_FUNCTION_NAME
+import it.unibo.collektive.compiler.common.error
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -53,7 +53,7 @@ class CollektiveIrGenerationExtension(private val logger: MessageCollector) : Ir
         val projectFunction = pluginContext.referenceFunctions(
             CallableId(
                 FqName("it.unibo.collektive.aggregate.api.impl"),
-                Name.identifier(PROJECT_FUNCTION),
+                Name.identifier(PROJECT_FUNCTION_NAME),
             ),
         ).firstOrNull() ?: return logger.error("Unable to find the 'project' function")
         // Function that handles the alignment

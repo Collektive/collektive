@@ -8,9 +8,9 @@
 
 package it.unibo.collektive.compiler.frontend.visitors
 
+import it.unibo.collektive.compiler.common.CollektiveNames.ALIGNED_ON_FUNCTION_FQ_NAME
 import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.fqName
 import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.isAggregate
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames.ALIGNED_ON_FUNCTION_FQ_NAME
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction

@@ -6,7 +6,7 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
-package it.unibo.collektive.compiler.utils.common
+package it.unibo.collektive.compiler.common
 
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
@@ -22,7 +22,7 @@ import it.unibo.collektive.aggregate.api.YieldingContext
  *
  * These constants are useful for matching IR declarations, resolving symbols, and generating IR.
  */
-object AggregateFunctionNames {
+object CollektiveNames {
 
     /** Simple name of the [Aggregate] interface. Useful for logging and diagnostics. */
     val AGGREGATE_CLASS_NAME: String? = Aggregate::class.simpleName
@@ -73,7 +73,7 @@ object AggregateFunctionNames {
     val IGNORE_FUNCTION_ANNOTATION_FQ_NAME: String = checkNotNull(CollektiveIgnore::class.qualifiedName)
 
     /** Name of the `project(...)` function for field projections. */
-    const val PROJECT_FUNCTION: String = "project"
+    const val PROJECT_FUNCTION_NAME: String = "project"
 
     /** Fully-qualified name of the `share(...)` function. */
     const val SHARE_FUNCTION_FQ_NAME: String = "it.unibo.collektive.aggregate.api.share"

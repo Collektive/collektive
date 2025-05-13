@@ -8,8 +8,8 @@
 
 package it.unibo.collektive.compiler.frontend.checkers
 
+import it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME
 import it.unibo.collektive.compiler.frontend.checkers.CheckersUtility.isInsideAggregateFunction
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames.FIELD_CLASS_FQ_NAME
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind

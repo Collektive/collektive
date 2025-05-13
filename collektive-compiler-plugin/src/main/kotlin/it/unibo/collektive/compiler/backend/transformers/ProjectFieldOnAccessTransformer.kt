@@ -9,10 +9,10 @@
 package it.unibo.collektive.compiler.backend.transformers
 
 import it.unibo.collektive.aggregate.Field
-import it.unibo.collektive.compiler.utils.common.AggregateFunctionNames.FIELD_CLASS_FQ_NAME
-import it.unibo.collektive.compiler.utils.common.hasAnnotationDisablingPlugin
-import it.unibo.collektive.compiler.utils.logging.debug
-import it.unibo.collektive.compiler.utils.logging.debugPrint
+import it.unibo.collektive.compiler.backend.irextensions.hasAnnotationDisablingPlugin
+import it.unibo.collektive.compiler.backend.util.debugPrint
+import it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME
+import it.unibo.collektive.compiler.common.debug
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrStatement
