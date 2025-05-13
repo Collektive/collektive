@@ -8,10 +8,10 @@
 
 package it.unibo.collektive.compiler.frontend
 
+import it.unibo.collektive.compiler.frontend.checkers.ConstructIgnoresParameter
 import it.unibo.collektive.compiler.frontend.checkers.ExplicitAlignDealign
 import it.unibo.collektive.compiler.frontend.checkers.ImproperConstruct
 import it.unibo.collektive.compiler.frontend.checkers.NoAlignInsideLoop
-import it.unibo.collektive.compiler.frontend.checkers.UnnecessaryUseOfConstructs
 import it.unibo.collektive.compiler.frontend.checkers.UnnecessaryYielding
 import it.unibo.collektive.compiler.frontend.checkers.WhenReturnsField
 import org.jetbrains.kotlin.fir.FirSession
@@ -32,7 +32,7 @@ class CollektiveExtension(session: FirSession) : FirAdditionalCheckersExtension(
                         ExplicitAlignDealign,
                         ImproperConstruct,
                         NoAlignInsideLoop,
-                        UnnecessaryUseOfConstructs,
+                        ConstructIgnoresParameter,
                         UnnecessaryYielding,
                     )
 

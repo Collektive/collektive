@@ -8,10 +8,8 @@
 
 package it.unibo.collektive.compiler.frontend.firextensions
 
-import it.unibo.collektive.compiler.frontend.visitors.ReturnsUnitVisitor
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
-import org.jetbrains.kotlin.fir.expressions.impl.FirUnitExpression
 import org.jetbrains.kotlin.fir.references.toResolvedFunctionSymbol
 import org.jetbrains.kotlin.fir.references.toResolvedNamedFunctionSymbol
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
@@ -50,9 +48,3 @@ internal fun FirFunctionCall?.isAggregate(context: CheckerContext): Boolean = wh
  */
 internal fun FirFunctionCall.receiversAndArgumentsTypes(): Sequence<ConeKotlinType> =
     calleeReference.toResolvedNamedFunctionSymbol()?.receiversAndArgumentsTypes().orEmpty()
-
-/**
- * Check if the function call has an empty return (i.e., no return statement, resulting into a [FirUnitExpression]).
- * Returns `true` if the function call has an empty return, `false` otherwise.
- */
-internal fun FirFunctionCall.returnsUnit(): Boolean = ReturnsUnitVisitor.returnsUnit(this)

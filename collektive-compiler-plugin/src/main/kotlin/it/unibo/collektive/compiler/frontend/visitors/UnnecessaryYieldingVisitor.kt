@@ -21,7 +21,7 @@ import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
  * Visitor that checks if a [FirFunctionCall] contains an unnecessary yielding context. Look at the documentation of
  * [it.unibo.collektive.frontend.checkers.UnnecessaryYielding] for more information.
  */
-object UnnecessaryYieldingVisitor : FirVisitorVoid() {
+class UnnecessaryYieldingVisitor : FirVisitorVoid() {
     private var containsUnnecessaryYielding = false
     private var yieldingReceiver: FirExpression? = null
     private var insideYielding = false

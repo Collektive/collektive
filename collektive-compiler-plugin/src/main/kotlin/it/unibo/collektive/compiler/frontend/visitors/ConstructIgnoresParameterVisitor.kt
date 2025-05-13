@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
 /**
  * Visitor that checks for usages of value parameters inside an anonymous function call block.
  */
-object ConstructCallVisitor : FirVisitorVoid() {
+class ConstructIgnoresParameterVisitor : FirVisitorVoid() {
     private var checkedParametersDeclarations = listOf<FirValueParameterSymbol>()
     private var found = true
     private var nestedAnonymousFunction = false

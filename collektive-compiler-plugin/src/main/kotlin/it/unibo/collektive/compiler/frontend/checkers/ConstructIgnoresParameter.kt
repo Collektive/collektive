@@ -12,8 +12,7 @@ import it.unibo.collektive.compiler.common.CollektiveNames
 import it.unibo.collektive.compiler.frontend.CollektiveFrontendErrors
 import it.unibo.collektive.compiler.frontend.firextensions.fqName
 import it.unibo.collektive.compiler.frontend.firextensions.functionName
-import it.unibo.collektive.compiler.frontend.firextensions.returnsUnit
-import it.unibo.collektive.compiler.frontend.visitors.ConstructCallVisitor
+import it.unibo.collektive.compiler.frontend.visitors.ConstructIgnoresParameterVisitor
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
@@ -37,9 +36,8 @@ import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
  *
  * Should generate a warning indicating the unnecessary use of the `evolve` construct.
  */
-object UnnecessaryUseOfConstructs : FirFunctionCallChecker(MppCheckerKind.Common) {
+object ConstructIgnoresParameter : FirFunctionCallChecker(MppCheckerKind.Common) {
     private val constructs = listOf(
-        CollektiveNames.NEIGHBORING_FUNCTION_FQ_NAME,
         CollektiveNames.EXCHANGE_FUNCTION_FQ_NAME,
         CollektiveNames.SHARE_FUNCTION_FQ_NAME,
         CollektiveNames.EVOLVE_FUNCTION_FQ_NAME,
@@ -61,8 +59,6 @@ object UnnecessaryUseOfConstructs : FirFunctionCallChecker(MppCheckerKind.Common
 
     private fun FirFunctionCall.shouldBeChecked() = fqName in constructs
 
-    private fun FirFunctionCall.doesNotUseParameter(): Boolean = when (fqName) {
-        CollektiveNames.NEIGHBORING_FUNCTION_FQ_NAME -> returnsUnit()
-        else -> ConstructCallVisitor.doesNotUseValueParameters(this)
-    }
+    private fun FirFunctionCall.doesNotUseParameter(): Boolean =
+        ConstructIgnoresParameterVisitor().doesNotUseValueParameters(this)
 }
