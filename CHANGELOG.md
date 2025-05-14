@@ -1,3 +1,19 @@
+## [24.0.6](https://github.com/Collektive/collektive/compare/24.0.5...24.0.6) (2025-05-13)
+
+### Dependency updates
+
+* **core-deps:** update kotlin monorepo to v2.1.21 ([7deab3f](https://github.com/Collektive/collektive/commit/7deab3f79cee6c81c78a205a574ff3567a6f2d35))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5.6.5 ([12d97eb](https://github.com/Collektive/collektive/commit/12d97eb8c67a5a7bf848a472df1e641f6879ce1a))
+* **deps:** update dependency react-router-dom to v7.6.0 ([f7100d3](https://github.com/Collektive/collektive/commit/f7100d3b94852f2e73bb00bb77a420b32bf1941d))
+* **deps:** update plugin gitsemver to v5.1.3 ([0e1b4ba](https://github.com/Collektive/collektive/commit/0e1b4baf8977e6dade1304e3ef4002e22b7fcccd))
+* **deps:** update plugin kotlin-qa to v0.86.2 ([ba2637f](https://github.com/Collektive/collektive/commit/ba2637f25f3da4880b525dc263221f18b6f4a796))
+* **deps:** update plugin multijvmtesting to v3.4.2 ([13c157b](https://github.com/Collektive/collektive/commit/13c157b608a46a938919e7341c42416e5d315a4c))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.24 ([70a4c2a](https://github.com/Collektive/collektive/commit/70a4c2aaa3ee8970dba67df1030016c7da3ef162))
+
+### Tests
+
+* **frontend-plugin:** test that fields conversions to map do not raise warnings ([#882](https://github.com/Collektive/collektive/issues/882)) ([26d55bf](https://github.com/Collektive/collektive/commit/26d55bf1f193b7b8fbde4eeb35e4d1bff6d00ec9))
+
 ## [24.0.5](https://github.com/Collektive/collektive/compare/24.0.4...24.0.5) (2025-05-05)
 
 ### Documentation
