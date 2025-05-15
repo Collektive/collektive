@@ -610,6 +610,7 @@ internal class ConstantField<ID : Any, T>(
             context.alignedOn(it) {
                 FieldEntry(checkNotLocal(it), local.value).map(transform)
             }
+        }
 
     override fun neighborValueOf(id: ID): T = local.value
 
