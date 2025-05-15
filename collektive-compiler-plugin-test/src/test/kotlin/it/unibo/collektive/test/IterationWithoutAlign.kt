@@ -41,10 +41,9 @@ class IterationWithoutAlign {
     private companion object {
         private fun expectedWarn(functionName: String): String =
             """
-            Aggregate function '$functionName' has been called inside a loop construct without explicit alignment.
-            The same path may generate interactions more than once, leading to ambiguous alignment.
-            
-            Consider wrapping the function into the 'alignedOn' method with a unique element.
+            Aggregate function '$functionName' is called inside a loop without explicit alignment.  
+            This may cause the same execution path to trigger multiple interactions, resulting in ambiguous alignment.
+            Wrap the function call using 'alignedOn' with a unique key to ensure consistent alignment.
             """.trimIndent()
     }
 }

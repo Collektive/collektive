@@ -16,8 +16,8 @@ import kotlin.test.assertEquals
 class WhenTest {
     private fun programUnderTest(input: Any) = aggregate(0) {
         when (input) {
-            is String -> neighboring("string")
-            else -> neighboring("test")
+            is String -> neighboring("string").local
+            else -> neighboring("test").local
         }
     }
 
@@ -71,11 +71,11 @@ class WhenTest {
         val result =
             aggregate(0) {
                 when {
-                    condition1 -> neighboring("test")
+                    condition1 -> neighboring("test").local
                     else ->
                         when {
-                            condition2 -> neighboring("test2")
-                            else -> neighboring("test3")
+                            condition2 -> neighboring("test2").local
+                            else -> neighboring("test3").local
                         }
                 }
             }

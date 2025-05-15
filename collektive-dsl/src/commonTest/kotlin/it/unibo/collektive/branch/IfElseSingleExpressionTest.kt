@@ -19,7 +19,7 @@ class IfElseSingleExpressionTest {
         val customCondition = true
         val result =
             aggregate(0) {
-                if (customCondition) neighboring("test-true") else neighboring("test-false")
+                if (customCondition) neighboring("test-true").local else neighboring("test-false").local
             }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
         assertEquals(1, messageFor0.size)
@@ -31,7 +31,7 @@ class IfElseSingleExpressionTest {
         val customCondition = false
         val result =
             aggregate(0) {
-                if (customCondition) neighboring("test-true") else neighboring("test-false")
+                if (customCondition) neighboring("test-true").local else neighboring("test-false").local
             }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
         assertEquals(1, messageFor0.size)

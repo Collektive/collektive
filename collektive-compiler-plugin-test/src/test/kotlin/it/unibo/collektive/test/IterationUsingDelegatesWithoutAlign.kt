@@ -29,17 +29,20 @@ class IterationUsingDelegatesWithoutAlign {
             val functionName = functionCall.substringBefore("(")
             for ((iteration, _) in formsOfIteration) {
                 with(testSubjects) {
-                    `iteration with warning`("IterationDelegate", functionName, iteration, expectedWarning)
                     `iteration without warning`("IterationAlignDelegate", functionName, iteration)
-                    `iteration without warning`("IterationDelegateAlign", functionName, iteration)
-                    `iteration without warning`("IterationDelegateWithNestedFun", functionName, iteration)
-                    `iteration with warning`("IterationRecursiveDelegate", functionName, iteration, expectedWarning)
-                    `iteration without warning`("IterationAlignRecursiveDelegate", functionName, iteration)
-                    `iteration without warning`("IterationRecursiveDelegateAlign", functionName, iteration)
-                    // Disabled tests
-                    // `iteration with warning`("IterationDelegatedNestedFun", functionName, iteration, expectedWarning)
-                    // `iteration without warning`("IterationAlignDelegatedNestedFun", functionName, iteration)
-                    // `iteration without warning`("IterationDelegatedNestedFunAlign", functionName, iteration)
+                    listOf(
+                        "IterationDelegate",
+                        "IterationDelegateAlign",
+                        "IterationDelegateWithNestedFun",
+                        "IterationDelegatedNestedFun",
+                        "IterationRecursiveDelegate",
+                        "IterationAlignRecursiveDelegate",
+                        "IterationRecursiveDelegateAlign",
+                        "IterationAlignDelegatedNestedFun",
+                        "IterationDelegatedNestedFunAlign",
+                    ).forEach {
+                        `iteration with warning`(it, functionName, iteration, expectedWarning)
+                    }
                 }
             }
         }
@@ -48,12 +51,9 @@ class IterationUsingDelegatesWithoutAlign {
     companion object {
         private val expectedWarning: String =
             """
-            Function 'delegate', that accepts and uses an aggregate argument, has been called inside a loop construct 
-            without explicit alignment.
-            The same path may generate interactions more than once, leading to ambiguous alignment.
-            
-            Consider wrapping the function into the 'alignedOn' method with a unique element, either at the call site
-            or inside the 'delegate' function declaration, wrapping the involved aggregate calls.
+            Aggregate function 'delegate' is called inside a loop without explicit alignment.  
+            This may cause the same execution path to trigger multiple interactions, resulting in ambiguous alignment.
+            Wrap the function call using 'alignedOn' with a unique key to ensure consistent alignment.
             """.trimIndent()
     }
 }

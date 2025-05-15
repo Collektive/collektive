@@ -1,7 +1,13 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 package it.unibo.collektive.compiler
 
-import it.unibo.collektive.AlignmentCommandLineProcessor
-import it.unibo.collektive.AlignmentComponentRegistrar
 import it.unibo.collektive.compiler.logging.SLF4JMessageCollector
 import org.jetbrains.kotlin.cli.common.arguments.K2JVMCompilerArguments
 import org.jetbrains.kotlin.cli.common.config.addKotlinSourceRoot
@@ -97,9 +103,9 @@ object CollektiveJVMCompiler {
         configuration.addJvmClasspathRoot(KotlinJars.stdlib)
         // Add the Collektive plugin
         configuration.add(CompilerPluginRegistrar.COMPILER_PLUGIN_REGISTRARS, ScriptingK2CompilerPluginRegistrar())
-        configuration.add(CompilerPluginRegistrar.COMPILER_PLUGIN_REGISTRARS, AlignmentComponentRegistrar())
+        configuration.add(CompilerPluginRegistrar.COMPILER_PLUGIN_REGISTRARS, CollektiveCompilerPluginRegistrar())
         // Configure the Collektive plugin options available in the command line processor
-        configuration.put(AlignmentCommandLineProcessor.ARG_ENABLED, true)
+        configuration.put(CollektiveCommandLineProcessor.ARG_ENABLED, true)
         val environment =
             KotlinCoreEnvironment.createForProduction(
                 { },

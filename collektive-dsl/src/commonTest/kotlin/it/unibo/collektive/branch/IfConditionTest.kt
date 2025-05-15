@@ -18,7 +18,7 @@ class IfConditionTest {
     fun `Branches with constant conditions should get aligned`() {
         val result =
             aggregate(0) {
-                if (true) neighboring("test")
+                if (true) neighboring("test").local
             }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
         assertEquals(1, messageFor0.size)
@@ -30,7 +30,7 @@ class IfConditionTest {
         val customCondition = true
         val result =
             aggregate(0) {
-                if (customCondition) neighboring("test")
+                if (customCondition) neighboring("test").local
             }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
         assertEquals(1, messageFor0.size)
@@ -42,7 +42,7 @@ class IfConditionTest {
         fun customFunction() = true
         val result =
             aggregate(0) {
-                if (customFunction()) neighboring("test")
+                if (customFunction()) neighboring("test").local
             }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
         assertEquals(1, messageFor0.size)
@@ -55,7 +55,7 @@ class IfConditionTest {
         val customCondition2 = true
         val result =
             aggregate(0) {
-                if (customCondition1 && customCondition2) neighboring("test")
+                if (customCondition1 && customCondition2) neighboring("test").local
             }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
         assertEquals(1, messageFor0.size)
@@ -68,7 +68,7 @@ class IfConditionTest {
         val customCondition2 = true
         val result =
             aggregate(0) {
-                if (customCondition1 || customCondition2) neighboring("test")
+                if (customCondition1 || customCondition2) neighboring("test").local
             }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
         assertEquals(1, messageFor0.size)
@@ -81,7 +81,7 @@ class IfConditionTest {
         val customCondition2 = false
         val result =
             aggregate(0) {
-                if (customCondition1 && !customCondition2) neighboring("test")
+                if (customCondition1 && !customCondition2) neighboring("test").local
             }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
         assertEquals(1, messageFor0.size)

@@ -23,9 +23,7 @@ class UnnecessaryUseOfConstructsSpec : FreeSpec({
 
     fun expectedWarning(construct: String): String =
         """
-        The '$construct' construct may not be necessary for this use case, as the parameter of the provided anonymous 
-        function is unused within its body.
-        
+        This '$construct' appears unnecessary in this case, as the anonymous function's parameter is unused.
         Consider using a different construct or eliminating the call altogether.
         """.trimIndent()
 
@@ -41,10 +39,8 @@ class UnnecessaryUseOfConstructsSpec : FreeSpec({
                 row("evolve"),
                 row("exchange"),
                 row("share"),
-                row("neighboring"),
                 row("evolving"),
                 row("exchanging"),
-                row("neighboring"),
                 row("sharing"),
             )
 

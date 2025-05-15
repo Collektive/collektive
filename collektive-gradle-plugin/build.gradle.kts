@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 plugins {
     `java-gradle-plugin`
     alias(libs.plugins.build.config)
@@ -17,10 +25,8 @@ repositories {
     mavenCentral()
 }
 
-check(gradle.includedBuilds.size == 1) {
-    "This build is designed for a single inclusion. Fix it."
-}
-val compilerPlugin = gradle.includedBuilds.first().name
+// This build is designed for a single inclusion.
+val compilerPlugin = gradle.includedBuilds.single().name
 
 dependencies {
     implementation(libs.kotlin.gradle.plugin)
