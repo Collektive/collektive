@@ -1,3 +1,9 @@
+## [24.0.8](https://github.com/Collektive/collektive/compare/24.0.7...24.0.8) (2025-05-15)
+
+### Bug Fixes
+
+* **dsl:** manually align field mapping operations to allow aggregate functions execution in mappings. Fixes [#960](https://github.com/Collektive/collektive/issues/960) ([#961](https://github.com/Collektive/collektive/issues/961)) ([4107114](https://github.com/Collektive/collektive/commit/4107114ecebe54fb1fa8ec941043b26aeeedffc1))
+
 ## [24.0.7](https://github.com/Collektive/collektive/compare/24.0.6...24.0.7) (2025-05-15)
 
 ### Dependency updates
