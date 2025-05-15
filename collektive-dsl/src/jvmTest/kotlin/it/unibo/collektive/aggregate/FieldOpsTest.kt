@@ -6,10 +6,16 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
+@file:CollektiveIgnore("This test needs to mock the context and does not use projection nor alignment")
+
 package it.unibo.collektive.aggregate
 
+import io.mockk.Runs
+import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.CollektiveIgnore
 import it.unibo.collektive.stdlib.fields.fold
 import it.unibo.collektive.stdlib.fields.foldValues
 import it.unibo.collektive.stdlib.fields.reduce
@@ -20,7 +26,13 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
 class FieldOpsTest {
-    private val mockedContext = mockk<Aggregate<Int>>(relaxed = true)
+    private val mockedContext = mockk<Aggregate<Int>>().apply {
+        every { align(anyNullable()) } just Runs
+        every { dealign() } just Runs
+        every { alignedOn(anyNullable(), captureLambda<() -> Any?>()) } answers {
+            lambda<() -> Any?>().captured.invoke()
+        }
+    }
     private val emptyField = Field(mockedContext, 0, "localVal")
     private val field = Field(mockedContext, 0, 0, mapOf(1 to 10, 2 to 20))
     private val fulfilledField = Field(mockedContext, 0, 0, mapOf(1 to 10, 2 to 20, 3 to 15))
