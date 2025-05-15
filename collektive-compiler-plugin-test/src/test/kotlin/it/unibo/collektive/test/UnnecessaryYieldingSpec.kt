@@ -23,10 +23,8 @@ class UnnecessaryYieldingSpec : FreeSpec({
 
     fun expectedWarning(construct: String): String =
         """
-        The yielding block inside the '$construct' construct may not be necessary for this use case, as the 
-        expression that is exchanged is the same as the one yielded inside the 'yielding' block.
-        
-        Consider switching to the same construct without the 'yielding' block.
+        The 'yielding' block inside '$construct' may be redundant, as the yielded expression is identical to the one being exchanged.
+        Consider using the non-ing (non-yielding) version of the same construct (e.g., 'share' instead of 'sharing').
         """.trimIndent()
 
     "When using a construct with yielding" - {

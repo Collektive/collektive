@@ -12,6 +12,8 @@ import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.exchange
+import it.unibo.collektive.aggregate.api.mapNeighborhood
+import it.unibo.collektive.aggregate.api.neighborhood
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
@@ -79,9 +81,12 @@ class BranchAlignmentTest {
                     if (id % 2 == 0) {
                         assertEquals(id / 2, neighboring(1).neighborsCount)
                         neighboring(1) + outerField
+                        assertEquals(neighborhood().neighborsCount, outerField.neighborsCount)
+                        1
                     } else {
                         assertEquals((id - 1) / 2, neighboring(1).neighborsCount)
                         neighboring(1) - outerField
+                        assertEquals(neighborhood().neighborsCount, outerField.neighborsCount)
                         outerField.minValue(Int.MAX_VALUE)
                     }
                 }
@@ -103,10 +108,11 @@ class BranchAlignmentTest {
     fun `A field should be projected also when the field is referenced as lambda parameter issue 171`() {
         exchangeWithThreeDevices {
             if (localId % 2 == 0) {
-                neighboring(1) + it
+                assertEquals(neighborhood().neighborsCount, it.neighborsCount)
             } else {
-                neighboring(1) + it
+                assertEquals(neighborhood().neighborsCount, it.neighborsCount)
             }
+            mapNeighborhood { 1 }
         }
     }
 
@@ -132,12 +138,15 @@ class BranchAlignmentTest {
             with(it) {
                 with(local.id % 2 == 0) {
                     if (this) {
-                        alignedMapValues(neighboring(1)) { a, b -> a + b }
+                        assertEquals(neighborhood().neighborsCount, neighborsCount)
+                        alignedMapValues(neighboring(1)) { a, b -> a + b }.local
                     } else {
-                        alignedMapValues(neighboring(1)) { a, b -> a - b }
+                        assertEquals(neighborhood().neighborsCount, it.neighborsCount)
+                        alignedMapValues(neighboring(1)) { a, b -> a - b }.local
                     }
                 }
             }
+            mapNeighborhood { 1 }
         }
     }
 }

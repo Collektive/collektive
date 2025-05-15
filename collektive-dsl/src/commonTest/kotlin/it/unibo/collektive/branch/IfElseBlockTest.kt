@@ -20,9 +20,9 @@ class IfElseBlockTest {
         val result =
             aggregate(0) {
                 if (customCondition) {
-                    neighboring("test1")
+                    neighboring("test1").local
                 } else {
-                    neighboring("test2")
+                    neighboring("test2").local
                 }
             }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
@@ -36,9 +36,9 @@ class IfElseBlockTest {
         val result =
             aggregate(0) {
                 if (customCondition) {
-                    neighboring("test1")
+                    neighboring("test1").local
                 } else {
-                    neighboring("test2")
+                    neighboring("test2").local
                 }
             }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
@@ -53,11 +53,11 @@ class IfElseBlockTest {
         val result =
             aggregate(0) {
                 if (customCondition1) {
-                    neighboring("test1")
+                    neighboring("test1").local
                 } else if (customCondition2) {
-                    neighboring("test2")
+                    neighboring("test2").local
                 } else {
-                    neighboring("test3")
+                    neighboring("test3").local
                 }
             }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData

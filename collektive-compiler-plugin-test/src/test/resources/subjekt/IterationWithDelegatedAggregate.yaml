@@ -42,6 +42,13 @@ subjects:
       fun Aggregate<Int>.entry() {
          ${{ loop('delegate(this)') }}
       }
+    outcomes:
+      warning: |-
+        Function 'delegate', that accepts and uses an aggregate argument, has been called inside a loop 
+        construct without explicit alignment.
+        The same path may generate interactions more than once, leading to ambiguous alignment.
+
+        Consider wrapping the function into the 'alignedOn' method with a unique element at the call site.
 
   - name: IterationDelegate${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
     code: |-
@@ -72,6 +79,12 @@ subjects:
       fun Aggregate<Int>.entry() {
           ${{ loop("delegate(this)") }}
       }
+    outcomes:
+      warning: |-
+        Function 'delegate' has been called inside a loop construct without explicit alignment.
+        The same path may generate interactions more than once, leading to ambiguous alignment.
+
+        Consider wrapping the function into the 'alignedOn' method with a unique element.
 
   - name: IterationRecursiveDelegate${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
     code: |-
@@ -110,6 +123,12 @@ subjects:
       fun Aggregate<Int>.entry() {
           ${{ loop("delegate(this)") }}
       }
+    outcomes:
+      warning: |-
+        Aggregate function 'delegate' has been called inside a loop construct without explicit alignment.
+        The same path may generate interactions more than once, leading to ambiguous alignment.
+
+        Consider wrapping the function into the 'alignedOn' method with a unique element.
 
   - name: IterationAlignRecursiveDelegate${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
     code: |-
@@ -126,6 +145,12 @@ subjects:
       fun Aggregate<Int>.entry() {
           ${{ loop("delegate(this)") }}
       }
+    outcomes:
+      warning: |-
+        Aggregate function 'delegate' has been called inside a loop construct without explicit alignment.
+        The same path may generate interactions more than once, leading to ambiguous alignment.
+
+        Consider wrapping the function into the 'alignedOn' method with a unique element.
 
   - name: IterationDelegatedNestedFun${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
     code: |-

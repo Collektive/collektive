@@ -37,7 +37,7 @@ dependencies {
 }
 
 buildConfig {
-    packageName(group.toString())
+    packageName("$group.compiler")
     buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"$group.collektive-compiler-plugin\"")
 }
 
@@ -108,22 +108,12 @@ publishOnCentral {
     }
 }
 
-val dslSource = rootProject.layout.buildDirectory.dir("dsl-api")
-
-sourceSets {
-    main {
-        kotlin {
-            srcDir(dslSource)
-        }
-    }
-}
+val dslSource = rootProject.layout.buildDirectory.dir("resources/main/it/unibo/collektive/compiler/sources")
 
 val importDsl by tasks.registering(Copy::class) {
     listOf(
         "Aggregate",
-        "DataSharingMethod",
         "Field",
-        "FieldEntry",
         "CollektiveIgnore",
         "YieldSupport",
     ).forEach { file ->
