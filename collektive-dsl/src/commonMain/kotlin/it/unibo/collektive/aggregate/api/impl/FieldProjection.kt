@@ -32,20 +32,25 @@ import it.unibo.collektive.aggregate.api.neighborhood
         """,
 )
 @DelicateCollektiveApi
-fun <ID : Any, T> project(field: Field<ID, T>): Field<ID, T> = field.context.alignedOn("<field-projection>") {
+fun <ID : Any, T> project(field: Field<ID, T>): Field<ID, T> {
     // Manually-aligned.
     // Equivalent to `mapNeighborhood { field[it] }`,
     // but avoids the operation entirely if there has been no restriction.
-    val others = field.context.neighborhood()
-    when {
-        field.neighborsCount == others.neighborsCount -> field
-        field.neighborsCount > others.neighborsCount -> others.map { (id, _) -> field[id] }
-        else -> error(
-            """
+    field.context.align("<field-projection>")
+    try {
+        val others = field.context.neighborhood()
+        return when {
+            field.neighborsCount == others.neighborsCount -> field
+            field.neighborsCount > others.neighborsCount -> others.map { (id, _) -> field[id] }
+            else -> error(
+                """
             Collektive is in an inconsistent state, this is most likely a bug in the implementation.
             Field $field with ${field.neighborsCount} neighbors has been projected into a context
             with more neighbors, ${others.neighborsCount}: ${others.excludeSelf().keys}.
-            """.trimIndent().replace(Regex("'\\R"), " "),
-        )
+                """.trimIndent().replace(Regex("'\\R"), " "),
+            )
+        }
+    } finally {
+        field.context.dealign()
     }
 }
