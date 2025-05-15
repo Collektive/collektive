@@ -22,6 +22,7 @@ import it.unibo.collektive.stdlib.ints.FieldedInts.minus
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class BranchAlignmentTest {
     @Test
@@ -117,9 +118,17 @@ class BranchAlignmentTest {
     }
 
     private fun manuallyAlignedExchangeWithThreeDevices(pivot: (Int) -> Any?) = exchangeWithThreeDevices { field ->
+        val neighborsBeforeRestriction = field.neighborsCount
+        assertTrue(localId == 0 || neighborsBeforeRestriction > 0)
+        // Map the pivots to the number of neighbors that are pivoting on the same value
+        val expectations = mapNeighborhood(pivot).neighborsValues.groupBy { it }.mapValues { it.value.size }
         alignedOn(pivot(localId)) {
-            neighboring(1) + field
+            val neighborsAfterRestriction = neighborhood().neighborsCount
+            val restrictedField = field.neighborsCount
+            assertEquals(neighborsAfterRestriction, restrictedField)
+            assertEquals(expectations[pivot(localId)] ?: 0, restrictedField)
         }
+        field
     }
 
     @Test
