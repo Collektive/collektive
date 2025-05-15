@@ -1,3 +1,18 @@
+## [24.0.7](https://github.com/Collektive/collektive/compare/24.0.6...24.0.7) (2025-05-15)
+
+### Dependency updates
+
+* **deps:** update alchemist to v42.1.1 ([685768d](https://github.com/Collektive/collektive/commit/685768d315cf6dbc9025bd54cb27cad8daca93b3))
+* **deps:** update alchemist to v42.2.0 ([971b683](https://github.com/Collektive/collektive/commit/971b68305d001fecc802528e68d4f8c8fffcb93d))
+
+### Bug Fixes
+
+* **dsl:** fail on alignedOn calls returning fields, fixes [#955](https://github.com/Collektive/collektive/issues/955) ([#957](https://github.com/Collektive/collektive/issues/957)) ([8b41c4d](https://github.com/Collektive/collektive/commit/8b41c4d3bfd9e82a9052cb3a38b73adb5281bd11))
+
+### Refactoring
+
+* **compiler-plugin:** restructure the plugin and improve the frontend ([#965](https://github.com/Collektive/collektive/issues/965)) ([a8f59dc](https://github.com/Collektive/collektive/commit/a8f59dc2dca36a8f5ee479797ac2c46902e25b92))
+
 ## [24.0.6](https://github.com/Collektive/collektive/compare/24.0.5...24.0.6) (2025-05-13)
 
 ### Dependency updates
