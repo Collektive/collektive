@@ -1,3 +1,21 @@
+## [24.0.9](https://github.com/Collektive/collektive/compare/24.0.8...24.0.9) (2025-05-19)
+
+### Dependency updates
+
+* **deps:** update arrow-kt monorepo to v2.1.2 ([3533ee1](https://github.com/Collektive/collektive/commit/3533ee18f2a70a8ee37349fe2dc7ca796fed5ac4))
+* **deps:** update dependency com.squareup:kotlinpoet to v2.2.0 ([91ed4cf](https://github.com/Collektive/collektive/commit/91ed4cf000d43c5e55e5e00c35841e1783131d1a))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.128 ([6bba383](https://github.com/Collektive/collektive/commit/6bba38371cd783b8697a57db0e3b38b37340f608))
+
+### Bug Fixes
+
+* **compiler-plugin:** detect and compile in the presence of delegated and top-level properties ([#990](https://github.com/Collektive/collektive/issues/990)) ([0a83102](https://github.com/Collektive/collektive/commit/0a83102b1e746a6b76b131d27d75a27786053f5c))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.19 ([696d1c3](https://github.com/Collektive/collektive/commit/696d1c30ec4762e2a61620a39c1118038c82a924))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v3.7.20 ([dd68cce](https://github.com/Collektive/collektive/commit/dd68cceabbaf58aa965fb57c3c8c2d7548ecc9ce))
+* **deps:** update github/codeql-action action to v3.28.18 ([9d8b45e](https://github.com/Collektive/collektive/commit/9d8b45ed8d34d209a7c988571d15e70c44c9336c))
+
 ## [24.0.8](https://github.com/Collektive/collektive/compare/24.0.7...24.0.8) (2025-05-15)
 
 ### Bug Fixes
