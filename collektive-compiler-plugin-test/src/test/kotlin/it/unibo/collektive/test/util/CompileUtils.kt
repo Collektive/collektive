@@ -15,13 +15,12 @@ import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import java.io.File
 import java.io.FileNotFoundException
 import kotlin.io.path.createTempDirectory
+import kotlin.io.path.createTempFile
+import kotlin.io.path.writeText
 import kotlin.test.assertTrue
 
 object CompileUtils {
-    data class KotlinTestingProgram(
-        val fileName: String,
-        val program: String,
-    ) {
+    data class KotlinTestingProgram(val fileName: String, val program: String) {
 
         fun compile(): Pair<ExitCode, CollectingMessageCollector> {
             val collector = CollectingMessageCollector()
@@ -98,4 +97,12 @@ object CompileUtils {
             "For" to "a for loop",
             "ForEach" to "a 'forEach' call",
         )
+
+    internal fun compileResource(name: String): Pair<ExitCode, CollectingMessageCollector> {
+        val collector = CollectingMessageCollector()
+        val file = createTempFile(suffix = ".kt")
+        file.writeText(ClassLoader.getSystemResource("it/unibo/collektive/test/$name.kt").readText())
+        val exitCode = CollektiveK2JVMCompiler.compile(file.toFile(), collector)
+        return exitCode to collector
+    }
 }

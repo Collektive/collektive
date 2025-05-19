@@ -8,21 +8,14 @@
 
 package it.unibo.collektive.test
 
-import it.unibo.collektive.compiler.CollektiveK2JVMCompiler
-import it.unibo.collektive.compiler.logging.CollectingMessageCollector
-import kotlin.io.path.createTempFile
-import kotlin.io.path.writeText
+import it.unibo.collektive.test.util.CompileUtils.compileResource
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
 class BranchesCannotReturnFieldTest {
 
     private val String.doesNotCompileBecauseBranchesReturnField get(): Unit {
-        val collector = CollectingMessageCollector()
-        val file = createTempFile(suffix = ".kt")
-        file.writeText(ClassLoader.getSystemResource("it/unibo/collektive/test/$this.kt").readText())
-        CollektiveK2JVMCompiler.compile(file.toFile(), collector)
-        assertTrue(collector.hasErrors())
+        assertTrue(compileResource(this).second.hasErrors())
     }
 
     @Test
