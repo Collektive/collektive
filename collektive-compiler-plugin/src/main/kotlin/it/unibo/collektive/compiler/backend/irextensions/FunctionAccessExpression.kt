@@ -9,6 +9,7 @@
 package it.unibo.collektive.compiler.backend.irextensions
 
 import it.unibo.collektive.compiler.backend.util.withBetterSymbols
+import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
@@ -58,12 +59,21 @@ internal fun IrFunctionAccessExpression.toFunctionAlignmentToken(): String {
         this is IrConstructorCall ->
             (type.classFqName?.asString() ?: "anonymous-init").withBetterSymbols() + generics + arguments
         isGetter -> {
-            val receiver = receiverAndArgs().single().type.classFqName
-                ?.asString()
-                ?.withBetterSymbols()
-                ?: "anonymous-type"
             val property = ownerName.substringAfterLast('<')
-            "$receiver.${property.substring(4..(property.length - 2))}"
+            val propertyNiceName = property.substring(4..(property.length - 2))
+            val receiver = receiverAndArgs().singleOrNull()
+            when (receiver) {
+                null -> {
+                    // Top level property or delegated property
+                    val isDelegated =
+                        (symbol.owner as? IrSimpleFunction)?.correspondingPropertySymbol?.owner?.isDelegated == true
+                    if (isDelegated) "by { $propertyNiceName }" else propertyNiceName
+                }
+                else -> {
+                    val receiverName = receiver.type.classFqName?.asString()?.withBetterSymbols() ?: "anonymous-type"
+                    "$receiverName.$propertyNiceName"
+                }
+            }
         }
         symbolOwner.name.isSpecial -> "λ$generics$arguments"
         else -> symbolOwner.kotlinFqName.asString().withBetterSymbols() + generics + arguments
