@@ -25,7 +25,7 @@ please feel free to open an issue or fix them through a [PR](https://github.com/
 3. [Explanation](/docs/category/explanation/)
    - [Aggregate Programming and Field Calculus](explanation/aggregate-programming.mdx)
    - [Levels of Abstraction](explanation/levels-of-abstractions.mdx)
-   - [Aggregate Operators and Field Operations](explanation/dsl-descriptions.mdx)
+   - [Fields and Basic Aggregate Operators](explanation/dsl-descriptions.mdx)
    - [Standard Library](explanation/stdlib-descriptions.mdx)
 4. [Reference guides](references.mdx)
 5. [Project structure](project-structure.mdx)
