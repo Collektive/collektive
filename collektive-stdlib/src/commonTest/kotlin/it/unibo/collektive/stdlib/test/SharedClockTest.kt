@@ -8,55 +8,56 @@
 
 package it.unibo.collektive.stdlib.test
 
-import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.stdlib.sharedClock
 import it.unibo.collektive.testing.Environment
-import it.unibo.collektive.testing.connectedGrid
-import kotlinx.datetime.Instant
-import kotlinx.datetime.Instant.Companion.DISTANT_PAST
-import kotlinx.datetime.format.DateTimeComponents
-import kotlin.time.Duration.Companion.microseconds
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.nanoseconds
+import it.unibo.collektive.testing.mooreGrid
+import kotlin.test.Test
+import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
+import kotlin.time.Instant.Companion.DISTANT_PAST
 
-class SharedClockTest : StringSpec({
+@OptIn(ExperimentalTime::class)
+class SharedClockTest {
 
     val size = 2
     var times = emptyList<Instant>().toMutableList()
-    repeat(size * size) {
-        times += Instant.parse(
-            input = "2024-01-01T00:00:0$it.00Z",
-            format = DateTimeComponents.Formats.ISO_DATE_TIME_OFFSET,
-        )
-    }
 
-    fun <R> Environment<R>.sharedClockIsStable(): Boolean =
-        status().values.distinct().size == 1
+//    repeat(size * size) {
+//        times += Instant.parse(
+//            input = "2024-01-01T00:00:0$it.00Z",
+//        )
+//    }
+
+    fun <R> Environment<R>.sharedClockIsStable(): Boolean = status().values.distinct().size == 1
 
     fun <R> Environment<R>.shouldBeInstant(nodeId: Int, time: Instant) {
         status()[nodeId] shouldBe time
     }
 
-    fun connectedGridWithSharedClock(size: Int) =
-        connectedGrid<Instant>(size, size, { _, _ -> DISTANT_PAST }) {
-            val clock = sharedClock(times[localId])
-            times[localId] = times[localId] + 1.seconds
-//            times[localId] = times[localId] + if(localId % 2 == 0) 30.milliseconds else 1.seconds
-            clock
-        }.apply {
-            nodes.size shouldBe size * size
-            val initial = status().values.distinct()
-            initial.size shouldBe 1
-            check(initial.first() == DISTANT_PAST) {
-                "Initial status is not `DISTANT_PAST`, but it is $initial (${initial::class.simpleName})"
-            }
-        }
+    fun connectedGridWithSharedClock(size: Int) = mooreGrid<Instant>(size, size, { _, _ -> DISTANT_PAST }) {
+        val clock = sharedClock(times[localId])
+        times[localId] = times[localId] + 1.seconds
+        clock
+    }
 
-    "devices using sharedClock should agree on the current time" {
+//        connectedGrid<Instant>(size, size, { _, _ -> DISTANT_PAST }) {
+//            val clock = sharedClock(times[localId])
+//            times[localId] = times[localId] + 1.seconds
+// //            times[localId] = times[localId] + if(localId % 2 == 0) 30.milliseconds else 1.seconds
+//            clock
+//        }.apply {
+//            nodes.size shouldBe size * size
+//            val initial = status().values.distinct()
+//            initial.size shouldBe 1
+//            check(initial.first() == DISTANT_PAST) {
+//                "Initial status is not `DISTANT_PAST`, but it is $initial (${initial::class.simpleName})"
+//            }
+//        }
+    @Test
+    fun `devices using sharedClock should agree on the current time`() {
         val environment: Environment<Instant> = connectedGridWithSharedClock(size)
         generateSequence(0) { it + 1 }.take(environment.nodes.size).forEach { iteration ->
             environment.nodes.drop(iteration).forEach { n ->
@@ -71,13 +72,14 @@ class SharedClockTest : StringSpec({
         println(environment.status())
     }
 
-//    "SharedClock should stabilize in one cycle even if the nodes have different times" {
-//        val environment: Environment<Instant> = connectedGridWithSharedClock(size)
-//        generateSequence(0) { it + 1 }.take(environment.nodes.size).forEach { iteration ->
-//            environment.nodes.drop(iteration).forEach { n -> n.cycle() }
-//        }
-//        environment.cycleInReverseOrder()
-//        environment.sharedClockIsStable().shouldBeTrue()
-////        environment.status().values.distinct() shouldBe Instant.parse("1970-01-01T00:${}:00Z")
-//    }
-})
+    @Test
+    fun `SharedClock should stabilize in one cycle even if the nodes have different times`() {
+        val environment: Environment<Instant> = connectedGridWithSharedClock(size)
+        generateSequence(0) { it + 1 }.take(environment.nodes.size).forEach { iteration ->
+            environment.nodes.drop(iteration).forEach { n -> n.cycle() }
+        }
+        environment.cycleInReverseOrder()
+        assertTrue(environment.sharedClockIsStable())
+        environment.status().values.distinct() shouldBe Instant.parse("1970-01-01T00:00:00Z")
+    }
+}

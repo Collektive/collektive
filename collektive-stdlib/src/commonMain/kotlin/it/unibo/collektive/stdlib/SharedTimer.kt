@@ -8,17 +8,19 @@
 
 package it.unibo.collektive.stdlib
 
+import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.operators.share
-import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.operations.max
-import it.unibo.collektive.field.operations.min
-import it.unibo.collektive.field.operations.replaceMatching
-import kotlinx.datetime.Instant
-import kotlinx.datetime.Instant.Companion.DISTANT_PAST
+import it.unibo.collektive.aggregate.api.share
+import it.unibo.collektive.stdlib.fields.maxValue
+import it.unibo.collektive.stdlib.fields.minBy
+import it.unibo.collektive.stdlib.fields.replaceMatching
+import it.unibo.collektive.stdlib.util.IncludingSelf
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.ZERO
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
+import kotlin.time.Instant.Companion.DISTANT_PAST
 
 /**
  * A shared timer progressing evenly across a network, at the pace set by the fastest device.
@@ -28,12 +30,12 @@ import kotlin.time.Duration.Companion.ZERO
  * The timer is shared among all devices,
  * and it is alive for [timeLeft] units of time.
  */
-//fun <ID : Comparable<ID>> Aggregate<ID>.sharedTimer(
+// fun <ID : Comparable<ID>> Aggregate<ID>.sharedTimer(
 //    processTime: Instant,
 //    timeLeft: Duration,
 //    decay: Duration,
 //    step: Duration,
-//): Duration =
+// ): Duration =
 //    share(processTime) { clock: Field<ID, Instant> ->
 //        val clockPerceived: Instant = sharedClock(processTime, step)
 //        val dt: Duration = deltaTime(processTime)
@@ -72,8 +74,7 @@ private fun <ID : Comparable<ID>> Aggregate<ID>.cyclicTimerWithDecay(timeout: Du
 fun <ID : Comparable<ID>> Aggregate<ID>.countDownWithDecay(timeout: Duration, decayRate: Duration): Duration =
     timer(timeout, ZERO) { time -> time - decayRate }
 
-
-//fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(current: Instant = Clock.System.now(), interval: Duration): Instant =
+// fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(current: Instant = Clock.System.now(), interval: Duration): Instant =
 //    share(current) { clock ->
 //        val dt = deltaTime(current)è an
 //        when {
@@ -82,11 +83,11 @@ fun <ID : Comparable<ID>> Aggregate<ID>.countDownWithDecay(timeout: Duration, de
 //        }
 //    }
 
-fun <ID : Comparable<ID>> Aggregate<ID>.deltaTime(now: Instant): Duration =
-    evolving(DISTANT_PAST) { previousTime ->
-        val otherTime = if (previousTime == DISTANT_PAST) now else previousTime
-        now.yielding { (now - otherTime).coerceAtLeast(ZERO) }
-    }
+@OptIn(ExperimentalTime::class)
+fun <ID : Comparable<ID>> Aggregate<ID>.deltaTime(now: Instant): Duration = evolving(DISTANT_PAST) { previousTime ->
+    val otherTime = if (previousTime == DISTANT_PAST) now else previousTime
+    now.yielding { (now - otherTime).coerceAtLeast(ZERO) }
+}
 
 /**
  * A shared clock across a network at the pace set by the fastest device.
@@ -96,26 +97,27 @@ fun <ID : Comparable<ID>> Aggregate<ID>.deltaTime(now: Instant): Duration =
  * **N.B.**: [current] is set as default to the current system time,
  * but it is recommended to change it according to the requirements to achieve accurate and non-astonishing results.
  */
-fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(now: Instant): Instant {
-    return share(now) { clocksAround: Field<ID, Instant> ->
+@OptIn(ExperimentalTime::class)
+fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(now: Instant): Instant =
+    share(now) { clocksAround: Field<ID, Instant> ->
         println("NOW FOR $localId is $now")
         println("CLOCKSAROUND: $clocksAround")
         val localDelta = deltaTime(now)
-//    if (localDelta == ZERO) throw IllegalStateException("Time is not moving forward")
-        val deltaTimes = clocksAround.map { it - now } // passarlo a infinito
+        check(localDelta == ZERO) { error("Time is not moving forward") }
+        val deltaTimes: Field<ID, Duration> = clocksAround.mapValues { it - now } // passarlo a infinito
 //        val deltaTimes = clocksAround.map { now - it } // passarlo a infinito
-        val deltaReplaced = deltaTimes.replaceMatching(INFINITE) { it <= ZERO }
+        val deltaReplaced = deltaTimes.replaceMatching(INFINITE) { it.value <= ZERO }
         println("deltaTimes: $deltaTimes")
         println("deltaReplaced: $deltaReplaced")
-        val minDelta = deltaReplaced.min(localDelta)
-        val deltamins = deltaTimes.map {it.coerceAtLeast(minDelta)}
+        val minDelta: Duration = deltaReplaced.minBy(IncludingSelf) { it.value }?.value ?: localDelta // (localDelta)
+        val deltamins: Field<ID, Duration> = deltaTimes.mapValues { it.coerceAtLeast(minDelta) }
         println("DELTAMINS: $deltamins")
         val referenceTime: Instant =
-            (clocksAround.alignedMap(deltamins) { base, dt -> base + dt }).max(clocksAround.localValue + minDelta)
-        println("REFERENCE TIME FOR DEVICE $localId: $referenceTime" )
-        referenceTime //+ minDelta
+            clocksAround.alignedMap<Duration, Instant>(deltamins) { _, base, dt -> base + dt }
+                .maxValue(clocksAround.local.value + minDelta)
+        println("REFERENCE TIME FOR DEVICE $localId: $referenceTime")
+        referenceTime // + minDelta
     }
-}
 
 //    return sharing(now to localDelta) { deltaAround: Field<ID, Pair<Instant, Duration>> ->
 //        // take the minimum delta, i.e., the fastest device
@@ -129,7 +131,12 @@ fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(now: Instant): Instant {
 
 // shared clock -> Instant -> il device piu veloce sta a T
 
-//fun <ID : Comparable<ID>> Aggregate<ID>.sharedTimeElapsed(deltaTime: Instant): Duration =
+// fun <ID : Comparable<ID>> Aggregate<ID>.sharedTimeElapsed(deltaTime: Instant): Duration =
 //    share(deltaTime) { time ->
-////        time.map { timeElapsed(it) }.max(base = ZERO)
+// //        time.map { timeElapsed(it) }.max(base = ZERO)
 //    }
+//
+
+// @OptIn(ExperimentalTime::class)
+// operator fun <ID: Comparable<ID>> Field<ID, Instant>.minus(other: Instant): Field<ID, Duration> =
+//    this.mapValues { it.minus(other) }

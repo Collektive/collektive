@@ -9,10 +9,8 @@
 package it.unibo.collektive.stdlib
 
 import it.unibo.collektive.aggregate.api.Aggregate
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.ZERO
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * A periodic restart strategy for removing obsolete information of [process] replicated across devices.
@@ -23,13 +21,13 @@ import kotlin.time.Duration.Companion.ZERO
  * The [process] function is executed on the replicas.
  * The [default] value is returned if no replica is alive.
  */
-//fun <ID : Comparable<ID>, Type : Any> Aggregate<ID>.timeReplicated(
+// fun <ID : Comparable<ID>, Type : Any> Aggregate<ID>.timeReplicated(
 //    default: Type,
 //    now: Instant = Clock.System.now(),
 //    timeToLive: Duration,
 //    maxReplicas: Int,
 //    process: Aggregate<ID>.() -> Type,
-//): Type {
+// ): Type {
 //     time elapsed without a new replica being created
 //    val deltaTime: Duration = deltaTime(now)
 //    val timeElapsed = sharedTimer(timeToLive, deltaTime)
@@ -60,13 +58,14 @@ import kotlin.time.Duration.Companion.ZERO
 //        applyReplicas
 //    }
 //    return result.firstOrNull()?.process?.let { it() } ?: default
-//}
+// }
 
 /**
  * A replica of a process that is alive for a certain amount of time [creationTime].
  * It is identified by an [id] and runs the [process] function.
  * The [process] function is executed while the replica is alive.
  */
+@OptIn(ExperimentalTime::class)
 data class Replica<ID : Comparable<ID>, Type>(
     val id: ULong,
     val process: Aggregate<ID>.() -> Type,
