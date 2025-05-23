@@ -16,32 +16,46 @@ import it.unibo.collektive.stdlib.util.hops
 import kotlin.jvm.JvmOverloads
 
 /**
- * Compute the distance from the closest [source], using [Double]s.
+ * Computes the distance from the nearest source node as a `Double`.
  *
- * The distance between neighboring devices is computed using the [metric] function,
- * and defaults to the hop distance.
+ * The distance between neighboring devices is computed using the `metric` function
+ * and defaults to the hop-count metric.
+ *
+ * @param ID The type used for neighbor identifiers.
+ * @param source True if this device is a source node; otherwise false.
+ * @param metric A `Field<ID, Double>` providing edge weights to each neighbor. Defaults to `hops().toDouble()`.
+ * @param maxDiameter Maximum allowed hops before discarding paths. Defaults to `Int.MAX_VALUE`.
+ * @return The computed `Double` distance to the closest source.
  */
 @JvmOverloads
 inline fun <reified ID : Any> Aggregate<ID>.distanceTo(
     source: Boolean,
-    maxPaths: Int = Int.MAX_VALUE,
-    isRiemannianManifold: Boolean = true,
     metric: Field<ID, Double> = hops().toDouble(),
-): Double = distanceTo(source, 0.0, Double.POSITIVE_INFINITY, metric, maxPaths, isRiemannianManifold, Double::plus)
+    maxDiameter: Int = Int.MAX_VALUE,
+): Double = distanceTo(source, 0.0, Double.POSITIVE_INFINITY, metric, maxDiameter, Double::plus)
 
 /**
- * Compute the [Distance] from the closest [source], starting from [bottom] and up to [top].
+ * Computes the distance from the nearest source node within a specified range.
  *
- * the [Distance] between neighboring devices is computed using the [metric] function,
- * the distance summation is governed by the [accumulateDistance] function.
+ * Starting from `bottom` at a source and up to `top`, distances between neighboring devices
+ * are computed using the `metric` function and accumulated via `accumulateDistance`.
+ *
+ * @param ID The type used for neighbor identifiers.
+ * @param Distance The comparable type representing path lengths.
+ * @param source True if this device is a source node; otherwise false.
+ * @param bottom The zero-distance value at a source.
+ * @param top The maximum allowed distance; incoming distances are clamped to this value.
+ * @param metric A `Field<ID, Distance>` providing edge weights to each neighbor.
+ * @param maxDiameter Maximum allowed hops before discarding paths. Defaults to `Int.MAX_VALUE`.
+ * @param accumulateDistance Reducer function to combine two distances.
+ * @return The computed `Distance` to the closest source.
  */
 inline fun <reified ID : Any, reified Distance : Comparable<Distance>> Aggregate<ID>.distanceTo(
     source: Boolean,
     bottom: Distance,
     top: Distance,
     metric: Field<ID, Distance>,
-    maxPaths: Int = Int.MAX_VALUE,
-    isRiemannianManifold: Boolean = true,
+    maxDiameter: Int = Int.MAX_VALUE,
     noinline accumulateDistance: Reducer<Distance>,
 ): Distance = gradientCast(
     source = source,
@@ -49,8 +63,7 @@ inline fun <reified ID : Any, reified Distance : Comparable<Distance>> Aggregate
     bottom = bottom,
     top = top,
     metric = metric,
-    maxPaths = maxPaths,
-    isRiemannianManifold = isRiemannianManifold,
+    maxDiameter = maxDiameter,
     accumulateData = { neighborToSource, hereToNeighbor, _ ->
         accumulateDistance(neighborToSource, hereToNeighbor)
     },
@@ -58,10 +71,15 @@ inline fun <reified ID : Any, reified Distance : Comparable<Distance>> Aggregate
 )
 
 /**
- * Computes the hop distance from the closest [source].
+ * Computes the hop-count distance from the nearest source node as an `Int`.
+ *
+ * @param ID The type used for neighbor identifiers.
+ * @param source True if this device is a source node; otherwise false.
+ * @param maxDiameter Maximum allowed hops before discarding paths. Defaults to `Int.MAX_VALUE`.
+ * @return The computed hop-count `Int` distance to the closest source.
  */
 @JvmOverloads
-inline fun <reified ID : Any> Aggregate<ID>.hopDistanceTo(source: Boolean, maxPaths: Int = Int.MAX_VALUE): Int =
-    hopGradientCast(source = source, local = 0, maxPaths = maxPaths) { neighborToSource, hereToNeighbor, _ ->
+inline fun <reified ID : Any> Aggregate<ID>.hopDistanceTo(source: Boolean, maxDiameter: Int = Int.MAX_VALUE): Int =
+    hopGradientCast(source = source, local = 0, maxDiameter = maxDiameter) { neighborToSource, hereToNeighbor, _ ->
         neighborToSource + hereToNeighbor
     }

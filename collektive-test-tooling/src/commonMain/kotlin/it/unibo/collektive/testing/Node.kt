@@ -101,10 +101,8 @@ class Node<R>(
             @Suppress("UNCHECKED_CAST")
             override fun <Value> dataAt(path: Path, dataSharingMethod: DataSharingMethod<Value>): Map<Int, Value> =
                 messageBuffer
-                    .mapValues { it.value.sharedData.getOrElse(path) { NoValue } as Value }
-                    .filterValues { it != NoValue }
+                    .filterValues { message -> message.sharedData.containsKey(path) }
+                    .mapValues { (_, message) -> message.sharedData[path] as Value }
         }
     }
-
-    private object NoValue
 }

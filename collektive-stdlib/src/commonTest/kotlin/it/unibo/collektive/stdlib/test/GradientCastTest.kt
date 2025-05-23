@@ -35,8 +35,8 @@ class GradientCastTest {
     fun `GradientPath is serializable`() {
         val network = SerializingMailbox()
         aggregate(0, network) {
-            neighboring(GradientPath(0, 0, 0, 0))
-            neighboring(GradientPath(0, 0, 0, listOf(1, 2, 3)))
+            neighboring(GradientPath(0, emptyList<String>(), 0))
+            neighboring(GradientPath(0, listOf(1, 2, 3), 0))
         }
         assertNotNull(network.serializeToString(1))
     }
@@ -117,23 +117,9 @@ class GradientCastTest {
     }
 
     @Test
-    fun `gradientCast keeps working when paths are limited`() {
-        for (maxPaths in 1..5) {
-            testManhattanDistance {
-                hopDistanceTo(localId == 0, maxPaths = maxPaths)
-            }
-        }
-    }
-
-    @Test
     fun `gradientCast supports multiple sources`() {
-        val maxPaths = listOf(1, 2, 3, 5, Int.MAX_VALUE)
-        vonNeumannGrid(10, 10, generateSequence { Int.MAX_VALUE }.take(maxPaths.size).toList()) {
-            maxPaths.map {
-                alignedOn(it) {
-                    hopDistanceTo(localId == 0 || localId == 99, maxPaths = it)
-                }
-            }
+        vonNeumannGrid(10, 10, Int.MAX_VALUE) {
+            hopDistanceTo(localId == 0 || localId == 99)
         }.apply {
             repeat(10) {
                 // In a diameter cycles all information should have been propagated
@@ -142,9 +128,8 @@ class GradientCastTest {
             nodes.forEach { node ->
                 val (x, y) = positionOf(node.id)
                 val manhattanDistance = min(x + y, abs(9 - x) + abs(9 - y))
-                val distances = node.value.toSet()
-                assertEquals(1, distances.size)
-                assertEquals(manhattanDistance.toInt(), distances.single(), "Node $node has not the expected distance")
+                val distance = node.value
+                assertEquals(manhattanDistance.toInt(), distance, "Node $node has not the expected distance")
             }
         }
     }
