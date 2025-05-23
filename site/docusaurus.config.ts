@@ -41,7 +41,8 @@ const config: Config = {
                     // Remove this to remove the "edit this page" links.
                     editUrl:
                         'https://github.com/Collektive/collektive/tree/master/site/',
-                    remarkPlugins: [codeImport],
+                    remarkPlugins: [codeImport, require('remark-math')],
+                    rehypePlugins: [require('rehype-katex')],
                 },
                 theme: {
                     customCss: './src/css/custom.css',
