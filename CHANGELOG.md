@@ -1,3 +1,19 @@
+## [24.0.10](https://github.com/Collektive/collektive/compare/24.0.9...24.0.10) (2025-05-23)
+
+### Dependency updates
+
+* **deps:** update dependency gradle to v8.14.1 ([d781553](https://github.com/Collektive/collektive/commit/d781553fae082121e4cc2d503b193df2a3f7a6a0))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.129 ([5b85c3b](https://github.com/Collektive/collektive/commit/5b85c3b9f0ccc8f74bc2cde7b8f8c1204f4dde32))
+* **deps:** update plugin kotlin-qa to v0.87.0 ([c725276](https://github.com/Collektive/collektive/commit/c7252768bd6e05031210818717aa0ab900353fc1))
+* **deps:** update plugin kotlin-qa to v0.87.1 ([3d398f1](https://github.com/Collektive/collektive/commit/3d398f1a028fc14e75c18a2e7cc0b29130472334))
+* **deps:** update plugin multijvmtesting to v3.4.3 ([7b25282](https://github.com/Collektive/collektive/commit/7b25282150d9be34b033234e1d1f11090fa6ac6b))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.25 ([876d47c](https://github.com/Collektive/collektive/commit/876d47ca0dfda3670f8dfac18fb1b027e5dba3fa))
+* **deps:** update plugin org.gradle.toolchains.foojay-resolver-convention to v1 ([7ea00dc](https://github.com/Collektive/collektive/commit/7ea00dc4b9f728f0d13c97518054490aaf3e225b))
+
+### Bug Fixes
+
+* **alchemist-incarnation:** correctly deal with nullable fields inside the simulator ([#993](https://github.com/Collektive/collektive/issues/993)) ([b86796a](https://github.com/Collektive/collektive/commit/b86796a35bb45f5e09dd892a82ae95602a79b61c))
+
 ## [24.0.9](https://github.com/Collektive/collektive/compare/24.0.8...24.0.9) (2025-05-19)
 
 ### Dependency updates
