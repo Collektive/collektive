@@ -16,11 +16,10 @@ import it.unibo.collektive.stdlib.fields.minBy
 import it.unibo.collektive.stdlib.fields.replaceMatching
 import it.unibo.collektive.stdlib.util.IncludingSelf
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
-import kotlin.time.Instant.Companion.DISTANT_PAST
+import kotlinx.datetime.Instant
+import kotlinx.datetime.Instant.Companion.DISTANT_PAST
 
 /**
  * A shared timer progressing evenly across a network, at the pace set by the fastest device.
@@ -58,6 +57,7 @@ import kotlin.time.Instant.Companion.DISTANT_PAST
  * It returns `true` if the timer has completed a full cycle,
  * `false` otherwise.
  */
+//@Serializable(with = InstantIso8601Serializer::class)
 private fun <ID : Comparable<ID>> Aggregate<ID>.cyclicTimerWithDecay(timeout: Duration, decayRate: Duration): Boolean =
     evolve(timeout) { timer ->
         if (timer == ZERO) {
@@ -97,20 +97,19 @@ fun <ID : Comparable<ID>> Aggregate<ID>.deltaTime(now: Instant): Duration = evol
  * **N.B.**: [current] is set as default to the current system time,
  * but it is recommended to change it according to the requirements to achieve accurate and non-astonishing results.
  */
-@OptIn(ExperimentalTime::class)
 fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(now: Instant): Instant =
     share(now) { clocksAround: Field<ID, Instant> ->
         println("NOW FOR $localId is $now")
         println("CLOCKSAROUND: $clocksAround")
-        val localDelta = deltaTime(now)
-        check(localDelta == ZERO) { error("Time is not moving forward") }
-        val deltaTimes: Field<ID, Duration> = clocksAround.mapValues { it - now } // passarlo a infinito
-//        val deltaTimes = clocksAround.map { now - it } // passarlo a infinito
-        val deltaReplaced = deltaTimes.replaceMatching(INFINITE) { it.value <= ZERO }
-        println("deltaTimes: $deltaTimes")
+        val localDelta: Duration = deltaTime(now)
+//        check(localDelta > ZERO) { error("Time is not moving forward") }
+        val neighborsDelta: Field<ID, Duration> = clocksAround.mapValues { it - now } // passarlo a infinito
+        println("neighborsDelta: $neighborsDelta")
+        val deltaReplaced = neighborsDelta.replaceMatching(localDelta) { it.value < ZERO }
         println("deltaReplaced: $deltaReplaced")
         val minDelta: Duration = deltaReplaced.minBy(IncludingSelf) { it.value }?.value ?: localDelta // (localDelta)
-        val deltamins: Field<ID, Duration> = deltaTimes.mapValues { it.coerceAtLeast(minDelta) }
+        println("MIN DELTA: $minDelta")
+        val deltamins: Field<ID, Duration> = neighborsDelta.mapValues { it.coerceAtLeast(minDelta) }
         println("DELTAMINS: $deltamins")
         val referenceTime: Instant =
             clocksAround.alignedMap<Duration, Instant>(deltamins) { _, base, dt -> base + dt }

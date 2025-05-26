@@ -12,24 +12,30 @@ import io.kotest.matchers.shouldBe
 import it.unibo.collektive.stdlib.sharedClock
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
-import kotlin.time.Instant.Companion.DISTANT_PAST
+import kotlinx.datetime.Instant
+import kotlinx.datetime.Instant.Companion.DISTANT_PAST
 
 @OptIn(ExperimentalTime::class)
 class SharedClockTest {
 
     val size = 2
+    val t = (0..size * size).map { Instant.fromEpochSeconds(it.toLong()) }
     var times = emptyList<Instant>().toMutableList()
 
-//    repeat(size * size) {
-//        times += Instant.parse(
-//            input = "2024-01-01T00:00:0$it.00Z",
-//        )
-//    }
+    @BeforeTest
+    fun setup() {
+        repeat(size * size) {
+            times += Instant.parse(
+                input = "2024-01-01T00:00:0$it.00Z",
+            )
+        }
+    }
+
 
     fun <R> Environment<R>.sharedClockIsStable(): Boolean = status().values.distinct().size == 1
 
