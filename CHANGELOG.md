@@ -1,3 +1,13 @@
+## [25.0.1](https://github.com/Collektive/collektive/compare/25.0.0...25.0.1) (2025-05-26)
+
+### Dependency updates
+
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.131 ([71b8789](https://github.com/Collektive/collektive/commit/71b8789222a07c913fe5388976abab7971d7fec9))
+
+### Documentation
+
+* **site:** improve some sections and add showcase ([#966](https://github.com/Collektive/collektive/issues/966)) ([899e499](https://github.com/Collektive/collektive/commit/899e499364e2330f18b4cea058f80485a906afec))
+
 ## [25.0.0](https://github.com/Collektive/collektive/compare/24.0.10...25.0.0) (2025-05-26)
 
 ### ⚠ BREAKING CHANGES
