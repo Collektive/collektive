@@ -1,3 +1,20 @@
+## [25.0.0](https://github.com/Collektive/collektive/compare/24.0.10...25.0.0) (2025-05-26)
+
+### ⚠ BREAKING CHANGES
+
+* **stdlib:** improve the memory usage and the usability of `gradientCast` (#1001)
+
+### Features
+
+* **stdlib:** improve the memory usage and the usability of `gradientCast` ([#1001](https://github.com/Collektive/collektive/issues/1001)) ([34570f0](https://github.com/Collektive/collektive/commit/34570f021ab17cfbb2ac6b89727c673cf00262cc))
+
+### Dependency updates
+
+* **deps:** update alchemist to v42.2.1 ([42c7033](https://github.com/Collektive/collektive/commit/42c70335f2fcd1527d08bab6f4e34d6c552d4209))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.130 ([98391a0](https://github.com/Collektive/collektive/commit/98391a0a5021b0a0264f6fab348b16778fed8923))
+* **deps:** update node.js to 22.16 ([0541d5b](https://github.com/Collektive/collektive/commit/0541d5bee47b2c70b8a3c8a4dfc2e7b83ca759be))
+* **deps:** update plugin kotlin-qa to v0.88.0 ([ac00251](https://github.com/Collektive/collektive/commit/ac002515ddc33292cbdee2d67aa23f0f743ca394))
+
 ## [24.0.10](https://github.com/Collektive/collektive/compare/24.0.9...24.0.10) (2025-05-23)
 
 ### Dependency updates
