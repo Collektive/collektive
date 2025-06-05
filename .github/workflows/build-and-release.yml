@@ -93,7 +93,7 @@ jobs:
           maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
           signing-key: ${{ secrets.GPG_PRIVATEKEY }}
           signing-password: ${{ secrets.GPG_PASSPHRASE }}
-      - uses: github/codeql-action/upload-sarif@v3.28.18
+      - uses: github/codeql-action/upload-sarif@v3.28.19
         if: always() && runner.os == 'Linux'
         with:
           sarif_file: build/reports/merge.sarif
