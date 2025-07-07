@@ -1,3 +1,46 @@
+## [25.0.1](https://github.com/Collektive/collektive/compare/25.0.0...25.0.1) (2025-05-26)
+
+### Dependency updates
+
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.131 ([71b8789](https://github.com/Collektive/collektive/commit/71b8789222a07c913fe5388976abab7971d7fec9))
+
+### Documentation
+
+* **site:** improve some sections and add showcase ([#966](https://github.com/Collektive/collektive/issues/966)) ([899e499](https://github.com/Collektive/collektive/commit/899e499364e2330f18b4cea058f80485a906afec))
+
+## [25.0.0](https://github.com/Collektive/collektive/compare/24.0.10...25.0.0) (2025-05-26)
+
+### ⚠ BREAKING CHANGES
+
+* **stdlib:** improve the memory usage and the usability of `gradientCast` (#1001)
+
+### Features
+
+* **stdlib:** improve the memory usage and the usability of `gradientCast` ([#1001](https://github.com/Collektive/collektive/issues/1001)) ([34570f0](https://github.com/Collektive/collektive/commit/34570f021ab17cfbb2ac6b89727c673cf00262cc))
+
+### Dependency updates
+
+* **deps:** update alchemist to v42.2.1 ([42c7033](https://github.com/Collektive/collektive/commit/42c70335f2fcd1527d08bab6f4e34d6c552d4209))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.130 ([98391a0](https://github.com/Collektive/collektive/commit/98391a0a5021b0a0264f6fab348b16778fed8923))
+* **deps:** update node.js to 22.16 ([0541d5b](https://github.com/Collektive/collektive/commit/0541d5bee47b2c70b8a3c8a4dfc2e7b83ca759be))
+* **deps:** update plugin kotlin-qa to v0.88.0 ([ac00251](https://github.com/Collektive/collektive/commit/ac002515ddc33292cbdee2d67aa23f0f743ca394))
+
+## [24.0.10](https://github.com/Collektive/collektive/compare/24.0.9...24.0.10) (2025-05-23)
+
+### Dependency updates
+
+* **deps:** update dependency gradle to v8.14.1 ([d781553](https://github.com/Collektive/collektive/commit/d781553fae082121e4cc2d503b193df2a3f7a6a0))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.129 ([5b85c3b](https://github.com/Collektive/collektive/commit/5b85c3b9f0ccc8f74bc2cde7b8f8c1204f4dde32))
+* **deps:** update plugin kotlin-qa to v0.87.0 ([c725276](https://github.com/Collektive/collektive/commit/c7252768bd6e05031210818717aa0ab900353fc1))
+* **deps:** update plugin kotlin-qa to v0.87.1 ([3d398f1](https://github.com/Collektive/collektive/commit/3d398f1a028fc14e75c18a2e7cc0b29130472334))
+* **deps:** update plugin multijvmtesting to v3.4.3 ([7b25282](https://github.com/Collektive/collektive/commit/7b25282150d9be34b033234e1d1f11090fa6ac6b))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.25 ([876d47c](https://github.com/Collektive/collektive/commit/876d47ca0dfda3670f8dfac18fb1b027e5dba3fa))
+* **deps:** update plugin org.gradle.toolchains.foojay-resolver-convention to v1 ([7ea00dc](https://github.com/Collektive/collektive/commit/7ea00dc4b9f728f0d13c97518054490aaf3e225b))
+
+### Bug Fixes
+
+* **alchemist-incarnation:** correctly deal with nullable fields inside the simulator ([#993](https://github.com/Collektive/collektive/issues/993)) ([b86796a](https://github.com/Collektive/collektive/commit/b86796a35bb45f5e09dd892a82ae95602a79b61c))
+
 ## [24.0.9](https://github.com/Collektive/collektive/compare/24.0.8...24.0.9) (2025-05-19)
 
 ### Dependency updates

@@ -1,5 +1,5 @@
 ---
-title: Aggregate Operators and Field Operations
+title: Fields and Basic Aggregate Operators
 position: 1
 ---
 
@@ -67,22 +67,32 @@ while device `3` has just the device with ID `0` in its neighborhood.
 [^1]: The neighborhood is the set of devices that are directly connected to a given device.
 [^2]: This is the definition of `field` inside Collektive, its definition from the Aggregate Computing perspective is slightly different.
 
+## Communication type
+
+### Isotropic
+The communication model is isotropic when the devices exchange the same information with each other in the neighborhood.
+
+![](/img/isotropic.svg)
+
+### Anisotropic
+The communication model is anisotropic when a device exchange different information based on the neighbor it is communicating with.
+
+![](/img/anisotropic.svg)
+
 ## Aggregate Operators
 
 The main operators of the `DSL` that can manipulate fields are:
 
 ### Exchange
 
-[`exchange`](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/exchange.html)
-is the foundation of `XC`[^3],
-has the crucial aspect that can send different values to each neighbor,
+[`exchange`](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/exchange.html)[^3] is the core operator of the `DSL`.
+This construct has the crucial aspect that can send different values to each neighbor,
 allowing custom interaction between them.
-It models the space-time evolution of the device.
+It models the space-time evolution of the device through an _anisotropic_ communication model with the neighbors.
 
 ![](/img/exchange.svg)
 
 #### Example
-
 
 ```kotlin
 // when the id of the device is even,
@@ -101,7 +111,6 @@ After each iteration of every device, the resultant fields are the following:
 ϕ(localId=2, localValue=15, neighbors={0=6, 1=20})
 ϕ(localId=3, localValue=20, neighbors={0=6, 1=20, 2=16})
 ```
-
 
 [^3]: G. Audrito, R. Casadei, F. Damiani, G. Salvaneschi, and M. Viroli "The eXchange Calculus (XC): A functional programming language design for distributed collective systems."
 

@@ -116,14 +116,11 @@ class CollektiveDevice<P>(
 
             @Suppress("UNCHECKED_CAST")
             override fun <Value> dataAt(path: Path, dataSharingMethod: DataSharingMethod<Value>): Map<Int, Value> =
-                messages
-                    .mapValues { (_, message) ->
-                        message.sharedData.getOrElse(path) { NoValue } as Value
-                    }.filter { it.value != NoValue }
+                // Messages need to be filtered by the path to allow for null values
+                messages.filterValues { message -> message.sharedData.containsKey(path) }
+                    .mapValues { (_, message) -> message.sharedData[path] as Value }
         }
     }
-
-    private object NoValue
 
     @Suppress("UNCHECKED_CAST")
     override fun <T> get(name: String): T = node.getConcentration(SimpleMolecule(name)) as T

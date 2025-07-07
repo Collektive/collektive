@@ -9,8 +9,8 @@ dependencyResolutionManagement {
 rootProject.name = "collektivize"
 
 plugins {
-    id("com.gradle.develocity") version "4.0.1"
-    id("org.danilopianini.gradle-pre-commit-git-hooks") version "2.0.24"
+    id("com.gradle.develocity") version "4.0.2"
+    id("org.danilopianini.gradle-pre-commit-git-hooks") version "2.0.27"
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
