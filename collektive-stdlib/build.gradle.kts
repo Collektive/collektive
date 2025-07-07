@@ -48,6 +48,7 @@ kotlinMultiplatform {
             dependencies {
                 implementation(collektive("dsl"))
                 implementation(rootProject.libs.kotlinx.serialization.core)
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
                 implementation(rootProject.libs.arrow.core.serialization)
             }
             kotlin.srcDirs(collektivizeKotlinStdlibTask)
