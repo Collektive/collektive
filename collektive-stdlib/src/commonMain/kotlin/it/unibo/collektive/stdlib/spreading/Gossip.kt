@@ -151,7 +151,7 @@ inline fun <
     top = top,
     metric = metric,
     maxDiameter = maxDiameter,
-    selector = { first, second -> maxOf(first, second) },
+    selector = ::maxOf,
     accumulateDistance = accumulateDistance,
 )
 
@@ -194,7 +194,7 @@ inline fun <
     top = top,
     metric = metric,
     maxDiameter = maxDiameter,
-    selector = { first, second -> minOf(first, second) },
+    selector = ::minOf,
     accumulateDistance = accumulateDistance,
 )
 
