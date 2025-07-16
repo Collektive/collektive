@@ -30,7 +30,7 @@ kotlinpoet = "com.squareup:kotlinpoet:2.2.0"
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "serialization" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 kotlinx-serialization-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-serialization-protobuf", version.ref = "serialization" }
-mockk = "io.mockk:mockk:1.14.4"
+mockk = "io.mockk:mockk:1.14.5"
 slf4j = "org.slf4j:slf4j-api:2.0.17"
 subjekt = "io.github.freshmag:subjekt-api:1.1.5"
 
