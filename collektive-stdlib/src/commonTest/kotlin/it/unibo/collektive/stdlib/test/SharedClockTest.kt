@@ -9,16 +9,19 @@
 package it.unibo.collektive.stdlib.test
 
 import io.kotest.matchers.shouldBe
+import it.unibo.collektive.stdlib.clock
 import it.unibo.collektive.stdlib.sharedClock
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.Instant
+import kotlinx.datetime.Instant.Companion.DISTANT_PAST
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
-import kotlinx.datetime.Instant
-import kotlinx.datetime.Instant.Companion.DISTANT_PAST
 
 @OptIn(ExperimentalTime::class)
 class SharedClockTest {
@@ -26,6 +29,7 @@ class SharedClockTest {
     val size = 2
     val t = (0..size * size).map { Instant.fromEpochSeconds(it.toLong()) }
     var times = emptyList<Instant>().toMutableList()
+    val expected = mutableListOf<Instant>()
 
     @BeforeTest
     fun setup() {
@@ -33,9 +37,9 @@ class SharedClockTest {
             times += Instant.parse(
                 input = "2024-01-01T00:00:0$it.00Z",
             )
+            expected += (DISTANT_PAST + (4.seconds * (it + 1)))
         }
     }
-
 
     fun <R> Environment<R>.sharedClockIsStable(): Boolean = status().values.distinct().size == 1
 
@@ -45,7 +49,7 @@ class SharedClockTest {
 
     fun connectedGridWithSharedClock(size: Int) = mooreGrid<Instant>(size, size, { _, _ -> DISTANT_PAST }) {
         val clock = sharedClock(times[localId])
-        times[localId] = times[localId] + 1.seconds
+        times[localId] = times[localId] + 4.seconds
         clock
     }
 
@@ -65,17 +69,21 @@ class SharedClockTest {
     @Test
     fun `devices using sharedClock should agree on the current time`() {
         val environment: Environment<Instant> = connectedGridWithSharedClock(size)
-        generateSequence(0) { it + 1 }.take(environment.nodes.size).forEach { iteration ->
-            environment.nodes.drop(iteration).forEach { n ->
-//                environment.shouldBeInstant(n.id, times[n.id])
-                repeat(n.id) {
-                    n.cycle()
-                }
-            }
-        }
-        println("finishing")
+//        generateSequence(0) { it + 1 }.take(environment.nodes.size).forEach { iteration ->
+//            val dropped = environment.nodes.drop(iteration)
+//            dropped.forEach { n ->
+//
+////                environment.shouldBeInstant(n.id, times[n.id])
+//                repeat(n.id + 1) {
+//                    n.cycle()
+//                }
+//            }
+//        }
         environment.cycleInOrder()
         println(environment.status())
+        environment.cycleInOrder()
+        println(environment.status())
+        environment.status().values shouldBe expected
     }
 
     @Test
