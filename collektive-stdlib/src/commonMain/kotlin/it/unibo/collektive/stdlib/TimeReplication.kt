@@ -9,10 +9,8 @@
 package it.unibo.collektive.stdlib
 
 import it.unibo.collektive.aggregate.api.Aggregate
-import kotlinx.datetime.serializers.InstantIso8601Serializer
-import kotlinx.serialization.Serializable
-import kotlin.time.ExperimentalTime
 import kotlinx.datetime.Instant
+import kotlin.time.ExperimentalTime
 
 /**
  * A periodic restart strategy for removing obsolete information of [process] replicated across devices.
