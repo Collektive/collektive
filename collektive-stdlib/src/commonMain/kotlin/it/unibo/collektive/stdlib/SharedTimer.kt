@@ -121,8 +121,8 @@ fun <ID : Comparable<ID>> Aggregate<ID>.minDelta(localDelta: Duration): Duration
         println("deltareplaced $deltareplaced")
         val minby = deltareplaced.minValue(localDelta)
         println("min by $minby")
-        val neighborDurations = deltareplaced.excludeSelf().filterValues { it > ZERO }.values
-        val actualMin = (neighborDurations + localDelta).min()
+        val neighborDurations = deltareplaced.excludeSelf().values + localDelta
+        val actualMin = neighborDurations.filter { it > ZERO }.minOrNull() ?: localDelta
         println("minDelta $actualMin")
         localDelta.yielding { actualMin }
     }
