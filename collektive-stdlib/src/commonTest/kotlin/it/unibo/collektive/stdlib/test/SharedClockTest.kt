@@ -68,16 +68,17 @@ class SharedClockTest {
     fun `todo`() {
         val env: Environment<Instant> = gridWithExecutionFrequency(SIZE, ONE_SEC_FREQUENCY)
         for (n in 0 until NUM_DEVICES) {
-            println("====== cycle $n")
             env.nodes.elementAt(n).cycle()
             if (n > 0) env.nodes.elementAt(n - 1).cycle()
         }
         env.nodes.last().cycle()
         println(env.status())
-        println("------ UPDATE TIMES")
         env.nodes.forEach { node -> increaseTime(node.id, ONE_SEC_FREQUENCY * (SEQUENTIAL_FREQUENCY - ONE_SEC_FREQUENCY)) }
         env.cycleInOrder()
         println(env.status())
+        val expected = listOf(DISTANT_PAST + 7.seconds, DISTANT_PAST + 8.seconds, DISTANT_PAST + 9.seconds, DISTANT_PAST + 13.seconds)
+        println("expected $expected")
+        env.nodes.forEach { node -> env.shouldBeInstant(node.id, expected[node.id]) }
     }
 
 
