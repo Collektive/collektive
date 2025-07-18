@@ -15,9 +15,9 @@ import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.aggregate.api.sharing
 import it.unibo.collektive.stdlib.fields.max
-import it.unibo.collektive.stdlib.fields.maxValue
 import it.unibo.collektive.stdlib.fields.min
 import it.unibo.collektive.stdlib.fields.minValue
+import it.unibo.collektive.stdlib.fields.minValueBy
 import it.unibo.collektive.stdlib.fields.replaceMatching
 import it.unibo.collektive.stdlib.pairs.FieldedPairs.component1
 import it.unibo.collektive.stdlib.pairs.FieldedPairs.component2
@@ -115,14 +115,19 @@ fun <ID : Comparable<ID>> Aggregate<ID>.localDeltaTime(now: Instant): Duration =
  * @return The minimum delta time determined from the local and shared context values.
  */
 fun <ID : Comparable<ID>> Aggregate<ID>.minDelta(localDelta: Duration): Duration =
-    sharing(ZERO) { deltaAround: Field<ID, Duration> ->
-        println("DELTA AROUND: $deltaAround")
-        val minDelta = deltaAround.replaceMatching(localDelta) { it.value <= ZERO }
-            .min(IncludingSelf)
-            ?.value ?: localDelta
-        localDelta.yielding { minDelta }
+    sharing(localDelta) { deltaAround: Field<ID, Duration> ->
+        println("delta around $deltaAround")
+        val deltareplaced = deltaAround.replaceMatching(localDelta) { it.value <= ZERO } // useless when local delta is 0
+        println("deltareplaced $deltareplaced")
+        val minby = deltareplaced.minValue(localDelta)
+        println("min by $minby")
+        val neighborDurations = deltareplaced.excludeSelf().filterValues { it > ZERO }.values
+        val actualMin = (neighborDurations + localDelta).min()
+        println("minDelta $actualMin")
+        localDelta.yielding { actualMin }
     }
 
+// sono meno conservativa, aggiungo quello che secondo me è la stima del delta rispetto agli altri
 /**
  * A shared clock across a network at the pace set by the fastest device.
  * Starts from an initial value that is the [current] time of execution of the device
@@ -131,27 +136,29 @@ fun <ID : Comparable<ID>> Aggregate<ID>.minDelta(localDelta: Duration): Duration
  * **N.B.**: [current] is set as default to the current system time,
  * but it is recommended to change it according to the requirements to achieve accurate and non-astonishing results.
  */
-fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(current: Instant): Instant {
+fun <ID : Comparable<ID>> Aggregate<ID>.sharedClockWithLag(current: Instant): Instant {
     println("NOW FOR $localId is $current")
     val localDelta: Duration = localDeltaTime(current)
     println("LOCAL DELTA: $localDelta")
     println("device ${localId} neighbors: ${neighborhood().neighbors}")
     return share(DISTANT_PAST) { clocksAround: Field<ID, Instant> ->
-        val minDelta: Duration = minDelta(localDelta)
-        println("MIN DELTA: $minDelta")
+//        val minDelta: Duration = minDelta(localDelta)
+//        println("MIN DELTA: $minDelta")
         println("CLOCKS AROUND: $clocksAround")
         val nbrLag = neighboring(current).map { field ->
             if (field.id == localId) localDelta else current - field.value
         }
         println("NBR LAG: $nbrLag")
-        val clocks = clocksAround.mapValues { it + minDelta }
-        println("CLOCKS: $clocks")
+//        val clocks = clocksAround.mapValues { it + minDelta }
+//        println("CLOCKS: $clocks")
         val res = clocksAround.alignedMap(nbrLag) { _, base, dt -> base + dt }.max(IncludingSelf)?.value ?: DISTANT_PAST
         println("res $res")
-        clocks.max(IncludingSelf)!!.value
+        res
+//        clocks.max(IncludingSelf)?.value ?: DISTANT_PAST
     }
 }
 
+//qui do un lower bound tempo al quale so di essere
 /**
  * A shared clock across a network at the pace set by the fastest device.
  * Starts from an initial value that is the [current] time of execution of the device
@@ -160,60 +167,20 @@ fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(current: Instant): Instant {
  * **N.B.**: [current] is set as default to the current system time,
  * but it is recommended to change it according to the requirements to achieve accurate and non-astonishing results.
  */
-fun <ID : Comparable<ID>> Aggregate<ID>.clock(now: Instant): Instant {
+fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(now: Instant): Instant {
     println("NOW FOR $localId is $now")
     val localDelta: Duration = localDeltaTime(now)
     println("LOCAL DELTA: $localDelta")
+    val minDelta = minDelta(localDelta)
+    println("MIN DELTA: $minDelta")
 
-    return share(localDelta to DISTANT_PAST) { (deltaAround: Field<ID, Duration>, clocksAround: Field<ID, Instant>) ->
-        println("deltaAround: $deltaAround")
+    return share(DISTANT_PAST) { clocksAround: Field<ID, Instant> ->
         println("CLOCKSAROUND: $clocksAround")
-//        check(localDelta > ZERO) { error("Time is not moving forward") }
-        val deltaReplaced = deltaAround.replaceMatching(localDelta) { it.value <= ZERO }
-        println("deltaReplaced: $deltaReplaced")
-        val minDelta = deltaReplaced.min(IncludingSelf)!!.value
-        println("MIN DELTA: $minDelta")
-        val deltamins: Field<ID, Duration> = deltaReplaced.mapValues { it.coerceAtLeast(minDelta) }
-        println("DELTAMINS: $deltamins")
         val maxTime = clocksAround.max(IncludingSelf)?.value ?: DISTANT_PAST
-//        val referenceTime: Instant =
-//            clocksAround.alignedMap<Duration, Instant>(deltamins) { _, base, dt -> base + dt }
-//                .maxValue(clocksAround.local.value + (deltamins.minValue() ?: localDelta))
-        println("REFERENCE TIME FOR DEVICE $localId: $maxTime")
-        minDelta to (maxTime + minDelta)
-    }.second
+        println("REFERENCE TIME FOR DEVICE $localId: ${maxTime + minDelta} ")
+        maxTime + minDelta
+    }
 }
-
-//fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(now: Instant): Instant =
-//    share(now) { clocksAround: Field<ID, Instant> ->
-//        val localDelta: Duration = deltaTime(now)
-//        println("NOW FOR $localId is $now")
-//        println("CLOCKSAROUND: $clocksAround")
-////        check(localDelta > ZERO) { error("Time is not moving forward") }
-//        val neighborsDelta: Field<ID, Duration> = clocksAround.mapValues { it - now } // passarlo a infinito
-//        println("neighborsDelta: $neighborsDelta")
-//        val deltaReplaced = neighborsDelta.replaceMatching(localDelta) { it.value < ZERO }
-//        println("deltaReplaced: $deltaReplaced")
-//        val minDelta: Duration = deltaReplaced.minBy(IncludingSelf) { it.value }?.value ?: localDelta // (localDelta)
-//        println("MIN DELTA: $minDelta")
-//        val deltamins: Field<ID, Duration> = neighborsDelta.mapValues { it.coerceAtLeast(minDelta) }
-//        println("DELTAMINS: $deltamins")
-//        val referenceTime: Instant =
-//            clocksAround.alignedMap<Duration, Instant>(deltamins) { _, base, dt -> base + dt }
-//                .maxValue(clocksAround.local.value + minDelta)
-//        println("REFERENCE TIME FOR DEVICE $localId: $referenceTime")
-//        referenceTime // + minDelta
-//    }
-
-//    return sharing(now to localDelta) { deltaAround: Field<ID, Pair<Instant, Duration>> ->
-//        // take the minimum delta, i.e., the fastest device
-//        val minDelta = deltaAround.minBy(deltaAround.localValue) { it.second }.secondà
-//        // take the biggest time, i.e., the device most ahead
-//        val fastestTime = deltaAround.maxBy(deltaAround.localValue) { it.first }.first
-//        val newTime = fastestTime + minDelta
-//        println("localDelta: $localDelta - minDelta: $minDelta - fastestTime: $fastestTime - newTime: $newTime")
-//        (newTime to minDelta).yielding { newTime }
-//    }
 
 // shared clock -> Instant -> il device piu veloce sta a T
 
@@ -222,15 +189,3 @@ fun <ID : Comparable<ID>> Aggregate<ID>.clock(now: Instant): Instant {
 // //        time.map { timeElapsed(it) }.max(base = ZERO)
 //    }
 //
-
-// @OptIn(ExperimentalTime::class)
-// operator fun <ID: Comparable<ID>> Field<ID, Instant>.minus(other: Instant): Field<ID, Duration> =
-//    this.mapValues { it.minus(other) }
-
-/*
-inline times_t shared_clock(node_t& node, trace_t call_point) {
-    return nbr(node, call_point, times_t{0}, [&](field<times_t> x){
-        return max_hood(node, call_point, node.previous_time() == TIME_MIN ? node.current_time() : x + node.nbr_lag());
-    });
-}
- */

@@ -9,91 +9,83 @@
 package it.unibo.collektive.stdlib.test
 
 import io.kotest.matchers.shouldBe
-import it.unibo.collektive.stdlib.clock
 import it.unibo.collektive.stdlib.sharedClock
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
-import kotlinx.datetime.Clock
-import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
 import kotlinx.datetime.Instant.Companion.DISTANT_PAST
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 class SharedClockTest {
 
-    val size = 2
-    val t = (0..size * size).map { Instant.fromEpochSeconds(it.toLong()) }
-    var times = emptyList<Instant>().toMutableList()
-    val expected = mutableListOf<Instant>()
-
     @BeforeTest
-    fun setup() {
-        repeat(size * size) {
+    fun setup() { // before each test
+        repeat(NUM_DEVICES) {
             times += Instant.parse(
                 input = "2024-01-01T00:00:0$it.00Z",
             )
-            expected += (DISTANT_PAST + (4.seconds * (it + 1)))
         }
     }
-
-    fun <R> Environment<R>.sharedClockIsStable(): Boolean = status().values.distinct().size == 1
 
     fun <R> Environment<R>.shouldBeInstant(nodeId: Int, time: Instant) {
         status()[nodeId] shouldBe time
     }
 
-    fun connectedGridWithSharedClock(size: Int) = mooreGrid<Instant>(size, size, { _, _ -> DISTANT_PAST }) {
-        val clock = sharedClock(times[localId])
-        times[localId] = times[localId] + 4.seconds
-        clock
+    fun gridWithExecutionFrequency(size: Int, frequency: Int) = mooreGrid<Instant>(size, size, { _, _ -> DISTANT_PAST }) {
+        sharedClock(times[localId]).also { increaseTime(localId, frequency) }
     }
 
-//        connectedGrid<Instant>(size, size, { _, _ -> DISTANT_PAST }) {
-//            val clock = sharedClock(times[localId])
-//            times[localId] = times[localId] + 1.seconds
-// //            times[localId] = times[localId] + if(localId % 2 == 0) 30.milliseconds else 1.seconds
-//            clock
-//        }.apply {
-//            nodes.size shouldBe size * size
-//            val initial = status().values.distinct()
-//            initial.size shouldBe 1
-//            check(initial.first() == DISTANT_PAST) {
-//                "Initial status is not `DISTANT_PAST`, but it is $initial (${initial::class.simpleName})"
-//            }
-//        }
+    fun increaseTime(node: Int, frequency: Int) {
+        times[node] = times[node] + frequency.seconds
+    }
+
     @Test
-    fun `devices using sharedClock should agree on the current time`() {
-        val environment: Environment<Instant> = connectedGridWithSharedClock(size)
-//        generateSequence(0) { it + 1 }.take(environment.nodes.size).forEach { iteration ->
-//            val dropped = environment.nodes.drop(iteration)
-//            dropped.forEach { n ->
-//
-////                environment.shouldBeInstant(n.id, times[n.id])
-//                repeat(n.id + 1) {
-//                    n.cycle()
-//                }
-//            }
-//        }
+    fun `After a single round of computation, all devices should return DISTANT_PAST`() {
+        val environment: Environment<Instant> = gridWithExecutionFrequency(SIZE, SEQUENTIAL_FREQUENCY)
+        environment.cycleInOrder()
+        val firstCycle = environment.status().values.distinct()
+        firstCycle.size shouldBe 1
+        firstCycle.first() shouldBe DISTANT_PAST
+    }
+
+    @Test
+    fun `In two subsequent rounds of computation, the devices should increase their time by their delta seconds`() {
+        val environment: Environment<Instant> = gridWithExecutionFrequency(SIZE, SEQUENTIAL_FREQUENCY)
         environment.cycleInOrder()
         println(environment.status())
         environment.cycleInOrder()
         println(environment.status())
-        environment.status().values shouldBe expected
-    }
-
-    @Test
-    fun `SharedClock should stabilize in one cycle even if the nodes have different times`() {
-        val environment: Environment<Instant> = connectedGridWithSharedClock(size)
-        generateSequence(0) { it + 1 }.take(environment.nodes.size).forEach { iteration ->
-            environment.nodes.drop(iteration).forEach { n -> n.cycle() }
+        environment.nodes.forEach { node ->
+            environment.shouldBeInstant(node.id, DISTANT_PAST + (SEQUENTIAL_FREQUENCY.seconds * (node.id + 1)))
         }
-        environment.cycleInReverseOrder()
-        assertTrue(environment.sharedClockIsStable())
-        environment.status().values.distinct() shouldBe Instant.parse("1970-01-01T00:00:00Z")
+    }
+
+    @Test
+    fun `todo`() {
+        val env: Environment<Instant> = gridWithExecutionFrequency(SIZE, ONE_SEC_FREQUENCY)
+        for (n in 0 until NUM_DEVICES) {
+            println("====== cycle $n")
+            env.nodes.elementAt(n).cycle()
+            if (n > 0) env.nodes.elementAt(n - 1).cycle()
+        }
+        env.nodes.last().cycle()
+        println(env.status())
+        println("------ UPDATE TIMES")
+        env.nodes.forEach { node -> increaseTime(node.id, ONE_SEC_FREQUENCY * (SEQUENTIAL_FREQUENCY - ONE_SEC_FREQUENCY)) }
+        env.cycleInOrder()
+        println(env.status())
+    }
+
+
+    companion object {
+        const val SIZE = 2
+        const val NUM_DEVICES = SIZE * SIZE
+        const val ONE_SEC_FREQUENCY = 1
+        const val SEQUENTIAL_FREQUENCY = NUM_DEVICES
+        val times = mutableListOf<Instant>()
     }
 }
