@@ -15,12 +15,7 @@ import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.aggregate.api.sharing
 import it.unibo.collektive.stdlib.fields.max
-import it.unibo.collektive.stdlib.fields.min
-import it.unibo.collektive.stdlib.fields.minValue
-import it.unibo.collektive.stdlib.fields.minValueBy
 import it.unibo.collektive.stdlib.fields.replaceMatching
-import it.unibo.collektive.stdlib.pairs.FieldedPairs.component1
-import it.unibo.collektive.stdlib.pairs.FieldedPairs.component2
 import it.unibo.collektive.stdlib.util.IncludingSelf
 import kotlinx.datetime.Instant
 import kotlinx.datetime.Instant.Companion.DISTANT_PAST
@@ -116,14 +111,9 @@ fun <ID : Comparable<ID>> Aggregate<ID>.localDeltaTime(now: Instant): Duration =
  */
 fun <ID : Comparable<ID>> Aggregate<ID>.minDelta(localDelta: Duration): Duration =
     sharing(localDelta) { deltaAround: Field<ID, Duration> ->
-        println("delta around $deltaAround")
-        val deltareplaced = deltaAround.replaceMatching(localDelta) { it.value <= ZERO } // useless when local delta is 0
-        println("deltareplaced $deltareplaced")
-        val minby = deltareplaced.minValue(localDelta)
-        println("min by $minby")
-        val neighborDurations = deltareplaced.excludeSelf().values + localDelta
-        val actualMin = neighborDurations.filter { it > ZERO }.minOrNull() ?: localDelta
-        println("minDelta $actualMin")
+        val deltaReplaced = deltaAround.replaceMatching(localDelta) { it.value <= ZERO }// useless when local delta is 0
+        val actualMin = (deltaReplaced.excludeSelf().values + localDelta)
+            .filter { it > ZERO }.minOrNull() ?: localDelta
         localDelta.yielding { actualMin }
     }
 
@@ -167,18 +157,11 @@ fun <ID : Comparable<ID>> Aggregate<ID>.sharedClockWithLag(current: Instant): In
  * **N.B.**: [current] is set as default to the current system time,
  * but it is recommended to change it according to the requirements to achieve accurate and non-astonishing results.
  */
-fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(now: Instant): Instant {
-    println("NOW FOR $localId is $now")
-    val localDelta: Duration = localDeltaTime(now)
-    println("LOCAL DELTA: $localDelta")
+fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(current: Instant): Instant {
+    val localDelta: Duration = localDeltaTime(current)
     val minDelta = minDelta(localDelta)
-    println("MIN DELTA: $minDelta")
-
     return share(DISTANT_PAST) { clocksAround: Field<ID, Instant> ->
-        println("CLOCKSAROUND: $clocksAround")
-        val maxTime = clocksAround.max(IncludingSelf)?.value ?: DISTANT_PAST
-        println("REFERENCE TIME FOR DEVICE $localId: ${maxTime + minDelta} ")
-        maxTime + minDelta
+        (clocksAround.max(IncludingSelf)?.value ?: DISTANT_PAST) + minDelta
     }
 }
 

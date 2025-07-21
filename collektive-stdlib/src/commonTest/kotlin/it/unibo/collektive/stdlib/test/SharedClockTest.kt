@@ -56,31 +56,28 @@ class SharedClockTest {
     fun `In two subsequent rounds of computation, the devices should increase their time by their delta seconds`() {
         val environment: Environment<Instant> = gridWithExecutionFrequency(SIZE, SEQUENTIAL_FREQUENCY)
         environment.cycleInOrder()
-        println(environment.status())
         environment.cycleInOrder()
-        println(environment.status())
         environment.nodes.forEach { node ->
             environment.shouldBeInstant(node.id, DISTANT_PAST + (SEQUENTIAL_FREQUENCY.seconds * (node.id + 1)))
         }
     }
 
     @Test
-    fun `todo`() {
+    fun `In staggered rounds of computation, the devices should increase their time based on the fastest device`() {
         val env: Environment<Instant> = gridWithExecutionFrequency(SIZE, ONE_SEC_FREQUENCY)
         for (n in 0 until NUM_DEVICES) {
             env.nodes.elementAt(n).cycle()
             if (n > 0) env.nodes.elementAt(n - 1).cycle()
         }
         env.nodes.last().cycle()
-        println(env.status())
-        env.nodes.forEach { node -> increaseTime(node.id, ONE_SEC_FREQUENCY * (SEQUENTIAL_FREQUENCY - ONE_SEC_FREQUENCY)) }
+        // change the device's execution frequency
+        env.nodes.forEach { node ->
+            increaseTime(node.id, ONE_SEC_FREQUENCY * (SEQUENTIAL_FREQUENCY - ONE_SEC_FREQUENCY))
+        }
         env.cycleInOrder()
-        println(env.status())
-        val expected = listOf(DISTANT_PAST + 7.seconds, DISTANT_PAST + 8.seconds, DISTANT_PAST + 9.seconds, DISTANT_PAST + 13.seconds)
-        println("expected $expected")
-        env.nodes.forEach { node -> env.shouldBeInstant(node.id, expected[node.id]) }
+        val expected = listOf(7, 8, 9, 13).map { DISTANT_PAST + it.seconds }
+        env.nodes.forEachIndexed { index, node -> env.shouldBeInstant(node.id, expected[index]) }
     }
-
 
     companion object {
         const val SIZE = 2
