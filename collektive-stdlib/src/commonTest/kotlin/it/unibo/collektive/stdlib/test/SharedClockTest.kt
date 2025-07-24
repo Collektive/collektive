@@ -45,6 +45,7 @@ class SharedClockTest {
 
     @Test
     fun `After a single round of computation, all devices should return DISTANT_PAST`() {
+        // execution sequence: d0 -> d1 -> d2 -> d3
         val environment: Environment<Instant> = gridWithExecutionFrequency(SIZE, SEQUENTIAL_FREQUENCY)
         environment.cycleInOrder()
         val firstCycle = environment.status().values.distinct()
@@ -54,6 +55,7 @@ class SharedClockTest {
 
     @Test
     fun `In two subsequent rounds of computation, the devices should increase their time by their delta seconds`() {
+        // execution sequence: d0 -> d1 -> d2 -> d3 -> d0 -> d1 -> d2 -> d3
         val environment: Environment<Instant> = gridWithExecutionFrequency(SIZE, SEQUENTIAL_FREQUENCY)
         environment.cycleInOrder()
         environment.cycleInOrder()
@@ -64,14 +66,16 @@ class SharedClockTest {
 
     @Test
     fun `In staggered rounds of computation, the devices should increase their time based on the fastest device`() {
+        // execution sequence: d0 -> (d1 -> d0) -> (d2 -> d1) -> (d3 -> d2) -> d3 -> d0 -> d1 -> d2 -> d3
         val env: Environment<Instant> = gridWithExecutionFrequency(SIZE, ONE_SEC_FREQUENCY)
         for (n in 0 until NUM_DEVICES) {
             env.nodes.elementAt(n).cycle()
             if (n > 0) env.nodes.elementAt(n - 1).cycle()
         }
         env.nodes.last().cycle()
-        // change the device's execution frequency
+        // change the device's execution frequency to execute after the time of the last device that has cycled
         env.nodes.forEach { node ->
+            // minus one second because it has already been added after the first cycle
             increaseTime(node.id, ONE_SEC_FREQUENCY * (SEQUENTIAL_FREQUENCY - ONE_SEC_FREQUENCY))
         }
         env.cycleInOrder()
