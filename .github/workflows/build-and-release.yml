@@ -40,7 +40,7 @@ jobs:
         with:
           check-command: |
             ./gradlew check koverXmlReport :collektive-compiler-plugin:check :collektive-gradle-plugin:check :collektivize:check --parallel
-          should-deploy: ${{ runner.os == 'macOS' && needs.check-secrets.outputs.run-with-secrets == 'true' }} # Deploy from macOS since it supports all the platforms
+          should-deploy: ${{ runner.os == 'macOS' && steps.detect-secrets.outputs.has-secrets == 'true' }} # Deploy from macOS since it supports all the platforms
           deploy-command: |
             # Compute all tasks to be executed
             projects=( "" ":collektive-compiler-plugin:" ":collektive-gradle-plugin:" ":collektivize:" )
