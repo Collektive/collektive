@@ -67,5 +67,5 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 kover = "org.jetbrains.kotlinx.kover:0.9.1"
 power-assert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = "kotlin" }
 multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:3.5.1"
-publishOnCentral = "org.danilopianini.publish-on-central:8.0.7"
+publishOnCentral = "org.danilopianini.publish-on-central:9.0.9-dev05-de8b938"
 taskTree = "com.dorongold.task-tree:4.0.1"

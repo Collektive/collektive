@@ -5,87 +5,53 @@ on:
   workflow_dispatch:
 
 jobs:
-  check-secrets:
-    runs-on: ubuntu-24.04
-    outputs:
-      run-with-secrets: ${{ steps.require-secrets.outputs.run-with-secrets }}
-    steps:
-      - name: Find if secrets are available
-        id: detect-secrets
-        uses: DanySK/are-secrets-available@1.0.0
-        with:
-          secrets: ${{ toJson(secrets) }}
-      - name: Set condition
-        id: require-secrets
-        run: |
-          echo "run-with-secrets=${{ steps.detect-secrets.outputs.has-secrets == 'true' && !github.event.repository.fork }}" >> $GITHUB_OUTPUT
-
-  precompute-next-version:
-    runs-on: ubuntu-24.04
-    outputs:
-      next-version: ${{ steps.compute-next-version.outputs.next-version }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4.2.2
-        with:
-          fetch-depth: 0
-      - name: Compute next release version
-        id: compute-next-version
-        uses: nicolasfara/precompute-semantic-release-version-action@2.0.2
-        with:
-          github-token: ${{ github.token }}
-
-  staging-repo:
-    runs-on: ubuntu-24.04
-    needs:
-      - check-secrets
-    if: needs.check-secrets.outputs.run-with-secrets == 'true'
-    outputs:
-      staging-repo-id: ${{ steps.create-staging-repo.outputs.staging-repo-id }}
-    steps:
-      - id: create-staging-repo
-        name: Create a staging repository
-        uses: danysk/action-create-ossrh-staging-repo@1.1.0
-        with:
-          group-id: "it.unibo.collektive"
-          maven-central-username: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
-          maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
-
   build:
-    needs:
-      - check-secrets
-      - precompute-next-version
-      - staging-repo
-    if: "!cancelled() && !contains(needs.precompute-next-version.result, 'failure')"
     strategy:
       fail-fast: false
       matrix:
         os: [ windows-2022, macos-14, ubuntu-24.04 ]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Find if secrets are available
+        id: detect-secrets
+        uses: DanySK/are-secrets-available@1.0.0
+        with:
+          secrets: ${{ toJson(secrets) }}
+      - name: Set run-with-secrets condition
+        id: require-secrets
+        run: |
+          echo "run-with-secrets=${{ steps.detect-secrets.outputs.has-secrets == 'true' && !github.event.repository.fork }}" >> $GITHUB_OUTPUT
       - name: Checkout
         uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
+          fetch-tags: true
+      - name: Determine dry-run flag
+        id: check_branch
+        shell: bash
+        run: |
+          ruby << 'RUBY' >> $GITHUB_OUTPUT
+            branch = ENV['GITHUB_REF'].sub(/^refs\/heads\//, '')
+            keywords = %w[gradle kotlin publish release deploy]
+            dry = keywords.any? { |kw| branch.include?(kw) } ? '' : '--dry-run'
+            puts "dry_run=#{dry}"
+          RUBY
       - uses: DanySK/build-check-deploy-gradle-action@4.0.1
         with:
           check-command: |
             ./gradlew check koverXmlReport :collektive-compiler-plugin:check :collektive-gradle-plugin:check :collektivize:check --parallel
           should-deploy: ${{ runner.os == 'macOS' && needs.check-secrets.outputs.run-with-secrets == 'true' }} # Deploy from macOS since it supports all the platforms
           deploy-command: |
-            NEXT_VERSION="${{ needs.precompute-next-version.outputs.next-version }}"
-            OVERRIDE_VERSION=$([[ "$NEXT_VERSION" != "" ]] && echo "-PforceVersion=$(echo $NEXT_VERSION)" || echo "")
             # Compute all tasks to be executed
             projects=( "" ":collektive-compiler-plugin:" ":collektive-gradle-plugin:" ":collektivize:" )
-            tasks=( "uploadAllToMavenCentralNexus" )
+            tasks=( "publishAllPublicationsToProjectLocalRepository" "zipMavenCentralPortalPublication" "releaseMavenCentralPortalPublication" )
             GRADLE_TASKS=()
             for p in "${projects[@]}"; do
               for t in "${tasks[@]}"; do
                 GRADLE_TASKS+=( "$p$t" )
               done
             done
-            ./gradlew $OVERRIDE_VERSION -PstagingRepositoryId=${{ needs.staging-repo.outputs.staging-repo-id }} "${GRADLE_TASKS[@]}"
-            ./gradlew -PstagingRepositoryId=${{ needs.staging-repo.outputs.staging-repo-id }} closeStaging
+            ./gradlew "${GRADLE_TASKS[@]}" ${{ steps.check_branch.outputs.dry_run }}
           should-run-codecov: ${{ runner.os == 'Linux' }}
           codecov-directory: build/reports/kover
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
@@ -125,8 +91,6 @@ jobs:
 
   release:
     needs:
-      - check-secrets
-      - staging-repo
       - build-website
       - build
     runs-on: ubuntu-24.04
@@ -181,24 +145,9 @@ jobs:
           signing-key: ${{ secrets.GPG_PRIVATEKEY }}
           signing-password: ${{ secrets.GPG_PASSPHRASE }}
 
-  drop-staging-repo:
-    needs:
-      - staging-repo
-      - release
-    runs-on: ubuntu-24.04
-    if: always() && !(contains(needs.staging-repo.result, 'failure') || contains(needs.staging-repo.result, 'cancelled'))
-    steps:
-      - name: Drop staging repository
-        uses: danysk/action-drop-ossrh-staging-repo@1.0.3
-        with:
-          repo-id: ${{ needs.staging-repo.outputs.staging-repo-id }}
-          maven-central-username: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
-          maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
-
   success:
     runs-on: ubuntu-latest
     needs:
-      - check-secrets
       - release
       - build
       - build-website
