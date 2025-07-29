@@ -94,8 +94,6 @@ jobs:
       - build-website
       - build
     runs-on: ubuntu-24.04
-    # Prevent the release job if the run is on a PR or a fork
-    if: ${{ needs.check-secrets.outputs.run-with-secrets == 'true' }}
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v4.2.2
