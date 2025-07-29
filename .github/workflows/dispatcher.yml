@@ -42,4 +42,8 @@ jobs:
   ci-cd:
     needs: [ dispatcher ]
     uses: ./.github/workflows/build-and-release.yml
+    permissions:
+      contents: write
+      packages: write
+      security-events: write
     secrets: inherit
