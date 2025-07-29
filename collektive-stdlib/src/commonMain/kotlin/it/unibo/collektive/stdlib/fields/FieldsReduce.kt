@@ -12,6 +12,8 @@ import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.FieldEntry
 import it.unibo.collektive.aggregate.toFieldEntry
 import it.unibo.collektive.stdlib.util.Reducer
+import it.unibo.collektive.stdlib.util.SummarizeWithSelf
+import it.unibo.collektive.stdlib.util.SummarizeWithoutSelf
 
 /**
  * Reduces the field entries to a single value using the given [reducer] function,
@@ -23,8 +25,11 @@ import it.unibo.collektive.stdlib.util.Reducer
  * @param reducer a binary operation that reduces two entries into one.
  * @return the result of the reduction, or `null` if the field has no neighbors.
  */
-inline fun <ID : Any, T> Field<ID, T>.reduce(crossinline reducer: Reducer<FieldEntry<ID, T>>): FieldEntry<ID, T>? =
-    excludeSelf().entries.asSequence().map { it.toFieldEntry() }.reduceOrNull(reducer)
+inline fun <ID : Any, T> SummarizeWithoutSelf<ID, T>.reduce(crossinline reducer: Reducer<FieldEntry<ID, T>>): FieldEntry<ID, T>? =
+    field.excludeSelf().entries.asSequence().map { it.toFieldEntry() }.reduceOrNull(reducer)
+
+inline fun <ID : Any, T> SummarizeWithSelf<ID, T>.reduce(crossinline reducer: Reducer<FieldEntry<ID, T>>): FieldEntry<ID, T> =
+    field.toMap().entries.asSequence().map { it.toFieldEntry() }.reduce(reducer)
 
 /**
  * Reduces the field IDs to a single value using the given [reducer] function,
@@ -36,8 +41,11 @@ inline fun <ID : Any, T> Field<ID, T>.reduce(crossinline reducer: Reducer<FieldE
  * @param reducer a binary operation that reduces two IDs into one.
  * @return the result of the reduction, or `null` if the field has no neighbors.
  */
-inline fun <ID : Any> Field<ID, *>.reduceIDs(crossinline reducer: Reducer<ID>): ID? =
-    excludeSelf().keys.reduceOrNull(reducer)
+inline fun <ID : Any> SummarizeWithoutSelf<ID, *>.reduceIDs(crossinline reducer: Reducer<ID>): ID? =
+    field.excludeSelf().keys.reduceOrNull(reducer)
+
+inline fun <ID : Any> SummarizeWithSelf<ID, *>.reduceIDs(crossinline reducer: Reducer<ID>): ID =
+    field.toMap().keys.reduce(reducer)
 
 /**
  * Reduces the field values to a single value using the given [reducer] function,
