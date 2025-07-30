@@ -8,8 +8,10 @@
 
 package it.unibo.collektive.compiler.backend.transformers
 
+import it.unibo.collektive.compiler.backend.irextensions.dispatchReceiverIndex
 import it.unibo.collektive.compiler.backend.irextensions.findAggregateReference
 import it.unibo.collektive.compiler.backend.irextensions.simpleFunctionName
+import it.unibo.collektive.compiler.backend.irextensions.singleRegularParameter
 import it.unibo.collektive.compiler.backend.irextensions.toFunctionAlignmentToken
 import it.unibo.collektive.compiler.backend.util.StackFunctionCall
 import it.unibo.collektive.compiler.backend.util.debugPrint
@@ -37,7 +39,6 @@ import org.jetbrains.kotlin.ir.expressions.IrElseBranch
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.IrGetValue
-import org.jetbrains.kotlin.ir.expressions.putArgument
 import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
 import org.jetbrains.kotlin.ir.util.dumpKotlinLike
 import org.jetbrains.kotlin.ir.visitors.IrTransformer
@@ -104,9 +105,10 @@ class AlignmentTransformer(
     private val logger: MessageCollector,
 ) : IrTransformer<StackFunctionCall>() {
 
+    private val alignRawRegularParameterIndex: Int = alignRawFunction.singleRegularParameter.indexInParameters
+
     /**
      * A mapping from alignment tokens to the number of times they have been encountered.
-     *
      * Used to disambiguate multiple identical calls.
      */
     private val alignedFunctions = mutableMapOf<String, Int>()
@@ -280,12 +282,8 @@ class AlignmentTransformer(
             )
             // Call the align function
             +irCall(alignRawFunction).apply {
-                putArgument(
-                    alignRawFunction.dispatchReceiverParameter
-                        ?: error("The alignRaw function has no dispatch receiver parameter"),
-                    irGet(contextAccess),
-                )
-                putValueArgument(0, alignmentToken(this@irStatement))
+                arguments[alignRawFunction.dispatchReceiverIndex] = irGet(contextAccess)
+                arguments[alignRawRegularParameterIndex] = alignmentToken(this@irStatement)
             }
             val blockResult = createTmpVariable(
                 expressionBody,
@@ -294,11 +292,7 @@ class AlignmentTransformer(
             )
             // Call the delign function after the body of the function to align
             +irCall(dealignFunction).apply {
-                putArgument(
-                    dealignFunction.dispatchReceiverParameter
-                        ?: error("The dealign function has no dispatch receiver parameter"),
-                    irGet(contextAccess),
-                )
+                arguments[dealignFunction.dispatchReceiverIndex] = irGet(contextAccess)
             }
             // ✅ Return block result
             +irGet(blockResult)

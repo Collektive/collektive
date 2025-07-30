@@ -24,7 +24,7 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
  * @return `true` if plugin checks should be disabled, `false` otherwise
  */
 fun FirFunctionSymbol<*>.hasAnnotationDisablingPlugin(context: CheckerContext): Boolean =
-    annotations.any { it.disablesPlugin() } || context.hasAnnotationDisablingPlugin()
+    resolvedAnnotationsWithClassIds.any { it.disablesPlugin() } || context.hasAnnotationDisablingPlugin()
 
 /**
  * Determines whether this function symbol represents an aggregate function.

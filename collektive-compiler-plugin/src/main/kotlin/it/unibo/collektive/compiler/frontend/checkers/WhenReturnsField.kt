@@ -58,7 +58,8 @@ import org.jetbrains.kotlin.fir.types.type
  * @see it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME
  */
 object WhenReturnsField : FirWhenExpressionChecker(MppCheckerKind.Common) {
-    override fun check(expression: FirWhenExpression, context: CheckerContext, reporter: DiagnosticReporter) {
+    context(context: CheckerContext, reporter: DiagnosticReporter)
+    override fun check(expression: FirWhenExpression) {
         val isInsideAggregate by lazy { context.isInsideAggregateFunction() }
         val isNotProject by lazy { !context.isAggregateProjection() }
         expression.branches.asSequence().map { it.result }.forEach { branch: FirBlock ->
@@ -71,7 +72,6 @@ object WhenReturnsField : FirWhenExpressionChecker(MppCheckerKind.Common) {
                         postfix = ">",
                         separator = ", ",
                     ) { (it.type?.classId?.shortClassName ?: it.type).toString() },
-                    context,
                 )
             }
         }

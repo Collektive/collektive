@@ -46,13 +46,13 @@ object ConstructIgnoresParameter : FirFunctionCallChecker(MppCheckerKind.Common)
         CollektiveNames.EVOLVING_FUNCTION_FQ_NAME,
     )
 
-    override fun check(expression: FirFunctionCall, context: CheckerContext, reporter: DiagnosticReporter) {
+    context(context: CheckerContext, reporter: DiagnosticReporter)
+    override fun check(expression: FirFunctionCall) {
         if (expression.shouldBeChecked() && expression.doesNotUseParameter()) {
             reporter.reportOn(
                 expression.calleeReference.source,
                 CollektiveFrontendErrors.UNNECESSARY_CONSTRUCT_CALL,
                 expression.functionName,
-                context,
             )
         }
     }
