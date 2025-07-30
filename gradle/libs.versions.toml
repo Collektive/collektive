@@ -13,7 +13,7 @@ alchemist-api = { module = "it.unibo.alchemist:alchemist-api", version.ref = "al
 alchemist-euclidean-geometry = { module = "it.unibo.alchemist:alchemist-euclidean-geometry", version.ref = "alchemist" }
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
 arrow-core-serialization = { module = "io.arrow-kt:arrow-core-serialization", version.ref = "arrow" }
-caffeine = "com.github.ben-manes.caffeine:caffeine:3.2.1"
+caffeine = "com.github.ben-manes.caffeine:caffeine:3.2.2"
 hash-sha3 = "org.kotlincrypto.hash:sha3:0.7.0"
 javap = "com.perfma.wrapped:com.sun.tools:1.8.0_jdk8u275-b01_linux_x64"
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
