@@ -13,33 +13,33 @@ import it.unibo.collektive.aggregate.FieldEntry
 import it.unibo.collektive.aggregate.toFieldEntry
 import it.unibo.collektive.stdlib.fields.max
 
-sealed interface Summarize<E> {
+sealed interface FieldSummary<E> {
     val entries: Sequence<E>
 }
 
-interface SummarizeWithoutSelf<E> : Summarize<E> {
-    val includingSelf: SummarizeWithSelf<E>
+interface SummaryWithoutSelf<E> : FieldSummary<E> {
+    val includingSelf: SummaryWithSelf<E>
 
     companion object {
         context(target: Field<ID, T>)
-        operator fun <ID: Any, T, E> invoke(target: Field<ID, T>, extractSequence: Field<ID, T>.() -> Sequence<E>): SummarizeWithoutSelf<E> = object : SummarizeWithoutSelf<E> {
+        operator fun <ID: Any, T, E> invoke(target: Field<ID, T>, extractSequence: Field<ID, T>.() -> Sequence<E>): SummaryWithoutSelf<E> = object : SummaryWithoutSelf<E> {
             override val entries: Sequence<E> by lazy {
                 extractSequence().excludeSelf().asSequence()
             }
-            override val includingSelf: SummarizeWithSelf<E> get() = object : SummarizeWithSelf<E> {
+            override val includingSelf: SummaryWithSelf<E> get() = object : SummaryWithSelf<E> {
                 override val entries: Sequence<E> = emptySequence()
             }
         }
     }
 }
 
-interface SummarizeWithSelf<E> : Summarize<E>
+interface SummaryWithSelf<E> : FieldSummary<E>
 
-fun <ID: Any, T> Field<ID, T>.summarize(): SummarizeWithoutSelf<FieldEntry<ID, T>> = object : SummarizeWithoutSelf<FieldEntry<ID, T>> {
+fun <ID: Any, T> Field<ID, T>.summarize(): SummaryWithoutSelf<FieldEntry<ID, T>> = object : SummaryWithoutSelf<FieldEntry<ID, T>> {
     override val entries: Sequence<FieldEntry<ID, T>> by lazy {
         this@summarize.excludeSelf().entries.asSequence().map { it.toFieldEntry() }
     }
-    override val includingSelf: SummarizeWithSelf<FieldEntry<ID, T>> get() = object : SummarizeWithSelf<ID, T> {
+    override val includingSelf: SummaryWithSelf<FieldEntry<ID, T>> get() = object : SummaryWithSelf<ID, T> {
         override val entries: Field<ID, T> = this@summarize
     }
 }
