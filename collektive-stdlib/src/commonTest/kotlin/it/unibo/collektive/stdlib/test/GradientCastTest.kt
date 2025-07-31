@@ -10,10 +10,10 @@ package it.unibo.collektive.stdlib.test
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.neighboring
-import it.unibo.collektive.stdlib.spreading.GradientPath
 import it.unibo.collektive.stdlib.spreading.bellmanFordGradientCast
 import it.unibo.collektive.stdlib.spreading.gradientCast
 import it.unibo.collektive.stdlib.spreading.hopDistanceTo
+import it.unibo.collektive.stdlib.util.PathValue
 import it.unibo.collektive.stdlib.util.euclideanDistance3D
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.EnvironmentWithMeshNetwork
@@ -35,8 +35,8 @@ class GradientCastTest {
     fun `GradientPath is serializable`() {
         val network = SerializingMailbox()
         aggregate(0, network) {
-            neighboring(GradientPath(0, emptyList<String>(), 0))
-            neighboring(GradientPath(0, listOf(1, 2, 3), 0))
+            neighboring(PathValue(0, 0, emptyList<String>()))
+            neighboring(PathValue(0, 0, listOf(1, 2, 3)))
         }
         assertNotNull(network.serializeToString(1))
     }
