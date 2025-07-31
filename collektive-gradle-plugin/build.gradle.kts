@@ -125,3 +125,9 @@ publishOnCentral {
         }
     }
 }
+
+listOf(tasks.build, tasks.ktlintFormat).forEach { task ->
+    task.configure {
+        dependsOn(gradle.includedBuilds.map { it.task(":${task.name}") })
+    }
+}
