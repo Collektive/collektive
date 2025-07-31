@@ -1,3 +1,24 @@
+## [26.0.0](https://github.com/Collektive/collektive/compare/25.0.2...26.0.0) (2025-07-31)
+
+### ⚠ BREAKING CHANGES
+
+* **core-deps:** update Kotlin to 2.2.0 (#1058)
+
+### Features
+
+* **core-deps:** update Kotlin to 2.2.0 ([#1058](https://github.com/Collektive/collektive/issues/1058)) ([a593d1c](https://github.com/Collektive/collektive/commit/a593d1cd90604dcb85e500c38dc7b6dfe7f772c6))
+
+### Dependency updates
+
+* **core-deps:** update serialization to v1.9.0 ([466d459](https://github.com/Collektive/collektive/commit/466d45985e60f5675f763c286bb5994579ed0678))
+* **deps:** update plugin kotlin-qa to v0.93.0 ([2a65a39](https://github.com/Collektive/collektive/commit/2a65a39603b69378cd4a6ed5fd4f504654cdd0ed))
+* **deps:** update plugin multijvmtesting to v3.5.4 ([328f807](https://github.com/Collektive/collektive/commit/328f8070721e2359164e3ca6e1baa88aa8c4055f))
+* **deps:** update plugin multijvmtesting to v3.6.0 ([6f386d7](https://github.com/Collektive/collektive/commit/6f386d79f01a83cd753a26eb85f8ffe2c6173b8a))
+
+### Build and continuous integration
+
+* bind task execution of build, check, ktlint and detekt to the execution of the same tasks on included projects ([#1059](https://github.com/Collektive/collektive/issues/1059)) ([14cb814](https://github.com/Collektive/collektive/commit/14cb81483b07b49f32272a70e64e4d380875842a))
+
 ## [25.0.2](https://github.com/Collektive/collektive/compare/25.0.1...25.0.2) (2025-07-30)
 
 ### Dependency updates
