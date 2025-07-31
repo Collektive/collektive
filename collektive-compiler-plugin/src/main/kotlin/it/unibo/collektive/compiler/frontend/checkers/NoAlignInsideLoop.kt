@@ -87,7 +87,8 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
             .mapValues { (_, value) -> value.map { it.second }.toSet() }
     }
 
-    override fun check(expression: FirFunctionCall, context: CheckerContext, reporter: DiagnosticReporter) {
+    context(context: CheckerContext, reporter: DiagnosticReporter)
+    override fun check(expression: FirFunctionCall) {
         val calleeName = expression.functionName
         if (expression.fqName in safeOperators) return
         val error = when {
@@ -96,7 +97,7 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
             else -> null
         }
         error?.let {
-            reporter.reportOn(expression.calleeReference.source, it, calleeName, context)
+            reporter.reportOn(expression.calleeReference.source, it, calleeName)
         }
     }
 

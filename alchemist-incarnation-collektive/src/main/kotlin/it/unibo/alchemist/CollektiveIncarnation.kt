@@ -38,6 +38,7 @@ import org.danilopianini.util.ListSet
 import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.ERROR
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.EXCEPTION
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.FIXED_WARNING
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.INFO
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.LOGGING
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.OUTPUT
@@ -308,7 +309,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
             messages.messages.forEach { (severity, message) ->
                 when (severity) {
                     ERROR, EXCEPTION -> logger.error(message)
-                    STRONG_WARNING, WARNING -> logger.error(message)
+                    STRONG_WARNING, WARNING, FIXED_WARNING -> logger.error(message)
                     INFO, OUTPUT -> logger.info(message)
                     LOGGING -> logger.debug(message)
                 }

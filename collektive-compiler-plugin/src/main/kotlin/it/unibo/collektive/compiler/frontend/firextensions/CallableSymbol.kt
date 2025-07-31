@@ -11,7 +11,6 @@ package it.unibo.collektive.compiler.frontend.firextensions
 import org.jetbrains.kotlin.fir.symbols.impl.FirCallableSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
-import org.jetbrains.kotlin.fir.types.coneType
 
 /**
  * Computes the full sequence of receiver and argument types for a given callable symbol.
@@ -32,7 +31,6 @@ internal fun FirCallableSymbol<*>.receiversAndArgumentsTypes(): Sequence<ConeKot
         ?.valueParameterSymbols?.asSequence()?.map { it.resolvedReturnType }.orEmpty()
     val receiver = sequenceOf(resolvedReceiverTypeRef?.coneType).filterNotNull()
     val dispatchReceiver = sequenceOf(dispatchReceiverType).filterNotNull()
-    val contextParameters: Sequence<ConeKotlinType> = resolvedContextParameters.asSequence()
-        .map { it.returnTypeRef.coneType }
+    val contextParameters: Sequence<ConeKotlinType> = contextParameterSymbols.asSequence().map { it.resolvedReturnType }
     return contextParameters + valueParameters + dispatchReceiver + receiver
 }

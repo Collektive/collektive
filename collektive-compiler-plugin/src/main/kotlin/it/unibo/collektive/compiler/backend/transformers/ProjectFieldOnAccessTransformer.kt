@@ -9,6 +9,7 @@
 package it.unibo.collektive.compiler.backend.transformers
 
 import it.unibo.collektive.compiler.backend.irextensions.hasAnnotationDisablingPlugin
+import it.unibo.collektive.compiler.backend.irextensions.singleRegularParameter
 import it.unibo.collektive.compiler.backend.util.debugPrint
 import it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME
 import it.unibo.collektive.compiler.common.debug
@@ -22,7 +23,6 @@ import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.IrGetValue
-import org.jetbrains.kotlin.ir.expressions.putArgument
 import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
 import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.classFqName
@@ -64,6 +64,8 @@ internal class ProjectFieldOnAccessTransformer(
     private val pluginContext: IrPluginContext,
     private val projectFunction: IrFunction,
 ) : IrElementTransformerVoid() {
+
+    val projectFunctionParameterIndex = projectFunction.singleRegularParameter.indexInParameters
 
     override fun visitFunction(declaration: IrFunction): IrStatement = when {
         declaration.hasAnnotationDisablingPlugin() -> declaration
@@ -109,13 +111,11 @@ internal class ProjectFieldOnAccessTransformer(
         debugPrint { "Projecting: ${fieldExpression.dumpKotlinLike()}" }
         this.type = fieldExpression.type
         val simpleType = fieldExpression.type as? IrSimpleType
-        val typeArguments = simpleType?.arguments
-            ?.mapNotNull { it.typeOrNull }
-            .orEmpty()
-        if (typeArguments.size == 2) {
-            putTypeArgument(0, typeArguments[0])
-            putTypeArgument(1, typeArguments[1])
+        val thisCallTypeArguments = simpleType?.arguments?.mapNotNull { it.typeOrNull }.orEmpty()
+        if (thisCallTypeArguments.size == 2) {
+            typeArguments[0] = thisCallTypeArguments[0]
+            typeArguments[1] = thisCallTypeArguments[1]
         }
-        putArgument(projectFunction.valueParameters.single(), fieldExpression)
+        arguments[projectFunctionParameterIndex] = fieldExpression
     }
 }

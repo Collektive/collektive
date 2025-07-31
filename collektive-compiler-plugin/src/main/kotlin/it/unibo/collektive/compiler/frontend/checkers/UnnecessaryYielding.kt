@@ -59,13 +59,13 @@ object UnnecessaryYielding : FirFunctionCallChecker(MppCheckerKind.Common) {
     private fun FirFunctionCall.usesAnUnnecessaryYieldingContext(): Boolean =
         UnnecessaryYieldingVisitor().containsUnnecessaryYielding(this)
 
-    override fun check(expression: FirFunctionCall, context: CheckerContext, reporter: DiagnosticReporter) {
+    context(context: CheckerContext, reporter: DiagnosticReporter)
+    override fun check(expression: FirFunctionCall) {
         if (expression.fqName in constructs && expression.usesAnUnnecessaryYieldingContext()) {
             reporter.reportOn(
                 expression.calleeReference.source,
                 CollektiveFrontendErrors.UNNECESSARY_YIELDING_CONTEXT,
                 expression.functionName,
-                context,
             )
         }
     }
