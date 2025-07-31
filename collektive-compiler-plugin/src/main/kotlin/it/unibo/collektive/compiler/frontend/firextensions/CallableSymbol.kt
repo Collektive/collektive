@@ -31,6 +31,6 @@ internal fun FirCallableSymbol<*>.receiversAndArgumentsTypes(): Sequence<ConeKot
         ?.valueParameterSymbols?.asSequence()?.map { it.resolvedReturnType }.orEmpty()
     val receiver = sequenceOf(resolvedReceiverTypeRef?.coneType).filterNotNull()
     val dispatchReceiver = sequenceOf(dispatchReceiverType).filterNotNull()
-    val contextParameters: Sequence<ConeKotlinType> = this.contextParameterSymbols.asSequence().map { it.resolvedReturnType }
+    val contextParameters: Sequence<ConeKotlinType> = contextParameterSymbols.asSequence().map { it.resolvedReturnType }
     return contextParameters + valueParameters + dispatchReceiver + receiver
 }
