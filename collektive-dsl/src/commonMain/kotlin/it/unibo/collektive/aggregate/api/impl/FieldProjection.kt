@@ -46,7 +46,7 @@ fun <ID : Any, T> project(field: Field<ID, T>): Field<ID, T> {
                 """
             Collektive is in an inconsistent state, this is most likely a bug in the implementation.
             Field $field with ${field.neighborsCount} neighbors has been projected into a context
-            with more neighbors, ${others.neighborsCount}: ${others.excludeSelf().keys}.
+            with more neighbors, ${others.neighborsCount}: ${others.neighbors}.
                 """.trimIndent().replace(Regex("'\\R"), " "),
             )
         }

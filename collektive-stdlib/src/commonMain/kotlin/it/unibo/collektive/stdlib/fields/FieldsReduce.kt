@@ -8,54 +8,28 @@
 
 package it.unibo.collektive.stdlib.fields
 
-import it.unibo.collektive.aggregate.Field
-import it.unibo.collektive.aggregate.FieldEntry
-import it.unibo.collektive.aggregate.toFieldEntry
+import it.unibo.collektive.aggregate.CollapsePeers
+import it.unibo.collektive.aggregate.CollapseWithSelf
 import it.unibo.collektive.stdlib.util.Reducer
-import it.unibo.collektive.stdlib.util.SummaryWithSelf
-import it.unibo.collektive.stdlib.util.SummaryWithoutSelf
 
 /**
- * Reduces the field entries to a single value using the given [reducer] function,
- * excluding the local element.
+ * Reduces the elements in this collapse (which includes the local element and peers) into a single value
+ * by repeatedly applying [reducer].
  *
- * This function performs a reduction over the field entries (excluding the local one), combining them
- * pairwise using [reducer]. If the field contains no neighbor entries, the result is `null`.
+ * Because the local element is always present in a CollapseWithSelf, this will always return a value.
  *
- * @param reducer a binary operation that reduces two entries into one.
- * @return the result of the reduction, or `null` if the field has no neighbors.
+ * @param reducer a binary operation that combines two values of type T into one.
+ * @return the accumulated result of reducing all elements.
  */
-inline fun <ID : Any, T> SummaryWithoutSelf<ID, T>.reduce(crossinline reducer: Reducer<FieldEntry<ID, T>>): FieldEntry<ID, T>? =
-    field.excludeSelf().entries.asSequence().map { it.toFieldEntry() }.reduceOrNull(reducer)
-
-inline fun <ID : Any, T> SummaryWithSelf<ID, T>.reduce(crossinline reducer: Reducer<FieldEntry<ID, T>>): FieldEntry<ID, T> =
-    field.toMap().entries.asSequence().map { it.toFieldEntry() }.reduce(reducer)
+inline fun <T> CollapseWithSelf<T>.reduce(crossinline reducer: Reducer<T>): T = sequence.reduce(reducer)
 
 /**
- * Reduces the field IDs to a single value using the given [reducer] function,
- * excluding the local element.
+ * Reduces the elements in this collapse (which excludes the local element, i.e., only peers) into a single value
+ * by repeatedly applying [reducer].
  *
- * This is a convenience reduction applied only to the field keys (IDs).
- * If there are no neighbors, the result is `null`.
+ * If there are no peer elements, returns `null`. Otherwise, behaves like a standard reduction over the peer sequence.
  *
- * @param reducer a binary operation that reduces two IDs into one.
- * @return the result of the reduction, or `null` if the field has no neighbors.
+ * @param reducer a binary operation that combines two values of type T into one.
+ * @return the accumulated result of reducing the peer values, or `null` if the collapse is empty.
  */
-inline fun <ID : Any> SummaryWithoutSelf<ID, *>.reduceIDs(crossinline reducer: Reducer<ID>): ID? =
-    field.excludeSelf().keys.reduceOrNull(reducer)
-
-inline fun <ID : Any> SummaryWithSelf<ID, *>.reduceIDs(crossinline reducer: Reducer<ID>): ID =
-    field.toMap().keys.reduce(reducer)
-
-/**
- * Reduces the field values to a single value using the given [reducer] function,
- * excluding the local element.
- *
- * This is a convenience reduction applied only to the field values.
- * If there are no neighbors, the result is `null`.
- *
- * @param reducer a binary operation that reduces two values into one.
- * @return the result of the reduction, or `null` if the field has no neighbors.
- */
-inline fun <ID : Any, T> Field<ID, T>.reduceValues(crossinline reducer: Reducer<T>): T? =
-    excludeSelf().values.reduceOrNull(reducer)
+inline fun <T> CollapsePeers<T>.reduce(crossinline reducer: Reducer<T>): T? = sequence.reduceOrNull(reducer)

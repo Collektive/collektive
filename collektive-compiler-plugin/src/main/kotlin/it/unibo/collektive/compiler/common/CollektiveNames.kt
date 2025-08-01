@@ -33,9 +33,9 @@ object CollektiveNames {
             "Cannot find resource: $name"
         }.readText()
 
-    private fun extractInterfaceName(from: String): String = regex("""interface (\w+)""").extractSingleFrom(from)
+    private fun extractInterfaceName(fileName: String): String = regex("""interface (\w+)""").extractSingleFrom(fileName)
 
-    private fun extractPackageName(from: String): String = regex("""^package (\w+(?:\.\w+)*)""").extractSingleFrom(from)
+    private fun extractPackageName(fileName: String): String = regex("""^package (\w+(?:\.\w+)*)""").extractSingleFrom(fileName)
 
     private fun extractAnnotationName(from: String): String =
         regex("""^annotation class (\w+)""").extractSingleFrom(from)
