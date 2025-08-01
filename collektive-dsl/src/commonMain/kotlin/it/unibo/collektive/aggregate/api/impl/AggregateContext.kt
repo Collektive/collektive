@@ -19,6 +19,7 @@ import it.unibo.collektive.aggregate.api.YieldingContext
 import it.unibo.collektive.aggregate.api.YieldingResult
 import it.unibo.collektive.aggregate.api.YieldingScope
 import it.unibo.collektive.aggregate.api.impl.stack.Stack
+import it.unibo.collektive.aggregate.toMap
 import it.unibo.collektive.networking.NeighborsData
 import it.unibo.collektive.networking.OutboundEnvelope
 import it.unibo.collektive.networking.OutboundEnvelope.SharedData
@@ -82,7 +83,10 @@ internal class AggregateContext<ID : Any>(
                     it.toSend.local.value,
                     when (it.toSend) {
                         is ConstantField<ID, Shared> -> emptyMap()
-                        else -> it.toSend.excludeSelf().filterNot { (_, value) -> value == it.toSend.local.value }
+                        else ->
+                            it.toSend.excludeSelf.sequence
+                                .filterNot { (_, value) -> value == it.toSend.local.value }
+                                .toMap()
                     },
                 )
                 toBeSent.addData(path, message, dataSharingMethod)

@@ -70,3 +70,8 @@ fun <ID : Any, T> Map.Entry<ID, T>.toFieldEntry(): FieldEntry<ID, T> = FieldEntr
  * Converts a [Pair] to a [FieldEntry].
  */
 fun <ID : Any, T> Pair<ID, T>.toFieldEntry(): FieldEntry<ID, T> = FieldEntry(this)
+
+/**
+ * Converts a Sequence of [FieldEntry] to a Map<ID, T>.
+ */
+fun <ID : Any, T> Sequence<FieldEntry<ID, T>>.toMap(): Map<ID, T> = associate { it.id to it.value }

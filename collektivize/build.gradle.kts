@@ -141,6 +141,7 @@ publishOnCentral {
 val importDsl by tasks.registering(Copy::class) {
     listOf(
         "Aggregate",
+        "Collapse",
         "DataSharingMethod",
         "Field",
         "FieldEntry",
