@@ -38,7 +38,7 @@
     "rehype-katex": "^7.0.1",
     "remark-code-import": "1.2.0",
     "remark-math": "^6.0.0",
-    "typescript": "~5.8.0"
+    "typescript": "~5.9.0"
   },
   "browserslist": {
     "production": [
