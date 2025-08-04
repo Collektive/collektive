@@ -17,6 +17,14 @@ import it.unibo.collektive.aggregate.FieldEntry
  * @param selector a function that maps each peer [FieldEntry] to a comparable value.
  * @return the ID of the peer entry with the highest value, or `null` if none.
  */
+fun <ID : Any, T : Comparable<T>> CollapsePeers<FieldEntry<ID, T>>.idOfMax(): ID? = maxBy { it.value }?.id
+
+/**
+ * Returns the ID of the peer entry (excluding local) that yields the largest value according to the given [selector].
+ *
+ * @param selector a function that maps each peer [FieldEntry] to a comparable value.
+ * @return the ID of the peer entry with the highest value, or `null` if none.
+ */
 inline fun <ID : Any, T, R : Comparable<R>> CollapsePeers<FieldEntry<ID, T>>.idOfMaxBy(
     crossinline selector: (FieldEntry<ID, T>) -> R,
 ): ID? = maxBy(selector)?.id
@@ -29,6 +37,13 @@ inline fun <ID : Any, T, R : Comparable<R>> CollapsePeers<FieldEntry<ID, T>>.idO
  */
 fun <ID : Any, T> CollapsePeers<FieldEntry<ID, T>>.idOfMaxWith(comparator: Comparator<FieldEntry<ID, T>>): ID? =
     maxWith(comparator)?.id
+
+/**
+ * Returns the ID of the peer entry (excluding local) that yields the smallest value.
+ *
+ * @return the ID of the peer entry with the lowest value, or `null` if none.
+ */
+fun <ID : Any, T : Comparable<T>> CollapsePeers<FieldEntry<ID, T>>.idOfMin(): ID? = minBy { it.value }?.id
 
 /**
  * Returns the ID of the peer entry (excluding local) that yields the smallest value according to the given [selector].

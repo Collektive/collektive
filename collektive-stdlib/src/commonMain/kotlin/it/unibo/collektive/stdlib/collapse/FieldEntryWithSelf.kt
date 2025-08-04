@@ -11,6 +11,8 @@ package it.unibo.collektive.stdlib.collapse
 import it.unibo.collektive.aggregate.CollapseWithSelf
 import it.unibo.collektive.aggregate.FieldEntry
 
+// TODO: add idOfMax and idOfMin for comparable field entries
+
 /**
  * Returns the ID of the entry that yields the largest value according to the given [selector],
  * including local entry if applicable.
