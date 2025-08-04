@@ -6,7 +6,7 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
-package it.unibo.collektive.stdlib.fields
+package it.unibo.collektive.stdlib.util
 
 import arrow.core.Predicate
 import it.unibo.collektive.aggregate.Field
@@ -40,4 +40,8 @@ inline fun <ID : Any, T> Field<ID, T>.replaceMatchingValues(
 inline fun <ID : Any, T> Field<ID, T>.replaceMatching(
     replacement: T,
     crossinline predicate: Predicate<FieldEntry<ID, T>>,
-): Field<ID, T> = map { (id, value) -> if (predicate(FieldEntry(id, value))) replacement else value }
+): Field<ID, T> = map { (id, value) ->
+    context.alignedOn(id) {
+        if (predicate(FieldEntry(id, value))) replacement else value
+    }
+}

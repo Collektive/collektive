@@ -24,16 +24,16 @@ class FieldTest {
     @Test
     fun createFieldWithoutMessages() {
         val field: Field<Int, String> = Field(mockedContext, myId, myValue)
-        assertTrue(field.toMap().containsKey(myId))
-        assertEquals(1, field.toMap().size)
+        assertTrue(field.includeSelf.toMap().containsKey(myId))
+        assertEquals(1, field.includeSelf.toMap().size)
     }
 
     @Test
     fun createFieldWithMessages() {
         val field: Field<Int, String> = Field(mockedContext, myId, myValue, mapOf(connectedId to connectedValue))
-        assertTrue(field.toMap().containsKey(myId))
-        assertTrue(field.toMap().containsKey(connectedId))
-        assertEquals(2, field.toMap().size)
+        assertTrue(field.includeSelf.toMap().containsKey(myId))
+        assertTrue(field.includeSelf.toMap().containsKey(connectedId))
+        assertEquals(2, field.includeSelf.toMap().size)
     }
 
     @Test

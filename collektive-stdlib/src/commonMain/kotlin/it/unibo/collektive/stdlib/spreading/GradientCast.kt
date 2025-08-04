@@ -14,7 +14,9 @@ import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
 import it.unibo.collektive.aggregate.api.exchange
 import it.unibo.collektive.aggregate.api.mapNeighborhood
 import it.unibo.collektive.aggregate.api.share
-import it.unibo.collektive.stdlib.fields.minValueBy
+import it.unibo.collektive.aggregate.toMap
+import it.unibo.collektive.aggregate.values
+import it.unibo.collektive.stdlib.collapse.valueOfMinBy
 import it.unibo.collektive.stdlib.util.Reducer
 import it.unibo.collektive.stdlib.util.coerceIn
 import it.unibo.collektive.stdlib.util.hops
@@ -68,7 +70,7 @@ inline fun <reified ID, reified Value, reified Distance> Aggregate<ID>.bellmanFo
             val newData = accumulateData(fromSource, toNeighbor, data)
             totalDistance to newData
         }
-        val bestThroughNeighbors = pathsThroughNeighbors.minValueBy { it.value.first } ?: topValue
+        val bestThroughNeighbors = pathsThroughNeighbors.excludeSelf.valueOfMinBy { it.value.first } ?: topValue
         when {
             source -> bottom to local
             else -> bestThroughNeighbors
@@ -175,14 +177,14 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
         val accDistances = neighborData.alignedMapValues(coercedMetric) { path, distance ->
             path?.distance?.let { accumulateDistance(it, distance) }
         }
-        val neighborAccumulatedDistances = accDistances.excludeSelf()
+        val neighborAccumulatedDistances = accDistances.excludeSelf.toMap()
         val nonLoopingPaths = neighborData.alignedMap(accDistances, coercedMetric) { id, path, accDist, distance ->
             path?.takeUnless { id == localId }
                 ?.takeUnless { path.length > maxDiameter }
                 ?.takeUnless { localId in path.hops }
                 ?.takeUnless { path.isInvalidViaShortcut(accDist, neighbors, neighborAccumulatedDistances) }
                 ?.run { accDist to lazy { update(id, distance, bottom, top, accumulateDistance, accumulateData) } }
-        }.excludeSelf().values.asSequence().filterNotNull().sortedBy { it.first }.map { it.second.value }
+        }.excludeSelf.values().sequence.filterNotNull().sortedBy { it.first }.map { it.second.value }
         val best = when {
             fromLocalSource != null -> sequenceOf(fromLocalSource)
             else -> {

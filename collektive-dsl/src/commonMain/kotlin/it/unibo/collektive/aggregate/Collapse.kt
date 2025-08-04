@@ -41,6 +41,11 @@ private interface AnyCollapse<out E> :
     CollapseWithSelf<E>
 
 /**
+ * Checks if the given [element] is present in this collapse.
+ */
+operator fun <T> Collapse<T>.contains(element: T): Boolean = set.contains(element)
+
+/**
  * Converts this collapse of field entries into a map from entry IDs to their values.
  *
  * Each entry in the collapse is turned into an entry in the resulting map using its `id`

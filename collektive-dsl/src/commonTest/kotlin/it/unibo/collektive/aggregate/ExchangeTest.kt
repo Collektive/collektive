@@ -11,7 +11,7 @@ package it.unibo.collektive.aggregate
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.exchange
 import it.unibo.collektive.aggregate.api.exchanging
-import it.unibo.collektive.stdlib.fields.foldValues
+import it.unibo.collektive.stdlib.collapse.fold
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.test.Test
@@ -26,7 +26,7 @@ class ExchangeTest {
 
     private fun mooreGridWithIncreaseOrDouble(size: Int) = mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }) { _ ->
         exchange(1) { field ->
-            field.mapValues { field.foldValues(localId) { acc, value -> acc + value } }
+            field.mapValues { field.excludeSelf.values().fold(localId) { acc, value -> acc + value } }
         }.local.value
     }.also {
         assertEquals(size * size, it.nodes.size)
@@ -94,7 +94,7 @@ class ExchangeTest {
                         val fieldResult = it + 1
                         fieldResult.yielding { fieldResult.mapValues { value -> "return: $value" } }
                     }
-                assertEquals(mapOf(0 to "return: 2"), xcRes.toMap())
+                assertEquals(mapOf(0 to "return: 2"), xcRes.includeSelf.toMap())
             }
         val messages = result.toSend.prepareMessageFor(1).sharedData
         assertEquals(1, messages.size)
@@ -110,7 +110,7 @@ class ExchangeTest {
                         val fieldResult = it + 1
                         fieldResult.yielding { fieldResult.mapValues { value -> value.takeIf { value > 10 } } }
                     }
-                assertEquals(mapOf(0 to null), xcRes.toMap())
+                assertEquals(mapOf(0 to null), xcRes.includeSelf.toMap())
             }
         val messages = result.toSend.prepareMessageFor(1).sharedData
         assertEquals(1, messages.size)

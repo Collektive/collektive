@@ -14,8 +14,8 @@ import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.aggregate.api.sharing
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
-import it.unibo.collektive.stdlib.fields.maxValue
-import it.unibo.collektive.stdlib.fields.minValue
+import it.unibo.collektive.stdlib.collapse.maxValue
+import it.unibo.collektive.stdlib.collapse.minValue
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.test.Test

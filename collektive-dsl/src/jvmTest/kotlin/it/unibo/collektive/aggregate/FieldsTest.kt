@@ -10,11 +10,8 @@ package it.unibo.collektive.aggregate
 
 import io.mockk.mockk
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.stdlib.fields.all
-import it.unibo.collektive.stdlib.fields.allValues
-import it.unibo.collektive.stdlib.fields.containsValue
-import it.unibo.collektive.stdlib.fields.noValue
-import it.unibo.collektive.stdlib.util.IncludingSelf
+import it.unibo.collektive.stdlib.collapse.all
+import it.unibo.collektive.stdlib.collapse.none
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -26,48 +23,48 @@ class FieldsTest {
 
     @Test
     fun `empty fields contain self`() {
-        assertTrue(emptyField.containsValue(10))
-        assertFalse(emptyField.containsValue(0))
-        assertTrue(emptyField.containsId(0))
+        assertTrue(10 in emptyField.includeSelf.values())
+        assertFalse(0 in emptyField.includeSelf.values())
+        assertTrue(0 in emptyField.includeSelf.ids())
     }
 
     @Test
     fun `The all operator on an empty field must return true`() {
-        assertTrue(emptyField.all { false })
+        assertTrue(emptyField.excludeSelf.all { false })
     }
 
     @Test
     fun `The all operator including self must return true if the local value matches the predicate`() {
-        assertTrue(emptyField.allValues(IncludingSelf) { it == 10 })
+        assertTrue(emptyField.includeSelf.values().all { it == 10 })
     }
 
     @Test
     fun `The all operator including self must return false if the local value does not matches the predicate`() {
-        assertFalse(emptyField.allValues(IncludingSelf) { it == 1 })
+        assertFalse(emptyField.includeSelf.values().all { it == 1 })
     }
 
     @Test
     fun `The all operator must return true when all the elements in the field match the predicate`() {
-        assertTrue(fullField.allValues { it <= 3 })
+        assertTrue(fullField.excludeSelf.values().all { it <= 3 })
     }
 
     @Test
     fun `The all operator must return false when at least one element in the field does not match the predicate`() {
-        assertFalse(fullField.allValues { it < 2 })
+        assertFalse(fullField.excludeSelf.values().all { it < 2 })
     }
 
     @Test
     fun `The none operator must return true when applied to a field with no values`() {
-        assertTrue(emptyField.noValue { it == 1 })
+        assertTrue(emptyField.excludeSelf.values().none { it == 1 })
     }
 
     @Test
     fun `The none operator must return true when applied to a field with no values including local value`() {
-        assertTrue(emptyField.noValue(IncludingSelf) { it == 1 })
+        assertTrue(emptyField.includeSelf.values().none { it == 1 })
     }
 
     @Test
     fun `The none operator must return false if at least one element in the field matches the predicate`() {
-        assertFalse(fullField.noValue { it == 2 })
+        assertFalse(fullField.excludeSelf.values().none { it == 2 })
     }
 }
