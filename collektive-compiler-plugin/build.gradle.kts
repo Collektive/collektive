@@ -41,9 +41,9 @@ buildConfig {
     buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"$group.collektive-compiler-plugin\"")
 }
 
-tasks.withType<KotlinCompilationTask<*>>().configureEach {
+kotlin {
     compilerOptions {
-        freeCompilerArgs.add("-Xcontext-receivers")
+        freeCompilerArgs.add("-Xcontext-parameters")
     }
 }
 

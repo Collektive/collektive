@@ -27,14 +27,15 @@ import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
  * is managed automatically by the compiler plugin.
  */
 object ExplicitAlignDealign : FirFunctionCallChecker(MppCheckerKind.Common) {
-    override fun check(expression: FirFunctionCall, context: CheckerContext, reporter: DiagnosticReporter) {
+
+    context(context: CheckerContext, reporter: DiagnosticReporter)
+    override fun check(expression: FirFunctionCall) {
         val fqnCalleeName = expression.fqName
         if (fqnCalleeName in FORBIDDEN_FUNCTIONS && context.isInsideAggregateFunction()) {
             reporter.reportOn(
                 expression.calleeReference.source,
                 CollektiveFrontendErrors.FORBIDDEN_FUNCTION_CALL,
                 fqnCalleeName,
-                context,
             )
         }
     }

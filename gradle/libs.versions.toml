@@ -1,11 +1,11 @@
 [versions]
-alchemist = "42.2.3"
+alchemist = "42.2.8"
 arrow = "2.1.2"
 build-config = "5.6.7"
 dokka = "2.0.0"
 kotest = "6.0.0.M2"
-kotlin = "2.1.21"
-serialization = "1.8.1"
+kotlin = "2.2.0"
+serialization = "1.9.0"
 
 [libraries]
 alchemist = { module = "it.unibo.alchemist:alchemist", version.ref = "alchemist" }
@@ -13,7 +13,7 @@ alchemist-api = { module = "it.unibo.alchemist:alchemist-api", version.ref = "al
 alchemist-euclidean-geometry = { module = "it.unibo.alchemist:alchemist-euclidean-geometry", version.ref = "alchemist" }
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
 arrow-core-serialization = { module = "io.arrow-kt:arrow-core-serialization", version.ref = "arrow" }
-caffeine = "com.github.ben-manes.caffeine:caffeine:3.2.1"
+caffeine = "com.github.ben-manes.caffeine:caffeine:3.2.2"
 hash-sha3 = "org.kotlincrypto.hash:sha3:0.7.0"
 javap = "com.perfma.wrapped:com.sun.tools:1.8.0_jdk8u275-b01_linux_x64"
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
@@ -30,7 +30,7 @@ kotlinpoet = "com.squareup:kotlinpoet:2.2.0"
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "serialization" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 kotlinx-serialization-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-serialization-protobuf", version.ref = "serialization" }
-mockk = "io.mockk:mockk:1.14.4"
+mockk = "io.mockk:mockk:1.14.5"
 slf4j = "org.slf4j:slf4j-api:2.0.17"
 subjekt = "io.github.freshmag:subjekt-api:1.1.5"
 
@@ -56,16 +56,16 @@ alchemist = [
 build-config = { id = "com.github.gmazzo.buildconfig", version.ref = "build-config" }
 collektivize = { id = "it.unibo.collektive.collektivize" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-gitSemVer = "org.danilopianini.git-sensitive-semantic-versioning:5.1.5"
+gitSemVer = "org.danilopianini.git-sensitive-semantic-versioning:5.1.7"
 gradlePluginPublish = { id = "com.gradle.plugin-publish", version = "1.3.1" }
 kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-power-assert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = "kotlin" }
-kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.89.1"
+kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.93.0"
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kover = "org.jetbrains.kotlinx.kover:0.9.1"
 power-assert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = "kotlin" }
-multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:3.5.1"
-publishOnCentral = "org.danilopianini.publish-on-central:8.0.7"
+multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:3.6.0"
+publishOnCentral = "org.danilopianini.publish-on-central:9.1.0"
 taskTree = "com.dorongold.task-tree:4.0.1"

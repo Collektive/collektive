@@ -17,10 +17,10 @@
   "dependencies": {
     "@docusaurus/core": "3.8.1",
     "@docusaurus/preset-classic": "3.8.1",
-    "@fortawesome/fontawesome-svg-core": "^6.7.2",
-    "@fortawesome/free-brands-svg-icons": "^6.7.2",
-    "@fortawesome/free-regular-svg-icons": "^6.7.2",
-    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/fontawesome-svg-core": "^7.0.0",
+    "@fortawesome/free-brands-svg-icons": "^7.0.0",
+    "@fortawesome/free-regular-svg-icons": "^7.0.0",
+    "@fortawesome/free-solid-svg-icons": "^7.0.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@mdx-js/react": "^3.0.0",
     "clsx": "^2.0.0",
@@ -38,7 +38,7 @@
     "rehype-katex": "^7.0.1",
     "remark-code-import": "1.2.0",
     "remark-math": "^6.0.0",
-    "typescript": "~5.8.0"
+    "typescript": "~5.9.0"
   },
   "browserslist": {
     "production": [
@@ -53,6 +53,6 @@
     ]
   },
   "engines": {
-    "node": "22.17"
+    "node": "22.18"
   }
 }

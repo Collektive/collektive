@@ -14,6 +14,8 @@ import io.gitlab.arturbosch.detekt.DetektPlugin
 import io.gitlab.arturbosch.detekt.report.ReportMergeTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 
 plugins {
     alias(libs.plugins.dokka)
@@ -195,4 +197,17 @@ tasks {
     withType<GenerateModuleMetadata>().configureEach {
         enabled = false
     }
+
+    fun <T : Task> T.dependsOnIncludedBuilds() = dependsOn(
+            gradle.includedBuilds.map {
+                it.task(":$name")
+        }
+        )
+    fun <T : Task> TaskProvider<T>.dependsOnIncludedBuilds() = configure { dependsOnIncludedBuilds() }
+    fun <T : Task> TaskCollection<T>.dependsOnIncludedBuilds() = configureEach { dependsOnIncludedBuilds() }
+    withType<KtLintFormatTask>().dependsOnIncludedBuilds()
+    withType<KtLintCheckTask>().dependsOnIncludedBuilds()
+    withType<Detekt>().dependsOnIncludedBuilds()
+    build.dependsOnIncludedBuilds()
+    check.dependsOnIncludedBuilds()
 }

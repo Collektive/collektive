@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.dumpKotlinLike
-import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
+import org.jetbrains.kotlin.ir.visitors.IrVisitorVoid
 
 /**
  * Attempts to locate a reference to the [it.unibo.collektive.compiler.common.CollektiveNames.AGGREGATE_CLASS_NAME]
@@ -73,7 +73,7 @@ internal fun IrExpression.findAggregateReference(
 internal fun IrExpression.findFirstCapturedVariableOfType(targetType: IrClass): IrGetValue? {
     var result: IrGetValue? = null
     accept(
-        object : IrElementVisitorVoid {
+        object : IrVisitorVoid() {
             override fun visitElement(element: IrElement) {
                 if (result == null) {
                     element.acceptChildren(this, null)

@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.declarations.IrAnnotationContainer
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
+import org.jetbrains.kotlin.ir.declarations.IrParameterKind
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.util.defaultType
@@ -23,14 +24,23 @@ import org.jetbrains.kotlin.ir.util.parents
 /**
  * Returns `true` if this [IrFunction] is abstract (declared but not implemented).
  */
-val IrFunction.isAbstract: Boolean
+internal val IrFunction.isAbstract: Boolean
     get() = this is IrSimpleFunction && modality == Modality.ABSTRACT
 
 /**
  * Returns `true` if this [IrFunction] is concrete (i.e., implemented, not abstract).
  */
-val IrFunction.isConcrete: Boolean
+internal val IrFunction.isConcrete: Boolean
     get() = !isAbstract
+
+internal val IrFunction.dispatchReceiverIndex get() =
+    checkNotNull(dispatchReceiverParameter) {
+        "Function ${this.name} has no dispatch receiver parameter, cannot determine index"
+    }.indexInParameters
+
+internal val IrFunction.regularParameters get() = parameters.filter { it.kind == IrParameterKind.Regular }
+
+internal val IrFunction.singleRegularParameter get() = parameters.single { it.kind == IrParameterKind.Regular }
 
 /**
  * Checks whether this [IrFunction] or any of its enclosing declarations
@@ -70,8 +80,6 @@ internal fun IrFunction.isAggregate(
     logger: MessageCollector? = null,
 ): Boolean = !hasAnnotationDisablingPlugin(logger) &&
     listOf(aggregateClass, fieldClass).any { irClass: IrClass ->
-        val type = irClass.defaultType
-        extensionReceiverParameter?.type?.isAssignableFrom(type)
-            ?: dispatchReceiverParameter?.type?.isAssignableFrom(type)
-            ?: valueParameters.any { it.type.isAssignableFrom(type) }
+        val aggregateType = irClass.defaultType
+        parameters.any { valueParameter -> aggregateType.isAssignableFrom(valueParameter.type) }
     }

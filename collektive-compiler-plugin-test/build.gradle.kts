@@ -9,7 +9,6 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     java
@@ -49,6 +48,7 @@ kotlinJvm {
     }
     compilerOptions {
         jvmTarget.set(targetJvm)
+        freeCompilerArgs.add("-Xcontext-parameters")
     }
     tasks.withType<Test> {
         useJUnitPlatform()
@@ -61,12 +61,6 @@ kotlinJvm {
                 )
             exceptionFormat = TestExceptionFormat.FULL
         }
-    }
-}
-
-tasks.withType<KotlinCompile>().configureEach {
-    compilerOptions {
-        freeCompilerArgs = listOf("-Xcontext-receivers")
     }
 }
 

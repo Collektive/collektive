@@ -45,14 +45,14 @@ object ImproperConstruct : FirFunctionCallChecker(MppCheckerKind.Common) {
         return visitor.isReplaceable
     }
 
-    override fun check(expression: FirFunctionCall, context: CheckerContext, reporter: DiagnosticReporter) {
+    context(context: CheckerContext, reporter: DiagnosticReporter)
+    override fun check(expression: FirFunctionCall) {
         val isEvolve = expression.fqName.run { this == EVOLVE_FUNCTION_FQ_NAME || this == EVOLVING_FUNCTION_FQ_NAME }
         if (isEvolve && expression.isImproperEvolve()) {
             reporter.reportOn(
                 expression.calleeReference.source,
                 CollektiveFrontendErrors.IMPROPER_EVOLVE_CONSTRUCT,
                 expression.functionName,
-                context,
             )
         }
     }

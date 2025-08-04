@@ -37,20 +37,6 @@ data object IncludingSelf : ReductionType
 data object ExcludingSelf : ReductionType
 
 /**
- * Computes the initial value for a reduction, depending on whether the local value is included.
- *
- * @param field the field from which to extract the local ID and value.
- * @param default the value to use if the local value is excluded.
- * @param self a function that computes the initial value from the local ID and value.
- * @return the result of [self] if this is [IncludingSelf], or [default] if [ExcludingSelf].
- */
-inline fun <ID : Any, T, R> ReductionType.init(field: Field<ID, T>, default: R, crossinline self: (ID, T) -> R): R =
-    when (this) {
-        IncludingSelf -> self(field.local.id, field.local.value)
-        ExcludingSelf -> default
-    }
-
-/**
  * Computes the initial value for a reduction using a [FieldEntry], based on whether the local value is included.
  *
  * @param field the field from which to extract the local entry.

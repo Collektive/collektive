@@ -1,3 +1,82 @@
+## [26.0.0](https://github.com/Collektive/collektive/compare/25.0.2...26.0.0) (2025-07-31)
+
+### ⚠ BREAKING CHANGES
+
+* **core-deps:** update Kotlin to 2.2.0 (#1058)
+
+### Features
+
+* **core-deps:** update Kotlin to 2.2.0 ([#1058](https://github.com/Collektive/collektive/issues/1058)) ([a593d1c](https://github.com/Collektive/collektive/commit/a593d1cd90604dcb85e500c38dc7b6dfe7f772c6))
+
+### Dependency updates
+
+* **core-deps:** update serialization to v1.9.0 ([466d459](https://github.com/Collektive/collektive/commit/466d45985e60f5675f763c286bb5994579ed0678))
+* **deps:** update plugin kotlin-qa to v0.93.0 ([2a65a39](https://github.com/Collektive/collektive/commit/2a65a39603b69378cd4a6ed5fd4f504654cdd0ed))
+* **deps:** update plugin multijvmtesting to v3.5.4 ([328f807](https://github.com/Collektive/collektive/commit/328f8070721e2359164e3ca6e1baa88aa8c4055f))
+* **deps:** update plugin multijvmtesting to v3.6.0 ([6f386d7](https://github.com/Collektive/collektive/commit/6f386d79f01a83cd753a26eb85f8ffe2c6173b8a))
+
+### Build and continuous integration
+
+* bind task execution of build, check, ktlint and detekt to the execution of the same tasks on included projects ([#1059](https://github.com/Collektive/collektive/issues/1059)) ([14cb814](https://github.com/Collektive/collektive/commit/14cb81483b07b49f32272a70e64e4d380875842a))
+
+## [25.0.2](https://github.com/Collektive/collektive/compare/25.0.1...25.0.2) (2025-07-30)
+
+### Dependency updates
+
+* **deps:** update alchemist to v42.2.2 ([ab69890](https://github.com/Collektive/collektive/commit/ab69890904dd277cac5ee7d25d84670a7ac37be1))
+* **deps:** update alchemist to v42.2.3 ([09af05b](https://github.com/Collektive/collektive/commit/09af05b45295f353958eb8b6c640cdb50e5ed476))
+* **deps:** update alchemist to v42.2.8 ([5f3835a](https://github.com/Collektive/collektive/commit/5f3835afe7cad35132a7c4de5d5dfeadfe596bab))
+* **deps:** update dependency @fortawesome/react-fontawesome to v0.2.3 ([cc66294](https://github.com/Collektive/collektive/commit/cc662941d74430c2c81205bfc67c1cd4335e517c))
+* **deps:** update dependency com.github.ben-manes.caffeine:caffeine to v3.2.1 ([77c214c](https://github.com/Collektive/collektive/commit/77c214ce830649e904498ee732d7a294cdb2045d))
+* **deps:** update dependency com.github.ben-manes.caffeine:caffeine to v3.2.2 ([706f5d8](https://github.com/Collektive/collektive/commit/706f5d85382320d77217105ad4ea4beb88cbd418))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5.6.6 ([81b3c5f](https://github.com/Collektive/collektive/commit/81b3c5f1723af2d84fb251d34588930a574a7a9b))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5.6.7 ([c2fd1ab](https://github.com/Collektive/collektive/commit/c2fd1ab5b79a1be513587732749cab5f6d802e0e))
+* **deps:** update dependency gradle to v8.14.2 ([80ad8e6](https://github.com/Collektive/collektive/commit/80ad8e618b1ccab795892aaa213f47a66999a16a))
+* **deps:** update dependency gradle to v8.14.3 ([d6f4b70](https://github.com/Collektive/collektive/commit/d6f4b709f7f1ca66884c38d308f88f9b29c3b7bf))
+* **deps:** update dependency io.mockk:mockk to v1.14.4 ([8e10c57](https://github.com/Collektive/collektive/commit/8e10c57cb25a41eac10f219baa2a96f300b97fe0))
+* **deps:** update dependency io.mockk:mockk to v1.14.5 ([7e9a07d](https://github.com/Collektive/collektive/commit/7e9a07dac4021caf5dd0306c5e153785b3804155))
+* **deps:** update dependency react-router-dom to v7.6.1 ([0a09160](https://github.com/Collektive/collektive/commit/0a0916002f7cbf3a2dccf651f8a0bef42fc32232))
+* **deps:** update dependency react-router-dom to v7.6.2 ([c9831e8](https://github.com/Collektive/collektive/commit/c9831e83493707f24fc3409fed3fde4d573defbe))
+* **deps:** update dependency react-router-dom to v7.6.3 ([f0303fb](https://github.com/Collektive/collektive/commit/f0303fbdb11e37c7e0baaf27c53b0783641a08fb))
+* **deps:** update dependency react-router-dom to v7.7.1 ([df0dc57](https://github.com/Collektive/collektive/commit/df0dc5788874202f7f1a219706e3b7588889ba3e))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.132 ([5f13d87](https://github.com/Collektive/collektive/commit/5f13d8760899a77a8fdcf75e2cab4360a1e06c79))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.133 ([a360cc1](https://github.com/Collektive/collektive/commit/a360cc16ca4c1f82d7f9f9e46a49687486a0643a))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.134 ([4855e11](https://github.com/Collektive/collektive/commit/4855e11e49dba66ce7c8511feda9dad12103cacc))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.138 ([b34642c](https://github.com/Collektive/collektive/commit/b34642caf48e6fcca092de98a422c538a41d9c5c))
+* **deps:** update docusaurus monorepo to v3.8.0 ([9ad0fa8](https://github.com/Collektive/collektive/commit/9ad0fa88fae1e7ed5b2e5b34ee87017ee926983f))
+* **deps:** update docusaurus monorepo to v3.8.1 ([e5208e2](https://github.com/Collektive/collektive/commit/e5208e2d8ef396b0a1fd69a39b3f9c9ad5bcf301))
+* **deps:** update font awesome to v7 ([ce0f4ea](https://github.com/Collektive/collektive/commit/ce0f4ea26fa1502de25683734c94c045b4d8336c))
+* **deps:** update node.js to 22.17 ([0b937f8](https://github.com/Collektive/collektive/commit/0b937f85d406261cf0302a4a07e506eecdd6dfc0))
+* **deps:** update plugin com.gradle.develocity to v4.0.2 ([9e45b58](https://github.com/Collektive/collektive/commit/9e45b58db75e9c584a72da6162e8a9f4fe7febbe))
+* **deps:** update plugin com.gradle.develocity to v4.0.3 ([0bf9caf](https://github.com/Collektive/collektive/commit/0bf9cafd1bb41df2be907dd82fd3561e15ac745c))
+* **deps:** update plugin com.gradle.develocity to v4.1 ([1d2db21](https://github.com/Collektive/collektive/commit/1d2db2175de0999eab09d5ce5f0f8a2e1ffcb4bf))
+* **deps:** update plugin gitsemver to v5.1.4 ([5cf3bd6](https://github.com/Collektive/collektive/commit/5cf3bd66993df28e99d57d3e31cd5ed7eddc011f))
+* **deps:** update plugin gitsemver to v5.1.5 ([c486fc4](https://github.com/Collektive/collektive/commit/c486fc4c5a36b3a9d7da9a32aafefb2d07d1170e))
+* **deps:** update plugin gitsemver to v5.1.7 ([46cea16](https://github.com/Collektive/collektive/commit/46cea1647086cadb3b3a96575f7a25166ac8fba5))
+* **deps:** update plugin kotlin-qa to v0.89.0 ([0af4bd8](https://github.com/Collektive/collektive/commit/0af4bd89702ffcf62469b0d27d294c4c651fc849))
+* **deps:** update plugin kotlin-qa to v0.89.1 ([21f4daf](https://github.com/Collektive/collektive/commit/21f4daf3a2c3a3e2d3411a25e34e373f0ed49c5a))
+* **deps:** update plugin multijvmtesting to v3.5.0 ([7dc6214](https://github.com/Collektive/collektive/commit/7dc62144fc76a1ebd46cf72be0dfff564ab98c42))
+* **deps:** update plugin multijvmtesting to v3.5.1 ([ef35c27](https://github.com/Collektive/collektive/commit/ef35c27d60fdab67a62f94426c879d42a9528581))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.26 ([073af4f](https://github.com/Collektive/collektive/commit/073af4f8e1f8876dd0c60579c108f13ab98b06b1))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.27 ([cc7c80d](https://github.com/Collektive/collektive/commit/cc7c80d9512cc5f62bb384b9f2425ebb965d3378))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.28 ([4d1598a](https://github.com/Collektive/collektive/commit/4d1598af4a955fb2f2f9a33314030377b4593a97))
+* **deps:** update plugin publishoncentral to v9.1.0 ([5228ec8](https://github.com/Collektive/collektive/commit/5228ec89811974c90643cae10b2f8855a7484606))
+
+### Bug Fixes
+
+* **release:** always run the release job ([28a1f58](https://github.com/Collektive/collektive/commit/28a1f58f5b2d90590b8d2b7d1d1fd499044c1e06))
+* **release:** migrate to Maven Central Portal ([#1055](https://github.com/Collektive/collektive/issues/1055)) ([85d15ce](https://github.com/Collektive/collektive/commit/85d15ce6b14c655ad1d60bbc3a5b8cbcdcaf9dcf))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4 ([c0814a9](https://github.com/Collektive/collektive/commit/c0814a9e31f179bdbc73c4c9510e9527fe10401f))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.1 ([d4b7d44](https://github.com/Collektive/collektive/commit/d4b7d44be81eb1a544772813e14b2564961cefb5))
+* **deps:** update github/codeql-action action to v3.28.19 ([6d859e1](https://github.com/Collektive/collektive/commit/6d859e148b6815bba8cff48700471becd55599e5))
+* **deps:** update github/codeql-action action to v3.29.0 ([50bafe2](https://github.com/Collektive/collektive/commit/50bafe25ef63e7086de12138697d37d2df87a46a))
+* **deps:** update github/codeql-action action to v3.29.1 ([06f2f08](https://github.com/Collektive/collektive/commit/06f2f085cbfc5b45371dec27ddbada49f44b11b7))
+* **deps:** update github/codeql-action action to v3.29.5 ([83945eb](https://github.com/Collektive/collektive/commit/83945ebca8c2f8bb52823d2f25f7ce2f3d5964f4))
+* run the gradle build in parallel by default ([#1057](https://github.com/Collektive/collektive/issues/1057)) ([741fb45](https://github.com/Collektive/collektive/commit/741fb45ddb6eeb505b09eb9e70d1efd99a3ab278))
+
 ## [25.0.1](https://github.com/Collektive/collektive/compare/25.0.0...25.0.1) (2025-05-26)
 
 ### Dependency updates
