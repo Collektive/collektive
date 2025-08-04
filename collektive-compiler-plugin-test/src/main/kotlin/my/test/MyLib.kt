@@ -11,14 +11,15 @@ package my.test
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.mapNeighborhood
 import it.unibo.collektive.aggregate.api.share
+import it.unibo.collektive.aggregate.values
+import it.unibo.collektive.stdlib.collapse.min
 import it.unibo.collektive.stdlib.doubles.FieldedDoubles.plus
-import it.unibo.collektive.stdlib.fields.minValue
 import kotlin.Double.Companion.POSITIVE_INFINITY
 
 fun Aggregate<Int>.gradient(source: Boolean): Double = share(POSITIVE_INFINITY) {
     val dist = mapNeighborhood { 1.0 }
     when {
         source -> 0.0
-        else -> (it + dist).minValue(POSITIVE_INFINITY)
+        else -> (it + dist).excludeSelf.values().min() ?: POSITIVE_INFINITY
     }
 }

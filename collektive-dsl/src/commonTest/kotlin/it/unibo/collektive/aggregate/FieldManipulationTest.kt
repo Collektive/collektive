@@ -12,8 +12,8 @@ import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
-import it.unibo.collektive.stdlib.fields.maxValue
-import it.unibo.collektive.stdlib.fields.minValue
+import it.unibo.collektive.stdlib.collapse.max
+import it.unibo.collektive.stdlib.collapse.min
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -28,12 +28,12 @@ class FieldManipulationTest {
     fun `get the min value including self`() {
         aggregate(id0) {
             val sharedField = neighboring(double(3))
-            assertEquals(6, sharedField.minValue(sharedField.local.value))
+            assertEquals(6, sharedField.includeSelf.values().min())
         }
 
         aggregate(id1) {
             val sharedField = neighboring(double(2))
-            assertEquals(4, sharedField.minValue(sharedField.local.value))
+            assertEquals(4, sharedField.includeSelf.values().min())
         }
     }
 
@@ -45,12 +45,12 @@ class FieldManipulationTest {
 
         aggregate(id0, network0) {
             val sharedField = neighboring(double(3))
-            assertEquals(6, sharedField.maxValue(sharedField.local.value))
+            assertEquals(6, sharedField.includeSelf.values().max())
         }
 
         aggregate(id1, network1) {
             val sharedField = neighboring(double(4))
-            assertEquals(8, sharedField.maxValue(sharedField.local.value))
+            assertEquals(8, sharedField.includeSelf.values().max())
         }
     }
 
@@ -61,12 +61,12 @@ class FieldManipulationTest {
         val network1 = NetworkImplTest(nm, id1)
 
         aggregate(id0, network0) {
-            val minValue = neighboring(double(3)).minValue(Int.MAX_VALUE)
+            val minValue = neighboring(double(3)).excludeSelf.values().min(Int.MAX_VALUE)
             assertEquals(Int.MAX_VALUE, minValue)
         }
 
         aggregate(id1, network1) {
-            val minValue = neighboring(double(2)).minValue(Int.MAX_VALUE)
+            val minValue = neighboring(double(2)).excludeSelf.values().min(Int.MAX_VALUE)
             assertEquals(6, minValue)
         }
     }
@@ -78,12 +78,12 @@ class FieldManipulationTest {
         val network1 = NetworkImplTest(nm, id1)
 
         aggregate(id0, network0) {
-            val maxValue = neighboring(double(3)).maxValue(Int.MIN_VALUE)
+            val maxValue = neighboring(double(3)).excludeSelf.values().max(Int.MIN_VALUE)
             assertEquals(Int.MIN_VALUE, maxValue)
         }
 
         aggregate(id1, network1) {
-            val maxValue = neighboring(double(2)).maxValue(Int.MIN_VALUE)
+            val maxValue = neighboring(double(2)).excludeSelf.values().max(Int.MIN_VALUE)
             assertEquals(6, maxValue)
         }
     }

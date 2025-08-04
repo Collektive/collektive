@@ -17,7 +17,7 @@ import it.unibo.collektive.aggregate.api.neighborhood
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
-import it.unibo.collektive.stdlib.fields.minValue
+import it.unibo.collektive.stdlib.collapse.minValue
 import it.unibo.collektive.stdlib.ints.FieldedInts.minus
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
 import kotlin.test.Test

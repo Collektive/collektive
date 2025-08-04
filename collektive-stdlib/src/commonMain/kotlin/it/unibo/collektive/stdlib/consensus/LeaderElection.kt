@@ -11,7 +11,8 @@ package it.unibo.collektive.stdlib.consensus
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.sharing
-import it.unibo.collektive.stdlib.fields.foldValues
+import it.unibo.collektive.aggregate.values
+import it.unibo.collektive.stdlib.collapse.fold
 import it.unibo.collektive.stdlib.util.Reducer
 import it.unibo.collektive.stdlib.util.hops
 import it.unibo.collektive.stdlib.util.nonOverflowingPlus
@@ -44,7 +45,7 @@ inline fun <reified ID, reified Distance, reified Strength> Aggregate<ID>.bounde
             // Update the distance of the candidacies
             candidacy.copy(distance = accumulateDistance(candidacy.distance, distance))
         }
-        localCandidates.foldValues(local) { current, next ->
+        localCandidates.excludeSelf.values().fold(local) { current, next ->
             when {
                 next.candidate == localId -> current // I have better information about myself
                 next.distance > bound -> current // This candidate is past the bound

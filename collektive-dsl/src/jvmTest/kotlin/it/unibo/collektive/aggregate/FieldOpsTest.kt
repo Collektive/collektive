@@ -16,11 +16,11 @@ import io.mockk.just
 import io.mockk.mockk
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.CollektiveIgnore
-import it.unibo.collektive.stdlib.fields.fold
-import it.unibo.collektive.stdlib.fields.foldValues
-import it.unibo.collektive.stdlib.fields.reduce
-import it.unibo.collektive.stdlib.fields.reduceValues
-import it.unibo.collektive.stdlib.fields.replaceMatchingValues
+import it.unibo.collektive.stdlib.collapse.fold
+import it.unibo.collektive.stdlib.collapse.foldValues
+import it.unibo.collektive.stdlib.collapse.reduce
+import it.unibo.collektive.stdlib.collapse.reduceValues
+import it.unibo.collektive.stdlib.util.replaceMatchingValues
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals

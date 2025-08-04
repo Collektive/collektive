@@ -19,8 +19,10 @@ package it.unibo.collektive.stdlib.spreading
 
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.share
-import it.unibo.collektive.stdlib.fields.fold
-import it.unibo.collektive.stdlib.fields.foldValues
+import it.unibo.collektive.aggregate.values
+import it.unibo.collektive.stdlib.collapse.fold
+import it.unibo.collektive.stdlib.collapse.reduce
+import it.unibo.collektive.stdlib.util.Reducer
 import kotlinx.serialization.Serializable
 
 /**
@@ -56,8 +58,8 @@ inline fun <reified ID : Comparable<ID>, reified Value> Aggregate<ID>.gossipMax(
 ): Value {
     val localGossip = GossipValue<ID, Value>(best = local, local = local)
     val maxGossip = share(localGossip) { gossip ->
-        val neighbors = gossip.neighbors.toSet()
-        val result = gossip.fold(localGossip) { current, (id, next) ->
+        val neighbors = gossip.neighbors
+        val result = gossip.excludeSelf.fold(localGossip) { current, (id, next) ->
             val valid = next.path.asReversed().asSequence()
                 .drop(1)
                 .none { it == localId || it in neighbors }
@@ -110,13 +112,13 @@ inline fun <reified ID : Comparable<ID>> Aggregate<ID>.isHappeningAnywhere(condi
     gossipMax(condition()) { first, second -> first.compareTo(second) }
 
 /**
- * A **non-self-stabilizing** gossip function for repeated propagation of a [value] and [aggregation]
+ * A **non-self-stabilizing** gossip function for repeated propagation of a [value] and [reducer]
  * of state estimates between neighboring devices.
  */
 inline fun <ID : Any, reified Value> Aggregate<ID>.nonStabilizingGossip(
     value: Value,
-    noinline aggregation: (Value, Value) -> Value,
-): Value = share(value) { it.foldValues(value, aggregation) }
+    noinline reducer: Reducer<Value>,
+): Value = share(value) { it.includeSelf.values().reduce(reducer) }
 
 /**
  * A **non-self-stabilizing** function returning `true` if at any point in time a certain [condition] happened.

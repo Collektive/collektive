@@ -16,14 +16,14 @@ import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.exchanging
 import it.unibo.collektive.aggregate.api.mapNeighborhood
 import it.unibo.collektive.aggregate.api.neighboring
-import it.unibo.collektive.stdlib.fields.collectIDsMatching
-import it.unibo.collektive.stdlib.fields.foldValues
-import it.unibo.collektive.stdlib.fields.minWith
+import it.unibo.collektive.aggregate.values
+import it.unibo.collektive.stdlib.collapse.fold
+import it.unibo.collektive.stdlib.collapse.idOfMinWith
 import it.unibo.collektive.stdlib.spreading.hopDistanceTo
-import it.unibo.collektive.stdlib.util.IncludingSelf
 import it.unibo.collektive.stdlib.util.Maybe
 import it.unibo.collektive.stdlib.util.Maybe.Companion.merge
 import it.unibo.collektive.stdlib.util.Maybe.Companion.some
+import it.unibo.collektive.stdlib.util.ids
 import kotlin.contracts.ExperimentalContracts
 import kotlin.jvm.JvmOverloads
 
@@ -40,8 +40,8 @@ inline fun <reified ID : Any, reified Data, reified Potential : Comparable<Poten
     selectParent: Comparator<FieldEntry<ID, Potential>> = defaultComparator(),
     crossinline accumulateData: (Data, Data) -> Data,
 ): Data = exchanging<ID, Maybe<Data>, Data>(Maybe.none) { data: Field<ID, Maybe<Data>> ->
-    val localValue: Maybe<Data> = data
-        .foldValues(some(local)) { current, new -> current.merge(new, accumulateData) }
+    val localValue: Maybe<Data> = data.excludeSelf.values()
+        .fold(some(local)) { current, new -> current.merge(new, accumulateData) }
     check(localValue.option is Some) {
         "Bug in the implementation of convergeCast. A reduction using as base value ${some(local)} produced $None"
     }
@@ -223,7 +223,7 @@ internal inline fun <reified ID : Any, reified P : Comparable<P>> defaultCompara
 inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggregate<ID>.findParent(
     potential: Field<ID, Potential>,
     comparator: Comparator<FieldEntry<ID, Potential>> = defaultComparator(),
-): ID = potential.minWith(IncludingSelf, comparator)?.id ?: localId
+): ID = potential.includeSelf.idOfMinWith(comparator)
 
 /**
  * Find the best neighbor of the current device along a [potential] field,
@@ -247,8 +247,8 @@ inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggrega
 @JvmOverloads
 inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggregate<ID>.findParents(
     potential: Field<ID, Potential>,
-    crossinline isParent: Predicate<FieldEntry<ID, Potential>> = { potential.local.value > it.value },
-): Set<ID> = potential.collectIDsMatching(predicate = isParent)
+    noinline isParent: Predicate<FieldEntry<ID, Potential>> = { potential.local.value > it.value },
+): Set<ID> = potential.excludeSelf.sequence.filter(isParent).ids().toSet()
 
 /**
  * Find the parents of the current device along a [potential] field.
@@ -258,5 +258,5 @@ inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggrega
 @JvmOverloads
 inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggregate<ID>.findParents(
     potential: Potential,
-    crossinline isParent: Predicate<FieldEntry<ID, Potential>> = { potential > it.value },
+    noinline isParent: Predicate<FieldEntry<ID, Potential>> = { potential > it.value },
 ): Set<ID> = findParents(neighboring(potential), isParent)
