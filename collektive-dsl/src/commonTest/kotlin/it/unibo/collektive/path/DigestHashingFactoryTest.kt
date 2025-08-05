@@ -27,16 +27,16 @@ class DigestHashingFactoryTest {
             Uuid.parse("00000000-0000-0000-0000-000000000003"),
         )
 
-        fun metric(agg: Aggregate<Uuid>) = agg.neighboring(1.0)
+        fun Aggregate<Uuid>.metric() = neighboring(1.0)
 
-        fun run(agg: Aggregate<Uuid>) = agg.multiGradientCast(
+        fun Aggregate<Uuid>.run() = multiGradientCast(
             sources = sources,
             local = "data",
-            metric = metric(agg),
+            metric = metric(),
         )
 
-        val result = Collektive.Companion.aggregate(sources.first()) {
-            run(this)
+        val result = Collektive.aggregate(sources.first()) {
+            run()
         }
 
         assertEquals(3, result.result.size)
