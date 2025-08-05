@@ -24,7 +24,7 @@ class DigestHashingFactoryTest {
         val sources: Set<Uuid> = setOf(
             Uuid.parse("00000000-0000-0000-0000-000000000001"),
             Uuid.parse("00000000-0000-0000-0000-000000000002"),
-            Uuid.parse("00000000-0000-0000-0000-000000000003")
+            Uuid.parse("00000000-0000-0000-0000-000000000003"),
         )
 
         fun metric(agg: Aggregate<Uuid>) = agg.neighboring(1.0)
@@ -32,7 +32,7 @@ class DigestHashingFactoryTest {
         fun run(agg: Aggregate<Uuid>) = agg.multiGradientCast(
             sources = sources,
             local = "data",
-            metric = metric(agg)
+            metric = metric(agg),
         )
 
         val result = Collektive.Companion.aggregate(sources.first()) {
