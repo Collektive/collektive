@@ -12,6 +12,8 @@ import org.kotlincrypto.hash.sha3.Keccak512
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.jvm.JvmInline
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 /**
  * A factory that creates [Path] instances by hashing their content.
@@ -87,6 +89,7 @@ value class DigestHashingFactory(val digest: Digest = KotlinCryptoDigest(Keccak5
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     private fun Any.toConvertedByteArray(): ByteArray = when (this) {
         is UByte -> this.toByte().toByteArray()
         is Short -> this.toInt().toByteArray()
@@ -96,6 +99,7 @@ value class DigestHashingFactory(val digest: Digest = KotlinCryptoDigest(Keccak5
         is Float -> this.toRawBits().toByteArray()
         is Double -> this.toRawBits().toByteArray()
         is Char -> this.toString().toByteArray()
+        is Uuid -> this.toString().encodeToByteArray()
         else -> error("Alignment on elements of type ${this::class.simpleName} is not supported")
     }
 
