@@ -30,7 +30,7 @@ class DigestHashingFactoryTest {
             multiGradientCast(
                 sources = sources,
                 local = "data",
-                metric = { neighboring(1.0) },
+                metric = neighboring(1.0),
             )
         }
         assertEquals(3, result.result.size)
