@@ -20,7 +20,7 @@ import kotlin.uuid.Uuid
 class DigestHashingFactoryTest {
     @OptIn(ExperimentalUuidApi::class)
     @Test
-    fun `multiGradientCast with Uuid test set cast to alignedOn`() {
+    fun `Uuids must be valid device identifiers`() {
         val sources: Set<Uuid> = setOf(
             Uuid.parse("00000000-0000-0000-0000-000000000001"),
             Uuid.parse("00000000-0000-0000-0000-000000000002"),
