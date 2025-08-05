@@ -93,6 +93,7 @@ jobs:
     needs:
       - build-website
       - build
+    if: ${{ github.event_name == 'push' && github.repository == 'Collektive/collektive' }}
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout the repo
