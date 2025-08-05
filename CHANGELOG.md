@@ -1,3 +1,20 @@
+## [26.0.1](https://github.com/Collektive/collektive/compare/26.0.0...26.0.1) (2025-08-05)
+
+### Dependency updates
+
+* **deps:** update dependency gradle to v9 ([b824407](https://github.com/Collektive/collektive/commit/b8244076f7cec13f1fbeaf47239775cc22562f68))
+* **deps:** update dependency typescript to ~5.9.0 ([02156e3](https://github.com/Collektive/collektive/commit/02156e3f82c7ca530d8d63de1ac94da02712b25f))
+* **deps:** update node.js to 22.18 ([212ac83](https://github.com/Collektive/collektive/commit/212ac83449775be0bc816ba0491bb94198ac5d9f))
+
+### Bug Fixes
+
+* **dsl:** support Kotlin's `Uuid` as device `ID` ([#1063](https://github.com/Collektive/collektive/issues/1063)) ([dd3f47a](https://github.com/Collektive/collektive/commit/dd3f47ad4ce44c8d05880c1a775d2d2dfb68a6de))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.2 ([966c3b8](https://github.com/Collektive/collektive/commit/966c3b8b08dc0407881e389d3641e5a2046d60ee))
+* **release:** run the release only on pushes to the main repo (or secrets won't be available) ([#1064](https://github.com/Collektive/collektive/issues/1064)) ([1583b6c](https://github.com/Collektive/collektive/commit/1583b6c234af884f1c6d55d25e2113b00055cf27))
+
 ## [26.0.0](https://github.com/Collektive/collektive/compare/25.0.2...26.0.0) (2025-07-31)
 
 ### ⚠ BREAKING CHANGES
