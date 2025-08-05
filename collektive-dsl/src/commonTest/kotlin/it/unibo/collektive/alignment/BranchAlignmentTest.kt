@@ -15,9 +15,10 @@ import it.unibo.collektive.aggregate.api.exchange
 import it.unibo.collektive.aggregate.api.mapNeighborhood
 import it.unibo.collektive.aggregate.api.neighborhood
 import it.unibo.collektive.aggregate.api.neighboring
+import it.unibo.collektive.aggregate.values
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
-import it.unibo.collektive.stdlib.collapse.minValue
+import it.unibo.collektive.stdlib.collapse.min
 import it.unibo.collektive.stdlib.ints.FieldedInts.minus
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
 import kotlin.test.Test
@@ -88,7 +89,7 @@ class BranchAlignmentTest {
                         assertEquals((id - 1) / 2, neighboring(1).neighborsCount)
                         neighboring(1) - outerField
                         assertEquals(neighborhood().neighborsCount, outerField.neighborsCount)
-                        outerField.minValue(Int.MAX_VALUE)
+                        outerField.excludeSelf.values.min
                     }
                 }
             }

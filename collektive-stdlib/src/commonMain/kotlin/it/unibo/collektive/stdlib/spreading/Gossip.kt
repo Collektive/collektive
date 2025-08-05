@@ -118,7 +118,7 @@ inline fun <reified ID : Comparable<ID>> Aggregate<ID>.isHappeningAnywhere(condi
 inline fun <ID : Any, reified Value> Aggregate<ID>.nonStabilizingGossip(
     value: Value,
     noinline reducer: Reducer<Value>,
-): Value = share(value) { it.includeSelf.values().reduce(reducer) }
+): Value = share(value) { it.includeSelf.values.reduce(reducer) }
 
 /**
  * A **non-self-stabilizing** function returning `true` if at any point in time a certain [condition] happened.

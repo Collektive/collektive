@@ -10,6 +10,7 @@
 
 package it.unibo.collektive.aggregate
 
+import arrow.core.none
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
@@ -17,13 +18,13 @@ import io.mockk.mockk
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.CollektiveIgnore
 import it.unibo.collektive.stdlib.collapse.fold
-import it.unibo.collektive.stdlib.collapse.foldValues
 import it.unibo.collektive.stdlib.collapse.reduce
-import it.unibo.collektive.stdlib.collapse.reduceValues
+import it.unibo.collektive.stdlib.collapse.sum
 import it.unibo.collektive.stdlib.util.replaceMatchingValues
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertNull
 
 class FieldOpsTest {
     private val mockedContext = mockk<Aggregate<Int>>().apply {
@@ -34,60 +35,45 @@ class FieldOpsTest {
         }
     }
     private val emptyField = Field(mockedContext, 0, "localVal")
+    private val emptyFieldOfNullables: Field<Int, String?> = emptyField
     private val field = Field(mockedContext, 0, 0, mapOf(1 to 10, 2 to 20))
     private val fulfilledField = Field(mockedContext, 0, 0, mapOf(1 to 10, 2 to 20, 3 to 15))
     private val fulfilledCompatibleField = Field(mockedContext, 0, 1, mapOf(1 to 1, 2 to 1, 3 to 1))
 
     @Test
-    fun `An empty field should return the default value value when is hooded`() {
-        assertEquals("default", emptyField.reduceValues { acc, elem -> acc + elem } ?: "default")
+    fun `An empty field should return null or an empty Option when its peer values are reduced`() {
+        assertNull(emptyField.excludeSelf.values.reduce { acc, elem -> acc + elem })
+        assertEquals(none(), emptyFieldOfNullables.excludeSelf.values.reduce { acc, elem -> acc + elem })
     }
 
     @Test
-    fun `A non-empty field should not be hooded on default value`() {
-        assertEquals(30, field.reduceValues { acc, elem -> acc + elem })
+    fun `An empty field should return the local value when its values are reduced including self`() {
+        assertEquals("localVal", emptyField.includeSelf.values.reduce { acc, elem -> acc + elem })
     }
 
     @Test
-    fun `A non-empty field hooded with Id should return a punctual value related to an evaluation over the id`() {
+    fun `Reduction on peers should exclude the local value`() {
+        assertEquals(30, field.excludeSelf.values.sum)
+    }
+
+    @Test
+    fun `Reducing using ids can work as a filter`() {
         assertEquals(
             15,
-            fulfilledField.reduce { acc, (id, elem) ->
-                acc.mapValue {
-                    if (id % 2 == 0) {
-                        it + elem
-                    } else {
-                        it - elem
-                    }
-                }
+            fulfilledField.excludeSelf.reduce { first, (id, value) ->
+                first.mapValue { if (id % 2 == 0) it + value else it - value }
             }?.value,
         )
     }
 
     @Test
-    fun `An empty field should return the self value value when is folded`() {
-        assertEquals("localVal", emptyField.foldValues(emptyField.local.value) { acc, elem -> acc + elem })
+    fun `An empty field should return the self value value when reduced including self`() {
+        assertEquals("localVal", emptyField.includeSelf.values.reduce(String::plus))
     }
 
     @Test
     fun `A non-empty field should return the accumulated value when is folded excluding self`() {
-        assertEquals(72, field.foldValues(42) { acc, elem -> acc + elem })
-    }
-
-    @Test
-    fun `A non-empty field folded with Id should return a punctual value related to an evaluation over the id`() {
-        assertEquals(
-            37,
-            fulfilledField.fold(42) { acc: Int, (id: Int, elem: Int) ->
-                if (id % 2 ==
-                    0
-                ) {
-                    acc + elem
-                } else {
-                    acc - elem
-                }
-            },
-        )
+        assertEquals(72, field.excludeSelf.values.fold(42) { acc, elem -> acc + elem })
     }
 
     @Test
@@ -132,7 +118,7 @@ class FieldOpsTest {
 
     @Test
     fun `A field should return a sequence containing all the values`() {
-        assertEquals(sequenceOf(0 to 0, 1 to 10, 2 to 20).toSet(), field.asSequence().map { it.pair }.toSet())
+        assertEquals(sequenceOf(0 to 0, 1 to 10, 2 to 20).toSet(), field.includeSelf.sequence.map { it.pair }.toSet())
     }
 
     @Test
