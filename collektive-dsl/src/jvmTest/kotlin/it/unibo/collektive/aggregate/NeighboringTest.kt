@@ -43,7 +43,7 @@ class NeighboringTest {
         }
     }
 
-    private fun envWithNeihboring1(size: Int) = mooreGrid(size) { _ -> neighboring(1).toMap() }
+    private fun envWithNeihboring1(size: Int) = mooreGrid(size) { _ -> neighboring(1).includeSelf.toMap() }
 
     @Test
     fun `neighboring should build a field containing the values of the aligned neighbors`() {

@@ -44,9 +44,9 @@ fun <ID : Any, T> project(field: Field<ID, T>): Field<ID, T> {
             field.neighborsCount > others.neighborsCount -> others.map { (id, _) -> field[id] }
             else -> error(
                 """
-            Collektive is in an inconsistent state, this is most likely a bug in the implementation.
-            Field $field with ${field.neighborsCount} neighbors has been projected into a context
-            with more neighbors, ${others.neighborsCount}: ${others.neighbors}.
+                Collektive is in an inconsistent state, this is most likely a bug in the implementation.
+                Field $field with ${field.neighborsCount} neighbors has been projected into a context
+                with more neighbors, ${others.neighborsCount}: ${others.neighbors}.
                 """.trimIndent().replace(Regex("'\\R"), " "),
             )
         }

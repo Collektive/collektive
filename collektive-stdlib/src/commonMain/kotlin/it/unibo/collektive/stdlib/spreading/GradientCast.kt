@@ -184,7 +184,7 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
                 ?.takeUnless { localId in path.hops }
                 ?.takeUnless { path.isInvalidViaShortcut(accDist, neighbors, neighborAccumulatedDistances) }
                 ?.run { accDist to lazy { update(id, distance, bottom, top, accumulateDistance, accumulateData) } }
-        }.excludeSelf.values().sequence.filterNotNull().sortedBy { it.first }.map { it.second.value }
+        }.excludeSelf.values.sequence.filterNotNull().sortedBy { it.first }.map { it.second.value }
         val best = when {
             fromLocalSource != null -> sequenceOf(fromLocalSource)
             else -> {

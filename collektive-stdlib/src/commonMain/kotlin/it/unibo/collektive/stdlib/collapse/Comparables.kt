@@ -14,13 +14,42 @@ import it.unibo.collektive.aggregate.CollapsePeers
 import it.unibo.collektive.aggregate.CollapseWithSelf
 
 /**
- * Aggregation helpers for collapsing computational fields into their extreme values
- * according to the natural ordering provided by [Comparable].
+ * Returns the largest element in the collapsed field, including the local value.
  *
- * A [Collapse] represents turning an aggregate computational field into a local Kotlin collection.
- * [CollapseWithSelf] includes the local value in the reduction, whereas [CollapsePeers] excludes it.
- * These extensions provide convenient minimum/maximum reductions with sensible defaults and fallbacks.
+ * If multiple elements are tied for the maximum, one is returned arbitrarily.
+ *
+ * @return the maximal element present in the field.
  */
+val <T : Comparable<T>> CollapseWithSelf<T>.max: T get() = maxBy(::identity)
+
+/**
+ * Returns the largest peer element in the collapsed field, excluding the local value.
+ *
+ * If multiple peers are tied for the maximum, one is returned arbitrarily.
+ * If there are no peer elements, returns `null`.
+ *
+ * @return the maximal peer element, or `null` if none exist.
+ */
+val <T : Comparable<T>> CollapsePeers<T>.max: T? get() = maxBy(::identity)
+
+/**
+ * Returns the smallest element in the collapsed field, including the local value.
+ *
+ * If multiple elements are tied for the minimum, one is returned arbitrarily.
+ *
+ * @return the minimal element present in the field.
+ */
+val <T : Comparable<T>> CollapseWithSelf<T>.min: T get() = minBy(::identity)
+
+/**
+ * Returns the smallest peer element in the collapsed field, excluding the local value.
+ *
+ * If multiple peers are tied for the minimum, one is returned arbitrarily.
+ * If there are no peer elements, returns `null`.
+ *
+ * @return the minimal peer element, or `null` if none exist.
+ */
+val <T : Comparable<T>> CollapsePeers<T>.min: T? get() = minBy(::identity)
 
 /**
  * Returns the maximum between all values in the collapsed field and the provided [base].
@@ -43,41 +72,3 @@ fun <T : Comparable<T>> Collapse<T>.max(base: T): T = fold(base, ::maxOf)
  * @return the minimal value among field entries and [base].
  */
 fun <T : Comparable<T>> Collapse<T>.min(base: T): T = fold(base, ::minOf)
-
-/**
- * Returns the largest element in the collapsed field, including the local value.
- *
- * If multiple elements are tied for the maximum, one is returned arbitrarily.
- *
- * @return the maximal element present in the field.
- */
-fun <T : Comparable<T>> CollapseWithSelf<T>.max(): T = maxBy(::identity)
-
-/**
- * Returns the largest peer element in the collapsed field, excluding the local value.
- *
- * If multiple peers are tied for the maximum, one is returned arbitrarily.
- * If there are no peer elements, returns `null`.
- *
- * @return the maximal peer element, or `null` if none exist.
- */
-fun <T : Comparable<T>> CollapsePeers<T>.max(): T? = maxBy(::identity)
-
-/**
- * Returns the smallest element in the collapsed field, including the local value.
- *
- * If multiple elements are tied for the minimum, one is returned arbitrarily.
- *
- * @return the minimal element present in the field.
- */
-fun <T : Comparable<T>> CollapseWithSelf<T>.min(): T = minBy(::identity)
-
-/**
- * Returns the smallest peer element in the collapsed field, excluding the local value.
- *
- * If multiple peers are tied for the minimum, one is returned arbitrarily.
- * If there are no peer elements, returns `null`.
- *
- * @return the minimal peer element, or `null` if none exist.
- */
-fun <T : Comparable<T>> CollapsePeers<T>.min(): T? = minBy(::identity)

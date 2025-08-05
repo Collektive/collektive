@@ -23,6 +23,7 @@ import it.unibo.collektive.stdlib.spreading.hopDistanceTo
 import it.unibo.collektive.stdlib.util.Maybe
 import it.unibo.collektive.stdlib.util.Maybe.Companion.merge
 import it.unibo.collektive.stdlib.util.Maybe.Companion.some
+import it.unibo.collektive.stdlib.util.Reducer
 import it.unibo.collektive.stdlib.util.ids
 import kotlin.contracts.ExperimentalContracts
 import kotlin.jvm.JvmOverloads
@@ -38,9 +39,9 @@ inline fun <reified ID : Any, reified Data, reified Potential : Comparable<Poten
     local: Data,
     potential: Field<ID, Potential>,
     selectParent: Comparator<FieldEntry<ID, Potential>> = defaultComparator(),
-    crossinline accumulateData: (Data, Data) -> Data,
+    crossinline accumulateData: Reducer<Data>,
 ): Data = exchanging<ID, Maybe<Data>, Data>(Maybe.none) { data: Field<ID, Maybe<Data>> ->
-    val localValue: Maybe<Data> = data.excludeSelf.values()
+    val localValue: Maybe<Data> = data.excludeSelf.values
         .fold(some(local)) { current, new -> current.merge(new, accumulateData) }
     check(localValue.option is Some) {
         "Bug in the implementation of convergeCast. A reduction using as base value ${some(local)} produced $None"
@@ -217,7 +218,7 @@ internal inline fun <reified ID : Any, reified P : Comparable<P>> defaultCompara
  *
  * By default, the neighbor with the **lowest** potential is selected.
  *
- * If there are no neighbors, or the local device is the best one, its ID is returned.
+ * If there are no neighbors, or the local device is the best one, the local ID is returned.
  */
 @JvmOverloads
 inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggregate<ID>.findParent(

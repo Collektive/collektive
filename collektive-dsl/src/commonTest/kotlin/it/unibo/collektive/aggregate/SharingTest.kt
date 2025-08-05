@@ -14,8 +14,8 @@ import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.aggregate.api.sharing
 import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
-import it.unibo.collektive.stdlib.collapse.maxValue
-import it.unibo.collektive.stdlib.collapse.minValue
+import it.unibo.collektive.stdlib.collapse.max
+import it.unibo.collektive.stdlib.collapse.min
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.test.Test
@@ -24,8 +24,8 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class SharingTest {
-    val findMax: (Field<*, Int>) -> Int = { e -> e.maxValue(e.local.value) }
-    val findMin: (Field<*, Int>) -> Int = { e -> e.minValue(e.local.value) }
+    val findMax: (Field<*, Int>) -> Int = { e -> e.includeSelf.values.max }
+    val findMin: (Field<*, Int>) -> Int = { e -> e.includeSelf.values.min }
 
     private fun mooreGridWithProgram(
         size: Int,
@@ -64,7 +64,7 @@ class SharingTest {
         aggregate(1, testNetwork) {
             val result =
                 share(1) {
-                    it.maxValue(it.local.value)
+                    it.includeSelf.values.max
                 }
             assertEquals(1, result)
         }
@@ -77,7 +77,7 @@ class SharingTest {
         aggregate(1, testNetwork) {
             val res =
                 sharing(1) {
-                    val min = it.maxValue(it.local.value)
+                    val min = it.includeSelf.values.min
                     min.yielding { "A string" }
                 }
             assertEquals("A string", res)
@@ -91,7 +91,7 @@ class SharingTest {
         aggregate(1, testNetwork) {
             val res =
                 sharing(1) {
-                    val min = it.minValue(it.local.value)
+                    val min = it.includeSelf.values.min
                     min.yielding { "Hello".takeIf { min > 1 } }
                 }
             assertNull(res)

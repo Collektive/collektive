@@ -8,12 +8,11 @@ config:
     import it.unibo.collektive.aggregate.api.Aggregate
     import it.unibo.collektive.aggregate.api.neighboring
     import it.unibo.collektive.aggregate.api.exchanging
-    import it.unibo.collektive.stdlib.fields.max
-    import it.unibo.collektive.stdlib.fields.maxBy
-    import it.unibo.collektive.stdlib.fields.maxValue  
     import it.unibo.collektive.aggregate.api.neighboring
     import it.unibo.collektive.aggregate.api.share
     import it.unibo.collektive.aggregate.api.sharing
+    import it.unibo.collektive.aggregate.*
+    import it.unibo.collektive.stdlib.collapse.*
     import kotlin.math.floor
 
 parameters:
@@ -29,7 +28,7 @@ parameters:
         }
       - |-
         sharing(initial) {
-          it.maxValue(initial).yielding { it.maxValue(initial) }
+          it.excludeSelf.values.max(initial).yielding { it.excludeSelf.values.max(initial) }
         }
 
   - name: UNNECESSARY_YIELDING_COMPLEX
@@ -48,7 +47,7 @@ parameters:
         }
       - |-
         sharing(initial) {
-          val maxValue = it.maxValue(0)
+          val maxValue = it.excludeSelf.values.max(0)
           floor(maxValue.toDouble() / 2).toInt().yielding { floor(maxValue.toDouble() / 2).toInt() }
         }
 
@@ -64,7 +63,7 @@ parameters:
         }
       - |-
         sharing(initial) {
-          val maxValue = it.maxValue(0)
+          val maxValue = it.excludeSelf.values.max(0)
           maxValue.yielding { maxValue + 1 }
         }
 
@@ -80,7 +79,7 @@ parameters:
         }
       - |-
         sharing(initial) {
-          val maxValue = it.maxValue(0)
+          val maxValue = it.excludeSelf.values.max(0)
           maxValue.yielding { "Test${maxValue + 1}" }
         }  
 

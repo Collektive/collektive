@@ -473,7 +473,7 @@ internal class ConstantField<ID : Any, T>(
         .map { FieldEntry(checkNotLocal(it), local.value) }
 
     override operator fun get(id: ID): T {
-        if (id !in neighbors) {
+        if (id != local.id && id !in neighbors) {
             throw NoSuchElementException("No neighbor with id $id in $this")
         }
         return local.value
