@@ -371,19 +371,21 @@ private class ArrayBasedField<ID : Any, T>(
     private val others: List<FieldEntry<ID, T>>,
 ) : AbstractField<ID, T>(context, localId, localValue) {
 
-    override val neighborsCount: Int get() = others.size
+    override val excludeSelf: CollapsePeers<FieldEntry<ID, T>> get() =  ListBackedCollapse(others)
+
+    override val includeSelf: CollapseWithSelf<FieldEntry<ID, T>>
+        get() = SequenceBackedCollapse(others.asSequence() + local)
+
     override val neighbors: Set<ID> by lazy {
         others.mapTo(mutableSetOf()) {
             checkNotLocal(it.id)
             it.id
         }
     }
+
+    override val neighborsCount: Int get() = others.size
+
     override val neighborsValues by lazy { others.mapTo(ArrayList(neighborsCount)) { it.value } }
-
-    override val includeSelf: CollapseWithSelf<FieldEntry<ID, T>> get() = ListBackedCollapse(others)
-
-    override val excludeSelf: CollapsePeers<FieldEntry<ID, T>>
-        get() = SequenceBackedCollapse(others.asSequence() + local)
 
     override fun <R> mapOthersAsSequence(transform: (FieldEntry<ID, T>) -> R): Sequence<FieldEntry<ID, R>> =
         others.asSequence().map {
@@ -394,8 +396,6 @@ private class ArrayBasedField<ID : Any, T>(
     override fun neighborsMap(): Map<ID, T> = buildMap {
         others.forEach { this[checkNotLocal(it.id)] = it.value }
     }
-
-    private fun neighborsAsSequence(): Sequence<FieldEntry<ID, T>> = others.asSequence()
 
     private companion object {
         const val MAP_OVER_LIST_PERFORMANCE_CROSSING_POINT = 16
@@ -409,11 +409,15 @@ private class SequenceBasedField<ID : Any, T>(
     private val others: Sequence<FieldEntry<ID, T>>,
 ) : AbstractField<ID, T>(context, localId, localValue) {
 
-    override val neighborsCount get() = neighbors.size
+    override val excludeSelf: CollapsePeers<FieldEntry<ID, T>> get() = SequenceBackedCollapse(others)
+
+    override val includeSelf: CollapseWithSelf<FieldEntry<ID, T>> get() = SequenceBackedCollapse(others + local)
 
     override val neighbors: Set<ID> by lazy {
         others.mapTo(mutableSetOf()) { checkNotLocal(it.id) }
     }
+
+    override val neighborsCount get() = neighbors.size
 
     override val neighborsValues: List<T> by lazy {
         others.mapTo(ArrayList(neighborsCount)) {
@@ -421,9 +425,6 @@ private class SequenceBasedField<ID : Any, T>(
             it.value
         }
     }
-
-    override val includeSelf: CollapseWithSelf<FieldEntry<ID, T>> get() = SequenceBackedCollapse(others + local)
-    override val excludeSelf: CollapsePeers<FieldEntry<ID, T>> get() = SequenceBackedCollapse(others)
 
     override fun neighborsMap(): Map<ID, T> = buildMap {
         putAll(
