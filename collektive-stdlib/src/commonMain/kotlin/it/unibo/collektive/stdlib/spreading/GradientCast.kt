@@ -14,6 +14,7 @@ import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
 import it.unibo.collektive.aggregate.api.exchange
 import it.unibo.collektive.aggregate.api.mapNeighborhood
 import it.unibo.collektive.aggregate.api.share
+import it.unibo.collektive.aggregate.ids
 import it.unibo.collektive.aggregate.toMap
 import it.unibo.collektive.aggregate.values
 import it.unibo.collektive.stdlib.collapse.valueOfMinBy
@@ -182,7 +183,7 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
             path?.takeUnless { id == localId }
                 ?.takeUnless { path.length > maxDiameter }
                 ?.takeUnless { localId in path.hops }
-                ?.takeUnless { path.isInvalidViaShortcut(accDist, neighbors, neighborAccumulatedDistances) }
+                ?.takeUnless { path.isInvalidViaShortcut(accDist, neighbors.ids.set, neighborAccumulatedDistances) }
                 ?.run { accDist to lazy { update(id, distance, bottom, top, accumulateDistance, accumulateData) } }
         }.excludeSelf.values.sequence.filterNotNull().sortedBy { it.first }.map { it.second.value }
         val best = when {

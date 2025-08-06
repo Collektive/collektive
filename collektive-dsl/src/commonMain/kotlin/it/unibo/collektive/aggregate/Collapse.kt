@@ -9,7 +9,7 @@
 package it.unibo.collektive.aggregate
 
 /**
- * A collapsing view over a collection of elements that can be accessed as a [list], [set], or [sequence].
+ * A collapsing view over a collection of [size] elements that can be accessed as a [list], [set], or [sequence].
  *
  * This abstraction is used to represent either the neighborhood of a field (peers), or the neighborhood
  * plus the local element (with self), with different subtypes conveying inclusion semantics.
@@ -20,6 +20,7 @@ sealed interface Collapse<out E> {
     val list: List<E>
     val set: Set<E>
     val sequence: Sequence<E>
+    val size: Int
 }
 
 /**
@@ -88,11 +89,34 @@ val <T> CollapsePeers<FieldEntry<*, T>>.values: CollapsePeers<T> get() = sequenc
 internal open class ListBackedCollapse<out T>(override val list: List<T>) : AnyCollapse<T> {
     override val set by lazy { list.toSet() }
     override val sequence get() = list.asSequence()
+    override val size: Int get() = list.size
 }
 
-internal open class SequenceBackedCollapse<out T>(override val sequence: Sequence<T>) : AnyCollapse<T> {
-    override val set by lazy { sequence.toSet() }
-    override val list by lazy { sequence.toList() }
+internal open class SequenceBackedCollapse<out T>(val origin: Sequence<T>) : AnyCollapse<T> {
+    private var consumed = false
+    override val list: List<T> by lazy {
+        when {
+            consumed -> set.toList()
+            else -> {
+                consumed = true
+                origin.toList()
+            }
+        }
+    }
+    override val set: Set<T> by lazy {
+        when {
+            consumed -> list.toSet()
+            else -> {
+                consumed = true
+                origin.toSet()
+            }
+        }
+    }
+    override val sequence: Sequence<T> get() = when {
+        consumed -> list.asSequence()
+        else -> origin
+    }
+    override val size: Int get() = list.size
 }
 
 private fun <ID : Any> Sequence<FieldEntry<ID, *>>.ids() = SequenceBackedCollapse(map { it.id })

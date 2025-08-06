@@ -59,6 +59,8 @@ value class FieldEntry<ID : Any, out T>(val pair: Pair<ID, T>) {
      * Returns a [FieldEntry] with the same [id] and a transformed [value].
      */
     fun <R> mapValue(transform: (T) -> R): FieldEntry<ID, R> = FieldEntry(id, transform(value))
+
+    override fun toString(): String = "$id=$value"
 }
 
 /**

@@ -12,6 +12,7 @@ import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.exchange
 import it.unibo.collektive.aggregate.api.exchanging
 import it.unibo.collektive.stdlib.collapse.fold
+import it.unibo.collektive.stdlib.collapse.sum
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.test.Test
@@ -42,16 +43,15 @@ class ExchangeTest {
 
     private fun mooreGridWithDedicatedNeighborValues(size: Int) =
         mooreGrid<Int>(size, size, { _, _ -> Int.MIN_VALUE }) { _ ->
-            val res =
-                exchange(0) { field ->
-                    field.map { (id, _) ->
-                        when (id) {
-                            0 -> 0
-                            else -> 1
-                        }
+            val res: Field<Int, Int> = exchange(0) { field ->
+                field.map { (id, _) ->
+                    when (id) {
+                        0 -> 0
+                        else -> 1
                     }
                 }
-            res.neighborsValues.sum() + res.local.value
+            }
+            res.neighbors.values.sum() + res.local.value
         }.also {
             assertEquals(size * size, it.nodes.size)
         }

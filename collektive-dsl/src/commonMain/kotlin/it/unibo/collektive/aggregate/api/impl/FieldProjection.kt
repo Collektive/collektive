@@ -40,13 +40,13 @@ fun <ID : Any, T> project(field: Field<ID, T>): Field<ID, T> {
     try {
         val others = field.context.neighborhood()
         return when {
-            field.neighborsCount == others.neighborsCount -> field
-            field.neighborsCount > others.neighborsCount -> others.map { (id, _) -> field[id] }
+            field.neighbors.size == others.neighbors.size -> field
+            field.neighbors.size > others.neighbors.size -> others.map { (id, _) -> field[id] }
             else -> error(
                 """
                 Collektive is in an inconsistent state, this is most likely a bug in the implementation.
-                Field $field with ${field.neighborsCount} neighbors has been projected into a context
-                with more neighbors, ${others.neighborsCount}: ${others.neighbors}.
+                Field $field with ${field.neighbors.size} neighbors has been projected into a context
+                with more neighbors, ${others.neighbors.size}: ${others.neighbors}.
                 """.trimIndent().replace(Regex("'\\R"), " "),
             )
         }

@@ -19,6 +19,7 @@ package it.unibo.collektive.stdlib.spreading
 
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.share
+import it.unibo.collektive.aggregate.ids
 import it.unibo.collektive.aggregate.values
 import it.unibo.collektive.stdlib.collapse.fold
 import it.unibo.collektive.stdlib.collapse.reduce
@@ -62,7 +63,7 @@ inline fun <reified ID : Comparable<ID>, reified Value> Aggregate<ID>.gossipMax(
         val result = gossip.excludeSelf.fold(localGossip) { current, (id, next) ->
             val valid = next.path.asReversed().asSequence()
                 .drop(1)
-                .none { it == localId || it in neighbors }
+                .none { it == localId || it in neighbors.ids.set }
             val actualNext = if (valid) next else next.base(id)
             val candidateValue = comparator.compare(current.best, actualNext.best)
             when {

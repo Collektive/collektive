@@ -79,16 +79,16 @@ class BranchAlignmentTest {
             .map { (net, id) ->
                 aggregate(id, net) {
                     val outerField = neighboring(0)
-                    assertEquals(id, outerField.neighborsCount)
+                    assertEquals(id, outerField.neighbors.size)
                     if (id % 2 == 0) {
-                        assertEquals(id / 2, neighboring(1).neighborsCount)
+                        assertEquals(id / 2, neighboring(1).neighbors.size)
                         neighboring(1) + outerField
-                        assertEquals(neighborhood().neighborsCount, outerField.neighborsCount)
+                        assertEquals(neighborhood().neighbors.size, outerField.neighbors.size)
                         1
                     } else {
-                        assertEquals((id - 1) / 2, neighboring(1).neighborsCount)
+                        assertEquals((id - 1) / 2, neighboring(1).neighbors.size)
                         neighboring(1) - outerField
-                        assertEquals(neighborhood().neighborsCount, outerField.neighborsCount)
+                        assertEquals(neighborhood().neighbors.size, outerField.neighbors.size)
                         outerField.excludeSelf.values.min()
                     }
                 }
@@ -110,22 +110,22 @@ class BranchAlignmentTest {
     fun `A field should be projected also when the field is referenced as lambda parameter issue 171`() {
         exchangeWithThreeDevices {
             if (localId % 2 == 0) {
-                assertEquals(neighborhood().neighborsCount, it.neighborsCount)
+                assertEquals(neighborhood().neighbors.size, it.neighbors.size)
             } else {
-                assertEquals(neighborhood().neighborsCount, it.neighborsCount)
+                assertEquals(neighborhood().neighbors.size, it.neighbors.size)
             }
             mapNeighborhood { 1 }
         }
     }
 
     private fun manuallyAlignedExchangeWithThreeDevices(pivot: (Int) -> Any?) = exchangeWithThreeDevices { field ->
-        val neighborsBeforeRestriction = field.neighborsCount
+        val neighborsBeforeRestriction = field.neighbors.size
         assertTrue(localId == 0 || neighborsBeforeRestriction > 0)
         // Map the pivots to the number of neighbors that are pivoting on the same value
-        val expectations = mapNeighborhood(pivot).neighborsValues.groupBy { it }.mapValues { it.value.size }
+        val expectations = mapNeighborhood(pivot).neighbors.values.list.groupBy { it }.mapValues { it.value.size }
         alignedOn(pivot(localId)) {
-            val neighborsAfterRestriction = neighborhood().neighborsCount
-            val restrictedField = field.neighborsCount
+            val neighborsAfterRestriction = neighborhood().neighbors.size
+            val restrictedField = field.neighbors.size
             assertEquals(neighborsAfterRestriction, restrictedField)
             assertEquals(expectations[pivot(localId)] ?: 0, restrictedField)
         }
@@ -148,10 +148,10 @@ class BranchAlignmentTest {
             with(it) {
                 with(local.id % 2 == 0) {
                     if (this) {
-                        assertEquals(neighborhood().neighborsCount, neighborsCount)
+                        assertEquals(neighborhood().neighbors.size, neighbors.size)
                         alignedMapValues(neighboring(1)) { a, b -> a + b }.local
                     } else {
-                        assertEquals(neighborhood().neighborsCount, it.neighborsCount)
+                        assertEquals(neighborhood().neighbors.size, it.neighbors.size)
                         alignedMapValues(neighboring(1)) { a, b -> a - b }.local
                     }
                 }
