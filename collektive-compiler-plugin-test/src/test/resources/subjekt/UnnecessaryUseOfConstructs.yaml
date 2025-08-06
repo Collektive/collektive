@@ -84,7 +84,7 @@ parameters:
         }
       - |-
         sharing(initial) {
-          it.includeSelf.values.max.yielding { "Test" }
+          it.includeSelf.values.max().yielding { "Test" }
         }
 
   - name: CONSTRUCT_IMPLICIT_SHADOWED
@@ -143,7 +143,7 @@ parameters:
         }
       - |-
         share(initial) { field ->
-          field.excludeSelf.values.max
+          field.excludeSelf.values.max()
         }
       - |-
         evolving(initial) { field ->
@@ -159,7 +159,7 @@ parameters:
         }
       - |-
         sharing(initial) { field ->
-            field.includeSelf.values.max.yielding { "Test" }
+            field.includeSelf.values.max().yielding { "Test" }
         }
 
 subjects:

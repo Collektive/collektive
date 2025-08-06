@@ -53,7 +53,7 @@ class FieldOpsTest {
 
     @Test
     fun `Reduction on peers should exclude the local value`() {
-        assertEquals(30, field.excludeSelf.values.sum)
+        assertEquals(30, field.excludeSelf.values.sum())
     }
 
     @Test

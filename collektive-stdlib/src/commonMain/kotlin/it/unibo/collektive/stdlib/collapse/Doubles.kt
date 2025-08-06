@@ -9,25 +9,26 @@
 package it.unibo.collektive.stdlib.collapse
 
 import it.unibo.collektive.aggregate.Collapse
+import it.unibo.collektive.aggregate.CollapsePeers
 
 /**
  * Returns the maximum of all values in this collapse, or [Double.NEGATIVE_INFINITY] if the collapse
  * is an empty [it.unibo.collektive.aggregate.CollapsePeers].
  */
-val Collapse<Double>.max: Double get() = max(Double.NEGATIVE_INFINITY)
+fun CollapsePeers<Double>.max(): Double = max(Double.NEGATIVE_INFINITY)
 
 /**
  * Returns the minimum of all values in this collapse, or [Double.POSITIVE_INFINITY] if the collapse
  * is an empty [it.unibo.collektive.aggregate.CollapsePeers].
  */
-val Collapse<Double>.min: Double get() = min(Double.POSITIVE_INFINITY)
+fun CollapsePeers<Double>.min(): Double = min(Double.POSITIVE_INFINITY)
 
 /**
  * Returns the product of all values in this collapse.
  */
-val Collapse<Double>.product: Double get() = sequence.fold(1.0, Double::times)
+fun Collapse<Double>.product(): Double = sequence.fold(1.0, Double::times)
 
 /**
  * Returns the sum of all values in this collapse.
  */
-val Collapse<Double>.sum: Double get() = sequence.fold(0.0, Double::plus)
+fun Collapse<Double>.sum(): Double = sequence.fold(0.0, Double::plus)

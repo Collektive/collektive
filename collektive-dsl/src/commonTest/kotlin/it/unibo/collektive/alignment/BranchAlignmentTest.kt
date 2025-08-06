@@ -89,7 +89,7 @@ class BranchAlignmentTest {
                         assertEquals((id - 1) / 2, neighboring(1).neighborsCount)
                         neighboring(1) - outerField
                         assertEquals(neighborhood().neighborsCount, outerField.neighborsCount)
-                        outerField.excludeSelf.values.min
+                        outerField.excludeSelf.values.min()
                     }
                 }
             }
