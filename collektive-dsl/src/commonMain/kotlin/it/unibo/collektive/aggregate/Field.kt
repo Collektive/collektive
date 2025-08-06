@@ -36,6 +36,19 @@ sealed interface Field<ID : Any, out T> {
     val context: Aggregate<ID>
 
     /**
+     * A collapsing view over the field entries that excludes the local entry, i.e., only peers.
+     * Provides access to the neighborhood without the local node, for computations scoped to neighbors.
+     */
+    val excludeSelf: CollapsePeers<FieldEntry<ID, T>>
+
+    /**
+     * A collapsing view over the field entries that includes the local entry and all neighbors.
+     * Provides access to the combined list/set/sequence of self + peers, e.g., for operations that
+     * need to reason about the entire neighborhood including the local node.
+     */
+    val includeSelf: CollapseWithSelf<FieldEntry<ID, T>>
+
+    /**
      * The entry representing the local node in the field.
      */
     val local: FieldEntry<ID, T>
@@ -233,19 +246,6 @@ sealed interface Field<ID : Any, out T> {
     operator fun get(id: ID): T
 
     /**
-     * A collapsing view over the field entries that includes the local entry and all neighbors.
-     * Provides access to the combined list/set/sequence of self + peers, e.g., for operations that
-     * need to reason about the entire neighborhood including the local node.
-     */
-    val includeSelf: CollapseWithSelf<FieldEntry<ID, T>>
-
-    /**
-     * A collapsing view over the field entries that excludes the local entry, i.e., only peers.
-     * Provides access to the neighborhood without the local node, for computations scoped to neighbors.
-     */
-    val excludeSelf: CollapsePeers<FieldEntry<ID, T>>
-
-    /**
      * Base operations on [Field]s.
      */
     companion object {
@@ -371,7 +371,7 @@ private class ArrayBasedField<ID : Any, T>(
     private val others: List<FieldEntry<ID, T>>,
 ) : AbstractField<ID, T>(context, localId, localValue) {
 
-    override val excludeSelf: CollapsePeers<FieldEntry<ID, T>> get() =  ListBackedCollapse(others)
+    override val excludeSelf: CollapsePeers<FieldEntry<ID, T>> get() = ListBackedCollapse(others)
 
     override val includeSelf: CollapseWithSelf<FieldEntry<ID, T>>
         get() = SequenceBackedCollapse(others.asSequence() + local)
