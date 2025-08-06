@@ -111,7 +111,7 @@ jobs:
           repository: Collektive/collektive.github.io
           token: ${{ secrets.DEPLOYMENT_TOKEN }}
       - name: Download website artifact
-        uses: actions/download-artifact@v4.3.0
+        uses: actions/download-artifact@v5.0.0
         with:
           name: website-${{ github.sha }}
       - name: Unpack website
