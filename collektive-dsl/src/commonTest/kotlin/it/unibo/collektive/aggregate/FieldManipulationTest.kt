@@ -61,12 +61,12 @@ class FieldManipulationTest {
         val network1 = NetworkImplTest(nm, id1)
 
         aggregate(id0, network0) {
-            val minValue = neighboring(doubleOf(3)).excludeSelf.values.min
+            val minValue: Int = neighboring(doubleOf(3)).excludeSelf.values.min
             assertEquals(Int.MAX_VALUE, minValue)
         }
 
         aggregate(id1, network1) {
-            val minValue = neighboring(doubleOf(2)).excludeSelf.values.min
+            val minValue: Int = neighboring(doubleOf(2)).excludeSelf.values.min
             assertEquals(6, minValue)
         }
     }
