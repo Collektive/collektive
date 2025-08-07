@@ -49,21 +49,6 @@ sealed interface Field<ID : Any, out T> {
     val neighbors: CollapsePeers<FieldEntry<ID, T>>
 
     /**
-     * A collapsing view over the field entries that excludes the local entry, i.e., only peers.
-     * Provides access to the neighborhood without the local node, for computations scoped to neighbors.
-     */
-    @Deprecated("Use neighbors", replaceWith = ReplaceWith("neighbors"))
-    val excludeSelf: CollapsePeers<FieldEntry<ID, T>> get() = neighbors
-
-    /**
-     * A collapsing view over the field entries that includes the local entry and all neighbors.
-     * Provides access to the combined list/set/sequence of self + peers, e.g., for operations that
-     * need to reason about the entire neighborhood including the local node.
-     */
-    @Deprecated("Use all", replaceWith = ReplaceWith("all"))
-    val includeSelf: CollapseWithSelf<FieldEntry<ID, T>> get() = all
-
-    /**
      * The entry representing the local node in the field.
      */
     val local: FieldEntry<ID, T>
