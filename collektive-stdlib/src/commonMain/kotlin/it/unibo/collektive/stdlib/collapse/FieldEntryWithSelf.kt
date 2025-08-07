@@ -8,7 +8,7 @@
 
 package it.unibo.collektive.stdlib.collapse
 
-import it.unibo.collektive.aggregate.CollapseWithSelf
+import it.unibo.collektive.aggregate.CollapseAll
 import it.unibo.collektive.aggregate.FieldEntry
 
 // TODO: add idOfMax and idOfMin for comparable field entries
@@ -20,7 +20,7 @@ import it.unibo.collektive.aggregate.FieldEntry
  * @param selector a function that maps each [FieldEntry] to a comparable value.
  * @return the ID of the entry with the highest value.
  */
-inline fun <ID : Any, T, R : Comparable<R>> CollapseWithSelf<FieldEntry<ID, T>>.idOfMaxBy(
+inline fun <ID : Any, T, R : Comparable<R>> CollapseAll<FieldEntry<ID, T>>.idOfMaxBy(
     crossinline selector: (FieldEntry<ID, T>) -> R,
 ): ID = maxBy(selector).id
 
@@ -31,7 +31,7 @@ inline fun <ID : Any, T, R : Comparable<R>> CollapseWithSelf<FieldEntry<ID, T>>.
  * @param comparator the comparator used to determine ordering between entries.
  * @return the ID of the entry with the greatest ordering.
  */
-fun <ID : Any, T> CollapseWithSelf<FieldEntry<ID, T>>.idOfMaxWith(comparator: Comparator<FieldEntry<ID, T>>): ID =
+fun <ID : Any, T> CollapseAll<FieldEntry<ID, T>>.idOfMaxWith(comparator: Comparator<FieldEntry<ID, T>>): ID =
     maxWith(comparator).id
 
 /**
@@ -41,7 +41,7 @@ fun <ID : Any, T> CollapseWithSelf<FieldEntry<ID, T>>.idOfMaxWith(comparator: Co
  * @param selector a function that maps each [FieldEntry] to a comparable value.
  * @return the ID of the entry with the lowest value.
  */
-inline fun <ID : Any, T, R : Comparable<R>> CollapseWithSelf<FieldEntry<ID, T>>.idOfMinBy(
+inline fun <ID : Any, T, R : Comparable<R>> CollapseAll<FieldEntry<ID, T>>.idOfMinBy(
     crossinline selector: (FieldEntry<ID, T>) -> R,
 ): ID = minBy(selector).id
 
@@ -52,7 +52,7 @@ inline fun <ID : Any, T, R : Comparable<R>> CollapseWithSelf<FieldEntry<ID, T>>.
  * @param comparator the comparator used to determine ordering between entries.
  * @return the ID of the entry with the smallest ordering.
  */
-fun <ID : Any, T> CollapseWithSelf<FieldEntry<ID, T>>.idOfMinWith(comparator: Comparator<FieldEntry<ID, T>>): ID =
+fun <ID : Any, T> CollapseAll<FieldEntry<ID, T>>.idOfMinWith(comparator: Comparator<FieldEntry<ID, T>>): ID =
     minWith(comparator).id
 
 /**
@@ -62,7 +62,7 @@ fun <ID : Any, T> CollapseWithSelf<FieldEntry<ID, T>>.idOfMinWith(comparator: Co
  * @param selector a function that maps each [FieldEntry] to a comparable value.
  * @return the value of the entry with the highest score.
  */
-inline fun <ID : Any, T, R : Comparable<R>> CollapseWithSelf<FieldEntry<ID, T>>.valueOfMaxBy(
+inline fun <ID : Any, T, R : Comparable<R>> CollapseAll<FieldEntry<ID, T>>.valueOfMaxBy(
     crossinline selector: (FieldEntry<ID, T>) -> R,
 ): T = maxBy(selector).value
 
@@ -73,7 +73,7 @@ inline fun <ID : Any, T, R : Comparable<R>> CollapseWithSelf<FieldEntry<ID, T>>.
  * @param comparator the comparator used to determine ordering between entries.
  * @return the value of the entry with the greatest ordering.
  */
-fun <ID : Any, T> CollapseWithSelf<FieldEntry<ID, T>>.valueOfMaxWith(comparator: Comparator<FieldEntry<ID, T>>): T =
+fun <ID : Any, T> CollapseAll<FieldEntry<ID, T>>.valueOfMaxWith(comparator: Comparator<FieldEntry<ID, T>>): T =
     maxWith(comparator).value
 
 /**
@@ -83,7 +83,7 @@ fun <ID : Any, T> CollapseWithSelf<FieldEntry<ID, T>>.valueOfMaxWith(comparator:
  * @param selector a function that maps each [FieldEntry] to a comparable value.
  * @return the value of the entry with the lowest score.
  */
-inline fun <ID : Any, T, R : Comparable<R>> CollapseWithSelf<FieldEntry<ID, T>>.valueOfMinBy(
+inline fun <ID : Any, T, R : Comparable<R>> CollapseAll<FieldEntry<ID, T>>.valueOfMinBy(
     crossinline selector: (FieldEntry<ID, T>) -> R,
 ): T = minBy(selector).value
 
@@ -94,5 +94,5 @@ inline fun <ID : Any, T, R : Comparable<R>> CollapseWithSelf<FieldEntry<ID, T>>.
  * @param comparator the comparator used to determine ordering between entries.
  * @return the value of the entry with the smallest ordering.
  */
-fun <ID : Any, T> CollapseWithSelf<FieldEntry<ID, T>>.valueOfMinWith(comparator: Comparator<FieldEntry<ID, T>>): T =
+fun <ID : Any, T> CollapseAll<FieldEntry<ID, T>>.valueOfMinWith(comparator: Comparator<FieldEntry<ID, T>>): T =
     minWith(comparator).value

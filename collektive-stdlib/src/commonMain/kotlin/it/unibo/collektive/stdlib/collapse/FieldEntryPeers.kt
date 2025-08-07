@@ -8,7 +8,7 @@
 
 package it.unibo.collektive.stdlib.collapse
 
-import it.unibo.collektive.aggregate.CollapsePeers
+import it.unibo.collektive.aggregate.CollapseNeighbors
 import it.unibo.collektive.aggregate.FieldEntry
 
 /**
@@ -17,7 +17,7 @@ import it.unibo.collektive.aggregate.FieldEntry
  * @param selector a function that maps each peer [FieldEntry] to a comparable value.
  * @return the ID of the peer entry with the highest value, or `null` if none.
  */
-fun <ID : Any, T : Comparable<T>> CollapsePeers<FieldEntry<ID, T>>.idOfMax(): ID? = maxBy { it.value }?.id
+fun <ID : Any, T : Comparable<T>> CollapseNeighbors<FieldEntry<ID, T>>.idOfMax(): ID? = maxBy { it.value }?.id
 
 /**
  * Returns the ID of the peer entry (excluding local) that yields the largest value according to the given [selector].
@@ -25,7 +25,7 @@ fun <ID : Any, T : Comparable<T>> CollapsePeers<FieldEntry<ID, T>>.idOfMax(): ID
  * @param selector a function that maps each peer [FieldEntry] to a comparable value.
  * @return the ID of the peer entry with the highest value, or `null` if none.
  */
-inline fun <ID : Any, T, R : Comparable<R>> CollapsePeers<FieldEntry<ID, T>>.idOfMaxBy(
+inline fun <ID : Any, T, R : Comparable<R>> CollapseNeighbors<FieldEntry<ID, T>>.idOfMaxBy(
     crossinline selector: (FieldEntry<ID, T>) -> R,
 ): ID? = maxBy(selector)?.id
 
@@ -35,7 +35,7 @@ inline fun <ID : Any, T, R : Comparable<R>> CollapsePeers<FieldEntry<ID, T>>.idO
  * @param comparator the comparator used to determine ordering between entries.
  * @return the ID of the peer entry with the greatest ordering, or `null` if none.
  */
-fun <ID : Any, T> CollapsePeers<FieldEntry<ID, T>>.idOfMaxWith(comparator: Comparator<FieldEntry<ID, T>>): ID? =
+fun <ID : Any, T> CollapseNeighbors<FieldEntry<ID, T>>.idOfMaxWith(comparator: Comparator<FieldEntry<ID, T>>): ID? =
     maxWith(comparator)?.id
 
 /**
@@ -43,7 +43,7 @@ fun <ID : Any, T> CollapsePeers<FieldEntry<ID, T>>.idOfMaxWith(comparator: Compa
  *
  * @return the ID of the peer entry with the lowest value, or `null` if none.
  */
-fun <ID : Any, T : Comparable<T>> CollapsePeers<FieldEntry<ID, T>>.idOfMin(): ID? = minBy { it.value }?.id
+fun <ID : Any, T : Comparable<T>> CollapseNeighbors<FieldEntry<ID, T>>.idOfMin(): ID? = minBy { it.value }?.id
 
 /**
  * Returns the ID of the peer entry (excluding local) that yields the smallest value according to the given [selector].
@@ -51,7 +51,7 @@ fun <ID : Any, T : Comparable<T>> CollapsePeers<FieldEntry<ID, T>>.idOfMin(): ID
  * @param selector a function that maps each peer [FieldEntry] to a comparable value.
  * @return the ID of the peer entry with the lowest value, or `null` if none.
  */
-inline fun <ID : Any, T, R : Comparable<R>> CollapsePeers<FieldEntry<ID, T>>.idOfMinBy(
+inline fun <ID : Any, T, R : Comparable<R>> CollapseNeighbors<FieldEntry<ID, T>>.idOfMinBy(
     crossinline selector: (FieldEntry<ID, T>) -> R,
 ): ID? = minBy(selector)?.id
 
@@ -62,7 +62,7 @@ inline fun <ID : Any, T, R : Comparable<R>> CollapsePeers<FieldEntry<ID, T>>.idO
  * @param comparator the comparator used to determine ordering between entries.
  * @return the ID of the peer entry with the smallest ordering, or `null` if none.
  */
-fun <ID : Any, T> CollapsePeers<FieldEntry<ID, T>>.idOfMinWith(comparator: Comparator<FieldEntry<ID, T>>): ID? =
+fun <ID : Any, T> CollapseNeighbors<FieldEntry<ID, T>>.idOfMinWith(comparator: Comparator<FieldEntry<ID, T>>): ID? =
     minWith(comparator)?.id
 
 /**
@@ -71,7 +71,7 @@ fun <ID : Any, T> CollapsePeers<FieldEntry<ID, T>>.idOfMinWith(comparator: Compa
  * @param selector a function that maps each peer [FieldEntry] to a comparable value.
  * @return the value of the peer entry with the highest score, or `null` if none.
  */
-inline fun <ID : Any, T, R : Comparable<R>> CollapsePeers<FieldEntry<ID, T>>.valueOfMaxBy(
+inline fun <ID : Any, T, R : Comparable<R>> CollapseNeighbors<FieldEntry<ID, T>>.valueOfMaxBy(
     crossinline selector: (FieldEntry<ID, T>) -> R,
 ): T? = maxBy(selector)?.value
 
@@ -81,7 +81,7 @@ inline fun <ID : Any, T, R : Comparable<R>> CollapsePeers<FieldEntry<ID, T>>.val
  * @param comparator the comparator used to determine ordering between entries.
  * @return the value of the peer entry with the greatest ordering, or `null` if none.
  */
-fun <ID : Any, T> CollapsePeers<FieldEntry<ID, T>>.valueOfMaxWith(comparator: Comparator<FieldEntry<ID, T>>): T? =
+fun <ID : Any, T> CollapseNeighbors<FieldEntry<ID, T>>.valueOfMaxWith(comparator: Comparator<FieldEntry<ID, T>>): T? =
     maxWith(comparator)?.value
 
 /**
@@ -90,7 +90,7 @@ fun <ID : Any, T> CollapsePeers<FieldEntry<ID, T>>.valueOfMaxWith(comparator: Co
  * @param selector a function that maps each peer [FieldEntry] to a comparable value.
  * @return the value of the peer entry with the lowest score, or `null` if none.
  */
-inline fun <ID : Any, T, R : Comparable<R>> CollapsePeers<FieldEntry<ID, T>>.valueOfMinBy(
+inline fun <ID : Any, T, R : Comparable<R>> CollapseNeighbors<FieldEntry<ID, T>>.valueOfMinBy(
     crossinline selector: (FieldEntry<ID, T>) -> R,
 ): T? = minBy(selector)?.value
 
@@ -100,5 +100,5 @@ inline fun <ID : Any, T, R : Comparable<R>> CollapsePeers<FieldEntry<ID, T>>.val
  * @param comparator the comparator used to determine ordering between entries.
  * @return the value of the peer entry with the smallest ordering, or `null` if none.
  */
-fun <ID : Any, T> CollapsePeers<FieldEntry<ID, T>>.valueOfMinWith(comparator: Comparator<FieldEntry<ID, T>>): T? =
+fun <ID : Any, T> CollapseNeighbors<FieldEntry<ID, T>>.valueOfMinWith(comparator: Comparator<FieldEntry<ID, T>>): T? =
     minWith(comparator)?.value

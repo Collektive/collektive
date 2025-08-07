@@ -10,8 +10,8 @@ package it.unibo.collektive.stdlib.collapse
 
 import arrow.core.identity
 import it.unibo.collektive.aggregate.Collapse
-import it.unibo.collektive.aggregate.CollapsePeers
-import it.unibo.collektive.aggregate.CollapseWithSelf
+import it.unibo.collektive.aggregate.CollapseAll
+import it.unibo.collektive.aggregate.CollapseNeighbors
 
 /**
  * Returns the largest element in the collapsed field, including the local value.
@@ -20,7 +20,7 @@ import it.unibo.collektive.aggregate.CollapseWithSelf
  *
  * @return the maximal element present in the field.
  */
-fun <T : Comparable<T>> CollapseWithSelf<T>.max(): T = maxBy(::identity)
+fun <T : Comparable<T>> CollapseAll<T>.max(): T = maxBy(::identity)
 
 /**
  * Returns the largest peer element in the collapsed field, excluding the local value.
@@ -30,7 +30,7 @@ fun <T : Comparable<T>> CollapseWithSelf<T>.max(): T = maxBy(::identity)
  *
  * @return the maximal peer element, or `null` if none exist.
  */
-fun <T : Comparable<T>> CollapsePeers<T>.max(): T? = maxBy(::identity)
+fun <T : Comparable<T>> CollapseNeighbors<T>.max(): T? = maxBy(::identity)
 
 /**
  * Returns the smallest element in the collapsed field, including the local value.
@@ -39,7 +39,7 @@ fun <T : Comparable<T>> CollapsePeers<T>.max(): T? = maxBy(::identity)
  *
  * @return the minimal element present in the field.
  */
-fun <T : Comparable<T>> CollapseWithSelf<T>.min(): T = minBy(::identity)
+fun <T : Comparable<T>> CollapseAll<T>.min(): T = minBy(::identity)
 
 /**
  * Returns the smallest peer element in the collapsed field, excluding the local value.
@@ -49,7 +49,7 @@ fun <T : Comparable<T>> CollapseWithSelf<T>.min(): T = minBy(::identity)
  *
  * @return the minimal peer element, or `null` if none exist.
  */
-fun <T : Comparable<T>> CollapsePeers<T>.min(): T? = minBy(::identity)
+fun <T : Comparable<T>> CollapseNeighbors<T>.min(): T? = minBy(::identity)
 
 /**
  * Returns the maximum between all values in the collapsed field and the provided [base].

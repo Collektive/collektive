@@ -11,7 +11,7 @@ package it.unibo.collektive.stdlib.collapse
 import arrow.core.Option
 import arrow.core.Predicate
 import it.unibo.collektive.aggregate.Collapse
-import it.unibo.collektive.aggregate.CollapsePeers
+import it.unibo.collektive.aggregate.CollapseNeighbors
 import it.unibo.collektive.stdlib.util.Accumulator
 
 /**
@@ -41,15 +41,6 @@ inline fun <T> Collapse<T>.all(crossinline predicate: Predicate<T>): Boolean = s
  * @return `true` if at least one element satisfies [predicate], `false` otherwise.
  */
 inline fun <T> Collapse<T>.any(crossinline predicate: Predicate<T>): Boolean = sequence.any(predicate)
-
-/**
- * Counts the total number of elements in the collapsed field.
- *
- * This includes local and peer contributions according to how the underlying [Collapse] was constructed.
- *
- * @return the number of elements.
- */
-fun <T> Collapse<T>.count(): Int = list.size
 
 /**
  * Counts how many elements in the collapsed field satisfy the given [predicate].
@@ -83,7 +74,8 @@ inline fun <Destination, T> Collapse<T>.fold(
  * @param comparator defines how two elements are compared to determine the maximum.
  * @return an [Option] containing the maximal peer element, or empty if no peers exist.
  */
-fun <T> CollapsePeers<T>.maxWith(comparator: Comparator<in T>): Option<T?> = reduce { a, b -> maxOf(a, b, comparator) }
+fun <T> CollapseNeighbors<T>.maxWith(comparator: Comparator<in T>): Option<T?> =
+    reduce { a, b -> maxOf(a, b, comparator) }
 
 /**
  * Returns `true` if no element in the collapsed field satisfies the given [predicate].

@@ -8,7 +8,7 @@
 
 package it.unibo.collektive.stdlib.collapse
 
-import it.unibo.collektive.aggregate.CollapseWithSelf
+import it.unibo.collektive.aggregate.CollapseAll
 import it.unibo.collektive.stdlib.util.Reducer
 
 /**
@@ -21,8 +21,7 @@ import it.unibo.collektive.stdlib.util.Reducer
  * @param selector a function that maps each entry to a comparable value.
  * @return the entry with the highest value as determined by [selector].
  */
-inline fun <T, R : Comparable<R>> CollapseWithSelf<T>.maxBy(crossinline selector: (T) -> R): T =
-    maxWith(compareBy(selector))
+inline fun <T, R : Comparable<R>> CollapseAll<T>.maxBy(crossinline selector: (T) -> R): T = maxWith(compareBy(selector))
 
 /**
  * Returns the entry that yields the largest value according to the given [comparator],
@@ -33,7 +32,7 @@ inline fun <T, R : Comparable<R>> CollapseWithSelf<T>.maxBy(crossinline selector
  * @param comparator the comparator used to determine ordering between entries.
  * @return the entry with the greatest value.
  */
-fun <T> CollapseWithSelf<T>.maxWith(comparator: Comparator<in T>): T = sequence.maxWith(comparator)
+fun <T> CollapseAll<T>.maxWith(comparator: Comparator<in T>): T = sequence.maxWith(comparator)
 
 /**
  * Returns the entry that yields the smallest value according to the given [selector],
@@ -45,8 +44,7 @@ fun <T> CollapseWithSelf<T>.maxWith(comparator: Comparator<in T>): T = sequence.
  * @param selector a function that maps each entry to a comparable value.
  * @return the entry with the lowest value as determined by [selector].
  */
-inline fun <T, R : Comparable<R>> CollapseWithSelf<T>.minBy(crossinline selector: (T) -> R): T =
-    minWith(compareBy(selector))
+inline fun <T, R : Comparable<R>> CollapseAll<T>.minBy(crossinline selector: (T) -> R): T = minWith(compareBy(selector))
 
 /**
  * Returns the entry that yields the smallest value according to the given [comparator],
@@ -57,7 +55,7 @@ inline fun <T, R : Comparable<R>> CollapseWithSelf<T>.minBy(crossinline selector
  * @param comparator the comparator used to determine ordering between entries.
  * @return the entry with the smallest value.
  */
-fun <T> CollapseWithSelf<T>.minWith(comparator: Comparator<in T>): T = sequence.minWith(comparator)
+fun <T> CollapseAll<T>.minWith(comparator: Comparator<in T>): T = sequence.minWith(comparator)
 
 /**
  * Reduces the elements in this collapse (which includes the local element and peers) into a single value
@@ -68,4 +66,4 @@ fun <T> CollapseWithSelf<T>.minWith(comparator: Comparator<in T>): T = sequence.
  * @param reducer a binary operation that combines two values of type T into one.
  * @return the accumulated result of reducing all elements.
  */
-inline fun <T> CollapseWithSelf<T>.reduce(crossinline reducer: Reducer<T>): T = sequence.reduce(reducer)
+inline fun <T> CollapseAll<T>.reduce(crossinline reducer: Reducer<T>): T = sequence.reduce(reducer)

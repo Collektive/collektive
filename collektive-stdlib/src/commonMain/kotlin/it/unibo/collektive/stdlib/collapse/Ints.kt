@@ -9,19 +9,19 @@
 package it.unibo.collektive.stdlib.collapse
 
 import it.unibo.collektive.aggregate.Collapse
-import it.unibo.collektive.aggregate.CollapsePeers
+import it.unibo.collektive.aggregate.CollapseNeighbors
 
 /**
  * Returns the maximum of all values in this collapse, or [Int.MIN_VALUE] if the collapse is an empty
- * [it.unibo.collektive.aggregate.CollapsePeers].
+ * [it.unibo.collektive.aggregate.CollapseNeighbors].
  */
-fun CollapsePeers<Int>.max(): Int = max(Int.MIN_VALUE)
+fun CollapseNeighbors<Int>.max(): Int = max(Int.MIN_VALUE)
 
 /**
  * Returns the minimum of all values in this collapse, or [Int.MAX_VALUE] if the collapse is an empty
- * [it.unibo.collektive.aggregate.CollapsePeers].
+ * [it.unibo.collektive.aggregate.CollapseNeighbors].
  */
-fun CollapsePeers<Int>.min(): Int = min(Int.MAX_VALUE)
+fun CollapseNeighbors<Int>.min(): Int = min(Int.MAX_VALUE)
 
 /**
  * Returns the product of all values in this collapse.

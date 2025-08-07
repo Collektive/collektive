@@ -11,7 +11,7 @@ package it.unibo.collektive.stdlib.collapse
 import arrow.core.Option
 import arrow.core.none
 import arrow.core.some
-import it.unibo.collektive.aggregate.CollapsePeers
+import it.unibo.collektive.aggregate.CollapseNeighbors
 import it.unibo.collektive.stdlib.util.Reducer
 
 /**
@@ -23,7 +23,7 @@ import it.unibo.collektive.stdlib.util.Reducer
  * @param selector a function that maps each peer entry to a comparable value.
  * @return the peer entry with the highest value, or `null` if none.
  */
-inline fun <T : Any, R : Comparable<R>> CollapsePeers<T>.maxBy(crossinline selector: (T) -> R): T? =
+inline fun <T : Any, R : Comparable<R>> CollapseNeighbors<T>.maxBy(crossinline selector: (T) -> R): T? =
     maxWith(compareBy(selector))
 
 /**
@@ -36,7 +36,7 @@ inline fun <T : Any, R : Comparable<R>> CollapsePeers<T>.maxBy(crossinline selec
  * @param selector a function that maps each peer entry to a comparable value.
  * @return an [Option] containing the peer entry with the highest value, or empty if none.
  */
-inline fun <T, R : Comparable<R>> CollapsePeers<T>.maxBy(crossinline selector: (T) -> R): Option<T?> =
+inline fun <T, R : Comparable<R>> CollapseNeighbors<T>.maxBy(crossinline selector: (T) -> R): Option<T?> =
     maxWith(compareBy(selector))
 
 /**
@@ -48,7 +48,7 @@ inline fun <T, R : Comparable<R>> CollapsePeers<T>.maxBy(crossinline selector: (
  * @param comparator the comparator used to determine ordering between entries.
  * @return the peer entry with the greatest value, or `null` if none.
  */
-fun <T : Any> CollapsePeers<T>.maxWith(comparator: Comparator<in T>): T? = sequence.maxWithOrNull(comparator)
+fun <T : Any> CollapseNeighbors<T>.maxWith(comparator: Comparator<in T>): T? = sequence.maxWithOrNull(comparator)
 
 /**
  * Returns the peer entry (excluding local) that yields the smallest value according to the given [selector].
@@ -59,7 +59,7 @@ fun <T : Any> CollapsePeers<T>.maxWith(comparator: Comparator<in T>): T? = seque
  * @param selector a function that maps each peer entry to a comparable value.
  * @return the peer entry with the lowest value, or `null` if none.
  */
-inline fun <T : Any, R : Comparable<R>> CollapsePeers<T>.minBy(crossinline selector: (T) -> R): T? =
+inline fun <T : Any, R : Comparable<R>> CollapseNeighbors<T>.minBy(crossinline selector: (T) -> R): T? =
     minWith(compareBy(selector))
 
 /**
@@ -72,7 +72,7 @@ inline fun <T : Any, R : Comparable<R>> CollapsePeers<T>.minBy(crossinline selec
  * @param selector a function that maps each peer entry to a comparable value.
  * @return an [Option] containing the peer entry with the lowest value, or empty if none.
  */
-inline fun <T, R : Comparable<R>> CollapsePeers<T>.minBy(crossinline selector: (T) -> R): Option<T?> =
+inline fun <T, R : Comparable<R>> CollapseNeighbors<T>.minBy(crossinline selector: (T) -> R): Option<T?> =
     minWith(compareBy(selector))
 
 /**
@@ -84,7 +84,7 @@ inline fun <T, R : Comparable<R>> CollapsePeers<T>.minBy(crossinline selector: (
  * @param comparator the comparator used to determine ordering between entries.
  * @return the peer entry with the smallest value, or `null` if none.
  */
-fun <T : Any> CollapsePeers<T>.minWith(comparator: Comparator<in T>): T? = sequence.minWithOrNull(comparator)
+fun <T : Any> CollapseNeighbors<T>.minWith(comparator: Comparator<in T>): T? = sequence.minWithOrNull(comparator)
 
 /**
  * Returns the peer entry (excluding local) that yields the smallest value according to the given [comparator],
@@ -95,7 +95,8 @@ fun <T : Any> CollapsePeers<T>.minWith(comparator: Comparator<in T>): T? = seque
  * @param comparator the comparator used to determine ordering between entries.
  * @return an [Option] containing the peer entry with the smallest value, or empty if none.
  */
-fun <T> CollapsePeers<T>.minWith(comparator: Comparator<in T>): Option<T?> = reduce { a, b -> minOf(a, b, comparator) }
+fun <T> CollapseNeighbors<T>.minWith(comparator: Comparator<in T>): Option<T?> =
+    reduce { a, b -> minOf(a, b, comparator) }
 
 /**
  * Reduces the elements in this collapse (which excludes the local element, i.e., only peers) into a single value
@@ -106,12 +107,12 @@ fun <T> CollapsePeers<T>.minWith(comparator: Comparator<in T>): Option<T?> = red
  * @param reducer a binary operation that combines two values of type T into one.
  * @return the accumulated result of reducing the peer values, or `null` if the collapse is empty.
  */
-inline fun <T : Any> CollapsePeers<T>.reduce(crossinline reducer: Reducer<T>): T? = sequence.reduceOrNull(reducer)
+inline fun <T : Any> CollapseNeighbors<T>.reduce(crossinline reducer: Reducer<T>): T? = sequence.reduceOrNull(reducer)
 
 /**
  * Performs a reduction over the peer values in a collapsed computational field.
  *
- * A [CollapsePeers] represents the non-local portion of an aggregate computational field
+ * A [CollapseNeighbors] represents the non-local portion of an aggregate computational field
  * turned into a local Kotlin collection. This function applies the provided binary [reducer]
  * to combine all peer elements into a single value, using the standard left-associative
  * reduction semantics of `Sequence.reduce`.
@@ -124,7 +125,7 @@ inline fun <T : Any> CollapsePeers<T>.reduce(crossinline reducer: Reducer<T>): T
  * @param reducer a function that combines two peer values into one.
  * @return an [Option] containing the reduced value if any peers exist, or `none()` if the peer set is empty.
  */
-inline fun <T> CollapsePeers<T>.reduce(crossinline reducer: Reducer<T>): Option<T?> = when {
+inline fun <T> CollapseNeighbors<T>.reduce(crossinline reducer: Reducer<T>): Option<T?> = when {
     list.isEmpty() -> none()
     else -> sequence.reduce(reducer).some()
 }

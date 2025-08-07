@@ -35,7 +35,7 @@ sealed interface Field<ID : Any, out T> {
      * Provides access to the combined list/set/sequence of self + peers, e.g., for operations that
      * need to reason about the entire neighborhood including the local node.
      */
-    val all: CollapseWithSelf<FieldEntry<ID, T>>
+    val all: CollapseAll<FieldEntry<ID, T>>
 
     /**
      * The [Aggregate] execution context this field belongs to.
@@ -46,7 +46,7 @@ sealed interface Field<ID : Any, out T> {
      * A collapsing view over the field entries that excludes the local entry, i.e., only peers.
      * Provides access to the neighborhood without the local node, for computations scoped to neighbors.
      */
-    val neighbors: CollapsePeers<FieldEntry<ID, T>>
+    val neighbors: CollapseNeighbors<FieldEntry<ID, T>>
 
     /**
      * The entry representing the local node in the field.
@@ -347,9 +347,9 @@ private class ArrayBasedField<ID : Any, T>(
             .apply { put(localId, localValue) }
     }
 
-    override val neighbors: CollapsePeers<FieldEntry<ID, T>> get() = ListBackedCollapse(others)
+    override val neighbors: CollapseNeighbors<FieldEntry<ID, T>> get() = ListBackedCollapse(others)
 
-    override val all: CollapseWithSelf<FieldEntry<ID, T>>
+    override val all: CollapseAll<FieldEntry<ID, T>>
         get() = SequenceBackedCollapse(others.asSequence() + local)
 
     override fun <R> mapNeighbors(transform: (FieldEntry<ID, T>) -> R): Sequence<FieldEntry<ID, R>> =
@@ -366,9 +366,9 @@ private class SequenceBasedField<ID : Any, T>(
     private val others: Sequence<FieldEntry<ID, T>>,
 ) : AbstractField<ID, T>(context, localId, localValue) {
 
-    override val all: CollapseWithSelf<FieldEntry<ID, T>> get() = SequenceBackedCollapse(others + local)
+    override val all: CollapseAll<FieldEntry<ID, T>> get() = SequenceBackedCollapse(others + local)
 
-    override val neighbors: CollapsePeers<FieldEntry<ID, T>> get() = SequenceBackedCollapse(others)
+    override val neighbors: CollapseNeighbors<FieldEntry<ID, T>> get() = SequenceBackedCollapse(others)
 
     override val asMap: Map<ID, T> by lazy { (others + local).toMap() }
 
@@ -385,14 +385,14 @@ internal class ConstantField<ID : Any, T>(
     val neighborsIDs: Sequence<ID>,
 ) : AbstractField<ID, T>(context, localId, localValue) {
 
-    override val all: CollapseWithSelf<FieldEntry<ID, T>> get() =
+    override val all: CollapseAll<FieldEntry<ID, T>> get() =
         SequenceBackedCollapse(neighborsAsSequence() + local)
 
     override val asMap: Map<ID, T> by lazy {
         (neighborsIDs + localId).associateWith { localValue }
     }
 
-    override val neighbors: CollapsePeers<FieldEntry<ID, T>> get() =
+    override val neighbors: CollapseNeighbors<FieldEntry<ID, T>> get() =
         SequenceBackedCollapse(neighborsAsSequence())
 
     override val stringRepresentation: String by lazy {
@@ -409,8 +409,8 @@ internal class ConstantField<ID : Any, T>(
 internal class PointwiseField<ID : Any, T>(context: Aggregate<ID>, localId: ID, localValue: T) :
     AbstractField<ID, T>(context, localId, localValue) {
 
-    override val all: CollapseWithSelf<FieldEntry<ID, T>>
-        get() = object : CollapseWithSelf<FieldEntry<ID, T>> {
+    override val all: CollapseAll<FieldEntry<ID, T>>
+        get() = object : CollapseAll<FieldEntry<ID, T>> {
             override val list get() = listOf(local)
             override val set get() = setOf(local)
             override val sequence get() = sequenceOf(local)
@@ -419,8 +419,8 @@ internal class PointwiseField<ID : Any, T>(context: Aggregate<ID>, localId: ID, 
 
     override val asMap: Map<ID, T> get() = mapOf(local.pair)
 
-    override val neighbors: CollapsePeers<FieldEntry<ID, T>>
-        get() = object : CollapsePeers<FieldEntry<ID, T>> {
+    override val neighbors: CollapseNeighbors<FieldEntry<ID, T>>
+        get() = object : CollapseNeighbors<FieldEntry<ID, T>> {
             override val list get() = emptyList<FieldEntry<ID, T>>()
             override val set get() = emptySet<FieldEntry<ID, T>>()
             override val sequence get() = emptySequence<FieldEntry<ID, T>>()

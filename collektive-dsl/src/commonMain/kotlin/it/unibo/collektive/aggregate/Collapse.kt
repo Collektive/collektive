@@ -28,18 +28,18 @@ sealed interface Collapse<out E> {
  *
  * @param E the element type contained in the collapse.
  */
-interface CollapsePeers<out E> : Collapse<E>
+interface CollapseNeighbors<out E> : Collapse<E>
 
 /**
  * A [Collapse] that include the local element in addition to peers.
  *
  * @param E the element type contained in the collapse.
  */
-interface CollapseWithSelf<out E> : Collapse<E>
+interface CollapseAll<out E> : Collapse<E>
 
 private interface AnyCollapse<out E> :
-    CollapsePeers<E>,
-    CollapseWithSelf<E>
+    CollapseNeighbors<E>,
+    CollapseAll<E>
 
 /**
  * Checks if the given [element] is present in this collapse.
@@ -59,32 +59,32 @@ operator fun <T> Collapse<T>.contains(element: T): Boolean = set.contains(elemen
 fun <ID : Any, T> Collapse<FieldEntry<ID, T>>.toMap(): Map<ID, T> = sequence.associate { it.pair }
 
 /**
- * Returns a collapse containing only the IDs from this [CollapseWithSelf].
+ * Returns a collapse containing only the IDs from this [CollapseAll].
  *
- * @return a collapse over the IDs present in the original [CollapseWithSelf].
+ * @return a collapse over the IDs present in the original [CollapseAll].
  */
-val <ID : Any> CollapseWithSelf<FieldEntry<ID, *>>.ids: CollapseWithSelf<ID> get() = sequence.ids()
+val <ID : Any> CollapseAll<FieldEntry<ID, *>>.ids: CollapseAll<ID> get() = sequence.ids()
 
 /**
- * Returns a collapse containing only the IDs from this [CollapsePeers].
+ * Returns a collapse containing only the IDs from this [CollapseNeighbors].
  *
- * @return a collapse over the IDs present in the original [CollapsePeers].
+ * @return a collapse over the IDs present in the original [CollapseNeighbors].
  */
-val <ID : Any> CollapsePeers<FieldEntry<ID, *>>.ids: CollapsePeers<ID> get() = sequence.ids()
+val <ID : Any> CollapseNeighbors<FieldEntry<ID, *>>.ids: CollapseNeighbors<ID> get() = sequence.ids()
 
 /**
- * Returns a collapse containing only the values from this [CollapseWithSelf].
+ * Returns a collapse containing only the values from this [CollapseAll].
  *
- * @return a collapse over the values present in the original [CollapseWithSelf].
+ * @return a collapse over the values present in the original [CollapseAll].
  */
-val <T> CollapseWithSelf<FieldEntry<*, T>>.values: CollapseWithSelf<T> get() = sequence.values()
+val <T> CollapseAll<FieldEntry<*, T>>.values: CollapseAll<T> get() = sequence.values()
 
 /**
- * Returns a collapse containing only the values from this [CollapsePeers].
+ * Returns a collapse containing only the values from this [CollapseNeighbors].
  *
- * @return a collapse over the values present in the original [CollapsePeers].
+ * @return a collapse over the values present in the original [CollapseNeighbors].
  */
-val <T> CollapsePeers<FieldEntry<*, T>>.values: CollapsePeers<T> get() = sequence.values()
+val <T> CollapseNeighbors<FieldEntry<*, T>>.values: CollapseNeighbors<T> get() = sequence.values()
 
 internal open class ListBackedCollapse<out T>(override val list: List<T>) : AnyCollapse<T> {
     override val set by lazy { list.toSet() }
