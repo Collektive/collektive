@@ -156,8 +156,8 @@ class FieldOpsTest {
 
     @Test
     fun `The string representation of a field should contain the local id and the local value and the neighbors`() {
-        assertEquals("ϕ(localId=0, localValue=localVal, neighbors={})", emptyField.toString())
-        assertEquals("ϕ(localId=0, localValue=0, neighbors={1=10, 2=20})", field.toString())
-        assertEquals("ϕ(localId=0, localValue=0, neighbors={1=10, 2=20, 3=15})", fulfilledField.toString())
+        assertEquals("ϕ(pointwise: 0=localVal)", emptyField.toString())
+        assertEquals("ϕ(local: 0=0, neighbors: {1=10, 2=20})", field.toString())
+        assertEquals("ϕ(local: 0=0, neighbors: {1=10, 2=20, 3=15})", fulfilledField.toString())
     }
 }
