@@ -41,7 +41,7 @@ inline fun <reified ID : Any, reified Data, reified Potential : Comparable<Poten
     selectParent: Comparator<FieldEntry<ID, Potential>> = defaultComparator(),
     crossinline accumulateData: Reducer<Data>,
 ): Data = exchanging<ID, Maybe<Data>, Data>(Maybe.none) { data: Field<ID, Maybe<Data>> ->
-    val localValue: Maybe<Data> = data.excludeSelf.values
+    val localValue: Maybe<Data> = data.neighbors.values
         .fold(some(local)) { current, new -> current.merge(new, accumulateData) }
     check(localValue.option is Some) {
         "Bug in the implementation of convergeCast. A reduction using as base value ${some(local)} produced $None"
@@ -224,7 +224,7 @@ internal inline fun <reified ID : Any, reified P : Comparable<P>> defaultCompara
 inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggregate<ID>.findParent(
     potential: Field<ID, Potential>,
     comparator: Comparator<FieldEntry<ID, Potential>> = defaultComparator(),
-): ID = potential.includeSelf.idOfMinWith(comparator)
+): ID = potential.all.idOfMinWith(comparator)
 
 /**
  * Find the best neighbor of the current device along a [potential] field,
@@ -249,7 +249,7 @@ inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggrega
 inline fun <reified ID : Any, reified Potential : Comparable<Potential>> Aggregate<ID>.findParents(
     potential: Field<ID, Potential>,
     noinline isParent: Predicate<FieldEntry<ID, Potential>> = { potential.local.value > it.value },
-): Set<ID> = potential.excludeSelf.sequence.filter(isParent).ids().toSet()
+): Set<ID> = potential.neighbors.sequence.filter(isParent).ids().toSet()
 
 /**
  * Find the parents of the current device along a [potential] field.

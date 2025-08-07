@@ -45,7 +45,7 @@ inline fun <reified ID, reified Distance, reified Strength> Aggregate<ID>.bounde
             // Update the distance of the candidacies
             candidacy.copy(distance = accumulateDistance(candidacy.distance, distance))
         }
-        localCandidates.excludeSelf.values.fold(local) { current, next ->
+        localCandidates.neighbors.values.fold(local) { current, next ->
             when {
                 next.candidate == localId -> current // I have better information about myself
                 next.distance > bound -> current // This candidate is past the bound

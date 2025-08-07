@@ -84,7 +84,7 @@ internal class AggregateContext<ID : Any>(
                     when (it.toSend) {
                         is ConstantField<ID, Shared> -> emptyMap()
                         else ->
-                            it.toSend.excludeSelf.sequence
+                            it.toSend.neighbors.sequence
                                 .filterNot { (_, value) -> value == it.toSend.local.value }
                                 .toMap()
                     },

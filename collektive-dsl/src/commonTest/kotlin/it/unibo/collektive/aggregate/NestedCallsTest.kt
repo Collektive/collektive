@@ -26,7 +26,7 @@ class NestedCallsTest {
     fun Aggregate<Int>.bar(): Double = share(POSITIVE_INFINITY) { dist ->
         when (localId) {
             0 -> 0.0
-            else -> (foo(localId) + dist).excludeSelf.values.min()
+            else -> (foo(localId) + dist).neighbors.values.min()
         }
     }
 

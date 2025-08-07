@@ -20,6 +20,6 @@ fun Aggregate<Int>.gradient(source: Boolean): Double = share(POSITIVE_INFINITY) 
     val dist = mapNeighborhood { 1.0 }
     when {
         source -> 0.0
-        else -> (it + dist).excludeSelf.values.min()
+        else -> (it + dist).neighbors.values.min()
     }
 }

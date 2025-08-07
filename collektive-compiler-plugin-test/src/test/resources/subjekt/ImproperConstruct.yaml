@@ -15,45 +15,45 @@ parameters:
     values:
       - |-
         evolve(0) { value ->
-            neighboring(value).excludeSelf.values.max(0)
+            neighboring(value).neighbors.values.max(0)
         }
       - |-
         evolving(0) { value ->
-            neighboring(value).excludeSelf.values.max(0).yielding { "test" }
+            neighboring(value).neighbors.values.max(0).yielding { "test" }
         }
   - name: IMPROPER_CONSTRUCT_IMPLICIT
     values:
       - |-
         evolve(0) {
-            neighboring(it).excludeSelf.values.max(0)
+            neighboring(it).neighbors.values.max(0)
         }
       - |-
         evolving(0) {
-            neighboring(it).excludeSelf.values.max(0).yielding { "test" }
+            neighboring(it).neighbors.values.max(0).yielding { "test" }
         }
   - name: IMPROPER_CONSTRUCT_DELEGATED_FIELD_EXPLICIT
     values:
       - |-
         evolve(0) { value ->
             val newValue = value + 1
-            neighboring(newValue).excludeSelf.values.max(0)
+            neighboring(newValue).neighbors.values.max(0)
         }
       - |-
         evolving(0) { value ->
             val newValue = value + 1
-            neighboring(newValue).excludeSelf.values.max(0).yielding { "test" }
+            neighboring(newValue).neighbors.values.max(0).yielding { "test" }
         }
   - name: IMPROPER_CONSTRUCT_DELEGATED_FIELD_IMPLICIT
     values:
       - |-
         evolve(0) {
             val newValue = it + 1
-            neighboring(newValue).excludeSelf.values.max(0)
+            neighboring(newValue).neighbors.values.max(0)
         }
       - |-
         evolving(0) { 
             val newValue = it + 1
-            neighboring(newValue).excludeSelf.values.max(0).yielding { "test" }
+            neighboring(newValue).neighbors.values.max(0).yielding { "test" }
         }
   - name: PROPER_CONSTRUCT_EXPLICIT
     values:

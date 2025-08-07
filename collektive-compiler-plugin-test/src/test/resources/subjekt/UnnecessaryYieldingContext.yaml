@@ -28,7 +28,7 @@ parameters:
         }
       - |-
         sharing(initial) {
-          it.excludeSelf.values.max(initial).yielding { it.excludeSelf.values.max(initial) }
+          it.neighbors.values.max(initial).yielding { it.neighbors.values.max(initial) }
         }
 
   - name: UNNECESSARY_YIELDING_COMPLEX
@@ -47,7 +47,7 @@ parameters:
         }
       - |-
         sharing(initial) {
-          val maxValue = it.excludeSelf.values.max(0)
+          val maxValue = it.neighbors.values.max(0)
           floor(maxValue.toDouble() / 2).toInt().yielding { floor(maxValue.toDouble() / 2).toInt() }
         }
 
@@ -63,7 +63,7 @@ parameters:
         }
       - |-
         sharing(initial) {
-          val maxValue = it.excludeSelf.values.max(0)
+          val maxValue = it.neighbors.values.max(0)
           maxValue.yielding { maxValue + 1 }
         }
 
@@ -79,7 +79,7 @@ parameters:
         }
       - |-
         sharing(initial) {
-          val maxValue = it.excludeSelf.values.max(0)
+          val maxValue = it.neighbors.values.max(0)
           maxValue.yielding { "Test${maxValue + 1}" }
         }  
 

@@ -28,12 +28,12 @@ class FieldManipulationTest {
     fun `get the min value including self`() {
         aggregate(id0) {
             val sharedField = neighboring(doubleOf(3))
-            assertEquals(6, sharedField.includeSelf.values.min())
+            assertEquals(6, sharedField.all.values.min())
         }
 
         aggregate(id1) {
             val sharedField = neighboring(doubleOf(2))
-            assertEquals(4, sharedField.includeSelf.values.min())
+            assertEquals(4, sharedField.all.values.min())
         }
     }
 
@@ -45,12 +45,12 @@ class FieldManipulationTest {
 
         aggregate(id0, network0) {
             val sharedField = neighboring(doubleOf(3))
-            assertEquals(6, sharedField.includeSelf.values.max())
+            assertEquals(6, sharedField.all.values.max())
         }
 
         aggregate(id1, network1) {
             val sharedField = neighboring(doubleOf(4))
-            assertEquals(8, sharedField.includeSelf.values.max())
+            assertEquals(8, sharedField.all.values.max())
         }
     }
 
@@ -61,12 +61,12 @@ class FieldManipulationTest {
         val network1 = NetworkImplTest(nm, id1)
 
         aggregate(id0, network0) {
-            val minValue: Int = neighboring(doubleOf(3)).excludeSelf.values.min()
+            val minValue: Int = neighboring(doubleOf(3)).neighbors.values.min()
             assertEquals(Int.MAX_VALUE, minValue)
         }
 
         aggregate(id1, network1) {
-            val minValue: Int = neighboring(doubleOf(2)).excludeSelf.values.min()
+            val minValue: Int = neighboring(doubleOf(2)).neighbors.values.min()
             assertEquals(6, minValue)
         }
     }
@@ -78,12 +78,12 @@ class FieldManipulationTest {
         val network1 = NetworkImplTest(nm, id1)
 
         aggregate(id0, network0) {
-            val maxValue = neighboring(doubleOf(3)).excludeSelf.values.max()
+            val maxValue = neighboring(doubleOf(3)).neighbors.values.max()
             assertEquals(Int.MIN_VALUE, maxValue)
         }
 
         aggregate(id1, network1) {
-            val maxValue = neighboring(doubleOf(2)).excludeSelf.values.max()
+            val maxValue = neighboring(doubleOf(2)).neighbors.values.max()
             assertEquals(6, maxValue)
         }
     }

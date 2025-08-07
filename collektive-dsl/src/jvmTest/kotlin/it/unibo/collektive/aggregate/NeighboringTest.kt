@@ -29,7 +29,7 @@ class NeighboringTest {
     fun `neighboring must produce a field with the local value when no neighbours are present`() {
         aggregate(0) {
             val field = neighboring(1)
-            assertContains(field.includeSelf.toMap().values, 1)
+            assertContains(field.all.toMap().values, 1)
             assertEquals(1, field.local.value)
         }
     }
@@ -38,12 +38,12 @@ class NeighboringTest {
     fun `optimized neighboring must produce a field with the local value when no neighbours are present`() {
         aggregate(0) {
             val field = neighboring(1)
-            assertContains(field.includeSelf.toMap().values, 1)
+            assertContains(field.all.toMap().values, 1)
             assertEquals(1, field.local.value)
         }
     }
 
-    private fun envWithNeihboring1(size: Int) = mooreGrid(size) { _ -> neighboring(1).includeSelf.toMap() }
+    private fun envWithNeihboring1(size: Int) = mooreGrid(size) { _ -> neighboring(1).all.toMap() }
 
     @Test
     fun `neighboring should build a field containing the values of the aligned neighbors`() {
@@ -74,7 +74,7 @@ class NeighboringTest {
     private fun envWithTwoNeighboringOpsInBranch(size: Int, condition: (Int) -> Boolean) = mooreGrid(size) { _ ->
         fun kingBehavior() = neighboring(1)
         fun queenBehavior() = neighboring(2)
-        if (condition(localId)) kingBehavior().includeSelf.toMap() else queenBehavior().includeSelf.toMap()
+        if (condition(localId)) kingBehavior().all.toMap() else queenBehavior().all.toMap()
     }
 
     @Test

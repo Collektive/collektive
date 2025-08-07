@@ -12,7 +12,7 @@ import kotlin.Double.Companion.POSITIVE_INFINITY
 fun Aggregate<Int>.gradient(distanceSensor: CollektiveDevice<*>, source: Boolean): Double =
     share(POSITIVE_INFINITY) {
         val dist = distanceSensor.run { distances() }
-        val throughNeighbor = (it + dist).excludeSelf.values.min()
+        val throughNeighbor = (it + dist).neighbors.values.min()
         when {
             source -> 0.0
             else -> throughNeighbor

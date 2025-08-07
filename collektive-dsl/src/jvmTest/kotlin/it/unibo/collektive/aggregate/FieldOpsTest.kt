@@ -42,25 +42,25 @@ class FieldOpsTest {
 
     @Test
     fun `An empty field should return null or an empty Option when its peer values are reduced`() {
-        assertNull(emptyField.excludeSelf.values.reduce { acc, elem -> acc + elem })
-        assertEquals(none(), emptyFieldOfNullables.excludeSelf.values.reduce { acc, elem -> acc + elem })
+        assertNull(emptyField.neighbors.values.reduce { acc, elem -> acc + elem })
+        assertEquals(none(), emptyFieldOfNullables.neighbors.values.reduce { acc, elem -> acc + elem })
     }
 
     @Test
     fun `An empty field should return the local value when its values are reduced including self`() {
-        assertEquals("localVal", emptyField.includeSelf.values.reduce { acc, elem -> acc + elem })
+        assertEquals("localVal", emptyField.all.values.reduce { acc, elem -> acc + elem })
     }
 
     @Test
     fun `Reduction on peers should exclude the local value`() {
-        assertEquals(30, field.excludeSelf.values.sum())
+        assertEquals(30, field.neighbors.values.sum())
     }
 
     @Test
     fun `Reducing using ids can work as a filter`() {
         assertEquals(
             15,
-            fulfilledField.excludeSelf.reduce { first, (id, value) ->
+            fulfilledField.neighbors.reduce { first, (id, value) ->
                 first.mapValue { if (id % 2 == 0) it + value else it - value }
             }?.value,
         )
@@ -68,12 +68,12 @@ class FieldOpsTest {
 
     @Test
     fun `An empty field should return the self value value when reduced including self`() {
-        assertEquals("localVal", emptyField.includeSelf.values.reduce(String::plus))
+        assertEquals("localVal", emptyField.all.values.reduce(String::plus))
     }
 
     @Test
     fun `A non-empty field should return the accumulated value when is folded excluding self`() {
-        assertEquals(72, field.excludeSelf.values.fold(42) { acc, elem -> acc + elem })
+        assertEquals(72, field.neighbors.values.fold(42) { acc, elem -> acc + elem })
     }
 
     @Test
@@ -118,7 +118,7 @@ class FieldOpsTest {
 
     @Test
     fun `A field should return a sequence containing all the values`() {
-        assertEquals(sequenceOf(0 to 0, 1 to 10, 2 to 20).toSet(), field.includeSelf.sequence.map { it.pair }.toSet())
+        assertEquals(sequenceOf(0 to 0, 1 to 10, 2 to 20).toSet(), field.all.sequence.map { it.pair }.toSet())
     }
 
     @Test

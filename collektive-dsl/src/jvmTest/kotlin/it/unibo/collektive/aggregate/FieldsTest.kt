@@ -23,48 +23,48 @@ class FieldsTest {
 
     @Test
     fun `empty fields contain self`() {
-        assertTrue(10 in emptyField.includeSelf.values)
-        assertFalse(0 in emptyField.includeSelf.values)
-        assertTrue(0 in emptyField.includeSelf.ids)
+        assertTrue(10 in emptyField.all.values)
+        assertFalse(0 in emptyField.all.values)
+        assertTrue(0 in emptyField.all.ids)
     }
 
     @Test
     fun `The all operator on an empty field must return true`() {
-        assertTrue(emptyField.excludeSelf.all { false })
+        assertTrue(emptyField.neighbors.all { false })
     }
 
     @Test
     fun `The all operator including self must return true if the local value matches the predicate`() {
-        assertTrue(emptyField.includeSelf.values.all { it == 10 })
+        assertTrue(emptyField.all.values.all { it == 10 })
     }
 
     @Test
     fun `The all operator including self must return false if the local value does not matches the predicate`() {
-        assertFalse(emptyField.includeSelf.values.all { it == 1 })
+        assertFalse(emptyField.all.values.all { it == 1 })
     }
 
     @Test
     fun `The all operator must return true when all the elements in the field match the predicate`() {
-        assertTrue(fullField.excludeSelf.values.all { it <= 3 })
+        assertTrue(fullField.neighbors.values.all { it <= 3 })
     }
 
     @Test
     fun `The all operator must return false when at least one element in the field does not match the predicate`() {
-        assertFalse(fullField.excludeSelf.values.all { it < 2 })
+        assertFalse(fullField.neighbors.values.all { it < 2 })
     }
 
     @Test
     fun `The none operator must return true when applied to a field with no values`() {
-        assertTrue(emptyField.excludeSelf.values.none { it == 1 })
+        assertTrue(emptyField.neighbors.values.none { it == 1 })
     }
 
     @Test
     fun `The none operator must return true when applied to a field with no values including local value`() {
-        assertTrue(emptyField.includeSelf.values.none { it == 1 })
+        assertTrue(emptyField.all.values.none { it == 1 })
     }
 
     @Test
     fun `The none operator must return false if at least one element in the field matches the predicate`() {
-        assertFalse(fullField.excludeSelf.values.none { it == 2 })
+        assertFalse(fullField.neighbors.values.none { it == 2 })
     }
 }

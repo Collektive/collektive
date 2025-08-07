@@ -24,8 +24,8 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class SharingTest {
-    val findMax: (Field<*, Int>) -> Int = { e -> e.includeSelf.values.max() }
-    val findMin: (Field<*, Int>) -> Int = { e -> e.includeSelf.values.min() }
+    val findMax: (Field<*, Int>) -> Int = { e -> e.all.values.max() }
+    val findMin: (Field<*, Int>) -> Int = { e -> e.all.values.min() }
 
     private fun mooreGridWithProgram(
         size: Int,
@@ -64,7 +64,7 @@ class SharingTest {
         aggregate(1, testNetwork) {
             val result =
                 share(1) {
-                    it.includeSelf.values.max()
+                    it.all.values.max()
                 }
             assertEquals(1, result)
         }
@@ -77,7 +77,7 @@ class SharingTest {
         aggregate(1, testNetwork) {
             val res =
                 sharing(1) {
-                    val min = it.includeSelf.values.min()
+                    val min = it.all.values.min()
                     min.yielding { "A string" }
                 }
             assertEquals("A string", res)
@@ -91,7 +91,7 @@ class SharingTest {
         aggregate(1, testNetwork) {
             val res =
                 sharing(1) {
-                    val min = it.includeSelf.values.min()
+                    val min = it.all.values.min()
                     min.yielding { "Hello".takeIf { min > 1 } }
                 }
             assertNull(res)

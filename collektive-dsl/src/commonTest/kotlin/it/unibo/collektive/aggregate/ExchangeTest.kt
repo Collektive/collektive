@@ -27,7 +27,7 @@ class ExchangeTest {
 
     private fun mooreGridWithIncreaseOrDouble(size: Int) = mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }) { _ ->
         exchange(1) { field ->
-            field.mapValues { field.excludeSelf.values.fold(localId) { acc, value -> acc + value } }
+            field.mapValues { field.neighbors.values.fold(localId) { acc, value -> acc + value } }
         }.local.value
     }.also {
         assertEquals(size * size, it.nodes.size)
@@ -95,7 +95,7 @@ class ExchangeTest {
                         val fieldResult = it + 1
                         fieldResult.yielding { fieldResult.mapValues { value -> "return: $value" } }
                     }
-                assertEquals(mapOf(0 to "return: 2"), xcRes.includeSelf.toMap())
+                assertEquals(mapOf(0 to "return: 2"), xcRes.all.toMap())
             }
         val messages = result.toSend.prepareMessageFor(1).sharedData
         assertEquals(1, messages.size)
@@ -111,7 +111,7 @@ class ExchangeTest {
                         val fieldResult = it + 1
                         fieldResult.yielding { fieldResult.mapValues { value -> value.takeIf { value > 10 } } }
                     }
-                assertEquals(mapOf(0 to null), xcRes.includeSelf.toMap())
+                assertEquals(mapOf(0 to null), xcRes.all.toMap())
             }
         val messages = result.toSend.prepareMessageFor(1).sharedData
         assertEquals(1, messages.size)

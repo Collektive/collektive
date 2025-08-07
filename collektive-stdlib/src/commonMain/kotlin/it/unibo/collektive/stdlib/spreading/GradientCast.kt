@@ -71,7 +71,7 @@ inline fun <reified ID, reified Value, reified Distance> Aggregate<ID>.bellmanFo
             val newData = accumulateData(fromSource, toNeighbor, data)
             totalDistance to newData
         }
-        val bestThroughNeighbors = pathsThroughNeighbors.excludeSelf.valueOfMinBy { it.value.first } ?: topValue
+        val bestThroughNeighbors = pathsThroughNeighbors.neighbors.valueOfMinBy { it.value.first } ?: topValue
         when {
             source -> bottom to local
             else -> bestThroughNeighbors
@@ -178,14 +178,14 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
         val accDistances = neighborData.alignedMapValues(coercedMetric) { path, distance ->
             path?.distance?.let { accumulateDistance(it, distance) }
         }
-        val neighborAccumulatedDistances = accDistances.excludeSelf.toMap()
+        val neighborAccumulatedDistances = accDistances.neighbors.toMap()
         val nonLoopingPaths = neighborData.alignedMap(accDistances, coercedMetric) { id, path, accDist, distance ->
             path?.takeUnless { id == localId }
                 ?.takeUnless { path.length > maxDiameter }
                 ?.takeUnless { localId in path.hops }
                 ?.takeUnless { path.isInvalidViaShortcut(accDist, neighbors.ids.set, neighborAccumulatedDistances) }
                 ?.run { accDist to lazy { update(id, distance, bottom, top, accumulateDistance, accumulateData) } }
-        }.excludeSelf.values.sequence.filterNotNull().sortedBy { it.first }.map { it.second.value }
+        }.neighbors.values.sequence.filterNotNull().sortedBy { it.first }.map { it.second.value }
         val best = when {
             fromLocalSource != null -> sequenceOf(fromLocalSource)
             else -> {

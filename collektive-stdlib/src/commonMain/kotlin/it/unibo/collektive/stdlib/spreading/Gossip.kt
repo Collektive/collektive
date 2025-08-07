@@ -60,7 +60,7 @@ inline fun <reified ID : Comparable<ID>, reified Value> Aggregate<ID>.gossipMax(
     val localGossip = GossipValue<ID, Value>(best = local, local = local)
     val maxGossip = share(localGossip) { gossip ->
         val neighbors = gossip.neighbors
-        val result = gossip.excludeSelf.fold(localGossip) { current, (id, next) ->
+        val result = gossip.neighbors.fold(localGossip) { current, (id, next) ->
             val valid = next.path.asReversed().asSequence()
                 .drop(1)
                 .none { it == localId || it in neighbors.ids.set }
@@ -119,7 +119,7 @@ inline fun <reified ID : Comparable<ID>> Aggregate<ID>.isHappeningAnywhere(condi
 inline fun <ID : Any, reified Value> Aggregate<ID>.nonStabilizingGossip(
     value: Value,
     noinline reducer: Reducer<Value>,
-): Value = share(value) { it.includeSelf.values.reduce(reducer) }
+): Value = share(value) { it.all.values.reduce(reducer) }
 
 /**
  * A **non-self-stabilizing** function returning `true` if at any point in time a certain [condition] happened.
