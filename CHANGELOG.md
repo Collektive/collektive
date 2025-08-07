@@ -1,3 +1,17 @@
+## [26.1.0](https://github.com/Collektive/collektive/compare/26.0.1...26.1.0) (2025-08-07)
+
+### Features
+
+* **stdlib:** add path coherence logic to the gossip functions ([#1045](https://github.com/Collektive/collektive/issues/1045)) ([c7ba791](https://github.com/Collektive/collektive/commit/c7ba791d793caef1292a154fc1d94f10f07c3d8f))
+
+### Dependency updates
+
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.139 ([ec2481d](https://github.com/Collektive/collektive/commit/ec2481d1d664ecea8c0fd55b48a274249b8ee71d))
+
+### Build and continuous integration
+
+* **deps:** update actions/download-artifact action to v5 ([aa29bb4](https://github.com/Collektive/collektive/commit/aa29bb45cf676f429495511760774ddb515274a0))
+
 ## [26.0.1](https://github.com/Collektive/collektive/compare/26.0.0...26.0.1) (2025-08-05)
 
 ### Dependency updates
