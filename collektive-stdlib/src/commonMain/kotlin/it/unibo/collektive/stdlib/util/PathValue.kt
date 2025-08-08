@@ -72,11 +72,7 @@ internal inline fun <reified Distance : Comparable<Distance>, reified ID : Any, 
  */
 @OptIn(DelicateCollektiveApi::class)
 @PublishedApi
-internal inline fun <
-    reified Distance : Comparable<Distance>,
-    reified ID : Any,
-    reified Value,
-    > Aggregate<ID>.nonLoopingPaths(
+internal inline fun <reified Distance, reified ID, reified Value> Aggregate<ID>.nonLoopingPaths(
     neighborData: Field<ID, PathValue<ID, Value, Distance>?>,
     coercedMetric: Field<ID, Distance>,
     maxDiameter: Int,
@@ -84,7 +80,8 @@ internal inline fun <
     top: Distance,
     crossinline accumulateData: (Distance, Distance, Value) -> Value,
     crossinline accumulateDistance: Reducer<Distance>,
-): Sequence<PathValue<ID, Value, Distance>> {
+): Sequence<PathValue<ID, Value, Distance>>
+where Distance : Comparable<Distance>, ID : Any {
     val neighbors = neighborData.neighbors.ids.set
     val accDistances =
         neighborData.alignedMapValues(coercedMetric) { path, distance ->
