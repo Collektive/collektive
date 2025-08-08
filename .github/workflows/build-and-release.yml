@@ -36,7 +36,7 @@ jobs:
             dry = keywords.any? { |kw| branch.include?(kw) } ? '' : '--dry-run'
             puts "dry_run=#{dry}"
           RUBY
-      - uses: DanySK/build-check-deploy-gradle-action@4.0.2
+      - uses: DanySK/build-check-deploy-gradle-action@4.0.3
         with:
           check-command: |
             ./gradlew check koverXmlReport :collektive-compiler-plugin:check :collektive-gradle-plugin:check :collektivize:check --parallel
@@ -59,7 +59,7 @@ jobs:
           maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
           signing-key: ${{ secrets.GPG_PRIVATEKEY }}
           signing-password: ${{ secrets.GPG_PASSPHRASE }}
-      - uses: github/codeql-action/upload-sarif@v3.29.5
+      - uses: github/codeql-action/upload-sarif@v3.29.7
         if: always() && runner.os == 'Linux'
         with:
           sarif_file: build/reports/merge.sarif
@@ -123,7 +123,7 @@ jobs:
         uses: actions/setup-node@v4.4.0
         with:
           node-version-file: package.json
-      - uses: DanySK/build-check-deploy-gradle-action@4.0.2
+      - uses: DanySK/build-check-deploy-gradle-action@4.0.3
         env:
           STAGING_REPO_ID: ${{ needs.staging-repo.outputs.staging-repo-id }}
           ORG_GRADLE_PROJECT_releaseStage: true
