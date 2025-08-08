@@ -6,7 +6,6 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
-@file:Suppress("MatchingDeclarationName")
 /*
  * Copyright (c) 2024-2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
@@ -17,100 +16,211 @@
 
 package it.unibo.collektive.stdlib.spreading
 
+import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
 import it.unibo.collektive.aggregate.api.share
-import it.unibo.collektive.aggregate.ids
 import it.unibo.collektive.aggregate.values
-import it.unibo.collektive.stdlib.collapse.fold
 import it.unibo.collektive.stdlib.collapse.reduce
+import it.unibo.collektive.stdlib.ints.FieldedInts.toDouble
+import it.unibo.collektive.stdlib.util.PathValue
 import it.unibo.collektive.stdlib.util.Reducer
-import kotlinx.serialization.Serializable
+import it.unibo.collektive.stdlib.util.coerceIn
+import it.unibo.collektive.stdlib.util.hops
+import it.unibo.collektive.stdlib.util.nonLoopingPaths
+import it.unibo.collektive.stdlib.util.pathCoherence
+import kotlin.jvm.JvmOverloads
 
 /**
- * The best value exchanged in the gossip algorithm.
- * It contains the [best] value evaluated yet,
- * the [local] value of the node, and the [path] of nodes through which it has passed.
+ * Executes a gossip-based aggregation algorithm. This method propagates and combines values
+ * across devices based on their distance, applying a selection and accumulation strategy.
+ *
+ * @param local The local value of the device.
+ * @param bottom The minimum distance value.
+ * @param top The maximum distance value.
+ * @param metric The distance field used to measure distances between devices.
+ * @param maxDiameter The maximum allowable diameter for paths [default: Int.MAX_VALUE].
+ * @param selector A function that determines how to select the preferred value during combination.
+ *                 By default, it selects the first value encountered.
+ * @param accumulateDistance The function used to combine distances during aggregation.
+ * @return The final aggregated value after the gossiping process.
  */
-@Serializable
-data class GossipValue<ID : Comparable<ID>, Value>(
-    val best: Value,
-    val local: Value,
-    val path: List<ID> = emptyList(),
-) {
-    /**
-     * TODO.
-     */
-    fun base(id: ID) = GossipValue(local, local, listOf(id))
-
-    /**
-     * TODO.
-     */
-    fun addHop(local: Value, id: ID) = GossipValue(best, local, path + id)
-}
-
-/**
- * Self-stabilizing gossip-max.
- * Spreads across all (aligned) devices the current maximum [Value] of [local],
- * as computed by [comparator].
- */
-inline fun <reified ID : Comparable<ID>, reified Value> Aggregate<ID>.gossipMax(
+@OptIn(DelicateCollektiveApi::class)
+@JvmOverloads
+inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Distance>> Aggregate<ID>.gossip(
     local: Value,
-    comparator: Comparator<Value>,
+    bottom: Distance,
+    top: Distance,
+    metric: Field<ID, Distance>,
+    maxDiameter: Int = Int.MAX_VALUE,
+    noinline selector: (Value, Value) -> Value = { first, _ -> first }, // identity function
+    crossinline accumulateDistance: Reducer<Distance>,
 ): Value {
-    val localGossip = GossipValue<ID, Value>(best = local, local = local)
-    val maxGossip = share(localGossip) { gossip ->
-        val neighbors = gossip.neighbors
-        val result = gossip.neighbors.fold(localGossip) { current, (id, next) ->
-            val valid = next.path.asReversed().asSequence()
-                .drop(1)
-                .none { it == localId || it in neighbors.ids.set }
-            val actualNext = if (valid) next else next.base(id)
-            val candidateValue = comparator.compare(current.best, actualNext.best)
+    val coercedMetric = metric.coerceIn(bottom, top)
+    val localCandidate = PathValue<ID, Value, Distance>(bottom, local, emptyList())
+    return share(localCandidate) { candidate ->
+        val nonLoopingPaths =
+            nonLoopingPaths(candidate, coercedMetric, maxDiameter, bottom, top, { _, _, data ->
+                selector(local, data)
+            }, accumulateDistance)
+        pathCoherence(nonLoopingPaths).fold(localCandidate) { current, next ->
+            val candidateValue = selector(current.data, next.data)
             when {
-                candidateValue > 0 -> current
-                candidateValue == 0 -> listOf(current, next).minBy { it.path.size }
-                else -> actualNext
+                current.data == next.data -> listOf(current, next).minBy { it.hops.size }
+                candidateValue == current.data -> current
+                else -> next
             }
         }
-        result.addHop(local, localId)
-    }
-    return maxGossip.best
+    }.data ?: local
 }
 
 /**
- * Self-stabilizing [gossipMax] with a default comparator.
- * Spreads across all (aligned) devices the current maximum [Value] of [local],
- * as computed by first value compared to the second.
+ * Propagates a value across a network of devices using a gossip-based approach. The method selects
+ * new values based on a provided selector function while computing distances using a specified metric.
+ *
+ * @param local the initial value held by the local device.
+ * @param metric a function providing a distance metric between devices,
+ * used to determine proximity during the gossip process.
+ * @param selector a function used to select a value during the gossip process, given two candidate values.
+ * @return the resulting value after the gossip process, based on the initial value,
+ * the metric, and the selector function.
  */
-inline fun <reified ID : Comparable<ID>, reified Value : Comparable<Value>> Aggregate<ID>.gossipMax(
+@OptIn(DelicateCollektiveApi::class)
+inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Distance>> Aggregate<ID>.gossip(
     local: Value,
-): Value = gossipMax(local) { first, second -> first.compareTo(second) }
+    metric: Field<ID, Double>,
+    noinline selector: (Value, Value) -> Value,
+): Value = gossip(
+    local = local,
+    bottom = 0.0,
+    top = Double.POSITIVE_INFINITY,
+    metric = metric,
+    selector = selector,
+    accumulateDistance = Double::plus,
+)
 
 /**
- * Self-stabilizing gossip-min.
- * Spreads across all (aligned) devices the current minimum [Value] of [local],
- * as computed by [comparator].
+ * Executes a gossip-based aggregation process, leveraging hop distance as the metric
+ * to propagate and combine values across devices in a network. Values are selected
+ * and aggregated based on the provided selection strategy.
+ *
+ * @param ID The type of the device identifier.
+ * @param Value The type of the values being aggregated.
+ * @param local The local value of the device executing the hop gossip.
+ * @param selector A function to determine the preferred value when combining.
+ *                 It takes two values as input and returns the selected value.
+ * @return The final aggregated value after the hop gossip process.
  */
-inline fun <reified ID : Comparable<ID>, reified Value> Aggregate<ID>.gossipMin(
+@OptIn(DelicateCollektiveApi::class)
+inline fun <reified ID : Any, reified Value> Aggregate<ID>.hopGossip(
     local: Value,
-    comparator: Comparator<Value>,
-): Value = gossipMax(local, comparator.reversed())
+    noinline selector: (Value, Value) -> Value,
+): Value = gossip(
+    local = local,
+    bottom = 0,
+    top = Int.MAX_VALUE,
+    metric = hops(),
+    selector = selector,
+    accumulateDistance = Int::plus,
+)
 
 /**
- * Self-stabilizing [gossipMin] with a default comparator.
- * Spreads across all (aligned) devices the current minimum [Value] of [local],
- * as computed by first value compared to the second,
- * and then reversed.
+ * Computes the maximum value among devices in an aggregate system, using a gossip-based approach.
+ *
+ * @param local the local value to be compared with values from other devices.
+ * @param bottom the minimal possible distance in the comparison range.
+ * @param top the maximal possible distance in the comparison range.
+ * @param metric a field representing the distance metric for comparison among devices.
+ * @param maxDiameter an optional parameter to limit the maximum diameter of the gossip protocol.
+ * @param accumulateDistance a function to reduce distances during the gossip process.
+ * @return the maximum value among devices in the context of the aggregate system.
+ */
+inline fun <
+    reified ID : Any,
+    reified Value : Comparable<Value>,
+    reified Distance : Comparable<Distance>,
+    > Aggregate<ID>.gossipMax(
+    local: Value,
+    bottom: Distance,
+    top: Distance,
+    metric: Field<ID, Distance>,
+    maxDiameter: Int = Int.MAX_VALUE,
+    crossinline accumulateDistance: Reducer<Distance>,
+): Value = gossip(
+    local = local,
+    bottom = bottom,
+    top = top,
+    metric = metric,
+    maxDiameter = maxDiameter,
+    selector = ::maxOf,
+    accumulateDistance = accumulateDistance,
+)
+
+/**
+ * Computes the maximum value among devices in an aggregate system, using a gossip-based approach.
+ *
+ * @param local the local value to be compared against values from other devices.
+ * @return the maximum value among devices in the context of the aggregate system.
+ */
+inline fun <reified ID : Any, reified Value : Comparable<Value>> Aggregate<ID>.gossipMax(local: Value): Value =
+    gossipMax(local, 0.0, Double.POSITIVE_INFINITY, hops().toDouble(), accumulateDistance = Double::plus)
+
+/**
+ * Aggregates and disseminates the minimum value of type [Value] using a gossiping protocol.
+ * This method enables devices in a network to converge on the smallest value in a distributed fashion,
+ * constrained by a specified distance metric.
+ *
+ * @param local the local value of type [Value] to contribute to the aggregation.
+ * @param bottom the minimum value that can be considered for [Distance].
+ * @param top the maximum value that can be considered for [Distance].
+ * @param metric a field representing the distance metric to compare devices.
+ * @param maxDiameter the maximum permissible network diameter for the gossiping operation, default is [Int.MAX_VALUE].
+ * @param accumulateDistance the lambda function to reduce or accumulate distances of type [Distance].
+ * @return the minimum value of type [Value] aggregated across the network.
+ */
+inline fun <
+    reified ID : Any,
+    reified Value : Comparable<Value>,
+    reified Distance : Comparable<Distance>,
+    > Aggregate<ID>.gossipMin(
+    local: Value,
+    bottom: Distance,
+    top: Distance,
+    metric: Field<ID, Distance>,
+    maxDiameter: Int = Int.MAX_VALUE,
+    crossinline accumulateDistance: Reducer<Distance>,
+): Value = gossip(
+    local = local,
+    bottom = bottom,
+    top = top,
+    metric = metric,
+    maxDiameter = maxDiameter,
+    selector = ::minOf,
+    accumulateDistance = accumulateDistance,
+)
+
+/**
+ * Aggregates and disseminates the minimum value of type [Value]
+ * using a gossiping protocol with a default distance configuration.
+ * This method enables devices in a network to converge on the smallest value in a distributed manner,
+ * using hop count as the distance metric.
+ *
+ * @param local the local value of type [Value] to contribute to the aggregation.
+ * @return the minimum value of type [Value] aggregated across the network.
  */
 inline fun <reified ID : Comparable<ID>, reified Value : Comparable<Value>> Aggregate<ID>.gossipMin(
     local: Value,
-): Value = gossipMin(local) { first, second -> first.compareTo(second) }
+): Value = gossipMin(local, 0.0, Double.POSITIVE_INFINITY, hops().toDouble(), accumulateDistance = Double::plus)
 
 /**
- * Returns true if the condition is holding anywhere in the network, false otherwise.
+ * Determines if the given condition is satisfied on at least one device in the aggregate context.
+ *
+ * @param condition A lambda function representing the condition to be checked. It evaluates to true if the condition
+ * is met on the current device, or false otherwise.
+ * @return True if any device in the aggregate context satisfies the condition, false otherwise.
  */
 inline fun <reified ID : Comparable<ID>> Aggregate<ID>.isHappeningAnywhere(condition: () -> Boolean): Boolean =
-    gossipMax(condition()) { first, second -> first.compareTo(second) }
+    gossipMax(condition())
 
 /**
  * A **non-self-stabilizing** gossip function for repeated propagation of a [value] and [reducer]
