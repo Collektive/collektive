@@ -94,7 +94,7 @@ jobs:
       - build-website
       - build
     if: ${{ github.event_name == 'push' && github.repository == 'Collektive/collektive' }}
-    runs-on: ubuntu-24.04
+    runs-on: macos-14
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v5.0.0
