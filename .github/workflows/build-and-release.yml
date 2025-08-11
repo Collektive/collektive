@@ -22,7 +22,7 @@ jobs:
         run: |
           echo "run-with-secrets=${{ steps.detect-secrets.outputs.has-secrets == 'true' && !github.event.repository.fork }}" >> $GITHUB_OUTPUT
       - name: Checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v4.3.0
         with:
           fetch-depth: 0
           fetch-tags: true
@@ -68,7 +68,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v4.3.0
         with:
           submodules: true
           fetch-depth: 0
@@ -97,13 +97,13 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v4.3.0
         with:
           fetch-depth: 0
           token: ${{ secrets.DEPLOYMENT_TOKEN }}
       - name: Checkout the docs
         if: contains(github.repository, 'Collektive/collektive')
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v4.3.0
         with:
           path: deployed-website
           fetch-depth: 0
