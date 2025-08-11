@@ -1,3 +1,25 @@
+## [26.1.1](https://github.com/Collektive/collektive/compare/26.1.0...26.1.1) (2025-08-11)
+
+### Dependency updates
+
+* **deps:** update dependency react-router-dom to v7.8.0 ([9686927](https://github.com/Collektive/collektive/commit/968692762e6b31b7fcd47eb2358cafab572352f0))
+* **deps:** update plugin multijvmtesting to v3.6.1 ([73e1b06](https://github.com/Collektive/collektive/commit/73e1b06098cdebc1c222c533792718afc374b539))
+* **deps:** update plugin multijvmtesting to v4 ([7d9b152](https://github.com/Collektive/collektive/commit/7d9b15201d6418ca69b7def14f69a5eb5b775756))
+* **deps:** update plugin multijvmtesting to v4.0.1 ([cac3bd2](https://github.com/Collektive/collektive/commit/cac3bd232e4bc0965bf0e8fa01cf3033b7022d3c))
+
+### Bug Fixes
+
+* **release:** use the MacOS runner to release ([26d69d2](https://github.com/Collektive/collektive/commit/26d69d2e6c1367bc21f59fa4002fc9b0ea9bf096))
+
+### Build and continuous integration
+
+* **deps:** update actions/checkout action to v5 ([7809ccd](https://github.com/Collektive/collektive/commit/7809ccd817ae4f5dfe7965f4834de6b3dec6ff0b))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.3 ([dd40a85](https://github.com/Collektive/collektive/commit/dd40a85f19accb754b2633235cca9696695252c8))
+* **deps:** update github/codeql-action action to v3.29.6 ([ca9450d](https://github.com/Collektive/collektive/commit/ca9450d8835229de42190ebbc548601e59a1a3d5))
+* **deps:** update github/codeql-action action to v3.29.7 ([87dfa3f](https://github.com/Collektive/collektive/commit/87dfa3f6819672fd4d3a75cf23858b0582027f62))
+* **deps:** update github/codeql-action action to v3.29.8 ([313debe](https://github.com/Collektive/collektive/commit/313debeee2a4d31466cf7a6146b0efe0933a2e69))
+* drop test releases ([7c9f529](https://github.com/Collektive/collektive/commit/7c9f5291c49e0a0e3372361f5a980408051385ab))
+
 ## [26.1.0](https://github.com/Collektive/collektive/compare/26.0.1...26.1.0) (2025-08-07)
 
 ### Features
