@@ -44,7 +44,7 @@ jobs:
           deploy-command: |
             # Compute all tasks to be executed
             projects=( "" ":collektive-compiler-plugin:" ":collektive-gradle-plugin:" ":collektivize:" )
-            tasks=( "publishAllPublicationsToProjectLocalRepository" "zipMavenCentralPortalPublication" "dropMavenCentralPortalPublication" )
+            tasks=( "publishAllPublicationsToProjectLocalRepository" "zipMavenCentralPortalPublication" "releaseMavenCentralPortalPublication" )
             GRADLE_TASKS=()
             for p in "${projects[@]}"; do
               for t in "${tasks[@]}"; do
