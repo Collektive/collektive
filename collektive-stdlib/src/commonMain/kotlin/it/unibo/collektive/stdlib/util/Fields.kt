@@ -6,7 +6,7 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
-package it.unibo.collektive.stdlib.fields
+package it.unibo.collektive.stdlib.util
 
 import arrow.core.Predicate
 import it.unibo.collektive.aggregate.Field
