@@ -1,3 +1,22 @@
+## [26.1.2](https://github.com/Collektive/collektive/compare/26.1.1...26.1.2) (2025-08-16)
+
+### Dependency updates
+
+* **core-deps:** update kotlin monorepo to v2.2.10 ([7e4f2ef](https://github.com/Collektive/collektive/commit/7e4f2efa6524d34df34abe74221d6c523a28f806))
+* **deps:** update alchemist to v42.2.9 ([d54d52c](https://github.com/Collektive/collektive/commit/d54d52cee011cf92e0bbb2111a865f249d15299b))
+* **deps:** update plugin gitsemver to v5.1.8 ([cd522a4](https://github.com/Collektive/collektive/commit/cd522a422de216d4c970109c006f8ae209710d30))
+* **deps:** update plugin gitsemver to v6 ([f4d2005](https://github.com/Collektive/collektive/commit/f4d2005ef3a0f6a715d6000d70e170b469706de8))
+* **deps:** update plugin gitsemver to v6.0.1 ([dcba94f](https://github.com/Collektive/collektive/commit/dcba94f96cb1a3d16517f42ceea7f017f55ddeb6))
+* **deps:** update plugin kotlin-qa to v0.93.1 ([833f3ce](https://github.com/Collektive/collektive/commit/833f3ce8fadf4b17b3920c6fc0bf3316f4e159e3))
+* **deps:** update plugin multijvmtesting to v4.0.2 ([8f7cf92](https://github.com/Collektive/collektive/commit/8f7cf92a652819968f4ebb9cb838ee755af738c6))
+* **deps:** update plugin multijvmtesting to v4.0.3 ([c1b6ad5](https://github.com/Collektive/collektive/commit/c1b6ad537baa1bd6f22a0f91677a9a738ce899a7))
+* **deps:** update plugin multijvmtesting to v4.1.0 ([0507e36](https://github.com/Collektive/collektive/commit/0507e3641ae6375525e66d9fb51c0e292957d224))
+
+### Build and continuous integration
+
+* **deps:** update github/codeql-action action to v3.29.9 ([3901438](https://github.com/Collektive/collektive/commit/3901438d7f0ac7744bf76768c9ac60c2ee935edd))
+* re-enable beta releases on specific branches ([ee1bf38](https://github.com/Collektive/collektive/commit/ee1bf38d389c0c69f993e100e804058ef1b0a445))
+
 ## [26.1.1](https://github.com/Collektive/collektive/compare/26.1.0...26.1.1) (2025-08-11)
 
 ### Dependency updates
