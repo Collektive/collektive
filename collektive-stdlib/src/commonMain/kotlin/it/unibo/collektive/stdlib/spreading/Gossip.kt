@@ -20,7 +20,8 @@ import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
 import it.unibo.collektive.aggregate.api.share
-import it.unibo.collektive.stdlib.fields.foldValues
+import it.unibo.collektive.aggregate.values
+import it.unibo.collektive.stdlib.collapse.reduce
 import it.unibo.collektive.stdlib.ints.FieldedInts.toDouble
 import it.unibo.collektive.stdlib.util.PathValue
 import it.unibo.collektive.stdlib.util.Reducer
@@ -222,17 +223,13 @@ inline fun <reified ID : Comparable<ID>> Aggregate<ID>.isHappeningAnywhere(condi
     gossipMax(condition())
 
 /**
- * Executes a non-stabilizing gossip operation by sharing the provided [value] and aggregating it with
- * the values received from neighbors using the provided [aggregation] function.
- *
- * @param value The value to be shared and aggregated.
- * @param aggregation A function defining how to aggregate the current value with the neighbor values.
- * @return The result of the aggregation after sharing and applying the operation on the values.
+ * A **non-self-stabilizing** gossip function for repeated propagation of a [value] and [reducer]
+ * of state estimates between neighboring devices.
  */
 inline fun <ID : Any, reified Value> Aggregate<ID>.nonStabilizingGossip(
     value: Value,
-    noinline aggregation: (Value, Value) -> Value,
-): Value = share(value) { it.foldValues(value, aggregation) }
+    noinline reducer: Reducer<Value>,
+): Value = share(value) { it.all.values.reduce(reducer) }
 
 /**
  * A **non-self-stabilizing** function returning `true` if at any point in time a certain [condition] happened.

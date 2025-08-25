@@ -11,7 +11,8 @@ package it.unibo.collektive.aggregate
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.exchange
 import it.unibo.collektive.aggregate.api.exchanging
-import it.unibo.collektive.stdlib.fields.foldValues
+import it.unibo.collektive.stdlib.collapse.fold
+import it.unibo.collektive.stdlib.collapse.sum
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.test.Test
@@ -26,7 +27,7 @@ class ExchangeTest {
 
     private fun mooreGridWithIncreaseOrDouble(size: Int) = mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }) { _ ->
         exchange(1) { field ->
-            field.mapValues { field.foldValues(localId) { acc, value -> acc + value } }
+            field.mapValues { field.neighbors.values.fold(localId) { acc, value -> acc + value } }
         }.local.value
     }.also {
         assertEquals(size * size, it.nodes.size)
@@ -42,16 +43,15 @@ class ExchangeTest {
 
     private fun mooreGridWithDedicatedNeighborValues(size: Int) =
         mooreGrid<Int>(size, size, { _, _ -> Int.MIN_VALUE }) { _ ->
-            val res =
-                exchange(0) { field ->
-                    field.map { (id, _) ->
-                        when (id) {
-                            0 -> 0
-                            else -> 1
-                        }
+            val res: Field<Int, Int> = exchange(0) { field ->
+                field.map { (id, _) ->
+                    when (id) {
+                        0 -> 0
+                        else -> 1
                     }
                 }
-            res.neighborsValues.sum() + res.local.value
+            }
+            res.neighbors.values.sum() + res.local.value
         }.also {
             assertEquals(size * size, it.nodes.size)
         }
@@ -75,7 +75,8 @@ class ExchangeTest {
         val result = environment.status()
 
         /**
-         * Each node id connected to the others in the network supposing to fire the round in order:
+         * The network is fully connected.
+         * Devices execute the round in order:
          * 0=ϕ(localId=0, localValue=0, neighbors={})
          * 1=ϕ(localId=1, localValue=1, neighbors={0=1})
          * 2=ϕ(localId=2, localValue=3, neighbors={0=3, 1=3})
@@ -94,7 +95,7 @@ class ExchangeTest {
                         val fieldResult = it + 1
                         fieldResult.yielding { fieldResult.mapValues { value -> "return: $value" } }
                     }
-                assertEquals(mapOf(0 to "return: 2"), xcRes.toMap())
+                assertEquals(mapOf(0 to "return: 2"), xcRes.all.toMap())
             }
         val messages = result.toSend.prepareMessageFor(1).sharedData
         assertEquals(1, messages.size)
@@ -110,7 +111,7 @@ class ExchangeTest {
                         val fieldResult = it + 1
                         fieldResult.yielding { fieldResult.mapValues { value -> value.takeIf { value > 10 } } }
                     }
-                assertEquals(mapOf(0 to null), xcRes.toMap())
+                assertEquals(mapOf(0 to null), xcRes.all.toMap())
             }
         val messages = result.toSend.prepareMessageFor(1).sharedData
         assertEquals(1, messages.size)

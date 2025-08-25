@@ -14,7 +14,10 @@ import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
 import it.unibo.collektive.aggregate.api.exchange
 import it.unibo.collektive.aggregate.api.mapNeighborhood
 import it.unibo.collektive.aggregate.api.share
-import it.unibo.collektive.stdlib.fields.minValueBy
+import it.unibo.collektive.aggregate.ids
+import it.unibo.collektive.aggregate.toMap
+import it.unibo.collektive.aggregate.values
+import it.unibo.collektive.stdlib.collapse.valueOfMinBy
 import it.unibo.collektive.stdlib.util.PathValue
 import it.unibo.collektive.stdlib.util.Reducer
 import it.unibo.collektive.stdlib.util.accumulate
@@ -69,7 +72,7 @@ inline fun <reified ID, reified Value, reified Distance> Aggregate<ID>.bellmanFo
             val newData = accumulateData(fromSource, toNeighbor, data)
             totalDistance to newData
         }
-        val bestThroughNeighbors = pathsThroughNeighbors.minValueBy { it.value.first } ?: topValue
+        val bestThroughNeighbors = pathsThroughNeighbors.neighbors.valueOfMinBy { it.value.first } ?: topValue
         when {
             source -> bottom to local
             else -> bestThroughNeighbors
