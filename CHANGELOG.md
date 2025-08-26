@@ -1,3 +1,39 @@
+## [27.0.0](https://github.com/Collektive/collektive/compare/26.1.2...27.0.0) (2025-08-26)
+
+### ⚠ BREAKING CHANGES
+
+* introduce field collapses and clarify all field reduction operations (#1068)
+
+### Features
+
+* introduce field collapses and clarify all field reduction operations ([#1068](https://github.com/Collektive/collektive/issues/1068)) ([64e0ef9](https://github.com/Collektive/collektive/commit/64e0ef9d1a8c9604b54cb199dd607e20907a0d37))
+
+### Dependency updates
+
+* **deps:** update alchemist to v42.2.10 ([79cbaf0](https://github.com/Collektive/collektive/commit/79cbaf091d038043af8d59610d63f77c740ca871))
+* **deps:** update alchemist to v42.2.11 ([2da7ca7](https://github.com/Collektive/collektive/commit/2da7ca7b753283b81cbf6df6853144e545b1cd9e))
+* **deps:** update dependency @fortawesome/react-fontawesome to v0.2.5 ([1dd24db](https://github.com/Collektive/collektive/commit/1dd24dbd5902df63f07c39f9f0639f60c10afbc4))
+* **deps:** update dependency @fortawesome/react-fontawesome to v0.2.6 ([88c25a7](https://github.com/Collektive/collektive/commit/88c25a71ba61914a4706b3e2d41de98490d265bf))
+* **deps:** update dependency @fortawesome/react-fontawesome to v3 ([b56754d](https://github.com/Collektive/collektive/commit/b56754d67f3417c33d04121ef7887cab41e5d5d2))
+* **deps:** update dependency org.kotlincrypto.hash:sha3 to v0.7.1 ([9ddabd0](https://github.com/Collektive/collektive/commit/9ddabd0e563106d71382afc0731da55d965dd844))
+* **deps:** update dependency react-router-dom to v7.8.1 ([6161c51](https://github.com/Collektive/collektive/commit/6161c51b1d5bbb8ab6049eb084e21c47043df6a4))
+* **deps:** update dependency react-router-dom to v7.8.2 ([4265e40](https://github.com/Collektive/collektive/commit/4265e4001837dadba03c1910b5cd79b2f0d8ca32))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.140 ([6f0024f](https://github.com/Collektive/collektive/commit/6f0024f2b1572c616531c4cbfa7d20f51964a867))
+* **deps:** update plugin com.gradle.develocity to v4.1.1 ([1065236](https://github.com/Collektive/collektive/commit/1065236a068586b1bbc0856f6bdb98240c796c51))
+* **deps:** update plugin gitsemver to v6.0.2 ([a568583](https://github.com/Collektive/collektive/commit/a568583aa9986087b454273d698158b00fe2cace))
+* **deps:** update plugin kotlin-qa to v0.93.2 ([ac63d9f](https://github.com/Collektive/collektive/commit/ac63d9feb2450fe6f7eac6380beebd7f1dfe4120))
+* **deps:** update plugin kotlin-qa to v0.93.3 ([1da8ba3](https://github.com/Collektive/collektive/commit/1da8ba32640df75c307f4a31d29933d9e323fb04))
+* **deps:** update plugin kotlin-qa to v0.94.0 ([d1264e8](https://github.com/Collektive/collektive/commit/d1264e80e3a42e5b33b8b39952361006b99491f5))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.0.30 ([7547e0f](https://github.com/Collektive/collektive/commit/7547e0f886a8abf358a9c5dd8cde00e5ea15220f))
+* **deps:** update plugin publishoncentral to v9.1.3 ([1f1d507](https://github.com/Collektive/collektive/commit/1f1d507176797d8bbd55a689a25bd5a6d7f5a35e))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.4 ([a2b3873](https://github.com/Collektive/collektive/commit/a2b387312c8e0de178cf923b1f7c8c4a9302097b))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.5 ([0fbeab0](https://github.com/Collektive/collektive/commit/0fbeab0d7004620a046c07ad7420cdd55b1922cd))
+* **deps:** update github/codeql-action action to v3.29.10 ([55de17b](https://github.com/Collektive/collektive/commit/55de17bc027e6225fa2b0b21ba0d7c3124df4cbe))
+* **deps:** update github/codeql-action action to v3.29.11 ([e6e1f6e](https://github.com/Collektive/collektive/commit/e6e1f6efee948f1bfb833a8c353553f7c4315580))
+
 ## [26.1.2](https://github.com/Collektive/collektive/compare/26.1.1...26.1.2) (2025-08-16)
 
 ### Dependency updates
