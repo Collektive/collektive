@@ -32,10 +32,6 @@ dependencies {
     implementation(libs.kotlin.gradle.plugin)
 }
 
-gitSemVer {
-    assignGitSemanticVersion()
-}
-
 buildConfig {
     packageName(project.group.toString())
     buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"${project.group}.$compilerPlugin\"")
