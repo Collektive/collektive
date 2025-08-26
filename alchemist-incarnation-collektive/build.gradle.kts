@@ -36,9 +36,13 @@ kotlinJvm {
                 implementation(libs.bundles.alchemist)
                 implementation(libs.bundles.kotlin.compiler)
                 implementation(libs.caffeine)
-                implementation(libs.kotlin.test)
                 implementation(libs.kotlinx.serialization.core)
                 implementation(libs.slf4j)
+            }
+        }
+        val test by getting {
+            dependencies {
+                implementation(kotlin("test"))
             }
         }
     }

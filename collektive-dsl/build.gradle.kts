@@ -6,6 +6,9 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
+import com.google.devtools.ksp.gradle.KspAATask
+import de.aaschmid.gradle.plugins.cpd.Cpd
+
 apply(plugin = rootProject.libs.plugins.kotlin.multiplatform.id)
 
 configureKotlinMultiplatform()
@@ -20,7 +23,7 @@ kotlinMultiplatform {
         commonTest.dependencies {
             implementation(collektive("stdlib"))
             implementation(collektive("test-tooling"))
-            implementation(libs.kotlin.test)
+            implementation(kotlin("test"))
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.serialization.protobuf)
         }
@@ -35,3 +38,5 @@ kotlinMultiplatform {
 collektive {
     collektiveEnabled = true
 }
+
+tasks.withType<Cpd>().configureEach { dependsOn(tasks.withType<KspAATask>()) }

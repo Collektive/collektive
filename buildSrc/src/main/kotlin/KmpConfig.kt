@@ -12,6 +12,7 @@ import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.project
@@ -31,6 +32,10 @@ val Provider<PluginDependency>.id: String get() = get().pluginId
 
 inline fun <reified ProjectType : KotlinProjectExtension> Project.kotlin(configuration: ProjectType.() -> Unit) =
     extensions.getByType<ProjectType>().configuration()
+
+fun PatternFilterable.excludeGenerated() {
+    exclude { it.file.absolutePath.contains("generated", ignoreCase = true) }
+}
 
 fun Project.kotlinJvm(configuration: KotlinJvmProjectExtension.() -> Unit) = kotlin(configuration)
 
