@@ -33,10 +33,6 @@ val reportMerge by tasks.registering(ReportMergeTask::class) {
     output = project.layout.buildDirectory.file("reports/merge.sarif")
 }
 
-gitSemVer {
-    assignGitSemanticVersion()
-}
-
 subprojects {
     project.version = rootProject.version
 }
