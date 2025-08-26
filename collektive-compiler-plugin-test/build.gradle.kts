@@ -16,7 +16,7 @@ plugins {
 
 apply(plugin = libs.plugins.kotlin.jvm.id)
 
-val targetJvm = JvmTarget.JVM_1_8
+val targetJvm = JvmTarget.JVM_11
 
 java {
     toolchain {
@@ -39,7 +39,7 @@ kotlinJvm {
                 implementation(collektive("dsl"))
                 implementation(collektive("stdlib"))
                 implementation(kotlin("test"))
-                implementation(rootProject.libs.kotest.runner.junit5.jvm)
+                implementation(rootProject.libs.bundles.kotest)
                 implementation(libs.javap)
                 implementation(libs.kotlinpoet)
                 implementation(libs.subjekt)

@@ -8,6 +8,7 @@
 
 import de.aaschmid.gradle.plugins.cpd.Cpd
 import io.gitlab.arturbosch.detekt.Detekt
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.dokka.gradle.tasks.DokkaGenerateTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
@@ -60,10 +61,6 @@ sourceSets {
         }
     }
 }
-
-// check(gradle.includedBuilds.size == 1) {
-//    "This build is designed for a single inclusion, not ${gradle.includedBuilds.size}. Fix it."
-// }
 
 dependencies {
     implementation(kotlin("stdlib"))

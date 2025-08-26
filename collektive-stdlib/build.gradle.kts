@@ -52,10 +52,13 @@ kotlinMultiplatform {
             }
             kotlin.srcDirs(collektivizeKotlinStdlibTask)
         }
-        commonTest.dependencies {
-            implementation(collektive("test-tooling"))
-            implementation(rootProject.libs.bundles.kotlin.testing.common)
-            implementation(rootProject.libs.kotlinx.serialization.json)
+        commonTest {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation(collektive("test-tooling"))
+                implementation(rootProject.libs.bundles.kotest)
+                implementation(rootProject.libs.kotlinx.serialization.json)
+            }
         }
     }
 }

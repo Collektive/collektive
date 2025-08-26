@@ -14,11 +14,15 @@ kotlinMultiplatform {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(rootProject.libs.bundles.kotlin.testing.common)
                 implementation(rootProject.libs.kotlinx.serialization.core)
                 implementation(rootProject.libs.kotlinx.serialization.json)
                 implementation(rootProject.libs.kotlinx.serialization.protobuf)
                 implementation(collektive("dsl"))
+            }
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
             }
         }
     }

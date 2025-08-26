@@ -36,7 +36,7 @@ kotlinJvm {
         val test by getting {
             dependencies {
                 implementation(collektive("dsl"))
-                implementation(rootProject.libs.kotest.runner.junit5.jvm)
+                implementation(rootProject.libs.kotest.runner.junit5)
                 implementation(libs.javap)
             }
         }
@@ -46,6 +46,7 @@ kotlinJvm {
         freeCompilerArgs.add("-Xcontext-parameters")
     }
     tasks.withType<Test> {
+        javaLauncher = javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(11)) }
         useJUnitPlatform()
         testLogging {
             showExceptions = true
