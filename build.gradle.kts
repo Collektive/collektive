@@ -187,18 +187,10 @@ kover {
 
 tasks {
     // Prevent publishing the root project (since is empty)
-    withType<AbstractPublishToMaven>().configureEach {
-        enabled = false
-    }
-    withType<GenerateModuleMetadata>().configureEach {
-        enabled = false
-    }
+    withType<AbstractPublishToMaven>().configureEach { enabled = false }
+    withType<GenerateModuleMetadata>().configureEach { enabled = false }
 
-    fun <T : Task> T.dependsOnIncludedBuilds() = dependsOn(
-            gradle.includedBuilds.map {
-                it.task(":$name")
-        }
-        )
+    fun <T : Task> T.dependsOnIncludedBuilds() = dependsOn(gradle.includedBuilds.map { it.task(":$name") })
     fun <T : Task> TaskProvider<T>.dependsOnIncludedBuilds() = configure { dependsOnIncludedBuilds() }
     fun <T : Task> TaskCollection<T>.dependsOnIncludedBuilds() = configureEach { dependsOnIncludedBuilds() }
     withType<KtLintFormatTask>().dependsOnIncludedBuilds()
