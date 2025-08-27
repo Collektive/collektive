@@ -86,10 +86,7 @@ tasks.withType<Test>().configureEach {
         showStandardStreams = true
         showCauses = true
         showStackTraces = true
-        events(
-            *org.gradle.api.tasks.testing.logging.TestLogEvent
-                .values(),
-        )
+        events = TestLogEvent.entries.toSet()
         exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
     }
 }
