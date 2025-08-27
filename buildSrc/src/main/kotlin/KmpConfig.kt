@@ -16,7 +16,6 @@ import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.project
-import org.gradle.kotlin.dsl.withType
 import org.gradle.plugin.use.PluginDependency
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -25,7 +24,6 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import kotlin.time.Duration.Companion.minutes
 
 val Provider<PluginDependency>.id: String get() = get().pluginId
@@ -111,13 +109,5 @@ fun Project.configureKotlinMultiplatform() {
         tvosArm64(nativeSetup)
         tvosX64(nativeSetup)
         tvosSimulatorArm64(nativeSetup)
-
-        // Workaround for https://github.com/kotest/kotest/pull/4598 (merged but not released)
-        tasks.withType<KotlinCompilationTask<*>>()
-            .configureEach {
-                compilerOptions {
-                    allWarningsAsErrors = !name.contains("test", ignoreCase = true)
-                }
-            }
     }
 }
