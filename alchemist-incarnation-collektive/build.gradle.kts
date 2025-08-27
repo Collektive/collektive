@@ -53,7 +53,7 @@ kotlinJvm {
         useJUnitPlatform()
         testLogging {
             showExceptions = true
-            events = TestLogEvent.entries.toSet()
+            events = setOf(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
             exceptionFormat = TestExceptionFormat.FULL
         }
     }
