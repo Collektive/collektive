@@ -14,7 +14,14 @@ Collektive is a Kotlin multiplatform implementation of Aggregate Programming tha
 ### Core Build Commands
 **CRITICAL**: Set timeouts of 60+ minutes for build commands. NEVER CANCEL long-running builds.
 
-#### JVM Development (Recommended for most work)
+#### Full Multiplatform Build (Complete validation)
+- **Full build and check**: `./gradlew build check --no-daemon` -- takes ~30 minutes. NEVER CANCEL. Set timeout to 60+ minutes.
+  - Compiles all targets: JVM, JavaScript, Native (Linux x64/ARM64, Windows, macOS)
+  - Runs all tests across all platforms
+  - Performs all code quality checks
+  - Use for final validation before commits
+
+#### JVM Development (Recommended for fast iteration)
 - **Compile JVM targets**: `./gradlew :collektive-dsl:compileKotlinJvm :collektive-stdlib:compileKotlinJvm :alchemist-incarnation-collektive:compileKotlin --no-daemon` -- takes ~30 seconds. NEVER CANCEL.
 - **Run JVM tests**: `./gradlew :collektive-dsl:jvmTest :collektive-stdlib:jvmTest :alchemist-incarnation-collektive:test --no-daemon` -- takes ~1 minute. NEVER CANCEL. Set timeout to 15+ minutes.
 - **Quick validation**: `./gradlew :collektive-dsl:compileKotlinJvm :collektive-dsl:jvmTest --no-daemon` -- takes ~45 seconds for core DSL module
@@ -28,14 +35,10 @@ Collektive is a Kotlin multiplatform implementation of Aggregate Programming tha
 - **Build site**: `cd site && npm run build` -- takes ~30 seconds. Expect SVG warnings (normal). Set timeout to 10+ minutes.
 - **Serve locally**: `cd site && npm run serve` (for testing changes)
 
-### Important Limitations
-**DO NOT attempt full multiplatform builds** in sandboxed environments:
-- Native targets (Linux, macOS, Windows) fail due to network restrictions accessing download.jetbrains.com
-- The full `./gradlew build` or `./gradlew check` commands will fail on native compilation
-- Stick to JVM-specific tasks for reliable builds
 
 ### Build Timing Expectations
 - **NEVER CANCEL**: All builds and tests MUST complete. Set generous timeouts.
+- Full multiplatform build: 25-35 minutes
 - JVM compilation: 30 seconds - 2 minutes
 - JVM tests: 1-3 minutes  
 - Linting: 30 seconds - 2 minutes
@@ -45,10 +48,14 @@ Collektive is a Kotlin multiplatform implementation of Aggregate Programming tha
 ## Validation
 
 ### Always Validate Changes With These Steps
+**For fast iteration (JVM only)**:
 1. **Compile JVM targets**: `./gradlew :collektive-dsl:compileKotlinJvm :collektive-stdlib:compileKotlinJvm --no-daemon`
 2. **Run core tests**: `./gradlew :collektive-dsl:jvmTest :collektive-stdlib:jvmTest --no-daemon`
 3. **Check code quality**: `./gradlew ktlintCheck detektAll --no-daemon`
-4. **Build documentation**: `cd site && npm run build`
+
+**For complete validation (before final commit)**:
+1. **Full multiplatform build and test**: `./gradlew build check --no-daemon` (~30 minutes)
+2. **Build documentation**: `cd site && npm run build`
 
 ### Manual Testing Scenarios
 After making changes to core DSL or stdlib:
@@ -104,26 +111,33 @@ The CI pipeline runs comprehensive tests including:
 4. Validate all links and examples work
 
 ### Before Committing
-**ALWAYS run this complete validation sequence**:
+**For fast iteration** (during development):
 ```bash
-# Compile and test core modules
+# Compile and test core modules (JVM only)
 ./gradlew :collektive-dsl:jvmTest :collektive-stdlib:jvmTest :alchemist-incarnation-collektive:test --no-daemon
 
 # Check code quality  
 ./gradlew ktlintCheck detektAll --no-daemon
+```
+
+**For final validation** (before committing):
+```bash
+# Full multiplatform build and test (~30 minutes)
+./gradlew build check --no-daemon
 
 # Build documentation
 cd site && npm run build && cd ..
 ```
 
-Set timeouts of 30+ minutes for the full sequence. NEVER CANCEL running builds or tests.
+Set timeouts of 60+ minutes for the full sequence. NEVER CANCEL running builds or tests.
 
 ## Troubleshooting
 
-### Network-Related Build Failures
-- Native target compilation fails due to download.jetbrains.com access restrictions
-- **Solution**: Focus on JVM targets only: `:collektive-dsl:jvmTest` instead of just `test`
-- Build scan publishing may fail (normal in sandboxed environments)
+### Network-Related Build Failures (Historical)
+Previously, native target compilation failed due to download.jetbrains.com access restrictions, but these have been resolved. If you encounter network issues:
+- **Current status**: Full multiplatform builds work correctly
+- **Fallback option**: Use JVM-specific tasks for faster iteration: `:collektive-dsl:jvmTest` instead of just `test`
+- **Build scan publishing**: May occasionally fail but does not affect build success
 
 ### Node.js Version Warnings
 - Site build shows engine warnings for Node.js version mismatch
@@ -137,6 +151,6 @@ Set timeouts of 30+ minutes for the full sequence. NEVER CANCEL running builds o
 - **Solution**: Consistently use `--no-daemon` in all commands
 
 ### Test Failures
-- If tests fail, check that you're running JVM-specific test tasks
-- Multiplatform test tasks may fail due to native compilation issues
-- **Solution**: Use `:moduleName:jvmTest` instead of `:moduleName:test`
+- For fast iteration during development, use JVM-specific test tasks: `:moduleName:jvmTest`
+- For complete validation, use the full multiplatform build: `./gradlew build check --no-daemon`
+- All platform tests (JVM, JavaScript, Native) are now working correctly
