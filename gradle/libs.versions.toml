@@ -63,7 +63,7 @@ kotlin-power-assert = { id = "org.jetbrains.kotlin.plugin.power-assert", version
 kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.94.1"
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kover = "org.jetbrains.kotlinx.kover:0.9.1"
-ksp = "com.google.devtools.ksp:2.2.10-2.0.2"
+ksp = "com.google.devtools.ksp:2.2.20-2.0.2"
 power-assert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = "kotlin" }
 multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:4.1.1"
 publishOnCentral = "org.danilopianini.publish-on-central:9.1.4"
