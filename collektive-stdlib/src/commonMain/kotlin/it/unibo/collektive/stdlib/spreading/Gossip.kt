@@ -282,7 +282,7 @@ inline fun <
  * @param local the local value of type [Value] to be considered in the computation.
  * @param metric the distance metric of type [Field<ID, Double>] used to constrain the computation.
  * @param accumulateDistance a reducer function that determines how distances are aggregated.
- * @return the maximum value of type [Value] determined by the gossip-based computation.
+ * @return the minimum value of type [Value] determined by the gossip-based computation.
  */
 inline fun <
     reified ID : Comparable<ID>,
@@ -299,7 +299,7 @@ inline fun <
  *
  * @param local The local value to be propagated and compared.
  * @param metric A [Field] representing a function that calculates a metric for a specific ID to use in this operation.
- * @return The maximum value of the metric within the distributed system.
+ * @return The minimum value of the metric within the distributed system.
  */
 inline fun <reified ID : Comparable<ID>, reified Value : Comparable<Value>> Aggregate<ID>.gossipMin(
     local: Value,
