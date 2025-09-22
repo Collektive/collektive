@@ -10,6 +10,8 @@ package it.unibo.collektive.stdlib.test
 
 import it.unibo.collektive.stdlib.spreading.gossipMax
 import it.unibo.collektive.stdlib.spreading.gossipMin
+import it.unibo.collektive.stdlib.spreading.hopGossipMax
+import it.unibo.collektive.stdlib.spreading.hopGossipMin
 import it.unibo.collektive.stdlib.spreading.nonStabilizingGossip
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
@@ -27,9 +29,9 @@ class GossipTest {
     private fun squareMooreGridWithGossip(size: Int, max: Boolean = true) =
         mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }) { _ ->
             if (max) {
-                gossipMax(localId) // gossip the max localID in the network
+                hopGossipMax(localId) // gossip the max localID in the network
             } else {
-                gossipMin(localId) // gossip the min localID in the network
+                hopGossipMin(localId) // gossip the min localID in the network
             }
         }.apply {
             assertEquals(size * size, nodes.size)
@@ -43,9 +45,9 @@ class GossipTest {
     private fun linearMooreGridWithGossip(size: Int, max: Boolean = true) =
         mooreGrid<Int>(size, 1, { _, _ -> Int.MAX_VALUE }) { _ ->
             if (max) {
-                gossipMax(localId) // gossip the max localID in the network
+                hopGossipMax(localId) // gossip the max localID in the network
             } else {
-                gossipMin(localId) // gossip the min localID in the network
+                hopGossipMin(localId) // gossip the min localID in the network
             }
         }.apply {
             assertEquals(size, nodes.size)
