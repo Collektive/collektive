@@ -59,7 +59,7 @@ import kotlin.time.ExperimentalTime
  * It returns `true` if the timer has completed a full cycle,
  * `false` otherwise.
  */
-//@Serializable(with = InstantIso8601Serializer::class)
+// @Serializable(with = InstantIso8601Serializer::class)
 private fun <ID : Comparable<ID>> Aggregate<ID>.cyclicTimerWithDecay(timeout: Duration, decayRate: Duration): Boolean =
     evolve(timeout) { timer ->
         if (timer == ZERO) {
@@ -94,10 +94,11 @@ fun <ID : Comparable<ID>> Aggregate<ID>.countDownWithDecay(timeout: Duration, de
  * @return The duration between the `now` instant and the last stored timestamp in the aggregate.
  */
 @OptIn(ExperimentalTime::class)
-fun <ID : Comparable<ID>> Aggregate<ID>.localDeltaTime(now: Instant): Duration = evolving(DISTANT_PAST) { previousTime ->
-    val otherTime = if (previousTime == DISTANT_PAST) now else previousTime
-    now.yielding { (now - otherTime).coerceAtLeast(ZERO) }
-}
+fun <ID : Comparable<ID>> Aggregate<ID>.localDeltaTime(now: Instant): Duration =
+    evolving(DISTANT_PAST) { previousTime ->
+        val otherTime = if (previousTime == DISTANT_PAST) now else previousTime
+        now.yielding { (now - otherTime).coerceAtLeast(ZERO) }
+    }
 
 /**
  * Computes the minimum delta time from the given [localDelta] value and the shared data context
@@ -111,13 +112,14 @@ fun <ID : Comparable<ID>> Aggregate<ID>.localDeltaTime(now: Instant): Duration =
  */
 fun <ID : Comparable<ID>> Aggregate<ID>.minDelta(localDelta: Duration): Duration =
     sharing(localDelta) { deltaAround: Field<ID, Duration> ->
-        val deltaReplaced = deltaAround.replaceMatching(localDelta) { it.value <= ZERO }// useless when local delta is 0
+        val deltaReplaced = deltaAround.replaceMatching(localDelta) { it.value <= ZERO } // useless when local delta = 0
         val actualMin = (deltaReplaced.excludeSelf().values + localDelta)
             .filter { it > ZERO }.minOrNull() ?: localDelta
         localDelta.yielding { actualMin }
     }
 
 // sono meno conservativa, aggiungo quello che secondo me è la stima del delta rispetto agli altri
+
 /**
  * A shared clock across a network at the pace set by the fastest device.
  * Starts from an initial value that is the [current] time of execution of the device
@@ -130,7 +132,7 @@ fun <ID : Comparable<ID>> Aggregate<ID>.sharedClockWithLag(current: Instant): In
     println("NOW FOR $localId is $current")
     val localDelta: Duration = localDeltaTime(current)
     println("LOCAL DELTA: $localDelta")
-    println("device ${localId} neighbors: ${neighborhood().neighbors}")
+    println("device $localId neighbors: ${neighborhood().neighbors}")
     return share(DISTANT_PAST) { clocksAround: Field<ID, Instant> ->
 //        val minDelta: Duration = minDelta(localDelta)
 //        println("MIN DELTA: $minDelta")
@@ -148,7 +150,8 @@ fun <ID : Comparable<ID>> Aggregate<ID>.sharedClockWithLag(current: Instant): In
     }
 }
 
-//qui do un lower bound tempo al quale so di essere
+// qui do un lower bound tempo al quale so di essere
+
 /**
  * A shared clock across a network at the pace set by the fastest device.
  * Starts from an initial value that is the [current] time of execution of the device
@@ -167,7 +170,7 @@ fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(current: Instant): Instant {
 
 // shared clock -> Instant -> il device piu veloce sta a T
 
-// fun <ID : Comparable<ID>> Aggregate<ID>.sharedTimeElapsed(deltaTime: Instant): Duration =
+// fun <ID : Comparable<ID>> Aggregate<ID>. sharedTimeElapsed(deltaTime: Instant): Duration =
 //    share(deltaTime) { time ->
 // //        time.map { timeElapsed(it) }.max(base = ZERO)
 //    }

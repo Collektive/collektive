@@ -35,7 +35,9 @@ class SharedClockTest {
         status()[nodeId] shouldBe time
     }
 
-    fun gridWithExecutionFrequency(size: Int, frequency: Int) = mooreGrid<Instant>(size, size, { _, _ -> DISTANT_PAST }) {
+    fun gridWithExecutionFrequency(size: Int, frequency: Int) = mooreGrid<Instant>(size, size, { _, _ ->
+        DISTANT_PAST
+    }) {
         sharedClock(times[localId]).also { increaseTime(localId, frequency) }
     }
 
@@ -44,7 +46,7 @@ class SharedClockTest {
     }
 
     @Test
-    fun `After a single round of computation, all devices should return DISTANT_PAST`() {
+    fun `After a single round of computation all devices should return DISTANT_PAST`() {
         // execution sequence: d0 -> d1 -> d2 -> d3
         val environment: Environment<Instant> = gridWithExecutionFrequency(SIZE, SEQUENTIAL_FREQUENCY)
         environment.cycleInOrder()
@@ -54,7 +56,7 @@ class SharedClockTest {
     }
 
     @Test
-    fun `In two subsequent rounds of computation, the devices should increase their time by their delta seconds`() {
+    fun `In two subsequent rounds of computation the devices should increase their time by their delta seconds`() {
         // execution sequence: d0 -> d1 -> d2 -> d3 -> d0 -> d1 -> d2 -> d3
         val environment: Environment<Instant> = gridWithExecutionFrequency(SIZE, SEQUENTIAL_FREQUENCY)
         environment.cycleInOrder()
@@ -65,7 +67,7 @@ class SharedClockTest {
     }
 
     @Test
-    fun `In staggered rounds of computation, the devices should increase their time based on the fastest device`() {
+    fun `In staggered rounds of computation the devices should increase their time based on the fastest device`() {
         // execution sequence: d0 -> (d1 -> d0) -> (d2 -> d1) -> (d3 -> d2) -> d3 -> d0 -> d1 -> d2 -> d3
         val env: Environment<Instant> = gridWithExecutionFrequency(SIZE, ONE_SEC_FREQUENCY)
         for (n in 0 until NUM_DEVICES) {

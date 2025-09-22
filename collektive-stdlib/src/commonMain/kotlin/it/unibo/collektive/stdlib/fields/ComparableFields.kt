@@ -29,8 +29,8 @@ import kotlin.jvm.JvmOverloads
 fun <ID : Any, T : Comparable<T>> Field<ID, T>.max(reductionType: ReductionType = ExcludingSelf): FieldEntry<ID, T>? =
     maxBy(reductionType) { it.value }
 
-//TODO MAX OR NULL
-//TODO MIN OR NULL
+// TODO MAX OR NULL
+// TODO MIN OR NULL
 // min by { it > Zero }
 
 /**
