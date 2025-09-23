@@ -8,11 +8,11 @@
 
 @file:OptIn(ExperimentalKotlinGradlePluginApi::class)
 
-import de.aaschmid.gradle.plugins.cpd.Cpd
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektPlugin
 import io.gitlab.arturbosch.detekt.report.ReportMergeTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
@@ -24,6 +24,7 @@ plugins {
     alias(libs.plugins.kotest)
     alias(libs.plugins.kotlin.qa)
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.power.assert)
     alias(libs.plugins.publishOnCentral)
     alias(libs.plugins.taskTree)
@@ -31,10 +32,6 @@ plugins {
 }
 val reportMerge by tasks.registering(ReportMergeTask::class) {
     output = project.layout.buildDirectory.file("reports/merge.sarif")
-}
-
-gitSemVer {
-    assignGitSemanticVersion()
 }
 
 subprojects {
@@ -51,7 +48,6 @@ allprojects {
     with(rootProject.libs.plugins) {
         apply(plugin = dokka.id)
         apply(plugin = gitSemVer.id)
-        apply(plugin = kotest.id)
         apply(plugin = kotlin.qa.id)
         apply(plugin = kotlinx.serialization.id)
         apply(plugin = kover.id)
@@ -155,17 +151,17 @@ allprojects {
         }
     }
 
-    tasks.withType<Detekt>().configureEach { finalizedBy(reportMerge) }
+    tasks.withType<SourceTask>().matching { it is VerificationTask }.configureEach {
+        finalizedBy(reportMerge)
+        excludeGenerated()
+    }
+    // KtLint tasks are not SourceTasks nor VerificationTasks
+    tasks.withType<BaseKtLintCheckTask>().configureEach { excludeGenerated() }
+
     tasks.withType<GenerateReportsTask>().configureEach { finalizedBy(reportMerge) }
     reportMerge {
         input.from(tasks.withType<Detekt>().map { it.sarifReportFile })
         input.from(tasks.withType<GenerateReportsTask>().flatMap { it.reportsOutputDirectory.asFileTree.files })
-    }
-
-    tasks.withType<Cpd>().configureEach {
-        exclude {
-            it.file.absolutePath.contains("generated", ignoreCase = true)
-        }
     }
 }
 
@@ -191,18 +187,10 @@ kover {
 
 tasks {
     // Prevent publishing the root project (since is empty)
-    withType<AbstractPublishToMaven>().configureEach {
-        enabled = false
-    }
-    withType<GenerateModuleMetadata>().configureEach {
-        enabled = false
-    }
+    withType<AbstractPublishToMaven>().configureEach { enabled = false }
+    withType<GenerateModuleMetadata>().configureEach { enabled = false }
 
-    fun <T : Task> T.dependsOnIncludedBuilds() = dependsOn(
-            gradle.includedBuilds.map {
-                it.task(":$name")
-        }
-        )
+    fun <T : Task> T.dependsOnIncludedBuilds() = dependsOn(gradle.includedBuilds.map { it.task(":$name") })
     fun <T : Task> TaskProvider<T>.dependsOnIncludedBuilds() = configure { dependsOnIncludedBuilds() }
     fun <T : Task> TaskCollection<T>.dependsOnIncludedBuilds() = configureEach { dependsOnIncludedBuilds() }
     withType<KtLintFormatTask>().dependsOnIncludedBuilds()

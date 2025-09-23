@@ -36,9 +36,13 @@ kotlinJvm {
                 implementation(libs.bundles.alchemist)
                 implementation(libs.bundles.kotlin.compiler)
                 implementation(libs.caffeine)
-                implementation(libs.kotlin.test)
                 implementation(libs.kotlinx.serialization.core)
                 implementation(libs.slf4j)
+            }
+        }
+        val test by getting {
+            dependencies {
+                implementation(kotlin("test"))
             }
         }
     }
@@ -49,11 +53,7 @@ kotlinJvm {
         useJUnitPlatform()
         testLogging {
             showExceptions = true
-            events =
-                setOf(
-                    TestLogEvent.FAILED,
-                    TestLogEvent.PASSED,
-                )
+            events = setOf(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
             exceptionFormat = TestExceptionFormat.FULL
         }
     }

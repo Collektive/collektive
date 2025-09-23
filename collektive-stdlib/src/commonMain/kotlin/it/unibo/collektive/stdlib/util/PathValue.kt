@@ -11,6 +11,9 @@ package it.unibo.collektive.stdlib.util
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
+import it.unibo.collektive.aggregate.ids
+import it.unibo.collektive.aggregate.toMap
+import it.unibo.collektive.aggregate.values
 import kotlinx.serialization.Serializable
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -69,11 +72,7 @@ internal inline fun <reified Distance : Comparable<Distance>, reified ID : Any, 
  */
 @OptIn(DelicateCollektiveApi::class)
 @PublishedApi
-internal inline fun <
-    reified Distance : Comparable<Distance>,
-    reified ID : Any,
-    reified Value,
-    > Aggregate<ID>.nonLoopingPaths(
+internal inline fun <reified Distance, reified ID, reified Value> Aggregate<ID>.nonLoopingPaths(
     neighborData: Field<ID, PathValue<ID, Value, Distance>?>,
     coercedMetric: Field<ID, Distance>,
     maxDiameter: Int,
@@ -81,13 +80,14 @@ internal inline fun <
     top: Distance,
     crossinline accumulateData: (Distance, Distance, Value) -> Value,
     crossinline accumulateDistance: Reducer<Distance>,
-): Sequence<PathValue<ID, Value, Distance>> {
-    val neighbors = neighborData.neighbors
+): Sequence<PathValue<ID, Value, Distance>>
+where Distance : Comparable<Distance>, ID : Any {
+    val neighbors = neighborData.neighbors.ids.set
     val accDistances =
         neighborData.alignedMapValues(coercedMetric) { path, distance ->
             path?.distance?.let { accumulateDistance(it, distance) }
         }
-    val neighborAccumulatedDistances = accDistances.excludeSelf()
+    val neighborAccumulatedDistances = accDistances.neighbors.toMap()
     return neighborData
         .alignedMap(accDistances, coercedMetric) { id, path, accDist, distance ->
             path
@@ -96,7 +96,7 @@ internal inline fun <
                 ?.takeUnless { localId in path.hops }
                 ?.takeUnless { path.isInvalidViaShortcut(accDist, neighbors, neighborAccumulatedDistances) }
                 ?.run { accDist to lazy { update(id, distance, bottom, top, accumulateDistance, accumulateData) } }
-        }.excludeSelf().values.asSequence().filterNotNull().sortedBy { it.first }.map { it.second.value }
+        }.neighbors.values.sequence.filterNotNull().sortedBy { it.first }.map { it.second.value }
 }
 
 /**
