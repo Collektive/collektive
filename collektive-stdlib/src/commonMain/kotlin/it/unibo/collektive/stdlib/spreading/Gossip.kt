@@ -40,7 +40,7 @@ import kotlin.jvm.JvmOverloads
  * @param top The maximum distance value.
  * @param metric The distance field used to measure distances between devices.
  * @param maxDiameter The maximum allowable diameter for paths [default: Int.MAX_VALUE].
- * @param selector A function that determines how to select the preferred value during combination.
+ * @param reducer A function that determines how to select the preferred value during combination.
  *                 By default, it selects the first value encountered.
  * @param accumulateDistance The function used to combine distances during aggregation.
  * @return The final aggregated value after the gossiping process.
@@ -53,7 +53,7 @@ inline fun <reified ID : Comparable<ID>, reified Value, reified Distance : Compa
     top: Distance,
     metric: Field<ID, Distance>,
     maxDiameter: Int = Int.MAX_VALUE,
-    noinline selector: (Value, Value) -> Value = { first, _ -> first }, // identity function
+    noinline reducer: Reducer<Value> = { first, _ -> first }, // identity function
     crossinline accumulateDistance: Reducer<Distance>,
 ): Value {
     val coercedMetric = metric.coerceIn(bottom, top)
@@ -61,10 +61,10 @@ inline fun <reified ID : Comparable<ID>, reified Value, reified Distance : Compa
     return share(localCandidate) { candidate ->
         val nonLoopingPaths =
             nonLoopingPaths(candidate, coercedMetric, maxDiameter, bottom, top, { _, _, data ->
-                selector(local, data)
+                reducer(local, data)
             }, accumulateDistance)
         pathCoherence(nonLoopingPaths).fold(localCandidate) { current, next ->
-            val candidateValue = selector(current.data, next.data)
+            val candidateValue = reducer(current.data, next.data)
             when {
                 current.data == next.data -> listOf(current, next).minBy { it.hops.size }
                 candidateValue == current.data -> current
@@ -76,26 +76,26 @@ inline fun <reified ID : Comparable<ID>, reified Value, reified Distance : Compa
 
 /**
  * Propagates a value across a network of devices using a gossip-based approach. The method selects
- * new values based on a provided selector function while computing distances using a specified metric.
+ * new values based on a provided reducer function while computing distances using a specified metric.
  *
  * @param local the initial value held by the local device.
  * @param metric a function providing a distance metric between devices,
  * used to determine proximity during the gossip process.
- * @param selector a function used to select a value during the gossip process, given two candidate values.
+ * @param reducer a function used to select a value during the gossip process, given two candidate values.
  * @return the resulting value after the gossip process, based on the initial value,
- * the metric, and the selector function.
+ * the metric, and the reducer function.
  */
 @OptIn(DelicateCollektiveApi::class)
 inline fun <reified ID : Comparable<ID>, reified Value> Aggregate<ID>.gossip(
     local: Value,
     metric: Field<ID, Double>,
-    noinline selector: (Value, Value) -> Value,
+    noinline reducer: Reducer<Value>,
 ): Value = gossip(
     local = local,
     bottom = 0.0,
     top = Double.POSITIVE_INFINITY,
     metric = metric,
-    selector = selector,
+    reducer = reducer,
     accumulateDistance = Double::plus,
 )
 
@@ -108,7 +108,7 @@ inline fun <reified ID : Comparable<ID>, reified Value> Aggregate<ID>.gossip(
  * @param bottom The minimum hop distance considered in the aggregation.
  * @param top The maximum hop distance considered in the aggregation.
  * @param maxDiameter The maximum allowable diameter (in terms of hops) for paths, default is Int.MAX_VALUE.
- * @param selector A function to determine how to resolve conflicts between multiple values during aggregation.
+ * @param reducer A function to determine how to resolve conflicts between multiple values during aggregation.
  *                 By default, it selects the first value encountered.
  * @param accumulateDistance A reducer function for combining hop distances during the aggregation process.
  * @return The final aggregated value after the hop-based gossiping process.
@@ -119,7 +119,7 @@ inline fun <reified ID : Comparable<ID>, reified Value> Aggregate<ID>.hopGossip(
     bottom: Int,
     top: Int,
     maxDiameter: Int = Int.MAX_VALUE,
-    noinline selector: (Value, Value) -> Value = { first, _ -> first }, // identity function
+    noinline reducer: Reducer<Value> = { first, _ -> first }, // identity function
     crossinline accumulateDistance: Reducer<Int> = Int::plus,
 ): Value = gossip(
     local = local,
@@ -127,7 +127,7 @@ inline fun <reified ID : Comparable<ID>, reified Value> Aggregate<ID>.hopGossip(
     top = top,
     metric = hops(),
     maxDiameter = maxDiameter,
-    selector = selector,
+    reducer = reducer,
     accumulateDistance = accumulateDistance,
 )
 
@@ -139,20 +139,19 @@ inline fun <reified ID : Comparable<ID>, reified Value> Aggregate<ID>.hopGossip(
  * @param ID The type of the device identifier.
  * @param Value The type of the values being aggregated.
  * @param local The local value of the device executing the hop gossip.
- * @param selector A function to determine the preferred value when combining.
+ * @param reducer A function to determine the preferred value when combining.
  *                 It takes two values as input and returns the selected value.
  * @return The final aggregated value after the hop gossip process.
  */
-@OptIn(DelicateCollektiveApi::class)
 inline fun <reified ID : Comparable<ID>, reified Value> Aggregate<ID>.hopGossip(
     local: Value,
-    noinline selector: (Value, Value) -> Value,
+    noinline reducer: Reducer<Value>,
 ): Value = gossip(
     local = local,
     bottom = 0,
     top = Int.MAX_VALUE,
     metric = hops(),
-    selector = selector,
+    reducer = reducer,
     accumulateDistance = Int::plus,
 )
 
@@ -184,7 +183,7 @@ inline fun <
     top = top,
     metric = metric,
     maxDiameter = maxDiameter,
-    selector = ::maxOf,
+    reducer = ::maxOf,
     accumulateDistance = accumulateDistance,
 )
 
@@ -270,7 +269,7 @@ inline fun <
     top = top,
     metric = metric,
     maxDiameter = maxDiameter,
-    selector = ::minOf,
+    reducer = ::minOf,
     accumulateDistance = accumulateDistance,
 )
 
