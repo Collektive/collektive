@@ -67,4 +67,3 @@ fun <R> vonNeumannGrid(
  */
 fun <R> vonNeumannGrid(sizeX: Int, sizeY: Int, initial: R, program: Aggregate<Int>.(Environment<R>) -> R) =
     vonNeumannGrid<R>(sizeX, sizeY, { _, _ -> initial }, program)
-    
