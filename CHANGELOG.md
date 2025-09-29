@@ -1,3 +1,23 @@
+## [27.1.0](https://github.com/Collektive/collektive/compare/27.0.1...27.1.0) (2025-09-24)
+
+### Features
+
+* **stdlib:** add gossip overloadings ([#1170](https://github.com/Collektive/collektive/issues/1170)) ([c9a9b0a](https://github.com/Collektive/collektive/commit/c9a9b0abffcd7dd73e84fdf3b973327d8c7a240d))
+
+### Dependency updates
+
+* **deps:** update alchemist to v42.3.5 ([a287b63](https://github.com/Collektive/collektive/commit/a287b63eb43a82a89c2885623d57ac78e2b490f6))
+* **deps:** update dependency org.kotlincrypto.hash:sha3 to v0.8.0 ([7b37f10](https://github.com/Collektive/collektive/commit/7b37f10bef44dbb18b40d3b441447dd959e3fafb))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.144 ([f73b7a0](https://github.com/Collektive/collektive/commit/f73b7a0b8ba1c82b592608ddf8c0843de7793289))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.145 ([9c1d8a6](https://github.com/Collektive/collektive/commit/9c1d8a6cb2bff7db2d8b992096a748e5e5781666))
+* **deps:** update gradle to v9.1.0 ([66a1d60](https://github.com/Collektive/collektive/commit/66a1d6051d1bce0685ac11ca404b7f934d255223))
+* **deps:** update plugin gitsemver to v7.0.4 ([a0d76ed](https://github.com/Collektive/collektive/commit/a0d76ed29031f73fc920259fd5b263a47fca7ca9))
+* **deps:** update plugin kotlin-qa to v0.95.1 ([a5c3c32](https://github.com/Collektive/collektive/commit/a5c3c32cdb33e18ca465d91339d6a657cdf4477e))
+* **deps:** update plugin multijvmtesting to v4.1.2 ([4193d90](https://github.com/Collektive/collektive/commit/4193d903e1dc7220ce4b784839f47891a833d2c7))
+* **deps:** update plugin multijvmtesting to v4.2.0 ([f45bca9](https://github.com/Collektive/collektive/commit/f45bca91a0cd52c1c9ed17e4d77bdad9eb654c41))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.1.2 ([24b9cfb](https://github.com/Collektive/collektive/commit/24b9cfb93c8d9cdc24c6aa5d74ff05d41f92e2f4))
+* **deps:** update plugin publishoncentral to v9.1.5 ([1a2e5cf](https://github.com/Collektive/collektive/commit/1a2e5cf9e225d7e6fe0040f90cab26a6ad8dcbd8))
+
 ## [27.0.1](https://github.com/Collektive/collektive/compare/27.0.0...27.0.1) (2025-09-17)
 
 ### Dependency updates
