@@ -10,7 +10,6 @@ package it.unibo.collektive.stdlib
 
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.neighborhood
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.aggregate.api.sharing
@@ -57,7 +56,6 @@ import kotlin.time.Duration.Companion.ZERO
  * It returns `true` if the timer has completed a full cycle,
  * `false` otherwise.
  */
-// @Serializable(with = InstantIso8601Serializer::class)
 private fun <ID : Comparable<ID>> Aggregate<ID>.cyclicTimerWithDecay(timeout: Duration, decayRate: Duration): Boolean =
     evolve(timeout) { timer ->
         if (timer == ZERO) {
@@ -73,15 +71,6 @@ private fun <ID : Comparable<ID>> Aggregate<ID>.cyclicTimerWithDecay(timeout: Du
  */
 fun <ID : Comparable<ID>> Aggregate<ID>.countDownWithDecay(timeout: Duration, decayRate: Duration): Duration =
     timer(timeout, ZERO) { time -> time - decayRate }
-
-// fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(current: Instant = Clock.System.now(), interval: Duration): Instant =
-//    share(current) { clock ->
-//        val dt = deltaTime(current)è an
-//        when {
-//            dt >= interval -> clock.max(base = clock.localValue)
-//            else -> clock.localValue
-//        }
-//    }
 
 /**
  * Calculates the time difference between the current moment (`now`) and a previous timestamp.
@@ -117,8 +106,6 @@ fun <ID : Comparable<ID>> Aggregate<ID>.minDelta(localDelta: Duration): Duration
         localDelta.yielding { actualMin } // propagate local, return the overall minimum
     }
 
-// sono meno conservativa, aggiungo quello che secondo me è la stima del delta rispetto agli altri
-
 /**
  * A shared clock across a network at the pace set by the fastest device.
  * Starts from an initial value that is the [current] time of execution of the device
@@ -128,28 +115,23 @@ fun <ID : Comparable<ID>> Aggregate<ID>.minDelta(localDelta: Duration): Duration
  * but it is recommended to change it according to the requirements to achieve accurate and non-astonishing results.
  */
 fun <ID : Comparable<ID>> Aggregate<ID>.sharedClockWithLag(current: Instant): Instant {
-    println("NOW FOR $localId is $current")
-    val localDelta: Duration = localDeltaTime(current)
-    println("LOCAL DELTA: $localDelta")
-    println("device $localId neighbors: ${neighborhood().neighbors}")
+    val nbrLag = neighboringLag(current) // time elapsed from neighbors to the current device
     return share(DISTANT_PAST) { clocksAround: Field<ID, Instant> ->
-//        val minDelta: Duration = minDelta(localDelta)
-//        println("MIN DELTA: $minDelta")
-        println("CLOCKS AROUND: $clocksAround")
-        val nbrLag = neighboring(current).map { field ->
-            if (field.id == localId) localDelta else current - field.value
-        }
-        println("NBR LAG: $nbrLag")
-//        val clocks = clocksAround.mapValues { it + minDelta }
-//        println("CLOCKS: $clocks")
-        val res = clocksAround.alignedMap(nbrLag) { _, base, dt -> base + dt }.all.maxBy { it.value }.value
-        println("res $res")
-        res
-//        clocks.max(IncludingSelf)?.value ?: DISTANT_PAST
+        clocksAround.alignedMap(nbrLag) { _, base, dt -> base + dt }.all.maxBy { it.value }.value
     }
 }
 
-// qui do un lower bound tempo al quale so di essere
+/**
+ * Computes the lag in time duration for each neighboring device relative to the current time.
+ * The lag is zero for the local device and calculated as the difference between the current
+ * time and the timestamp value of each neighbor.
+ *
+ * @param current The current timestamp as an [Instant].
+ * @return A [Field] where each entry indicates the time lag ([Duration])
+ *         for both the local device (set to zero) and neighboring devices.
+ */
+fun <ID : Comparable<ID>> Aggregate<ID>.neighboringLag(current: Instant): Field<ID, Duration> =
+    neighboring(current).map { current - it.value }
 
 /**
  * A shared clock across a network at the pace set by the fastest device.
@@ -167,10 +149,17 @@ fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(current: Instant): Instant {
     }
 }
 
-// shared clock -> Instant -> il device piu veloce sta a T
-
 // fun <ID : Comparable<ID>> Aggregate<ID>. sharedTimeElapsed(deltaTime: Instant): Duration =
 //    share(deltaTime) { time ->
 // //        time.map { timeElapsed(it) }.max(base = ZERO)
 //    }
 //
+
+// fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(current: Instant, interval: Duration): Instant =
+//    share(current) { clock ->
+//        val dt = deltaTime(current)è an
+//        when {
+//            dt >= interval -> clock.max(base = clock.localValue)
+//            else -> clock.localValue
+//        }
+//    }
