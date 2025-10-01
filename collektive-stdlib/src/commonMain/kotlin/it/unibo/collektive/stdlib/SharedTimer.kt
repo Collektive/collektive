@@ -110,9 +110,11 @@ fun <ID : Comparable<ID>> Aggregate<ID>.localDeltaTime(now: Instant): Duration =
 fun <ID : Comparable<ID>> Aggregate<ID>.minDelta(localDelta: Duration): Duration =
     sharing(localDelta) { deltaAround: Field<ID, Duration> ->
         val deltaReplaced = deltaAround.replaceMatching(localDelta) { it.value <= ZERO } // useless when local delta = 0
-        val actualMin = deltaReplaced.neighbors.list.map { it.value + localDelta }
+        // use neighbor's delta and add my new local delta; otherwise it would propagate the old (possibly wrong) delta
+        // filtering out 0 to avoid blocking the clock, local delta if no other device has a valid delta
+        val actualMin = (deltaReplaced.neighbors.list.map { it.value } + localDelta)
             .filter { it > ZERO }.minOrNull() ?: localDelta
-        localDelta.yielding { actualMin }
+        localDelta.yielding { actualMin } // propagate local, return the overall minimum
     }
 
 // sono meno conservativa, aggiungo quello che secondo me è la stima del delta rispetto agli altri

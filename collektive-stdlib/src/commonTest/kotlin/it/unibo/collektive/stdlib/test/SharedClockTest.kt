@@ -24,10 +24,10 @@ class SharedClockTest {
 
     @BeforeTest
     fun setup() { // before each test
+        times.clear()
+        val baseTime = Instant.parse("2024-01-01T00:00:00Z")
         repeat(NUM_DEVICES) {
-            times += Instant.parse(
-                input = "2024-01-01T00:00:0$it.00Z",
-            )
+            times += baseTime + it.seconds
         }
     }
 
