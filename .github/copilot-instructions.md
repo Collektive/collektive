@@ -6,11 +6,6 @@ Collektive is a Kotlin multiplatform implementation of Aggregate Programming tha
 
 ## Working Effectively
 
-### Prerequisites and Setup
-- **Java**: Requires Java 17 or higher (project uses OpenJDK 17.0.16)
-- **Node.js**: Site documentation requires Node.js 22.19 (version 20.19.4 works but shows warnings)
-- **Gradle**: Uses Gradle 9.0.0 via wrapper (./gradlew) - downloads automatically
-
 ### Core Build Commands
 **CRITICAL**: Set timeouts of 60+ minutes for build commands. NEVER CANCEL long-running builds.
 
@@ -34,7 +29,6 @@ Collektive is a Kotlin multiplatform implementation of Aggregate Programming tha
 - **Install dependencies**: `cd site && npm install` -- takes ~50 seconds. Set timeout to 15+ minutes.
 - **Build site**: `cd site && npm run build` -- takes ~30 seconds. Expect SVG warnings (normal). Set timeout to 10+ minutes.
 - **Serve locally**: `cd site && npm run serve` (for testing changes)
-
 
 ### Build Timing Expectations
 - **NEVER CANCEL**: All builds and tests MUST complete. Set generous timeouts.
@@ -132,12 +126,6 @@ cd site && npm run build && cd ..
 Set timeouts of 60+ minutes for the full sequence. NEVER CANCEL running builds or tests.
 
 ## Troubleshooting
-
-### Network-Related Build Failures (Historical)
-Previously, native target compilation failed due to download.jetbrains.com access restrictions, but these have been resolved. If you encounter network issues:
-- **Current status**: Full multiplatform builds work correctly
-- **Fallback option**: Use JVM-specific tasks for faster iteration: `:collektive-dsl:jvmTest` instead of just `test`
-- **Build scan publishing**: May occasionally fail but does not affect build success
 
 ### Node.js Version Warnings
 - Site build shows engine warnings for Node.js version mismatch
