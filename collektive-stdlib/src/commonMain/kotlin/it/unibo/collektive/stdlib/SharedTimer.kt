@@ -151,14 +151,9 @@ fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(timeSensed: Instant): Instan
  * but it is recommended to change it according to the requirements to achieve accurate and non-astonishing results.
  */
 fun <ID : Comparable<ID>> Aggregate<ID>.sharedClockWithLag(current: Instant): Instant {
-    println("device $localId current $current")
     val nbrLag = neighboringLag(current) // time elapsed from neighbors to the current device
-    println("device $localId nbrlag $nbrLag")
     return share(DISTANT_PAST) { clocksAround: Field<ID, Instant> ->
-        println("device $localId clocksAround $clocksAround")
-        val mapped = clocksAround.alignedMap(nbrLag) { _, base, dt -> base + dt }
-        println("device $localId mapped $mapped")
-        mapped.all.maxBy { it.value }.value
+        clocksAround.alignedMap(nbrLag) { _, base, dt -> base + dt }.all.maxBy { it.value }.value
     }
 }
 
