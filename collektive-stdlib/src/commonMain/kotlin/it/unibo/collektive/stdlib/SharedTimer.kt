@@ -107,6 +107,42 @@ fun <ID : Comparable<ID>> Aggregate<ID>.minDelta(localDelta: Duration): Duration
     }
 
 /**
+ * Computes the lag in time duration for each neighboring device relative to the current time.
+ * The lag is zero for the local device and calculated as the difference between the current
+ * time and the timestamp value of each neighbor.
+ *
+ * @param timeSensed The current timestamp as an [Instant].
+ * @return A [Field] where each entry indicates the time lag ([Duration])
+ *         for both the local device (set to zero) and neighboring devices.
+ */
+fun <ID : Comparable<ID>> Aggregate<ID>.neighboringLag(timeSensed: Instant): Field<ID, Duration> =
+    neighboring(timeSensed).map { timeSensed - it.value }
+
+/**
+ * A shared clock across a network at the pace set by the fastest device.
+ * Starts from an initial value that is the [timeSensed] time of execution of the device
+ * and returns the [Instant] of the fastest device.
+ *
+ * **N.B.**: [timeSensed] is set as default to the current system time,
+ * but it is recommended to change it according to the requirements to achieve accurate and non-astonishing results.
+ */
+fun <ID : Comparable<ID>> Aggregate<ID>.sharedClockWithMinDelta(timeSensed: Instant): Instant {
+    val localDelta: Duration = localDeltaTime(timeSensed)
+    val minDelta = minDelta(localDelta)
+    return share(DISTANT_PAST) { clocksAround: Field<ID, Instant> ->
+        (clocksAround.all.maxBy { it.value }.value) + minDelta
+    }
+}
+
+fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(timeSensed: Instant): Instant {
+    val localDelta: Duration = localDeltaTime(timeSensed)
+    return share(DISTANT_PAST) { clocksAround: Field<ID, Instant> ->
+        val localClockWithDelta = clocksAround.local.value + localDelta
+        maxOf(localClockWithDelta, clocksAround.all.maxBy { it.value }.value)
+    }
+}
+
+/**
  * A shared clock across a network at the pace set by the fastest device.
  * Starts from an initial value that is the [current] time of execution of the device
  * and returns the [Instant] of the fastest device.
@@ -115,37 +151,14 @@ fun <ID : Comparable<ID>> Aggregate<ID>.minDelta(localDelta: Duration): Duration
  * but it is recommended to change it according to the requirements to achieve accurate and non-astonishing results.
  */
 fun <ID : Comparable<ID>> Aggregate<ID>.sharedClockWithLag(current: Instant): Instant {
+    println("device $localId current $current")
     val nbrLag = neighboringLag(current) // time elapsed from neighbors to the current device
+    println("device $localId nbrlag $nbrLag")
     return share(DISTANT_PAST) { clocksAround: Field<ID, Instant> ->
-        clocksAround.alignedMap(nbrLag) { _, base, dt -> base + dt }.all.maxBy { it.value }.value
-    }
-}
-
-/**
- * Computes the lag in time duration for each neighboring device relative to the current time.
- * The lag is zero for the local device and calculated as the difference between the current
- * time and the timestamp value of each neighbor.
- *
- * @param current The current timestamp as an [Instant].
- * @return A [Field] where each entry indicates the time lag ([Duration])
- *         for both the local device (set to zero) and neighboring devices.
- */
-fun <ID : Comparable<ID>> Aggregate<ID>.neighboringLag(current: Instant): Field<ID, Duration> =
-    neighboring(current).map { current - it.value }
-
-/**
- * A shared clock across a network at the pace set by the fastest device.
- * Starts from an initial value that is the [current] time of execution of the device
- * and returns the [Instant] of the fastest device.
- *
- * **N.B.**: [current] is set as default to the current system time,
- * but it is recommended to change it according to the requirements to achieve accurate and non-astonishing results.
- */
-fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(current: Instant): Instant {
-    val localDelta: Duration = localDeltaTime(current)
-    val minDelta = minDelta(localDelta)
-    return share(DISTANT_PAST) { clocksAround: Field<ID, Instant> ->
-        (clocksAround.all.maxBy { it.value }.value) + minDelta
+        println("device $localId clocksAround $clocksAround")
+        val mapped = clocksAround.alignedMap(nbrLag) { _, base, dt -> base + dt }
+        println("device $localId mapped $mapped")
+        mapped.all.maxBy { it.value }.value
     }
 }
 

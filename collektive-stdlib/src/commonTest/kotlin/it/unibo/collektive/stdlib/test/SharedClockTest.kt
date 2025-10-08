@@ -9,7 +9,9 @@
 package it.unibo.collektive.stdlib.test
 
 import io.kotest.matchers.shouldBe
+import it.unibo.collektive.stdlib.sharedClock
 import it.unibo.collektive.testing.Environment
+import it.unibo.collektive.testing.mooreGrid
 import kotlinx.datetime.Instant
 import kotlinx.datetime.Instant.Companion.DISTANT_PAST
 import kotlin.test.BeforeTest
@@ -18,7 +20,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
-class SharedClockTest : SharedClockTestUtils() {
+class SharedClockTest {
 
     @BeforeTest
     fun setup() { // before each test
@@ -38,22 +40,143 @@ class SharedClockTest : SharedClockTestUtils() {
         firstCycle.size shouldBe 1
         firstCycle.first() shouldBe DISTANT_PAST
     }
-   @Test
+
+    @Test
     fun `In two subsequent rounds of computation the devices should increase their time by their delta seconds`() {
         // execution sequence: d0 -> d1 -> d2 -> d3 -> d0 -> d1 -> d2 -> d3
         val env: Environment<Instant> = gridWithExecutionFrequency(SIZE, SEQUENTIAL_FREQUENCY)
         env.executeSubsequentRounds(times = 2)
-        env.nodes.forEach { node ->
-            env.shouldBeInstant(node.id, DISTANT_PAST + (SEQUENTIAL_FREQUENCY.seconds * (node.id + 1)))
-        }
+        val twoRounds = env.status().values.distinct()
+        twoRounds.size shouldBe 1
+        twoRounds.first() shouldBe DISTANT_PAST + SEQUENTIAL_FREQUENCY.seconds
     }
 
     @Test
     fun `In staggered rounds of computation the devices should increase their time based on the fastest device`() {
         // execution sequence: d0 -> (d1 -> d0) -> (d2 -> d1) -> (d3 -> d2) -> d3 -> d0 -> d1 -> d2 -> d3
         val env: Environment<Instant> = gridWithExecutionFrequency(SIZE, ONE_SEC_FREQUENCY)
-        env.executeStaggeredRounds()
-        val expected = listOf(7, 8, 9, 13).map { DISTANT_PAST + it.seconds }
-        env.nodes.forEachIndexed { index, node -> env.shouldBeInstant(node.id, expected[index]) }
+        for (n in 0 until NUM_DEVICES) {
+            env.nodes.elementAt(n).cycle()
+            if (n > 0) env.nodes.elementAt(n - 1).cycle()
+        }
+        env.nodes.last().cycle()
+        // change the device's execution frequency to execute after the time of the last device that has cycled
+        env.nodes.forEach { node ->
+            // minus one second because it has already been added after the first cycle
+            increaseTime(node.id, ONE_SEC_FREQUENCY * (SEQUENTIAL_FREQUENCY - ONE_SEC_FREQUENCY))
+        }
+        env.cycleInOrder()
+        val offset = env.nodes.size + ONE_SEC_FREQUENCY // each device gets an additional offset per round
+        val expected = listOf(offset, offset, offset + ONE_SEC_FREQUENCY, offset + ONE_SEC_FREQUENCY)
+        env.nodes.forEachIndexed { index, node -> env.shouldBeInstant(node.id, DISTANT_PAST + expected[index].seconds) }
+    }
+
+    @Test
+    fun `A single device that execute with a higher timestamp should put forward the time`() {
+        // execution sequence: d0 -> d1 -> d2 -> d3 -> d0 -> d1 -> d2 -> d3 ->
+        // -> d0 (drift time) -> d1 -> d2 -> d3 -> d1 -> d2 -> d3 (d0 is disappeared)
+        val env: Environment<Instant> = gridWithExecutionFrequency(SIZE, SEQUENTIAL_FREQUENCY)
+        val subsequentRounds = 2
+        env.executeSubsequentRounds(times = subsequentRounds)
+        val node = env.nodes.find { it.id == 0 }
+        // put device 0 at virtual time 20
+        // (it was already at virtual time 8, as the timestamp has been increased twice by SEQUENTIAL_FREQUENCY)
+        val driftTime = SEQUENTIAL_FREQUENCY * 3
+        increaseTime(node!!.id, driftTime)
+        // execute a single round with the fast-forwarded device
+        env.executeSubsequentRounds(times = 1)
+        // simulate the death of device 0
+        env.nodes.filter { it.id != node.id }.forEach { n -> n.cycle() }
+        val deadDeviceTime = (SEQUENTIAL_FREQUENCY * subsequentRounds) + driftTime
+        val inSynch = deadDeviceTime + SEQUENTIAL_FREQUENCY
+        val expected = listOf(deadDeviceTime, inSynch, inSynch, inSynch)
+        env.nodes.forEachIndexed { index, node -> env.shouldBeInstant(node.id, DISTANT_PAST + expected[index].seconds) }
+    }
+
+    companion object {
+        /**
+         * The default size used for creating grid-based environments in gossip tests.
+         *
+         * It typically represents the edge length of a square grid or the number of nodes
+         * in a linear grid, depending on the test case. The value is used to initialize
+         * the network size for simulation purposes.
+         */
+        private const val SIZE = 2
+
+        /**
+         * Represents the total number of devices in a square grid network.
+         * This constant is computed as the square of the grid size (`SIZE`),
+         * assuming the grid is dimensioned as `SIZE x SIZE`.
+         */
+        private const val NUM_DEVICES = SIZE * SIZE
+
+        /**
+         * Represents the frequency, in seconds, of a specific process or operation.
+         *
+         * This constant is typically used to define intervals or timing for processes
+         * that need to occur at a one-second frequency.
+         */
+        private const val ONE_SEC_FREQUENCY = 1
+
+        /**
+         * Defines the frequency of sequential operations, represented as the total number of devices
+         * in the environment.
+         *
+         * This constant is used in testing environments to determine the behavior or execution steps
+         * relative to the number of devices in a network.
+         */
+        private const val SEQUENTIAL_FREQUENCY = NUM_DEVICES
+
+        /**
+         * A mutable list that keeps track of timestamps represented as `Instant`.
+         * Can be used to store and manage instances of time within a test scenario
+         * or other temporal context.
+         */
+        private val times = mutableListOf<Instant>()
+
+        /**
+         * Verifies that the node with the specified [nodeId] in the environment has the given [time] as its value.
+         *
+         * @param nodeId the ID of the node whose value is being verified.
+         * @param time the expected value of the node, represented as an Instant.
+         */
+        private fun <R> Environment<R>.shouldBeInstant(nodeId: Int, time: Instant) {
+            status()[nodeId] shouldBe time
+        }
+
+        /**
+         * Creates a grid environment of the specified size where each node has a shared clock with execution frequency adjustment.
+         *
+         * @param size the size of the grid (both width and height).
+         * @param frequency the frequency at which to increase the clock value of each node.
+         */
+        private fun gridWithExecutionFrequency(size: Int, frequency: Int) = mooreGrid<Instant>(size, size, { _, _ ->
+            DISTANT_PAST
+        }) {
+            sharedClock(times[localId]).also { increaseTime(localId, frequency) }
+        }
+
+        /**
+         * Increases the time for a specific node by a given frequency.
+         *
+         * @param node The identifier of the node whose time is to be increased.
+         * @param frequency The frequency in seconds to be added to the node's current time.
+         */
+        private fun increaseTime(node: Int, frequency: Int) {
+            times[node] = times[node] + frequency.seconds
+        }
+
+        /**
+         * Executes the specified number of subsequent rounds in the environment.
+         * Each round runs a cycle for all the nodes in the environment,
+         * following the order of node IDs from the lowest to the highest.
+         *
+         * @param times the number of rounds to execute. Defaults to 1 if no value is provided.
+         */
+        private fun Environment<Instant>.executeSubsequentRounds(times: Int = 1) {
+            repeat(times) {
+                cycleInOrder()
+            }
+        }
     }
 }
