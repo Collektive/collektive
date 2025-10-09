@@ -29,14 +29,14 @@ import kotlin.time.Duration.Companion.seconds
  * The timer is shared among all devices,
  * and it is alive for [timeLeft] units of time.
  */
- fun <ID : Comparable<ID>> Aggregate<ID>.sharedTimer(
+fun <ID : Comparable<ID>> Aggregate<ID>.sharedTimer(
     processTime: Instant,
     timeLeft: Duration,
     decay: Duration,
     step: Duration,
- ): Duration {
+): Duration {
+    val clockPerceived: Instant = sharedClock(processTime)
     share(processTime) { clock: Field<ID, Instant> ->
-        val clockPerceived: Instant = sharedClock(processTime)
         val dt: Duration = localDeltaTime(processTime)
         val decayRate = when {
             dt >= step -> timeLeft - decay
