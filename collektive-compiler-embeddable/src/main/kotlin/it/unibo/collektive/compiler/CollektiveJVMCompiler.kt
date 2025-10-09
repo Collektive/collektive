@@ -9,6 +9,7 @@
 package it.unibo.collektive.compiler
 
 import it.unibo.collektive.compiler.logging.SLF4JMessageCollector
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.cli.common.arguments.K2JVMCompilerArguments
 import org.jetbrains.kotlin.cli.common.config.addKotlinSourceRoot
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -57,6 +58,7 @@ object CollektiveJVMCompiler {
      * Configures the Kotlin-JVM compiler to compile the [inputFiles] using the Collektive plugin.
      * When [inputFiles] contains a directory, it is used as a source root.
      */
+    @OptIn(K1Deprecation::class)
     @JvmStatic
     @JvmOverloads
     fun compile(
