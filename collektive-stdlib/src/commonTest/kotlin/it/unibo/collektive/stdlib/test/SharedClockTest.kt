@@ -34,7 +34,7 @@ class SharedClockTest {
     @Test
     fun `After a single round of computation all devices should return DISTANT_PAST`() {
         // execution sequence: d0 -> d1 -> d2 -> d3
-        val env: Environment<Instant> = gridWithExecutionFrequency(SIZE, SEQUENTIAL_FREQUENCY)
+        val env: Environment<Instant> = gridWithExecutionFrequency(SEQUENTIAL_FREQUENCY)
         env.executeSubsequentRounds(times = 1)
         val firstCycle = env.status().values.distinct()
         firstCycle.size shouldBe 1
@@ -44,7 +44,7 @@ class SharedClockTest {
     @Test
     fun `In two subsequent rounds of computation the devices should increase their time by their delta seconds`() {
         // execution sequence: d0 -> d1 -> d2 -> d3 -> d0 -> d1 -> d2 -> d3
-        val env: Environment<Instant> = gridWithExecutionFrequency(SIZE, SEQUENTIAL_FREQUENCY)
+        val env: Environment<Instant> = gridWithExecutionFrequency(SEQUENTIAL_FREQUENCY)
         env.executeSubsequentRounds(times = 2)
         val twoRounds = env.status().values.distinct()
         twoRounds.size shouldBe 1
@@ -54,7 +54,7 @@ class SharedClockTest {
     @Test
     fun `In staggered rounds of computation the devices should increase their time based on the fastest device`() {
         // execution sequence: d0 -> (d1 -> d0) -> (d2 -> d1) -> (d3 -> d2) -> d3 -> d0 -> d1 -> d2 -> d3
-        val env: Environment<Instant> = gridWithExecutionFrequency(SIZE, ONE_SEC_FREQUENCY)
+        val env: Environment<Instant> = gridWithExecutionFrequency(ONE_SEC_FREQUENCY)
         for (n in 0 until NUM_DEVICES) {
             env.nodes.elementAt(n).cycle()
             if (n > 0) env.nodes.elementAt(n - 1).cycle()
@@ -75,7 +75,7 @@ class SharedClockTest {
     fun `A single device that execute with a higher timestamp should put forward the time`() {
         // execution sequence: d0 -> d1 -> d2 -> d3 -> d0 -> d1 -> d2 -> d3 ->
         // -> d0 (drift time) -> d1 -> d2 -> d3 -> d1 -> d2 -> d3 (d0 is disappeared)
-        val env: Environment<Instant> = gridWithExecutionFrequency(SIZE, SEQUENTIAL_FREQUENCY)
+        val env: Environment<Instant> = gridWithExecutionFrequency(SEQUENTIAL_FREQUENCY)
         val subsequentRounds = 2
         env.executeSubsequentRounds(times = subsequentRounds)
         val node = env.nodes.find { it.id == 0 }
@@ -147,10 +147,9 @@ class SharedClockTest {
         /**
          * Creates a grid environment of the specified size where each node has a shared clock with execution frequency adjustment.
          *
-         * @param size the size of the grid (both width and height).
          * @param frequency the frequency at which to increase the clock value of each node.
          */
-        private fun gridWithExecutionFrequency(size: Int, frequency: Int) = mooreGrid<Instant>(size, size, { _, _ ->
+        private fun gridWithExecutionFrequency(frequency: Int) = mooreGrid<Instant>(SIZE, SIZE, { _, _ ->
             DISTANT_PAST
         }) {
             sharedClock(times[localId]).also { increaseTime(localId, frequency) }
