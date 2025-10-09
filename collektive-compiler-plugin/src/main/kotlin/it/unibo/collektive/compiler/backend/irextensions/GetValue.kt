@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.IrGetValue
+import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
 import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.util.defaultType
 
@@ -36,6 +37,7 @@ import org.jetbrains.kotlin.ir.util.defaultType
  * @throws IllegalStateException if the receiver is not assignable from
  *   [it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME]
  */
+@OptIn(UnsafeDuringIrConstructionAPI::class)
 internal fun IrGetValue.buildGetFieldContext(
     pluginContext: IrPluginContext,
     aggregateClass: IrClass,
@@ -45,9 +47,8 @@ internal fun IrGetValue.buildGetFieldContext(
     check(type.isAssignableFrom(fieldClass.defaultType)) {
         "Expected a Field, but got a: ${type.classFqName}"
     }
-    return IrSingleStatementBuilder(pluginContext, Scope(getContext.symbol), startOffset, endOffset)
-        .build {
-            irCall(getContext.symbol, aggregateClass.defaultType)
-                .apply { dispatchReceiver = this@buildGetFieldContext }
-        }
+    return IrSingleStatementBuilder(pluginContext, Scope(getContext.symbol), startOffset, endOffset).build {
+        irCall(getContext.symbol, aggregateClass.defaultType)
+            .apply { dispatchReceiver = this@buildGetFieldContext }
+    }
 }
