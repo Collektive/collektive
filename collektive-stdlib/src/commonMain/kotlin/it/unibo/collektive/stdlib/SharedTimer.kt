@@ -19,36 +19,39 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.Instant.Companion.DISTANT_PAST
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * A shared timer progressing evenly across a network, at the pace set by the fastest device.
- * This function is useful to ensure that devices with drifting clocks or different round evaluation frequency
+ * This function is useful to ensure that devices with drifting clocks or different round evaluation frequencies
  * operate in a synchronized way.
  * The timer starts at [processTime] and decreases the [timeLeft] by [decay] every [step].
  * The timer is shared among all devices,
  * and it is alive for [timeLeft] units of time.
  */
-// fun <ID : Comparable<ID>> Aggregate<ID>.sharedTimer(
-//    processTime: Instant,
-//    timeLeft: Duration,
-//    decay: Duration,
-//    step: Duration,
-// ): Duration =
-//    share(processTime) { clock: Field<ID, Instant> ->
-//        val clockPerceived: Instant = sharedClock(processTime, step)
-//        val dt: Duration = deltaTime(processTime)
-//        when {
-//            dt >= step -> timeLeft - decay
-//            else -> clockPerceived
-//        }
-//    }
+ fun <ID : Comparable<ID>> Aggregate<ID>.sharedTimer(
+    processTime: Instant,
+    timeLeft: Duration,
+    decay: Duration,
+    step: Duration,
+ ): Duration {
+    share(processTime) { clock: Field<ID, Instant> ->
+        val clockPerceived: Instant = sharedClock(processTime)
+        val dt: Duration = localDeltaTime(processTime)
+        val decayRate = when {
+            dt >= step -> timeLeft - decay
+            else -> clockPerceived
+        }
 
-//        if (clockPerceived <= clock.localValue) {
-//             currently as fast as the fastest device in the neighborhood, so keep on counting time
-//            clock.localValue + if (cyclicTimerWithDecay(timeLeft, processTime)) 1.toDuration(SECONDS) else ZERO
-//        } else {
-//            clockPerceived
-//        }
+        if (clockPerceived <= clock.local.value) {
+//        currently as fast as the fastest device in the neighborhood, so keep on counting time
+            clock.local.value + if (cyclicTimerWithDecay(timeLeft, decay)) 1.seconds else ZERO
+        } else {
+            clockPerceived
+        }
+    }
+    return ZERO
+}
 
 /**
  * A cyclic timer that decays over time.
@@ -134,26 +137,22 @@ fun <ID : Comparable<ID>> Aggregate<ID>.sharedClockWithMinDelta(timeSensed: Inst
     }
 }
 
+/**
+ * Synchronizes the local clock of the aggregate with the maximum clock value among its neighbors,
+ * ensuring that time does not move backward. The synchronization includes a local time adjustment
+ * based on the sensed time delta.
+ *
+ * @param timeSensed The current timestamp sensed (used to calculate the local time difference).
+ * @return The resulting synchronized timestamp for the local device.
+ * @throws IllegalArgumentException if the local time delta is computed to be negative, indicating
+ * that time has moved backward, which is not allowed.
+ */
 fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(timeSensed: Instant): Instant {
     val localDelta: Duration = localDeltaTime(timeSensed)
+    require(localDelta >= ZERO) { "Time has moved backwards. This should not happen." }
     return share(DISTANT_PAST) { clocksAround: Field<ID, Instant> ->
         val localClockWithDelta = clocksAround.local.value + localDelta
         maxOf(localClockWithDelta, clocksAround.all.maxBy { it.value }.value)
-    }
-}
-
-/**
- * A shared clock across a network at the pace set by the fastest device.
- * Starts from an initial value that is the [current] time of execution of the device
- * and returns the [Instant] of the fastest device.
- *
- * **N.B.**: [current] is set as default to the current system time,
- * but it is recommended to change it according to the requirements to achieve accurate and non-astonishing results.
- */
-fun <ID : Comparable<ID>> Aggregate<ID>.sharedClockWithLag(current: Instant): Instant {
-    val nbrLag = neighboringLag(current) // time elapsed from neighbors to the current device
-    return share(DISTANT_PAST) { clocksAround: Field<ID, Instant> ->
-        clocksAround.alignedMap(nbrLag) { _, base, dt -> base + dt }.all.maxBy { it.value }.value
     }
 }
 
@@ -165,7 +164,7 @@ fun <ID : Comparable<ID>> Aggregate<ID>.sharedClockWithLag(current: Instant): In
 
 // fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(current: Instant, interval: Duration): Instant =
 //    share(current) { clock ->
-//        val dt = deltaTime(current)è an
+//        val dt = deltaTime(current)
 //        when {
 //            dt >= interval -> clock.max(base = clock.localValue)
 //            else -> clock.localValue
