@@ -1,3 +1,17 @@
+## [27.3.0](https://github.com/Collektive/collektive/compare/27.2.0...27.3.0) (2025-10-11)
+
+### Features
+
+* **stdlib:** simplify gossip functions and improve parameter handling ([f764608](https://github.com/Collektive/collektive/commit/f764608f7eac8ec886aa0485a9a086b0b0415177))
+
+### Dependency updates
+
+* **deps:** update alchemist to v42.3.8 ([6540959](https://github.com/Collektive/collektive/commit/6540959b645722d71d7519e7e4d0c314e998415b))
+
+### Build and continuous integration
+
+* **deps:** update github/codeql-action action to v4.30.8 ([e36bcbe](https://github.com/Collektive/collektive/commit/e36bcbe796cb542f058dc94c9adf9fcb63effb15))
+
 ## [27.2.0](https://github.com/Collektive/collektive/compare/27.1.0...27.2.0) (2025-10-09)
 
 ### Features
