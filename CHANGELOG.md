@@ -1,3 +1,21 @@
+## [27.3.1](https://github.com/Collektive/collektive/compare/27.3.0...27.3.1) (2025-10-16)
+
+### Dependency updates
+
+* **core-deps:** update plugin kover to v0.9.3 ([a4e0f95](https://github.com/Collektive/collektive/commit/a4e0f95ff896b6f627533e01c8fa409a153a7659))
+* **deps:** update alchemist to v42.3.10 ([4efe60c](https://github.com/Collektive/collektive/commit/4efe60c6dfdf091e4ae17ee6e3e772c8ffb561ac))
+* **deps:** update alchemist to v42.3.11 ([d15edcc](https://github.com/Collektive/collektive/commit/d15edcc8d1a0c55dc7fca45e8a5ba644f3158264))
+* **deps:** update alchemist to v42.3.12 ([dd29353](https://github.com/Collektive/collektive/commit/dd29353e05fe11242b614906e4a1f02acfd4c809))
+* **deps:** update alchemist to v42.3.9 ([41171d1](https://github.com/Collektive/collektive/commit/41171d1b2c3615117420e8c6da96e2bab6e7ec54))
+* **deps:** update dependency org.jetbrains.dokka to v2.1.0 ([ecc6659](https://github.com/Collektive/collektive/commit/ecc66597b9de80d637ec4854084121833c13cf2f))
+* **deps:** update dependency react-router-dom to v7.9.4 ([56b6f13](https://github.com/Collektive/collektive/commit/56b6f13f4138052d5a6cabee6a8821625b7f7e45))
+* **deps:** update kotest to v6.0.4 ([140d2a0](https://github.com/Collektive/collektive/commit/140d2a0072642343c93080f04746dab897f43c15))
+* **deps:** update plugin com.gradle.develocity to v4.2.2 ([0ad787a](https://github.com/Collektive/collektive/commit/0ad787af1415c5016a84e52f677a4756d8160897))
+
+### Build and continuous integration
+
+* **deps:** update actions/setup-node action to v6 ([5c31154](https://github.com/Collektive/collektive/commit/5c31154e6657ecfb8f50d636622dbe614d229f71))
+
 ## [27.3.0](https://github.com/Collektive/collektive/compare/27.2.0...27.3.0) (2025-10-11)
 
 ### Features
