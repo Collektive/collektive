@@ -19,61 +19,23 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.Instant.Companion.DISTANT_PAST
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
-import kotlin.time.Duration.Companion.seconds
 
 /**
- * A shared timer progressing evenly across a network, at the pace set by the fastest device.
- * This function is useful to ensure that devices with drifting clocks or different round evaluation frequencies
- * operate in a synchronized way.
- * The timer starts at [processTime] and decreases the [timeLeft] by [decay] every [step].
- * The timer is shared among all devices,
- * and it is alive for [timeLeft] units of time.
+ * Checks if enough time has passed since the last recorded process time
+ * to consider that the time-to-live has been exceeded.
+ *
+ * @param processTime The timestamp of the last recorded process time.
+ * @param timeToWait The duration representing the time-to-live threshold.
+ * @return `true` if the elapsed time since `processTime` exceeds `timeToLive`, `false` otherwise.
  */
-fun <ID : Comparable<ID>> Aggregate<ID>.sharedTimer(
+fun <ID : Comparable<ID>> Aggregate<ID>.enoughTimeHasPassed(
     processTime: Instant,
-    timeLeft: Duration,
-    decay: Duration,
-    step: Duration,
-): Duration {
+    timeToWait: Duration,
+): Boolean {
     val clockPerceived: Instant = sharedClock(processTime)
-    share(processTime) { clock: Field<ID, Instant> ->
-        val dt: Duration = localDeltaTime(processTime)
-        val decayRate = when {
-            dt >= step -> timeLeft - decay
-            else -> clockPerceived
-        }
-
-        if (clockPerceived <= clock.local.value) {
-//        currently as fast as the fastest device in the neighborhood, so keep on counting time
-            clock.local.value + if (cyclicTimerWithDecay(timeLeft, decay)) 1.seconds else ZERO
-        } else {
-            clockPerceived
-        }
-    }
-    return ZERO
+    val timeElapsed = localDeltaTime(clockPerceived)
+    return (timeToWait - timeElapsed) <= ZERO
 }
-
-/**
- * A cyclic timer that decays over time.
- * It starts from a [timeout] and decreases by [decayRate].
- * It returns `true` if the timer has completed a full cycle,
- * `false` otherwise.
- */
-private fun <ID : Comparable<ID>> Aggregate<ID>.cyclicTimerWithDecay(timeout: Duration, decayRate: Duration): Boolean =
-    evolve(timeout) { timer ->
-        if (timer == ZERO) {
-            timeout
-        } else {
-            countDownWithDecay(timeout, decayRate)
-        }
-    } == timeout
-
-/**
- * A timer that decays over time.
- * It starts from a [timeout] and decreases by [decayRate].
- */
-fun <ID : Comparable<ID>> Aggregate<ID>.countDownWithDecay(timeout: Duration, decayRate: Duration): Duration =
-    timer(timeout, ZERO) { time -> time - decayRate }
 
 /**
  * Calculates the time difference between the current moment (`now`) and a previous timestamp.
@@ -155,18 +117,3 @@ fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(timeSensed: Instant): Instan
         maxOf(localClockWithDelta, clocksAround.all.maxBy { it.value }.value)
     }
 }
-
-// fun <ID : Comparable<ID>> Aggregate<ID>. sharedTimeElapsed(deltaTime: Instant): Duration =
-//    share(deltaTime) { time ->
-// //        time.map { timeElapsed(it) }.max(base = ZERO)
-//    }
-//
-
-// fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(current: Instant, interval: Duration): Instant =
-//    share(current) { clock ->
-//        val dt = deltaTime(current)
-//        when {
-//            dt >= interval -> clock.max(base = clock.localValue)
-//            else -> clock.localValue
-//        }
-//    }

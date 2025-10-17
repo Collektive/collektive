@@ -10,6 +10,7 @@ package it.unibo.collektive.stdlib
 
 import it.unibo.collektive.aggregate.api.Aggregate
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.ZERO
 
 /**
  * A timer that decays over time.
@@ -24,3 +25,25 @@ fun <ID : Comparable<ID>> Aggregate<ID>.timer(
 ): Duration = evolve(initial) { timeLeft ->
     decayRate(timeLeft).coerceIn(lowerBound, initial)
 }
+
+/**
+ * A cyclic timer that decays over time.
+ * It starts from a [timeout] and decreases by [decayRate].
+ * It returns `true` if the timer has completed a full cycle,
+ * `false` otherwise.
+ */
+private fun <ID : Comparable<ID>> Aggregate<ID>.cyclicTimerWithDecay(timeout: Duration, decayRate: Duration): Boolean =
+    evolve(timeout) { timer ->
+        if (timer == ZERO) {
+            timeout
+        } else {
+            countDownWithDecay(timeout, decayRate)
+        }
+    } == timeout
+
+/**
+ * A timer that decays over time.
+ * It starts from a [timeout] and decreases by [decayRate].
+ */
+fun <ID : Comparable<ID>> Aggregate<ID>.countDownWithDecay(timeout: Duration, decayRate: Duration): Duration =
+    timer(timeout, ZERO) { time -> time - decayRate }
