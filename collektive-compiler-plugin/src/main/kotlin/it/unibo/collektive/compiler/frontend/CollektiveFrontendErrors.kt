@@ -8,8 +8,9 @@
 
 package it.unibo.collektive.compiler.frontend
 
+import org.jetbrains.kotlin.diagnostics.KtDiagnosticsContainer
 import org.jetbrains.kotlin.diagnostics.error1
-import org.jetbrains.kotlin.diagnostics.rendering.RootDiagnosticRendererFactory
+import org.jetbrains.kotlin.diagnostics.rendering.BaseDiagnosticRendererFactory
 import org.jetbrains.kotlin.diagnostics.warning1
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
@@ -17,7 +18,7 @@ import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 /**
  * Collection of diagnostic messages used by the Collektive compiler plugin.
  */
-object CollektiveFrontendErrors {
+object CollektiveFrontendErrors : KtDiagnosticsContainer() {
 
     /**
      * Warning raised when an aggregate function is called inside a loop or iteration construct
@@ -55,13 +56,11 @@ object CollektiveFrontendErrors {
 
     /**
      * Error raised when a branch (e.g., in a `when` or `if` expression) returns a value
-     * of type [it.unibo.collektive.aggregate.Field].
+     * of type Field.
      *
      * Returning fields from branches is disallowed due to potential misalignments across devices.
      */
     val BRANCH_RETURNS_FIELD by error1<KtExpression, String>()
 
-    init {
-        RootDiagnosticRendererFactory.registerFactory(CollektiveFrontendErrorMessageRenderer)
-    }
+    override fun getRendererFactory(): BaseDiagnosticRendererFactory = CollektiveFrontendErrorMessageRenderer
 }

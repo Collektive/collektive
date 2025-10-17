@@ -63,8 +63,8 @@ internal inline fun <reified Distance : Comparable<Distance>, reified ID : Any, 
  * @param neighborData A field containing neighbor information and existing paths for each node.
  * @param coercedMetric A field providing distance metrics for the nodes.
  * @param maxDiameter The maximum allowable length for a path.
- * @param bottom The lower distance boundary for filtering paths.
- * @param top The upper distance boundary for filtering paths.
+ * @param bottom The minimum distance value.
+ * @param top The masimum distance value.
  * @param accumulateData A function to combine data values along the path.
  * @param accumulateDistance A reducer function to combine or calculate distances along the path.
  * @return A sequence of non-looping paths represented as instances of [PathValue],
@@ -88,15 +88,13 @@ where Distance : Comparable<Distance>, ID : Any {
             path?.distance?.let { accumulateDistance(it, distance) }
         }
     val neighborAccumulatedDistances = accDistances.neighbors.toMap()
-    return neighborData
-        .alignedMap(accDistances, coercedMetric) { id, path, accDist, distance ->
-            path
-                ?.takeUnless { id == localId }
-                ?.takeUnless { path.length > maxDiameter }
-                ?.takeUnless { localId in path.hops }
-                ?.takeUnless { path.isInvalidViaShortcut(accDist, neighbors, neighborAccumulatedDistances) }
-                ?.run { accDist to lazy { update(id, distance, bottom, top, accumulateDistance, accumulateData) } }
-        }.neighbors.values.sequence.filterNotNull().sortedBy { it.first }.map { it.second.value }
+    return neighborData.alignedMap(accDistances, coercedMetric) { id, path, accDist, distance ->
+        path?.takeUnless { id == localId }
+            ?.takeUnless { path.length > maxDiameter }
+            ?.takeUnless { localId in path.hops }
+            ?.takeUnless { path.isInvalidViaShortcut(accDist, neighbors, neighborAccumulatedDistances) }
+            ?.run { accDist to lazy { update(id, distance, bottom, top, accumulateDistance, accumulateData) } }
+    }.neighbors.values.sequence.filterNotNull().sortedBy { it.first }.map { it.second.value }
 }
 
 /**

@@ -1,10 +1,10 @@
 [versions]
-alchemist = "42.3.7"
+alchemist = "42.3.12"
 arrow = "2.1.2"
 build-config = "5.7.0"
-dokka = "2.0.0"
-kotest = "6.0.3"
-kotlin = "2.2.10"
+dokka = "2.1.0"
+kotest = "6.0.4"
+kotlin = "2.2.20"
 serialization = "1.9.0"
 
 [libraries]
@@ -62,7 +62,7 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-power-assert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = "kotlin" }
 kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.95.1"
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-kover = "org.jetbrains.kotlinx.kover:0.9.2"
+kover = "org.jetbrains.kotlinx.kover:0.9.3"
 ksp = "com.google.devtools.ksp:2.2.20-2.0.4"
 power-assert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = "kotlin" }
 multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:4.2.0"

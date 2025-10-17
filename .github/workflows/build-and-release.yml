@@ -59,7 +59,7 @@ jobs:
           maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
           signing-key: ${{ secrets.GPG_PRIVATEKEY }}
           signing-password: ${{ secrets.GPG_PASSPHRASE }}
-      - uses: github/codeql-action/upload-sarif@v4.30.7
+      - uses: github/codeql-action/upload-sarif@v4.30.8
         if: always() && runner.os == 'Linux'
         with:
           sarif_file: build/reports/merge.sarif
@@ -73,7 +73,7 @@ jobs:
           submodules: true
           fetch-depth: 0
       - name: Install Node
-        uses: actions/setup-node@v5.0.0
+        uses: actions/setup-node@v6.0.0
         with:
           node-version-file: site/package.json
       - name: Build documentation website
@@ -120,7 +120,7 @@ jobs:
           mv deployed-website/.git site/build
           git -C site/build status
       - name: Install Node
-        uses: actions/setup-node@v5.0.0
+        uses: actions/setup-node@v6.0.0
         with:
           node-version-file: package.json
       - uses: DanySK/build-check-deploy-gradle-action@4.0.10
