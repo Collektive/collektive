@@ -17,8 +17,11 @@ import it.unibo.collektive.stdlib.collapse.maxBy
 import it.unibo.collektive.stdlib.util.replaceMatching
 import kotlinx.datetime.Instant
 import kotlinx.datetime.Instant.Companion.DISTANT_PAST
+import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
+
+typealias ReplicaID = ULong
 
 /**
  * Checks if enough time has passed since the last recorded process time
@@ -28,13 +31,49 @@ import kotlin.time.Duration.Companion.ZERO
  * @param timeToWait The duration representing the time-to-live threshold.
  * @return `true` if the elapsed time since `processTime` exceeds `timeToLive`, `false` otherwise.
  */
-fun <ID : Comparable<ID>> Aggregate<ID>.enoughTimeHasPassed(
-    processTime: Instant,
-    timeToWait: Duration,
-): Boolean {
+fun <ID : Comparable<ID>> Aggregate<ID>.timeLeftToLive(processTime: Instant, timeToWait: Duration): Duration {
     val clockPerceived: Instant = sharedClock(processTime)
     val timeElapsed = localDeltaTime(clockPerceived)
-    return (timeToWait - timeElapsed) <= ZERO
+    return timeToWait - timeElapsed
+}
+
+/**
+ * Manages a shared timer across an aggregate network, creating or updating replicas
+ * based on the time-to-live and the current time.
+ *
+ * @param timeToLive The duration for which a timer replica is valid.
+ * @param currentTime The current timestamp used to evaluate the timer state.
+ * @return The unique identifier of the newly created or updated timer replica.
+ */
+fun <ID : Comparable<ID>> Aggregate<ID>.sharedTimer(timeToLive: Duration, currentTime: Instant): ReplicaID {
+    var newReplicaID = ULong.MIN_VALUE
+    val timeLeft = timeLeftToLive(currentTime, timeToLive) // or just the delta time from me and myself of before?
+    share(TimerReplica(newReplicaID, ZERO)) { replicas ->
+        val maxID = replicas.all.maxBy { it.value.id }.value.id
+        when {
+            maxID > replicas.local.value.id -> { // Someone else created a new replica, I need to follow it
+                newReplicaID = maxID
+                TimerReplica(maxID, timeToLive)
+            }
+            replicas.local.value.remainingTimeToLive <= ZERO -> { // I have to create a new replica
+                newReplicaID = maxID.inc()
+                TimerReplica(newReplicaID, timeToLive)
+            }
+            else -> TimerReplica(replicas.local.value.id, timeLeft) // just update the time left
+        }
+    }
+    return newReplicaID
+}
+
+/**
+ * A data class representing a timer replica with an identifier and remaining time to live.
+ *
+ * @property id The unique identifier of the timer replica.
+ * @property remainingTimeToLive The remaining duration before the timer expires.
+ */
+@Serializable
+private data class TimerReplica(val id: ReplicaID, val remainingTimeToLive: Duration) {
+    override fun toString(): String = "TimerReplica(id=$id, remainingTimeToLive=$remainingTimeToLive)"
 }
 
 /**
@@ -46,10 +85,7 @@ fun <ID : Comparable<ID>> Aggregate<ID>.enoughTimeHasPassed(
  * @return The duration between the `now` instant and the last stored timestamp in the aggregate.
  */
 fun <ID : Comparable<ID>> Aggregate<ID>.localDeltaTime(now: Instant): Duration =
-    evolving(DISTANT_PAST) { previousTime ->
-        val otherTime = if (previousTime == DISTANT_PAST) now else previousTime
-        now.yielding { (now - otherTime).coerceAtLeast(ZERO) }
-    }
+    evolving(now) { previousTime -> now.yielding { (now - previousTime).coerceAtLeast(ZERO) } }
 
 /**
  * Computes the minimum delta time from the given [localDelta] value and the shared data context
