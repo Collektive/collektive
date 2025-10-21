@@ -32,6 +32,7 @@ fun <ID : Comparable<ID>> Aggregate<ID>.timer(
  * It returns `true` if the timer has completed a full cycle,
  * `false` otherwise.
  */
+@Suppress("UnusedPrivateMember")
 private fun <ID : Comparable<ID>> Aggregate<ID>.cyclicTimerWithDecay(timeout: Duration, decayRate: Duration): Boolean =
     evolve(timeout) { timer ->
         if (timer == ZERO) {
