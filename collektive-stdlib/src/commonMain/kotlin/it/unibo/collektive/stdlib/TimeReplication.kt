@@ -41,7 +41,10 @@ fun <ID : Comparable<ID>, Type : Any> Aggregate<ID>.timeReplicated(
         alignedOn(it.id) {
             process()
         }
-    }.first()
+    }.firstOrNull()
+        ?: error(
+            "Empty replica set in timeReplicated, this should not happen, perhaps there is a bug, please report it.",
+        )
     localRep.yielding { oldestReplicaValue }
 }
 
