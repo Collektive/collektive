@@ -21,11 +21,11 @@ import kotlin.time.Duration
  * same if the number of replicas exceeds [maxReplicas].
  * The [process] function is executed on the replicas.
  */
-fun <ID : Comparable<ID>, Type : Any> Aggregate<ID>.timeReplicated(
+inline fun <reified ID : Comparable<ID>, reified Type : Any> Aggregate<ID>.timeReplicated(
     currentTime: Instant,
     maxReplicas: Int,
     timeToSpawn: Duration,
-    process: () -> Type,
+    noinline process: () -> Type,
 ): Type = evolving(emptySet<Replica<Type>>()) { localReplicas ->
     val localRep: MutableSet<Replica<Type>> = localReplicas.toMutableSet()
     val newReplicaId = sharedTimer(timeToSpawn, currentTime)
@@ -60,6 +60,6 @@ fun <ID : Comparable<ID>, Type : Any> Aggregate<ID>.timeReplicated(
  * This function defines the computation logic to be executed by the replica.
  */
 @Serializable
-private data class Replica<Type>(val id: ULong, val process: () -> Type) {
+data class Replica<Type>(val id: ULong, val process: () -> Type) {
     override fun toString(): String = "Replica(id=$id)"
 }

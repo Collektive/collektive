@@ -31,7 +31,10 @@ typealias ReplicaID = ULong
  * @param timeToWait The duration representing the time-to-live threshold.
  * @return `true` if the elapsed time since `processTime` exceeds `timeToLive`, `false` otherwise.
  */
-fun <ID : Comparable<ID>> Aggregate<ID>.timeLeftToLive(processTime: Instant, timeToWait: Duration): Duration {
+inline fun <reified ID : Comparable<ID>> Aggregate<ID>.timeLeftToLive(
+    processTime: Instant,
+    timeToWait: Duration,
+): Duration {
     val clockPerceived: Instant = sharedClock(processTime)
     val timeElapsed = localDeltaTime(clockPerceived)
     return timeToWait - timeElapsed
@@ -45,7 +48,10 @@ fun <ID : Comparable<ID>> Aggregate<ID>.timeLeftToLive(processTime: Instant, tim
  * @param currentTime The current timestamp used to evaluate the timer state.
  * @return The unique identifier of the newly created or updated timer replica.
  */
-fun <ID : Comparable<ID>> Aggregate<ID>.sharedTimer(timeToLive: Duration, currentTime: Instant): ReplicaID {
+inline fun <reified ID : Comparable<ID>> Aggregate<ID>.sharedTimer(
+    timeToLive: Duration,
+    currentTime: Instant,
+): ReplicaID {
     var newReplicaID = ULong.MIN_VALUE
     val timeLeft = timeLeftToLive(currentTime, timeToLive) // or just the delta time from me and myself of before?
     share(TimerReplica(newReplicaID, ZERO)) { replicas ->
@@ -72,7 +78,7 @@ fun <ID : Comparable<ID>> Aggregate<ID>.sharedTimer(timeToLive: Duration, curren
  * @property remainingTimeToLive The remaining duration before the timer expires.
  */
 @Serializable
-private data class TimerReplica(val id: ReplicaID, val remainingTimeToLive: Duration) {
+data class TimerReplica(val id: ReplicaID, val remainingTimeToLive: Duration) {
     override fun toString(): String = "TimerReplica(id=$id, remainingTimeToLive=$remainingTimeToLive)"
 }
 
@@ -97,7 +103,7 @@ fun <ID : Comparable<ID>> Aggregate<ID>.localDeltaTime(now: Instant): Duration =
  * @param localDelta The local delta time value to be considered as the basis for comparison.
  * @return The minimum delta time determined from the local and shared context values.
  */
-fun <ID : Comparable<ID>> Aggregate<ID>.minDelta(localDelta: Duration): Duration =
+inline fun <reified ID : Comparable<ID>> Aggregate<ID>.minDelta(localDelta: Duration): Duration =
     sharing(localDelta) { deltaAround: Field<ID, Duration> ->
         val deltaReplaced = deltaAround.replaceMatching(localDelta) { it.value <= ZERO } // useless when local delta = 0
         // use neighbor's delta and add my new local delta; otherwise it would propagate the old (possibly wrong) delta
@@ -116,7 +122,7 @@ fun <ID : Comparable<ID>> Aggregate<ID>.minDelta(localDelta: Duration): Duration
  * @return A [Field] where each entry indicates the time lag ([Duration])
  *         for both the local device (set to zero) and neighboring devices.
  */
-fun <ID : Comparable<ID>> Aggregate<ID>.neighboringLag(timeSensed: Instant): Field<ID, Duration> =
+inline fun <reified ID : Comparable<ID>> Aggregate<ID>.neighboringLag(timeSensed: Instant): Field<ID, Duration> =
     neighboring(timeSensed).map { timeSensed - it.value }
 
 /**
@@ -127,7 +133,7 @@ fun <ID : Comparable<ID>> Aggregate<ID>.neighboringLag(timeSensed: Instant): Fie
  * **N.B.**: [timeSensed] is set as default to the current system time,
  * but it is recommended to change it according to the requirements to achieve accurate and non-astonishing results.
  */
-fun <ID : Comparable<ID>> Aggregate<ID>.sharedClockWithMinDelta(timeSensed: Instant): Instant {
+inline fun <reified ID : Comparable<ID>> Aggregate<ID>.sharedClockWithMinDelta(timeSensed: Instant): Instant {
     val localDelta: Duration = localDeltaTime(timeSensed)
     val minDelta = minDelta(localDelta)
     return share(DISTANT_PAST) { clocksAround: Field<ID, Instant> ->
@@ -145,7 +151,7 @@ fun <ID : Comparable<ID>> Aggregate<ID>.sharedClockWithMinDelta(timeSensed: Inst
  * @throws IllegalArgumentException if the local time delta is computed to be negative, indicating
  * that time has moved backward, which is not allowed.
  */
-fun <ID : Comparable<ID>> Aggregate<ID>.sharedClock(timeSensed: Instant): Instant {
+inline fun <reified ID : Comparable<ID>> Aggregate<ID>.sharedClock(timeSensed: Instant): Instant {
     val localDelta: Duration = localDeltaTime(timeSensed)
     require(localDelta >= ZERO) { "Time has moved backwards. This should not happen." }
     return share(DISTANT_PAST) { clocksAround: Field<ID, Instant> ->
