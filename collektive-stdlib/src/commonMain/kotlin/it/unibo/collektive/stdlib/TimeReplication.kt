@@ -21,7 +21,7 @@ import kotlin.time.Duration
  * same if the number of replicas exceeds [maxReplicas].
  * The [process] function is executed on the replicas.
  */
-inline fun <reified ID : Comparable<ID>, reified Type : Any> Aggregate<ID>.timeReplicated(
+inline fun <reified Type : Any> Aggregate<*>.timeReplicated(
     currentTime: Instant,
     maxReplicas: Int,
     timeToSpawn: Duration,

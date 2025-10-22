@@ -31,10 +31,7 @@ typealias ReplicaID = ULong
  * @param timeToWait The duration representing the time-to-live threshold.
  * @return `true` if the elapsed time since `processTime` exceeds `timeToLive`, `false` otherwise.
  */
-inline fun <reified ID : Comparable<ID>> Aggregate<ID>.timeLeftToLive(
-    processTime: Instant,
-    timeToWait: Duration,
-): Duration {
+fun Aggregate<*>.timeLeftToLive(processTime: Instant, timeToWait: Duration): Duration {
     val clockPerceived: Instant = sharedClock(processTime)
     val timeElapsed = localDeltaTime(clockPerceived)
     return timeToWait - timeElapsed
@@ -48,10 +45,7 @@ inline fun <reified ID : Comparable<ID>> Aggregate<ID>.timeLeftToLive(
  * @param currentTime The current timestamp used to evaluate the timer state.
  * @return The unique identifier of the newly created or updated timer replica.
  */
-inline fun <reified ID : Comparable<ID>> Aggregate<ID>.sharedTimer(
-    timeToLive: Duration,
-    currentTime: Instant,
-): ReplicaID {
+fun Aggregate<*>.sharedTimer(timeToLive: Duration, currentTime: Instant): ReplicaID {
     var newReplicaID = ULong.MIN_VALUE
     val timeLeft = timeLeftToLive(currentTime, timeToLive) // or just the delta time from me and myself of before?
     share(TimerReplica(newReplicaID, ZERO)) { replicas ->
@@ -90,56 +84,8 @@ data class TimerReplica(val id: ReplicaID, val remainingTimeToLive: Duration) {
  * @param now The current instant in time to compare against.
  * @return The duration between the `now` instant and the last stored timestamp in the aggregate.
  */
-fun <ID : Comparable<ID>> Aggregate<ID>.localDeltaTime(now: Instant): Duration =
+fun Aggregate<*>.localDeltaTime(now: Instant): Duration =
     evolving(now) { previousTime -> now.yielding { (now - previousTime).coerceAtLeast(ZERO) } }
-
-/**
- * Computes the minimum delta time from the given [localDelta] value and the shared data context
- * across a network of devices within the aggregate program.
- *
- * This function uses the `sharing` mechanism to exchange stateful information and determines
- * the minimum delta time value from the locally provided `localDelta` and shared values from neighbors.
- *
- * @param localDelta The local delta time value to be considered as the basis for comparison.
- * @return The minimum delta time determined from the local and shared context values.
- */
-inline fun <reified ID : Comparable<ID>> Aggregate<ID>.minDelta(localDelta: Duration): Duration =
-    sharing(localDelta) { deltaAround: Field<ID, Duration> ->
-        val deltaReplaced = deltaAround.replaceMatching(localDelta) { it.value <= ZERO } // useless when local delta = 0
-        // use neighbor's delta and add my new local delta; otherwise it would propagate the old (possibly wrong) delta
-        // filtering out 0 to avoid blocking the clock, local delta if no other device has a valid delta
-        val actualMin = (deltaReplaced.neighbors.list.map { it.value } + localDelta)
-            .filter { it > ZERO }.minOrNull() ?: localDelta
-        localDelta.yielding { actualMin } // propagate local, return the overall minimum
-    }
-
-/**
- * Computes the lag in time duration for each neighboring device relative to the current time.
- * The lag is zero for the local device and calculated as the difference between the current
- * time and the timestamp value of each neighbor.
- *
- * @param timeSensed The current timestamp as an [Instant].
- * @return A [Field] where each entry indicates the time lag ([Duration])
- *         for both the local device (set to zero) and neighboring devices.
- */
-inline fun <reified ID : Comparable<ID>> Aggregate<ID>.neighboringLag(timeSensed: Instant): Field<ID, Duration> =
-    neighboring(timeSensed).map { timeSensed - it.value }
-
-/**
- * A shared clock across a network at the pace set by the fastest device.
- * Starts from an initial value that is the [timeSensed] time of execution of the device
- * and returns the [Instant] of the fastest device.
- *
- * **N.B.**: [timeSensed] is set as default to the current system time,
- * but it is recommended to change it according to the requirements to achieve accurate and non-astonishing results.
- */
-inline fun <reified ID : Comparable<ID>> Aggregate<ID>.sharedClockWithMinDelta(timeSensed: Instant): Instant {
-    val localDelta: Duration = localDeltaTime(timeSensed)
-    val minDelta = minDelta(localDelta)
-    return share(DISTANT_PAST) { clocksAround: Field<ID, Instant> ->
-        (clocksAround.all.maxBy { it.value }.value) + minDelta
-    }
-}
 
 /**
  * Synchronizes the local clock of the aggregate with the maximum clock value among its neighbors,
@@ -151,10 +97,10 @@ inline fun <reified ID : Comparable<ID>> Aggregate<ID>.sharedClockWithMinDelta(t
  * @throws IllegalArgumentException if the local time delta is computed to be negative, indicating
  * that time has moved backward, which is not allowed.
  */
-inline fun <reified ID : Comparable<ID>> Aggregate<ID>.sharedClock(timeSensed: Instant): Instant {
+fun Aggregate<*>.sharedClock(timeSensed: Instant): Instant {
     val localDelta: Duration = localDeltaTime(timeSensed)
-    require(localDelta >= ZERO) { "Time has moved backwards. This should not happen." }
-    return share(DISTANT_PAST) { clocksAround: Field<ID, Instant> ->
+    check(localDelta >= ZERO) { "Time has moved backwards. This should not happen." }
+    return share(DISTANT_PAST) { clocksAround: Field<*, Instant> ->
         val localClockWithDelta = clocksAround.local.value + localDelta
         maxOf(localClockWithDelta, clocksAround.all.maxBy { it.value }.value)
     }
