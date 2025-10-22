@@ -43,7 +43,7 @@ class CollektiveDevice<P>(
 
     private data class TimedMessage(val receivedAt: Time, val payload: Message<Int, *>)
 
-    override val inMemory: Boolean = false
+    override val inMemory: Boolean = true
 
     /**
      * The current time.
