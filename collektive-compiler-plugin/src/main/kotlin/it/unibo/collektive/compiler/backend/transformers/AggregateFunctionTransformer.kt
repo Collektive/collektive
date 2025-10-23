@@ -94,6 +94,17 @@ class AggregateFunctionTransformer(
             } else {
                 debugPrint { "Projected: $postProjection" }
             }
+            
+            /*
+             * This transformation optimizes neighboring(constant) calls to use mapNeighborhood instead.
+             * This provides better performance by avoiding unnecessary network communication of constants.
+             */
+            declaration.transformChildren(
+                NeighboringOptimizationTransformer(pluginContext, logger),
+                null,
+            )
+            debugPrint { "Applied neighboring optimization" }
+            
             /*
              * This transformation is needed to add the `alignRaw` and `dealign` calls to the aggregate functions.
              */
