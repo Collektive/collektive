@@ -67,5 +67,5 @@ kover = "org.jetbrains.kotlinx.kover:0.9.3"
 ksp = "com.google.devtools.ksp:2.3.0"
 power-assert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = "kotlin" }
 multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:4.2.0"
-publishOnCentral = "org.danilopianini.publish-on-central:9.1.5"
+publishOnCentral = "org.danilopianini.publish-on-central:9.1.6"
 taskTree = "com.dorongold.task-tree:4.0.1"
