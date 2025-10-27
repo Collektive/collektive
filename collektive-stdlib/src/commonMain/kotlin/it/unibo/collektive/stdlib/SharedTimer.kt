@@ -47,7 +47,7 @@ fun Aggregate<*>.timeLeftToLive(processTime: Instant, timeToWait: Duration): Dur
  */
 fun Aggregate<*>.sharedTimer(timeToLive: Duration, currentTime: Instant): ReplicaID {
     var newReplicaID = ULong.MIN_VALUE
-    val timeLeft = timeLeftToLive(currentTime, timeToLive) // or just the delta time from me and myself of before?
+    val timeLeft = timeLeftToLive(currentTime, timeToLive)
     share(TimerReplica(newReplicaID, ZERO)) { replicas ->
         val maxID = replicas.all.maxBy { it.value.id }.value.id
         when {
