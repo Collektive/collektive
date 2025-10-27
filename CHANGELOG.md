@@ -1,3 +1,19 @@
+## [27.3.2](https://github.com/Collektive/collektive/compare/27.3.1...27.3.2) (2025-10-23)
+
+### Dependency updates
+
+* **core-deps:** update kotlin monorepo to v2.2.21 ([0a3a975](https://github.com/Collektive/collektive/commit/0a3a975a2c3893942f640278d13a2df2723214c8))
+* **deps:** update alchemist to v42.3.13 ([6104aec](https://github.com/Collektive/collektive/commit/6104aec2015e79d1ad42132d8e7a20b2acfc8a73))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.148 ([1bf701d](https://github.com/Collektive/collektive/commit/1bf701da451d492235df7dcfaa381dabb052fce1))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.149 ([d506757](https://github.com/Collektive/collektive/commit/d506757537b6a6b42a5d51e8bbeeb64ba35aa8c3))
+* **deps:** update docusaurus monorepo to v3.9.2 ([ac01c02](https://github.com/Collektive/collektive/commit/ac01c02bf04123a280a4978b88602d5c34c630b6))
+* **deps:** update node.js to 22.21 ([62a5768](https://github.com/Collektive/collektive/commit/62a5768ad6398bd251f045433ae9a3d528fe97e2))
+* **deps:** update plugin ksp to v2.3.0 ([8247dfb](https://github.com/Collektive/collektive/commit/8247dfb8a4d888f8d1350332cab6265fe2365db6))
+
+### Build and continuous integration
+
+* **deps:** update github/codeql-action action to v4.30.9 ([972bacb](https://github.com/Collektive/collektive/commit/972bacb21cc9c697785d59dc11b58b4ed678ae6f))
+
 ## [27.3.1](https://github.com/Collektive/collektive/compare/27.3.0...27.3.1) (2025-10-16)
 
 ### Dependency updates

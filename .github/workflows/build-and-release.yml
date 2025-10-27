@@ -59,7 +59,7 @@ jobs:
           maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
           signing-key: ${{ secrets.GPG_PRIVATEKEY }}
           signing-password: ${{ secrets.GPG_PASSPHRASE }}
-      - uses: github/codeql-action/upload-sarif@v4.30.9
+      - uses: github/codeql-action/upload-sarif@v4.31.0
         if: always() && runner.os == 'Linux'
         with:
           sarif_file: build/reports/merge.sarif
@@ -84,7 +84,7 @@ jobs:
       - name: Tar files
         run: tar -cvf website.tar site/build
       - name: Upload website
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v5.0.0
         with:
           name: website-${{ github.sha }}
           path: website.tar
@@ -111,7 +111,7 @@ jobs:
           repository: Collektive/collektive.github.io
           token: ${{ secrets.DEPLOYMENT_TOKEN }}
       - name: Download website artifact
-        uses: actions/download-artifact@v5.0.0
+        uses: actions/download-artifact@v6.0.0
         with:
           name: website-${{ github.sha }}
       - name: Unpack website
