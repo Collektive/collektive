@@ -54,7 +54,7 @@ alchemist = [
 build-config = { id = "com.github.gmazzo.buildconfig", version.ref = "build-config" }
 collektivize = { id = "it.unibo.collektive.collektivize" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-gitSemVer = "org.danilopianini.git-sensitive-semantic-versioning:7.0.5"
+gitSemVer = "org.danilopianini.git-sensitive-semantic-versioning:7.0.6"
 gradlePluginPublish = { id = "com.gradle.plugin-publish", version = "2.0.0" }
 kotest = { id = "io.kotest", version.ref = "kotest" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
