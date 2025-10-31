@@ -63,7 +63,7 @@ fun Aggregate<*>.sharedTimer(timeToLive: Duration, currentTime: Instant): Replic
 }
 
 /**
- * A data class representing a timer replica with an identifier and remaining time to live.
+ * A data class representing a process replica with an [id] and a [remainingTimeToLive].
  *
  * @property id The unique identifier of the timer replica.
  * @property remainingTimeToLive The remaining duration before the timer expires.
