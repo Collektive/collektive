@@ -11,6 +11,7 @@ package it.unibo.collektive.stdlib
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.share
+import it.unibo.collektive.aggregate.api.sharing
 import it.unibo.collektive.stdlib.collapse.maxBy
 import kotlinx.datetime.Instant
 import kotlinx.datetime.Instant.Companion.DISTANT_PAST
@@ -21,18 +22,16 @@ import kotlin.time.Duration.Companion.ZERO
 typealias ReplicaID = ULong
 
 /**
- * Checks if enough time has passed since the last recorded process time
- * to consider that the time-to-live has been exceeded.
+ * Computes the time left (or past, when negative) until a timer expires,
+ * using a shared clock across the aggregate network to evaluate elapsed time
+ * (devices with faster clocks will drive the shared clock forward).
  *
- * @param processTime The timestamp of the last recorded process time.
+ * @param now The locally-perceived device time.
  * @param timeToWait The duration representing the time-to-live threshold.
  * @return `true` if the elapsed time since `processTime` exceeds `timeToLive`, `false` otherwise.
  */
-fun Aggregate<*>.timeLeftToLive(processTime: Instant, timeToWait: Duration): Duration {
-    val clockPerceived: Instant = sharedClock(processTime)
-    val timeElapsed = localDeltaTime(clockPerceived)
-    return timeToWait - timeElapsed
-}
+fun Aggregate<*>.sharedTimeLeftTo(now: Instant, timeToWait: Duration): Duration =
+    timeToWait - localDeltaTime(sharedClock(now))
 
 /**
  * Manages a shared timer across an aggregate network, creating or updating replicas
@@ -42,24 +41,22 @@ fun Aggregate<*>.timeLeftToLive(processTime: Instant, timeToWait: Duration): Dur
  * @param currentTime The current timestamp used to evaluate the timer state.
  * @return The unique identifier of the newly created or updated timer replica.
  */
-fun Aggregate<*>.sharedTimer(timeToLive: Duration, currentTime: Instant): ReplicaID {
-    var newReplicaID = ULong.MIN_VALUE
-    val timeLeft = timeLeftToLive(currentTime, timeToLive)
-    share(TimerReplica(newReplicaID, ZERO)) { replicas ->
+fun Aggregate<*>.sharedTimer(timeToLive: Duration, currentTime: Instant): ReplicaID? {
+    val timeLeft = sharedTimeLeftTo(currentTime, timeToLive)
+    return sharing(TimerReplica(0UL, ZERO)) { replicas ->
         val maxID = replicas.all.maxBy { it.value.id }.value.id
         when {
             maxID > replicas.local.value.id -> { // Someone else created a new replica, I need to follow it
-                newReplicaID = maxID
                 TimerReplica(maxID, timeToLive)
             }
             replicas.local.value.remainingTimeToLive <= ZERO -> { // I have to create a new replica
-                newReplicaID = maxID.inc()
-                TimerReplica(newReplicaID, timeToLive)
+                TimerReplica(maxID.inc(), timeToLive)
             }
             else -> TimerReplica(replicas.local.value.id, timeLeft) // just update the time left
+        }.yielding {
+            id.takeUnless { it == replicas.local.value.id }
         }
     }
-    return newReplicaID
 }
 
 /**

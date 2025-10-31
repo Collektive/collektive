@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2024-2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -30,7 +30,7 @@ inline fun <reified Type : Any> Aggregate<*>.timeReplicated(
     val localRep: MutableSet<Replica<Type>> = localReplicas.toMutableSet()
     val newReplicaId = sharedTimer(timeToSpawn, currentTime)
     // if the replica ID is greater than the minimum, it means it is the ID of the new replica to be spawned
-    if (newReplicaId > ULong.MIN_VALUE) {
+    if (newReplicaId != null) {
         if (localReplicas.size == maxReplicas) {
             val oldestReplica = localReplicas.minBy { it.id }
             localRep.remove(oldestReplica)
