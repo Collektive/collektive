@@ -72,15 +72,15 @@ fun Aggregate<*>.sharedTimer(timeToLive: Duration, currentTime: Instant): Replic
 data class TimerReplica(val id: ReplicaID, val remainingTimeToLive: Duration)
 
 /**
- * Calculates the time difference between the current moment (`now`) and a previous timestamp.
- * If no previous timestamp is present, the calculation assumes `DISTANT_PAST`.
+ * Calculates the time difference between the current moment ([now]) and a previous timestamp.
  * The duration is always a non-negative value.
  *
  * @param now The current instant in time to compare against.
  * @return The duration between the `now` instant and the last stored timestamp in the aggregate.
  */
-fun Aggregate<*>.localDeltaTime(now: Instant): Duration =
-    evolving(now) { previousTime -> now.yielding { (now - previousTime).coerceAtLeast(ZERO) } }
+fun Aggregate<*>.localDeltaTime(now: Instant): Duration = evolving(now) { previousTime ->
+    now.yielding { (now - previousTime).coerceAtLeast(ZERO) }
+}
 
 /**
  * Synchronizes the local clock of the aggregate with the maximum clock value among its neighbors,
