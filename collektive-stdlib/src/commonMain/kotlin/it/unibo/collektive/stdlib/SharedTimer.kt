@@ -68,8 +68,9 @@ fun Aggregate<*>.sharedTimer(timeToLive: Duration, currentTime: Instant): Replic
  * @property id The unique identifier of the timer replica.
  * @property remainingTimeToLive The remaining duration before the timer expires.
  */
+@PublishedApi
 @Serializable
-data class TimerReplica(val id: ReplicaID, val remainingTimeToLive: Duration)
+internal data class TimerReplica(val id: ReplicaID, val remainingTimeToLive: Duration)
 
 /**
  * Calculates the time difference between the current moment ([now]) and a previous timestamp.
