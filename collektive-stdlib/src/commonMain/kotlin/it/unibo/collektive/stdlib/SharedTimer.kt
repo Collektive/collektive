@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2024-2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -10,11 +10,8 @@ package it.unibo.collektive.stdlib
 
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.aggregate.api.share
-import it.unibo.collektive.aggregate.api.sharing
 import it.unibo.collektive.stdlib.collapse.maxBy
-import it.unibo.collektive.stdlib.util.replaceMatching
 import kotlinx.datetime.Instant
 import kotlinx.datetime.Instant.Companion.DISTANT_PAST
 import kotlinx.serialization.Serializable
@@ -72,9 +69,7 @@ fun Aggregate<*>.sharedTimer(timeToLive: Duration, currentTime: Instant): Replic
  * @property remainingTimeToLive The remaining duration before the timer expires.
  */
 @Serializable
-data class TimerReplica(val id: ReplicaID, val remainingTimeToLive: Duration) {
-    override fun toString(): String = "TimerReplica(id=$id, remainingTimeToLive=$remainingTimeToLive)"
-}
+data class TimerReplica(val id: ReplicaID, val remainingTimeToLive: Duration)
 
 /**
  * Calculates the time difference between the current moment (`now`) and a previous timestamp.
