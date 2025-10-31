@@ -83,17 +83,16 @@ fun Aggregate<*>.localDeltaTime(now: Instant): Duration = evolving(now) { previo
 }
 
 /**
- * Synchronizes the local clock of the aggregate with the maximum clock value among its neighbors,
- * ensuring that time does not move backward. The synchronization includes a local time adjustment
- * based on the sensed time delta.
+ * Agrees on a shared clock timestamp across the aggregate network.
+ * The device whose time progresses the most will drive the shared clock forward.
  *
- * @param timeSensed The current timestamp sensed (used to calculate the local time difference).
- * @return The resulting synchronized timestamp for the local device.
+ * @param localTime The time as perceived locally.
+ * @return The resulting synchronized timestamp. The provided Instant will always be past or equal to the local time.
  * @throws IllegalArgumentException if the local time delta is computed to be negative, indicating
- * that time has moved backward, which is not allowed.
+ * that time has moved backward.
  */
-fun Aggregate<*>.sharedClock(timeSensed: Instant): Instant {
-    val localDelta: Duration = localDeltaTime(timeSensed)
+fun Aggregate<*>.sharedClock(localTime: Instant): Instant {
+    val localDelta: Duration = localDeltaTime(localTime)
     check(localDelta >= ZERO) { "Time has moved backwards. This should not happen." }
     return share(DISTANT_PAST) { clocksAround: Field<*, Instant> ->
         val localClockWithDelta = clocksAround.local.value + localDelta
