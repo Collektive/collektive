@@ -55,17 +55,17 @@ alchemist = [
 build-config = { id = "com.github.gmazzo.buildconfig", version.ref = "build-config" }
 collektivize = { id = "it.unibo.collektive.collektivize" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-gitSemVer = "org.danilopianini.git-sensitive-semantic-versioning:7.0.5"
+gitSemVer = "org.danilopianini.git-sensitive-semantic-versioning:7.0.6"
 gradlePluginPublish = { id = "com.gradle.plugin-publish", version = "2.0.0" }
 kotest = { id = "io.kotest", version.ref = "kotest" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-power-assert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = "kotlin" }
-kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.95.2"
+kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.96.0"
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kover = "org.jetbrains.kotlinx.kover:0.9.3"
 ksp = "com.google.devtools.ksp:2.3.0"
 power-assert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = "kotlin" }
-multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:4.3.1"
-publishOnCentral = "org.danilopianini.publish-on-central:9.1.6"
+multiJvmTesting = "org.danilopianini.multi-jvm-test-plugin:4.3.2"
+publishOnCentral = "org.danilopianini.publish-on-central:9.1.7"
 taskTree = "com.dorongold.task-tree:4.0.1"
