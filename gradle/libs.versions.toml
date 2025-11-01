@@ -1,7 +1,7 @@
 [versions]
 alchemist = "42.3.15"
 arrow = "2.2.0"
-build-config = "5.7.0"
+build-config = "5.7.1"
 dokka = "2.1.0"
 kotest = "6.0.4"
 kotlin = "2.2.21"
