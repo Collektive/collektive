@@ -60,6 +60,6 @@ inline fun <reified Type : Any?> Aggregate<*>.timeReplicated(
  * This function defines the computation logic to be executed by the replica.
  */
 @Serializable
-data class Replica<Type>(val id: ULong, val process: () -> Type) {
+data class Replica<Type>(val id: ReplicaID, val process: () -> Type) {
     override fun toString(): String = "Replica(id=$id)"
 }
