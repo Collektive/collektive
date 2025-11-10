@@ -13,7 +13,6 @@ import it.unibo.collektive.stdlib.spreading.nonStabilizingGossip
 import it.unibo.collektive.stdlib.timeReplicated
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
-import kotlinx.datetime.Instant
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.time.Duration.Companion.seconds
