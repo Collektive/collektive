@@ -9,8 +9,8 @@
 package it.unibo.collektive.stdlib.test
 
 import io.kotest.matchers.shouldBe
-import it.unibo.collektive.stdlib.spreading.nonStabilizingGossip
 import it.unibo.collektive.stdlib.processes.timeReplicated
+import it.unibo.collektive.stdlib.spreading.nonStabilizingGossip
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.test.BeforeTest
