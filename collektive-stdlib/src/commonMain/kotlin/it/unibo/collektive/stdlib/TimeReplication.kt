@@ -10,9 +10,14 @@ package it.unibo.collektive.stdlib
 
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
+import it.unibo.collektive.aggregate.api.sharing
+import it.unibo.collektive.stdlib.collapse.maxBy
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.ZERO
+
+typealias ReplicaID = ULong
 
 /**
  * A periodic restart strategy for removing obsolete information of [process] replicated across devices.
@@ -65,3 +70,40 @@ inline fun <reified Type : Any?> Aggregate<*>.timeReplicated(
 @DelicateCollektiveApi
 @PublishedApi
 internal data class Replica<Type>(val id: ReplicaID, val process: () -> Type)
+
+/**
+ * Manages a shared timer across an aggregate network, creating or updating replicas
+ * based on the time-to-live and the current time.
+ *
+ * @param timeToLive The duration for which a timer replica is valid.
+ * @param currentTime The current timestamp used to evaluate the timer state.
+ * @return The unique identifier of the newly created or updated timer replica.
+ */
+@PublishedApi
+internal fun Aggregate<*>.sharedTimer(timeToLive: Duration, currentTime: Instant): ReplicaID? {
+    val timeLeft = sharedTimeLeftTo(currentTime, timeToLive)
+    return sharing(TimerReplica(0UL, ZERO)) { replicas ->
+        val maxID = replicas.all.maxBy { it.value.id }.value.id
+        when {
+            maxID > replicas.local.value.id -> { // Someone else created a new replica, I need to follow it
+                TimerReplica(maxID, timeToLive)
+            }
+            replicas.local.value.remainingTimeToLive <= ZERO -> { // I have to create a new replica
+                TimerReplica(maxID.inc(), timeToLive)
+            }
+            else -> TimerReplica(replicas.local.value.id, timeLeft) // just update the time left
+        }.yielding {
+            id.takeUnless { it == replicas.local.value.id }
+        }
+    }
+}
+
+/**
+ * A data class representing a process replica with an [id] and a [remainingTimeToLive].
+ *
+ * @property id The unique identifier of the timer replica.
+ * @property remainingTimeToLive The remaining duration before the timer expires.
+ */
+@PublishedApi
+@Serializable
+internal data class TimerReplica(val id: ReplicaID, val remainingTimeToLive: Duration)
