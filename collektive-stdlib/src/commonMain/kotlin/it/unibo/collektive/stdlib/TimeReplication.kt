@@ -9,6 +9,7 @@
 package it.unibo.collektive.stdlib
 
 import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
@@ -21,6 +22,7 @@ import kotlin.time.Duration
  * same if the number of replicas exceeds [maxReplicas].
  * The [process] function is executed on the replicas.
  */
+@OptIn(DelicateCollektiveApi::class)
 inline fun <reified Type : Any?> Aggregate<*>.timeReplicated(
     currentTime: Instant,
     maxReplicas: Int,
@@ -50,16 +52,16 @@ inline fun <reified Type : Any?> Aggregate<*>.timeReplicated(
 
 /**
  * Represents a replicated state or process in a distributed system.
- *
  * The `Replica` class models a computation that is associated with an identifier,
  * a state evolution function, a creation timestamp, and a specific time-to-live duration.
  *
+ * **NB**: This class is intended for internal use only and should not be used directly;
+ * it uses a non-serializable function type.
+ * When inline functions support it, it will be moved as local class inside [timeReplicated].
  * @param Type The type of the resulting value computed by the process.
  * @property id A unique identifier for the replica.
  * @property process A computation expressed as an extension function on [Aggregate].
- * This function defines the computation logic to be executed by the replica.
  */
-@Serializable
-data class Replica<Type>(val id: ReplicaID, val process: () -> Type) {
-    override fun toString(): String = "Replica(id=$id)"
-}
+@DelicateCollektiveApi
+@PublishedApi
+internal data class Replica<Type>(val id: ReplicaID, val process: () -> Type)
