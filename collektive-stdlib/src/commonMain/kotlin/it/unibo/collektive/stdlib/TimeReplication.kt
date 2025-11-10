@@ -35,7 +35,7 @@ inline fun <reified Type : Any?> Aggregate<*>.timeReplicated(
     noinline process: () -> Type,
 ): Type = evolving(emptySet<Replica<Type>>()) { localReplicas ->
     val localRep: MutableSet<Replica<Type>> = localReplicas.toMutableSet()
-    val newReplicaId = sharedTimer(timeToSpawn, currentTime)
+    val newReplicaId = newReplicaID(timeToSpawn, currentTime)
     // if the replica ID is greater than the minimum, it means it is the ID of the new replica to be spawned
     if (newReplicaId != null) {
         if (localReplicas.size == maxReplicas) {
@@ -80,7 +80,7 @@ internal data class Replica<Type>(val id: ReplicaID, val process: () -> Type)
  * @return The unique identifier of the newly created or updated timer replica.
  */
 @PublishedApi
-internal fun Aggregate<*>.sharedTimer(timeToLive: Duration, currentTime: Instant): ReplicaID? {
+internal fun Aggregate<*>.newReplicaID(timeToLive: Duration, currentTime: Instant): ReplicaID? {
     val timeLeft = sharedTimeLeftTo(currentTime, timeToLive)
     return sharing(TimerReplica(0UL, ZERO)) { replicas ->
         val maxID = replicas.all.maxBy { it.value.id }.value.id
