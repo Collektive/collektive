@@ -6,7 +6,7 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
-package it.unibo.collektive.stdlib
+package it.unibo.collektive.stdlib.time
 
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate

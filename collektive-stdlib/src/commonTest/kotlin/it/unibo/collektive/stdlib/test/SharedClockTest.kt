@@ -9,7 +9,7 @@
 package it.unibo.collektive.stdlib.test
 
 import io.kotest.matchers.shouldBe
-import it.unibo.collektive.stdlib.sharedClock
+import it.unibo.collektive.stdlib.time.sharedClock
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
 import kotlinx.datetime.Instant
