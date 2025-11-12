@@ -1,3 +1,53 @@
+## [27.3.3](https://github.com/Collektive/collektive/compare/27.3.2...27.3.3) (2025-11-12)
+
+### Dependency updates
+
+* **deps:** update alchemist to v42.3.14 ([363aae0](https://github.com/Collektive/collektive/commit/363aae02438ce23dc7654bc6dedb15e00d7ae0e4))
+* **deps:** update alchemist to v42.3.15 ([59fa24a](https://github.com/Collektive/collektive/commit/59fa24aab0bd32e1a5723be266e542e58866441c))
+* **deps:** update alchemist to v42.3.16 ([0193249](https://github.com/Collektive/collektive/commit/019324922cabdc55df2ccb15fcbcb05482abc7da))
+* **deps:** update arrow-kt monorepo to v2.2.0 ([89e9164](https://github.com/Collektive/collektive/commit/89e91641bb86a942c8304f24e326131fefaa8ee9))
+* **deps:** update dependency com.github.ben-manes.caffeine:caffeine to v3.2.3 ([be9fd6f](https://github.com/Collektive/collektive/commit/be9fd6fda216f27b208eac143f7fbe3023ae7a6b))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v5.7.1 ([e57fd53](https://github.com/Collektive/collektive/commit/e57fd53b818a46a0a53470ba2b80f2f20a160f7b))
+* **deps:** update dependency react-router-dom to v7.9.5 ([d7176c1](https://github.com/Collektive/collektive/commit/d7176c148b6298384228136e01e28f5030ee44d0))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.150 ([6476dc2](https://github.com/Collektive/collektive/commit/6476dc297b6292f2e8cc80f078576d6388c19d18))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.151 ([206accd](https://github.com/Collektive/collektive/commit/206accd2c2f6e7a67e5ac3cc53ef5d4b2abb058d))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.152 ([95f8154](https://github.com/Collektive/collektive/commit/95f8154e7928e3e36fd6350c1d447595c1989908))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.153 ([ff768cf](https://github.com/Collektive/collektive/commit/ff768cf1abd2cdbd8bf0bed40f3e6606dbe5594f))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.154 ([0419025](https://github.com/Collektive/collektive/commit/0419025a7bd671847afd69d9324989da2ca5d725))
+* **deps:** update gradle to v9.2.0 ([f4f09bd](https://github.com/Collektive/collektive/commit/f4f09bd89cd590df86eabeba654359f94209ed5f))
+* **deps:** update node.js to v24 ([484a936](https://github.com/Collektive/collektive/commit/484a936fe076924fe80a9207e04ff58ae6891a8f))
+* **deps:** update plugin gitsemver to v7.0.5 ([120dee6](https://github.com/Collektive/collektive/commit/120dee6b01bf8112322051e0012aa07bd199897c))
+* **deps:** update plugin gitsemver to v7.0.6 ([318dcab](https://github.com/Collektive/collektive/commit/318dcab9c14486579b420b2756c34fa70e0cadc8))
+* **deps:** update plugin kotlin-qa to v0.95.2 ([b1cfc6c](https://github.com/Collektive/collektive/commit/b1cfc6ca541bfe5d5e42cf4dd0c827122f70b58c))
+* **deps:** update plugin kotlin-qa to v0.95.3 ([38a5c47](https://github.com/Collektive/collektive/commit/38a5c4739e17d0a6df6d48db61d1a743b505bd95))
+* **deps:** update plugin kotlin-qa to v0.96.0 ([3fa5d09](https://github.com/Collektive/collektive/commit/3fa5d09b57a475ad12e34f543d69729e8b4706ab))
+* **deps:** update plugin ksp to v2.3.1 ([c5f8be8](https://github.com/Collektive/collektive/commit/c5f8be8d96eec9a121a51bcd0c467576c8adcab9))
+* **deps:** update plugin ksp to v2.3.2 ([cb1ad92](https://github.com/Collektive/collektive/commit/cb1ad9220d1c23d7cb63823077f1748edc16748c))
+* **deps:** update plugin multijvmtesting to v4.3.1 ([f4f7148](https://github.com/Collektive/collektive/commit/f4f71480a205e86593a9acf232990109f8c6b488))
+* **deps:** update plugin multijvmtesting to v4.3.2 ([3044ae0](https://github.com/Collektive/collektive/commit/3044ae07d6ce178d74fca4e7807f1d1de7dd7ca4))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.1.3 ([0daee1b](https://github.com/Collektive/collektive/commit/0daee1b96fa9ca7449ae1cc6e6b0836c252709bf))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.1.4 ([27e5771](https://github.com/Collektive/collektive/commit/27e577100f293579a4739d8dc645d796ca374443))
+* **deps:** update plugin publishoncentral to v9.1.6 ([7a1d848](https://github.com/Collektive/collektive/commit/7a1d84888f6b7088eb077823f8af2d0dde24d217))
+* **deps:** update plugin publishoncentral to v9.1.7 ([3649e29](https://github.com/Collektive/collektive/commit/3649e294d1b642b3559901b75f70499a1141e0b0))
+
+### Documentation
+
+* **site:** fix typo ([#1254](https://github.com/Collektive/collektive/issues/1254)) ([7f41095](https://github.com/Collektive/collektive/commit/7f410956153c71fa069f994ea00a09272d520f84))
+
+### Build and continuous integration
+
+* **deps:** update actions/download-artifact action to v6 ([093d599](https://github.com/Collektive/collektive/commit/093d5999a16691b94c5c717ff24ab50ca4b85c4a))
+* **deps:** update actions/upload-artifact action to v5 ([03b587a](https://github.com/Collektive/collektive/commit/03b587ae9fd9c03379b438b07a11173aa59bafde))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.11 ([a52f1ac](https://github.com/Collektive/collektive/commit/a52f1ac5a2221e2f9fdb5c9d09fcfad88ac9ef8c))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.12 ([9b17695](https://github.com/Collektive/collektive/commit/9b17695f525ce62756277d40d5bd553af2cb2f5e))
+* **deps:** update github/codeql-action action to v4.31.0 ([0778c3d](https://github.com/Collektive/collektive/commit/0778c3d4ba67ce98e25655e0608c02ecbe151aa9))
+* **deps:** update github/codeql-action action to v4.31.1 ([be6f382](https://github.com/Collektive/collektive/commit/be6f382ec687d7593b247ec85b4cc36cab065878))
+* **deps:** update github/codeql-action action to v4.31.2 ([4a438be](https://github.com/Collektive/collektive/commit/4a438be60b36bbf1488c869430ce06de7c095baa))
+
+### Style improvements
+
+* **compiler-embeddable:** reformat function call ([#1240](https://github.com/Collektive/collektive/issues/1240)) ([532f6ac](https://github.com/Collektive/collektive/commit/532f6ac555ec0a41e784a8aa62f5429207bd0d9f))
+
 ## [27.3.2](https://github.com/Collektive/collektive/compare/27.3.1...27.3.2) (2025-10-23)
 
 ### Dependency updates
