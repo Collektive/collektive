@@ -51,7 +51,7 @@ fun Aggregate<*>.localDeltaTime(now: Instant): Duration = evolving(now) { previo
  */
 fun Aggregate<*>.sharedClock(localTime: Instant): Instant {
     val localDelta: Duration = localDeltaTime(localTime)
-    check(localDelta >= ZERO) { "Time has moved backwards. This should not happen." }
+    check(localDelta >= ZERO) { "Time has moved backwards of $localDelta at $localTime." }
     return share(DISTANT_PAST) { clocksAround: Field<*, Instant> ->
         val localClockWithDelta = clocksAround.local.value + localDelta
         maxOf(localClockWithDelta, clocksAround.all.maxBy { it.value }.value)

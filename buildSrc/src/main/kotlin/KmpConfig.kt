@@ -48,6 +48,7 @@ fun Project.configureKotlinMultiplatform() {
     with(extensions.getByType<KotlinMultiplatformExtension>()) {
         compilerOptions {
             allWarningsAsErrors = true
+            freeCompilerArgs.add("-Xcontext-parameters")
         }
         jvm {
             compilerOptions {

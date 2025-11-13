@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2024-2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -9,12 +9,12 @@
 package it.unibo.collektive.stdlib.test
 
 import io.kotest.matchers.shouldBe
+import it.unibo.collektive.stdlib.test.MultiClock.Companion.DEVICE_COUNT
 import it.unibo.collektive.stdlib.time.sharedClock
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
 import kotlinx.datetime.Instant
 import kotlinx.datetime.Instant.Companion.DISTANT_PAST
-import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
@@ -22,25 +22,22 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalTime::class)
 class SharedClockTest {
 
-    @BeforeTest
-    fun setup() {
-        setupTimes()
-    }
-
     @Test
     fun `After a single round of computation all devices should return DISTANT_PAST`() {
         // execution sequence: d0 -> d1 -> d2 -> d3
-        val env: Environment<Instant> = gridWithExecutionFrequency(SEQUENTIAL_FREQUENCY)
-        env.executeSubsequentRounds(times = 1)
-        val firstCycle = env.status().values.distinct()
-        firstCycle.size shouldBe 1
-        firstCycle.first() shouldBe DISTANT_PAST
+        with(MultiClock(DEVICE_COUNT)) {
+            val env: Environment<Instant> = gridWithTimeIntervalBetweenRounds()
+            env.cycleInOrder()
+            val firstCycle = env.status().values.distinct()
+            firstCycle.size shouldBe 1
+            firstCycle.first() shouldBe DISTANT_PAST
+        }
     }
 
     @Test
     fun `In two subsequent rounds of computation the devices should increase their time by their delta seconds`() {
         // execution sequence: d0 -> d1 -> d2 -> d3 -> d0 -> d1 -> d2 -> d3
-        val env: Environment<Instant> = gridWithExecutionFrequency(SEQUENTIAL_FREQUENCY)
+        val env: Environment<Instant> = gridWithTimeIntervalBetweenRounds(SEQUENTIAL_FREQUENCY)
         env.executeSubsequentRounds(times = 2)
         val twoRounds = env.status().values.distinct()
         twoRounds.size shouldBe 1
@@ -50,7 +47,7 @@ class SharedClockTest {
     @Test
     fun `In staggered rounds of computation the devices should increase their time based on the fastest device`() {
         // execution sequence: d0 -> (d1 -> d0) -> (d2 -> d1) -> (d3 -> d2) -> d3 -> d0 -> d1 -> d2 -> d3
-        val env: Environment<Instant> = gridWithExecutionFrequency(ONE_SEC_FREQUENCY)
+        val env: Environment<Instant> = gridWithTimeIntervalBetweenRounds(ONE_SEC_FREQUENCY)
         for (n in 0 until NUM_DEVICES) {
             env.nodes.elementAt(n).cycle()
             if (n > 0) env.nodes.elementAt(n - 1).cycle()
@@ -71,7 +68,7 @@ class SharedClockTest {
     fun `A single device that execute with a higher timestamp should put forward the time`() {
         // execution sequence: d0 -> d1 -> d2 -> d3 -> d0 -> d1 -> d2 -> d3 ->
         // -> d0 (drift time) -> d1 -> d2 -> d3 -> d1 -> d2 -> d3 (d0 is disappeared)
-        val env: Environment<Instant> = gridWithExecutionFrequency(SEQUENTIAL_FREQUENCY)
+        val env: Environment<Instant> = gridWithTimeIntervalBetweenRounds(SEQUENTIAL_FREQUENCY)
         val subsequentRounds = 2
         env.executeSubsequentRounds(times = subsequentRounds)
         val node = env.nodes.find { it.id == 0 }
@@ -100,15 +97,10 @@ class SharedClockTest {
             status()[nodeId] shouldBe time
         }
 
-        /**
-         * Creates a grid environment of the specified size where each node has a shared clock with execution frequency adjustment.
-         *
-         * @param frequency the frequency at which to increase the clock value of each node.
-         */
-        private fun gridWithExecutionFrequency(frequency: Int) = mooreGrid<Instant>(GRID_SIZE, GRID_SIZE, { _, _ ->
-            DISTANT_PAST
-        }) {
-            sharedClock(times[localId]).also { increaseTime(localId, frequency) }
-        }
+        context(clock: MultiClock)
+        private fun gridWithTimeIntervalBetweenRounds(sideSize: Int = 2, timeBetweenRounds: Int = sideSize * sideSize) =
+            mooreGrid<Instant>(2, 2, { _, _ -> DISTANT_PAST }) {
+                sharedClock(clock[localId]).also { clock.increaseTime(localId, timeBetweenRounds) }
+            }
     }
 }
