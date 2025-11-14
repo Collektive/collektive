@@ -12,13 +12,16 @@ import it.unibo.collektive.testing.Environment
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.seconds
 
-class MultiClock(val devices: Int) {
+class MultiClock(devices: Int) {
     /**
      * A mutable list that keeps track of timestamps represented as `Instant`.
      * Can be used to store and manage instances of time within a test scenario
      * or other temporal context.
      */
-    private val times = generateSequence { startTime }.take(devices).toMutableList()
+    private val times = generateSequence { startTime }
+        .take(devices)
+        .mapIndexed { index, time -> time + index.seconds }
+        .toMutableList()
 
     operator fun get(deviceId: Int): Instant = times[deviceId]
 
@@ -30,12 +33,6 @@ class MultiClock(val devices: Int) {
      */
     internal fun increaseTime(nodeId: Int, frequency: Int) {
         times[nodeId] += frequency.seconds
-    }
-
-    internal fun setupTimes() {
-        repeat(DEVICE_COUNT) {
-            times[it] += it.seconds
-        }
     }
 
     /**
@@ -72,9 +69,8 @@ class MultiClock(val devices: Int) {
          * This constant is typically used to define intervals or timing for processes
          * that need to occur at a one-second frequency.
          */
-        const val ONE_SEC_FREQUENCY = 1
+        const val ONE_SECOND = 1
 
         val startTime = Instant.parse("2024-01-01T00:00:00Z")
     }
-
 }

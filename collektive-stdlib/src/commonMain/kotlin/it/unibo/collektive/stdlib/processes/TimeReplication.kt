@@ -37,7 +37,7 @@ inline fun <reified Type : Any?> Aggregate<*>.timeReplicated(
 ): Type = evolving(emptySet<Replica<Type>>()) { localReplicas ->
     val localRep: MutableSet<Replica<Type>> = localReplicas.toMutableSet()
     val newReplicaId = newReplicaID(timeToSpawn, currentTime)
-    // if the replica ID is greater than the minimum, it means it is the ID of the new replica to be spawned
+    // if the replica ID is not null, it means it is the ID of the new replica to be spawned
     if (newReplicaId != null) {
         if (localReplicas.size == maxReplicas) {
             val oldestReplica = localReplicas.minBy { it.id }
