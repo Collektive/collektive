@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -15,8 +15,6 @@ import it.unibo.collektive.stdlib.test.MultiClock.Companion.DEVICE_COUNT
 import it.unibo.collektive.stdlib.test.MultiClock.Companion.GRID_SIZE
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
-import kotlinx.datetime.Instant
-import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
@@ -57,12 +55,9 @@ class TimeReplicatedTest {
         private fun gridWithTimeIntervalBetweenRounds() = mooreGrid<Int>(GRID_SIZE, GRID_SIZE, { _, _ ->
             Int.MIN_VALUE
         }) {
-            timeReplicated(
-                currentTime = clock[localId],
-                maxReplicas = 4,
-                timeToSpawn = 3.seconds,
-                process = { nonStabilizingGossip(value = localId, reducer = ::maxOf) },
-            ).also { clock.increaseTime(localId, DEVICE_COUNT) }
+            timeReplicated(currentTime = clock[localId], maxReplicas = 4, timeToSpawn = 3.seconds) {
+                nonStabilizingGossip(value = localId, reducer = ::maxOf)
+            }.also { clock.increaseTime(localId, DEVICE_COUNT) }
         }
     }
 }

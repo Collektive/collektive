@@ -30,24 +30,19 @@ fun Aggregate<*>.sharedTimeLeftTo(now: Instant, timeToWait: Duration): Duration 
     timeToWait - localDeltaTime(sharedClock(now))
 
 /**
- * Calculates the time difference between the current moment ([now]) and a previous timestamp.
- * The duration is always a non-negative value.
- *
- * @param now The current instant in time to compare against.
- * @return The duration between the `now` instant and the last stored timestamp in the aggregate.
+ * Calculates the time passed since the last execution round, provided the current time ([now]).
+ * The duration is always coerced to positive or zero.
  */
 fun Aggregate<*>.localDeltaTime(now: Instant): Duration = evolving(now) { previousTime ->
     now.yielding { (now - previousTime).coerceAtLeast(ZERO) }
 }
 
 /**
- * Agrees on a shared clock timestamp across the aggregate network.
- * The device whose time progresses the most will drive the shared clock forward.
+ * Agrees on a shared clock across the network.
+ * The device whose time progresses the fastest will drive the shared clock forward.
  *
  * @param localTime The time as perceived locally.
  * @return The resulting synchronized timestamp. The provided Instant will always be past or equal to the local time.
- * @throws IllegalArgumentException if the local time delta is computed to be negative, indicating
- * that time has moved backward.
  */
 fun Aggregate<*>.sharedClock(localTime: Instant): Instant {
     val localDelta: Duration = localDeltaTime(localTime)
