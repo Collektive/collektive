@@ -1,3 +1,32 @@
+## [27.4.0](https://github.com/Collektive/collektive/compare/27.3.3...27.4.0) (2025-11-20)
+
+### Features
+
+* **collektive-stdlib:** add `timeReplicated` and `sharedClock` ([#566](https://github.com/Collektive/collektive/issues/566)) ([932e677](https://github.com/Collektive/collektive/commit/932e677ad42fbd8f859789f09da018408d4ab602))
+
+### Dependency updates
+
+* **deps:** update alchemist to v42.3.17 ([39d01ac](https://github.com/Collektive/collektive/commit/39d01ac68c1b78447614280257781b5d925b4688))
+* **deps:** update alchemist to v42.3.18 ([20644f3](https://github.com/Collektive/collektive/commit/20644f34735886a4f8232727431dea8529384238))
+* **deps:** update dependency react-router-dom to v7.9.6 ([55da63f](https://github.com/Collektive/collektive/commit/55da63f27d3298bc990d9bbc38688a227883a80f))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.155 ([12ccf59](https://github.com/Collektive/collektive/commit/12ccf597d2a4c7f206be191d8c85ddeb413fe864))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.156 ([264ab22](https://github.com/Collektive/collektive/commit/264ab2275561f5e1378114d2cd7415f23f772ece))
+* **deps:** update gradle to v9.2.1 ([3fedee7](https://github.com/Collektive/collektive/commit/3fedee74298ffd0221d0dc1c0765ae8641a02f90))
+* **deps:** update plugin gitsemver to v7.0.7 ([1c4ad46](https://github.com/Collektive/collektive/commit/1c4ad46c186c3412f22b8e58a39eb210fe964b6b))
+* **deps:** update plugin kotlin-qa to v0.97.0 ([17b908d](https://github.com/Collektive/collektive/commit/17b908de457d7329223dd62c1b5d6c7641eaf7e5))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.1.5 ([ace3798](https://github.com/Collektive/collektive/commit/ace3798c707aabce12a91991981b0748069bd2ba))
+* **deps:** update plugin publishoncentral to v9.1.8 ([691c4cf](https://github.com/Collektive/collektive/commit/691c4cf4a0a69e284d4cab69c2bb53d5befe17f6))
+
+### Build and continuous integration
+
+* **deps:** update actions/checkout action to v5.0.1 ([eb8289f](https://github.com/Collektive/collektive/commit/eb8289f1aebe920cb8096eec564e076862ea1e66))
+* **deps:** update github/codeql-action action to v4.31.3 ([ca87548](https://github.com/Collektive/collektive/commit/ca87548faaa4bc6cf88caeebb1d4b691cb9d7c3c))
+* **deps:** update github/codeql-action action to v4.31.4 ([a2e148f](https://github.com/Collektive/collektive/commit/a2e148f9ac3b12b6da32329b4561460e01e80c40))
+
+### General maintenance
+
+* **copyright:** update copyright notice to include the starting and current year ([3ca9433](https://github.com/Collektive/collektive/commit/3ca94335c0cabee1641912a48488e3e586a7b0a1))
+
 ## [27.3.3](https://github.com/Collektive/collektive/compare/27.3.2...27.3.3) (2025-11-12)
 
 ### Dependency updates
