@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2024-2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -27,9 +27,9 @@ object Round {
         computation: Aggregate<ID>.() -> Result,
     ): AggregateResult<ID, Result> {
         require(steps > 0) { "Unable to perform '$steps' rounds. At least 1 round is required" }
-        val firstRoundResult = aggregate(deviceId, inMemory = true, compute = computation)
+        val firstRoundResult = aggregate(deviceId, inMemory = false, compute = computation)
         return (1 until steps).fold(firstRoundResult) { previousResult, _ ->
-            aggregate(deviceId, previousResult.newState, NoNeighborsData(), inMemory = true, compute = computation)
+            aggregate(deviceId, previousResult.newState, NoNeighborsData(), inMemory = false, compute = computation)
         }
     }
 }
