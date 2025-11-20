@@ -334,7 +334,6 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
                 }
                 listOf(file)
             }
-
             is Iterable<*> -> flatMap { files -> files.toFiles() }
             else -> error("Invalid source set of type ${this::class.simpleName ?: "anonymous"}: $this")
         }
