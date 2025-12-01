@@ -13,11 +13,11 @@ import it.unibo.collektive.stdlib.test.MultiClock.Companion.ONE_SECOND
 import it.unibo.collektive.stdlib.time.sharedClock
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.mooreGrid
-import kotlinx.datetime.Instant
-import kotlinx.datetime.Instant.Companion.DISTANT_PAST
 import kotlin.test.Test
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
+import kotlin.time.Instant.Companion.DISTANT_PAST
 
 @OptIn(ExperimentalTime::class)
 class SharedClockTest {
