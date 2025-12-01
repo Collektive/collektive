@@ -6,6 +6,8 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
+@file:OptIn(ExperimentalTime::class)
+
 package it.unibo.collektive.stdlib.test
 import io.kotest.matchers.shouldBe
 import it.unibo.collektive.stdlib.test.MultiClock.Companion.DEVICE_COUNT
@@ -19,7 +21,6 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 import kotlin.time.Instant.Companion.DISTANT_PAST
 
-@OptIn(ExperimentalTime::class)
 class SharedClockTest {
 
     @Test
