@@ -15,6 +15,11 @@ import it.unibo.collektive.compiler.frontend.firextensions.fqName
 import it.unibo.collektive.compiler.frontend.firextensions.functionName
 import it.unibo.collektive.compiler.frontend.firextensions.isAggregate
 import it.unibo.collektive.compiler.frontend.firextensions.isAlignedOn
+import kotlin.reflect.KClass
+import kotlin.reflect.KFunction
+import kotlin.reflect.KType
+import kotlin.reflect.full.functions
+import kotlin.reflect.jvm.kotlinFunction
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.FirElement
@@ -30,11 +35,6 @@ import org.jetbrains.kotlin.fir.expressions.FirReturnExpression
 import org.jetbrains.kotlin.fir.expressions.allReceiverExpressions
 import org.jetbrains.kotlin.fir.types.classId
 import org.jetbrains.kotlin.fir.types.resolvedType
-import kotlin.reflect.KClass
-import kotlin.reflect.KFunction
-import kotlin.reflect.KType
-import kotlin.reflect.full.functions
-import kotlin.reflect.jvm.kotlinFunction
 
 /**
  * Checker that reports aggregate function calls made inside a loop or collection

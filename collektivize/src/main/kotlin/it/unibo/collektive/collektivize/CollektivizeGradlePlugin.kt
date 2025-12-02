@@ -10,6 +10,8 @@ package it.unibo.collektive.collektivize
 
 import it.unibo.collektive.collektivize.FieldedMembersGenerator.baseExtensions
 import it.unibo.collektive.collektivize.FieldedMembersGenerator.baseTargetTypes
+import java.io.File
+import kotlin.reflect.KClass
 import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -23,8 +25,6 @@ import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.listProperty
 import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.register
-import java.io.File
-import kotlin.reflect.KClass
 
 /**
  * Collekivize Gradle plugin.
