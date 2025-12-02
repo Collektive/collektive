@@ -6,6 +6,8 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
+@file:OptIn(ExperimentalTime::class)
+
 package it.unibo.collektive.stdlib.processes
 
 import it.unibo.collektive.aggregate.api.Aggregate
@@ -13,11 +15,12 @@ import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
 import it.unibo.collektive.aggregate.api.sharing
 import it.unibo.collektive.stdlib.collapse.maxBy
 import it.unibo.collektive.stdlib.time.sharedTimeLeftTo
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 typealias ReplicaID = ULong
 
