@@ -6,16 +6,19 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
+@file:OptIn(ExperimentalTime::class)
+
 package it.unibo.collektive.stdlib.time
 
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.stdlib.collapse.maxBy
-import kotlinx.datetime.Instant
-import kotlinx.datetime.Instant.Companion.DISTANT_PAST
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
+import kotlin.time.Instant.Companion.DISTANT_PAST
 
 /**
  * Computes the time left (or past, when negative) until a timer expires,
