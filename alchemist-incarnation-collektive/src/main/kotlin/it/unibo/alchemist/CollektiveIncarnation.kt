@@ -33,6 +33,17 @@ import it.unibo.alchemist.util.RandomGenerators.nextDouble
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.compiler.CollektiveK2JVMCompiler
 import it.unibo.collektive.compiler.logging.CollectingMessageCollector
+import java.io.File
+import java.lang.reflect.Method
+import java.net.URLClassLoader
+import java.security.MessageDigest
+import javax.script.ScriptEngineManager
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.createTempDirectory
+import kotlin.io.path.exists
+import kotlin.io.path.isDirectory
+import kotlin.reflect.KProperty
+import kotlin.reflect.full.starProjectedType
 import org.apache.commons.math3.random.RandomGenerator
 import org.danilopianini.util.ListSet
 import org.jetbrains.kotlin.cli.common.ExitCode
@@ -45,17 +56,6 @@ import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.OUTPUT
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.STRONG_WARNING
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.WARNING
 import org.slf4j.LoggerFactory
-import java.io.File
-import java.lang.reflect.Method
-import java.net.URLClassLoader
-import java.security.MessageDigest
-import javax.script.ScriptEngineManager
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.createTempDirectory
-import kotlin.io.path.exists
-import kotlin.io.path.isDirectory
-import kotlin.reflect.KProperty
-import kotlin.reflect.full.starProjectedType
 
 /**
  * Collektive incarnation in Alchemist.

@@ -12,13 +12,13 @@ import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.mapNeighborhood
 import it.unibo.collektive.aggregate.api.neighboring
-import kotlinx.serialization.Serializable
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.jvm.JvmInline
 import kotlin.math.hypot
 import kotlin.math.sqrt
+import kotlinx.serialization.Serializable
 
 /**
  * A 2D point represented as a pair of [x] and [y] [coordinates].

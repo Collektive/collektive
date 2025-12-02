@@ -16,8 +16,8 @@ import it.unibo.collektive.stdlib.collapse.fold
 import it.unibo.collektive.stdlib.util.Reducer
 import it.unibo.collektive.stdlib.util.hops
 import it.unibo.collektive.stdlib.util.nonOverflowingPlus
-import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmOverloads
+import kotlinx.serialization.Serializable
 
 /**
  * Bounded election is a self-stabilizing and priority-based multi-leader election algorithm

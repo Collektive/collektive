@@ -8,8 +8,8 @@
 
 package it.unibo.collektive.aggregate.api
 
-import kotlinx.serialization.KSerializer
 import kotlin.jvm.JvmInline
+import kotlinx.serialization.KSerializer
 
 /**
  * A method to share data between nodes in a network.

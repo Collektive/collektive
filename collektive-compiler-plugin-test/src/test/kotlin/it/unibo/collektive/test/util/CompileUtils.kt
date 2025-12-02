@@ -10,14 +10,14 @@ package it.unibo.collektive.test.util
 
 import it.unibo.collektive.compiler.CollektiveK2JVMCompiler
 import it.unibo.collektive.compiler.logging.CollectingMessageCollector
-import org.jetbrains.kotlin.cli.common.ExitCode
-import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import java.io.File
 import java.io.FileNotFoundException
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.createTempFile
 import kotlin.io.path.writeText
 import kotlin.test.assertTrue
+import org.jetbrains.kotlin.cli.common.ExitCode
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 
 object CompileUtils {
     data class KotlinTestingProgram(val fileName: String, val program: String) {

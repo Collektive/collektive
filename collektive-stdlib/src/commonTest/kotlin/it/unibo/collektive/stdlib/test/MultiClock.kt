@@ -9,8 +9,8 @@
 package it.unibo.collektive.stdlib.test
 
 import it.unibo.collektive.testing.Environment
-import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.datetime.Instant
 
 class MultiClock(devices: Int) {
     /**

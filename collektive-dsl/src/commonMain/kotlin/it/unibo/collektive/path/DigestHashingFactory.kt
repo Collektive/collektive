@@ -8,12 +8,12 @@
 
 package it.unibo.collektive.path
 
-import org.kotlincrypto.hash.sha3.Keccak512
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.jvm.JvmInline
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
+import org.kotlincrypto.hash.sha3.Keccak512
 
 /**
  * A factory that creates [Path] instances by hashing their content.

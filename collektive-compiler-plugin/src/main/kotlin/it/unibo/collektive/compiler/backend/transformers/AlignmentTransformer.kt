@@ -16,6 +16,8 @@ import it.unibo.collektive.compiler.backend.irextensions.toFunctionAlignmentToke
 import it.unibo.collektive.compiler.backend.util.StackFunctionCall
 import it.unibo.collektive.compiler.backend.util.debugPrint
 import it.unibo.collektive.compiler.common.error
+import kotlin.concurrent.atomics.AtomicInt
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrElement
@@ -42,8 +44,6 @@ import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
 import org.jetbrains.kotlin.ir.util.dumpKotlinLike
 import org.jetbrains.kotlin.ir.visitors.IrTransformer
-import kotlin.concurrent.atomics.AtomicInt
-import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 /**
  * IR transformer that injects alignment logic around aggregate-aware computations.

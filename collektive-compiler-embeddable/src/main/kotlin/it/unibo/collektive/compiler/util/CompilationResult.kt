@@ -1,8 +1,8 @@
 package it.unibo.collektive.compiler.util
 
+import java.io.File
 import org.jetbrains.kotlin.codegen.state.GenerationState
 import org.jetbrains.kotlin.config.JVMConfigurationKeys.OUTPUT_DIRECTORY
-import java.io.File
 
 /**
  * Get the output directory for the KotlinJVM compiler from the configuration.
