@@ -14,10 +14,10 @@ import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
 import it.unibo.collektive.aggregate.ids
 import it.unibo.collektive.aggregate.toMap
 import it.unibo.collektive.aggregate.values
-import kotlinx.serialization.Serializable
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.jvm.JvmField
+import kotlinx.serialization.Serializable
 
 /**
  * Filters the input sequence of paths to retain only those that satisfy the coherence criterion.

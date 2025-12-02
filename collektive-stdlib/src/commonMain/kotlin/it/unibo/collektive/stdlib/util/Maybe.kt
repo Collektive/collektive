@@ -6,11 +6,11 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.serialization.OptionSerializer
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.jvm.JvmInline
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 
 /**
  * A [Serializable] wrapper for [Option] to allow serialization of optional values.

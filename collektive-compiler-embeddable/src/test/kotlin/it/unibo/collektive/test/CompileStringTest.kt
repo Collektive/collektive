@@ -1,5 +1,6 @@
 package it.unibo.collektive.test
 
+import com.sun.tools.javap.Main as Javap
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.ints.beGreaterThan
 import io.kotest.matchers.nulls.beNull
@@ -11,7 +12,6 @@ import java.io.ByteArrayOutputStream
 import java.io.PrintWriter
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.listDirectoryEntries
-import com.sun.tools.javap.Main as Javap
 
 class CompileStringTest : FreeSpec({
     "a simple aggregate function" - {

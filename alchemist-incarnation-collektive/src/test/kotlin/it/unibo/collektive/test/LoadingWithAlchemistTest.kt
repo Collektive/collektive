@@ -18,10 +18,10 @@ import it.unibo.alchemist.model.positions.Euclidean2DPosition
 import it.unibo.alchemist.model.terminators.AfterTime
 import it.unibo.alchemist.model.times.DoubleTime
 import it.unibo.alchemist.util.ClassPathScanner
-import org.apache.commons.math3.random.MersenneTwister
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import org.apache.commons.math3.random.MersenneTwister
 
 class LoadingWithAlchemistTest {
     @Test

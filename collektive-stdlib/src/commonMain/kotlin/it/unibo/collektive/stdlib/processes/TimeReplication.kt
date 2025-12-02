@@ -13,11 +13,11 @@ import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
 import it.unibo.collektive.aggregate.api.sharing
 import it.unibo.collektive.stdlib.collapse.maxBy
 import it.unibo.collektive.stdlib.time.sharedTimeLeftTo
-import kotlinx.datetime.Instant
-import kotlinx.serialization.Serializable
 import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
+import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 
 typealias ReplicaID = ULong
 

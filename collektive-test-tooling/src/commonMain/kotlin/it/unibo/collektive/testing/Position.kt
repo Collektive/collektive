@@ -8,8 +8,8 @@
 
 package it.unibo.collektive.testing
 
-import kotlinx.serialization.Serializable
 import kotlin.math.sqrt
+import kotlinx.serialization.Serializable
 
 /**
  * A position in a 3D space with [x], [y], and [z] coordinates.
