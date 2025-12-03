@@ -38,7 +38,7 @@ class TimeReplicatedTest {
         with(MultiClock(DEVICE_COUNT)) {
             val env: Environment<Int> = gridWithTimeIntervalBetweenRounds()
             env.runAllDevices(times = DEVICE_COUNT)
-            env.status().values.distinct()
+            env.status().values.distinct().first() shouldBe env.nodes.maxBy { it.id }.id // should be 3
             env.removeNode(3) // simulate device 3 failure
             env.runAllDevices(times = DEVICE_COUNT * 2)
             val finalStatus = env.status().values.distinct()
