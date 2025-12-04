@@ -29,8 +29,10 @@ import kotlin.time.Instant.Companion.DISTANT_PAST
  * @param timeToWait The duration representing the time-to-live threshold.
  * @return `true` if the elapsed time since `processTime` exceeds `timeToLive`, `false` otherwise.
  */
-fun Aggregate<*>.sharedTimeLeftTo(now: Instant, timeToWait: Duration): Duration =
-    timeToWait - localDeltaTime(sharedClock(now))
+fun Aggregate<*>.sharedTimeLeftTo(now: Instant, timeToWait: Duration): Duration = evolving(timeToWait) { previous ->
+    val timeLeft = previous - localDeltaTime(sharedClock(now))
+    (if (timeLeft <= ZERO) timeToWait else timeLeft).yielding { timeLeft }
+}
 
 /**
  * Calculates the time passed since the last execution round, provided the current time ([now]).
