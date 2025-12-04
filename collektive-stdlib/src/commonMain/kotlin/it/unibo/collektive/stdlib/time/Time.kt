@@ -30,8 +30,8 @@ import kotlin.time.Instant.Companion.DISTANT_PAST
  * @return `true` if the elapsed time since `processTime` exceeds `timeToLive`, `false` otherwise.
  */
 fun Aggregate<*>.sharedTimeLeftTo(now: Instant, timeToWait: Duration): Duration = evolving(timeToWait) { previous ->
-    val result = previous - localDeltaTime(sharedClock(now))
-    (if (result <= ZERO) timeToWait else result).yielding { result }
+    val timeLeft = previous - localDeltaTime(sharedClock(now))
+    (if (timeLeft <= ZERO) timeToWait else timeLeft).yielding { timeLeft }
 }
 
 /**
