@@ -93,6 +93,9 @@ object CollektiveNames {
     /** Fully qualified name of the `neighboring(...)` function for building neighbor views. */
     val NEIGHBORING_FUNCTION_FQ_NAME: String = "$COLLEKTIVE_API_PACKAGE.neighboring"
 
+    /** Fully qualified name of the `mapNeighborhood(...)` function for efficient neighbor mapping. */
+    val MAP_NEIGHBORHOOD_FUNCTION_FQ_NAME: String = "$COLLEKTIVE_API_PACKAGE.mapNeighborhood"
+
     /** Fully qualified name of the ignore annotation used to suppress automatic alignment. */
     val IGNORE_FUNCTION_ANNOTATION_FQ_NAME: String =
         "${extractPackageName("CollektiveIgnore")}.${extractAnnotationName("CollektiveIgnore")}"
