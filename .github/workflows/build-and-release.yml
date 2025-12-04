@@ -136,7 +136,7 @@ jobs:
             npx semantic-release
           should-run-codecov: false
           should-deploy: true
-          github-token: ${{ github.token }}
+          github-token: ${{ secrets.DEPLOYMENT_TOKEN }}
           maven-central-username: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
           gradle-publish-secret: ${{ secrets.GRADLE_PUBLISH_SECRET }}
