@@ -1,3 +1,23 @@
+## [27.4.2](https://github.com/Collektive/collektive/compare/27.4.1...27.4.2) (2025-12-04)
+
+### Bug Fixes
+
+* **stdlib:** use evolve to keep track of the previous step of the timer ([#1286](https://github.com/Collektive/collektive/issues/1286)) ([9dda049](https://github.com/Collektive/collektive/commit/9dda0493fb327248054b86348f19b82207ca6393))
+
+### Tests
+
+* **stdlib:** add missing assertion ([#1284](https://github.com/Collektive/collektive/issues/1284)) ([b81b196](https://github.com/Collektive/collektive/commit/b81b1963e9b8f29c704bb832f5c8cb3c1854fca7))
+
+### Build and continuous integration
+
+* **deps:** update actions/setup-node action to v6.1.0 ([e026045](https://github.com/Collektive/collektive/commit/e026045cc9c9dd7899431d4a0d0ae85a6060c98f))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.13 ([756aaad](https://github.com/Collektive/collektive/commit/756aaadc3bacabb229f10be25d44e6bd544745a4))
+* use the deployment token when running semantic release ([fba0e5b](https://github.com/Collektive/collektive/commit/fba0e5b0b9651c329ae7284421a0247add7bb7f7))
+
+### Style improvements
+
+* **stdlib-buildfile:** reformat for compactness ([#1282](https://github.com/Collektive/collektive/issues/1282)) ([c5b50a3](https://github.com/Collektive/collektive/commit/c5b50a3e63df62dfe5b581b7222653ae6a851e1c))
+
 ## [27.4.1](https://github.com/Collektive/collektive/compare/27.4.0...27.4.1) (2025-12-02)
 
 ### Dependency updates
