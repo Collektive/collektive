@@ -110,12 +110,6 @@ jobs:
           persist-credentials: true
           repository: Collektive/collektive.github.io
           token: ${{ secrets.DEPLOYMENT_TOKEN }}
-      - name: Recreate checkout v5 credentials in site/build
-        run: |
-          # Set the PAT as a basic auth header (what checkout v5 used to do)
-          git -C deployed-website config \
-           http.https://github.com/.extraheader \
-           "AUTHORIZATION: basic $(printf 'x-access-token:%s' '${{ secrets.DEPLOYMENT_TOKEN }}' | base64 | tr -d '\n')"
       - name: Download website artifact
         uses: actions/download-artifact@v6.0.0
         with:
@@ -125,6 +119,12 @@ jobs:
           tar -xvf website.tar
           mv deployed-website/.git site/build
           git -C site/build status
+      - name: Configure git credentials for site/build
+        run: |
+          # Set the PAT as a basic auth header (what checkout v5 used to do)
+          git -C site/build config \
+           http.https://github.com/.extraheader \
+           "AUTHORIZATION: basic $(printf 'x-access-token:%s' '${{ secrets.DEPLOYMENT_TOKEN }}' | base64 | tr -d '\n')"
       - name: Install Node
         uses: actions/setup-node@v6.1.0
         with:
