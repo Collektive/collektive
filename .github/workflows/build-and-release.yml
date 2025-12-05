@@ -110,7 +110,7 @@ jobs:
           persist-credentials: true
           repository: Collektive/collektive.github.io
           token: ${{ secrets.DEPLOYMENT_TOKEN }}
-      - name: Recreate checkout v5 credentials in site/build
+      - name: Recreate checkout v5 credentials in deployed-website
         env:
           GH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
         run: |
