@@ -110,14 +110,6 @@ jobs:
           persist-credentials: true
           repository: Collektive/collektive.github.io
           token: ${{ secrets.DEPLOYMENT_TOKEN }}
-      - name: Recreate checkout v5 credentials in deployed-website
-        env:
-          GH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
-        run: |
-          # Set the PAT as a basic auth header (what checkout v5 used to do)
-          git -C deployed-website config \
-           http.https://github.com/.extraheader \
-           "authorization: basic $(printf 'x-access-token:%s' \"$GH_TOKEN\" | base64 | tr -d '\n')"
       - name: Download website artifact
         uses: actions/download-artifact@v6.0.0
         with:
