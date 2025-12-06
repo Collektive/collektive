@@ -1,3 +1,17 @@
+## [27.4.3](https://github.com/Collektive/collektive/compare/27.4.2...27.4.3) (2025-12-06)
+
+### Dependency updates
+
+* **deps:** update dependency react-router-dom to v7.10.0 ([ce54b6b](https://github.com/Collektive/collektive/commit/ce54b6b67155299379d24b0acc4a9ccce05dd7e8))
+
+### Bug Fixes
+
+* **ci:** mock the behavior of actions/checkout@v5 by reifying credentials into an `.extraheader` file ([#1287](https://github.com/Collektive/collektive/issues/1287)) ([aab8730](https://github.com/Collektive/collektive/commit/aab8730e3c851e3f3a82f92c902bdf3572b9d6d5))
+
+### Build and continuous integration
+
+* **deps:** update github/codeql-action action to v4.31.7 ([3f4b6c3](https://github.com/Collektive/collektive/commit/3f4b6c338f723191a057383e446c17d620b1cfce))
+
 ## [27.4.2](https://github.com/Collektive/collektive/compare/27.4.1...27.4.2) (2025-12-04)
 
 ### Bug Fixes
