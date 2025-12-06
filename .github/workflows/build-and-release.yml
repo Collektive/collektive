@@ -22,7 +22,7 @@ jobs:
         run: |
           echo "run-with-secrets=${{ steps.detect-secrets.outputs.has-secrets == 'true' && !github.event.repository.fork }}" >> $GITHUB_OUTPUT
       - name: Checkout
-        uses: actions/checkout@v6.0.0
+        uses: actions/checkout@v6.0.1
         with:
           fetch-depth: 0
           fetch-tags: true
@@ -36,7 +36,7 @@ jobs:
             dry = keywords.any? { |kw| branch.include?(kw) } ? '' : '--dry-run'
             puts "dry_run=#{dry}"
           RUBY
-      - uses: DanySK/build-check-deploy-gradle-action@4.0.12
+      - uses: DanySK/build-check-deploy-gradle-action@4.0.13
         with:
           check-command: |
             ./gradlew check koverXmlReport :collektive-compiler-plugin:check :collektive-gradle-plugin:check :collektivize:check --parallel
@@ -59,7 +59,7 @@ jobs:
           maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
           signing-key: ${{ secrets.GPG_PRIVATEKEY }}
           signing-password: ${{ secrets.GPG_PASSPHRASE }}
-      - uses: github/codeql-action/upload-sarif@v4.31.6
+      - uses: github/codeql-action/upload-sarif@v4.31.7
         if: always() && runner.os == 'Linux'
         with:
           sarif_file: build/reports/merge.sarif
@@ -68,12 +68,12 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v6.0.0
+        uses: actions/checkout@v6.0.1
         with:
           submodules: true
           fetch-depth: 0
       - name: Install Node
-        uses: actions/setup-node@v6.0.0
+        uses: actions/setup-node@v6.1.0
         with:
           node-version-file: site/package.json
       - name: Build documentation website
@@ -97,13 +97,13 @@ jobs:
     runs-on: macos-15
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v6.0.0
+        uses: actions/checkout@v6.0.1
         with:
           fetch-depth: 0
           token: ${{ secrets.DEPLOYMENT_TOKEN }}
       - name: Checkout the docs
         if: contains(github.repository, 'Collektive/collektive')
-        uses: actions/checkout@v6.0.0
+        uses: actions/checkout@v6.0.1
         with:
           path: deployed-website
           fetch-depth: 0
@@ -119,11 +119,19 @@ jobs:
           tar -xvf website.tar
           mv deployed-website/.git site/build
           git -C site/build status
+      - name: Configure git credentials for site/build
+        env:
+          GH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
+        run: |
+          # Set the PAT as a basic auth header (what checkout v5 used to do)
+          git -C site/build config \
+           http.https://github.com/.extraheader \
+           "authorization: basic $(printf 'x-access-token:%s' \"$GH_TOKEN\" | base64 | tr -d '\n')"
       - name: Install Node
-        uses: actions/setup-node@v6.0.0
+        uses: actions/setup-node@v6.1.0
         with:
           node-version-file: package.json
-      - uses: DanySK/build-check-deploy-gradle-action@4.0.12
+      - uses: DanySK/build-check-deploy-gradle-action@4.0.13
         env:
           STAGING_REPO_ID: ${{ needs.staging-repo.outputs.staging-repo-id }}
           ORG_GRADLE_PROJECT_releaseStage: true
@@ -136,7 +144,7 @@ jobs:
             npx semantic-release
           should-run-codecov: false
           should-deploy: true
-          github-token: ${{ github.token }}
+          github-token: ${{ secrets.DEPLOYMENT_TOKEN }}
           maven-central-username: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
           gradle-publish-secret: ${{ secrets.GRADLE_PUBLISH_SECRET }}

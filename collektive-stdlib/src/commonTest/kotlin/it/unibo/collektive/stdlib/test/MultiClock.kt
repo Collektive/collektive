@@ -6,11 +6,14 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
+@file:OptIn(ExperimentalTime::class)
+
 package it.unibo.collektive.stdlib.test
 
 import it.unibo.collektive.testing.Environment
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.datetime.Instant
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 class MultiClock(devices: Int) {
     /**

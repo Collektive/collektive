@@ -1,3 +1,44 @@
+## [27.4.2](https://github.com/Collektive/collektive/compare/27.4.1...27.4.2) (2025-12-04)
+
+### Bug Fixes
+
+* **stdlib:** use evolve to keep track of the previous step of the timer ([#1286](https://github.com/Collektive/collektive/issues/1286)) ([9dda049](https://github.com/Collektive/collektive/commit/9dda0493fb327248054b86348f19b82207ca6393))
+
+### Tests
+
+* **stdlib:** add missing assertion ([#1284](https://github.com/Collektive/collektive/issues/1284)) ([b81b196](https://github.com/Collektive/collektive/commit/b81b1963e9b8f29c704bb832f5c8cb3c1854fca7))
+
+### Build and continuous integration
+
+* **deps:** update actions/setup-node action to v6.1.0 ([e026045](https://github.com/Collektive/collektive/commit/e026045cc9c9dd7899431d4a0d0ae85a6060c98f))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.13 ([756aaad](https://github.com/Collektive/collektive/commit/756aaadc3bacabb229f10be25d44e6bd544745a4))
+* use the deployment token when running semantic release ([fba0e5b](https://github.com/Collektive/collektive/commit/fba0e5b0b9651c329ae7284421a0247add7bb7f7))
+
+### Style improvements
+
+* **stdlib-buildfile:** reformat for compactness ([#1282](https://github.com/Collektive/collektive/issues/1282)) ([c5b50a3](https://github.com/Collektive/collektive/commit/c5b50a3e63df62dfe5b581b7222653ae6a851e1c))
+
+## [27.4.1](https://github.com/Collektive/collektive/compare/27.4.0...27.4.1) (2025-12-02)
+
+### Dependency updates
+
+* **core-deps:** update dependency org.jetbrains.kotlinx:kotlinx-datetime to v0.7.1-0.6.x-compat ([b68ddd8](https://github.com/Collektive/collektive/commit/b68ddd8aaff914363e2947fe0d80e758a9cd878b))
+* **deps:** update dependency @fortawesome/react-fontawesome to v3.1.1 ([9bc0982](https://github.com/Collektive/collektive/commit/9bc0982fa6b9e43e6728f1288d6bd4779d59a1b6))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.157 ([9b49f2e](https://github.com/Collektive/collektive/commit/9b49f2e59a6cc5b03782cc7b281a0c149f1ad050))
+* **deps:** update kotest to v6.0.7 ([efcc924](https://github.com/Collektive/collektive/commit/efcc92446823a11cd063b53d1d6b37d6a450b955))
+* **deps:** update plugin ksp to v2.3.3 ([b9e7590](https://github.com/Collektive/collektive/commit/b9e7590b2b7a6db4bd435947f044e0cff07dae24))
+
+### Bug Fixes
+
+* **stdlib:** migrate from kotlinx.datetime.Instant to kotlin.time.Instant ([#1278](https://github.com/Collektive/collektive/issues/1278)) ([85d0082](https://github.com/Collektive/collektive/commit/85d0082444e64d2bcc2d18ece99fd7f4b1035f56))
+
+### Build and continuous integration
+
+* **deps:** update actions/checkout action to v6 ([1cd8084](https://github.com/Collektive/collektive/commit/1cd8084abd8ffbd8237292b2dbf2f59c54c9a485))
+* **deps:** update actions/checkout action to v6.0.1 ([ff36cd0](https://github.com/Collektive/collektive/commit/ff36cd00ef13f9328985cc6235e0bbc0c5300ff2))
+* **deps:** update github/codeql-action action to v4.31.5 ([167d7a4](https://github.com/Collektive/collektive/commit/167d7a44e611943dd87476060ee893a86967e84c))
+* **deps:** update github/codeql-action action to v4.31.6 ([2efd76b](https://github.com/Collektive/collektive/commit/2efd76b76fee91abb598ed34cce43fb990d068bd))
+
 ## [27.4.0](https://github.com/Collektive/collektive/compare/27.3.3...27.4.0) (2025-11-20)
 
 ### Features

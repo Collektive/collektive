@@ -6,6 +6,8 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
+@file:OptIn(ExperimentalTime::class)
+
 package it.unibo.collektive.stdlib.time
 
 import it.unibo.collektive.aggregate.Field
@@ -14,8 +16,9 @@ import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.stdlib.collapse.maxBy
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
-import kotlinx.datetime.Instant
-import kotlinx.datetime.Instant.Companion.DISTANT_PAST
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
+import kotlin.time.Instant.Companion.DISTANT_PAST
 
 /**
  * Computes the time left (or past, when negative) until a timer expires,
@@ -26,8 +29,10 @@ import kotlinx.datetime.Instant.Companion.DISTANT_PAST
  * @param timeToWait The duration representing the time-to-live threshold.
  * @return `true` if the elapsed time since `processTime` exceeds `timeToLive`, `false` otherwise.
  */
-fun Aggregate<*>.sharedTimeLeftTo(now: Instant, timeToWait: Duration): Duration =
-    timeToWait - localDeltaTime(sharedClock(now))
+fun Aggregate<*>.sharedTimeLeftTo(now: Instant, timeToWait: Duration): Duration = evolving(timeToWait) { previous ->
+    val timeLeft = previous - localDeltaTime(sharedClock(now))
+    (if (timeLeft <= ZERO) timeToWait else timeLeft).yielding { timeLeft }
+}
 
 /**
  * Calculates the time passed since the last execution round, provided the current time ([now]).

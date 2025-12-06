@@ -38,9 +38,11 @@ class TimeReplicatedTest {
         with(MultiClock(DEVICE_COUNT)) {
             val env: Environment<Int> = gridWithTimeIntervalBetweenRounds()
             env.runAllDevices(times = DEVICE_COUNT)
-            env.status().values.distinct()
+            val initialStatus = env.status().values.distinct()
+            initialStatus.size shouldBe 1
+            initialStatus.first() shouldBe env.nodes.maxBy { it.id }.id // should be 3
             env.removeNode(3) // simulate device 3 failure
-            env.runAllDevices(times = DEVICE_COUNT * 2)
+            env.runAllDevices(times = DEVICE_COUNT * 3)
             val finalStatus = env.status().values.distinct()
             finalStatus.size shouldBe 1
             finalStatus.first() shouldBe env.nodes.maxBy { it.id }.id // should be 2 now
@@ -55,7 +57,7 @@ class TimeReplicatedTest {
         private fun gridWithTimeIntervalBetweenRounds() = mooreGrid<Int>(GRID_SIZE, GRID_SIZE, { _, _ ->
             Int.MIN_VALUE
         }) {
-            timeReplicated(currentTime = clock[localId], maxReplicas = 4, timeToSpawn = 3.seconds) {
+            timeReplicated(currentTime = clock[localId], maxReplicas = 6, timeToSpawn = 6.seconds) {
                 nonStabilizingGossip(value = localId, reducer = ::maxOf)
             }.also { clock.increaseTime(localId, DEVICE_COUNT) }
         }
