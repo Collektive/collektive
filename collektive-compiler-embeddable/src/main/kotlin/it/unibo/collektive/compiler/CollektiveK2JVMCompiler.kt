@@ -9,13 +9,6 @@
 package it.unibo.collektive.compiler
 
 import it.unibo.collektive.compiler.logging.SLF4JMessageCollector
-import org.jetbrains.kotlin.cli.common.ExitCode
-import org.jetbrains.kotlin.cli.common.arguments.K2JVMCompilerArguments
-import org.jetbrains.kotlin.cli.common.arguments.validateArguments
-import org.jetbrains.kotlin.cli.common.messages.MessageCollector
-import org.jetbrains.kotlin.cli.jvm.K2JVMCompiler
-import org.jetbrains.kotlin.config.Services
-import org.jetbrains.kotlin.incremental.classpathAsList
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
@@ -23,6 +16,13 @@ import kotlin.io.path.createTempDirectory
 import kotlin.io.path.createTempFile
 import kotlin.io.path.writeText
 import kotlin.script.experimental.jvm.util.classpathFromClassloader
+import org.jetbrains.kotlin.cli.common.ExitCode
+import org.jetbrains.kotlin.cli.common.arguments.K2JVMCompilerArguments
+import org.jetbrains.kotlin.cli.common.arguments.validateArguments
+import org.jetbrains.kotlin.cli.common.messages.MessageCollector
+import org.jetbrains.kotlin.cli.jvm.K2JVMCompiler
+import org.jetbrains.kotlin.config.Services
+import org.jetbrains.kotlin.incremental.classpathAsList
 
 /**
  * A facade for the Kotlin-JVM compiler with the Collektive plugin.

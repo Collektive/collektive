@@ -10,9 +10,9 @@ package it.unibo.collektive.collektivize.utils
 
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.ParameterSpec
-import org.gradle.internal.extensions.stdlib.capitalized
 import kotlin.reflect.KCallable
 import kotlin.reflect.KProperty
+import org.gradle.internal.extensions.stdlib.capitalized
 
 /**
  * Utilities for interoperate with kotlin poet.

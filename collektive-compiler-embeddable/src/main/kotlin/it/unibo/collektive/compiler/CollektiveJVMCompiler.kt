@@ -9,6 +9,10 @@
 package it.unibo.collektive.compiler
 
 import it.unibo.collektive.compiler.logging.SLF4JMessageCollector
+import java.io.File
+import kotlin.io.path.createTempDirectory
+import kotlin.script.experimental.jvm.util.KotlinJars
+import kotlin.script.experimental.jvm.util.classpathFromClassloader
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.cli.common.arguments.K2JVMCompilerArguments
 import org.jetbrains.kotlin.cli.common.config.addKotlinSourceRoot
@@ -27,10 +31,6 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.config.JvmTarget
 import org.jetbrains.kotlin.scripting.compiler.plugin.ScriptingK2CompilerPluginRegistrar
-import java.io.File
-import kotlin.io.path.createTempDirectory
-import kotlin.script.experimental.jvm.util.KotlinJars
-import kotlin.script.experimental.jvm.util.classpathFromClassloader
 
 /**
  * A facade for the Kotlin-JVM compiler with the Collektive plugin.
