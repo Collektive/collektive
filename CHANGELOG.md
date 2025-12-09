@@ -1,3 +1,16 @@
+## [27.4.4](https://github.com/Collektive/collektive/compare/27.4.3...27.4.4) (2025-12-09)
+
+### Dependency updates
+
+* **core-deps:** update plugin kover to v0.9.4 ([f958062](https://github.com/Collektive/collektive/commit/f95806280fc9b3503719479b277f3725d904bad3))
+* **deps:** update dependency io.mockk:mockk to v1.14.7 ([0cbff99](https://github.com/Collektive/collektive/commit/0cbff993a9d86007c6d3ecbacc2fa8e333ff76c0))
+* **deps:** update dependency react-router-dom to v7.10.1 ([94261b4](https://github.com/Collektive/collektive/commit/94261b46108511ff2507d2a28fc277571ffeb9f5))
+* **deps:** update react monorepo to v19.2.1 ([5bf6ab6](https://github.com/Collektive/collektive/commit/5bf6ab644dd1e5653304dae525623314d8c9da57))
+
+### Style improvements
+
+* import the style configuration from Alchemist ([#1279](https://github.com/Collektive/collektive/issues/1279)) ([f6bb80a](https://github.com/Collektive/collektive/commit/f6bb80a948c706e3c7bded421856befada1c7551))
+
 ## [27.4.3](https://github.com/Collektive/collektive/compare/27.4.2...27.4.3) (2025-12-06)
 
 ### Dependency updates
