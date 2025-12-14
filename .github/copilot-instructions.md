@@ -22,8 +22,8 @@ Collektive is a Kotlin multiplatform implementation of Aggregate Programming tha
 - **Quick validation**: `./gradlew :collektive-dsl:compileKotlinJvm :collektive-dsl:jvmTest --no-daemon` -- takes ~45 seconds for core DSL module
 
 #### Code Quality and Linting
-- **Run all linting**: `./gradlew ktlintCheck detektAll --no-daemon` -- takes ~30 seconds. NEVER CANCEL. Set timeout to 10+ minutes.
-- **Format code**: `./gradlew ktlintFormat --no-daemon`
+- **Run all linting**: `./gradlew ktlintCheck detektAll :collektive-compiler-plugin:ktlintCheck :collektive-compiler-plugin:detektAll :collektive-gradle-plugin:ktlintCheck :collektive-gradle-plugin:detektAll :collektivize:ktlintCheck :collektivize:detektAll --no-daemon` -- takes ~30 seconds. NEVER CANCEL. Set timeout to 10+ minutes.
+- **Format code**: `./gradlew ktlintFormat :collektive-compiler-plugin:ktlintFormat :collektive-gradle-plugin:ktlintFormat :collektivize:ktlintFormat --no-daemon`
 
 #### Documentation Site
 - **Install dependencies**: `cd site && npm install` -- takes ~50 seconds. Set timeout to 15+ minutes.
@@ -45,7 +45,7 @@ Collektive is a Kotlin multiplatform implementation of Aggregate Programming tha
 **For fast iteration (JVM only)**:
 1. **Compile JVM targets**: `./gradlew :collektive-dsl:compileKotlinJvm :collektive-stdlib:compileKotlinJvm --no-daemon`
 2. **Run core tests**: `./gradlew :collektive-dsl:jvmTest :collektive-stdlib:jvmTest --no-daemon`
-3. **Check code quality**: `./gradlew ktlintCheck detektAll --no-daemon`
+3. **Check code quality**: `./gradlew ktlintCheck detektAll :collektive-compiler-plugin:ktlintCheck :collektive-compiler-plugin:detektAll :collektive-gradle-plugin:ktlintCheck :collektive-gradle-plugin:detektAll :collektivize:ktlintCheck :collektivize:detektAll --no-daemon`
 
 **For complete validation (before final commit)**:
 1. **Full multiplatform build and test**: `./gradlew build check --no-daemon` (~30 minutes)
@@ -90,7 +90,7 @@ The CI pipeline runs comprehensive tests including:
 2. Add corresponding tests in **collektive-dsl/src/commonTest/**
 3. Update **collektive-stdlib** if new standard functions needed
 4. Run: `./gradlew :collektive-dsl:jvmTest :collektive-stdlib:jvmTest --no-daemon`
-5. Always run linting: `./gradlew ktlintCheck detektAll --no-daemon`
+5. Always run linting: `./gradlew ktlintCheck detektAll :collektive-compiler-plugin:ktlintCheck :collektive-compiler-plugin:detektAll :collektive-gradle-plugin:ktlintCheck :collektive-gradle-plugin:detektAll :collektivize:ktlintCheck :collektivize:detektAll --no-daemon`
 
 ### Working on Compiler Plugin
 1. Changes go in **collektive-compiler-plugin**
@@ -111,7 +111,7 @@ The CI pipeline runs comprehensive tests including:
 ./gradlew :collektive-dsl:jvmTest :collektive-stdlib:jvmTest :alchemist-incarnation-collektive:test --no-daemon
 
 # Check code quality  
-./gradlew ktlintCheck detektAll --no-daemon
+./gradlew ktlintCheck detektAll :collektive-compiler-plugin:ktlintCheck :collektive-compiler-plugin:detektAll :collektive-gradle-plugin:ktlintCheck :collektive-gradle-plugin:detektAll :collektivize:ktlintCheck :collektivize:detektAll --no-daemon
 ```
 
 **For final validation** (before committing):
