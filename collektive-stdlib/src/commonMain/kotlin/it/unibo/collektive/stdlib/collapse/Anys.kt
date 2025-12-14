@@ -17,7 +17,7 @@ import it.unibo.collektive.stdlib.util.Accumulator
 /*
  * Utility extensions for performing common reductions and queries over a collapsed computational field.
  *
- * A Collapse represents turning a distributed aggregate field into a local Kotlin collection,
+ * A `Collapse` represents turning a distributed aggregate field into a local Kotlin collection,
  * exposing its underlying sequence and list. These helpers provide predicates, counting, folding,
  * and peer-specific maximum extraction in a safe and ergonomic way.
  */
