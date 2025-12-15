@@ -1,3 +1,29 @@
+## [27.4.5](https://github.com/Collektive/collektive/compare/27.4.4...27.4.5) (2025-12-15)
+
+### Dependency updates
+
+* **deps:** update alchemist to v42.3.20 ([a8fd6ee](https://github.com/Collektive/collektive/commit/a8fd6eecd4e19a861cc97ee9cc90fa78ed5f1952))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v6 ([#1270](https://github.com/Collektive/collektive/issues/1270)) ([94cb78b](https://github.com/Collektive/collektive/commit/94cb78b7b34e4f6bdcb6d5de350b08aadbe13a99))
+* **deps:** update node.js to 24.12 ([0e2a7b5](https://github.com/Collektive/collektive/commit/0e2a7b568892aefb94e1f6205f0c24fcf140f7b8))
+* **deps:** update plugin com.gradle.develocity to v4.3 ([7fd0fbe](https://github.com/Collektive/collektive/commit/7fd0fbe15b328ab01326a47726f9cc71019da476))
+* **deps:** update plugin kotlin-qa to v0.99.0 ([4275862](https://github.com/Collektive/collektive/commit/4275862cbb72305a6a0ae880884081ee18e2245e))
+* **deps:** update react monorepo to v19.2.3 ([45d35ce](https://github.com/Collektive/collektive/commit/45d35ceeec8e02034a6619eb8d64ae9f6de133db))
+
+### Bug Fixes
+
+* **build:** use danysk/checkout-classic@1.0.0 when checking out the website ([#1309](https://github.com/Collektive/collektive/issues/1309)) ([1315bf5](https://github.com/Collektive/collektive/commit/1315bf5a6cc81b026c45941964e4ac440aaa15b2))
+
+### Build and continuous integration
+
+* **copilot:** enhance linting instructions in copilot documentation ([2a94139](https://github.com/Collektive/collektive/commit/2a941396d0df3ce37b04dd78af6b60623ea41e18))
+* **deps:** update actions/download-artifact action to v7 ([82f7cf3](https://github.com/Collektive/collektive/commit/82f7cf3b9054321a448ffaf380d36a1195caa7b5))
+* **deps:** update actions/upload-artifact action to v6 ([f273df3](https://github.com/Collektive/collektive/commit/f273df3024bd7576fddc74c570c7a8e84526c1e9))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.14 ([29eb4df](https://github.com/Collektive/collektive/commit/29eb4dfc9421ad18a2be7f39c699218b2ac0ccef))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.15 ([b211fb4](https://github.com/Collektive/collektive/commit/b211fb403890cf31cb7408459b1ca539dc0ec6d2))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.16 ([c764eed](https://github.com/Collektive/collektive/commit/c764eedd68377d30822d7d54f941cf491c53e6f8))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.17 ([dcebee1](https://github.com/Collektive/collektive/commit/dcebee12eef2936ada3591bad0eeedeb432a9f09))
+* **deps:** update github/codeql-action action to v4.31.8 ([d9aa698](https://github.com/Collektive/collektive/commit/d9aa6988916c0a663795047069633b284625b886))
+
 ## [27.4.4](https://github.com/Collektive/collektive/compare/27.4.3...27.4.4) (2025-12-09)
 
 ### Dependency updates
