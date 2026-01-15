@@ -73,7 +73,7 @@ jobs:
           submodules: true
           fetch-depth: 0
       - name: Install Node
-        uses: actions/setup-node@v6.1.0
+        uses: actions/setup-node@v6.2.0
         with:
           node-version-file: site/package.json
       - name: Build documentation website
@@ -128,7 +128,7 @@ jobs:
            http.https://github.com/.extraheader \
            "authorization: basic $(printf 'x-access-token:%s' \"$GH_TOKEN\" | base64 | tr -d '\n')"
       - name: Install Node
-        uses: actions/setup-node@v6.1.0
+        uses: actions/setup-node@v6.2.0
         with:
           node-version-file: package.json
       - uses: DanySK/build-check-deploy-gradle-action@4.0.18
