@@ -3,7 +3,7 @@ alchemist = "42.3.32"
 arrow = "2.2.0"
 build-config = "6.0.7"
 dokka = "2.1.0"
-kotest = "6.1.0"
+kotest = "6.1.1"
 kotlin = "2.2.21"
 serialization = "1.9.0"
 
