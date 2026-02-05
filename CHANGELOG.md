@@ -1,3 +1,13 @@
+## [27.4.7](https://github.com/Collektive/collektive/compare/27.4.6...27.4.7) (2026-02-05)
+
+### Dependency updates
+
+* **core-deps:** update plugin kover to v0.9.6 ([c4ba697](https://github.com/Collektive/collektive/commit/c4ba697880b842ea4cca562d97bc8abf7188a260))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.23 ([017807c](https://github.com/Collektive/collektive/commit/017807c6a4103002e3ed784d82ecf28a030c23a0))
+
 ## [27.4.6](https://github.com/Collektive/collektive/compare/27.4.5...27.4.6) (2026-01-31)
 
 ### Dependency updates
