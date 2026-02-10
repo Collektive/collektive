@@ -1,3 +1,18 @@
+## [27.4.8](https://github.com/Collektive/collektive/compare/27.4.7...27.4.8) (2026-02-10)
+
+### Dependency updates
+
+* **core-deps:** update plugin kover to v0.9.7 ([f9cade8](https://github.com/Collektive/collektive/commit/f9cade8fbc956f82e03efc453f3b0157e1365453))
+* **deps:** update alchemist to v42.3.34 ([f9c2332](https://github.com/Collektive/collektive/commit/f9c233260c47108e33f50623822859f9bd9d4859))
+* **deps:** update dependency @fortawesome/react-fontawesome to v3.2.0 ([6b8d225](https://github.com/Collektive/collektive/commit/6b8d225aa2a44f03c0a887066b1f6b30a0b3d19f))
+* **deps:** update kotest to v6.1.3 ([65c1e3f](https://github.com/Collektive/collektive/commit/65c1e3f43a8407d72f8fd2304ca638c4dd771439))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.1.9 ([803805f](https://github.com/Collektive/collektive/commit/803805fa3e5db0af81d9d84458cb5f5aff6089ca))
+
+### Build and continuous integration
+
+* **deps:** update github/codeql-action action to v4.32.1 ([9a9a308](https://github.com/Collektive/collektive/commit/9a9a30869b27375f42cf960714e136b30d39bbae))
+* **deps:** update github/codeql-action action to v4.32.2 ([322c703](https://github.com/Collektive/collektive/commit/322c7030fb438187bb813c49eb2bf208ee8c2ba0))
+
 ## [27.4.7](https://github.com/Collektive/collektive/compare/27.4.6...27.4.7) (2026-02-05)
 
 ### Dependency updates
