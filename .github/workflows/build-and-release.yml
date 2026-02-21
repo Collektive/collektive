@@ -97,7 +97,7 @@ jobs:
     runs-on: macos-15
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v6.0.2
+        uses: danysk/checkout-classic@f55ca46048a09d13b47f0e80db6b546977327791 # 1.0.0
         with:
           fetch-depth: 0
           token: ${{ secrets.DEPLOYMENT_TOKEN }}
@@ -141,6 +141,7 @@ jobs:
           check-command: true
           deploy-command: |
             npm install
+            git -C site/build push --dry-run
             npx semantic-release
           should-run-codecov: false
           should-deploy: true
