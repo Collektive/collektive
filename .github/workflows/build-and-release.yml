@@ -119,14 +119,13 @@ jobs:
           tar -xvf website.tar
           mv deployed-website/.git site/build
           git -C site/build status
-      - name: Configure git credentials for site/build
-        env:
-          GH_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
+      - name: Check that the extraheader exists
+        run: git -C site/build config --get http.https://github.com/.extraheader >/dev/null
+      - name: Check that the token is not empty
         run: |
-          # Set the PAT as a basic auth header (what checkout v5 used to do)
-          git -C site/build config \
-           http.https://github.com/.extraheader \
-           "authorization: basic $(printf 'x-access-token:%s' \"$GH_TOKEN\" | base64 | tr -d '\n')"
+          [ -n "${{ secrets.DEPLOYMENT_TOKEN }}" ]
+      - name: Check the token push rights
+        run: git -C site/build push --dry-run
       - name: Install Node
         uses: actions/setup-node@v6.2.0
         with:
@@ -141,7 +140,6 @@ jobs:
           check-command: true
           deploy-command: |
             npm install
-            git -C site/build push --dry-run
             npx semantic-release
           should-run-codecov: false
           should-deploy: true
