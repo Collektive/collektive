@@ -1,5 +1,5 @@
 [versions]
-alchemist = "42.4.2"
+alchemist = "43.0.5"
 arrow = "2.2.0"
 build-config = "6.0.7"
 dokka = "2.1.0"
