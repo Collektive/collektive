@@ -126,11 +126,11 @@ jobs:
           [ -n "${{ secrets.DEPLOYMENT_TOKEN }}" ]
       - name: Check the token push rights
         run: |
-          git config user.name  "${GITHUB_ACTOR:-github-actions[bot]}"
-          git config user.email "${GITHUB_ACTOR_ID:-41898282}+${GITHUB_ACTOR:-github-actions[bot]}@users.noreply.github.com"
-          git commit --allow-empty -m "chore: auth probe (skip ci)"
+          git -C site/build config user.name  "${GITHUB_ACTOR:-github-actions[bot]}"
+          git -C site/build config user.email "${GITHUB_ACTOR_ID:-41898282}+${GITHUB_ACTOR:-github-actions[bot]}@users.noreply.github.com"
+          git -C site/build commit --allow-empty -m "chore: auth probe (skip ci)"
           git -C site/build push --dry-run
-          git reset --soft HEAD~1
+          git -C site/build reset --soft HEAD~1
       - name: Install Node
         uses: actions/setup-node@v6.2.0
         with:
