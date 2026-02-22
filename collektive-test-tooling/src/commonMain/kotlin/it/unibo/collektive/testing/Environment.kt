@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -12,7 +12,7 @@ import it.unibo.collektive.aggregate.api.Aggregate
 import kotlin.random.Random
 
 /**
- * An environment with a set of [nodes] with a [defaultRetainTime] mapped into [positions],
+ * An environment with a set of [nodes] with a [defaultRetainTime] mapped into positions,
  * which are considered connected if the [areConnected] function returns true for them.
  */
 open class Environment<R>(

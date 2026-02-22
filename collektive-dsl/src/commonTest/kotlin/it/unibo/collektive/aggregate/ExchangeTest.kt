@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -136,9 +136,7 @@ class ExchangeTest {
         val size = 3
         val environment = mooreGridWithDedicatedNeighborValues(size)
         // Executes two rounds per device
-        for (i in 0 until size * size) {
-            environment.cycleInOrder()
-        }
+        repeat(size * size) { environment.cycleInOrder() }
         val result = environment.status()
         // Program rationale: if you have the device with ID=0 in the neighbor, it counts as 0, otherwise 1
         val expectedLocalValues = mapOf(0 to 3, 1 to 5, 2 to 4, 3 to 5, 4 to 8, 5 to 6, 6 to 4, 7 to 6, 8 to 4)

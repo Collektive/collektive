@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -50,19 +50,18 @@ class BranchAlignmentTest {
 
     @Test
     fun `Branch alignment should not occur in non aggregate context`() {
-        val result =
-            aggregate(0) {
-                val condition = true
+        val result = aggregate(0) {
+            val condition = true
 
-                fun test(): String = "hello"
+            fun test(): String = "hello".uppercase()
 
-                fun test2() {
-                    test()
-                }
-                if (condition) {
-                    test2()
-                }
+            fun test2() {
+                test()
             }
+            if (condition) {
+                test2()
+            }
+        }
         assertEquals(
             0,
             result.toSend

@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 package it.unibo.collektive
 
 import it.unibo.collektive.aggregate.AggregateResult
@@ -67,7 +75,7 @@ class Collektive<ID : Any, R>(
             pathFactory: PathFactory = DigestHashingFactory(),
             compute: Aggregate<ID>.() -> R,
         ): AggregateResult<ID, R> = AggregateContext(localId, inbound, previousState, inMemory, pathFactory).run {
-            AggregateResult(localId, compute(), messagesToSend(), newState())
+            AggregateResult(localId, compute(), messagesToSend(), state)
         }
 
         /**
@@ -83,7 +91,7 @@ class Collektive<ID : Any, R>(
             compute: Aggregate<ID>.() -> R,
         ): AggregateResult<ID, R> =
             with(AggregateContext(localId, network.currentInbound(), previousState, network.inMemory, pathFactory)) {
-                AggregateResult(localId, compute(), messagesToSend(), newState()).also {
+                AggregateResult(localId, compute(), messagesToSend(), state).also {
                     network.deliverableFor(it.toSend)
                 }
             }

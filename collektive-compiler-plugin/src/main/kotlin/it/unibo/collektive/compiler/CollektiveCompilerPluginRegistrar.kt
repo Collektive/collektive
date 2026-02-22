@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -27,6 +27,8 @@ import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter
  */
 @OptIn(ExperimentalCompilerApi::class)
 class CollektiveCompilerPluginRegistrar : CompilerPluginRegistrar() {
+
+    override val pluginId: String get() = BuildConfig.KOTLIN_PLUGIN_ID
 
     override val supportsK2: Boolean = true
 

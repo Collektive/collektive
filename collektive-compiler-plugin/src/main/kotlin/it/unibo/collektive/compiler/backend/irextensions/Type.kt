@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -25,8 +25,8 @@ import org.jetbrains.kotlin.ir.types.classifierOrNull
  * @return `true` if [other] can be assigned to this type; `false` otherwise
  */
 internal fun IrType.isAssignableFrom(other: IrType): Boolean = classifierOrNull?.let { base ->
-    other.classifierOrNull?.let { other ->
-        FqNameEqualityChecker.areEqual(base, other)
+    other.classifierOrNull?.let { otherClassifier ->
+        FqNameEqualityChecker.areEqual(base, otherClassifier)
     } == true
 } == true
 

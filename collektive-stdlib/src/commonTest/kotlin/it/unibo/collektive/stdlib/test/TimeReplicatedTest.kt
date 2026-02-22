@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -51,7 +51,8 @@ class TimeReplicatedTest {
 
     companion object {
         /**
-         * Creates a grid environment of the specified size where each node has a shared clock with execution frequency adjustment.
+         * Creates a grid environment of the specified size
+         * where each node has a shared clock with execution frequency adjustment.
          */
         context(clock: MultiClock)
         private fun gridWithTimeIntervalBetweenRounds() = mooreGrid<Int>(GRID_SIZE, GRID_SIZE, { _, _ ->

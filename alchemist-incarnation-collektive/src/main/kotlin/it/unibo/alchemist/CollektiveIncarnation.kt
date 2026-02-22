@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -37,6 +37,7 @@ import java.io.File
 import java.lang.reflect.Method
 import java.net.URLClassLoader
 import java.security.MessageDigest
+import java.util.Locale
 import javax.script.ScriptEngineManager
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.createTempDirectory
@@ -228,7 +229,7 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         }
 
         private fun String.md5(): String = MessageDigest.getInstance("MD5").digest(toByteArray()).joinToString("") {
-            "%02x".format(it)
+            "%02x".format(Locale.US, it)
         }
 
         private val findPackage = Regex("""package\s+((\w+\.)*\w+)(\s|;|/|$)""", RegexOption.MULTILINE)

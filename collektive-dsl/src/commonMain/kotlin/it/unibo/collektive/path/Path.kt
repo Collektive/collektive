@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -82,7 +82,12 @@ data class FullPath(private val path: List<Any?>) : Path {
 @Serializable
 value class SerializablePath(val backend: String) : Path
 
-private object PathSerializer : KSerializer<Path> {
+/**
+ * Custom serializer for [Path] that delegates to [SerializablePath] for serialization and deserialization.
+ * This allows us to serialize any [Path] that can be represented as a [SerializablePath], while throwing
+ * an exception for unsupported types.
+ */
+object PathSerializer : KSerializer<Path> {
     override val descriptor: SerialDescriptor
         get() = SerializablePath.serializer().descriptor
 

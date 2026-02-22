@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 package it.unibo.collektive.network
 
 import it.unibo.collektive.aggregate.api.DataSharingMethod
@@ -10,7 +18,7 @@ import it.unibo.collektive.path.Path
  * A fully connected virtual network.
  */
 class NetworkManager {
-    private var messageBuffer: MutableMap<Int, MutableMap<Int, Message<Int, *>>> = mutableMapOf()
+    private val messageBuffer: MutableMap<Int, MutableMap<Int, Message<Int, *>>> = mutableMapOf()
 
     /**
      * Registers a device with the given [deviceId].
@@ -38,7 +46,7 @@ class NetworkManager {
      * Return the messages directed to a specific [receiverId].
      */
     fun receiveMessageFor(receiverId: Int): NeighborsData<Int> = object : NeighborsData<Int> {
-        private val neighborDeliverableMessages by lazy { messageBuffer[receiverId] ?: emptyMap() }
+        private val neighborDeliverableMessages by lazy { messageBuffer[receiverId].orEmpty() }
         override val neighbors: Set<Int> get() = neighborDeliverableMessages.keys
 
         @Suppress("UNCHECKED_CAST")

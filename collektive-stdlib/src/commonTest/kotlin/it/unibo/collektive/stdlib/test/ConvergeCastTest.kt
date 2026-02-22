@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -33,7 +33,7 @@ class ConvergeCastTest {
         environment.cycleInOrder()
         assertTrue(environment.nodes.all { it.value == 1 })
         var valueAtSink = 1
-        repeat(size - 1) {
+        repeat(size - 1) { _ ->
             environment.cycleInOrder()
             val currentValueAtSink = environment[0].value
             assertTrue(currentValueAtSink > valueAtSink)
@@ -54,7 +54,7 @@ class ConvergeCastTest {
             val random = Random(0)
             fun randomCoordinate() = random.nextDouble(bounds.start, bounds.endInclusive)
             fun randomPosition() = Position(randomCoordinate(), randomCoordinate(), randomCoordinate())
-            fun addNode() = addNode(randomPosition(), emptyList<Int>()) {
+            fun addNode() = addNode(randomPosition(), emptyList()) { _ ->
                 val metric = euclideanDistance3D { Point3D(positionOf(it).toTriple()) }
                 val distance = distanceTo(localId == 0, metric = metric)
                 convergeCast(
