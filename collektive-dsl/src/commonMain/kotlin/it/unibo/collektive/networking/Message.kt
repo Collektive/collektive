@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -47,9 +47,9 @@ data class SerializedMessage<ID : Any>(override val senderId: ID, override val s
     Message<ID, ByteArray>
 
 /**
- * TODO.
+ * A factory for [SerializedMessage]s, which serializes the shared data using the provided [serializerFormat].
  */
-abstract class SerializedMessageFactory<ID : Any, Payload>(private val serializerFormat: SerialFormat) :
+class SerializedMessageFactory<ID : Any, Payload>(private val serializerFormat: SerialFormat) :
     MessageFactory<ID, ByteArray> {
     @OptIn(InternalSerializationApi::class)
     override fun invoke(senderId: ID, sharedData: Map<Path, PayloadRepresentation<Any?>>): Message<ID, ByteArray> {

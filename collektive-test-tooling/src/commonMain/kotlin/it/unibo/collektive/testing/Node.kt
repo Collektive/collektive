@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -28,7 +28,7 @@ class Node<R>(
     private val cyclesToResetMessages: Int = 1,
     private val program: Aggregate<Int>.(Environment<R>) -> R,
 ) {
-    private var network = DeviceMailbox()
+    private val network = DeviceMailbox()
     private var lastcycle = 0
 
     /**

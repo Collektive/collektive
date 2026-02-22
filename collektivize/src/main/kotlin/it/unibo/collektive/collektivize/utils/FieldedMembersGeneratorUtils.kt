@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -159,37 +159,38 @@ internal fun generateFunction(callable: KCallable<*>, paramList: List<ParameterS
         val declaredTypeVariables = callable.typeParameters.map { it.toTypeVariableName() }
         addTypeVariables(declaredTypeVariables)
         val declaredTypeVariableNames = declaredTypeVariables.map { it.name }
-        val typeVariablesInParameters =
-            paramList
-                .map { it.type }
-                .flatMap { it.getAllTypeVariables() }
-                .distinct()
-                .filterNot { it.name in declaredTypeVariableNames }
+        val typeVariablesInParameters = paramList
+            .map { it.type }
+            .flatMap { it.getAllTypeVariables() }
+            .distinct()
+            .filterNot { it.name in declaredTypeVariableNames }
         addTypeVariables(typeVariablesInParameters)
         // Remove the `this` parameter since, when present, it is the extension receiver
         addParameters(paramList.filter { it.name != "this" })
         // Generate always function with extension receiver
         receiver(paramList.first().type)
         // Add the JavaName annotation preventing JVM name clashes
-        val typesRepr =
-            paramList
-                .joinToString("_and_") {
-                    it.type
-                        .toString()
-                        .replace("kotlin.", "")
-                        .replace("kotlinx.", "")
-                        .replace("it.unibo.collektive.`field`.Field", "Field")
-                }.replace(".", "_")
-                .replace("<", "_of_")
-                .replace(">", "_end")
-                .replace(", ", "_and_")
-                .replace("*", "wildcard")
-                .replace("?", "_nullable")
-                .replace("Field_of_ID_and_", "Field_of_")
+        val typesRepr = paramList
+            .joinToString("_and_") {
+                it.type.toString()
+                    .replace("kotlin.", "")
+                    .replace("kotlinx.", "")
+                    .replace("it.unibo.collektive.`field`.Field", "Field")
+            }.replace(".", "_")
+            .replace("<", "_of_")
+            .replace(">", "_end")
+            .replace(", ", "_and_")
+            .replace("*", "wildcard")
+            .replace("?", "_nullable")
+            .replace("Field_of_ID_and_", "Field_of_")
         addAnnotation(
-            AnnotationSpec
-                .builder(JvmName::class)
+            AnnotationSpec.builder(JvmName::class)
                 .addMember("%S", "${callable.name}_with_$typesRepr")
+                .build(),
+        )
+        addAnnotation(
+            AnnotationSpec.builder(Suppress::class)
+                .addMember("%S", "REDUNDANT_CALL_OF_CONVERSION_METHOD")
                 .build(),
         )
         // Always return a Field parametrized by the ID type and the return type of the callable

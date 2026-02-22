@@ -4,7 +4,7 @@ arrow = "2.2.0"
 build-config = "6.0.7"
 dokka = "2.1.0"
 kotest = "6.1.3"
-kotlin = "2.2.21"
+kotlin = "2.3.10"
 serialization = "1.9.0"
 
 [libraries]
@@ -61,7 +61,7 @@ kotest = { id = "io.kotest", version.ref = "kotest" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-power-assert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = "kotlin" }
-kotlin-qa = "org.danilopianini.gradle-kotlin-qa:0.100.1"
+kotlin-qa = "org.danilopianini.gradle-kotlin-qa:1.0.1"
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kover = "org.jetbrains.kotlinx.kover:0.9.7"
 ksp = "com.google.devtools.ksp:2.3.6"

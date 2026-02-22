@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -41,7 +41,7 @@ internal class AggregateContext<ID : Any>(
     pathFactory: PathFactory,
 ) : Aggregate<ID> {
     private val stack = Stack(pathFactory)
-    private var state: MutableMap<Path, Any?> = mutableMapOf()
+    private val internalState: MutableMap<Path, Any?> = mutableMapOf()
     private val toBeSent: OutboundEnvelope<ID> = OutboundEnvelope(localId, inboundMessage.neighbors.size)
 
     /**
@@ -49,10 +49,7 @@ internal class AggregateContext<ID : Any>(
      */
     fun messagesToSend(): OutboundEnvelope<ID> = toBeSent
 
-    /**
-     * Return the current state of the device as a new state.
-     */
-    fun newState(): State = state
+    val state: Map<Path, Any?> get() = internalState
 
     @CollektiveIgnore(
         """
@@ -90,7 +87,7 @@ internal class AggregateContext<ID : Any>(
                     },
                 )
                 toBeSent.addData(path, message, dataSharingMethod)
-                state += path to it.toSend.local.value
+                internalState += path to it.toSend.local.value
             }.toReturn
     }
 
@@ -101,7 +98,7 @@ internal class AggregateContext<ID : Any>(
                 check(it.toReturn !is Field<*, *>) {
                     "evolving operations cannot return fields (guaranteed misalignment on every neighborhood change)"
                 }
-                state += path to it.toSend
+                internalState += path to it.toSend
             }.toReturn
     }
 
