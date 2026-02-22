@@ -1,3 +1,29 @@
+## [28.0.0](https://github.com/Collektive/collektive/compare/27.4.8...28.0.0) (2026-02-22)
+
+### ⚠ BREAKING CHANGES
+
+* **api-deps:** update Kotlin to 2.3.10, revise some parts of the public API (#1385)
+
+### Features
+
+* **api-deps:** update Kotlin to 2.3.10, revise some parts of the public API ([#1385](https://github.com/Collektive/collektive/issues/1385)) ([baed1d9](https://github.com/Collektive/collektive/commit/baed1d95e56f2716720bba39c740801620b5b1ae))
+
+### Dependency updates
+
+* **deps:** update alchemist to v42.3.35 ([7be78f4](https://github.com/Collektive/collektive/commit/7be78f44600f01f94a292031ef718eba55698a5d))
+* **deps:** update alchemist to v42.4.0 ([4f21cdd](https://github.com/Collektive/collektive/commit/4f21cddb211ef8706ba5daf7c24b470681a27014))
+* **deps:** update alchemist to v42.4.1 ([74a4561](https://github.com/Collektive/collektive/commit/74a456107824acd45434b40434bd5723e63e9528))
+* **deps:** update alchemist to v42.4.2 ([849bf97](https://github.com/Collektive/collektive/commit/849bf97916a52e5858e1d09f3e9dccb27e108dd5))
+* **deps:** update font awesome to v7.2.0 ([d03f60d](https://github.com/Collektive/collektive/commit/d03f60d0d3533f1096032c4ed874e61604a69787))
+* **deps:** update plugin gitsemver to v7.0.12 ([082aea7](https://github.com/Collektive/collektive/commit/082aea728fd222dbf468835198506663f61ff718))
+* **deps:** update plugin ksp to v2.3.6 ([b280f7e](https://github.com/Collektive/collektive/commit/b280f7e53c13e9bc7530f351eda17f967bf948cf))
+
+### Build and continuous integration
+
+* add a dry push before running the semantic release script ([#1384](https://github.com/Collektive/collektive/issues/1384)) ([f2c8cb8](https://github.com/Collektive/collektive/commit/f2c8cb8653c76c32d57178f57613180186d8b25b))
+* **deps:** update github/codeql-action action to v4.32.3 ([1f83d93](https://github.com/Collektive/collektive/commit/1f83d93d600142c9bff4a08f3bde735cdb406765))
+* **deps:** update github/codeql-action action to v4.32.4 ([51fe766](https://github.com/Collektive/collektive/commit/51fe766d2e16dff87c7f6cbab4cd7bc990cefe69))
+
 ## [27.4.8](https://github.com/Collektive/collektive/compare/27.4.7...27.4.8) (2026-02-10)
 
 ### Dependency updates
