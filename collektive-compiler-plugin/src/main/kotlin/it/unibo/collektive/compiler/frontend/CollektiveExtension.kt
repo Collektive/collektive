@@ -11,6 +11,7 @@ package it.unibo.collektive.compiler.frontend
 import it.unibo.collektive.compiler.frontend.checkers.ConstructIgnoresParameter
 import it.unibo.collektive.compiler.frontend.checkers.ExplicitAlignDealign
 import it.unibo.collektive.compiler.frontend.checkers.ImproperConstruct
+import it.unibo.collektive.compiler.frontend.checkers.NeighboringWithConstant
 import it.unibo.collektive.compiler.frontend.checkers.NoAlignInsideLoop
 import it.unibo.collektive.compiler.frontend.checkers.UnnecessaryYielding
 import it.unibo.collektive.compiler.frontend.checkers.WhenReturnsField
@@ -37,6 +38,7 @@ class CollektiveExtension(session: FirSession) : FirAdditionalCheckersExtension(
                 get() = setOf(
                     ExplicitAlignDealign,
                     ImproperConstruct,
+                    NeighboringWithConstant,
                     NoAlignInsideLoop,
                     ConstructIgnoresParameter,
                     UnnecessaryYielding,

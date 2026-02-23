@@ -56,6 +56,14 @@ object CollektiveFrontendErrorMessageRenderer : BaseDiagnosticRendererFactory() 
             CommonRenderers.STRING,
         )
         it.put(
+            CollektiveFrontendErrors.NEIGHBORING_WITH_CONSTANT,
+            """
+            This ''{0}'' call uses a compile-time constant, which is shared with neighbors unnecessarily.
+            Consider using ''mapNeighborhood '{' constant '}''' instead, which provides minimal communication by only sharing the alignment token.
+            """.trimIndent(),
+            CommonRenderers.STRING,
+        )
+        it.put(
             CollektiveFrontendErrors.UNNECESSARY_CONSTRUCT_CALL,
             """
             This ''{0}'' appears unnecessary in this case, as the anonymous function''s parameter is unused.
