@@ -19,6 +19,7 @@ import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirFunctionCallChecker
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.FirLiteralExpression
+import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 
 /**
  * Checker that detects calls to `neighboring` with a compile-time constant argument.
@@ -38,19 +39,30 @@ import org.jetbrains.kotlin.fir.expressions.FirLiteralExpression
  * // Efficient: only shares alignment token; reconstructs 42 locally
  * mapNeighborhood { 42 }
  * ```
+ *
+ * This checker does not fire inside functions annotated with [kotlin.test.Test], as test code
+ * may intentionally use `neighboring(constant)` to verify value-sharing semantics at runtime,
+ * which differ from `mapNeighborhood`.
  */
 object NeighboringWithConstant : FirFunctionCallChecker(MppCheckerKind.Common) {
+
+    private const val TEST_ANNOTATION_SHORT_NAME = "Test"
 
     context(context: CheckerContext, reporter: DiagnosticReporter)
     override fun check(expression: FirFunctionCall) {
         if (expression.fqName != NEIGHBORING_FUNCTION_FQ_NAME) return
         val argument = expression.argumentList.arguments.singleOrNull() ?: return
-        if (argument is FirLiteralExpression) {
-            reporter.reportOn(
-                expression.calleeReference.source,
-                CollektiveFrontendErrors.NEIGHBORING_WITH_CONSTANT,
-                expression.functionName,
-            )
-        }
+        if (argument !is FirLiteralExpression) return
+        // Don't fire inside @Test-annotated functions: test code intentionally uses neighboring(constant)
+        // to verify value-sharing semantics, which differ from mapNeighborhood.
+        if (context.containingDeclarations
+                .filterIsInstance<FirFunctionSymbol<*>>()
+                .any { fn -> fn.resolvedAnnotationClassIds.any { it.shortClassName.asString() == TEST_ANNOTATION_SHORT_NAME } }
+        ) return
+        reporter.reportOn(
+            expression.calleeReference.source,
+            CollektiveFrontendErrors.NEIGHBORING_WITH_CONSTANT,
+            expression.functionName,
+        )
     }
 }
