@@ -1,3 +1,12 @@
+## [28.0.1](https://github.com/Collektive/collektive/compare/28.0.0...28.0.1) (2026-02-23)
+
+### Dependency updates
+
+* **core-deps:** update serialization to v1.10.0 ([1330da8](https://github.com/Collektive/collektive/commit/1330da80ae38243e0dbd2cab82866ad92babfc70))
+* **deps:** update alchemist to v43 (major) ([#1386](https://github.com/Collektive/collektive/issues/1386)) ([cf290a9](https://github.com/Collektive/collektive/commit/cf290a99601c0f6312c79d81a0e5475e9c17170f))
+* **deps:** update arrow-kt monorepo to v2.2.1.1 ([578395e](https://github.com/Collektive/collektive/commit/578395ea0a20cb3d9abada5aaaa10d30c310f7de))
+* **deps:** update plugin publishoncentral to v9.1.13 ([a370c1a](https://github.com/Collektive/collektive/commit/a370c1a765dc2bea09bcd7ff90e3aca4c86e234a))
+
 ## [28.0.0](https://github.com/Collektive/collektive/compare/27.4.8...28.0.0) (2026-02-22)
 
 ### ⚠ BREAKING CHANGES
