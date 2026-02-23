@@ -13,7 +13,7 @@ import:
 
 parameters:
   name: AGGREGATE
-  value: neighboring(0)
+  value: neighboring(1 - 1)
 
 # SUBJECTS
 subjects:
