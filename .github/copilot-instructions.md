@@ -128,8 +128,7 @@ Set timeouts of 60+ minutes for the full sequence. NEVER CANCEL running builds o
 ## Troubleshooting
 
 ### Node.js Version Warnings
-- Site build shows engine warnings for Node.js version mismatch
-- **Current**: Node.js 20.19.4, **Required**: 22.19
+- Site build may show engine warnings for Node.js version mismatch
 - **Impact**: Site builds successfully despite warnings
 - **Solution**: Warnings are safe to ignore; functionality works correctly
 
