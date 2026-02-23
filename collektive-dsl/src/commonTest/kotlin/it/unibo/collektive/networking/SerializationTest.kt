@@ -6,7 +6,6 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
-@file:Suppress("NEIGHBORING_WITH_CONSTANT")
 
 package it.unibo.collektive.networking
 

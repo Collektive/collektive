@@ -6,7 +6,6 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
-@file:Suppress("NEIGHBORING_WITH_CONSTANT")
 
 package it.unibo.collektive.branch
 
@@ -17,9 +16,11 @@ import kotlin.test.assertEquals
 
 class WhenTest {
     private fun programUnderTest(input: Any) = aggregate(0) {
+        val stringVal = "string"
+        val testVal = "test"
         when (input) {
-            is String -> neighboring("string").local
-            else -> neighboring("test").local
+            is String -> neighboring(stringVal).local
+            else -> neighboring(testVal).local
         }
     }
 

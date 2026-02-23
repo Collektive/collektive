@@ -6,7 +6,6 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
-@file:Suppress("NEIGHBORING_WITH_CONSTANT")
 
 package it.unibo.collektive.aggregate
 
@@ -45,7 +44,10 @@ class NeighboringTest {
         }
     }
 
-    private fun envWithNeihboring1(size: Int) = mooreGrid(size) { _ -> neighboring(1).all.toMap() }
+    private fun envWithNeihboring1(size: Int) = mooreGrid(size) { _ ->
+        val n = 1
+        neighboring(n).all.toMap()
+    }
 
     @Test
     fun `neighboring should build a field containing the values of the aligned neighbors`() {
@@ -74,8 +76,10 @@ class NeighboringTest {
     }
 
     private fun envWithTwoNeighboringOpsInBranch(size: Int, condition: (Int) -> Boolean) = mooreGrid(size) { _ ->
-        fun kingBehavior() = neighboring(1)
-        fun queenBehavior() = neighboring(2)
+        val kingValue = 1
+        val queenValue = 2
+        fun kingBehavior() = neighboring(kingValue)
+        fun queenBehavior() = neighboring(queenValue)
         if (condition(localId)) kingBehavior().all.toMap() else queenBehavior().all.toMap()
     }
 
