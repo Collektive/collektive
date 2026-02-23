@@ -1,4 +1,5 @@
 @file:JvmName("ScriptTest")
+@file:Suppress("NEIGHBORING_WITH_CONSTANT")
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.neighboring
 
