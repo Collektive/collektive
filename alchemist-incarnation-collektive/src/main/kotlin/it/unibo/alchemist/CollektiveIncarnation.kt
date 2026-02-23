@@ -46,7 +46,6 @@ import kotlin.io.path.isDirectory
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.starProjectedType
 import org.apache.commons.math3.random.RandomGenerator
-import org.danilopianini.util.ListSet
 import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.ERROR
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.EXCEPTION
@@ -62,24 +61,6 @@ import org.slf4j.LoggerFactory
  * Collektive incarnation in Alchemist.
  */
 class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
-    override fun getProperty(node: Node<Any?>, molecule: Molecule, property: String?): Double {
-        val interpreted =
-            when {
-                property.isNullOrBlank() -> node.getConcentration(molecule)
-                else -> {
-                    val concentration = node.getConcentration(molecule)
-                    val toInvoke = propertyCache.get(CodeElements(concentration, property))
-                    node.asPropertyOrNull(CollektiveDevice::class).toInvoke(concentration)
-                }
-            }
-        return when (interpreted) {
-            is Double -> interpreted
-            is Number -> interpreted.toDouble()
-            is String -> interpreted.toDoubleOrNull() ?: Double.NaN
-            is Boolean -> if (interpreted) 1.0 else 0.0
-            else -> Double.NaN
-        }
-    }
 
     override fun createMolecule(molecule: String) = SimpleMolecule(molecule)
 
@@ -91,7 +72,6 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         randomGenerator: RandomGenerator,
         environment: Environment<Any?, P>,
         node: Node<Any?>?,
-        time: TimeDistribution<Any?>,
         actionable: Actionable<Any?>,
         additionalParameters: Any?,
     ): Action<Any?> {
@@ -104,10 +84,9 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
             val type = additionalParameters?.let { it::class.simpleName } ?: "null"
             "Invalid parameters for Collektive. Map required, but $type has been provided: $additionalParameters"
         }
-        val entrypoint: String =
-            requireNotNull(parameters["entrypoint"]) {
-                "No entrypoint provided in $additionalParameters"
-            }.toString()
+        val entrypoint: String = requireNotNull(parameters["entrypoint"]) {
+            "No entrypoint provided in $additionalParameters"
+        }.toString()
         val code: String = parameters["code"]?.toString().orEmpty()
         val sourceSets: List<File> = parameters["source-sets"].toFiles()
         val classpath = sourceSets.joinToString(separator = File.pathSeparator) { it.absolutePath }
@@ -130,14 +109,13 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         val classLoader = classLoaders.get(methodName)
 
         fun loadMethod() = classLoader.loadClass(classFqName).methods.first { it.name == methodName }
-        val methodToCall: Method =
-            runCatching {
-                loadMethod()
-            }.recover { exception ->
+        val methodToCall: Method = runCatching { loadMethod() }
+            .recover { exception ->
                 logger.info("Collektive program $name not found, compiling", exception)
                 compileCollektive(name, sourceSets, className, methodName, code, entrypoint, classLoader)
                 loadMethod()
-            }.getOrThrow()
+            }
+            .getOrThrow()
         return RunCollektiveProgram(node, methodToCall, name)
     }
 
@@ -145,7 +123,6 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         randomGenerator: RandomGenerator,
         environment: Environment<Any?, P>?,
         node: Node<Any?>?,
-        time: TimeDistribution<Any?>,
         actionable: Actionable<Any?>,
         additionalParameters: Any?,
     ): Condition<Any?> = object : AbstractCondition<Any>(requireNotNull(node)) {
@@ -163,10 +140,9 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         timeDistribution: TimeDistribution<Any?>,
         parameter: Any?,
     ): Reaction<Any?> = Event(node, timeDistribution).also {
-        it.actions =
-            ListSet.of(
-                createAction(randomGenerator, environment, node, timeDistribution, it, parameter),
-            )
+        it.actions = listOf(
+            createAction(randomGenerator, environment, node, it, parameter),
+        )
     }
 
     override fun createTimeDistribution(
@@ -203,6 +179,24 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
                 },
             ),
         )
+    }
+
+    override fun getProperty(node: Node<Any?>, molecule: Molecule, property: String?): Double {
+        val interpreted = when {
+            property.isNullOrBlank() -> node.getConcentration(molecule)
+            else -> {
+                val concentration = node.getConcentration(molecule)
+                val toInvoke = propertyCache.get(CodeElements(concentration, property))
+                node.asPropertyOrNull(CollektiveDevice::class).toInvoke(concentration)
+            }
+        }
+        return when (interpreted) {
+            is Double -> interpreted
+            is Number -> interpreted.toDouble()
+            is String -> interpreted.toDoubleOrNull() ?: Double.NaN
+            is Boolean -> if (interpreted) 1.0 else 0.0
+            else -> Double.NaN
+        }
     }
 
     private companion object {
