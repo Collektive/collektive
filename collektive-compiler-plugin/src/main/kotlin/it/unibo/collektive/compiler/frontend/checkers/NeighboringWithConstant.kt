@@ -50,14 +50,10 @@ object NeighboringWithConstant : FirFunctionCallChecker(MppCheckerKind.Common) {
 
     context(context: CheckerContext, reporter: DiagnosticReporter)
     override fun check(expression: FirFunctionCall) {
-        if (expression.fqName != NEIGHBORING_FUNCTION_FQ_NAME) return
-        val argument = expression.argumentList.arguments.singleOrNull() ?: return
-        if (argument !is FirLiteralExpression) return
-        // Don't fire inside @Test-annotated functions: test code intentionally uses neighboring(constant)
-        // to verify value-sharing semantics, which differ from mapNeighborhood.
-        if (context.containingDeclarations
-                .filterIsInstance<FirFunctionSymbol<*>>()
-                .any { fn -> fn.resolvedAnnotationClassIds.any { it.shortClassName.asString() == TEST_ANNOTATION_SHORT_NAME } }
+        val argument = expression.argumentList.arguments.singleOrNull()
+        if (expression.fqName != NEIGHBORING_FUNCTION_FQ_NAME ||
+            argument !is FirLiteralExpression ||
+            context.isInsideTestFunction()
         ) return
         reporter.reportOn(
             expression.calleeReference.source,
@@ -65,4 +61,14 @@ object NeighboringWithConstant : FirFunctionCallChecker(MppCheckerKind.Common) {
             expression.functionName,
         )
     }
+
+    /**
+     * Returns `true` if the current context is inside a function annotated with `@Test`.
+     *
+     * Test code may intentionally pass literal constants to `neighboring` to verify value-sharing
+     * semantics at runtime, which differ from `mapNeighborhood`. The checker skips such contexts.
+     */
+    private fun CheckerContext.isInsideTestFunction(): Boolean = containingDeclarations
+        .filterIsInstance<FirFunctionSymbol<*>>()
+        .any { fn -> fn.resolvedAnnotationClassIds.any { it.shortClassName.asString() == TEST_ANNOTATION_SHORT_NAME } }
 }
