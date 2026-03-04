@@ -6,7 +6,6 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
-
 package it.unibo.collektive.aggregate
 
 import it.unibo.collektive.Collektive.Companion.aggregate
