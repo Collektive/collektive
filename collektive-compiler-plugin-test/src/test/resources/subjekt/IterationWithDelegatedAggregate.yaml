@@ -12,7 +12,7 @@ import:
 
 parameters:
   name: "AGGREGATE"
-  value: neighboring(0)
+  value: neighboring(1 - 1)
 
 subjects:
   - name: IterationAlignDelegate${{ prettify(AGGREGATE, loop(AGGREGATE)) }}

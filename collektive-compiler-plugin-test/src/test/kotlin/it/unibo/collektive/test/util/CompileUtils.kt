@@ -89,7 +89,7 @@ object CompileUtils {
 
     val testedAggregateFunctions =
         listOf(
-            "neighboring(0)",
+            "neighboring(1 - 1)",
         )
 
     val formsOfIteration =
