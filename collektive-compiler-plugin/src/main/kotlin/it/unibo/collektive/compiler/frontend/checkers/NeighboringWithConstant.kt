@@ -54,7 +54,9 @@ object NeighboringWithConstant : FirFunctionCallChecker(MppCheckerKind.Common) {
         if (expression.fqName != NEIGHBORING_FUNCTION_FQ_NAME ||
             argument !is FirLiteralExpression ||
             context.isInsideTestFunction()
-        ) return
+        ) {
+            return
+        }
         reporter.reportOn(
             expression.calleeReference.source,
             CollektiveFrontendErrors.NEIGHBORING_WITH_CONSTANT,
