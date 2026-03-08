@@ -1,3 +1,44 @@
+## [28.1.0](https://github.com/Collektive/collektive/compare/28.0.1...28.1.0) (2026-03-08)
+
+### Features
+
+* use a `mapNeighborhood` when `neighbor(CONSTANT)` is used ([#1129](https://github.com/Collektive/collektive/issues/1129)) ([58592d4](https://github.com/Collektive/collektive/commit/58592d409306dc23b939bf271e00f5c579f72c8a))
+
+### Dependency updates
+
+* **deps:** update alchemist to v43.0.10 ([4ea2e88](https://github.com/Collektive/collektive/commit/4ea2e88f57b00b0fdde037073b154926f2bdd6ac))
+* **deps:** update alchemist to v43.0.11 ([5ef9171](https://github.com/Collektive/collektive/commit/5ef9171abcd7a4e7eba53475a734ae9f08c56778))
+* **deps:** update alchemist to v43.0.12 ([0078f27](https://github.com/Collektive/collektive/commit/0078f27cba77c106b8d757528ec37c4bbd5258df))
+* **deps:** update alchemist to v43.0.6 ([cf7be07](https://github.com/Collektive/collektive/commit/cf7be078599282174ad4a97a17a9c7bd0f05b54c))
+* **deps:** update alchemist to v43.0.7 ([be3f6fd](https://github.com/Collektive/collektive/commit/be3f6fdf2f5ae5606c5cd490a74be6ca9adab1f7))
+* **deps:** update alchemist to v43.0.8 ([c7f6526](https://github.com/Collektive/collektive/commit/c7f6526972c4a27a6d9952e6e29cf399f21e2040))
+* **deps:** update alchemist to v43.0.9 ([3ad30b6](https://github.com/Collektive/collektive/commit/3ad30b6dd5f36ec0dd3045ade0fd091d823d79a6))
+* **deps:** update arrow-kt monorepo to v2.2.2 ([89c88c2](https://github.com/Collektive/collektive/commit/89c88c24e3ddd6d2e81b57d7579a7b9a5fa34004))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v6.0.8 ([0197ecc](https://github.com/Collektive/collektive/commit/0197ecc6d48b6c6839ca670b8a4761a14fd92293))
+* **deps:** update dependency com.github.gmazzo.buildconfig to v6.0.9 ([d6d0ccd](https://github.com/Collektive/collektive/commit/d6d0ccdef21c2646f8893e3674b899535783eb91))
+* **deps:** update dependency react-icons to v5.6.0 ([54406ae](https://github.com/Collektive/collektive/commit/54406ae1a16d43e4c672c510c6afa78ae1a1ccca))
+* **deps:** update dependency react-router-dom to v7.13.1 ([57b1859](https://github.com/Collektive/collektive/commit/57b18591a64c29901951de6d61b2c580abaa058b))
+* **deps:** update kotest to v6.1.4 ([7dd4eb2](https://github.com/Collektive/collektive/commit/7dd4eb215c762963b427548e9db1e83847436d60))
+* **deps:** update node.js to 24.14 ([8fac1e8](https://github.com/Collektive/collektive/commit/8fac1e8ddae49ecfeea51f16ab50d977346ea75d))
+* **deps:** update plugin gitsemver to v7.0.13 ([b5de57d](https://github.com/Collektive/collektive/commit/b5de57da2fd57bcd6639f8a79280fbeeadc9ac20))
+* **deps:** update plugin gradlepluginpublish to v2.1.0 ([a2ad224](https://github.com/Collektive/collektive/commit/a2ad224f80891121592f84b11a9303cf368e9aa6))
+* **deps:** update plugin kotlin-qa to v1.1.0 ([154df06](https://github.com/Collektive/collektive/commit/154df062130b3981dc0ae055f7d18b4068261bf8))
+* **deps:** update plugin kotlin-qa to v1.2.0 ([d29d41a](https://github.com/Collektive/collektive/commit/d29d41ae00d65525783c183ae3272c450e531d94))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.1.10 ([9715b3d](https://github.com/Collektive/collektive/commit/9715b3df4e60fb4eb72131235a1dc4e7a5c32cec))
+
+### Build and continuous integration
+
+* **deps:** update actions/download-artifact action to v8 ([c102706](https://github.com/Collektive/collektive/commit/c102706ab203a98d77744f9275ef1fd06a6af791))
+* **deps:** update actions/setup-node action to v6.3.0 ([36f1754](https://github.com/Collektive/collektive/commit/36f1754131ed908e09c7c09e546db6361267137d))
+* **deps:** update actions/upload-artifact action to v7 ([7122d52](https://github.com/Collektive/collektive/commit/7122d52a671ea60d650e6f7c1a39050dc6f405aa))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.24 ([7d6ed02](https://github.com/Collektive/collektive/commit/7d6ed022685be0128a56931f12537c8dc2eec84e))
+* **deps:** update github/codeql-action action to v4.32.5 ([8c565e4](https://github.com/Collektive/collektive/commit/8c565e4f0219759583cf9d8e99d48a1d42e10e3f))
+* **deps:** update github/codeql-action action to v4.32.6 ([8f0abf0](https://github.com/Collektive/collektive/commit/8f0abf0e11f3f08fc4012bb5cbc35c2b11160e7a))
+
+### General maintenance
+
+* remove pinned dependency versions from Copilot instructions ([#1388](https://github.com/Collektive/collektive/issues/1388)) ([75d256c](https://github.com/Collektive/collektive/commit/75d256ceae3624d90751106ad262ab9bcf315c59))
+
 ## [28.0.1](https://github.com/Collektive/collektive/compare/28.0.0...28.0.1) (2026-02-23)
 
 ### Dependency updates
