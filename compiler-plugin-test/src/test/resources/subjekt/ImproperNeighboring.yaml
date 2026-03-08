@@ -13,7 +13,7 @@ parameters:
   - name: MAPPING_ON_NEIGHBORING
     values:
       - |-
-        neighboring(0).toMap().map { it }
+        neighboring(1 - 1).toMap().map { it }
 
 subjects:
   - name: ProperUse${{ prettify(MAPPING_ON_NEIGHBORING) }}Mapping

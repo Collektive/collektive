@@ -55,6 +55,16 @@ object CollektiveFrontendErrors : KtDiagnosticsContainer() {
     val UNNECESSARY_YIELDING_CONTEXT by warning1<KtNameReferenceExpression, String>()
 
     /**
+     * Warning raised when `neighboring` is called with a compile-time constant argument.
+     *
+     * Using `neighboring(constant)` sends the constant value to all neighbors over the network,
+     * even though it is locally known and never changes. The recommended alternative is
+     * `mapNeighborhood { constant }`, which provides minimal communication by only sharing
+     * the alignment token and reconstructing the constant locally.
+     */
+    val NEIGHBORING_WITH_CONSTANT by warning1<KtNameReferenceExpression, String>()
+
+    /**
      * Error raised when a branch (e.g., in a `when` or `if` expression) returns a value
      * of type Field.
      *

@@ -1,0 +1,49 @@
+name: "Neighboring with constant"
+
+config:
+  codePreamble: |-
+    /**
+      * This file has been auto-generated with Subjekt (https://github.com/mini-roostico/subjekt).
+    */
+    import it.unibo.collektive.aggregate.api.neighboring
+    import it.unibo.collektive.aggregate.api.mapNeighborhood
+    import it.unibo.collektive.aggregate.api.Aggregate
+
+subjects:
+  - name: NeighboringWithIntConstant
+    code: |-
+      fun Aggregate<Int>.entry() {
+          neighboring(42)
+      }
+
+  - name: NeighboringWithStringConstant
+    code: |-
+      fun Aggregate<Int>.entry() {
+          neighboring("hello")
+      }
+
+  - name: NeighboringWithBooleanConstant
+    code: |-
+      fun Aggregate<Int>.entry() {
+          neighboring(true)
+      }
+
+  - name: NeighboringWithVariable
+    code: |-
+      fun Aggregate<Int>.entry() {
+          val x = 42
+          neighboring(x)
+      }
+
+  - name: NeighboringWithFunctionCall
+    code: |-
+      fun getConstant(): Int = 42
+      fun Aggregate<Int>.entry() {
+          neighboring(getConstant())
+      }
+
+  - name: NeighboringWithMapNeighborhood
+    code: |-
+      fun Aggregate<Int>.entry() {
+          mapNeighborhood { 42 }
+      }
