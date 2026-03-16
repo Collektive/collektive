@@ -12,24 +12,28 @@ This work was presented at the **2025 IEEE International Conference on Autonomic
 :::
 
 :::note
-This experiment uses the **Collektive** aggregate computing framework and the **Alchemist** simulator.
+This article has won the **Best Student Paper Award** at [ACSOS 2025](https://acsos.github.io/awards/#Best-stu).
 :::
 
 ## Abstract
-Ensuring mission success for multi-robot systems in unpredictable environments requires robust mechanisms to react to events like robot failures by adapting plans in real-time. Adaptive mechanisms are especially needed for large teams deployed in areas with unreliable network infrastructure, where centralized control is impractical.
+Ensuring mission success for multi-robot systems in unpredictable environments requires robust mechanisms to react to events like robot failures by adapting plans in real-time.
+Adaptive mechanisms are especially needed for large teams deployed in areas with unreliable network infrastructure, where centralized control is impractical.
 
-This paper proposes a **field-based runtime task replanning approach** grounded in the Aggregate Computing (AC) paradigm. By representing the mission and environment as continuously evolving computational fields, robots can make decentralized decisions and collectively adapt ongoing plans.
+This paper proposes a **field-based runtime task replanning approach** grounded in the Aggregate Computing (AC) paradigm.
+By representing the mission and environment as continuously evolving computational fields, robots can make decentralized decisions and collectively adapt ongoing plans.
 
 The core of the approach focuses on two strategies:
 - **Gossip-based approach**: Every robot independently monitors the collective state (active nodes and task status) and triggers replanning upon detecting changes.
 - **Leader-based approach**: A leader is dynamically elected via distributed consensus to initiate and compute the replan, reducing the overall computational load.
 
-The results show that the proposed approach scales linearly with team size and maintains performance levels close to an "oracle" centralized replanner, provided the communication range is sufficient to maintain network connectivity.
+The results show that the proposed approach scales linearly with team size and maintains performance levels close to an "oracle" centralized replanner,
+provided the communication range is sufficient to maintain network connectivity.
 
 ## Experiment description
 The evaluation aims to verify the resilience and scalability of the field-based approaches in a simulated Multi-Robot Task Allocation (MRTA) scenario.
 
-The mission requires a team of $m$ robots to service $n$ tasks. Robots must navigate from a source to a destination while stopping at task locations. The experiments are designed to test how the swarm reacts when robots fail or the environment changes.
+The mission requires a team of $m$ robots to service $n$ tasks. Robots must navigate from a source to a destination while stopping at task locations.
+The experiments are designed to test how the swarm reacts when robots fail or the environment changes.
 
 We compared four main strategies:
 - **Gossip (G)**: Fully decentralized, high resilience but higher message overhead.
@@ -47,7 +51,8 @@ The simulations varied several parameters:
 The experiments demonstrate that field-based replanning significantly improves mission efficiency compared to non-adaptive baselines.
 
 Key findings include:
-- **Connectivity**: A minimum communication range is required to allow the "fields" to propagate information. Once met, the performance gap between decentralized and centralized (Oracle) approaches becomes negligible.
+- **Connectivity**: A minimum communication range is required to allow the "fields" to propagate information.
+    Once met, the performance gap between decentralized and centralized (Oracle) approaches becomes negligible.
 - **Resilience**: The Gossip strategy proves most robust against high failure rates, as it does not rely on specific nodes (like leaders) to coordinate.
 - **Efficiency**: In large-scale scenarios, the field-based approach reduces the time to mission completion by up to 30% compared to the Late-Stage baseline.
 
