@@ -62,17 +62,20 @@ The experiments presented in this artefact correspond to scenarios exploring the
 
 To this end, we designed a set of five experiments:
 - _oneRoot_: self-construction from a single node (growth from seed),
-- _cutting_: self-repair after disruption (network segmentation) with no regeneration (cutting). The segmentation is performed by removing a part of the structure after 500 simulated seconds, and the nodes are not able to regenerate the missing part;
+- _cutting_: self-repair after disruption (network segmentation) with no regeneration (cutting).
+    The segmentation is performed by removing a part of the structure after 500 simulated seconds, and the nodes are not able to regenerate the missing part;
 - _graft_: self-integration of multiple FieldVMC systems (grafting). Two distinct structures are created, and after 500 simulated seconds, they are merged into a single structure;
-- _graftWithMoreLeaders_: self-segmentation of a larger structure (budding). Two distinct structures are created with possibly more than leader each; after 500 simulated seconds, they are merged into a single structure;
-- _graftWithSpawning_: self-optimization of multiple large structures into a more efficient one (abscission and regrowth). Two distinct structures are created, and after 500 simulated seconds, they are merged into a single structure. During the simulation, nodes are able to spawn new nodes and destroy the ones that are not useful anymore, resulting in an optimized structure.
+- _graftWithMoreLeaders_: self-segmentation of a larger structure (budding). Two distinct structures are created with possibly more than leader each;
+    after 500 simulated seconds, they are merged into a single structure;
+- _graftWithSpawning_: self-optimization of multiple large structures into a more efficient one (abscission and regrowth).
+    Two distinct structures are created, and after 500 simulated seconds, they are merged into a single structure.
+    During the simulation, nodes are able to spawn new nodes and destroy the ones that are not useful anymore, resulting in an optimized structure.
 
 More generally, these scenarios illustrate how the aggregate formulation allows the system to naturally support structural operations such as **growth, merging, division, and reconfiguration**, which are difficult to express in the original VMC formulation.
 
 ## Results
-In all the experiments, the cyan area represents the resource and the yellow area is the success, with darker shades indicating higher values. \
-Nodes are represented as circles.
-The root is identified by a dark outer circumference.\
+In all the experiments, the cyan area represents the resource and the yellow area is the success, with darker shades indicating higher values.
+Nodes are represented as circles. The root is identified by a dark outer circumference.
 The size of a circle depends on the amount of resource and success received
 relative to all other nodes in the system: we fix the maximum possible size **_D_**, compute the maximum amount of resource **_R_**
 and the maximum amount of success **_S_** across all nodes in the system.
@@ -80,7 +83,7 @@ Then, for each node in the system with success **_s_** and resource **_r_**,
 we determine its size **_d_** proportionally to **_D_** as: **_`d = D × (r + s)/(R + S)`_**
 
 Their color depends on the amount of resource nodes have and is assigned based on the hue of the HSV color space,
-with the most resource associated with indigo, and the lowest with red.\
+with the most resource associated with indigo, and the lowest with red.
 Dashed lines are communication channels, solid black lines represent the tree structure, and green (resp. orange) lines depict
 the resource (resp. success) distribution flows, the thicker they are, the more resource (resp. success) is being transferred.
 
