@@ -1,3 +1,31 @@
+## [28.2.0](https://github.com/Collektive/collektive/compare/28.1.0...28.2.0) (2026-03-19)
+
+### Dependency updates
+
+* **api-deps:** update Kotlin to 2.3.20 ([#1432](https://github.com/Collektive/collektive/issues/1432)) ([a42c974](https://github.com/Collektive/collektive/commit/a42c9743af4e32839fbe5299ddcf671b91640ab7))
+* **deps:** update alchemist to v43.0.13 ([2f31ea2](https://github.com/Collektive/collektive/commit/2f31ea23fc14b8898845091dcabf19e12379e725))
+* **deps:** update alchemist to v43.0.14 ([b326eb6](https://github.com/Collektive/collektive/commit/b326eb6e5a7ba609bb3354f6ae502c58318fd61d))
+* **deps:** update alchemist to v43.0.19 ([11a2273](https://github.com/Collektive/collektive/commit/11a2273f5698756d9ab09e8808bb8fdedcae2856))
+* **deps:** update kotest to v6.1.5 ([b431b41](https://github.com/Collektive/collektive/commit/b431b410c3abc7f3e55ee1a99bf76d3556db272f))
+* **deps:** update kotest to v6.1.6 ([0b1d1c6](https://github.com/Collektive/collektive/commit/0b1d1c6641c3e117369e06cf02e91e86c2bfc306))
+* **deps:** update kotest to v6.1.7 ([0c264a5](https://github.com/Collektive/collektive/commit/0c264a56b6c3d0732b775a973c1536e8840dc82a))
+* **deps:** update plugin gitsemver to v7.0.15 ([3869572](https://github.com/Collektive/collektive/commit/3869572180a79e6dc08270eae7f7ca2470539bbd))
+* **deps:** update plugin gradlepluginpublish to v2.1.1 ([207c101](https://github.com/Collektive/collektive/commit/207c10170b2a4a360184411c2504da5bbe0b1a5c))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.1.11 ([e8e9652](https://github.com/Collektive/collektive/commit/e8e9652dbf5b94a133ad2147fbbe361369a6dce6))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.1.12 ([6b591ca](https://github.com/Collektive/collektive/commit/6b591cae2cb9f0eae80f158267b5db0f7a1aaa5a))
+* **deps:** update plugin publishoncentral to v9.1.14 ([e9d7d87](https://github.com/Collektive/collektive/commit/e9d7d878f91bc37bfdc5dd1dc72d4d5d829f7d3b))
+
+### Build and continuous integration
+
+* **deps:** update actions/download-artifact action to v8.0.1 ([14a3016](https://github.com/Collektive/collektive/commit/14a30165ea683c43693b6782b05bd65f6712a6ea))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.25 ([1a81c34](https://github.com/Collektive/collektive/commit/1a81c3450d889a90f30583db56d838545d6d7603))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.26 ([05c94f2](https://github.com/Collektive/collektive/commit/05c94f294d36371d274969c7f8ecd76e7cb72143))
+* **deps:** update github/codeql-action action to v4.33.0 ([0a1a2e1](https://github.com/Collektive/collektive/commit/0a1a2e18e2131862b8af389570f97d1b3ecaacad))
+
+### General maintenance
+
+* update copyright year in Gossip.kt ([16cfc3a](https://github.com/Collektive/collektive/commit/16cfc3adc2a41c4aeee0b28d8f85d59033467876))
+
 ## [28.1.0](https://github.com/Collektive/collektive/compare/28.0.1...28.1.0) (2026-03-08)
 
 ### Features
