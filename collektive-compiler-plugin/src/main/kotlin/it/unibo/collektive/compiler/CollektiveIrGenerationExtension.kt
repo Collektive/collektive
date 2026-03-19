@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -41,18 +41,20 @@ import org.jetbrains.kotlin.name.Name
 class CollektiveIrGenerationExtension(private val logger: MessageCollector) : IrGenerationExtension {
 
     override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
+        val finder = pluginContext.finderForBuiltins()
+
         val aggregateClass =
-            checkNotNull(pluginContext.referenceClass(ClassId.topLevel(FqName(AGGREGATE_CLASS_FQ_NAME)))) {
+            checkNotNull(finder.findClass(ClassId.topLevel(FqName(AGGREGATE_CLASS_FQ_NAME)))) {
                 "Class $AGGREGATE_CLASS_FQ_NAME not found"
             }
         val fieldClass =
-            checkNotNull(pluginContext.referenceClass(ClassId.topLevel(FqName(FIELD_CLASS_FQ_NAME)))) {
+            checkNotNull(finder.findClass(ClassId.topLevel(FqName(FIELD_CLASS_FQ_NAME)))) {
                 "Class $FIELD_CLASS_FQ_NAME not found"
             }
         val getContextSymbol = checkNotNull(fieldClass.getPropertyGetter("context")) {
             "Property 'context' not found in class $FIELD_CLASS_FQ_NAME"
         }
-        val projectFunction = pluginContext.referenceFunctions(
+        val projectFunction = finder.findFunctions(
             CallableId(
                 FqName("it.unibo.collektive.aggregate.api.impl"),
                 Name.identifier(PROJECTION_FUNCTION_NAME),
@@ -62,9 +64,6 @@ class CollektiveIrGenerationExtension(private val logger: MessageCollector) : Ir
             ?: return logger.error("Unable to find the '$ALIGN_FUNCTION_NAME' function")
         val dealignFunction = aggregateClass.getFunctionReferenceWithName(DEALIGN_FUNCTION_NAME)
             ?: return logger.error("Unable to find the '$DEALIGN_FUNCTION_NAME' function")
-        /*
-         * Apply the transformation to all aggregate-aware functions in the module.
-         */
         moduleFragment.transform(
             AggregateFunctionTransformer(
                 pluginContext,
