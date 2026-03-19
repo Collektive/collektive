@@ -27,7 +27,7 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirFunctionCallChecker
-import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
+import org.jetbrains.kotlin.fir.declarations.FirNamedFunction
 import org.jetbrains.kotlin.fir.expressions.FirArgumentList
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.FirLoop
@@ -109,7 +109,7 @@ object NoAlignInsideLoop : FirFunctionCallChecker(MppCheckerKind.Common) {
         val outermostAggregateDeclaration = containingDeclarations.firstOrNull { it.isAggregate(this) }
         val elements = containingElements
             .takeLastWhile {
-                it !is FirReturnExpression && it !is FirSimpleFunction && it != outermostAggregateDeclaration
+                it !is FirReturnExpression && it !is FirNamedFunction && it != outermostAggregateDeclaration
             }
 
         val scanner = elements.toMutableList()
