@@ -1,3 +1,19 @@
+## [28.2.1](https://github.com/Collektive/collektive/compare/28.2.0...28.2.1) (2026-03-25)
+
+### Dependency updates
+
+* **core-deps:** update plugin kover to v0.9.8 ([df5f738](https://github.com/Collektive/collektive/commit/df5f73887e06579f3543d7d88372f992d95960b9))
+* **deps:** update alchemist to v43.0.20 ([254540f](https://github.com/Collektive/collektive/commit/254540f6d673ab5dc46ea47c2552957f98605a71))
+* **deps:** update alchemist to v43.0.22 ([3561df5](https://github.com/Collektive/collektive/commit/3561df5db9302b28e8a48b7467aa7d667bfdc249))
+* **deps:** update kotest to v6.1.8 ([ef2f32d](https://github.com/Collektive/collektive/commit/ef2f32d54ed538439ed6eb187feaf74d37d60d12))
+* **deps:** update kotest to v6.1.9 ([f61fc3f](https://github.com/Collektive/collektive/commit/f61fc3f1c0bb493327ba161a42a09d8d89affb14))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.27 ([e9958f8](https://github.com/Collektive/collektive/commit/e9958f89c764402deacc9103a5df6fdfaab28af8))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.28 ([3c0798c](https://github.com/Collektive/collektive/commit/3c0798c1826b17ef995db49c44b8540d4bd3f8d2))
+* **deps:** update github/codeql-action action to v4.34.0 ([c53fa9d](https://github.com/Collektive/collektive/commit/c53fa9de9b6bdde8728a7d1bbbab696df6457ef2))
+
 ## [28.2.0](https://github.com/Collektive/collektive/compare/28.1.0...28.2.0) (2026-03-19)
 
 ### Dependency updates
