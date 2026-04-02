@@ -1,3 +1,31 @@
+## [28.2.2](https://github.com/Collektive/collektive/compare/28.2.1...28.2.2) (2026-04-02)
+
+### Dependency updates
+
+* **deps:** update alchemist to v43.0.23 ([8295343](https://github.com/Collektive/collektive/commit/8295343681c6c8242149e54936e74106a75c2622))
+* **deps:** update alchemist to v43.0.24 ([44e0ec7](https://github.com/Collektive/collektive/commit/44e0ec777e6bb1dcdb301d787c77e34ede149d05))
+* **deps:** update alchemist to v43.0.25 ([4444eb6](https://github.com/Collektive/collektive/commit/4444eb62d9f2212b3550f768096dab801094568a))
+* **deps:** update alchemist to v43.0.27 ([29e3930](https://github.com/Collektive/collektive/commit/29e393066b178446b2c816175c82c61a684eafb5))
+* **deps:** update dependency com.squareup:kotlinpoet to v2.3.0 ([8e0b6e1](https://github.com/Collektive/collektive/commit/8e0b6e1388c07f5fe035c09bf218c7a5aa6a4ef9))
+* **deps:** update dependency org.jetbrains.dokka to v2.2.0 ([c09659c](https://github.com/Collektive/collektive/commit/c09659cea43c533a455eaf71dfabf134695887ce))
+* **deps:** update dependency react-router-dom to v7.13.2 ([59532f1](https://github.com/Collektive/collektive/commit/59532f153a5037edec1f4fc367658c046bba9890))
+* **deps:** update dependency typescript to v6 ([f78cc23](https://github.com/Collektive/collektive/commit/f78cc230cc5d70b578b9a9974aeedcb227b2a3e1))
+* **deps:** update plugin com.gradle.develocity to v4.4.0 ([7a455a8](https://github.com/Collektive/collektive/commit/7a455a859626feed87cf4ebd28265336eeff4160))
+* **deps:** update plugin gitsemver to v7.0.16 ([a3bbea0](https://github.com/Collektive/collektive/commit/a3bbea0e7b9733b7588ff8b86fee745056f3d57f))
+* **deps:** update plugin kotlin-qa to v1.3.2 ([ccb530a](https://github.com/Collektive/collektive/commit/ccb530a938575d64b264f62b3169bd01c364b6d5))
+* **deps:** update plugin kotlin-qa to v1.4.0 ([f5b31b2](https://github.com/Collektive/collektive/commit/f5b31b22a9bf3a251cc1a7b636dbee4f04d4c8bc))
+
+### Documentation
+
+* add `FieldVMC` and `Field-Based Path Replanning` to showcase ([#1417](https://github.com/Collektive/collektive/issues/1417)) ([42386a1](https://github.com/Collektive/collektive/commit/42386a163cbf69e23895e27fc8b97500c10ef002))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.29 ([745c6f9](https://github.com/Collektive/collektive/commit/745c6f9de72ef3a8f04fec606baacf4ebe4b18fd))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.30 ([1edc353](https://github.com/Collektive/collektive/commit/1edc353c77074e25185ad94a7198c06868b4e537))
+* **deps:** update github/codeql-action action to v4.35.0 ([3a64504](https://github.com/Collektive/collektive/commit/3a64504fa258628c022f6000140cc22ecc16ac18))
+* **deps:** update github/codeql-action action to v4.35.1 ([53f2b40](https://github.com/Collektive/collektive/commit/53f2b40264c240994574189b948f1eb6c32d25e2))
+
 ## [28.2.1](https://github.com/Collektive/collektive/compare/28.2.0...28.2.1) (2026-03-25)
 
 ### Dependency updates
