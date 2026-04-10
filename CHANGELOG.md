@@ -1,3 +1,16 @@
+## [28.2.3](https://github.com/Collektive/collektive/compare/28.2.2...28.2.3) (2026-04-10)
+
+### Dependency updates
+
+* **core-deps:** update serialization to v1.11.0 ([0f0a68f](https://github.com/Collektive/collektive/commit/0f0a68fdd3961005a8adae3a6c71b0fb6803ca02))
+* **deps:** update alchemist to v43.0.28 ([11c34d7](https://github.com/Collektive/collektive/commit/11c34d75047eb6a4a9f4e97e49a587f967b4d3ea))
+* **deps:** update alchemist to v43.0.29 ([529de35](https://github.com/Collektive/collektive/commit/529de359e7faa00d968b3b249c5c91ad172c3c8e))
+* **deps:** update alchemist to v43.0.30 ([2cc7b19](https://github.com/Collektive/collektive/commit/2cc7b19449504baa4e2235fe8562615f76cc3efd))
+* **deps:** update alchemist to v43.0.31 ([eb0f767](https://github.com/Collektive/collektive/commit/eb0f7675ddfb5f70cd4f01987dc110279637dc2b))
+* **deps:** update alchemist to v43.0.32 ([b98f107](https://github.com/Collektive/collektive/commit/b98f10716c35ea0b4a09dfb673ceab5306f50e40))
+* **deps:** update dependency react-router-dom to v7.14.0 ([51ed46e](https://github.com/Collektive/collektive/commit/51ed46efbc955ad15aee64528aeb29ce8c68c9fe))
+* **deps:** update kotest to v6.1.11 ([d1b9507](https://github.com/Collektive/collektive/commit/d1b95076a1bcb6c79f5eebd5ec28848a010d18c7))
+
 ## [28.2.2](https://github.com/Collektive/collektive/compare/28.2.1...28.2.2) (2026-04-02)
 
 ### Dependency updates
