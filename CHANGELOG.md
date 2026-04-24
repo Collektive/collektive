@@ -1,3 +1,42 @@
+## [28.2.4](https://github.com/Collektive/collektive/compare/28.2.3...28.2.4) (2026-04-24)
+
+### Dependency updates
+
+* **core-deps:** update kotlin monorepo to v2.3.21 ([03c04f9](https://github.com/Collektive/collektive/commit/03c04f976af410971afbf6d2f7d3a9662acc6002))
+* **deps:** update alchemist to v43.0.33 ([7bd3c19](https://github.com/Collektive/collektive/commit/7bd3c1922e92cde010a850ae4d8ff0f8265115c5))
+* **deps:** update alchemist to v43.0.34 ([9a38075](https://github.com/Collektive/collektive/commit/9a380753c8a9593cdc1d3bdbf366c0ca4cf220bf))
+* **deps:** update alchemist to v43.0.35 ([4280b9a](https://github.com/Collektive/collektive/commit/4280b9a39fb604b43e10b0c41df778c23ef95a39))
+* **deps:** update alchemist to v43.0.36 ([e709891](https://github.com/Collektive/collektive/commit/e709891183b58f18e656748618a37fbe9a0c9d98))
+* **deps:** update alchemist to v43.0.37 ([e065bcf](https://github.com/Collektive/collektive/commit/e065bcf05a8c5b781e54a381ce48c1da06450080))
+* **deps:** update alchemist to v43.0.38 ([f77a035](https://github.com/Collektive/collektive/commit/f77a0358d7e5e077f4c73631d0b5d2a7dbe90bf1))
+* **deps:** update alchemist to v43.0.39 ([b7c6151](https://github.com/Collektive/collektive/commit/b7c61513eb1cf6db5e44e0ead20236894efc4fdd))
+* **deps:** update alchemist to v43.0.40 ([48a5e59](https://github.com/Collektive/collektive/commit/48a5e5971a87b0164bd142cdd14a2bb377cf077b))
+* **deps:** update alchemist to v43.0.41 ([618ac01](https://github.com/Collektive/collektive/commit/618ac0170413b8daa7bd8d98f0a5c113e9dacb4c))
+* **deps:** update dependency react-router-dom to v7.14.1 ([0b29a17](https://github.com/Collektive/collektive/commit/0b29a17a0decc5021895ac38336b4ba58406c386))
+* **deps:** update dependency typescript to v6.0.3 ([8538d71](https://github.com/Collektive/collektive/commit/8538d71032baf7de9b1a1df9d825dbcc1cb8a8cc))
+* **deps:** update docusaurus monorepo to v3.10.0 ([ce4ad7b](https://github.com/Collektive/collektive/commit/ce4ad7ba21a89ff364c7bd390608d3c50f4b8ac2))
+* **deps:** update node.js to 24.15 ([2a23b81](https://github.com/Collektive/collektive/commit/2a23b81b34ec8caa1eeeac36048f1ece6426a5c7))
+* **deps:** update plugin com.gradle.develocity to v4.4.1 ([ceda771](https://github.com/Collektive/collektive/commit/ceda771fbaaf5b437822ca033a898e26ffcf5e88))
+* **deps:** update plugin gitsemver to v7.0.17 ([e4787ce](https://github.com/Collektive/collektive/commit/e4787ce5b2dd739fdbc9ce55e2e0e48434286193))
+* **deps:** update plugin kotlin-qa to v1.4.1 ([773b1e0](https://github.com/Collektive/collektive/commit/773b1e06070a0784f2cb971fa529b6e6ad009089))
+* **deps:** update plugin kotlin-qa to v1.5.0 ([6b2eb56](https://github.com/Collektive/collektive/commit/6b2eb561127e944e8b68334cff8e2b5e59a0d211))
+* **deps:** update plugin kotlin-qa to v1.5.1 ([35e1d92](https://github.com/Collektive/collektive/commit/35e1d92ab0b3ad59d10add6a93fdcabe9fec18a6))
+* **deps:** update plugin kotlin-qa to v1.6.0 ([6bb2d45](https://github.com/Collektive/collektive/commit/6bb2d453ae777761d25387212ec4ffe6fed520fe))
+* **deps:** update plugin ksp to v2.3.7 ([e066704](https://github.com/Collektive/collektive/commit/e066704ea9fec2260fe232e85d16d83e7188dd1d))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.1.13 ([10a8ce5](https://github.com/Collektive/collektive/commit/10a8ce5819a5a83d9d7450b6b8578013d7ded801))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.1.14 ([ecd18e1](https://github.com/Collektive/collektive/commit/ecd18e1b130e60ae334869fbeda2fd9344537b43))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.1.15 ([a1ceb7b](https://github.com/Collektive/collektive/commit/a1ceb7b6bd48158e09395237312bb129b00a0fd4))
+* **deps:** update plugin publishoncentral to v9.1.15 ([4909fb2](https://github.com/Collektive/collektive/commit/4909fb2fd2654d4f6ae321f6e90b1df04fad3df3))
+* **deps:** update plugin publishoncentral to v9.2.0 ([32a44cc](https://github.com/Collektive/collektive/commit/32a44cc001a7f803ac2c2b979eeecac82fdd2922))
+* **deps:** update plugin publishoncentral to v9.2.1 ([9c185d6](https://github.com/Collektive/collektive/commit/9c185d67db5d4d94a034d520b706f17dccf10086))
+* **deps:** update react monorepo to v19.2.5 ([0ddec07](https://github.com/Collektive/collektive/commit/0ddec0721f10f0617d2df71f3ff7b4e9ac6a2b47))
+
+### Build and continuous integration
+
+* **deps:** update actions/setup-node action to v6.4.0 ([ffc5437](https://github.com/Collektive/collektive/commit/ffc543787f43c239f647e9c7756666ef59df9f4b))
+* **deps:** update actions/upload-artifact action to v7.0.1 ([dd687a1](https://github.com/Collektive/collektive/commit/dd687a1d5f27b794b3510ec596cc6a7a0c79ce33))
+* **deps:** update github/codeql-action action to v4.35.2 ([ab966fa](https://github.com/Collektive/collektive/commit/ab966fa29d3952831c1096e3772f25aa9d0ac37a))
+
 ## [28.2.3](https://github.com/Collektive/collektive/compare/28.2.2...28.2.3) (2026-04-10)
 
 ### Dependency updates
