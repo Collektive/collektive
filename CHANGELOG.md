@@ -1,3 +1,30 @@
+## [28.2.5](https://github.com/Collektive/collektive/compare/28.2.4...28.2.5) (2026-05-08)
+
+### Dependency updates
+
+* **core-deps:** update dependency org.jetbrains.kotlinx:kotlinx-datetime to v0.8.0-0.6.x-compat ([6ab88ca](https://github.com/Collektive/collektive/commit/6ab88ca8e28ba4c60c6ddab62449cb453f1121b7))
+* **deps:** update alchemist to v43.0.42 ([ffa8ffe](https://github.com/Collektive/collektive/commit/ffa8ffe8e29ac27a1fa9d4cff68d88e491fc09af))
+* **deps:** update alchemist to v43.0.44 ([d17061a](https://github.com/Collektive/collektive/commit/d17061a7792f9617270a143423721c7a0395a442))
+* **deps:** update alchemist to v43.0.45 ([1447142](https://github.com/Collektive/collektive/commit/144714226912e8a9446aaaa3f3ca42176a791e74))
+* **deps:** update alchemist to v43.0.46 ([ad2444f](https://github.com/Collektive/collektive/commit/ad2444f974a3f3dfb8d8bc462802e94b86a14b63))
+* **deps:** update alchemist to v43.0.47 ([e82399b](https://github.com/Collektive/collektive/commit/e82399ba7a368f22b7f98a194a7704e2968bc7c3))
+* **deps:** update dependency com.github.ben-manes.caffeine:caffeine to v3.2.4 ([d0b2d66](https://github.com/Collektive/collektive/commit/d0b2d661f6246580a74824c5b3e061539f898b70))
+* **deps:** update dependency react-router-dom to v7.14.2 ([34fa37a](https://github.com/Collektive/collektive/commit/34fa37a1aa8c770a3811533c47ec539d715d5e9c))
+* **deps:** update dependency react-router-dom to v7.15.0 ([890ff4e](https://github.com/Collektive/collektive/commit/890ff4eae22009a6352347b9b00db7fec682f01c))
+* **deps:** update docusaurus monorepo to v3.10.1 ([5736a39](https://github.com/Collektive/collektive/commit/5736a3904ba05686c9e6bea6561c455627ca883f))
+* **deps:** update plugin gitsemver to v7.0.18 ([eb0658b](https://github.com/Collektive/collektive/commit/eb0658b076de0b0ecb1d9cd5332143ed9a564972))
+* **deps:** update plugin kotlin-qa to v1.6.1 ([435a8c8](https://github.com/Collektive/collektive/commit/435a8c8bdf448a747b2135936f0424e36212581e))
+* **deps:** update plugin multijvmtesting to v4.3.3 ([bd0a4f4](https://github.com/Collektive/collektive/commit/bd0a4f46032036a9a6ebbcd3df15a4cb42948c0b))
+* **deps:** update plugin multijvmtesting to v4.3.4 ([fa9f49d](https://github.com/Collektive/collektive/commit/fa9f49d8dcb2b411a9a25e707992d04962c9e11a))
+* **deps:** update plugin multijvmtesting to v4.3.5 ([f5311c8](https://github.com/Collektive/collektive/commit/f5311c8870e2df8e6e648c027cea99bdd1313c9b))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.1.16 ([1edb17d](https://github.com/Collektive/collektive/commit/1edb17d52da63eee564926f281a9b1414ebc4315))
+* **deps:** update plugin publishoncentral to v9.2.2 ([b5828df](https://github.com/Collektive/collektive/commit/b5828df557280d4924b981aba2cf8e365b3dde51))
+
+### Build and continuous integration
+
+* **deps:** update github/codeql-action action to v4.35.3 ([b6939c8](https://github.com/Collektive/collektive/commit/b6939c87cdd044addf5d16c3d76416ea0ca243a6))
+* **deps:** update github/codeql-action action to v4.35.4 ([0d213b9](https://github.com/Collektive/collektive/commit/0d213b90fabee87d42f0b043adb24a0eb2ebcffb))
+
 ## [28.2.4](https://github.com/Collektive/collektive/compare/28.2.3...28.2.4) (2026-04-24)
 
 ### Dependency updates
