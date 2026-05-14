@@ -94,7 +94,7 @@ jobs:
       - build-website
       - build
     if: ${{ github.event_name == 'push' && github.repository == 'Collektive/collektive' }}
-    runs-on: macos-15
+    runs-on: macos-26
     steps:
       - name: Checkout the repo
         uses: danysk/checkout-classic@f55ca46048a09d13b47f0e80db6b546977327791 # 1.0.0
