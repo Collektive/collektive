@@ -48,7 +48,6 @@ kotlinJvm {
     }
     compilerOptions {
         jvmTarget.set(targetJvm)
-        freeCompilerArgs.add("-Xcontext-parameters")
     }
     tasks.withType<Test> {
         useJUnitPlatform()

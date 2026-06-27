@@ -59,9 +59,3 @@ kotlinMultiplatform {
         }
     }
 }
-
-// tasks.withType<KotlinCompilationTask<*>>().configureEach {
-//    compilerOptions {
-//        freeCompilerArgs.add("-Xcontext-parameters")
-//    }
-// }

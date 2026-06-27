@@ -58,7 +58,7 @@ object CollektiveJVMCompiler {
      * Configures the Kotlin-JVM compiler to compile the [inputFiles] using the Collektive plugin.
      * When [inputFiles] contains a directory, it is used as a source root.
      */
-    @OptIn(K1Deprecation::class)
+    @OptIn(K1Deprecation::class, CompilerConfiguration.Internals::class)
     @JvmStatic
     @JvmOverloads
     fun compile(
