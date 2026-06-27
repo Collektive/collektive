@@ -13,7 +13,6 @@ import it.unibo.collektive.compiler.backend.irextensions.findAggregateReference
 import it.unibo.collektive.compiler.backend.irextensions.simpleFunctionName
 import it.unibo.collektive.compiler.backend.irextensions.singleRegularParameter
 import it.unibo.collektive.compiler.backend.irextensions.toFunctionAlignmentToken
-import it.unibo.collektive.compiler.backend.util.StackFunctionCall
 import it.unibo.collektive.compiler.backend.util.debugPrint
 import it.unibo.collektive.compiler.common.error
 import kotlin.concurrent.atomics.AtomicInt
@@ -85,7 +84,6 @@ import org.jetbrains.kotlin.ir.visitors.IrTransformer
  *   [it.unibo.collektive.compiler.common.CollektiveNames.AGGREGATE_CLASS_FQ_NAME]
  * @property fieldClass the IR class symbol for
  *   [it.unibo.collektive.compiler.common.CollektiveNames.FIELD_CLASS_FQ_NAME]
- * @property functionToAlign the IR function being processed
  * @property alignRawFunction the IR function representing
  *   [it.unibo.collektive.compiler.common.CollektiveNames.AGGREGATE_CLASS_FQ_NAME]`.alignRaw`
  * @property dealignFunction the IR function representing
@@ -98,12 +96,11 @@ class AlignmentTransformer(
     private val pluginContext: IrPluginContext,
     private val aggregateClass: IrClass,
     private val fieldClass: IrClass,
-    private val functionToAlign: IrFunction,
     private val alignRawFunction: IrFunction,
     private val dealignFunction: IrFunction,
     private val getContext: IrFunction,
     private val logger: MessageCollector,
-) : IrTransformer<StackFunctionCall>() {
+) : IrTransformer<AlignmentTraversalContext>() {
 
     private val alignRawRegularParameterIndex: Int = alignRawFunction.singleRegularParameter.indexInParameters
 
@@ -127,30 +124,39 @@ class AlignmentTransformer(
         return "$nth$token"
     }
 
-    private fun visitNotAlignable(expression: IrDeclarationReference, data: StackFunctionCall): IrExpression {
+    private fun visitNotAlignable(expression: IrDeclarationReference, data: AlignmentTraversalContext): IrExpression {
         val token = expression.alignmentToken()
-        data.push(token)
+        data.functionCallStack.push(token)
         return super.visitDeclarationReference(expression, data)
     }
 
     /**
-     * Visits regular functions and logs their discovery.
+     * Visits regular functions and updates the current IR builder scope.
+     *
+     * Kotlin IR lambdas and local functions are [IrFunction] declarations. When the transformer inserts
+     * temporaries inside them, [IrBlockBodyBuilder] must be scoped to that innermost function, not to the
+     * outer aggregate function that originally triggered alignment. This is especially important for
+     * public inline generic primitives: Native serializes their IR and validates that generic type
+     * parameters can be resolved through the declaration ownership chain.
      */
-    override fun visitFunction(declaration: IrFunction, data: StackFunctionCall): IrStatement {
+    override fun visitFunction(declaration: IrFunction, data: AlignmentTraversalContext): IrStatement {
         debugPrint {
             "Encountered: ${if (declaration.isInline) "inline" else "non-inline"} ${declaration.dumpKotlinLike()}"
         }
-        return super.visitFunction(declaration, data)
+        return super.visitFunction(declaration, data.withCurrentFunctionScope(declaration))
     }
 
     @OptIn(ExperimentalAtomicApi::class)
-    override fun visitDeclarationReference(expression: IrDeclarationReference, data: StackFunctionCall): IrExpression {
+    override fun visitDeclarationReference(
+        expression: IrDeclarationReference,
+        data: AlignmentTraversalContext,
+    ): IrExpression {
         val aggregateContext = expression.findAggregateReference()
         return when (aggregateContext) {
             null -> visitNotAlignable(expression, data)
             else -> {
-                val token = "$data${expression.alignmentToken()}"
-                generateAlignmentCode(aggregateContext, functionToAlign, expression) {
+                val token = "${data.functionCallStack}${expression.alignmentToken()}"
+                generateAlignmentCode(aggregateContext, data.currentFunctionScope, expression) {
                     irString(token)
                 }
             }
@@ -194,7 +200,10 @@ class AlignmentTransformer(
      * Otherwise, simply visits children recursively.
      */
     @OptIn(UnsafeDuringIrConstructionAPI::class, ExperimentalAtomicApi::class)
-    override fun visitFunctionAccess(expression: IrFunctionAccessExpression, data: StackFunctionCall): IrElement {
+    override fun visitFunctionAccess(
+        expression: IrFunctionAccessExpression,
+        data: AlignmentTraversalContext,
+    ): IrElement {
         if (expression.isNotAnAlignmentTarget()) {
             return visitNotAlignable(expression, data)
         }
@@ -218,11 +227,11 @@ class AlignmentTransformer(
                     }
                 }
                 // If the expression contains a lambda, this recursion is necessary to visit the children
-                expression.transformChildren(this, StackFunctionCall())
-                val fullToken = "$data$alignmentToken"
+                expression.transformChildren(this, data.withEmptyFunctionCallStack())
+                val fullToken = "${data.functionCallStack}$alignmentToken"
                 // Return the modified function body to have as a first statement the alignRaw function,
                 // then the body of the function to align and finally the dealign function
-                generateAlignmentCode(context, expression.symbol.owner, expression) { irString(fullToken) }
+                generateAlignmentCode(context, data.currentFunctionScope, expression) { irString(fullToken) }
             }
         }
     }
@@ -231,22 +240,22 @@ class AlignmentTransformer(
      * Visits a conditional branch (`if` or `when` case) and injects alignment
      * if its result is aggregate-aware.
      */
-    override fun visitBranch(branch: IrBranch, data: StackFunctionCall): IrBranch {
-        branch.generateBranchAlignmentCode(true)
+    override fun visitBranch(branch: IrBranch, data: AlignmentTraversalContext): IrBranch {
+        branch.generateBranchAlignmentCode(true, data)
         return super.visitBranch(branch, data)
     }
 
     /**
      * Visits an `else` branch and injects alignment if needed.
      */
-    override fun visitElseBranch(branch: IrElseBranch, data: StackFunctionCall): IrElseBranch {
-        branch.generateBranchAlignmentCode(false)
+    override fun visitElseBranch(branch: IrElseBranch, data: AlignmentTraversalContext): IrElseBranch {
+        branch.generateBranchAlignmentCode(false, data)
         return super.visitElseBranch(branch, data)
     }
 
-    private fun IrBranch.generateBranchAlignmentCode(condition: Boolean) {
+    private fun IrBranch.generateBranchAlignmentCode(condition: Boolean, data: AlignmentTraversalContext) {
         result.findAggregateReference(pluginContext, aggregateClass, fieldClass, getContext, logger)?.let {
-            result = generateAlignmentCode(it, functionToAlign, result) { irBoolean(condition) }
+            result = generateAlignmentCode(it, data.currentFunctionScope, result) { irBoolean(condition) }
         }
     }
 
@@ -259,7 +268,7 @@ class AlignmentTransformer(
      * This block guarantees alignment consistency for the duration of the computation.
      *
      * @param context the IR expression providing the aggregate context
-     * @param function the enclosing IR function
+     * @param currentFunctionScope the innermost IR function that owns [expressionBody]
      * @param expressionBody the computation to wrap
      * @param alignmentToken a builder producing the token expression
      * @return a new [IrContainerExpression] representing the aligned computation
@@ -267,14 +276,14 @@ class AlignmentTransformer(
     @OptIn(ExperimentalAtomicApi::class)
     private fun generateAlignmentCode(
         context: IrExpression,
-        function: IrFunction,
+        currentFunctionScope: IrFunction,
         expressionBody: IrExpression,
         alignmentToken: IrBlockBodyBuilder.() -> IrConst,
-    ): IrContainerExpression = irStatement(pluginContext, function, expressionBody) {
+    ): IrContainerExpression = irStatement(pluginContext, currentFunctionScope, expressionBody) {
         // Call the align function before the body of the function to align
         val generationId = counter.fetchAndAdd(1)
         irBlock {
-            // ✅ Create a declared, scoped, bound variable from the context
+            // Create a declared, scoped, bound variable from the context.
             val contextAccess = createTmpVariable(
                 context,
                 irType = context.type,
@@ -290,11 +299,11 @@ class AlignmentTransformer(
                 irType = expressionBody.type,
                 nameHint = "$ALIGNED_COMPUTATION_VARIABLE_NAME$generationId",
             )
-            // Call the delign function after the body of the function to align
+            // Call the dealign function after the body of the function to align.
             +irCall(dealignFunction).apply {
                 arguments[dealignFunction.dispatchReceiverIndex] = irGet(contextAccess)
             }
-            // ✅ Return block result
+            // Return block result.
             +irGet(blockResult)
         }
     }

@@ -55,7 +55,7 @@ class CollektiveCompilerPluginRegistrar : CompilerPluginRegistrar() {
      * @param messageOnError Provides a custom error message if the requirement is violated.
      * @throws IllegalStateException if the key is present with a conflicting value.
      */
-    fun <T> CompilerConfiguration.requireConfiguration(
+    fun <T : Any> CompilerConfiguration.requireConfiguration(
         key: CompilerConfigurationKey<T>,
         value: T,
         logger: MessageCollector,

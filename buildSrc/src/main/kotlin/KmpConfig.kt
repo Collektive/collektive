@@ -48,7 +48,6 @@ fun Project.configureKotlinMultiplatform() {
     with(extensions.getByType<KotlinMultiplatformExtension>()) {
         compilerOptions {
             allWarningsAsErrors = true
-            freeCompilerArgs.add("-Xcontext-parameters")
         }
         jvm {
             compilerOptions {
@@ -70,7 +69,7 @@ fun Project.configureKotlinMultiplatform() {
             }
         }
         val mochaTimeout = 60.minutes.inWholeMilliseconds.toString()
-        js(IR) {
+        js {
             browser {
                 testTask {
                     useMocha {
@@ -93,22 +92,27 @@ fun Project.configureKotlinMultiplatform() {
                 staticLib()
             }
         }
+
         applyDefaultHierarchyTemplate()
+
+        androidNativeArm32(nativeSetup)
+        androidNativeArm64(nativeSetup)
+        androidNativeX86(nativeSetup)
+        androidNativeX64(nativeSetup)
         linuxX64(nativeSetup)
         linuxArm64(nativeSetup)
 
         mingwX64(nativeSetup)
 
-        macosX64(nativeSetup)
         macosArm64(nativeSetup)
         iosArm64(nativeSetup)
         iosX64(nativeSetup)
         iosSimulatorArm64(nativeSetup)
-        watchosArm64(nativeSetup)
-        watchosX64(nativeSetup)
-        watchosSimulatorArm64(nativeSetup)
         tvosArm64(nativeSetup)
-        tvosX64(nativeSetup)
         tvosSimulatorArm64(nativeSetup)
+        watchosArm32(nativeSetup)
+        watchosArm64(nativeSetup)
+        watchosDeviceArm64(nativeSetup)
+        watchosSimulatorArm64(nativeSetup)
     }
 }

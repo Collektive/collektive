@@ -43,7 +43,6 @@ kotlinJvm {
     }
     compilerOptions {
         jvmTarget.set(targetJvm)
-        freeCompilerArgs.add("-Xcontext-parameters")
     }
     tasks.withType<Test> {
         javaLauncher = javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(11)) }

@@ -102,13 +102,12 @@ class AggregateFunctionTransformer(
                     pluginContext,
                     aggregateClass,
                     fieldClass,
-                    declaration,
                     alignRawFunction,
                     dealignFunction,
                     getContext,
                     logger,
                 ),
-                StackFunctionCall(),
+                AlignmentTraversalContext(StackFunctionCall(), declaration),
             )
             debugPrint { "Aligned function:\n${declaration.dumpKotlinLike()}" }
             debugPrint { "-------------" }
