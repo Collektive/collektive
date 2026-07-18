@@ -1,3 +1,37 @@
+## [28.3.1](https://github.com/Collektive/collektive/compare/28.3.0...28.3.1) (2026-07-18)
+
+### Dependency updates
+
+* **core-deps:** update kotlin monorepo to v2.4.10 ([69f4290](https://github.com/Collektive/collektive/commit/69f42903a5a8bd0bc6433e87520909414e58ed85))
+* **core-deps:** update plugin kover to v0.9.9 ([2846610](https://github.com/Collektive/collektive/commit/284661000907f22396829a875ba08a2f2712ffe4))
+* **deps:** update arrow-kt monorepo to v2.2.3 ([88fe7cf](https://github.com/Collektive/collektive/commit/88fe7cfaffd162ddaca48fdebc9984e738e962f5))
+* **deps:** update dependency @fortawesome/react-fontawesome to v3.4.0 ([e1adc87](https://github.com/Collektive/collektive/commit/e1adc877d3d98c465a1180c756b777ab310d4a1b))
+* **deps:** update dependency react-icons to v5.7.0 ([b5aa1c2](https://github.com/Collektive/collektive/commit/b5aa1c211cb4ebd05b599390c17cffeb8123038a))
+* **deps:** update dependency react-router-dom to v7.18.1 ([e4875dd](https://github.com/Collektive/collektive/commit/e4875ddc79b38a8b1a09c496e34aeea9a8d18c26))
+* **deps:** update dependency typescript to v7 ([1de2006](https://github.com/Collektive/collektive/commit/1de20060ecc4c8c38fac6a19eb9509a367a16bec))
+* **deps:** update docusaurus monorepo to v3.10.2 ([533348d](https://github.com/Collektive/collektive/commit/533348dabfa55816a6cd1a8d3e1fba6a27c784de))
+* **deps:** update font awesome to v7.3.0 ([be93452](https://github.com/Collektive/collektive/commit/be93452deb81c6ce6a262f0a7930df2352ba0c84))
+* **deps:** update kotest to v6.2.2 ([9ac91d2](https://github.com/Collektive/collektive/commit/9ac91d2e9c74a818bd30cbba9a87bb1f8b235982))
+* **deps:** update plugin com.gradle.develocity to v4.5.0 ([1298d83](https://github.com/Collektive/collektive/commit/1298d830cd253cdc266f089275daecc8c8f8dd66))
+* **deps:** update plugin gitsemver to v7.0.23 ([6fbf829](https://github.com/Collektive/collektive/commit/6fbf829d759405c8f67854f1503641a913cf783c))
+* **deps:** update plugin kotlin-qa to v1.7.1 ([f2e14b7](https://github.com/Collektive/collektive/commit/f2e14b71668f2b899ec2b67a22dadcf371751e38))
+* **deps:** update plugin kotlin-qa to v1.8.0 ([52ec84b](https://github.com/Collektive/collektive/commit/52ec84b8297ebaa035ec6077c0bfb4be9878d042))
+* **deps:** update plugin kotlin-qa to v1.8.1 ([9a27cdd](https://github.com/Collektive/collektive/commit/9a27cdd505fdc2e0c5c87b8ae4e26c00b23956b0))
+* **deps:** update plugin ksp to v2.3.10 ([45066b2](https://github.com/Collektive/collektive/commit/45066b2efd9e105ef34e84f40cc46f3bfe556837))
+* **deps:** update plugin multijvmtesting to v4.5.3 ([98e8e00](https://github.com/Collektive/collektive/commit/98e8e00326a95bdd56ae3d1dd73f0d4478c7787d))
+* **deps:** update plugin multijvmtesting to v4.5.4 ([4040e21](https://github.com/Collektive/collektive/commit/4040e2191b284cecc558fd8523e5c8d592e80c9f))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.1.21 ([cd28950](https://github.com/Collektive/collektive/commit/cd28950a2e35203bab697afadfd732db3fd85170))
+
+### Build and continuous integration
+
+* **deps:** update actions/setup-node action to v7 ([1e3b321](https://github.com/Collektive/collektive/commit/1e3b32114ed2403505e3b89f8d1806616dd85285))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.39 ([#1463](https://github.com/Collektive/collektive/issues/1463)) ([ac89212](https://github.com/Collektive/collektive/commit/ac8921244994ec9232dc5c101edcc9e4788e3f6d))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.40 ([6cb7a85](https://github.com/Collektive/collektive/commit/6cb7a85c33c1bc65e58f4acd70f35a8cd7665fa0))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.41 ([21105ca](https://github.com/Collektive/collektive/commit/21105ca9ecf1d33628b6b164fc1ec2f3aa283bdd))
+* **deps:** update github/codeql-action action to v4.36.3 ([134b067](https://github.com/Collektive/collektive/commit/134b0675941f382ec2d6f19c04b43dbc85e3572f))
+* **deps:** update github/codeql-action action to v4.37.0 ([d1f5493](https://github.com/Collektive/collektive/commit/d1f54932d7e57f8b2d6103901af848d4f556cd69))
+* **deps:** update github/codeql-action action to v4.37.1 ([40911ce](https://github.com/Collektive/collektive/commit/40911ce7a7ca1d89fde48f2a6cf150a2bd07eb05))
+
 ## [28.3.0](https://github.com/Collektive/collektive/compare/28.2.5...28.3.0) (2026-06-27)
 
 ### Features
