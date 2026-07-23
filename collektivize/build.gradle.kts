@@ -70,7 +70,7 @@ dependencies {
     implementation(rootProject.libs.kotlinx.serialization.core)
     implementation(rootProject.libs.kotlinpoet)
     implementation(rootProject.libs.slf4j)
-    implementation("org.ow2.asm:asm:9.9")
+    implementation(rootProject.libs.asm)
     testImplementation(kotlin("test"))
 }
 
