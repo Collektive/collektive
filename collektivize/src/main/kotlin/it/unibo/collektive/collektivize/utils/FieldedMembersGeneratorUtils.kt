@@ -202,7 +202,7 @@ private fun Method.annotationsFromBytecode(): Sequence<KClass<out Annotation>> =
 
 private fun KCallable<*>.requiredOptInMarkers(): Set<KClass<out Annotation>> {
     val reflectedMarkers: Sequence<KClass<out Annotation>> = annotations.asSequence().map { it.annotationClass }
-    // Kotlin does not allow using @RequireOptIn as a normal class name. We must go search in the bytecode
+    // Kotlin does not allow using @RequiresOptIn as a normal class name. We must go search in the bytecode
     val javaMethod = runCatching { (this as? KFunction<*>)?.javaMethod }.getOrNull()
     val bytecodeMarkers: Sequence<KClass<out Annotation>> = javaMethod?.annotationsFromBytecode().orEmpty()
     return (reflectedMarkers + bytecodeMarkers)
