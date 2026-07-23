@@ -25,6 +25,7 @@ import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.listProperty
 import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.register
+import org.gradle.work.DisableCachingByDefault
 
 /**
  * Collekivize Gradle plugin.
@@ -43,6 +44,7 @@ open class CollektivizeGradlePlugin : Plugin<Project> {
  * Code generation task generating "fielded" version for each [typesToField] members.
  * The generated code is written to [outputDirectory].
  */
+@DisableCachingByDefault(because = "The task generates source files by reflecting over the configured Kotlin classes.")
 open class CollektivizeTask : DefaultTask() {
     /**
      * All the types that should be "fielded".

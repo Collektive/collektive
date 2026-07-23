@@ -26,13 +26,22 @@ import it.unibo.collektive.collektivize.utils.KTypeUtils.toTypeNameWithRecurring
 import it.unibo.collektive.collektivize.utils.KTypeUtils.toTypeVariableName
 import it.unibo.collektive.collektivize.utils.KotlinPoetUtils.addBodyFunction
 import it.unibo.collektive.collektivize.utils.KotlinPoetUtils.addSingleStatementBodyFunction
+import java.lang.reflect.Method
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.pow
 import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
 import kotlin.reflect.full.isSupertypeOf
+import kotlin.reflect.jvm.javaMethod
 import kotlin.reflect.typeOf
+import org.objectweb.asm.AnnotationVisitor
+import org.objectweb.asm.ClassReader
+import org.objectweb.asm.ClassVisitor
+import org.objectweb.asm.MethodVisitor
+import org.objectweb.asm.Opcodes.ASM9
+import org.objectweb.asm.Type
 
 internal val FIELD_INTERFACE = Field::class.asClassName()
 internal val FIELD_COMPANION = Field.Companion::class.asClassName()
@@ -57,10 +66,36 @@ internal val specializedArrayTypes =
         BooleanArray::class,
     )
 
+private sealed interface CachedAnnotation {
+    val annotation: KClass<out Annotation>?
+}
+private object NoAnnotation : CachedAnnotation {
+    override val annotation: KClass<out Annotation>? = null
+}
+
+@JvmInline
+private value class AnnotationPresent(override val annotation: KClass<out Annotation>) : CachedAnnotation
+
+private val annotationClassCache = ConcurrentHashMap<String, CachedAnnotation>()
+
+@Suppress("UNCHECKED_CAST")
+private fun descriptorToAnnotationClass(descriptor: String): KClass<out Annotation>? {
+    val cachedAnnotation = annotationClassCache.computeIfAbsent(descriptor) {
+        runCatching {
+            AnnotationPresent(
+                Class.forName(
+                    descriptor.substring(1, descriptor.length - 1).replace('/', '.'),
+                ).kotlin as KClass<out Annotation>,
+            )
+        }.getOrNull() ?: NoAnnotation
+    }
+    return cachedAnnotation.annotation
+}
+
 /**
  * Given a list of parameters, returns a list of all possible combinations of parameters where each parameter is
  * replaced by a `Field` of the same type.
- * The function drop the first combination where all parameters are not `Field`.
+ * The function drops the first combination where all parameters are not `Field`.
  */
 internal fun parameterCombinations(origin: KCallable<*>): List<List<ParameterSpec>> {
     fun decimalToBinaryArray(decimal: Int, size: Int): List<Boolean> {
@@ -105,6 +140,74 @@ private fun KParameter.toParameterSpec(origin: KCallable<*>): ParameterSpec {
             else -> emptyList()
         },
     )
+}
+
+private fun KClass<out Annotation>.isErrorLevelOptInMarker(): Boolean {
+    var errorLevel = false
+    val resource = java.getResourceAsStream("/${java.name.replace('.', '/')}.class") ?: return false
+    ClassReader(resource).accept(
+        object : ClassVisitor(ASM9) {
+            override fun visitAnnotation(
+                annotationDescriptor: String,
+                visible: Boolean,
+            ): org.objectweb.asm.AnnotationVisitor? = if (annotationDescriptor == "Lkotlin/RequiresOptIn;") {
+                object : org.objectweb.asm.AnnotationVisitor(ASM9) {
+                    override fun visitEnum(name: String, levelDescriptor: String, value: String) {
+                        if (name == "level" && value == "ERROR") {
+                            errorLevel = true
+                        }
+                    }
+                }
+            } else {
+                null
+            }
+        },
+        ClassReader.SKIP_CODE or ClassReader.SKIP_DEBUG or ClassReader.SKIP_FRAMES,
+    )
+    return errorLevel
+}
+
+private fun Method.annotationsFromBytecode(): Sequence<KClass<out Annotation>> =
+    declaringClass.getResourceAsStream("/${declaringClass.name.replace('.', '/')}.class")?.use { resource ->
+        val targetDescriptor = Type.getMethodDescriptor(this)
+        buildSet {
+            ClassReader(resource).accept(
+                object : ClassVisitor(ASM9) {
+                    override fun visitMethod(
+                        access: Int,
+                        name: String,
+                        candidateDescriptor: String,
+                        signature: String?,
+                        exceptions: Array<out String>?,
+                    ): MethodVisitor? = when {
+                        name == this@annotationsFromBytecode.name && candidateDescriptor == targetDescriptor ->
+                            object : MethodVisitor(ASM9) {
+                                override fun visitAnnotation(
+                                    annotationDescriptor: String,
+                                    visible: Boolean,
+                                ): AnnotationVisitor? {
+                                    if (annotationDescriptor.startsWith("L") && annotationDescriptor.endsWith(";")) {
+                                        add(descriptorToAnnotationClass(annotationDescriptor))
+                                    }
+                                    return null
+                                }
+                            }
+                        else -> null
+                    }
+                },
+                ClassReader.SKIP_CODE or ClassReader.SKIP_DEBUG or ClassReader.SKIP_FRAMES,
+            )
+        }.asSequence().filterNotNull()
+    }.orEmpty()
+
+private fun KCallable<*>.requiredOptInMarkers(): Set<KClass<out Annotation>> {
+    val reflectedMarkers: Sequence<KClass<out Annotation>> = annotations.asSequence().map { it.annotationClass }
+    // Kotlin does not allow using @RequireOptIn as a normal class name. We must go search in the bytecode
+    val javaMethod = runCatching { (this as? KFunction<*>)?.javaMethod }.getOrNull()
+    val bytecodeMarkers: Sequence<KClass<out Annotation>> = javaMethod?.annotationsFromBytecode().orEmpty()
+    return (reflectedMarkers + bytecodeMarkers)
+        .filter { it.isErrorLevelOptInMarker() }
+        .toSet()
 }
 
 /**
@@ -193,6 +296,16 @@ internal fun generateFunction(callable: KCallable<*>, paramList: List<ParameterS
                 .addMember("%S", "REDUNDANT_CALL_OF_CONVERSION_METHOD")
                 .build(),
         )
+        val requiredOptInMarkers = callable.requiredOptInMarkers()
+        if (requiredOptInMarkers.isNotEmpty()) {
+            addAnnotation(
+                AnnotationSpec.builder(ClassName("kotlin", "OptIn"))
+                    .addMember(
+                        requiredOptInMarkers.joinToString(", ") { "%T::class" },
+                        *requiredOptInMarkers.toTypedArray(),
+                    ).build(),
+            )
+        }
         // Always return a Field parametrized by the ID type and the return type of the callable
         val returnType = callable.returnType.toTypeNameWithRecurringGenericSupport()
         returns(FIELD_INTERFACE.parameterizedBy(ID_BOUNDED_TYPE, returnType))
