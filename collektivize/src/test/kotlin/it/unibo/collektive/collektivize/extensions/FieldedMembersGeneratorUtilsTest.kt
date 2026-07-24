@@ -6,7 +6,7 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
-@file:OptIn(ErrorOptIn::class, AnotherErrorOptIn::class, WarningOptIn::class)
+@file:OptIn(DefaultErrorOptIn::class, ErrorOptIn::class, AnotherErrorOptIn::class, WarningOptIn::class)
 
 package it.unibo.collektive.collektivize.extensions
 
@@ -20,6 +20,11 @@ import kotlin.test.assertFalse
 @Target(AnnotationTarget.FUNCTION)
 annotation class ErrorOptIn
 
+@RequiresOptIn
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.FUNCTION)
+annotation class DefaultErrorOptIn
+
 @RequiresOptIn(level = RequiresOptIn.Level.ERROR)
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION)
@@ -32,6 +37,9 @@ annotation class WarningOptIn
 
 @ErrorOptIn
 fun String.errorOpted(): String = this
+
+@DefaultErrorOptIn
+fun String.defaultErrorOpted(): String = this
 
 @ErrorOptIn
 @WarningOptIn
@@ -47,6 +55,16 @@ fun String.warningOpted(): String = this
 fun String.notOpted(): String = this
 
 class FieldedMembersGeneratorUtilsTest {
+    @Test
+    fun `plain requires opt in is propagated as error`() {
+        val generated = generatePrimitivesFile(
+            listOf(String::defaultErrorOpted),
+            "generated",
+            "Generated",
+        )!!.toString()
+        assertContains(generated, "@OptIn(DefaultErrorOptIn::class)")
+    }
+
     @Test
     fun `error opt in is propagated to generated function`() {
         val generated = generatePrimitivesFile(

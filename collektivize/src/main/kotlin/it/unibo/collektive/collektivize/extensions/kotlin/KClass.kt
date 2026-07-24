@@ -15,16 +15,18 @@ import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.Opcodes.ASM9
 
 internal fun KClass<out Annotation>.isErrorLevelOptInMarker(): Boolean {
-    var errorLevel = false
+    var isOptInMarker = false
+    var errorLevel = true
     java.getResourceAsStream("/${java.name.replace('.', '/')}.class")?.use { resource ->
         ClassReader(resource).accept(
             object : ClassVisitor(ASM9) {
                 override fun visitAnnotation(annotationDescriptor: String, visible: Boolean): AnnotationVisitor? =
                     if (annotationDescriptor == "Lkotlin/RequiresOptIn;") {
+                        isOptInMarker = true
                         object : AnnotationVisitor(ASM9) {
                             override fun visitEnum(name: String, levelDescriptor: String, value: String) {
-                                if (name == "level" && value == "ERROR") {
-                                    errorLevel = true
+                                if (name == "level") {
+                                    errorLevel = value == "ERROR"
                                 }
                             }
                         }
@@ -35,5 +37,5 @@ internal fun KClass<out Annotation>.isErrorLevelOptInMarker(): Boolean {
             ClassReader.SKIP_CODE or ClassReader.SKIP_DEBUG or ClassReader.SKIP_FRAMES,
         )
     }
-    return errorLevel
+    return isOptInMarker && errorLevel
 }
