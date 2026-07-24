@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -26,14 +26,14 @@ java {
 
 kotlinJvm {
     sourceSets {
-        val main by getting {
+        main {
             dependencies {
                 implementation("it.unibo.collektive:collektive-compiler-plugin:${project.version}")
                 implementation(libs.bundles.kotlin.compiler)
                 implementation(libs.slf4j)
             }
         }
-        val test by getting {
+        test {
             dependencies {
                 implementation(collektive("dsl"))
                 implementation(rootProject.libs.kotest.runner.junit5)

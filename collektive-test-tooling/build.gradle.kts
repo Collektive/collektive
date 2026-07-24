@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -12,7 +12,7 @@ configureKotlinMultiplatform()
 
 kotlinMultiplatform {
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 implementation(rootProject.libs.kotlinx.serialization.core)
                 implementation(rootProject.libs.kotlinx.serialization.json)
@@ -20,7 +20,7 @@ kotlinMultiplatform {
                 implementation(collektive("dsl"))
             }
         }
-        val commonTest by getting {
+        commonTest {
             dependencies {
                 implementation(kotlin("test"))
             }

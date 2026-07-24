@@ -70,6 +70,8 @@ dependencies {
     implementation(rootProject.libs.kotlinx.serialization.core)
     implementation(rootProject.libs.kotlinpoet)
     implementation(rootProject.libs.slf4j)
+    implementation(rootProject.libs.asm)
+    testImplementation(kotlin("test"))
 }
 
 signing {
@@ -132,7 +134,8 @@ publishOnCentral {
     }
 }
 
-val importDsl by tasks.registering(Copy::class) {
+val importDsl = tasks.register<Copy>("importDsl") {
+    description = "Imports the DSL source files from the collektive-dsl module into this module's build directory."
     listOf(
         "Aggregate",
         "Collapse",

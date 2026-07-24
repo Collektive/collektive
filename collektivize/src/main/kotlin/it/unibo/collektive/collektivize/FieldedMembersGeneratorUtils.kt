@@ -6,61 +6,35 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
-package it.unibo.collektive.collektivize.utils
+package it.unibo.collektive.collektivize
 
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.MemberName.Companion.member
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeSpec
-import com.squareup.kotlinpoet.TypeVariableName
-import com.squareup.kotlinpoet.asClassName
-import com.squareup.kotlinpoet.asTypeName
-import it.unibo.collektive.aggregate.Field
-import it.unibo.collektive.collektivize.utils.KTypeUtils.getAllTypeVariables
-import it.unibo.collektive.collektivize.utils.KTypeUtils.toTypeNameWithRecurringGenericSupport
-import it.unibo.collektive.collektivize.utils.KTypeUtils.toTypeVariableName
-import it.unibo.collektive.collektivize.utils.KotlinPoetUtils.addBodyFunction
-import it.unibo.collektive.collektivize.utils.KotlinPoetUtils.addSingleStatementBodyFunction
+import it.unibo.collektive.collektivize.extensions.kotlin.requiredOptInMarkers
+import it.unibo.collektive.collektivize.extensions.kotlin.toFieldParameterSpec
+import it.unibo.collektive.collektivize.extensions.kotlin.toParameterSpec
+import it.unibo.collektive.collektivize.extensions.kotlin.toTypeNameWithRecurringGenericSupport
+import it.unibo.collektive.collektivize.extensions.kotlin.toTypeVariableName
+import it.unibo.collektive.collektivize.extensions.kotlinpoet.addBodyFunction
+import it.unibo.collektive.collektivize.extensions.kotlinpoet.addSingleStatementBodyFunction
+import it.unibo.collektive.collektivize.extensions.kotlinpoet.getAllTypeVariables
+import it.unibo.collektive.collektivize.extensions.kotlinpoet.isField
 import kotlin.math.pow
 import kotlin.reflect.KCallable
-import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
-import kotlin.reflect.KParameter
-import kotlin.reflect.full.isSupertypeOf
-import kotlin.reflect.typeOf
 
-internal val FIELD_INTERFACE = Field::class.asClassName()
-internal val FIELD_COMPANION = Field.Companion::class.asClassName()
-
-// internal val CHECK_ALIGNED = FIELD_COMPANION.member("checkAligned")
-internal val FIELD_MAP = FIELD_INTERFACE.member("mapValues")
-internal val ALIGNED_MAP_VALUES = FIELD_INTERFACE.member("alignedMapValues")
-internal val ID_BOUNDED_TYPE = TypeVariableName("ID", Any::class.asTypeName())
-internal val operatorNotReturningField = listOf("compareTo", "contains")
-
-internal fun ParameterSpec.isField() = type.toString().contains("Field")
-
-internal val specializedArrayTypes =
-    setOf(
-        IntArray::class,
-        DoubleArray::class,
-        LongArray::class,
-        FloatArray::class,
-        ShortArray::class,
-        ByteArray::class,
-        CharArray::class,
-        BooleanArray::class,
-    )
+private val operatorNotReturningField = listOf("compareTo", "contains")
 
 /**
  * Given a list of parameters, returns a list of all possible combinations of parameters where each parameter is
  * replaced by a `Field` of the same type.
- * The function drop the first combination where all parameters are not `Field`.
+ * The function drops the first combination where all parameters are not `Field`.
  */
 internal fun parameterCombinations(origin: KCallable<*>): List<List<ParameterSpec>> {
     fun decimalToBinaryArray(decimal: Int, size: Int): List<Boolean> {
@@ -91,39 +65,6 @@ internal fun parameterCombinations(origin: KCallable<*>): List<List<ParameterSpe
                 false -> paramList.filterNotNull()
             }
         }
-}
-
-private fun KParameter.toParameterSpec(origin: KCallable<*>): ParameterSpec {
-    val typeName = type.toTypeNameWithRecurringGenericSupport()
-    return ParameterSpec(
-        name = name ?: "this",
-        type = typeName.copy(annotations = emptyList()),
-        modifiers =
-        when {
-            origin is KFunction<*> && origin.isInline && isFunctionType() ->
-                listOf(KModifier.CROSSINLINE)
-            else -> emptyList()
-        },
-    )
-}
-
-/**
- * Given a [KParameter], returns a [ParameterSpec] where the type is a [Field] of the same type as the parameter.
- * Returns `null` if the "fielded" parameter would be shadowed.
- */
-private fun KParameter.toFieldParameterSpec(): ParameterSpec? {
-    val willBeShadowed = type == typeOf<Field<*, *>>() || type.isSupertypeOf(typeOf<Field<*, *>>())
-    return when (willBeShadowed) {
-        true -> null // this parameter will be shadowed, do not generate it (will be removed later)
-        false ->
-            ParameterSpec(
-                name ?: "this",
-                FIELD_INTERFACE.parameterizedBy(
-                    ID_BOUNDED_TYPE,
-                    type.toTypeNameWithRecurringGenericSupport(),
-                ),
-            )
-    }
 }
 
 internal fun generateFunction(callable: KCallable<*>, paramList: List<ParameterSpec>): FunSpec = FunSpec
@@ -193,6 +134,16 @@ internal fun generateFunction(callable: KCallable<*>, paramList: List<ParameterS
                 .addMember("%S", "REDUNDANT_CALL_OF_CONVERSION_METHOD")
                 .build(),
         )
+        val requiredOptInMarkers = callable.requiredOptInMarkers()
+        if (requiredOptInMarkers.isNotEmpty()) {
+            addAnnotation(
+                AnnotationSpec.builder(ClassName("kotlin", "OptIn"))
+                    .addMember(
+                        requiredOptInMarkers.joinToString(", ") { "%T::class" },
+                        *requiredOptInMarkers.toTypedArray(),
+                    ).build(),
+            )
+        }
         // Always return a Field parametrized by the ID type and the return type of the callable
         val returnType = callable.returnType.toTypeNameWithRecurringGenericSupport()
         returns(FIELD_INTERFACE.parameterizedBy(ID_BOUNDED_TYPE, returnType))
@@ -201,10 +152,6 @@ internal fun generateFunction(callable: KCallable<*>, paramList: List<ParameterS
             else -> addBodyFunction(callable, paramList, paramList.first().isField())
         }
     }.build()
-
-internal fun KParameter.isFunctionType(): Boolean = (type.classifier as? KClass<*>)
-    ?.qualifiedName
-    ?.startsWith("kotlin.Function") == true
 
 /**
  * This function generates all the possible functions for a given [origin] callable.
