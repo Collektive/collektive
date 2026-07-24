@@ -8,8 +8,9 @@
 
 @file:OptIn(ErrorOptIn::class, AnotherErrorOptIn::class, WarningOptIn::class)
 
-package it.unibo.collektive.collektivize.utils
+package it.unibo.collektive.collektivize.extensions
 
+import it.unibo.collektive.collektivize.generatePrimitivesFile
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertFalse

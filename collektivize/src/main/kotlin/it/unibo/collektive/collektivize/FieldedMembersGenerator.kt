@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -10,7 +10,6 @@ package it.unibo.collektive.collektivize
 
 import com.squareup.kotlinpoet.FileSpec
 import it.unibo.collektive.aggregate.Field
-import it.unibo.collektive.collektivize.utils.generatePrimitivesFile
 import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
