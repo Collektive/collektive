@@ -1,3 +1,20 @@
+## [28.3.2](https://github.com/Collektive/collektive/compare/28.3.1...28.3.2) (2026-07-24)
+
+### Dependency updates
+
+* **deps:** update font awesome to v7.3.1 ([863b9b8](https://github.com/Collektive/collektive/commit/863b9b8a47091a472d216ee6ee3afa1c1b9fc85b))
+* **deps:** update kotest to v6.2.3 ([56165c5](https://github.com/Collektive/collektive/commit/56165c57aab45a94a415873436357efd65853d28))
+
+### Bug Fixes
+
+* **collektivize:** `@OptIn` when required on generated code. Contextually update Gradle to v9.6.1 ([#1602](https://github.com/Collektive/collektive/issues/1602)) ([e1fae2b](https://github.com/Collektive/collektive/commit/e1fae2bfce1195b24d90335ad75ab2fe13de3c3e))
+
+### Build and continuous integration
+
+* **deps:** update actions/checkout action to v7.0.1 ([c71c47c](https://github.com/Collektive/collektive/commit/c71c47c2351804c26613e4fdc49c3a388ab71c8a))
+* **deps:** update github/codeql-action action to v4.37.2 ([b054ac9](https://github.com/Collektive/collektive/commit/b054ac97c87d667e98875be76a46d8bef8eec66c))
+* **deps:** update github/codeql-action action to v4.37.3 ([8b3123a](https://github.com/Collektive/collektive/commit/8b3123a67de3f40ba011da85a200a2da96cd5c25))
+
 ## [28.3.1](https://github.com/Collektive/collektive/compare/28.3.0...28.3.1) (2026-07-18)
 
 ### Dependency updates
