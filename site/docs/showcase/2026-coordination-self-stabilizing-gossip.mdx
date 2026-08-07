@@ -1,0 +1,67 @@
+---
+title: A Self-stabilizing Min-Max Consensus via Path-Loop Detection (2026)
+summary: "A self-stabilizing min-max consensus algorithm that removes obsolete contributions after transient faults and topology changes."
+---
+
+:::info
+Experimental artefact and simulation setup available at
+[https://github.com/angelacorte/experiments-coordination-self-stabilizing-gossip](https://github.com/angelacorte/experiments-coordination-self-stabilizing-gossip).
+
+This work was published in **COORDINATION 2026**, pp. 93–114
+(DOI: [10.1007/978-3-032-28358-0_5](https://doi.org/10.1007/978-3-032-28358-0_5)).
+:::
+
+## Abstract
+
+Min-max consensus allows the nodes of a distributed system to converge on the best value produced by any participant.
+Traditional gossip implementations are monotonic: once a value has been incorporated into the aggregate,
+it cannot be retracted.
+Consequently, values made obsolete by a transient fault, a changed local input, or a network partition can continue to circulate indefinitely.
+
+This work introduces a **self-stabilizing min-max consensus algorithm** based on path-loop detection.
+Each gossip message carries both a candidate value and the path of nodes that acknowledged it.
+Nodes propagate information along shortest valid paths,
+use the path to prevent loops,
+and naturally prune contributions that are no longer supported by the current network state.
+
+The algorithm is presented through Aggregate Computing,
+formally shown to self-stabilize,
+and implemented as a reusable operation for the Collektive DSL.
+It provides a resilient coordination building block for large-scale and pervasive distributed systems.
+
+## Experiment description
+
+The evaluation uses Alchemist to simulate devices distributed in a two-dimensional space.
+Communication is proximity-based: each device exchanges information only with neighbours within a fixed range,
+and every node executes the gossip update asynchronously using local information.
+
+The main split-and-merge scenario lasts 200 simulated seconds:
+
+1. Nodes start with random values in $[-1, 1]$ and run min-consensus for 50 seconds.
+2. The network is partitioned by moving the devices on one side of the arena into a separate area.
+3. After another 50 seconds, every node receives a new random value in $[-1/2, 1/2]$.
+4. The two groups are reconnected and allowed to converge again for a final 50 seconds.
+
+The evaluation compares three approaches under these perturbations:
+
+- **Non-stabilizing gossip**: the conventional monotonic min-max consensus baseline.
+- **Self-stabilizing gossip**: the proposed path-based algorithm.
+- **Time-replicated gossip**: non-stabilizing gossip wrapped in time replication to obtain self-stabilization.
+
+A smaller baseline scenario with 50 nodes and a 10-meter communication range illustrates ordinary gossip convergence without the complete split-and-merge sequence.
+
+## Results
+
+The simulations show the behavioral difference between ordinary monotonic gossip and the self-stabilizing alternatives.
+After the topology and input values change,
+the path-based algorithm can discard obsolete information,
+converge independently inside each partition,
+and restore global agreement once the network is reconnected.
+
+In the graphical experiments, node color represents the currently selected value:
+equal colors indicate local agreement,
+while communication links show which devices can exchange gossip messages.
+The transition from a shared color to partition-specific agreement and back to a common colour makes the stabilization process directly observable.
+
+The comparison with time replication also evaluates the proposed algorithm as a dedicated alternative to a general-purpose stabilization wrapper,
+considering convergence behavior and the overhead introduced by the coordination strategy.
