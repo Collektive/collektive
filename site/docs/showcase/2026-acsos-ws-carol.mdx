@@ -1,0 +1,59 @@
+---
+title: "Toward Safe Aggregate Computing: A Distributed Control-Theoretic Safety Filter for Robot Swarms (2026)"
+summary: "A fully distributed safety filter combining Aggregate Computing with control Lyapunov and barrier functions for safe robot-swarm coordination."
+---
+
+:::info
+Experimental artefact and simulation setup available at
+[https://github.com/angelacorte/experiments-2026-acsos-ws-carol](https://github.com/angelacorte/experiments-2026-acsos-ws-carol).
+
+This work was presented at the **2026 IEEE International Conference on Autonomic Computing and Self-Organizing Systems Companion (ACSOS-C 2026)**.
+The DOI is not yet available.
+:::
+
+## Abstract
+
+Robot swarms need to coordinate their motion while satisfying safety requirements such as obstacle avoidance,
+inter-robot separation, and bounded speed.
+Centralized controllers can enforce these constraints, but they introduce a single coordination point and do not naturally fit large,
+dynamic swarms operating through local communication.
+
+This work presents **CAROL** (Coordinated Aggregate Robotics with Online control Lyapunov and barrier functions),
+a fully distributed multi-robot control framework implemented with Collektive.
+It connects Aggregate Computing with optimization-based control through **Control Lyapunov Functions (CLFs)**,
+which drive robots towards their goals, and **Control Barrier Functions (CBFs)**,
+which constrain their motion to preserve safety.
+
+The coupled control problem is solved using the **Alternating Direction Method of Multipliers (ADMM)**.
+Robots perform local and pairwise optimisation steps and negotiate compatible control inputs without a central coordinator.
+The resulting safety filter can enforce maximum-speed, obstacle-avoidance, and collision-avoidance constraints,
+while treating communication-range preservation as a soft constraint when physical conditions make it impossible to maintain.
+
+## Experiment description
+
+The artefact evaluates the controller through Alchemist simulations covering different coordination patterns and combinations of safety constraints:
+
+- **No obstacle, split targets**: two groups move towards different goals in free space while respecting speed and collision constraints.
+- **Common moving target**: the swarm follows a shared moving target, avoids a static obstacle, and preserves connectivity when possible.
+- **Leader-follower**: a leader elected through distributed coordination tracks a target while neighbouring robots follow it under obstacle, collision, speed, and communication-range constraints.
+- **Different targets**: robots are assigned separate targets and split towards their destinations while avoiding obstacles and one another.
+- **Multiple obstacles**: the swarm navigates an environment containing several hazards under the same distributed safety-filtering mechanism.
+
+At every control step, each robot solves a local quadratic program.
+The objective remains close to a nominal goal-directed command,
+while CLF and CBF terms encode convergence and safety requirements.
+The continuous-time dynamics are robustified through zero-order-hold discretisation,
+and ADMM terminates when its local primal and dual residuals meet the configured tolerances or the scenario limit is reached.
+
+## Results
+
+The scenarios demonstrate how the same aggregate control architecture supports multiple swarm behaviours without introducing a centralized controller.
+Across the experiments, the safety filter combines:
+
+- distributed agreement over coupled control inputs;
+- convergence towards common, separate, or leader-defined goals;
+- hard limits for speed, obstacle clearance, and inter-robot distance;
+- graceful relaxation of communication-range constraints when preserving connectivity would make the local optimisation problem infeasible.
+
+Together, these experiments show how Aggregate Computing can act as the coordination layer for control-theoretic safety mechanisms,
+allowing safety constraints and collective behaviors to be composed within the same field-based program.

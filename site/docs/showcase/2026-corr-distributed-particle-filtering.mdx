@@ -1,0 +1,61 @@
+---
+title: Flexible Distributed Particle Filtering for the Internet of Things via Aggregate Computing (2026)
+summary: "A field-based formulation that separates particle-filter estimation from information propagation and coordination in open IoT systems."
+---
+
+:::info
+Experimental artefact and simulation setup available at
+[https://github.com/domm99/experiments-ac-based-distributed-particle-filtering](https://github.com/domm99/experiments-ac-based-distributed-particle-filtering).
+
+This work was published in **DCOSS-IOT**, pp. 601–606
+(DOI: [10.48550/ARXIV.2606.18483](https://doi.org/10.48550/ARXIV.2606.18483)).
+:::
+
+## Abstract
+
+State estimation from uncertain observations collected across a network is central to many cyber-physical and Internet of Things applications.
+Distributed Particle Filtering (DPF) supports nonlinear and non-Gaussian estimation,
+but existing solutions are often coupled to a particular network architecture or communication model.
+This makes them difficult to adapt to open and heterogeneous deployments.
+
+This work proposes a **field-based formulation of Distributed Particle Filtering** grounded in Aggregate Computing.
+Estimation and information dissemination are expressed as computational fields,
+separating the core particle-filter logic from the mechanisms that coordinate devices and move data through the network.
+
+This separation makes several design dimensions independently configurable,
+including the placement and resilience of fusion centres,
+the function used to aggregate observations,
+and the type and spatial scope of information propagation.
+The aim is to provide a common abstraction for engineering different DPF organisations without rewriting the underlying estimator.
+
+## Experiment description
+
+The artefact evaluates the approach through object-tracking simulations in a two-dimensional environment.
+A moving node follows a known trajectory,
+while a network of observer nodes estimates its position from uncertain local observations.
+The repository includes a centralized particle filter as a reference and several distributed configurations built from the same filtering components.
+
+The evaluated configurations cover:
+
+- **Centralized filtering**: one observer performs the complete particle-filter update.
+- **Distributed filtering**: estimation state and observations are propagated across the sensor network.
+- **Alternative sensing functions**: configurations use continuous, block, and Boolean observation models to vary how local evidence contributes to particle weights.
+- **Neighbourhood aggregation**: sensors combine information over a configurable local neighborhood rather than the entire network.
+- **Leader-based aggregation**: an elected node acts as the fusion center, allowing the evaluation to include leader replacement after a failure.
+
+Together, these scenarios vary the aggregation function,
+the scope of information sharing,
+and the placement of the filtering computation while preserving a common Aggregate Computing formulation.
+
+## Results
+
+The experiments show that multiple DPF architectures can be derived from the same field-based framework.
+Changing the coordination strategy exposes trade-offs among:
+
+- **accuracy**, as filters incorporate different quantities and forms of evidence;
+- **communication cost**, as information is propagated locally or more broadly;
+- **robustness**, as fusion is centralized, distributed, or assigned to a replaceable elected leader.
+
+The evaluation positions Aggregate Computing as an abstraction layer for adaptable distributed estimation:
+the particle-filter implementation remains reusable,
+while coordination policies can be changed to match the topology, sensing model, and resilience requirements of an IoT deployment.
