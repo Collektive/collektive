@@ -1,3 +1,9 @@
+## [28.3.4](https://github.com/Collektive/collektive/compare/28.3.3...28.3.4) (2026-09-29)
+
+### Dependency updates
+
+* **core-deps:** update plugin kover to v0.9.11 ([3d24fe8](https://github.com/Collektive/collektive/commit/3d24fe8946b5e775d5d3c695ac8768d5e893a6e5))
+
 ## [28.3.3](https://github.com/Collektive/collektive/compare/28.3.2...28.3.3) (2026-09-29)
 
 ### Dependency updates
