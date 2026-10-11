@@ -32,7 +32,7 @@ jobs:
         run: |
           ruby << 'RUBY' >> $GITHUB_OUTPUT
             branch = ENV['GITHUB_REF'].sub(/^refs\/heads\//, '')
-            keywords = %w[gradle kotlin publish release deploy]
+            keywords = %w[gradle publishoncentral]
             dry = keywords.any? { |kw| branch.include?(kw) } ? '' : '--dry-run'
             puts "dry_run=#{dry}"
           RUBY
