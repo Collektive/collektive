@@ -11,7 +11,10 @@ Through multiple levels of abstraction, aggregate programming mitigates the comp
 
 ### Field Calculus Constructs
 
-This layer represents the interface where aggregate programming interacts with the external environment. It is composed of device infrastructure and non-aggregated software services, which together form the system's lowest layer. As depicted in the figure, this is the second layer from the bottom.
+At the bottom of the stack lie the device infrastructure and the non-aggregate software services
+(sensors, actuators, operating systems, networking): the interface through which aggregate programs interact with the external environment.
+Right above it, the second layer from the bottom in the figure, lie the **field calculus constructs**,
+implemented in Collektive by the [`collektive-dsl` module](dsl-descriptions.mdx).
 
 A key abstraction provided by **Field Calculus** is the notion of a *field*, inspired by physical phenomena.
 
@@ -32,7 +35,8 @@ Together, these constructs enable the creation of robust and flexible behaviors 
 
 ### Resilient Coordination Operators
 
-The next level of abstraction introduces a set of **resilient coordination operators** designed for robust distributed computations.
+The next level of abstraction introduces a set of **resilient coordination operators** designed for robust distributed computations,
+provided in Collektive by the [standard library](standard-library/overview.mdx).
 
 These operators enable the system to adapt reactively to changes in network structure or input values, ensuring self-stabilization and resilience.
 
@@ -59,14 +63,14 @@ The following example demonstrates a simple API function for computing a **dista
 **Note**: when defining new aggregate functions, it is recommended to use extension functions on the aggregate interface. This promotes reusability and consistency as follows:
 
 ```kotlin
-fun Aggregate<Int>.gradient(distanceSensor: DistanceSensor, source: Boolean): Double =
-    share(POSITIVE_INFINITY) {
-        val dist = distances()
-        when {
-            source -> 0.0
-            else -> (it + dist).min(POSITIVE_INFINITY)
-        }
+fun Aggregate<Int>.gradient(source: Boolean, metric: Field<Int, Double>): Double =
+    share(Double.POSITIVE_INFINITY) { distances ->
+        val throughNeighbors = (distances + metric).neighbors.values.min()
+        if (source) 0.0 else throughNeighbors
     }
 ```
+
+See [Thinking in Fields](fields.mdx#example-a-gradient-in-a-few-lines) for a step-by-step explanation of this function,
+and the [standard library](standard-library/spreading.mdx) for production-ready gradients.
 
 These APIs enable developers to implement sophisticated behaviors within dynamic networks without needing to delve into the low-level details of aggregate computations.

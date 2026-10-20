@@ -5,42 +5,66 @@ id: gettingstarted
 title: Getting Started
 ---
 
-
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-**Collektive** is composed of several independent components:
+**Collektive** is composed of three components:
 
-- The core _DSL_ (Domain Specific Language) defining the language syntax and semantics.
-- The _compiler plugin_ used to automatically devise the communication protocol based on the program's structure.
-- The _stdlib_ (Standard Library) providing common functionalities and data structures.
+- the **DSL** (`collektive-dsl`), defining the aggregate operators and the runtime that executes them;
+- the **compiler plugin**, which instruments your Kotlin code with the *alignment* information needed to match
+  the messages exchanged by devices with the operators that produced them (see [Alignment](../explanation/alignment.mdx));
+- the **standard library** (`collektive-stdlib`), providing ready-to-use collective building blocks
+  (distances, broadcasts, collection, gossip, leader election, …).
 
-**Collektive** is designed to be used in a **multiplatform** environment,
-allowing you to run the same code on different platforms (JVM, JS, Native) with minimal changes,
-and uses **Gradle** as build system.
-Even though **Collektive** is designed to be used in a multiplatform environment,
-it can also be used in a single platform environment (e.g., JVM only).
+Collektive is a [Kotlin Multiplatform](https://kotlinlang.org/docs/multiplatform-intro.html) library built with **Gradle**:
+the same aggregate program can be compiled for the JVM, JavaScript, and native targets,
+but Collektive works just as well in a single-platform project (e.g., JVM only).
 
 ## Compiler plugin setup
 
-To use **Collektive** in your project, first add the **compiler plugin** to your `build.gradle.kts` file:
+First, apply the Collektive Gradle plugin in your `build.gradle.kts` file.
+The plugin adds the compiler plugin to every Kotlin compilation of the project.
+
+<Tabs>
+<TabItem value="multiplatform" label="Multiplatform">
 
 ```kotlin
 plugins {
-    kotlin("multiplatform") version "<kotlin_version>"
+    kotlin("multiplatform") version "<kotlin version>"
     id("it.unibo.collektive.collektive-plugin") version "<latest version>"
 }
 ```
 
-:::danger
-The **compiler plugin** it's a mandatory component of the **Collektive** ecosystem. It is used to automatically devise
-the communication protocol based on the program's structure.
+</TabItem>
+<TabItem value="jvm" label="JVM only">
 
-Without this plugin, the program will **NOT** run as expected at runtime.
+```kotlin
+plugins {
+    kotlin("jvm") version "<kotlin version>"
+    id("it.unibo.collektive.collektive-plugin") version "<latest version>"
+}
+```
+
+</TabItem>
+</Tabs>
+
+:::danger
+The **compiler plugin** is a mandatory component of Collektive.
+Without it, programs compile but fail at runtime with an `AlignmentClashException`,
+as soon as they contain more than one aggregate operator.
 :::
 
+The plugin is enabled by default. If needed, it can be disabled for a specific project:
+
+```kotlin
+collektive {
+    collektiveEnabled = false
+}
+```
+
 ## Dependencies setup
-To start you app development, add the `dsl` and (optionally) the `stdlib` dependencies to your `build.gradle.kts` file:
+
+Then, add the `collektive-dsl` and (optionally, but recommended) the `collektive-stdlib` dependencies:
 
 <Tabs>
 <TabItem value="multiplatform" label="Multiplatform">
@@ -48,10 +72,10 @@ To start you app development, add the `dsl` and (optionally) the `stdlib` depend
 ```kotlin
 kotlin {
     jvm()
-    js()
-    ...
+    js { browser(); nodejs() }
+    // other targets...
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 implementation("it.unibo.collektive:collektive-dsl:<latest version>")
                 implementation("it.unibo.collektive:collektive-stdlib:<latest version>")
@@ -74,16 +98,22 @@ dependencies {
 </TabItem>
 </Tabs>
 
+The latest version is shown on [Maven Central](https://central.sonatype.com/artifact/it.unibo.collektive/collektive-dsl).
+
 :::tip[**Collektive** :heart: Kotlin Multiplatform]
-
-**Collektive** supports [KMP](https://kotlinlang.org/docs/multiplatform-intro.html) (Kotlin Multiplatform) projects, allowing you to use the DSL in Native, JS, and JVM environments.       
-Currently, the following platforms are supported:
-- **JVM**
-- **JS** (node.js and browser)
-- **Native** (iOS, macOS, Linux, Windows)
+Collektive supports the following targets:
+- **JVM** (including Android applications);
+- **JavaScript** (browser and Node.js);
+- **Native**: macOS, iOS, tvOS, watchOS, Linux, Windows (MinGW), and Android Native.
 :::
 
-:::info[Note]
-Collektive is a language and as such it must be executed in an environment that supports it.
-We suggest getting familiar with the tool by starting with one of our [template repositories](../../references/#template-repositories).
-:::
+## What's next
+
+Collektive is a language: to see it in action, programs must be executed by a set of devices that communicate.
+The quickest ways to get started are:
+
+- the [Alchemist simulator](collektive-and-alchemist.mdx), to run your programs on simulated networks of devices;
+- one of our [template repositories](../references.mdx#template-repositories), with ready-to-use project setups.
+
+Then, write your [first Collektive program](first-collektive-program.mdx),
+and learn the concepts behind it in the [Explanation](/docs/category/explanation/) section.

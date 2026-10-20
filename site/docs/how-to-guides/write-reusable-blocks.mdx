@@ -1,0 +1,110 @@
+---
+draft: true
+title: Write Reusable Aggregate Functions
+sidebar_position: 3
+---
+
+The real power of aggregate programming is composition: application code is built from
+reusable collective functions, which are built from other collective functions, down to the core operators.
+This guide collects the conventions that make your own functions as reusable as the
+[standard library](../explanation/standard-library/overview.mdx) ones.
+
+## Extension functions on `Aggregate`
+
+An aggregate function is an extension function of `Aggregate<ID>`.
+Prefer a generic `ID` unless the function really depends on the identifier type:
+
+```kotlin
+// works with any type of device identifier
+fun <ID : Any> Aggregate<ID>.neighborCount(): Int = neighborhood().neighbors.size
+```
+
+Inputs (sensor readings, configuration) are ordinary parameters;
+the result is an ordinary return value. Do not read global mutable state from inside aggregate functions:
+every device must be able to evaluate the function using only its local information.
+
+## Generic values need `inline` and `reified`
+
+Shared values are serialized, and the serializer is derived from the type at compile time.
+Therefore, a function that shares a value of a *generic* type must be `inline` with a `reified` type parameter:
+
+```kotlin
+// ❌ does not compile: "Cannot use 'T' as reified type parameter"
+fun <ID : Any, T> Aggregate<ID>.majority(local: T): T = …
+
+// ✅
+inline fun <ID : Any, reified T> Aggregate<ID>.neighborhoodMajority(local: T): T =
+    neighboring(local).all.values.list
+        .groupingBy { it }.eachCount()
+        .maxBy { (_, votes) -> votes }.key
+```
+
+The same applies to `ID`, when the identifiers are shared (for instance, because you call standard library functions
+that track paths of devices, such as `gradientCast`, `gossip`, or `boundedElection`):
+
+```kotlin
+@Serializable
+data class Reading(val sensor: String, val value: Double)
+
+inline fun <reified ID : Comparable<ID>> Aggregate<ID>.hottest(local: Reading): Reading =
+    gossipMaxBy(local) { it.value }
+```
+
+Data classes you share must be annotated with `@Serializable`, and the
+[kotlinx.serialization Gradle plugin](https://github.com/Kotlin/kotlinx.serialization#setup) must be applied.
+
+## Compile libraries with the Collektive plugin
+
+Alignment is injected at compile time.
+A library of aggregate functions must be compiled with the Collektive Gradle plugin, exactly like an application:
+otherwise, the operators inside the library are not aligned, and fail at runtime.
+
+## Make it self-stabilizing
+
+A good building block keeps working when the network changes: it is *self-stabilizing*.
+Some rules of thumb:
+
+- **Recompute from fresh inputs at every round.** Derive the new value from the current inputs and the neighbors' values,
+  not by monotonically accumulating the past (`share(x) { max(...) }` can never forget a value).
+- **Prefer existing blocks.** `gradientCast`, `convergeCast`, `gossip`, and `boundedElection` are already self-stabilizing:
+  compose them before writing your own `share` or `exchange`.
+- **Remember the partitioning semantics.** Compute neighbor-dependent values before `if`/`when`, unless you *want* to split the network
+  (see [Alignment](../explanation/alignment.mdx#pitfall-computing-in-the-wrong-branch)).
+- **Wrap non-stabilizing logic** in [`timeReplicated`](../explanation/standard-library/time-and-processes.mdx#replicated-processes)
+  when you cannot avoid it.
+
+## Accept fields and values
+
+Many standard library functions come in two flavors: one taking a local value (shared internally with `neighboring`),
+one taking a `Field` (when the caller already has it, or wants a different metric).
+Offering both makes your function easy to use in both situations:
+
+```kotlin
+fun <ID : Any> Aggregate<ID>.isLocalMinimum(potential: Field<ID, Double>): Boolean =
+    potential.neighbors.values.all { it > potential.local.value }
+
+fun <ID : Any> Aggregate<ID>.isLocalMinimum(potential: Double): Boolean =
+    isLocalMinimum(neighboring(potential))
+```
+
+Likewise, take spatial information as a `metric: Field<ID, Distance>` parameter
+(defaulting, e.g., to `hops()`), instead of reading positions directly:
+the same function will then work with hops, Euclidean distances, or latencies.
+
+## Loops over dynamic collections
+
+When a function runs the same aggregate computation for each element of a collection,
+align each iteration on a value that identifies the element on every device:
+
+```kotlin
+inline fun <reified ID : Any> Aggregate<ID>.distancesTo(targets: Set<ID>): Map<ID, Double> =
+    targets.associateWith { target -> alignedOn(target) { distanceTo(localId == target) } }
+```
+
+Pivots must be hashable by the path factory (numbers, strings, `Uuid`s, and collections of them, see
+[Paths and message size](run-on-real-devices.mdx#5-paths-and-message-size)).
+
+## Document and test
+
+- State in the KDoc whether the function is self-stabilizing, and what happens when there are no neighbors or no sources.
+- Test convergence and recovery on small networks, as shown in [Test Aggregate Programs](test-aggregate-programs.mdx).
