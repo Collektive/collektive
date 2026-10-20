@@ -5,7 +5,7 @@ build-config = "6.1.2"
 dokka = "2.2.0"
 kotest = "6.2.6"
 kotlin = "2.4.10"
-serialization = "1.11.0"
+serialization = "1.12.0"
 
 [libraries]
 alchemist = { module = "it.unibo.alchemist:alchemist", version.ref = "alchemist" }
