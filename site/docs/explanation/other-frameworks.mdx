@@ -1,0 +1,74 @@
+---
+title: Collektive and Other Aggregate Frameworks
+sidebar_position: 7
+---
+
+# Collektive and Other Aggregate Frameworks
+
+Aggregate programming has more than a decade of research behind it, and several implementations.
+If you already know one of them, this page helps you map what you know onto Collektive.
+
+## The landscape
+
+- **[Protelis](https://protelis.github.io/)** is the first implementation of the higher-order field calculus:
+  an *external* DSL with a C-like syntax, interpreted on the JVM, and integrated with the Alchemist simulator.
+- **[ScaFi](https://scafi.github.io/)** is an *internal* DSL in Scala, targeting the JVM and JavaScript (via Scala.js).
+  Neighbor interaction is expressed through `foldhood`/`minHood`-style operations rather than explicit neighbor values.
+- **[FCPP](https://fcpp.github.io/)** is a C++ implementation designed for performance and resource-constrained devices,
+  with explicit alignment through the `CALL` macro.
+- **Collektive** is an *internal* DSL in Kotlin, built on Kotlin Multiplatform, with compile-time alignment
+  provided by a compiler plugin.
+
+## Comparison
+
+| | Protelis | ScaFi | FCPP | Collektive |
+|---|:---:|:---:|:---:|:---:|
+| DSL type | external | internal (Scala) | internal (C++) | internal (Kotlin) |
+| JVM | ✓ | ✓ | × | ✓ |
+| JavaScript | × | ✓ | × | ✓ |
+| Native | × | ∼ | ✓ | ✓ |
+| Android / iOS | ∼ / × | ∼ / × | ∼ / × | ✓ / ✓ |
+| Static typing | × | ✓ | ✓ | ✓ |
+| Alignment | runtime, transparent | runtime, needs explicit scopes in some cases | runtime, explicit (`CALL`) | compile-time, transparent |
+| Reified neighbor fields | ✓ | × | ✓ | ✓ |
+| eXchange Calculus | ∼ | ∼ | ✓ | ✓ |
+
+✓ supported, ∼ partially supported, × not supported.
+
+## Concept mapping
+
+| Concept | Field calculus / XC | Collektive |
+|---------|--------------------|------------|
+| local state | `rep` | [`evolve`](dsl-descriptions.mdx#evolve-and-evolving-local-state) |
+| observe neighbors | `nbr` | [`neighboring`](dsl-descriptions.mdx#neighboring-observing-the-neighborhood) |
+| state + communication | `share` | [`share`](dsl-descriptions.mdx#share-and-sharing-propagating-state) |
+| neighbor-specific messages | `exchange` | [`exchange`](dsl-descriptions.mdx#exchange-and-exchanging-neighbor-specific-messages) |
+| domain partitioning | `if` (branch) | Kotlin [`if` / `when`](alignment.mdx#branches-partition-the-network) |
+| selection without partitioning | `mux` | compute the alternatives, then choose (see the [pitfall](alignment.mdx#pitfall-computing-in-the-wrong-branch)) |
+| neighborhood reduction | `minHood`, `foldHood`, … | [`field.neighbors.values.min()`](standard-library/field-operations.mdx#collapsing-fields), `fold`, … |
+| explicit alignment | `align` | [`alignedOn`](alignment.mdx#loops-and-alignedon) |
+
+## Coming from ScaFi
+
+The most visible difference is that Collektive **reifies** neighbor values:
+`neighboring(x)` returns a `Field` that you can store in a variable, pass around, combine, and collapse later.
+
+```scala
+// ScaFi
+val minId = minHood(nbr(mid()))
+```
+
+```kotlin
+// Collektive
+val ids: Field<Int, Int> = neighboring(localId)
+val minId = ids.all.values.min()
+```
+
+In ScaFi, storing `nbr(mid())` in a variable outside `minHood` changes its meaning;
+in Collektive, a field is a value like any other, and the type system tells fields and local values apart.
+
+## Coming from FCPP
+
+Collektive programs need no alignment annotations: the compiler plugin derives alignment tokens from the code,
+including function calls, branches, and lambdas. `alignedOn` is only needed for repeated calls from the same position,
+typically inside loops.

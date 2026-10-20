@@ -1,0 +1,148 @@
+---
+draft: true
+title: Test Aggregate Programs
+sidebar_position: 2
+---
+
+Aggregate programs are ordinary Kotlin functions, so they can be unit tested with any test framework
+(`kotlin.test`, Kotest, JUnit), on any Kotlin target.
+The only thing you need is a network of devices that lives in memory:
+this guide shows how to build one in a few lines, and which properties are worth testing.
+
+For larger experiments (mobility, realistic topologies, timing), use the [Alchemist simulator](../tutorials/collektive-and-alchemist.mdx) instead.
+
+## An in-memory network
+
+A [`Mailbox`](run-on-real-devices.mdx#1-what-a-mailbox-does) that delivers messages by putting them directly
+in the inbox of the receivers is enough to run many devices in the same process:
+
+```kotlin
+import it.unibo.collektive.aggregate.api.DataSharingMethod
+import it.unibo.collektive.networking.Mailbox
+import it.unibo.collektive.networking.Message
+import it.unibo.collektive.networking.NeighborsData
+import it.unibo.collektive.networking.OutboundEnvelope
+import it.unibo.collektive.path.Path
+
+/** A network of devices living in the same process, connected according to [links]. */
+class InMemoryNetwork(private val links: (Int, Int) -> Boolean) {
+    private val inboxes = mutableMapOf<Int, MutableMap<Int, Message<Int, *>>>()
+
+    /** The mailbox of device [id]. */
+    fun mailboxFor(id: Int): Mailbox<Int> = object : Mailbox<Int> {
+        override val inMemory = true
+
+        override fun deliverableFor(outboundMessage: OutboundEnvelope<Int>) {
+            inboxes.keys.filter { it != id && links(id, it) }.forEach { neighbor ->
+                inboxes.getValue(neighbor)[id] = outboundMessage.prepareMessageFor(neighbor)
+            }
+        }
+
+        override fun deliverableReceived(message: Message<Int, *>) {
+            inboxes.getValue(id)[message.senderId] = message
+        }
+
+        override fun currentInbound(): NeighborsData<Int> {
+            val received = inboxes.getValue(id).toMap()
+            return object : NeighborsData<Int> {
+                override val neighbors: Set<Int> get() = received.keys
+                @Suppress("UNCHECKED_CAST")
+                override fun <Value> dataAt(path: Path, dataSharingMethod: DataSharingMethod<Value>): Map<Int, Value> =
+                    received.filterValues { path in it.sharedData }.mapValues { (_, m) -> m.sharedData[path] as Value }
+            }
+        }
+    }.also { inboxes[id] = mutableMapOf() }
+
+    /** Disconnects device [id]: the other devices forget its messages. */
+    fun remove(id: Int) {
+        inboxes.remove(id)
+        inboxes.values.forEach { it.remove(id) }
+    }
+}
+```
+
+Since `inMemory` is `true`, values are passed as objects and do not need to be serializable.
+To also test serialization, use a serializing mailbox like the one in
+[Run Collektive on Real Devices](run-on-real-devices.mdx#2-serializing-messages), with a loopback transport.
+
+Two small helpers make tests readable: one builds the devices, the other runs rounds in a random (but reproducible) order,
+since real devices are not synchronized:
+
+```kotlin
+import it.unibo.collektive.Collektive
+import it.unibo.collektive.aggregate.api.Aggregate
+import kotlin.random.Random
+
+/** A line of [size] devices `0 - 1 - … - size-1` running [program]. */
+fun <R> lineOf(size: Int, program: Aggregate<Int>.() -> R): Pair<InMemoryNetwork, Map<Int, Collektive<Int, R>>> {
+    val network = InMemoryNetwork { a, b -> kotlin.math.abs(a - b) == 1 }
+    val devices = (0 until size).associateWith { id -> Collektive(id, network.mailboxFor(id), computeFunction = program) }
+    return network to devices
+}
+
+/** Runs [rounds] rounds on every device, in random order, and returns the last results. */
+fun <R> Map<Int, Collektive<Int, R>>.runRounds(rounds: Int, random: Random = Random(42)): Map<Int, R> {
+    var results = emptyMap<Int, R>()
+    repeat(rounds) { results = entries.shuffled(random).associate { (id, device) -> id to device.cycle() } }
+    return results
+}
+```
+
+## What to test
+
+Aggregate programs are not expected to be right at every round, but to **converge** to the right result,
+and to **recover** after changes. Tests should check exactly that.
+
+```kotlin
+import it.unibo.collektive.stdlib.spreading.distanceTo
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+
+class DistanceTest {
+    private var sourceId = 0
+    private val line = lineOf(5) { distanceTo(source = localId == sourceId) }
+    private val network = line.first
+    private val devices = line.second
+
+    @Test
+    fun `converges to the hop distance from the source`() {
+        assertEquals(mapOf(0 to 0.0, 1 to 1.0, 2 to 2.0, 3 to 3.0, 4 to 4.0), devices.runRounds(10))
+    }
+
+    @Test
+    fun `self-heals when the source moves`() {
+        devices.runRounds(10)
+        sourceId = 4
+        assertEquals(mapOf(0 to 4.0, 1 to 3.0, 2 to 2.0, 3 to 1.0, 4 to 0.0), devices.runRounds(10))
+    }
+
+    @Test
+    fun `devices disconnected from the source go to infinity`() {
+        devices.runRounds(10)
+        network.remove(2) // split the line in {0, 1} and {3, 4}
+        val split = (devices - 2).runRounds(10)
+        assertEquals(1.0, split.getValue(1))
+        assertTrue(split.getValue(3).isInfinite() && split.getValue(4).isInfinite())
+    }
+}
+```
+
+:::tip Good habits
+- **Run enough rounds**: at least the network diameter (in hops), plus some margin for random ordering.
+- **Randomize the order** of the rounds, with a fixed seed: programs must not depend on a specific schedule.
+- **Change the inputs and the topology** mid-test (move the source, remove devices, split the network):
+  self-stabilization is the property you care about most.
+- **Test the building blocks**, not only the final application: they are where bugs hide, and they are easy to isolate.
+:::
+
+## Testing a single round
+
+To check the very first round of a device, or to inspect the messages it would send, use the single-round entry point:
+
+```kotlin
+val result = Collektive.aggregate(localId = 0) { neighboring(42).local.value }
+result.result    // 42
+result.toSend    // the outbound envelope
+result.newState  // the state to pass to the next round
+```
