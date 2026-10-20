@@ -1,8 +1,129 @@
 ---
-title: Common mistakes
+title: Common Mistakes
 sidebar_position: 4
 ---
 
-:::note
-Work in progress, sorry for the inconvenience.
-:::
+Aggregate programs look like ordinary Kotlin, but they are executed by a whole network of devices, round after round.
+These are the mistakes we see most often, how to recognize them, and how to fix them.
+
+## The compiler plugin is not applied
+
+**Symptom:** the program compiles, but fails at runtime with an `AlignmentClashException`.
+
+**Fix:** apply the Collektive Gradle plugin, see [Getting Started](getting-started.mdx#compiler-plugin-setup).
+Without it, Collektive cannot tell its operators apart.
+
+## Computing inside the wrong branch
+
+**Symptom:** a value never propagates, typically a gradient that stays at infinity.
+
+```kotlin
+// ❌ the source takes the other branch, so it is not a neighbor inside the else branch
+share(Double.POSITIVE_INFINITY) { d -> if (source) 0.0 else (d + metric).neighbors.values.min() }
+
+// ✅ compute through the whole neighborhood first, then select
+share(Double.POSITIVE_INFINITY) { d ->
+    val throughNeighbors = (d + metric).neighbors.values.min()
+    if (source) 0.0 else throughNeighbors
+}
+```
+
+**Why:** `if` and `when` partition the network: inside a branch, only the devices that took the same branch are aligned.
+Use branches to *separate* sub-collectives; to *select* a value, compute the alternatives first.
+See [Branches partition the network](../explanation/alignment.mdx#branches-partition-the-network).
+
+## Aggregate operators in loops
+
+**Symptom:** an `AlignmentClashException` at runtime, or a compiler warning
+*"Aggregate function … is called inside a loop without explicit alignment"*.
+
+```kotlin
+// ❌ every iteration produces the same alignment path
+targets.map { target -> distanceTo(localId == target) }
+
+// ✅ align each iteration on a value that identifies it on every device
+targets.map { target -> alignedOn(target) { distanceTo(localId == target) } }
+```
+
+See [Loops and `alignedOn`](../explanation/alignment.mdx#loops-and-alignedon).
+
+## Including (or excluding) yourself by mistake
+
+**Symptom:** values that do not change, or that only depend on the local device.
+
+```kotlin
+// ❌ in a gradient, the minimum must be computed through the neighbors only:
+//    including the local entry makes every device "see" its own old estimate
+(distances + metric).all.values.min()
+
+// ✅
+(distances + metric).neighbors.values.min()
+```
+
+Choose deliberately between `field.all` (local entry included) and `field.neighbors` (local entry excluded).
+Also remember that `neighbors` may be empty: reductions on it return `null` or a neutral element
+(see [Field operations](../explanation/standard-library/field-operations.mdx#return-types-depend-on-the-view)).
+
+## Using `evolve` + `neighboring` instead of `share`
+
+**Symptom:** information propagates slowly, or the compiler warns *"This 'evolve' can be replaced with 'share'"*.
+
+```kotlin
+// ❌ neighbors receive the value *before* the update: propagation is slower
+evolve(localId) { max -> neighboring(max).all.values.max() }
+
+// ✅
+share(localId) { ids -> ids.all.values.max() }
+```
+
+## Sharing a constant with `neighboring`
+
+**Symptom:** a compiler warning *"This 'neighboring' call uses a compile-time constant"*.
+Sending a value that every device already knows wastes bandwidth:
+
+```kotlin
+// ❌
+val ones = neighboring(1)
+
+// ✅ only the alignment information is exchanged
+val ones = mapNeighborhood { 1 }
+```
+
+## Returning or storing fields
+
+**Symptom:** a compile-time error *"This branch returns a Field"*, or a runtime error from `evolve` or `alignedOn`.
+
+Fields are only meaningful in the round and in the alignment context in which they were built:
+they cannot be returned from branches, stored with `evolve`, or returned from `alignedOn`.
+Build fields before branching, and store collapsed (local) values.
+See [Rules of the game](../explanation/fields.mdx#rules-of-the-game).
+
+## Non-serializable shared values
+
+**Symptom:** `SerializationException: Serializer for class '…' is not found` at runtime.
+
+Values sent to neighbors are serialized, unless the network works in memory only.
+Annotate your data classes with `@Serializable`
+(and apply the [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) plugin):
+
+```kotlin
+@Serializable
+data class Candidate(val id: Int, val score: Double)
+```
+
+## Expecting synchronous, instantaneous results
+
+**Symptom:** results are "wrong" in the first rounds, or right after a change.
+
+Aggregate programs *converge*: information travels (at least) one hop per round, rounds are not synchronized,
+and in its very first round a device has heard from nobody.
+Check results after the network had time to stabilize,
+and design your program so that transient values are harmless.
+
+## Using non-stabilizing blocks where things change
+
+**Symptom:** stale values that never go away after a device leaves or an input changes.
+
+Some blocks never forget by design: `share` with a monotonic operation (like `max`), `nonStabilizingGossip`, `everHappened`.
+Prefer their self-stabilizing counterparts (`gossipMax`, `isHappeningAnywhere`),
+or wrap them in [`timeReplicated`](../explanation/standard-library/time-and-processes.mdx#replicated-processes).
