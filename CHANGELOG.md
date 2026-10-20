@@ -1,3 +1,33 @@
+## [28.3.5](https://github.com/Collektive/collektive/compare/28.3.4...28.3.5) (2026-10-20)
+
+### Dependency updates
+
+* **core-deps:** update serialization to v1.12.0 ([436020e](https://github.com/Collektive/collektive/commit/436020e4f8480d42f468f114baf51cf80e619739))
+* **deps:** update dependency com.github.ben-manes.caffeine:caffeine to v3.3.1 ([3a654a7](https://github.com/Collektive/collektive/commit/3a654a7ab12bf01b41481d9a11cd421010114875))
+* **deps:** update dependency org.ow2.asm:asm to v9.11 ([645a927](https://github.com/Collektive/collektive/commit/645a9275f2e7f8bc3909a4a0b9339c4d394c4fdd))
+* **deps:** update dependency org.ow2.asm:asm to v9.11.1 ([75f598b](https://github.com/Collektive/collektive/commit/75f598b23351e458e2d5f16c6c4ed63fbe117c8d))
+* **deps:** update gradle to v9.8.1 ([0db4d91](https://github.com/Collektive/collektive/commit/0db4d911492cc3b7f048ec4ca7e8442737fcb85b))
+* **deps:** update kotest to v6.2.6 ([492de4a](https://github.com/Collektive/collektive/commit/492de4a6d94de0acb76ffb51eafd55202bf8c86a))
+* **deps:** update node.js to 24.22 ([493252c](https://github.com/Collektive/collektive/commit/493252cbd9338cdb6d59be88f385c0de5d144634))
+* **deps:** update plugin gitsemver to v7.0.25 ([71e7f51](https://github.com/Collektive/collektive/commit/71e7f51a0c15245101ef687a77620f72416ac3ea))
+* **deps:** update plugin gitsemver to v7.1.0 ([cb3ebb3](https://github.com/Collektive/collektive/commit/cb3ebb3768e2b81f9238e699cbb61a5cc16aabe2))
+* **deps:** update plugin multijvmtesting to v4.5.10 ([808dea8](https://github.com/Collektive/collektive/commit/808dea87fe7b5f8a174115dfed4fa1493a370d83))
+* **deps:** update plugin multijvmtesting to v4.5.8 ([56d3e0a](https://github.com/Collektive/collektive/commit/56d3e0ab2ddcabc8b6e3bc5c9342dc795f831901))
+* **deps:** update plugin multijvmtesting to v4.5.9 ([56bdd97](https://github.com/Collektive/collektive/commit/56bdd9766b46a1ffba46843c76b4c071c1ec9fc8))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.1.26 ([067cb89](https://github.com/Collektive/collektive/commit/067cb899c0363e40f1ade1197bbfe262f9363a59))
+* **deps:** update plugin org.danilopianini.gradle-pre-commit-git-hooks to v2.1.27 ([ca113d1](https://github.com/Collektive/collektive/commit/ca113d1af4c8fe11205ed71e26824d860f60fc7d))
+* **deps:** update react monorepo to v19.3.1 ([c32d93f](https://github.com/Collektive/collektive/commit/c32d93ff7900c578d801ca152121ac66178c4d09))
+
+### Build and continuous integration
+
+* **deps:** update actions/download-artifact action to v8.0.2 ([390439e](https://github.com/Collektive/collektive/commit/390439e374b6981d81e3c333dd8d8c1dbd64fe66))
+* **deps:** update actions/setup-node action to v7.1.0 ([581e53a](https://github.com/Collektive/collektive/commit/581e53aa58f8e614a50f311de1f548e77c479c30))
+* **deps:** update actions/upload-artifact action to v7.0.2 ([28634ae](https://github.com/Collektive/collektive/commit/28634ae2689740dcca23180035633a64747337b4))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.49 ([a4828f9](https://github.com/Collektive/collektive/commit/a4828f9c03c80b91a7c7d76e141bd3196515f483))
+* **deps:** update github/codeql-action action to v4.38.3 ([0043164](https://github.com/Collektive/collektive/commit/0043164a4d499b3dbbf67a0d758490214e84ab54))
+* **deps:** update github/codeql-action action to v4.39.0 ([6297b9d](https://github.com/Collektive/collektive/commit/6297b9da6462f49f6ba78bed9ba7a7ac74ddb842))
+* reduce the number of dry releases to releave some load from Central ([8158aef](https://github.com/Collektive/collektive/commit/8158aefadaf24a3b9e48b362eaf5512ddf1dd627))
+
 ## [28.3.4](https://github.com/Collektive/collektive/compare/28.3.3...28.3.4) (2026-09-29)
 
 ### Dependency updates
