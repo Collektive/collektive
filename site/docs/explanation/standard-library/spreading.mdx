@@ -1,0 +1,156 @@
+---
+title: "Spreading: Distances and Broadcasts"
+sidebar_position: 3
+---
+
+# Spreading: Distances and Broadcasts
+
+*Spreading* blocks propagate information **outwards**, from one or more *sources* to the rest of the network,
+along shortest paths.
+They are the **G** of the [G-C-S building blocks](overview.mdx#the-self-organizing-building-blocks)
+and the foundation of most aggregate programs: distances, broadcasts, regions, channels, and spanning trees all build on them.
+
+All functions live in `it.unibo.collektive.stdlib.spreading`.
+
+## Metrics
+
+Spreading functions measure space through a **metric**: a `Field<ID, Distance>` holding,
+for each neighbor, the length of the link towards it (the local entry is ignored).
+The library provides (in `it.unibo.collektive.stdlib.util`):
+
+| Metric | Type | Description |
+|--------|------|-------------|
+| `hops()` | `Field<ID, Int>` | `1` for every neighbor: distances count hops |
+| `euclideanDistance2D(position)` | `Field<ID, Double>` | Euclidean distance; `position` is a `Point2D`, a `Pair<Double, Double>`, or a function `(ID) -> Point2D` |
+| `euclideanDistance3D(position)` | `Field<ID, Double>` | as above, in 3D (`Point3D`, `Triple`, or `(ID) -> Point3D`) |
+
+Each device shares its own position, so neighbors compute distances without needing a positioning service
+beyond their own sensors.
+Any other field works too: link latency, signal strength, energy cost, or a metric that is `+∞` towards devices to avoid.
+
+```kotlin
+val metric = euclideanDistance2D(Point2D(x to y))
+val hopMetric = hops().toDouble() // import it.unibo.collektive.stdlib.ints.FieldedInts.toDouble
+```
+
+## Distances
+
+| Function | Returns |
+|----------|---------|
+| `distanceTo(source, metric = hops().toDouble(), maxDiameter = Int.MAX_VALUE)` | `Double`: the distance from the nearest source (`+∞` if none is reachable) |
+| `hopDistanceTo(source, maxDiameter = Int.MAX_VALUE)` | `Int`: the number of hops from the nearest source |
+| `distanceTo(source, bottom, top, metric, maxDiameter, accumulateDistance)` | a generic `Distance`, for custom distance types |
+
+:::caution
+In the current version, `hopDistanceTo` returns `0` (not `Int.MAX_VALUE`) on devices that cannot reach any source.
+If you need to detect unreachable devices, use `distanceTo`, which returns `+∞`.
+:::
+
+`source` is a `Boolean` evaluated *locally*: each device states whether it is a source;
+there can be any number of sources, and they can change at any time.
+
+```kotlin
+fun Aggregate<Int>.distanceFromExit(isExit: Boolean, position: Point2D): Double =
+    distanceTo(source = isExit, metric = euclideanDistance2D(position))
+```
+
+On a line of five devices spaced by 2 meters, with the exit at device `0`, the result is
+`{0=0.0, 1=2.0, 2=4.0, 3=6.0, 4=8.0}`.
+
+## Broadcasts: gradient-casts
+
+A **gradient-cast** generalizes distances:
+instead of propagating just the distance, it propagates a *value* from the nearest source,
+optionally transforming it hop by hop.
+The resulting field holds, on each device, the value of the closest source.
+
+```kotlin
+gradientCast(
+    source: Boolean,           // am I a source?
+    local: Value,              // my value: broadcast if I'm a source, fallback if no source is reachable
+    metric: Field<ID, Double>, // distance to each neighbor
+    maxDiameter: Int = Int.MAX_VALUE,
+    accumulateData: (fromSource: Double, toNeighbor: Double, data: Value) -> Value = { _, _, data -> data },
+): Value
+```
+
+```kotlin
+// every device learns the value sensed by the nearest source
+fun Aggregate<Int>.readingOfNearestSource(source: Boolean, reading: Double): Double =
+    gradientCast(source, reading, metric = hops().toDouble())
+```
+
+`accumulateData` transforms the value at each hop, given the distance of the neighbor from the source and
+the length of the link: for instance, it can count hops, accumulate a cost, or decay a signal with distance.
+
+```kotlin
+// the number of hops from the source, computed by incrementing the value at every hop
+hopGradientCast(source = isSource, local = 0, accumulateData = { _, _, hops -> hops + 1 })
+```
+
+### Variants
+
+| Function | Distance | Notes |
+|----------|----------|-------|
+| `gradientCast(source, local, metric, …)` | `Double` | the default choice |
+| `intGradientCast(source, local, metric, …)` | `Int` | integer metrics, with overflow-safe accumulation |
+| `hopGradientCast(source, local, …)` | hops | metric fixed to `hops()` |
+| `gradientCast(source, local, bottom, top, metric, …, accumulateDistance)` | any `Comparable` | the general version |
+| `bellmanFordGradientCast(…)` | `Double` or any `Comparable` | simpler and cheaper, but slower to repair (see below) |
+
+### Fast repair vs Bellman-Ford
+
+There are two implementations of gradient-casts, with different trade-offs.
+
+- `bellmanFordGradientCast` uses `share` to propagate `(distance, value)` pairs
+  and picks the neighbor offering the shortest path, as in the distributed Bellman-Ford algorithm.
+  It is lightweight, but it repairs *incrementally*: when a source disappears,
+  devices keep "bouncing" stale distances among themselves, and estimates rise slowly
+  (the *rising value* or *count-to-infinity* problem)[^1].
+- `gradientCast` (and `distanceTo`, which is built on it) uses `exchange` to propagate whole **paths**.
+  Each device discards paths containing loops, paths through itself, and paths inconsistent with
+  what its neighbors report, and it never sends a neighbor a path that goes through that very neighbor
+  (an anisotropic message, which is why `exchange` is needed).
+  Repair is *fast*: stale information is dropped as soon as the paths supporting it break.
+  The price is larger messages: use `maxDiameter` to bound the length of the paths when you know the size of your network.
+
+The difference is evident when the only source of a line of five devices is switched off:
+
+| | stable | after 1 round | after 2 rounds | after 3 rounds |
+|---|---|---|---|---|
+| `bellmanFordGradientCast` | `0 1 2 3 4` | `2 3 4 5 6` | `4 5 6 7 8` | `6 7 8 9 10` (slowly rising…) |
+| `gradientCast` | `0 1 2 3 4` | `∞ ∞ ∞ ∞ ∞` | `∞ ∞ ∞ ∞ ∞` | `∞ ∞ ∞ ∞ ∞` |
+
+:::tip Which one should I use?
+Use `distanceTo` / `gradientCast` by default.
+Switch to `bellmanFordGradientCast` when message size matters more than recovery speed,
+for instance on constrained devices in networks whose sources rarely change.
+:::
+
+## Many sources at once
+
+The functions above return the value of the *nearest* source.
+When each device needs the value of *several* specific sources,
+`multiGradientCast` (and its `Int` and hop-count siblings `multiIntGradientCast`) runs one independent gradient-cast
+per source, [aligned on the source ID](../alignment.mdx#loops-and-alignedon), and returns a `Map<ID, Value>`:
+
+```kotlin
+// every device learns the readings of both device 0 and device 4: {0=reading of 0, 4=reading of 4}
+val fromEach: Map<Int, Int> = multiIntGradientCast(sources = listOf(0, 4), local = reading)
+```
+
+The cost grows linearly with the number of sources: use it for a handful of well-known devices
+(e.g., base stations), not for every device in the network.
+
+## Building on spreading
+
+Spreading blocks are the starting point of most higher-level patterns:
+
+- **broadcast of a collected value** (G → C → G): see [Collection](collection.mdx#collect-and-share);
+- **regions** around elected leaders (S → G): broadcast the leader ID with `gradientCast(isLeader, localId, metric)`;
+- **channels** (G + G + G): see the [overview](overview.mdx#composition-patterns).
+
+---
+
+[^1]: J. Beal, J. Bachrach, D. Vickery, and M. Tobenkin, "Fast self-healing gradients",
+ACM Symposium on Applied Computing, 2008. [doi:10.1145/1363686.1364163](https://doi.org/10.1145/1363686.1364163)

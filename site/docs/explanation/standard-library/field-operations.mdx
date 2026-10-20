@@ -1,0 +1,147 @@
+---
+title: Field Operations
+sidebar_position: 2
+---
+
+# Field Operations
+
+This page catalogues the standard library functions that work *on fields*, without any further communication:
+collapsing fields into local values, field arithmetic, and a few utilities.
+For the `Field` type itself, its views (`local`, `neighbors`, `all`), and the transformations provided by the DSL
+(`map`, `mapValues`, `alignedMap`, …), see [Thinking in Fields](../fields.mdx).
+
+## Collapsing fields
+
+A field is collapsed by applying a reduction to one of its views:
+
+- `field.neighbors` (`CollapseNeighbors`): the neighbors' entries, **excluding** the local one. It may be empty.
+- `field.all` (`CollapseAll`): the neighbors' entries **and** the local one. It is never empty.
+
+Both views contain `FieldEntry<ID, T>`s, and can be narrowed with `.values` (only the values) or `.ids` (only the IDs).
+All functions below live in the `it.unibo.collektive.stdlib.collapse` package.
+
+### Return types depend on the view
+
+The same reduction has different return types on the two views, because only `all` is guaranteed to be non-empty:
+
+| Reduction | on `all` | on `neighbors` |
+|-----------|----------|----------------|
+| `min()`, `max()` | `T` | `T?` (`null` if there are no neighbors) |
+| `min()`, `max()` on `Int` | `Int` | `Int` (`Int.MAX_VALUE` / `Int.MIN_VALUE` if empty) |
+| `min()`, `max()` on `Double` | `Double` | `Double` (`+∞` / `−∞` if empty) |
+| `minBy`, `maxBy`, `minWith`, `maxWith`, `reduce` | `T` | `T?` |
+| the same, when `T` is itself nullable | `T` | `Option<T?>` ([Arrow](https://arrow-kt.io/)'s `Option`, `None` if empty) |
+
+The `Option` overloads are selected automatically when the element type is nullable,
+so that an empty neighborhood (`None`) can be distinguished from a neighbor whose value is `null` (`Some(null)`).
+
+### Catalogue
+
+| Function | Available on | Returns |
+|----------|--------------|---------|
+| `min()`, `max()` | `Comparable` values | the minimum/maximum (see the table above for empty neighborhoods) |
+| `min(base)`, `max(base)` | `Comparable` values, any view | the minimum/maximum among the values and `base` |
+| `minBy { … }`, `maxBy { … }` | any view | the element with the minimum/maximum selector |
+| `minWith(comparator)`, `maxWith(comparator)` | any view | the minimum/maximum element according to `comparator` |
+| `sum()`, `product()` | `Int` and `Double` values | sum/product (`0`/`1` if empty) |
+| `reduce { a, b -> … }` | any view | the reduction of all the elements |
+| `fold(initial) { acc, e -> … }` | any view | the fold of all the elements |
+| `all { … }`, `any { … }`, `none { … }` | any view | whether all/any/none of the elements match |
+| `countMatching { … }` | any view | how many elements match |
+| `.all`, `.any`, `.none` (properties) | `Boolean` values | whether all/any/none are `true` |
+| `idOfMin()`, `idOfMax()` | `neighbors` with `Comparable` values | the ID of the neighbor with the min/max value, or `null` |
+| `idOfMinBy`, `idOfMaxBy`, `idOfMinWith`, `idOfMaxWith` | entries of any view | the ID of the min/max entry |
+| `valueOfMinBy`, `valueOfMaxBy`, `valueOfMinWith`, `valueOfMaxWith` | entries of any view | the value of the min/max entry |
+| `contains(element)` / `element in view` | any view | membership |
+| `toMap()` | entries of any view | a `Map<ID, T>` |
+| `list`, `set`, `sequence`, `size` | any view | standard Kotlin collections |
+
+```kotlin
+import it.unibo.collektive.aggregate.api.neighboring
+import it.unibo.collektive.aggregate.values
+import it.unibo.collektive.stdlib.collapse.*
+
+val readings = neighboring(temperature)
+val average = readings.all.values.sum() / readings.all.size
+val coldestNeighbor: Int? = readings.neighbors.idOfMinBy { it.value }
+val hotNeighbors: Int = readings.neighbors.countMatching { it.value > 30.0 }
+val warmest = readings.all.maxBy { it.value }        // FieldEntry: id and value of the warmest device
+val anyAlarm: Boolean = neighboring(alarm).neighbors.values.any
+```
+
+:::tip When in doubt, fall back to collections
+`list`, `set`, and `sequence` expose plain Kotlin collections,
+so any function of the Kotlin standard library is available:
+`field.neighbors.values.list.sorted().take(3)`.
+Prefer `sequence` for long pipelines (it is lazy) and `set` for membership checks.
+:::
+
+## Fielded operators
+
+Combining fields value by value with `alignedMapValues` quickly becomes verbose.
+The standard library ships **fielded** versions of the operators and functions of the Kotlin standard library,
+for the most common types, so that fields can be manipulated as if they were plain values:
+
+```kotlin
+import it.unibo.collektive.stdlib.doubles.FieldedDoubles.plus
+import it.unibo.collektive.stdlib.doubles.FieldedDoubles.times
+import it.unibo.collektive.stdlib.ints.FieldedInts.toDouble
+
+val distances: Field<Int, Double> = neighboring(myDistance)
+val metric: Field<Int, Double> = hops().toDouble()   // Field<Int, Int> → Field<Int, Double>
+val throughNeighbors = distances + metric            // Field + Field: entry by entry
+val doubled = metric * 2.0                           // Field * scalar
+```
+
+For every eligible function `f` of a type `T`, three versions are generated:
+
+| Original | Generated |
+|----------|-----------|
+| `T.f(other: U): R` | `Field<ID, T>.f(other: U): Field<ID, R>` (field with scalar) |
+| | `T.f(other: Field<ID, U>): Field<ID, R>` (scalar with field) |
+| | `Field<ID, T>.f(other: Field<ID, U>): Field<ID, R>` (field with field, entry by entry) |
+
+Operator modifiers are preserved, so `+`, `-`, `*`, `/`, `%`, unary `-`, and `!` work on fields.
+Generated functions are grouped in objects named after the target type, one per package:
+
+| Package | Object | Examples |
+|---------|--------|----------|
+| `stdlib.booleans` | `FieldedBooleans` | `!`, `and`, `or`, `xor` |
+| `stdlib.ints`, `stdlib.longs`, `stdlib.shorts`, `stdlib.bytes` | `FieldedInts`, `FieldedLongs`, … | `+`, `-`, `*`, `/`, `%`, `shl`, `toDouble()`, … |
+| `stdlib.doubles`, `stdlib.floats` | `FieldedDoubles`, `FieldedFloats` | `+`, `-`, `*`, `/`, `toInt()`, … |
+| `stdlib.uints`, `stdlib.ulongs`, … | `FieldedUInts`, … | unsigned arithmetic |
+| `stdlib.chars`, `stdlib.strings`, `stdlib.charsequences` | `FieldedChars`, `FieldedStrings`, … | `+`, `length()`, `isEmpty()`, `subSequence`, … |
+| `stdlib.collections`, `stdlib.lists`, `stdlib.sets`, `stdlib.maps`, `stdlib.iterables`, `stdlib.sequences` | `FieldedLists`, `FieldedSets`, … | `first()`, `getOrNull`, `takeLast`, `containsAll`, … |
+| `stdlib.pairs`, `stdlib.triples`, `stdlib.results` | `FieldedPairs`, … | `first()`, `second()`, … |
+
+Properties are lifted as functions: `stringField.length()` is the `Field` of the lengths.
+
+:::note
+Comparison operators (`<`, `>`, …) cannot be lifted, since Kotlin requires `compareTo` to return `Int`.
+To compare a field with a value, map it: `field.mapValues { it > threshold }`.
+Functions with side effects or operating on mutable types are not generated.
+:::
+
+These members are generated at build time from the Kotlin standard library by **collektivize**,
+a code generator shipped as a Gradle plugin (`it.unibo.collektive.collektivize`)
+that can be configured with the types to lift.
+
+## Utilities
+
+The `it.unibo.collektive.stdlib.util` package contains general-purpose helpers.
+
+| Function | Description |
+|----------|-------------|
+| `Field.coerceIn(min, max)`, `Field.coerceIn(range)` | coerces every value of the field into a range |
+| `Field.replaceMatchingValues(replacement) { value -> … }` | replaces the values matching a predicate |
+| `Field.replaceMatching(replacement) { entry -> … }` | replaces the entries matching a predicate (with access to the ID) |
+| `hops()` | the hop-count metric: `0` locally, `1` for every neighbor |
+| `euclideanDistance2D(...)`, `euclideanDistance3D(...)` | Euclidean distance to each neighbor, see [Metrics](spreading.mdx#metrics) |
+| `Point2D`, `Point3D` | serializable points with vector arithmetic and `distanceTo` |
+| `Int.nonOverflowingPlus(other)` | sum of non-negative integers, saturating at `Int.MAX_VALUE` |
+| `Maybe<T>` | a serializable wrapper of Arrow's `Option`, to share optional values |
+
+```kotlin
+val readings = neighboring(sensorValue)
+val clean = readings.replaceMatchingValues(0.0) { it.isNaN() }.coerceIn(0.0, 100.0)
+```

@@ -1,0 +1,140 @@
+---
+title: Gossip and Leader Election
+sidebar_position: 5
+---
+
+# Gossip and Leader Election
+
+Spreading and collection need someone to play a special role (a source, a sink).
+The blocks on this page are **symmetric**: every device contributes on equal terms,
+and the network agrees on a value (gossip) or on a set of coordinators (leader election).
+
+## Gossip
+
+*Gossip* makes all devices of a connected network agree on an aggregate of their local values,
+obtained by repeatedly combining what each device knows with what its neighbors know.
+The functions live in `it.unibo.collektive.stdlib.spreading`.
+
+| Function | Result on every device |
+|----------|------------------------|
+| `gossipMax(local)`, `gossipMin(local)` | the maximum/minimum of the local values |
+| `gossipMaxBy(local) { selector }`, `gossipMinBy(…)` | the value with the maximum/minimum selector |
+| `gossipMaxWith(local, comparator)`, `gossipMinWith(…)` | the maximum/minimum according to a comparator |
+| `gossip(local, reducer = { first, _ -> first })` | the general version: the value selected by `reducer` |
+| `isHappeningAnywhere { condition }` | whether `condition` currently holds on at least one device |
+
+```kotlin
+import it.unibo.collektive.stdlib.spreading.gossipMax
+import it.unibo.collektive.stdlib.spreading.isHappeningAnywhere
+
+val hottest: Double = gossipMax(temperature)
+val alarm: Boolean = isHappeningAnywhere { smokeDetected }
+```
+
+These functions are **self-stabilizing**: they track, for each candidate value, the path it came from,
+and drop it as soon as the path breaks.
+If the device holding the maximum leaves the network, or its value decreases,
+the network converges to the new maximum:
+
+| | device 0 | device 1 | device 2 | device 3 | device 4 |
+|---|:---:|:---:|:---:|:---:|:---:|
+| local values | 1 | **9** | 3 | 2 | 5 |
+| `gossipMax` | 9 | 9 | 9 | 9 | 9 |
+| local values, after device 1 changes | 1 | 0 | 3 | 2 | **5** |
+| `gossipMax` | 5 | 5 | 5 | 5 | 5 |
+
+Like [`gradientCast`](spreading.mdx#fast-repair-vs-bellman-ford), path tracking has a cost in message size:
+pass `maxDiameter` to bound the path length.
+Self-stabilizing gossip requires comparable device identifiers (`ID : Comparable<ID>`).
+
+### Non-stabilizing gossip
+
+Sometimes you *want* the network to remember: "has an alarm ever been raised?".
+
+| Function | Result |
+|----------|--------|
+| `nonStabilizingGossip(value) { a, b -> … }` | the reduction of all the values ever seen |
+| `everHappened { condition }` | `true` if `condition` held on any device at any time in the past |
+
+| | device 0 | device 1 | device 2 | device 3 | device 4 |
+|---|:---:|:---:|:---:|:---:|:---:|
+| local values | 1 | **9** | 3 | 2 | 5 |
+| `nonStabilizingGossip` | 9 | 9 | 9 | 9 | 9 |
+| local values, after device 1 changes | 1 | 0 | 3 | 2 | 5 |
+| `nonStabilizingGossip` | 9 | 9 | 9 | 9 | 9 ← never forgotten |
+
+They are much cheaper (a single `share` of the value) but, once a value has been seen, it can never be retracted.
+Use `isHappeningAnywhere` when the condition may stop holding, `everHappened` when it is a one-way event.
+
+## Leader election
+
+Leader election breaks the symmetry of the network by selecting a few devices as coordinators.
+It is the **S** (*sparse choice*) of the [G-C-S building blocks](overview.mdx#the-self-organizing-building-blocks),
+and it is the key to making sinks and sources resilient:
+elect them instead of hard-coding them, and the system will replace them when they fail.
+The functions live in `it.unibo.collektive.stdlib.consensus`.
+
+### Bounded election
+
+`boundedElection`[^1] elects multiple leaders, each one ruling over the devices within a distance `bound`.
+Every device is a candidate with a **strength**; each device follows the strongest candidate within the bound.
+Ties are broken in favor of the closest candidate.
+
+```kotlin
+// one leader every ~3 hops; the device with the highest ID wins in each area
+val myLeader: Int = boundedElection(bound = 3)
+
+// stronger devices (e.g., with more battery) are preferred
+val myLeader: Int = boundedElection(strength = batteryLevel, bound = 50.0, metric = euclideanDistance2D(position))
+
+val amILeader = myLeader == localId
+```
+
+On a line of seven devices with `bound = 2`, the result is `{0=0, 1=3, 2=3, 3=3, 4=6, 5=6, 6=6}`:
+devices `3` and `6` win their areas, and device `0`, three hops away from `3`, elects itself.
+
+| Overload | Distance | Strength |
+|----------|----------|----------|
+| `boundedElection(bound: Int, metric = hops())` | hops | the device ID |
+| `boundedElection(bound: Double, metric)` | `Double` | the device ID |
+| `boundedElection(strength, bound: Int, metric = hops())` | hops | custom |
+| `boundedElection(strength, bound: Double, metric)` | `Double` | custom |
+| `boundedElection(strength, bound, metric, bottom, accumulateDistance, selectBest)` | any `Comparable` | custom |
+
+The optional `selectBest` reducer decides between two `Candidacy` objects (candidate, distance, strength);
+it defaults to the strongest, then closest, candidate.
+
+### Global election
+
+`globalElection()` and `globalElection(strength)` elect a single leader for the whole network,
+by running a bounded election with an unlimited bound.
+
+:::caution Recovery after a leader failure
+Like a [Bellman-Ford gradient](spreading.mdx#fast-repair-vs-bellman-ford), the election repairs by letting distances rise:
+when a leader disappears, its candidacy survives until its distance exceeds `bound`,
+and only then a new leader is elected.
+Recovery time therefore grows with `bound`: choose it as small as your application allows.
+In the current version, `globalElection` (whose bound is unlimited) does not recover from the disappearance of the elected leader;
+if leaders can fail, prefer a `boundedElection` with a bound slightly larger than the network diameter.
+:::
+
+### Using leaders
+
+Leaders become sources and sinks for the other building blocks:
+
+```kotlin
+fun Aggregate<Int>.areaAverage(temperature: Double, radius: Int): Double {
+    val leader = boundedElection(bound = radius)
+    val isLeader = leader == localId
+    val potential = hopDistanceTo(isLeader)
+    val average = convergeMean(temperature, potential)              // C: towards the leader
+    return gradientCast(isLeader, average, hops().toDouble())       // G: back to the area
+}
+```
+
+---
+
+[^1]: D. Pianini, R. Casadei, and M. Viroli,
+"Self-stabilising Priority-Based Multi-Leader Election and Network Partitioning",
+IEEE International Conference on Autonomic Computing and Self-Organizing Systems (ACSOS), 2022, pp. 81–90.
+[doi:10.1109/ACSOS55765.2022.00026](https://doi.org/10.1109/ACSOS55765.2022.00026)
