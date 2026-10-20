@@ -1,0 +1,192 @@
+---
+draft: true
+title: Run Collektive on Real Devices
+sidebar_position: 1
+---
+
+In simulation, the simulator delivers messages for you.
+On real devices, you connect Collektive to a network by implementing a
+[`Mailbox`](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/latest/collektive-dsl/it.unibo.collektive.networking/-mailbox/index.html),
+and you schedule the rounds yourself.
+This guide shows how, step by step.
+
+:::info Complete example
+The [collektive-example-distributed](https://github.com/Collektive/collektive-example-distributed) repository
+contains a working multiplatform (JVM and Node.js) deployment that communicates over MQTT.
+:::
+
+## 1. What a `Mailbox` does
+
+The `Mailbox` is the only part of Collektive that knows about the network.
+At every round, the runtime:
+
+1. calls `currentInbound()` to take a snapshot of the most recent message received from each neighbor;
+2. runs the aggregate program;
+3. calls `deliverableFor(envelope)` with an `OutboundEnvelope` holding everything the device must send.
+
+In between rounds, your networking code calls `deliverableReceived(message)` whenever a message arrives.
+
+| Member | Called by | Responsibility |
+|--------|-----------|----------------|
+| `inMemory: Boolean` | runtime | `true` if messages are passed as objects (same process); `false` if they are serialized |
+| `deliverableFor(envelope)` | runtime, at the end of a round | build one message per neighbor with `envelope.prepareMessageFor(neighborId, factory)` and send it |
+| `deliverableReceived(message)` | your code, when a message arrives | store the message, replacing the previous one from the same sender |
+| `currentInbound()` | runtime, at the beginning of a round | return the stored messages as `NeighborsData`, after dropping the expired ones |
+
+Note that the envelope produces a *different* message for each neighbor: this is how
+[`exchange`](../explanation/dsl-descriptions.mdx#exchange-and-exchanging-neighbor-specific-messages) sends neighbor-specific values.
+If your transport only supports broadcast, you can still broadcast all of them,
+and let each receiver keep only the message addressed to it.
+
+## 2. Serializing messages
+
+Over a real network, `inMemory` must be `false`, and messages must be turned into bytes.
+Collektive serializes each shared value with [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization):
+
+- `SerializedMessageFactory(format)` turns the envelope into a `SerializedMessage`, whose payloads are already encoded with `format` (e.g., `Json`, `ProtoBuf`, `Cbor`);
+- `SerializedMessage` is itself `@Serializable`, so it can be encoded with the same format for transport;
+- on reception, `dataAt(path, dataSharingMethod)` receives a `Serialize` data sharing method carrying the `KSerializer` needed to decode each value.
+
+The following mailbox puts these pieces together, delegating neighbor discovery and transport to two functions:
+
+```kotlin
+import it.unibo.collektive.aggregate.api.DataSharingMethod
+import it.unibo.collektive.aggregate.api.Serialize
+import it.unibo.collektive.networking.Mailbox
+import it.unibo.collektive.networking.Message
+import it.unibo.collektive.networking.NeighborsData
+import it.unibo.collektive.networking.OutboundEnvelope
+import it.unibo.collektive.networking.SerializedMessage
+import it.unibo.collektive.networking.SerializedMessageFactory
+import it.unibo.collektive.path.Path
+import kotlin.time.Clock
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Instant
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.json.Json
+
+/**
+ * A mailbox that serializes messages to JSON and hands them to a [transport].
+ * Messages older than [retention] are forgotten: their senders are no longer considered neighbors.
+ */
+class JsonMailbox(
+    private val localId: Int,
+    private val neighbors: () -> Set<Int>,                       // neighbor discovery, e.g., by proximity
+    private val transport: (to: Int, bytes: ByteArray) -> Unit,  // e.g., UDP, BLE, MQTT, WebSockets…
+    private val retention: Duration = 5.seconds,
+) : Mailbox<Int> {
+    private val format = Json
+    private val messageSerializer = SerializedMessage.serializer(Int.serializer())
+    private val factory = SerializedMessageFactory<Int, Any?>(format)
+    private val received = mutableMapOf<Int, Pair<SerializedMessage<Int>, Instant>>()
+
+    override val inMemory = false
+
+    override fun deliverableFor(outboundMessage: OutboundEnvelope<Int>) {
+        for (neighbor in neighbors() - localId) {
+            val message = outboundMessage.prepareMessageFor(neighbor, factory) as SerializedMessage<Int>
+            transport(neighbor, format.encodeToString(messageSerializer, message).encodeToByteArray())
+        }
+    }
+
+    /** Call this from your networking code when bytes arrive. */
+    fun onBytesReceived(bytes: ByteArray) =
+        deliverableReceived(format.decodeFromString(messageSerializer, bytes.decodeToString()))
+
+    override fun deliverableReceived(message: Message<Int, *>) {
+        received[message.senderId] = (message as SerializedMessage<Int>) to Clock.System.now()
+    }
+
+    override fun currentInbound(): NeighborsData<Int> {
+        val now = Clock.System.now()
+        received.values.removeAll { (_, time) -> now - time > retention }
+        val snapshot = received.mapValues { it.value.first }
+        return object : NeighborsData<Int> {
+            override val neighbors: Set<Int> get() = snapshot.keys
+
+            override fun <Value> dataAt(path: Path, dataSharingMethod: DataSharingMethod<Value>): Map<Int, Value> {
+                val serializer = (dataSharingMethod as Serialize<Value>).serializer
+                return snapshot
+                    .filterValues { path in it.sharedData }
+                    .mapValues { (_, message) ->
+                        format.decodeFromString(serializer, message.sharedData.getValue(path).decodeToString())
+                    }
+            }
+        }
+    }
+}
+```
+
+:::tip Choosing the retention time
+A neighbor whose last message is older than `retention` disappears from all fields.
+Too short, and neighbors flicker in and out whenever a message is late;
+too long, and devices that left keep influencing the computation.
+A few round periods is a good starting point.
+:::
+
+:::caution Concurrency
+Messages usually arrive on a different thread or coroutine than the one running the rounds.
+In production code, protect the received messages (e.g., with a lock, or by confining them to a single coroutine),
+so that `currentInbound()` always sees a consistent snapshot.
+:::
+
+## 3. Scheduling rounds
+
+Create one `Collektive` instance per device, and call `cycle()` periodically.
+Rounds of different devices do not need to be synchronized.
+
+```kotlin
+import it.unibo.collektive.Collektive
+import it.unibo.collektive.networking.Mailbox
+import it.unibo.collektive.stdlib.spreading.gossipMax
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+
+suspend fun runDevice(id: Int, mailbox: Mailbox<Int>, readTemperature: () -> Double) {
+    val device = Collektive(id, mailbox) {
+        gossipMax(readTemperature()) // the aggregate program
+    }
+    while (currentCoroutineContext().isActive) {
+        val hottest = device.cycle()
+        println("Device $id: the hottest temperature around is $hottest")
+        delay(1.seconds)
+    }
+}
+```
+
+The round period trades responsiveness for energy and bandwidth:
+information travels about one hop per round, so the time needed to converge grows with the network diameter.
+
+## 4. Device identifiers
+
+`Collektive` is generic in the type of the identifiers: `Aggregate<ID>` works with `Int`, `Long`, `String`,
+`Uuid`, or any other type, provided that:
+
+- identifiers are unique in the network;
+- they are serializable, since they travel inside messages;
+- they are `Comparable`, if you use standard library functions that need to order devices (gossip, leader election by ID).
+
+## 5. Paths and message size
+
+Each shared value travels with the *path* that identifies its position in the program
+(see [Alignment](../explanation/alignment.mdx)).
+`Collektive` accepts a `pathFactory` parameter deciding how paths are represented:
+
+| Path factory | Representation | Use it for |
+|--------------|----------------|------------|
+| `DigestHashingFactory()` (default) | a fixed-size hash of the path, serializable | real deployments |
+| `FullPathFactory` | the full list of tokens, readable but not serializable | simulation and debugging only |
+
+With the default factory, values passed to [`alignedOn`](../explanation/alignment.mdx#loops-and-alignedon) must be hashable:
+`Boolean`, numbers, `Char`, `String`, `Uuid`, `null`, or pairs, triples, collections, and maps of them.
+Other types (e.g., your own data classes) fail at runtime with *"Alignment on elements of type … is not supported"*:
+align on one of their properties instead.
+
+## 6. Mixing platforms
+
+The aggregate program, written in `commonMain`, is the same on every target.
+Devices running on different platforms (an Android phone, a Linux gateway, a browser) cooperate in the same collective,
+as long as their mailboxes use the same transport and the same serialization format.

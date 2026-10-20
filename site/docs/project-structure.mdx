@@ -3,21 +3,34 @@ title: Project Structure
 sidebar_position: 5
 ---
 
-## Project submodules
+import Figure, {FigureGrid} from '@site/src/components/Figure';
 
-The Collektive project is organized into several submodules, each serving a distinct role:
+## Architecture
 
-- **collektive-dsl**: the core implementation of the Domain-Specific Language (DSL) for aggregate computing,
-    exposing the operators and logic for this programming paradigm.
-- **collektive-stdlib**: a standard library providing essential functions and utilities to support aggregate computing operations.
-- **collektive-compiler-plugin** is divided into two components:
-  - **frontend**: checks for dangerous or inappropriate code written using the Collektive DSL
-  - **backend**: a compiler plugin that modifies a data structure used to track the runtime stack.
-        Each time a function is called, its name is registered in this structure.
-- **collektive-compiler-embeddable**:
-  - **compiler-embedded**: an embeddable version of the compiler designed for integration into other projects.
-    This allows developers to leverage the compiler’s capabilities directly within their applications,
-    making it easier to extend and customize compilation features.
-- **collektive-gradle-plugin**: a necessary plugin that allows Gradle projects to include and apply the compiler plugin.
-- **alchemist-incarnation-collektive**: an incarnation of Collektive for the Alchemist simulator,
-  which is a simulation framework for distributed systems.
+Collektive separates the aggregate programming semantics, which is the same on every platform,
+from the platform-specific mechanisms used to communicate:
+
+<Figure src="/img/concepts/collektive-multiplatform.svg" alt="Collektive architecture: the DSL and the library are common to all platforms, the Mailbox connects them to platform-specific networking" width={420} card />
+
+- the **DSL** and the **libraries** (the standard library, as well as your own) are written in common Kotlin code,
+  and compiled for every target supported by Kotlin Multiplatform;
+- the **`Mailbox`** interface is the only communication dependency of the runtime:
+  each platform (or simulator) provides an implementation that sends and receives messages
+  with the available network technology.
+
+## Modules
+
+The Collektive repository is organized into the following modules.
+
+| Module | Artifact | Role |
+|--------|----------|------|
+| `collektive-dsl` | `it.unibo.collektive:collektive-dsl` | the core of Collektive: the `Aggregate` scope, the [aggregate operators](explanation/dsl-descriptions.mdx), [fields](explanation/fields.mdx), and the round-based runtime (`Collektive`, `Mailbox`) |
+| `collektive-stdlib` | `it.unibo.collektive:collektive-stdlib` | the [standard library](explanation/standard-library/overview.mdx) of collective building blocks |
+| `collektive-compiler-plugin` | `it.unibo.collektive:collektive-compiler-plugin` | the Kotlin compiler plugin that injects [alignment](explanation/alignment.mdx) and field projections (backend), and reports misuses of the DSL (frontend) |
+| `collektive-gradle-plugin` | `it.unibo.collektive.collektive-plugin` (Gradle plugin) | applies the compiler plugin to the Kotlin compilations of a Gradle project |
+| `collektive-compiler-embeddable` | `it.unibo.collektive:collektive-compiler-embeddable` | a programmatic Kotlin/JVM compiler with the Collektive plugin applied, to compile aggregate programs at runtime (used, e.g., by the Alchemist incarnation for inline programs) |
+| `collektivize` | `it.unibo.collektive.collektivize` (Gradle plugin) | the code generator producing the [fielded operators](explanation/standard-library/field-operations.mdx#fielded-operators) of the standard library |
+| `collektive-test-tooling` | (internal) | in-memory networks (grids, meshes) and deterministic round scheduling, to unit test aggregate programs |
+| `alchemist-incarnation-collektive` | `it.unibo.collektive:alchemist-incarnation-collektive` | the incarnation running Collektive programs in the [Alchemist simulator](tutorials/collektive-and-alchemist.mdx) |
+
+The `site` folder contains the sources of this website.
