@@ -1,15 +1,25 @@
 ---
 title: Levels of Abstraction in Aggregate Programming
 sidebar_position: 2
+description: "The layers of aggregate programming, from device capabilities to field calculus constructs, building blocks, and applications."
 ---
 
-## Levels of Abstraction in Aggregate Programming
+import LayerStack from '@site/src/components/LayerStack';
 
 Through multiple levels of abstraction, aggregate programming mitigates the complexity involved in distributed coordination within IoT network environments:
 
-![Aggregated levels of abstraction in aggregate programming](/img/multiple-levels-of-abstraction-ag.png)
+<LayerStack
+  caption="Each layer is built by composing the one below it."
+  layers={[
+    {name: 'Application code', items: ['your collective application'], collektive: {label: 'your code'}},
+    {name: 'Developer APIs', items: ['perception', 'action', 'state', 'collective behaviors'], collektive: {label: 'your libraries'}},
+    {name: 'Resilient coordination operators', items: ['gradients', 'cumulative aggregation', 'decay functions', 'branching'], collektive: {label: 'collektive-stdlib', to: '/docs/explanation/stdlib-descriptions'}},
+    {name: 'Field calculus constructs', items: ['built-ins', 'data sharing', 'state evolution', 'branching'], collektive: {label: 'collektive-dsl', to: '/docs/explanation/dsl-descriptions'}},
+    {name: 'Device capabilities', items: ['sensors', 'actuators', 'local functions', 'communication', 'state'], collektive: {label: 'Mailbox, your platform'}},
+  ]}
+/>
 
-### Field Calculus Constructs
+## Field Calculus Constructs
 
 At the bottom of the stack lie the device infrastructure and the non-aggregate software services
 (sensors, actuators, operating systems, networking): the interface through which aggregate programs interact with the external environment.
@@ -33,7 +43,7 @@ Together, these constructs enable the creation of robust and flexible behaviors 
 
 ---
 
-### Resilient Coordination Operators
+## Resilient Coordination Operators
 
 The next level of abstraction introduces a set of **resilient coordination operators** designed for robust distributed computations,
 provided in Collektive by the [standard library](standard-library/overview.mdx).
@@ -50,13 +60,13 @@ These operators abstract common coordination patterns, simplifying the developme
 
 ---
 
-### Developer APIs
+## Developer APIs
 
 Libraries developed using fundamental operators can leverage and combine these operators to create a pragmatic and user-friendly **API** (Application Programming Interface). These libraries represent the penultimate layer in the structure illustrated in the figure, on which application code is based.
 
 Many distributed actions and information diffusion processes can be abstracted into high-level API functions that encapsulate the complexity of the underlying coordination logic.
 
-#### Example: Gradient Computation
+### Example: Gradient Computation
 
 The following example demonstrates a simple API function for computing a **distance gradient**. This function calculates the minimum distance from a set of source devices within a dynamic network. Gradients are a foundational construct in aggregate programming, enabling behaviors like distance estimation and value propagation.
 
