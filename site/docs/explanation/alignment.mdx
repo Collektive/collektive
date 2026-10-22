@@ -6,6 +6,7 @@ sidebar_position: 5
 import Figure, {FigureGrid} from '@site/src/components/Figure';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import {DoDont, Do, Dont} from '@site/src/components/Mistakes';
 
 # Alignment and Domain Partitioning
 
@@ -162,21 +163,27 @@ Projection has an important consequence: **neighbor-dependent computations must 
 whenever they must involve devices taking different branches.
 The classic example is the gradient, in which the source takes a different branch than everybody else:
 
+<DoDont>
+<Dont label="inside the else branch the source is not aligned, so nobody ever sees it" result={<>On a line of five devices with source <code>0</code>: <code>{'{0=0.0, 1=∞, 2=∞, 3=∞, 4=∞}'}</code></>}>
+
 ```kotlin
-// ❌ WRONG: inside the else branch, the source is not aligned, so nobody ever "sees" it
 share(Double.POSITIVE_INFINITY) { distances ->
     if (source) 0.0 else (distances + metric).neighbors.values.min()
 }
+```
 
-// ✅ RIGHT: compute through the whole neighborhood, then select
+</Dont>
+<Do label="compute through the whole neighborhood, then select" result={<>Converges to <code>{'{0=0.0, 1=1.0, 2=2.0, 3=3.0, 4=4.0}'}</code></>}>
+
+```kotlin
 share(Double.POSITIVE_INFINITY) { distances ->
     val throughNeighbors = (distances + metric).neighbors.values.min()
     if (source) 0.0 else throughNeighbors
 }
 ```
 
-On a line of five devices with source `0`, the first version returns `{0=0.0, 1=∞, 2=∞, 3=∞, 4=∞}`,
-the second converges to `{0=0.0, 1=1.0, 2=2.0, 3=3.0, 4=4.0}`.
+</Do>
+</DoDont>
 
 :::tip Rule of thumb
 Use `if`/`when` when you *want* to separate sub-collectives.
@@ -188,15 +195,24 @@ When you just need to *select* a value (what field calculus calls `mux`), comput
 Since fields are projected inside branches, a branch returning a `Field` would produce a field defined on a partial domain.
 The plugin rejects it at compile time:
 
-```kotlin
-// ❌ compile-time error: this branch returns a Field
-val f = if (condition) neighboring(a) else neighboring(b)
+<DoDont>
+<Dont label="compile-time error: this branch returns a Field">
 
-// ✅ build the fields first, then choose entry by entry
+```kotlin
+val f = if (condition) neighboring(a) else neighboring(b)
+```
+
+</Dont>
+<Do label="build the fields first, then choose entry by entry">
+
+```kotlin
 val fa = neighboring(a)
 val fb = neighboring(b)
 val f = fa.alignedMapValues(fb) { x, y -> if (condition) x else y }
 ```
+
+</Do>
+</DoDont>
 
 ## Loops and `alignedOn`
 
@@ -226,7 +242,7 @@ With the default path representation, pivots must be hashable values:
 `Boolean`, numbers, `Char`, `String`, `Uuid`, `null`, or pairs, triples, collections, and maps of them.
 To align on your own data classes, align on one of their identifying properties.
 
-The plugin warns when it detects an aggregate call inside a `for`/`while` loop without `alignedOn`.
+The plugin [warns](compiler-plugin.mdx#aggregate-in-loop) when it detects an aggregate call inside a `for`/`while` loop without `alignedOn`.
 Calls inside lambdas of collection operations (`map`, `forEach`, …) are not detected:
 if you forget `alignedOn` there, Collektive fails at runtime with an `AlignmentClashException`.
 
@@ -237,17 +253,10 @@ Never call `align`/`dealign` directly: they are low-level primitives used by the
 
 ## Compiler diagnostics
 
-Besides injecting alignment, the plugin checks for common misuses of the DSL:
-
-| Diagnostic | Severity | Meaning |
-|------------|----------|---------|
-| Branch returns a `Field` | error | see [above](#branches-cannot-return-fields) |
-| Aggregate function inside a loop without explicit alignment | warning | wrap the call in `alignedOn` |
-| `neighboring` with a compile-time constant | warning | use `mapNeighborhood { constant }`, which avoids sending the value |
-| Construct with an unused lambda parameter | warning | e.g., `share(0) { _ -> 1 }`: the construct is useless |
-| `evolve` that could be a `share` | warning | `evolve` + `neighboring` of the state propagates information more slowly |
-| Unnecessary `yielding` | warning | the yielded value equals the shared one: use the non-`ing` construct |
-| Explicit `align`/`dealign` call | warning | use `alignedOn` |
+Besides injecting alignment, the plugin checks the code for common misuses of the DSL,
+such as aggregate calls in loops without `alignedOn` or branches returning fields,
+and reports them as compiler warnings and errors.
+See [The Compiler Plugin](compiler-plugin.mdx) for the list.
 
 ## Opting out: `@CollektiveIgnore`
 
