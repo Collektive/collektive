@@ -1,6 +1,7 @@
 ---
 title: Project Structure
 sidebar_position: 5
+description: "The architecture of Collektive and the modules of its repository."
 ---
 
 import Figure, {FigureGrid} from '@site/src/components/Figure';
@@ -10,13 +11,18 @@ import Figure, {FigureGrid} from '@site/src/components/Figure';
 Collektive separates the aggregate programming semantics, which is the same on every platform,
 from the platform-specific mechanisms used to communicate:
 
-<Figure src="/img/concepts/collektive-multiplatform.svg" alt="Collektive architecture: the DSL and the library are common to all platforms, the Mailbox connects them to platform-specific networking" width={420} card />
+<Figure src="/img/concepts/collektive-architecture.svg" alt="Collektive architecture: coordination libraries are built on the DSL and runtime, compiled with the compiler plugin; the Mailbox is the only communication dependency, implemented by platform-specific adapters such as a real network, Alchemist, Unity, or in-memory tests; the common code compiles for JVM, JavaScript, Android, iOS, and native targets" width={720} />
 
-- the **DSL** and the **libraries** (the standard library, as well as your own) are written in common Kotlin code,
-  and compiled for every target supported by Kotlin Multiplatform;
-- the **`Mailbox`** interface is the only communication dependency of the runtime:
-  each platform (or simulator) provides an implementation that sends and receives messages
-  with the available network technology.
+- **Coordination libraries**, the standard library as well as your own, are ordinary Kotlin functions built on the DSL;
+- the **DSL and runtime** (`collektive-dsl`) provide the `Aggregate` scope, the operators, fields,
+  and the executor of rounds (`Collektive`), which keeps the state of a device from one round to the next;
+- the **compiler plugin** is applied to every compilation of aggregate code: it injects alignment and reports misuses of the DSL;
+- the **`Mailbox`** is the only communication dependency of the runtime.
+  Below it, an adapter connects the device to the world: a real network (MQTT, sockets, …),
+  a simulator ([Alchemist](tutorials/collektive-and-alchemist.mdx), [Unity](tutorials/collektive-and-unity.mdx)), or an in-memory network for tests.
+
+Everything above the `Mailbox` is common Kotlin code, compiled for every target supported by Kotlin Multiplatform:
+devices running on different platforms can cooperate in the same collective, as long as their adapters exchange compatible messages.
 
 ## Modules
 
