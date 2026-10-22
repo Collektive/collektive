@@ -3,6 +3,8 @@ title: Gossip and Leader Election
 sidebar_position: 5
 ---
 
+import Figure from '@site/src/components/Figure';
+
 # Gossip and Leader Election
 
 Spreading and collection need someone to play a special role (a source, a sink).
@@ -31,21 +33,134 @@ val hottest: Double = gossipMax(temperature)
 val alarm: Boolean = isHappeningAnywhere { smokeDetected }
 ```
 
-These functions are **self-stabilizing**: they track, for each candidate value, the path it came from,
-and drop it as soon as the path breaks.
-If the device holding the maximum leaves the network, or its value decreases,
-the network converges to the new maximum:
+These functions are **self-stabilizing**: if the device holding the maximum leaves the network, or its value decreases,
+the network forgets the old value and converges to the new maximum.
+This is less obvious than it looks, and it is what the rest of this section is about.
 
-| | device 0 | device 1 | device 2 | device 3 | device 4 |
-|---|:---:|:---:|:---:|:---:|:---:|
-| local values | 1 | **9** | 3 | 2 | 5 |
-| `gossipMax` | 9 | 9 | 9 | 9 | 9 |
-| local values, after device 1 changes | 1 | 0 | 3 | 2 | **5** |
-| `gossipMax` | 5 | 5 | 5 | 5 | 5 |
+### Why forgetting is hard
 
-Like [`gradientCast`](spreading.mdx#fast-repair-vs-bellman-ford), path tracking has a cost in message size:
-pass `maxDiameter` to bound the path length.
+The classic gossip is a single `share` that merges what a device knows with what its neighbors know:
+
+```kotlin
+share(local) { known -> known.all.values.max() } // this is nonStabilizingGossip
+```
+
+The merge function (`max`, `min`, set union, …) is idempotent and commutative,
+so the result does not depend on the order of the messages, nor on duplicates.
+But the same property makes it impossible to **retract** a value:
+once `9` has been merged, every device keeps sending `9` to its neighbors, which send it back,
+and nobody can tell whether a `9` still has a source somewhere in the network or is just an echo.
+Classic fixes restart the gossip periodically, or run [overlapping replicas](time-and-processes.mdx#replicated-processes) of it:
+they work, but they forget slowly, and the replicas multiply the traffic.
+
+### Path-loop detection
+
+The gossip of Collektive solves the problem with a self-stabilizing min-max consensus based on **path-loop detection**[^2].
+Every candidate value travels with the **path** of the devices that forwarded it, starting from the device that produced it.
+At every round, each device:
+
+1. discards the candidates whose path already contains its own identifier: they are **loops**, echoes of something the device itself sent;
+2. among the remaining ones and its own local value, picks the **best value**;
+3. breaks ties by preferring the **shortest path**, then the neighbor with the lowest identifier;
+4. appends its own identifier to the path of the winner, and sends it to the neighbors.
+
+A value whose source disappears is no longer regenerated: its copies keep circulating only until they reach,
+along some cycle, a device they already traversed, and then they are discarded.
+Meanwhile, the values that still have a source keep winning along their shortest paths.
+
+Here is `gossipMax` on a line of five devices.
+Every candidate is shown as *value · path*, colored by the device that produced it.
+
+**1. Stable.** Everybody agrees on 9, the value of device 1, each one with the path it came through:
+
+<Figure src="/img/concepts/gossip-path-loop-1.svg" alt="Stable state: all five devices agree on 9, each with the path from device 1" />
+
+**2. Device 1 drops to 0.** The candidates it receives from its neighbors, `9 · [1, 0]` and `9 · [1, 2]`,
+both contain its own identifier: they are loops, echoes of what device 1 itself sent, so they are discarded,
+and device 1 keeps its own value:
+
+<Figure src="/img/concepts/gossip-path-loop-2.svg" alt="Device 1 drops to 0: the candidates it receives from devices 0 and 2 contain its own identifier, so they are discarded, and device 1 keeps its own value" />
+
+**3. A few rounds later.** The stale 9 is gone from the whole network, and the actual maximum, 5, spreads from device 4:
+
+<Figure src="/img/concepts/gossip-path-loop-3.svg" alt="A few rounds later: the stale 9 is gone, and all devices agree on 5, spread from device 4" />
+
+This is the actual run of `gossipMax` on the same line, round by round, after device 1 changes its value from 9 to 0
+(devices run in order, from 0 to 4):
+
+| round | device 0 | device 1 | device 2 | device 3 | device 4 |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| stable | 9 | 9 | 9 | 9 | 9 |
+| 1 | 9 | **0** | 3 | 3 | 5 |
+| 2 | 1 | 3 | 3 | 5 | 5 |
+| 3 | 3 | 3 | 5 | 5 | 5 |
+| 4 | 3 | 5 | 5 | 5 | 5 |
+| 5 | 5 | 5 | 5 | 5 | 5 |
+
+Device 1 forgets 9 at once (the two copies it receives come from itself);
+then the stale 9 is gone, and the actual maximum, 5, spreads one hop per round.
+In the same scenario, `nonStabilizingGossip` returns 9 forever.
+
+The algorithm is an instance of the *minimizing share* pattern
+(extending the path makes a candidate strictly worse, and loops are rejected),
+which is enough to prove that it self-stabilizes in any network that eventually stops changing.
+
+### The algorithm in a few lines
+
+The core of the algorithm is a `share` with a fold over the neighbors' candidates.
+The standard library implements a generalized version of it, based on the same path utilities as
+[`gradientCast`](spreading.mdx#fast-repair-vs-bellman-ford);
+the version below, from the paper, is self-contained and behaves in the same way (it produces the table above):
+
+```kotlin
+@Serializable
+data class GossipValue<ID : Comparable<ID>, Value>(
+    val best: Value,
+    val path: List<ID> = emptyList(),
+) {
+    fun addHop(id: ID) = GossipValue(best, path + id)
+}
+
+inline fun <reified ID : Comparable<ID>, reified Value> Aggregate<ID>.findMaxOf(
+    local: Value,
+    comparator: Comparator<in Value>,
+): Value {
+    val localGossip = GossipValue<ID, Value>(best = local)
+    return share(localGossip) { gossip ->
+        gossip.neighbors.values.fold(localGossip) { current, neighbor ->
+            when {
+                localId in neighbor.path -> current // a loop: discard it
+                else -> when (comparator.compare(neighbor.best, current.best)) {
+                    0 -> when { // same value: shortest path first, then lowest sender
+                        neighbor.path.size == current.path.size ->
+                            listOf(neighbor, current).minBy { it.path.last() }
+                        else -> listOf(neighbor, current).minBy { it.path.size }
+                    }
+                    in 1..Int.MAX_VALUE -> neighbor // a better value
+                    else -> current
+                }
+            }
+        }.addHop(localId) // acknowledge the winner, and forward it
+    }.best
+}
+```
+
+### Costs and alternatives
+
+The only extra information with respect to the classic gossip is the path,
+used for loop detection and for breaking ties.
+In stable conditions, the path is as long as the distance from the best device;
+after a disruption, paths grow for a while, until loop detection prunes the stale candidates.
+Pass `maxDiameter` to bound the path length (and the message size) when you know the diameter of your network.
 Self-stabilizing gossip requires comparable device identifiers (`ID : Comparable<ID>`).
+
+In the simulations of the paper (100 devices, with network partitions, changes of all the values, and reconnections),
+compared to a gossip wrapped in [`timeReplicated`](time-and-processes.mdx#replicated-processes):
+
+- the path-based gossip starts converging **as soon as** a change happens, with a lower error during the transient,
+  while time replication waits for a fresh replica (a well-tuned replication may still reach the final value sooner);
+- it needs about **four times less** data, in regular operation, than three overlapping replicas;
+- unlike leader-based approaches (elect a leader, collect, broadcast), it has no coordination point that can fail.
 
 ### Non-stabilizing gossip
 
@@ -138,3 +253,8 @@ fun Aggregate<Int>.areaAverage(temperature: Double, radius: Int): Double {
 "Self-stabilising Priority-Based Multi-Leader Election and Network Partitioning",
 IEEE International Conference on Autonomic Computing and Self-Organizing Systems (ACSOS), 2022, pp. 81–90.
 [doi:10.1109/ACSOS55765.2022.00026](https://doi.org/10.1109/ACSOS55765.2022.00026)
+
+[^2]: A. Cortecchia, D. Pianini, and M. Viroli,
+"A Self-Stabilizing Min-Max Consensus via Path-loop Detection",
+Coordination Models and Languages (COORDINATION), 2026, pp. 93–114.
+[doi:10.1007/978-3-032-28358-0_5](https://doi.org/10.1007/978-3-032-28358-0_5)
