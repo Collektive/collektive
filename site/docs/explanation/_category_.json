@@ -3,6 +3,6 @@
   "position": 4,
   "link": {
     "type": "generated-index",
-    "description": " "
+    "description": "The concepts behind Collektive: aggregate programming, fields, the aggregate operators, alignment, and the standard library."
   }
 }

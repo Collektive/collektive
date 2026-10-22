@@ -1,169 +1,293 @@
 ---
-title: Fields and Basic Aggregate Operators
-position: 1
+title: Aggregate Operators
+sidebar_position: 4
+description: "evolve, neighboring, share, exchange, and their -ing variants: what each operator does and how to choose."
 ---
 
-:::warning
-This section is a work in progress,
-the content may be incomplete or missing,
-sorry for the inconvenience.
-In doubt,
-please refer to the [API documentation](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/latest/index.html)
+import Figure, {FigureGrid} from '@site/src/components/Figure';
 
-If you find any bugs or suggestions,
-please feel free to open an issue or fix them through a [PR](https://github.com/Collektive/collektive/pulls) :)
+# Aggregate Operators
+
+Collektive implements the **eXchange Calculus** (XC)[^1] as a Kotlin internal DSL.
+This page describes the constructs of the DSL (module `collektive-dsl`):
+how a program is structured, how each operator behaves, and how to choose among them.
+
+## The aggregate scope
+
+An aggregate program is an ordinary Kotlin function whose receiver is
+[`Aggregate<ID>`](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/latest/collektive-dsl/it.unibo.collektive.aggregate.api/-aggregate/index.html),
+where `ID` is the type of the device identifiers:
+
+```kotlin
+fun Aggregate<Int>.myProgram(temperature: Double): Boolean {
+    // localId: Int is available here
+    // aggregate operators can be called here
+}
+```
+
+The receiver works as a *capability*: only code running in an `Aggregate` scope can keep state across rounds or
+communicate with neighbors.
+Aggregate functions are therefore regular Kotlin extension functions:
+they compose by calling each other, and they receive sensor readings, configuration, and any other local data through
+ordinary parameters.
+
+:::tip
+Write reusable aggregate functions as extension functions of `Aggregate<ID>`.
+If the function does not depend on the specific type of the identifiers, keep it generic:
+`fun <ID : Any> Aggregate<ID>.myBlock(...)`.
+Most standard library functions are written this way.
 :::
 
-## Fields
+## Operators at a glance
 
-The `Field` is a data structure that maps for each device inside a neighborhood[^1],
-the device's ID to its local value.[^2]
+| Construct | XC counterpart | Communication | State | Use it to… |
+|-----------|----------------|---------------|-------|------------|
+| [`evolve` / `evolving`](#evolve-and-evolving-local-state) | `rep` | none | ✓ | remember a value across rounds |
+| [`neighboring`](#neighboring-observing-the-neighborhood) | `nbr` | same value to all neighbors | – | observe a value in the neighborhood |
+| [`mapNeighborhood`](#mapneighborhood-and-neighborhood) | – | alignment only | – | build a field computed locally from neighbor IDs |
+| [`share` / `sharing`](#share-and-sharing-propagating-state) | `share` | same value to all neighbors | ✓ | propagate information across many hops |
+| [`exchange` / `exchanging`](#exchange-and-exchanging-neighbor-specific-messages) | `exchange` | a possibly different value to each neighbor | ✓ | neighbor-specific interaction |
+| [`if` / `when`](alignment.mdx#branches-partition-the-network) | branch | – | – | partition the network into sub-collectives |
+| [`alignedOn`](alignment.mdx#loops-and-alignedon) | `align` | – | – | align computations explicitly (e.g., in loops) |
 
-Each field contains the `ID` of the device itself as well as its **local value**,
-and the IDs of the neighbors and their values.
-For example, the field shared by an isolated device with ID `0` in a network is:
-```
-ϕ(localId=0, localValue=0, neighbors={})
-```
-Note that, hence no neighbors are present, the `neighbors` value is empty.
+`exchange` is the most general construct: all the others (except branching) can be expressed through it.
+Prefer the most specific one that fits your needs: it communicates the intent, and it is often cheaper.
 
-Suppose that there are three devices all connected to each other:
+### The `-ing` variants and `yielding`
 
-![](/img/devices.svg)
-
-Device with ID `0` has a local value of `5`,
-device with ID `1` has a local value of `10`,
-and device with ID `2` has a local value of `15`.
-
-Considering the following `exchange` program:
-```kotlin
-exchange(initialValue) { field -> field }
-```
-
-These are the fields that each device perceives:
-```
-ϕ(localId=0, localValue=5, neighbors={1=10, 2=15}) // field perceived by device 0
-ϕ(localId=1, localValue=10, neighbors={0=5, 2=15}) // field perceived by device 1
-ϕ(localId=2, localValue=15, neighbors={0=5, 1=10}) // field perceived by device 2
-```
-
-Notice how the values of the neighbors are included in the field.
-
-Now, let's consider a more complex scenario with four devices, where the device with ID `3` has as neighbor only the device with ID `0`:
-
-![](/img/four-devices.svg)
-
-With the same `exchange` program as before, the fields perceived by each device are:
-```
-ϕ(localId=0, localValue=5, neighbors={1=10, 2=15, 3=20}) // field perceived by device 0
-ϕ(localId=1, localValue=10, neighbors={0=5, 2=15}) // field perceived by device 1
-ϕ(localId=2, localValue=15, neighbors={0=5, 1=10}) // field perceived by device 2
-ϕ(localId=3, localValue=20, neighbors={0=5}) // field perceived by device 3
-```
-Note now that the device with ID `3` has only one neighbor, the device with ID `0`,
-thus device `0` is the only one that has the device with ID `3` in its neighborhood,
-while device `3` has just the device with ID `0` in its neighborhood.
-
-[^1]: The neighborhood is the set of devices that are directly connected to a given device.
-[^2]: This is the definition of `field` inside Collektive, its definition from the Aggregate Computing perspective is slightly different.
-
-## Communication type
-
-### Isotropic
-The communication model is isotropic when the devices exchange the same information with each other in the neighborhood.
-
-![](/img/isotropic.svg)
-
-### Anisotropic
-The communication model is anisotropic when a device exchange different information based on the neighbor it is communicating with.
-
-![](/img/anisotropic.svg)
-
-## Aggregate Operators
-
-The main operators of the `DSL` that can manipulate fields are:
-
-### Exchange
-
-[`exchange`](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/exchange.html)[^3] is the core operator of the `DSL`.
-This construct has the crucial aspect that can send different values to each neighbor,
-allowing custom interaction between them.
-It models the space-time evolution of the device through an _anisotropic_ communication model with the neighbors.
-
-![](/img/exchange.svg)
-
-#### Example
+`evolving`, `sharing`, and `exchanging` decouple the value that is *stored and/or sent*
+from the value that is *returned* to the caller.
+Their body must end with `yielding`:
 
 ```kotlin
-// when the id of the device is even,
-// add 1 to the value perceived, else double the value.
-exchange(initialValue) { field ->
-    field.mapWithId { id, value ->
-        if (id % 2 == 0) value + 1 else value * 2
+valueToStoreOrSend.yielding { valueToReturn }
+```
+
+Inside the `yielding` block, `this` refers to the value being stored/sent.
+The non-`ing` versions (`evolve`, `share`, `exchange`) are shorthands for the case in which the two coincide.
+
+## `evolve` and `evolving`: local state
+
+[`evolve(initial) { previous -> next }`](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/latest/collektive-dsl/it.unibo.collektive.aggregate.api/-aggregate/evolve.html)
+keeps a value in the device state across rounds.
+In the first round `previous` is `initial`; afterwards, it is the value computed in the previous round.
+Nothing is sent to the neighbors.
+
+```kotlin
+fun Aggregate<Int>.roundCounter(): Int = evolve(0) { it + 1 }
+
+// exponential moving average of a noisy sensor
+fun Aggregate<Int>.runningAverage(x: Double): Double = evolve(x) { old -> 0.8 * old + 0.2 * x }
+```
+
+[`evolving`](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/latest/collektive-dsl/it.unibo.collektive.aggregate.api/-aggregate/evolving.html)
+stores a value and returns another:
+
+```kotlin
+// stores the last value, returns whether it changed since the last round
+fun Aggregate<Int>.hasChanged(value: Int): Boolean =
+    evolving(value) { previous -> value.yielding { value != previous } }
+```
+
+:::note
+State is attached to the *position* of the `evolve` call in the program (its alignment path, see [Alignment](alignment.mdx)).
+Two `evolve` calls in different places of the program, or the same call reached through different branches,
+hold independent states.
+If a branch is not executed in a round, its state is discarded.
+:::
+
+## `neighboring`: observing the neighborhood
+
+[`neighboring(value)`](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/latest/collektive-dsl/it.unibo.collektive.aggregate.api/neighboring.html)
+sends `value` to all neighbors and returns the `Field` containing the local `value`
+and the values that each aligned neighbor sent in its last round, at the same point of the program.
+
+<Figure src="/img/concepts/nbr.svg" alt="neighboring: the device sends x to every neighbor and receives their values" width={440}>
+`neighboring(x)`: the device sends its value `x` to every neighbor and receives theirs (`x₁`, `x₂`, `x₃`). Nothing is kept for the next round.
+</Figure>
+
+```kotlin
+// the largest value in my neighborhood (including mine)
+fun Aggregate<Int>.neighborMaximum(x: Int): Int = neighboring(x).all.values.max()
+```
+
+`neighboring` has no memory: on a line of three devices `0 - 1 - 2` with `x = 0, 2, 4`, it returns `2, 4, 4`.
+The information travels exactly one hop.
+
+## `mapNeighborhood` and `neighborhood`
+
+[`mapNeighborhood { id -> value }`](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/latest/collektive-dsl/it.unibo.collektive.aggregate.api/map-neighborhood.html)
+builds a `Field` whose values are computed *locally* from the neighbor IDs.
+It only exchanges the minimal information required to know who the aligned neighbors are,
+so it is preferable to `neighboring(constant)` (the compiler plugin warns if you share a compile-time constant).
+`neighborhood()` returns the bare field of the aligned neighbors.
+
+```kotlin
+val toNeighbors: Field<Int, Boolean> = mapNeighborhood { id -> id == parent }
+```
+
+## `share` and `sharing`: propagating state
+
+[`share(initial) { field -> value }`](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/latest/collektive-dsl/it.unibo.collektive.aggregate.api/share.html)
+combines state and communication.
+The lambda receives a `Field` holding:
+
+- as local value, the result of the previous round (or `initial`, in the first round), and
+- for each aligned neighbor, the last value it shared at this point of the program.
+
+The value returned by the lambda is stored *and* sent to all the neighbors.
+
+<Figure src="/img/concepts/share.svg" alt="share: the device computes y from the received values and its state, stores it, and sends it to every neighbor" width={440}>
+`share`: from the values received (`x₁`, `x₂`, `x₃`) and its own state, the device computes a new value `y`, which it stores and sends to every neighbor.
+</Figure>
+
+Since every device re-shares what it computed from what it received,
+information propagates over **multiple hops**, one per round:
+
+```kotlin
+// all devices converge to the maximum of x in the network
+fun Aggregate<Int>.networkMaximum(x: Int): Int = share(x) { maxOf(x, it.all.values.max()) }
+```
+
+On the same line `0 - 1 - 2` with `x = 0, 2, 4`, after a few rounds every device returns `4`.
+Compare it with `neighboring` above: the difference is that `share` feeds its own output back.
+
+`share` is the workhorse of self-organizing coordination:
+gradients, broadcasts, and gossip are all built on top of it.
+See the [gradient example](fields.mdx#example-a-gradient-in-a-few-lines) for a complete program.
+
+[`sharing`](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/latest/collektive-dsl/it.unibo.collektive.aggregate.api/sharing.html)
+shares a value and returns another:
+
+```kotlin
+// shares a distance, but only tells the caller whether a source is reachable
+fun Aggregate<Int>.isConnectedTo(source: Boolean, metric: Field<Int, Double>): Boolean =
+    sharing(Double.POSITIVE_INFINITY) { distances ->
+        val throughNeighbors = (distances + metric).neighbors.values.min()
+        val distance = if (source) 0.0 else throughNeighbors
+        distance.yielding { isFinite() }
+    }
+```
+
+:::note `share` vs `evolve` + `neighboring`
+`share(x) { f -> … }` is *not* the same as `evolve(x) { v -> … neighboring(v) … }`:
+in the latter, the value received from the neighbors is the one they had *before* updating it, which slows down propagation.
+The compiler plugin warns when an `evolve` could be replaced by a `share`.
+:::
+
+## `exchange` and `exchanging`: neighbor-specific messages
+
+[`exchange(initial) { field -> field }`](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/latest/collektive-dsl/it.unibo.collektive.aggregate.api/exchange.html)
+is the core primitive of XC.
+Like `share`, its lambda receives a `Field` (local value: the previous local result or `initial`;
+neighbors: the messages they sent *to this device*), but it must return a **`Field`**:
+the entry for each neighbor is the message sent *specifically to that neighbor*,
+and the local entry is the value stored for the next round (and sent to neighbors that have no specific entry).
+
+This is called **anisotropic** communication, as opposed to the **isotropic** communication of `neighboring` and `share`,
+in which every neighbor receives the same value:
+
+<FigureGrid columns={2}>
+  <Figure src="/img/concepts/isotropic.svg" alt="Isotropic communication: the same value v to every neighbor" width={360} label="Isotropic">
+  `neighboring`, `share`: every neighbor receives the same value `v`.
+  </Figure>
+  <Figure src="/img/concepts/anisotropic.svg" alt="Anisotropic communication: a different value to each neighbor" width={360} label="Anisotropic">
+  `exchange`: each neighbor receives its own value `v₁ … v₅`.
+  </Figure>
+</FigureGrid>
+
+Putting it together, at every round `exchange` combines state and anisotropic communication:
+
+<Figure src="/img/concepts/exchange.svg" alt="exchange: a value received from and a possibly different value sent to each neighbor, plus the local state" width={440}>
+`exchange`: the device receives from each neighbor the value addressed to it (`x₁`, `x₂`, `x₃`), sends back a possibly different value to each one (`y₁`, `y₂`, `y₃`), and stores its own entry as state.
+</Figure>
+
+Anisotropy enables interactions that are impossible with isotropic constructs,
+such as telling each neighbor something different.
+The following function builds a spanning tree descending a `potential` (e.g., a distance from a root)
+and returns, on every device, the set of its *children*:
+each device sends `true` only to its parent, so each device receives `true` only from its children.
+
+```kotlin
+import it.unibo.collektive.aggregate.Field
+import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.exchanging
+import it.unibo.collektive.aggregate.api.mapNeighborhood
+import it.unibo.collektive.stdlib.accumulation.findParent
+
+fun Aggregate<Int>.children(potential: Int): Set<Int> {
+    val parent: Int = findParent(potential) // the neighbor with the lowest potential (or myself)
+    return exchanging(false) { fromNeighbors: Field<Int, Boolean> ->
+        // anisotropic message: true to my parent, false to everyone else
+        val toNeighbors: Field<Int, Boolean> = mapNeighborhood { id -> id == parent && id != localId }
+        toNeighbors.yielding {
+            fromNeighbors.neighbors.list.filter { it.value }.map { it.id }.toSet()
+        }
     }
 }
 ```
-After each iteration of every device, the resultant fields are the following:
 
-```
-ϕ(localId=0, localValue=5, neighbors={})
-ϕ(localId=1, localValue=10, neighbors={0=6})
-ϕ(localId=2, localValue=15, neighbors={0=6, 1=20})
-ϕ(localId=3, localValue=20, neighbors={0=6, 1=20, 2=16})
-```
+On a 3×3 grid rooted in a corner, with `potential = hopDistanceTo(localId == 0)`,
+every device learns exactly which neighbors chose it as parent.
+This is the very mechanism used by the standard library's
+[`convergeCast`](standard-library/collection.mdx) to aggregate values towards a sink.
 
-[^3]: G. Audrito, R. Casadei, F. Damiani, G. Salvaneschi, and M. Viroli "The eXchange Calculus (XC): A functional programming language design for distributed collective systems."
-
----
-### Exchanging
-[`exchanging`](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/exchanging.html)
-
----
-
-### Share
-[share](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api.operators/share.html)
-models the device space-time evolution.
-
-
-![](/img/share.svg)
-
----
-
-### Sharing
-
-[`sharing`](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api.operators/sharing.html)
-
----
-
-### Neighboring
-
-[`neighboring`](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/neighboring.html)
-allows to access the values of the neighbours and send them information.
-
-![](/img/nbr.svg)
-
----
-
-### Neighboring via Exchange
-
-[`neighboringViaExchange`](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api.operators/neighboring-via-exchange.html)
-
----
-
-### Evolve
-
-[`evolve`](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/evolve.html)
-allows to model the state evolution of the device over time.
-
----
-
-### Evolving
-
-[`evolving`](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/evolving.html)
-
-
-## Field Operations
-
-:::note
-Work in progress, sorry for the inconvenience.
+:::tip
+When `exchange` is used with a field that holds the same value for every neighbor,
+Collektive sends a single value (no per-neighbor overrides), so isotropic usages are not penalized.
 :::
+
+## Choosing the right operator
+
+<Figure src="/img/concepts/choose-operator.svg" alt="Decision tree: no communication, evolve; a different value per neighbor, exchange; the same value for one hop, neighboring; for many hops, share" width={720} />
+
+When the value shared with `neighboring` is local knowledge that neighbors could compute themselves (e.g., a constant), use `mapNeighborhood` instead.
+Use the `-ing` variant whenever the value you need to *return* differs from the value you need to *store or send*.
+
+## Running an aggregate program
+
+The aggregate program is executed by a
+[`Collektive`](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/latest/collektive-dsl/it.unibo.collektive/-collektive/index.html)
+instance, one per device:
+
+```kotlin
+val device = Collektive(localId = 1, network = myMailbox) {
+    networkMaximum(readSensor())
+}
+while (running) {
+    val result = device.cycle() // runs one round
+    actuate(result)
+    delay(roundPeriod)
+}
+```
+
+- `cycle()` runs one round: it snapshots the inbound messages from the `Mailbox`,
+  evaluates the program from the stored state, saves the new state, and hands the outbound messages to the `Mailbox`;
+- `cycleWhile { result -> condition }` runs rounds while the condition holds;
+- `Collektive.aggregate(localId, previousState, inbound) { … }` runs a *single* round without a `Collektive` instance,
+  returning an `AggregateResult` with the result, the new state, and the messages to send.
+  It is useful when rounds are scheduled by an external system (e.g., a simulator).
+
+<Figure src="/img/concepts/collektive-architecture.svg" alt="Collektive architecture: coordination libraries are built on the DSL and runtime, compiled with the compiler plugin; the Mailbox is the only communication dependency, implemented by platform-specific adapters such as a real network, Alchemist, Unity, or in-memory tests; the common code compiles for JVM, JavaScript, Android, iOS, and native targets" width={720}>
+The DSL and the libraries are shared by all platforms; the `Mailbox` is the boundary towards platform-specific communication.
+</Figure>
+
+The [`Mailbox`](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/latest/collektive-dsl/it.unibo.collektive.networking/-mailbox/index.html)
+interface is the only communication dependency of the runtime: implement it to plug Collektive into any network technology
+(MQTT, BLE, UDP broadcast, a simulator, …).
+A mailbox declaring `inMemory = true` exchanges values without serialization;
+otherwise values are serialized through [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization),
+so any shared type must be serializable (annotate your data classes with `@Serializable`).
+
+:::info Simulation
+Most of the times, you will not write a `Mailbox` yourself:
+the [Alchemist incarnation](../tutorials/collektive-and-alchemist.mdx) runs Collektive programs in simulation,
+and the `collektive-test-tooling` module provides in-memory networks for unit tests.
+:::
+
+---
+
+[^1]: G. Audrito, R. Casadei, F. Damiani, G. Salvaneschi, and M. Viroli,
+"The eXchange Calculus (XC): A functional programming language design for distributed collective systems",
+Journal of Systems and Software, 210, 2024.
+[doi:10.1016/j.jss.2024.111976](https://doi.org/10.1016/j.jss.2024.111976)

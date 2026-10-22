@@ -1,0 +1,9 @@
+{
+  "label": "Standard Library",
+  "position": 6,
+  "link": {
+    "type": "doc",
+    "id": "explanation/standard-library/overview"
+  },
+  "description": "Self-stabilizing building blocks: distances, broadcasts, collection, gossip, leaders, and time."
+}

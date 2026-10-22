@@ -1,0 +1,92 @@
+---
+title: Time and Processes
+sidebar_position: 6
+description: "Shared clocks, timers, and replicated processes for computations that must forget."
+---
+
+# Time and Processes
+
+Rounds are asynchronous, and device clocks are not synchronized.
+The blocks on this page let a collective reason about time anyway:
+measuring elapsed time, agreeing on a shared notion of time, and periodically refreshing computations
+that would otherwise never forget.
+
+Time is passed to these functions as a parameter (a `kotlin.time.Instant`),
+so the same program works with wall-clock time on real devices and with simulated time in simulators.
+
+## Local and shared time
+
+| Function | Package | Returns |
+|----------|---------|---------|
+| `localDeltaTime(now)` | `stdlib.time` | the time elapsed since the previous round of this device (never negative) |
+| `sharedClock(localTime)` | `stdlib.time` | a logical clock shared by the network, advancing as fast as the fastest device |
+| `sharedTimeLeftTo(now, timeToWait)` | `stdlib.time` | the time left before a shared, periodic timer expires |
+
+```kotlin
+import it.unibo.collektive.stdlib.time.localDeltaTime
+import kotlin.time.Clock
+
+val sinceLastRound = localDeltaTime(Clock.System.now())
+```
+
+`sharedClock` is a [gossip](gossip-and-leader-election.mdx#gossip) of clock *progress*:
+each device advances the shared clock by its own elapsed time, and adopts the most advanced clock among its neighbors.
+The resulting value is a logical time, useful to measure durations consistently across devices,
+not a synchronized wall-clock time.
+
+`sharedTimeLeftTo` builds a **periodic timer** on top of the shared clock:
+it returns how much time is left before the timer expires (zero or negative when it does),
+and then restarts the countdown from `timeToWait`.
+
+```kotlin
+// trigger an action roughly every 30 seconds, consistently across the network
+val shouldAct = sharedTimeLeftTo(now, 30.seconds) <= Duration.ZERO
+```
+
+## Replicated processes
+
+Some computations are not self-stabilizing:
+a [non-stabilizing gossip](gossip-and-leader-election.mdx#non-stabilizing-gossip) never forgets a value,
+and a stale value can linger forever after a failure.
+**Time replication**[^1] mitigates this by periodically starting a fresh copy (a *replica*) of the computation,
+running a few replicas in parallel, and returning the result of the **oldest** one, which has had the most time to converge.
+When a replica becomes too old, it is discarded: obsolete information is forgotten with it.
+
+```kotlin
+timeReplicated(
+    currentTime: Instant,  // the current time
+    maxReplicas: Int,      // how many replicas run at the same time
+    timeToSpawn: Duration, // how often a new replica is spawned
+    process: () -> Type,   // the aggregate computation to replicate
+): Type
+```
+
+```kotlin
+import it.unibo.collektive.stdlib.processes.timeReplicated
+import it.unibo.collektive.stdlib.spreading.everHappened
+import kotlin.time.Duration.Companion.seconds
+
+// "has an alarm been raised recently?"
+// everHappened never forgets; replicated, it forgets alarms older than ~ maxReplicas * timeToSpawn
+fun Aggregate<Int>.recentAlarm(now: Instant, alarm: Boolean): Boolean =
+    timeReplicated(now, maxReplicas = 2, timeToSpawn = 10.seconds) {
+        everHappened { alarm }
+    }
+```
+
+Spawning is coordinated through `sharedTimeLeftTo`, so that all devices create replicas at about the same time;
+each replica is [aligned on its own identifier](../alignment.mdx#loops-and-alignedon),
+so replicas never mix their messages.
+
+:::tip Choosing the parameters
+The oldest replica is between `(maxReplicas - 1) * timeToSpawn` and `maxReplicas * timeToSpawn` old.
+`timeToSpawn` must be long enough for a replica to converge across the network (a few rounds per hop of the diameter);
+`maxReplicas` trades memory and messages for a smoother result.
+:::
+
+---
+
+[^1]: D. Pianini, J. Beal, and M. Viroli,
+"Improving Gossip Dynamics Through Overlapping Replicates",
+Coordination Models and Languages (COORDINATION), 2016.
+[doi:10.1007/978-3-319-39519-7_12](https://doi.org/10.1007/978-3-319-39519-7_12)
