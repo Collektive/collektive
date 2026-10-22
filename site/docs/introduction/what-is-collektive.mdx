@@ -1,6 +1,9 @@
 ---
 title: What is Collektive?
+description: "What Collektive is, the problems it addresses, and what makes it different."
 ---
+
+import {Card, CardGrid} from '@site/src/components/Cards';
 
 # What is Collektive?
 
@@ -32,32 +35,24 @@ See [Building Resilient Systems with Aggregate Programming](../explanation/aggre
 
 ## Why Collektive?
 
-### Plain, statically typed Kotlin
-
-Collektive is an *internal* DSL: aggregate programs are ordinary Kotlin functions,
-with full IDE support, static type checking, and access to the whole Kotlin ecosystem.
-There is no new language to learn, and type errors are caught at compile time.
-
-### Transparent alignment
-
-Devices must know which message belongs to which part of the program (*alignment*).
-Collektive's compiler plugin computes this information at compile time, without annotations:
-branches, function calls, and higher-order functions just work.
-The same plugin also checks your code, and warns about common misuses of the DSL while you build.
-See [Alignment](../explanation/alignment.mdx) and [The Compiler Plugin](../explanation/compiler-plugin.mdx).
-
-### Complete semantic foundation
-
-Collektive implements the **eXchange Calculus** (XC), the core calculus that generalizes the field calculus and underpins modern aggregate programming,
-with first-class (*reified*) neighborhood fields.
-On top of it, a [standard library](../explanation/standard-library/overview.mdx) provides self-stabilizing building blocks:
-distances, broadcasts, collection, gossip, leader election, and time.
-
-### Truly multiplatform
-
-Thanks to Kotlin Multiplatform, the same aggregate program compiles for the **JVM**, **JavaScript** (browser and Node.js),
-and **native** targets, including **Android** and **iOS**.
-Devices running on different platforms can cooperate in the same collective, as long as they exchange compatible messages.
+<CardGrid columns={2}>
+  <Card icon="code" title="Plain, statically typed Kotlin">
+    An *internal* DSL: aggregate programs are ordinary Kotlin functions, with full IDE support, static type checking,
+    and the whole Kotlin ecosystem. No new language to learn.
+  </Card>
+  <Card to="/docs/explanation/alignment" icon="sitemap" title="Transparent alignment">
+    The compiler plugin matches each message to its operator at compile time, without annotations,
+    and warns about common misuses of the DSL while you build.
+  </Card>
+  <Card to="/docs/explanation/stdlib-descriptions" icon="shield" title="Complete semantic foundation">
+    The **eXchange Calculus**, with first-class neighborhood fields, and a standard library of self-stabilizing building blocks:
+    distances, broadcasts, collection, gossip, leader election, and time.
+  </Card>
+  <Card icon="multiplatform" title="Truly multiplatform">
+    The same program compiles for the **JVM**, **JavaScript**, and **native** targets, including **Android** and **iOS**:
+    devices on different platforms cooperate in the same collective.
+  </Card>
+</CardGrid>
 
 ---
 

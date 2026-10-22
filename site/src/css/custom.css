@@ -110,3 +110,41 @@
 [data-theme='dark'] .markdown h4 code {
     color: var(--ifm-color-primary-light);
 }
+
+/* Category pages: cards with full titles and two-line descriptions, in the style of the doc cards */
+.theme-doc-card-container {
+    border-radius: 14px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    padding: 1.1rem 1.2rem !important;
+    transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+.theme-doc-card-container:hover {
+    box-shadow: 0 6px 18px rgba(78, 163, 241, 0.15);
+    transform: translateY(-1px);
+}
+
+.theme-doc-card-heading {
+    align-items: flex-start !important;
+    font-size: 1.05rem;
+    line-height: 1.35;
+}
+
+.theme-doc-card-title,
+.theme-doc-card-description {
+    white-space: normal !important;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+}
+
+.theme-doc-card-title {
+    -webkit-line-clamp: 2;
+}
+
+.theme-doc-card-description {
+    -webkit-line-clamp: 2;
+    font-size: 0.88rem !important;
+    line-height: 1.5;
+    color: var(--ifm-color-emphasis-700);
+}
