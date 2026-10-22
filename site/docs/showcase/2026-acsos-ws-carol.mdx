@@ -1,6 +1,7 @@
 ---
 title: "Toward Safe Aggregate Computing: A Distributed Control-Theoretic Safety Filter for Robot Swarms (2026)"
 summary: "A fully distributed safety filter combining Aggregate Computing with control Lyapunov and barrier functions for safe robot-swarm coordination."
+sidebar_position: 6
 ---
 
 :::info
@@ -15,45 +16,94 @@ The DOI is not yet available.
 
 Robot swarms need to coordinate their motion while satisfying safety requirements such as obstacle avoidance,
 inter-robot separation, and bounded speed.
-Centralized controllers can enforce these constraints, but they introduce a single coordination point and do not naturally fit large,
-dynamic swarms operating through local communication.
+Aggregate Computing makes it easy to specify adaptive swarm-level behaviour,
+but its self-stabilisation guarantees are *eventual*: during transients, or while the environment keeps changing,
+the commands computed by the aggregate program may be unsafe.
 
 This work presents **CAROL** (Coordinated Aggregate Robotics with Online control Lyapunov and barrier functions),
-a fully distributed multi-robot control framework implemented with Collektive.
-It connects Aggregate Computing with optimization-based control through **Control Lyapunov Functions (CLFs)**,
-which drive robots towards their goals, and **Control Barrier Functions (CBFs)**,
-which constrain their motion to preserve safety.
+an architecture that integrates Aggregate Computing with a **control-theoretic safety filter**.
+The aggregate program computes the nominal collective behaviour,
+while a safety-filtering layer refines the resulting commands through
+**Control Lyapunov Functions (CLFs)**, which drive robots towards their goals,
+and **Control Barrier Functions (CBFs)**, which constrain their motion to preserve safety.
+Constraints are enforced on each robot in a fully distributed fashion.
 
-The coupled control problem is solved using the **Alternating Direction Method of Multipliers (ADMM)**.
-Robots perform local and pairwise optimisation steps and negotiate compatible control inputs without a central coordinator.
-The resulting safety filter can enforce maximum-speed, obstacle-avoidance, and collision-avoidance constraints,
-while treating communication-range preservation as a soft constraint when physical conditions make it impossible to maintain.
+## Architecture
+
+![Architecture of the aggregate safety filter](/img/acsos-ws-2026-carol/architecture.png)
+
+Each robot runs the same aggregate program, which computes a nominal input $u_{nom}$ from its local state and neighbour information.
+Before being applied, $u_{nom}$ is refined by the safety filter into a safe input $u$,
+which stays as close as possible to the nominal one while satisfying the active constraints.
+Both commands are fed back to a collective strategy layer, which can reason about the next actions (e.g., re-planning when convergence is too slow).
+
+![Device-wise view of the aggregate safety filter](/img/acsos-ws-2026-carol/architecture-device.png)
+
+Constraints involving a single robot (target convergence, speed limit, obstacle avoidance) are handled by a **local QP**,
+whereas constraints coupling two robots (collision avoidance, communication-range preservation) are handled by a **pairwise QP**
+using information exchanged with neighbours.
+The coupled problem is solved through the **Alternating Direction Method of Multipliers (ADMM)**:
+robots iteratively exchange their pairwise solutions with neighbours until convergence, without any central coordinator.
 
 ## Experiment description
 
-The artefact evaluates the controller through Alchemist simulations covering different coordination patterns and combinations of safety constraints:
+The proof-of-concept experiments run in Alchemist, with the QPs solved by Gurobi.
+Each experiment considers 4 robots, modelled as points moving in a 2D plane with single-integrator dynamics ($\dot{p} = u$).
+Robots communicate within a 10 m range, must keep a minimum distance of 2 m from each other,
+cannot exceed a speed of 2 m/s, and must stay out of the obstacles' unsafe region (2 m radius plus a 1.5 m safety margin).
 
-- **No obstacle, split targets**: two groups move towards different goals in free space while respecting speed and collision constraints.
-- **Common moving target**: the swarm follows a shared moving target, avoids a static obstacle, and preserves connectivity when possible.
-- **Leader-follower**: a leader elected through distributed coordination tracks a target while neighbouring robots follow it under obstacle, collision, speed, and communication-range constraints.
-- **Different targets**: robots are assigned separate targets and split towards their destinations while avoiding obstacles and one another.
-- **Multiple obstacles**: the swarm navigates an environment containing several hazards under the same distributed safety-filtering mechanism.
+At every round, the safety filter solves:
 
-At every control step, each robot solves a local quadratic program.
-The objective remains close to a nominal goal-directed command,
-while CLF and CBF terms encode convergence and safety requirements.
-The continuous-time dynamics are robustified through zero-order-hold discretisation,
-and ADMM terminates when its local primal and dual residuals meet the configured tolerances or the scenario limit is reached.
+$$
+\min_{u_i,\ \delta_i \geq 0} \sum_{i=1}^{N} \left( \lVert u_i - u_{nom,i} \rVert^2 + \rho\,\delta_i^2 \right)
+$$
+
+subject to a soft CLF constraint for target convergence (relaxed through the slack $\delta_i$),
+and hard CBF constraints for obstacle avoidance, inter-robot collision avoidance, communication-range preservation, and maximum speed.
 
 ## Results
 
-The scenarios demonstrate how the same aggregate control architecture supports multiple swarm behaviours without introducing a centralized controller.
-Across the experiments, the safety filter combines:
+In all the animations, robots are blue dots surrounded by their safety radius,
+the light circles are their communication ranges, and grey lines are links between robots within communication distance.
+Targets are green stars, and obstacles are dark red crosses surrounded by their unsafe region and safety margin.
 
-- distributed agreement over coupled control inputs;
-- convergence towards common, separate, or leader-defined goals;
-- hard limits for speed, obstacle clearance, and inter-robot distance;
-- graceful relaxation of communication-range constraints when preserving connectivity would make the local optimisation problem infeasible.
+### No obstacles
+
+Two groups move towards different goals in free space, respecting speed and collision constraints.
+
+![No-obstacles scenario](/img/acsos-ws-2026-carol/no-obstacles.gif)
+
+### Different targets with collision and obstacle avoidance
+
+Robots 0 and 1 are assigned to target $t_1$, while robots 2 and 3 are assigned to target $t_2$.
+Both groups reach their targets without colliding with each other or with the obstacle.
+
+![Different-targets scenario](/img/acsos-ws-2026-carol/different-targets.gif)
+
+### Common target
+
+The swarm moves towards a shared target, going around a static obstacle while preserving connectivity when possible.
+
+![Follow-target scenario](/img/acsos-ws-2026-carol/follow-target.gif)
+
+### Leader election and connectivity preservation
+
+Within each communication neighbourhood, the robot with the highest identifier is elected leader (yellow circle) and moves towards the target,
+while the others follow it.
+Initially two disconnected clusters follow different leaders;
+once they enter communication range they merge, elect a common leader,
+and follow it while preserving connectivity, avoiding collisions, and navigating around the obstacle.
+
+![Follow-leader scenario](/img/acsos-ws-2026-carol/follow-leader.gif)
+
+### Multiple obstacles: local minima
+
+The relative position of targets and obstacles may trap the robots in a local minimum of the target-convergence CLF:
+active obstacle-avoidance constraints block direct convergence, even though a feasible path exists.
+Safety is never violated, but this scenario motivates the collective strategy layer,
+which could switch to an alternative navigation strategy (e.g., exploration or waypoint selection) at runtime.
+
+![Multiple-obstacles scenario](/img/acsos-ws-2026-carol/multiple-obstacles.gif)
 
 Together, these experiments show how Aggregate Computing can act as the coordination layer for control-theoretic safety mechanisms,
-allowing safety constraints and collective behaviors to be composed within the same field-based program.
+keeping the specification of the collective behaviour separate from the enforcement of physical constraints.
