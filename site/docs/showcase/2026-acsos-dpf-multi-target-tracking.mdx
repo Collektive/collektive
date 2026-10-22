@@ -1,11 +1,12 @@
 ---
 title: Multi-Target Tracking via Field-Based Distributed Particle Filtering (2026)
 summary: "A field-based distributed particle filter for tracking multiple moving targets with fixed, leader-based, and mobile sensor networks."
+sidebar_position: 5
 ---
 
 :::info
 Experimental artefact and simulation setup available at
-[https://github.com/domm99/experiments-acsos-2026-DPF-multi-object-tracking](https://github.com/domm99/experiments-acsos-2026-DPF-multi-object-tracking).
+[https://github.com/Field-Based-DPF/experiments-acsos-2026-DPF-multi-object-tracking](https://github.com/Field-Based-DPF/experiments-acsos-2026-DPF-multi-object-tracking)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21063216.svg)](https://doi.org/10.5281/zenodo.21063216)
 
 This work was presented at the **2026 IEEE International Conference on Autonomic Computing and Self-Organizing Systems (ACSOS 2026)**.
@@ -21,37 +22,65 @@ The artifact associated with this article has won the **Best Companion Artifact 
 Tracking several moving targets from observations collected by a distributed sensor network requires nodes to combine uncertain,
 partial information without relying on permanent centralized infrastructure.
 Particle filters are well suited to nonlinear and non-Gaussian estimation,
-but distributing their computation introduces choices about where measurements are fused,
-how far information propagates, and how the sensing network reacts to failures or target motion.
+but existing Distributed Particle Filtering (DPF) approaches are often tied to fixed architectures, predefined roles, or rigid communication assumptions.
 
-This work expresses distributed particle filtering as a **field-based computation** implemented with Collektive.
-Sensors locally execute the filtering logic and use Aggregate Computing coordination mechanisms to select and combine observations.
-The formulation supports both neighborhood-based information fusion and dynamically elected fusion leaders,
-as well as sensor deployments that move collectively with the targets.
+Building on the field-based formulation of DPF introduced in
+[Flexible Distributed Particle Filtering for the Internet of Things via Aggregate Computing](./2026-dcoss-distributed-particle-filtering.mdx),
+this work uses Collektive to turn DPF into a **self-organising collective process**:
+sensing, information dissemination, role assignment, and particle-based estimation are all expressed as computational fields.
+As a result, the architecture becomes a runtime coordination choice rather than a fixed property of the filtering algorithm, supporting:
+
+- **self-organisation**, through neighbourhood-level aggregation of local measurements;
+- **self-healing**, through fusion centres realised as dynamically elected leaders, replaced upon failure;
+- **self-adaptation**, through mobile sensors that reorganise their spatial configuration around the moving targets.
 
 ## Experiment description
 
-The evaluation replays three recorded zebra trajectories and deploys a $4 \times 6$ grid of filter nodes.
-Each filter uses 250 particles per tracked target,
-and each simulation runs for 1,400 simulated seconds to cover the complete trajectories.
+Target trajectories are derived from the **KABR** telemetry dataset of drone-based wildlife observations:
+three zebra tracks are converted into planar coordinates and used as moving targets.
+Each target emits a radio-like signal carrying a unique identifier,
+and sensors perceive it through a noisy log-distance path-loss model.
+Each sensor runs a single **multi-target particle filter**, maintaining particles and estimates per target identifier.
 
-Three main scenarios explore different information-flow and deployment strategies:
+All experiments use 24 sensors placed on a grid with small random perturbations,
+execute rounds at 1 Hz without global synchronisation,
+last 1,400 simulated seconds, and are repeated with 50 random seeds.
+Three scenarios exercise different coordination patterns over the same field-based filter:
 
-- **Fixed sensors, neighbor-based filtering**: every sensor remains in place and combines its local observation with those of a bounded number of nearby sensors. The evaluation varies the number of neighbors over 0, 1, 2, 4, and 7.
-- **Fixed sensors, leader-based filtering**: observations are routed towards an elected leader, which performs the particle-filter update and exports the estimated trajectories. The active leader is removed after 700 seconds to evaluate recovery through a new election.
-- **Moving sensors, neighbor-based filtering**: the sensor grid moves as a swarm around the estimated centroid of the zebras, changing the observation geometry while retaining neighborhood-based fusion. The evaluation varies the number of neighbors over 0, 1, 4, and 7.
-
-All scenarios share the same target trajectories and particle-filter implementation,
-so the evaluation isolates the effect of the coordination and deployment strategy.
+- **Fixed sensors, neighbourhood-level aggregation**: each sensor refines its local filter with the observations of its neighbours (no particles are exchanged), with neighbourhood size $|N|$ in 0, 1, 4, and 7.
+- **Fixed sensors, leader-based fusion centre**: measurements are routed through a converge-cast towards a leader elected via a geometric centrality score. The leader is failed halfway through the simulation (time step 700) to evaluate recovery through a new election.
+- **Mobile sensors, neighbourhood-level aggregation**: the sensors keep a grid-like formation whose centroid follows the estimated centroid of the zebras. A temporary coordinator is elected only for motion coordination, while particle filtering remains fully decentralised.
 
 ## Results
 
-The experiments provide a common basis for comparing how field-based particle filtering behaves under different network organisations.
-In particular, they expose the effects of:
+### Neighbourhood-level aggregation
 
-- increasing or reducing the amount of neighboring information available to each filter;
-- concentrating the update at an elected leader and recovering after that leader fails;
-- moving the sensing infrastructure with the estimated targets instead of relying on a fixed deployment.
+With $|N| = 0$, each sensor relies only on its own noisy measurements, which are insufficient to reconstruct the trajectories.
+Sharing observations among neighbours progressively improves the estimates,
+and larger neighbourhoods yield accurate and stable tracking of all three targets without any fusion centre.
 
-The artefact therefore demonstrates that tracking logic, information propagation, leader election,
+![Estimated trajectories of three zebras for different neighbourhood sizes](/img/acsos-2026-dpf/trajectories-by-neighbors.png)
+
+![Average RMSE over 50 seeds for different neighbourhood sizes](/img/acsos-2026-dpf/rmse.png)
+
+### Leader-based fusion centre with failure
+
+When the elected leader fails at time step 700, the estimates temporarily degrade.
+After the new leader is elected, the system self-heals and the trajectories progressively stabilise.
+
+![Estimated trajectories with a leader-based fusion centre failing at time step 700](/img/acsos-2026-dpf/leader-failure.png)
+
+### Mobile sensors
+
+The mobile sensors (blue) preserve a grid-like formation centred around the barycentre of the three zebras (pink),
+coupling distributed estimation with self-organising mobility.
+
+![Flocking behaviour of the moving sensors following the zebras](/img/acsos-2026-dpf/moving-sensors.png)
+
+The quality of motion coordination directly affects estimation accuracy:
+the farther the formation drifts from the tracked targets, the less informative the measurements, and the higher the RMSE.
+
+![Estimation error as a function of the tracking error of the moving sensors](/img/acsos-2026-dpf/rmse-by-position-error.png)
+
+Overall, the artefact shows that tracking logic, information propagation, leader election,
 and collective sensor motion can be expressed as composable aggregate mechanisms while retaining the same underlying particle-filter model.
