@@ -1,0 +1,107 @@
+.grid {
+    display: grid;
+    gap: 0.9rem;
+    margin: 1.2rem 0 2rem;
+}
+
+.columns1 {
+    grid-template-columns: 1fr;
+}
+
+.columns2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.columns3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 760px) {
+    .columns2,
+    .columns3 {
+        grid-template-columns: 1fr;
+    }
+}
+
+.card {
+    display: flex;
+    gap: 0.9rem;
+    align-items: flex-start;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--ifm-color-emphasis-200);
+    border-radius: 14px;
+    background: var(--ifm-background-color);
+    color: var(--ifm-font-color-base);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.link {
+    transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+.link:hover {
+    color: var(--ifm-font-color-base);
+    text-decoration: none;
+    border-color: var(--ifm-color-primary);
+    box-shadow: 0 6px 18px rgba(78, 163, 241, 0.15);
+    transform: translateY(-1px);
+}
+
+.icon {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 2.3rem;
+    height: 2.3rem;
+    border-radius: 10px;
+    background: rgba(78, 163, 241, 0.12);
+    color: var(--ifm-color-primary-darker);
+    font-size: 1.05rem;
+}
+
+[data-theme='dark'] .icon {
+    background: rgba(112, 185, 249, 0.14);
+    color: var(--ifm-color-primary-light);
+}
+
+.text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.eyebrow {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ifm-color-emphasis-600);
+}
+
+.title {
+    font-weight: 700;
+    font-size: 1.02rem;
+    line-height: 1.35;
+}
+
+.arrow {
+    display: inline-block;
+    margin-left: 0.35rem;
+    color: var(--ifm-color-primary);
+    transition: transform 0.15s;
+}
+
+.link:hover .arrow {
+    transform: translateX(3px);
+}
+
+.description {
+    margin-top: 0.25rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--ifm-color-emphasis-800);
+}
+
+.description p {
+    margin: 0;
+}

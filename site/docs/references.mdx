@@ -1,30 +1,45 @@
 ---
 title: References
 sidebar_position: 4
+description: "API documentation, examples, and template repositories."
 ---
 
-### Documentation
-- [All the modules](https://javadoc.io/doc/it.unibo.collektive)
-    -- Links to the documentation of all the modules of Collektive.
-- [DSL documentation](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl)
-    -- The core of Collektive with the main Field Calculus constructs implementation.
-- [Standard library documentation](https://javadoc.io/doc/it.unibo.collektive/collektive-stdlib)
-    -- The documentation of the standard library of Collektive.
-- [Alchemist-Collektive Incarnation documentation](https://javadoc.io/doc/it.unibo.collektive/alchemist-incarnation-collektive)
-    -- The incarnation of Collektive for the [Alchemist simulator](https://alchemistsimulator.github.io/index.html).
+import {Card, CardGrid} from '@site/src/components/Cards';
 
-### GitHub repositories
+# References
 
-- [Collektive Organization](https://github.com/Collektive)
-    -- The GitHub organization of Collektive.
-- [Collektive example distributed](https://github.com/Collektive/collektive-example-distributed)
-    -- A Collektive program that runs on different distributed nodes.
-- [Examples](https://github.com/Collektive/collektive-examples)
-    -- Examples of Collektive programs leveraging on the Alchemist simulator.
+## API documentation
 
-### Template repositories
+<CardGrid columns={2}>
+  <Card to="https://javadoc.io/doc/it.unibo.collektive/collektive-dsl" icon="book" title="collektive-dsl">
+    The core: the `Aggregate` scope, the aggregate operators, fields, and the runtime.
+  </Card>
+  <Card to="https://javadoc.io/doc/it.unibo.collektive/collektive-stdlib" icon="book-open" title="collektive-stdlib">
+    The standard library of collective building blocks.
+  </Card>
+  <Card to="https://javadoc.io/doc/it.unibo.collektive/alchemist-incarnation-collektive" icon="flask" title="alchemist-incarnation-collektive">
+    The incarnation of Collektive for the Alchemist simulator.
+  </Card>
+  <Card to="https://javadoc.io/doc/it.unibo.collektive" icon="layers" title="All the modules">
+    The documentation of every published module.
+  </Card>
+</CardGrid>
 
-- [Android Examples](https://github.com/Collektive/collektive-example-android)
-    -- Examples and template repository of Collektive programs on Android.
-- [Experiments bootstrap](https://github.com/Collektive/collektive-experiments-bootstrap)
-    -- A starting repository for experiments with Collektive.
+## Examples and templates
+
+<CardGrid columns={2}>
+  <Card to="https://github.com/Collektive/collektive-examples" icon="github" title="collektive-examples">
+    Collektive programs simulated with Alchemist.
+  </Card>
+  <Card to="https://github.com/Collektive/collektive-example-distributed" icon="github" title="collektive-example-distributed">
+    A Collektive program running on separate processes, communicating over the network.
+  </Card>
+  <Card to="https://github.com/Collektive/collektive-example-android" icon="android" title="collektive-example-android">
+    A template for Collektive programs on Android.
+  </Card>
+  <Card to="https://github.com/Collektive/collektive-experiments-bootstrap" icon="rocket" title="collektive-experiments-bootstrap">
+    A starting point for simulation experiments with Collektive.
+  </Card>
+</CardGrid>
+
+See the [Collektive organization](https://github.com/Collektive) on GitHub for all the repositories.
