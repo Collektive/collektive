@@ -13,33 +13,60 @@ If you find any bugs or suggestions,
 please feel free to open an issue or fix them through a [PR](https://github.com/Collektive/collektive/pulls) :)
 :::
 
-## Index
-1. [Introduction](/docs/category/introduction/)
-   - [What is Collektive?](introduction/what-is-collektive.mdx)
-2. [Tutorials](/docs/category/tutorials/)
-   - [Getting Started](tutorials/getting-started.mdx)
-   - [First Collektive Program](tutorials/first-collektive-program.mdx)
-   - [Basic Usage](tutorials/basic-usage.mdx)
-   - [Common Mistakes](tutorials/common-mistakes.mdx)
-   - [Integration with Simulator](tutorials/collektive-and-alchemist.mdx)
-   - [Simulation in Unity](tutorials/collektive-and-unity.mdx)
-3. [Explanation](/docs/category/explanation/)
-   - [Aggregate Programming and Field Calculus](explanation/aggregate-programming.mdx)
-   - [Levels of Abstraction](explanation/levels-of-abstractions.mdx)
-   - [Thinking in Fields](explanation/fields.mdx)
-   - [Aggregate Operators](explanation/dsl-descriptions.mdx)
-   - [Alignment and Domain Partitioning](explanation/alignment.mdx)
-   - [The Compiler Plugin](explanation/compiler-plugin.mdx)
-   - [Standard Library](explanation/standard-library/overview.mdx)
-     - [Field Operations](explanation/standard-library/field-operations.mdx)
-     - [Spreading: Distances and Broadcasts](explanation/standard-library/spreading.mdx)
-     - [Collection](explanation/standard-library/collection.mdx)
-     - [Gossip and Leader Election](explanation/standard-library/gossip-and-leader-election.mdx)
-     - [Time and Processes](explanation/standard-library/time-and-processes.mdx)
-   - [Collektive and Other Aggregate Frameworks](explanation/other-frameworks.mdx)
-4. [Reference guides](references.mdx)
-5. [Glossary](glossary.mdx)
-6. [Project structure](project-structure.mdx)
-7. [Showcase](/docs/category/showcase/)
+import {Card, CardGrid} from '@site/src/components/Cards';
 
-[//]: # (4. [How-to guides]&#40;/docs/category/how-to-guides/&#41;)
+Collektive is a Kotlin Multiplatform framework for **aggregate programming**:
+you write one program for a whole network of devices, and Collektive turns it into what each device computes and sends.
+
+## Start here
+
+<CardGrid columns={3}>
+  <Card to="/docs/introduction/what-is-collektive" icon="compass" eyebrow="Introduction" title="What is Collektive?">
+    The problems it solves, and what makes it different.
+  </Card>
+  <Card to="/docs/tutorials/gettingstarted" icon="rocket" eyebrow="Tutorial" title="Getting Started">
+    Add Collektive and its compiler plugin to a Gradle project.
+  </Card>
+  <Card to="/docs/tutorials/first-collektive-program" icon="code" eyebrow="Tutorial" title="Your first program">
+    A self-healing collective, step by step.
+  </Card>
+</CardGrid>
+
+## Learn
+
+<CardGrid columns={2}>
+  <Card to="/docs/category/tutorials" icon="learn" title="Tutorials">
+    Basic usage, common mistakes, and simulation with Alchemist and Unity.
+  </Card>
+  <Card to="/docs/explanation/fields" icon="layers" title="Thinking in Fields">
+    The mental model of aggregate programming: fields, neighbors, and rounds.
+  </Card>
+  <Card to="/docs/explanation/dsl-descriptions" icon="puzzle" title="Aggregate Operators">
+    `evolve`, `neighboring`, `share`, `exchange`, and how to choose among them.
+  </Card>
+  <Card to="/docs/explanation/stdlib-descriptions" icon="book-open" title="Standard Library">
+    Self-stabilizing building blocks: distances, broadcasts, collection, gossip, leaders, time.
+  </Card>
+  <Card to="/docs/explanation/alignment" icon="sitemap" title="Alignment and Partitioning">
+    How messages find their operator, and why branches split the network.
+  </Card>
+  <Card to="/docs/explanation/compiler-plugin" icon="magic" title="The Compiler Plugin">
+    Alignment at compile time, and the diagnostics that catch misuses of the DSL.
+  </Card>
+</CardGrid>
+
+## Reference
+
+<CardGrid columns={3}>
+  <Card to="/docs/glossary" icon="book" title="Glossary">
+    The terms of aggregate programming, in one place.
+  </Card>
+  <Card to="/docs/references" icon="code" title="APIs and examples">
+    API documentation, examples, and template projects.
+  </Card>
+  <Card to="/docs/category/showcase" icon="flask" title="Showcase">
+    Research built with Collektive, with experiments and artifacts.
+  </Card>
+</CardGrid>
+
+[//]: # (How-to guides: hidden for now, see /docs/category/how-to-guides/)
