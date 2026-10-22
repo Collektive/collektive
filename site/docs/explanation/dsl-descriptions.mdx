@@ -1,6 +1,7 @@
 ---
 title: Aggregate Operators
 sidebar_position: 4
+description: "evolve, neighboring, share, exchange, and their -ing variants: what each operator does and how to choose."
 ---
 
 import Figure, {FigureGrid} from '@site/src/components/Figure';
@@ -267,7 +268,7 @@ while (running) {
   returning an `AggregateResult` with the result, the new state, and the messages to send.
   It is useful when rounds are scheduled by an external system (e.g., a simulator).
 
-<Figure src="/img/concepts/collektive-multiplatform.svg" alt="Collektive architecture: the DSL and the library are common to all platforms, the Mailbox connects them to platform-specific networking" width={420} card>
+<Figure src="/img/concepts/collektive-architecture.svg" alt="Collektive architecture: coordination libraries are built on the DSL and runtime, compiled with the compiler plugin; the Mailbox is the only communication dependency, implemented by platform-specific adapters such as a real network, Alchemist, Unity, or in-memory tests; the common code compiles for JVM, JavaScript, Android, iOS, and native targets" width={720}>
 The DSL and the libraries are shared by all platforms; the `Mailbox` is the boundary towards platform-specific communication.
 </Figure>
 
