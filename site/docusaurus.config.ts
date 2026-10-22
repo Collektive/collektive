@@ -124,21 +124,28 @@ const config: Config = {
             style: 'dark',
             links: [
                 {
-                    title: 'Docs',
+                    title: 'Learn',
                     items: [
-                        {
-                            label: 'Getting Started',
-                            to: '/docs/intro',
-                        },
+                        {label: 'What is Collektive?', to: '/docs/introduction/what-is-collektive'},
+                        {label: 'Getting Started', to: '/docs/tutorials/gettingstarted'},
+                        {label: 'Thinking in Fields', to: '/docs/explanation/fields'},
+                        {label: 'Standard Library', to: '/docs/explanation/stdlib-descriptions'},
                     ],
                 },
                 {
-                    title: 'More',
+                    title: 'Reference',
                     items: [
-                        {
-                            label: 'GitHub',
-                            href: 'https://github.com/Collektive/collektive',
-                        },
+                        {label: 'API documentation', href: 'https://javadoc.io/doc/it.unibo.collektive'},
+                        {label: 'Glossary', to: '/docs/glossary'},
+                        {label: 'Showcase', to: '/docs/category/showcase'},
+                    ],
+                },
+                {
+                    title: 'Community',
+                    items: [
+                        {label: 'GitHub', href: 'https://github.com/Collektive/collektive'},
+                        {label: 'Issues', href: 'https://github.com/Collektive/collektive/issues'},
+                        {label: 'Examples', href: 'https://github.com/Collektive/collektive-examples'},
                     ],
                 },
             ],
