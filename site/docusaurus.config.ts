@@ -9,6 +9,14 @@ const config: Config = {
     title: 'Collektive',
     tagline: 'Aggregate Computing in Kotlin Multiplatform',
     favicon: 'img/collektive-logo-white-background-round.svg',
+    stylesheets: [
+        {
+            href: 'https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css',
+            type: 'text/css',
+            integrity: 'sha384-5TcZemv2l/9On385z///+d7MSYlvIEw9FuZTIdZ14vJLqWphw7e7ZPuOiCHJcFCP',
+            crossorigin: 'anonymous',
+        },
+    ],
 
     // Set the production url of your site here
     url: 'https://collektive.github.io',
