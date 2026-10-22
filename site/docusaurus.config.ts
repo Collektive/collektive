@@ -147,6 +147,7 @@ const config: Config = {
         prism: {
             theme: prismThemes.github,
             darkTheme: prismThemes.dracula,
+            additionalLanguages: ['csharp', 'java', 'scala', 'protobuf'],
         },
         metadata: [
             {name: 'keywords', content: 'cooking, blog'},
