@@ -64,6 +64,14 @@ or on the `all` view (including it).
 
 </Term>
 
+<Term name="Compiler plugin">
+
+The Kotlin compiler plugin applied by the Collektive Gradle plugin: it injects alignment into aggregate code,
+and reports misuses of the DSL as compiler warnings and errors.
+See [The Compiler Plugin](explanation/compiler-plugin.mdx).
+
+</Term>
+
 <Term name="Computational field">
 
 A global, distributed data structure mapping every device of the system to a value, at every moment in time.
@@ -93,6 +101,8 @@ A first-class (*reified*) value in Collektive.
 <Term name="Gossip">
 
 Network-wide agreement on an aggregate (minimum, maximum, …) of the local values, without designated sources.
+In Collektive it is self-stabilizing: candidates carry the path they traveled, and the ones that loop back are discarded.
+See [Gossip](explanation/standard-library/gossip-and-leader-election.mdx#path-loop-detection).
 
 </Term>
 
