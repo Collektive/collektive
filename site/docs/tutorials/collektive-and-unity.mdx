@@ -1,0 +1,191 @@
+---
+title: Using Collektive with Unity
+sidebar_position: 6
+---
+
+import Figure, {FigureGrid} from '@site/src/components/Figure';
+
+# Using Collektive with Unity
+
+[Alchemist](collektive-and-alchemist.mdx) simulates thousands of devices on simplified models of the world:
+positions, distances, and connectivity rules.
+That is what you want while you design and tune a collective algorithm,
+but some questions need a more faithful world:
+devices with a body, that collide, are blocked by walls, or see each other only when nothing is in between.
+
+**Collektivity**[^1] runs unmodified Collektive programs inside the [Unity](https://unity.com/) game engine,
+so that the environment gets Unity's physics, 3D scenes, and rendering,
+while the collective behavior is still an ordinary aggregate program.
+
+<FigureGrid columns={2}>
+<Figure src="/img/unity/collektivity-simple.jpg" alt="Spheres connected by network links moving around box-shaped obstacles in a simple 3D arena" label="(a)">
+A simple arena with box obstacles: links show the neighborhoods.
+</Figure>
+<Figure src="/img/unity/collektivity-oasis.jpg" alt="About a hundred spheres moving across a realistic desert oasis scene, among rocks and palm trees" label="(b)">
+The same program in Unity's *Oasis* environment.
+</Figure>
+</FigureGrid>
+
+## Alchemist or Unity?
+
+| | [Alchemist](collektive-and-alchemist.mdx) | Unity (Collektivity) |
+|---|---|---|
+| world model | positions, distances, maps, mobility models | 3D scenes, rigid-body physics, collisions |
+| neighborhoods | declared in YAML (e.g., within a distance) | computed by Unity (e.g., trigger colliders, occlusion) |
+| scale | thousands to tens of thousands of devices | hundreds of devices, in real time |
+| typical use | design, parameter sweeps, batch experiments | validation in a realistic setting, demos |
+| how programs run | on the JVM, in the simulator | compiled to a native library, called by Unity |
+
+The two are complementary steps of the same validation pipeline:
+the same aggregate function can be run in both, then on real devices.
+
+## How it works
+
+Collektive and Unity were not made to work together:
+Unity runs C# on its own .NET runtime, which is not a Kotlin target.
+Collektivity therefore compiles the aggregate program with **Kotlin/Native** into a shared library,
+which Unity calls directly through a foreign-function interface (much faster than a socket bridge:
+the paper measures a difference of more than two orders of magnitude).
+
+<Figure src="/img/unity/collektivity-architecture.svg" alt="Architecture of Collektivity: platform-agnostic data structures generate Kotlin and C# sensors and actuators; Unity sends sensor data to the aggregate program, compiled as a native library, and receives actuation data back" width={680} card>
+Architecture of Collektivity (from the [Collektivity repository](https://github.com/pslab-unibo/collektivity)).
+</Figure>
+
+The responsibilities are split along the natural line:
+
+- **Unity owns the world**: physics, positions, and **who is a neighbor of whom**.
+  At every tick of its game loop, Unity asks each device to sense, runs a round of the aggregate program for it, and applies the result;
+- **Collektive owns the computation**: the aggregate program, the state of each device across rounds,
+  and the messages exchanged with the neighbors (they never leave the Kotlin side);
+- **a shared schema** describes what flows between the two: the *sensors* (from Unity to the program) and the *actuators* (from the program to Unity).
+  It is written once as a [Protocol Buffers](https://protobuf.dev/) file, which generates matching Kotlin and C# classes.
+
+Messages between devices are not part of the schema, on purpose:
+their shape depends on the program and on alignment, so changing the program never requires changing the Unity side.
+
+## Writing a simulation
+
+Collektivity is a **repository template**: start from [pslab-unibo/collektivity](https://github.com/pslab-unibo/collektivity),
+which contains the integration, the Kotlin backend, and two example Unity projects
+(a simple arena and the Oasis scene, in the figure above).
+It requires Unity 6, Java 21, and Linux or macOS; the README of the repository explains the setup.
+
+A new scenario takes four steps.
+
+### 1. Define sensors and actuators
+
+Edit `collektive-backend/lib/src/commonMain/proto/user-defined-schema.proto`.
+In the examples, each device senses the intensity of a source, its position, and the nearby obstacles,
+and the program decides where it should move:
+
+```protobuf
+message SensorData {
+  double sourceIntensity = 1;
+  Vector3 currentPosition = 2;
+  repeated Vector3 obstacles = 3;
+}
+
+message ActuatorData {
+  Vector3 targetPosition = 1;
+}
+```
+
+`./gradlew build` in `collektive-backend` generates the Kotlin and C# classes.
+
+### 2. Write the aggregate program
+
+The program is an ordinary aggregate function from the sensors to the actuators,
+in `UserDefinedEntrypoint.kt`.
+In the examples, devices climb the gradient of the source intensity using what their neighbors perceive, and steer away from obstacles:
+
+```kotlin
+fun Aggregate<Int>.entrypoint(sensorData: SensorData): ActuatorData {
+    val neighbors = neighboring(sensorData).neighbors.sequence // what each neighbor senses
+    val towardsSource = neighbors.fold(Vector3Helper.zero()) { direction, neighbor ->
+        val gain = neighbor.value.sourceIntensity - sensorData.sourceIntensity
+        val towardsNeighbor = neighbor.value.currentPosition - sensorData.currentPosition
+        if (gain <= 0) direction else direction + towardsNeighbor.normalized() * gain.toFloat()
+    }
+    val awayFromObstacles = sensorData.obstacles.fold(Vector3Helper.zero()) { direction, obstacle ->
+        val distance = obstacle.magnitude() // obstacles are relative to the device
+        if (distance <= 0.001f) direction else direction - obstacle.normalized() * (1f / (distance * distance))
+    }
+    return ActuatorData(sensorData.currentPosition + towardsSource + awayFromObstacles * 2f)
+}
+```
+
+Everything you know about Collektive applies: the [standard library](../explanation/standard-library/overview.mdx) is available,
+and the program can be tested without Unity, as any other aggregate function.
+Since the program runs in a single process, values are exchanged in memory, and need not be serializable.
+
+### 3. Implement sensing and actuation in Unity
+
+In Unity, open the project and run **Tools → Proto → Generate** and **Tools → Native → Rebuild backend**
+(rerun them whenever the schema or the program change).
+Then create a `MonoBehaviour` extending `Node`, which translates between the Unity world and the schema:
+
+```csharp
+public class MyRobot : Node // Intensity and MoveTowards are your own helpers
+{
+    [SerializeField] private Transform source;
+
+    public override SensorData Sense() => new SensorData
+    {
+        SourceIntensity = Intensity(Vector3.Distance(transform.position, source.position)),
+        CurrentPosition = new Shared.Vector3
+        {
+            X = transform.position.x, Y = transform.position.y, Z = transform.position.z,
+        },
+    };
+
+    protected override void Act(ActuatorData state) =>
+        MoveTowards(new Vector3(state.TargetPosition.X, state.TargetPosition.Y, state.TargetPosition.Z));
+}
+```
+
+Attach it to the game objects that represent the devices, and add the `Simulation Manager` prefab to the scene:
+it registers the nodes, drives the rounds, and controls the random seed for reproducibility.
+
+### 4. Decide who is a neighbor
+
+Neighborhoods are up to Unity, through the `SimulationManager` API.
+The examples use a trigger collider around each device: whatever enters it becomes a neighbor, whatever leaves it stops being one.
+
+```csharp
+[RequireComponent(typeof(Collider))]
+public class ProximityNeighborhoodBehaviour : MonoBehaviour
+{
+    private Node _node;
+
+    private void Start() => _node = GetComponentInParent<Node>();
+
+    private void OnTriggerEnter(Collider other)
+    {
+        var otherNode = other.GetComponent<Node>();
+        if (otherNode != null) SimulationManager.Instance.Subscribe(_node, otherNode);
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        var otherNode = other.GetComponent<Node>();
+        if (otherNode != null) SimulationManager.Instance.Unsubscribe(_node, otherNode);
+    }
+}
+```
+
+The same mechanism supports any rule Unity can compute: line of sight, layers, or signal attenuation through walls.
+Press **Play**, and the devices start running the aggregate program.
+
+:::info Performance
+In the examples (devices running at 20 Hz), a laptop with integrated graphics handles about 50 devices in real time,
+a desktop with a dedicated GPU about 100;
+richer scenes, like Oasis, need more graphics power.
+For large-scale experiments, use [Alchemist](collektive-and-alchemist.mdx).
+:::
+
+---
+
+[^1]: F. Gurioli, M. Baiardi, A. Cortecchia, and D. Pianini,
+"High-Fidelity Simulation of Aggregate Computing Systems with Collektivity",
+Coordination Models and Languages (COORDINATION), 2026, pp. 263–281.
+[doi:10.1007/978-3-032-28358-0_13](https://doi.org/10.1007/978-3-032-28358-0_13)
