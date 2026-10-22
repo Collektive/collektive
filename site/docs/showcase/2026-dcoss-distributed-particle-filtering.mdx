@@ -1,0 +1,89 @@
+---
+title: Flexible Distributed Particle Filtering for the Internet of Things via Aggregate Computing (2026)
+summary: "A field-based formulation that separates particle-filter estimation from information propagation and coordination in open IoT systems."
+sidebar_position: 4
+---
+
+:::info
+Experimental artefact and simulation setup available at
+[https://github.com/Field-Based-DPF/experiments-ac-based-distributed-particle-filtering](https://github.com/Field-Based-DPF/experiments-ac-based-distributed-particle-filtering).
+
+This work was published in **DCOSS-IoT 2026**, pp. 601–606
+(DOI: [10.48550/ARXIV.2606.18483](https://doi.org/10.48550/ARXIV.2606.18483)).
+:::
+
+:::tip
+This work is extended to multiple moving targets and mobile sensors in
+[Multi-Target Tracking via Field-Based Distributed Particle Filtering](./2026-acsos-dpf-multi-target-tracking.mdx).
+:::
+
+## Abstract
+
+State estimation from uncertain observations collected across a network is central to many cyber-physical and Internet of Things (IoT) applications.
+Distributed Particle Filtering (DPF) supports nonlinear and non-Gaussian estimation,
+but existing solutions are often coupled to a particular network architecture or communication model.
+This makes them difficult to adapt to open and heterogeneous deployments.
+
+This work proposes a **field-based formulation of Distributed Particle Filtering** grounded in Aggregate Computing.
+Estimation and information dissemination are expressed as computational fields,
+separating the core particle-filter logic from the mechanisms that coordinate devices and move data through the network.
+
+This separation makes several design dimensions independently configurable:
+
+- the **placement and resilience of fusion centres**, realised as dynamically elected leaders that are replaced upon failure;
+- the **aggregated measurement functions**, combining raw local observations of neighbouring devices into a richer, distributed "virtual sensor";
+- the **type of information** exchanged among nodes (particles, beliefs, likelihoods, or raw measurements);
+- the **spatial and topological scope** of dissemination, e.g., restricting the filtering to the sensors close to the estimated target.
+
+## Experiment description
+
+The evaluation considers a **target-tracking** scenario in a two-dimensional environment.
+A network of 25 static sensors is deployed on a grid (with small random perturbations),
+while a single object moves along a non-linear sinusoidal trajectory at constant speed.
+Sensors perceive the radio signal emitted by the target through a log-distance path-loss model with Gaussian noise:
+the farther the target, the weaker and noisier the measurement.
+
+Sensors run their computation at 1 Hz without synchronisation;
+each run lasts 3,000 simulated seconds and is repeated with 100 random seeds.
+Two experiments are derived from the same field-based specification:
+
+- **Aggregated measurement function**: every sensor runs its own local particle filter,
+  and enriches its weighting step with the measurements shared by its neighbours (no particles are exchanged).
+  The neighbourhood size $|N|$ varies over 0, 1, 4, and 7.
+- **Fusion centre as an elected leader**: measurements are collected through a converge-cast towards a dynamically elected leader,
+  which runs the particle filter. At time step 1,500 the leader fails, and a new one is elected by the aggregate program.
+
+## Results
+
+### Aggregated measurements
+
+With no neighbours, the filters fail to converge due to the limited amount of information.
+As the neighbourhood grows, the aggregated measurement becomes more informative:
+a single neighbour already improves the estimate significantly,
+and with $|N| = 7$ the estimate is both accurate and stable.
+
+![Estimated trajectories for different neighbourhood sizes](/img/dcoss-2026-dpf/trajectories-by-neighbors.png)
+
+![Average RMSE over 100 seeds for different neighbourhood sizes](/img/dcoss-2026-dpf/rmse.png)
+
+*Average RMSE over 100 random seeds; shaded areas indicate variance.*
+
+The animation below shows how the particles of a local filter evolve over time
+when the measurement function aggregates the observations of an increasing number of sensors.
+The red dot is the real position of the target, blue dots are the particles:
+the more sensors contribute, the faster and tighter the particles concentrate around the target.
+
+![Evolution of the particle distribution for an increasing number of contributing sensors](/img/dcoss-2026-dpf/particles.gif)
+
+### Leader-based fusion centre
+
+The fusion centre exhibits two short transients: one at the beginning, when the first leader is elected,
+and one after the failure at time step 1,500.
+Once the new leader is elected, it takes over the fusion role and keeps tracking the target,
+showing that the field-based fusion centre self-heals without external intervention.
+
+![Estimated trajectory with a leader-based fusion centre failing at time step 1500](/img/dcoss-2026-dpf/leader-failure.png)
+
+Overall, the evaluation positions Aggregate Computing as an abstraction layer for adaptable distributed estimation:
+the particle-filter implementation remains reusable,
+while coordination policies can be changed to match the topology, sensing model, and resilience requirements of an IoT deployment.

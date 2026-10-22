@@ -1,6 +1,7 @@
 ---
-title: FieldVMC An Asynchronous Model and Platform for Self-Organising Morphogenesis of Artificial Structures (2026)
-summary: "Simulations related to the generalization of the Vascular Morphogenesis algorithm using the Aggregate Computing paradigm, presented at ACSOS 2024."
+title: "FieldVMC: An Asynchronous Model and Platform for Self-Organising Morphogenesis of Artificial Structures (2026)"
+summary: "A field-based generalisation of the Vascular Morphogenesis Controller (VMC) using Aggregate Computing, first presented at ACSOS 2024 and extended in Complex & Intelligent Systems (2026)."
+sidebar_position: 2
 ---
 
 :::info
@@ -20,10 +21,11 @@ published in **Complex & Intelligent Systems (2026)**
 
 :::note
 This experiment uses an old Collektive version: `13.1.1`.
+However, you can find an updated version of the approach in the [Collektive/FieldVMC](https://github.com/Collektive/FieldVMC) repository, which is compatible with the latest Collektive version.
 :::
 
 ## Abstract
-In the field of evolutionary computing, the concept of Vascular Morphogenesis Controller (VMC) has been proposed in to model the growth of artificial structures over time.
+In the field of evolutionary computing, the concept of Vascular Morphogenesis Controller (VMC) has been proposed to model the growth of artificial structures over time.
 
 A thorough analysis of the VMC model revealed some limitations:
 - assumes the organization structure is a tree,
@@ -61,7 +63,7 @@ To this end, we designed a set of experiments:
 - _legacySelfConstruction_: self-construction from a single node (growth from seed),
 - _selfDivision_: self-division after disruption (network segmentation) with no regeneration (cutting). The segmentation is performed by removing a part of the structure after 500 simulated seconds, and the nodes are not able to regenerate the missing part;
 - _selfIntegration_: self-integration of multiple FieldVMC systems (grafting). Two distinct structures are created, and after 500 simulated seconds, they are merged into a single structure;
-- _selfSegmentation_: self-segmentation of a larger structure (budding). Two distinct structures are created with possibly more than leader each; after 500 simulated seconds, they are merged into a single structure;
+- _selfSegmentation_: self-segmentation of a larger structure (budding). Two distinct structures are created with possibly more than one leader each; after 500 simulated seconds, they are merged into a single structure;
 - _selfOptimisation_: self-optimisation of multiple large structures into a more efficient one (abscission and regrowth). Sparse nodes are created far from success and resource sources, with spawning and destruction of nodes enabled, the structure is allowed to grow and optimize itself.
 - _selfConstructionClassicVMC_: implementation of the classic VMC model, starting from a single node, with spawning of new nodes but no destruction of them;
 - _selfHealingClassicVMC_: same of the previous one, but with the cutting of a part of the structure after 500 simulated seconds;
