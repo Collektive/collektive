@@ -4,6 +4,8 @@ title: Write Reusable Aggregate Functions
 sidebar_position: 3
 ---
 
+import {DoDont, Do, Dont} from '@site/src/components/Mistakes';
+
 The real power of aggregate programming is composition: application code is built from
 reusable collective functions, which are built from other collective functions, down to the core operators.
 This guide collects the conventions that make your own functions as reusable as the
@@ -28,16 +30,25 @@ every device must be able to evaluate the function using only its local informat
 Shared values are serialized, and the serializer is derived from the type at compile time.
 Therefore, a function that shares a value of a *generic* type must be `inline` with a `reified` type parameter:
 
-```kotlin
-// ❌ does not compile: "Cannot use 'T' as reified type parameter"
-fun <ID : Any, T> Aggregate<ID>.majority(local: T): T = …
+<DoDont>
+<Dont label={'does not compile: "Cannot use \'T\' as reified type parameter"'}>
 
-// ✅
+```kotlin
+fun <ID : Any, T> Aggregate<ID>.majority(local: T): T = …
+```
+
+</Dont>
+<Do label="inline, with a reified type parameter">
+
+```kotlin
 inline fun <ID : Any, reified T> Aggregate<ID>.neighborhoodMajority(local: T): T =
     neighboring(local).all.values.list
         .groupingBy { it }.eachCount()
         .maxBy { (_, votes) -> votes }.key
 ```
+
+</Do>
+</DoDont>
 
 The same applies to `ID`, when the identifiers are shared (for instance, because you call standard library functions
 that track paths of devices, such as `gradientCast`, `gossip`, or `boundedElection`):
