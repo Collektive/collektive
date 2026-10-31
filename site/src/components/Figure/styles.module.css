@@ -1,0 +1,66 @@
+.figure {
+    margin: 1.75rem auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.frame {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.frame img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 0.75rem;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+}
+
+[data-theme='dark'] .card {
+    box-shadow: none;
+}
+
+.caption {
+    margin-top: 0.75rem;
+    max-width: 46rem;
+    text-align: center;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--ifm-color-emphasis-700);
+}
+
+.caption p {
+    margin: 0;
+}
+
+.label {
+    font-weight: 700;
+    margin-right: 0.35rem;
+    color: var(--ifm-color-emphasis-900);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(var(--figure-columns), minmax(0, 1fr));
+    gap: 1.5rem;
+    margin: 1.75rem 0;
+    align-items: start;
+}
+
+.grid .figure {
+    margin: 0;
+}
+
+@media (max-width: 720px) {
+    .grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

@@ -1,0 +1,306 @@
+/* Colors shared by the components of this module, in both themes. */
+.mistake,
+.doDont,
+.index {
+    --mistake-red: #dc2626;
+    --mistake-red-soft: rgba(220, 38, 38, 0.07);
+    --mistake-green: #16a34a;
+    --mistake-green-soft: rgba(22, 163, 74, 0.07);
+    --mistake-amber: #b45309;
+    --mistake-amber-soft: rgba(245, 158, 11, 0.1);
+}
+
+[data-theme='dark'] .mistake,
+[data-theme='dark'] .doDont,
+[data-theme='dark'] .index {
+    --mistake-red: #f87171;
+    --mistake-red-soft: rgba(248, 113, 113, 0.08);
+    --mistake-green: #4ade80;
+    --mistake-green-soft: rgba(74, 222, 128, 0.07);
+    --mistake-amber: #fbbf24;
+    --mistake-amber-soft: rgba(251, 191, 36, 0.08);
+}
+
+/* --- the card --- */
+
+.mistake {
+    margin: 2.2rem 0;
+    padding: 1.3rem 1.4rem 0.4rem;
+    border: 1px solid var(--ifm-color-emphasis-200);
+    border-radius: 14px;
+    background: var(--ifm-background-color);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.mistake > h2,
+.mistake > h3 {
+    margin: 0 0 0.9rem;
+    font-size: 1.4rem;
+    line-height: 1.3;
+}
+
+/* --- compiler diagnostic --- */
+
+.diagnostic {
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--ifm-color-emphasis-200);
+    background: var(--ifm-background-surface-color);
+    overflow: hidden;
+}
+
+.diagnosticHead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    border-bottom: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.severity {
+    padding: 0.05rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.severityWarning {
+    background: var(--mistake-amber-soft);
+    color: var(--mistake-amber);
+}
+
+.severityError {
+    background: var(--mistake-red-soft);
+    color: var(--mistake-red);
+}
+
+.diagnosticHead .diagnosticId {
+    border: none;
+    background: none;
+    padding: 0;
+    font-size: 0.78rem;
+    color: var(--ifm-color-emphasis-700);
+}
+
+.diagnosticMessage {
+    padding: 0.55rem 0.75rem;
+    font-family: var(--ifm-font-family-monospace);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.diagnosticMessage > p {
+    margin: 0;
+}
+
+/* --- symptom --- */
+
+.symptom {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    margin-bottom: 1rem;
+    padding: 0.55rem 0.8rem;
+    border-radius: 10px;
+    background: var(--mistake-amber-soft);
+}
+
+.symptomLabel {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    flex: none;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--mistake-amber);
+}
+
+.symptomLabel svg {
+    width: 0.9rem;
+    height: 0.9rem;
+    align-self: center;
+}
+
+.symptomText > p:last-child {
+    margin-bottom: 0;
+}
+
+/* --- do / don't --- */
+
+.doDont {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    margin-bottom: 1rem;
+}
+
+.panel {
+    border-radius: 10px;
+    border: 1px solid var(--ifm-color-emphasis-200);
+    overflow: hidden;
+}
+
+.panelHead {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8rem;
+}
+
+.panelDont {
+    border-color: color-mix(in srgb, var(--mistake-red) 35%, transparent);
+}
+
+.panelDont .panelHead {
+    background: var(--mistake-red-soft);
+    color: var(--mistake-red);
+}
+
+.panelDo {
+    border-color: color-mix(in srgb, var(--mistake-green) 35%, transparent);
+}
+
+.panelDo .panelHead {
+    background: var(--mistake-green-soft);
+    color: var(--mistake-green);
+}
+
+.panelIcon {
+    display: inline-grid;
+    place-items: center;
+    width: 1.15rem;
+    height: 1.15rem;
+    border-radius: 999px;
+    background: currentColor;
+    font-size: 0.7rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.panelDont .panelIcon,
+.panelDo .panelIcon {
+    color: #ffffff;
+}
+
+.panelDont .panelIcon {
+    background: var(--mistake-red);
+}
+
+.panelDo .panelIcon {
+    background: var(--mistake-green);
+}
+
+.panelTitle {
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.panelLabel {
+    color: var(--ifm-color-emphasis-700);
+}
+
+.panelBody > div[class*='codeBlockContainer'],
+.panelBody > div {
+    margin-bottom: 0 !important;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.panelBody pre {
+    border-radius: 0;
+}
+
+.panelResult {
+    padding: 0.4rem 0.75rem;
+    border-top: 1px solid var(--ifm-color-emphasis-200);
+    font-size: 0.82rem;
+    color: var(--ifm-color-emphasis-800);
+}
+
+.panelResult code {
+    font-size: 0.8rem;
+}
+
+/* --- why / fix --- */
+
+.explanation {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    margin: 0 0 1rem;
+}
+
+.explanationLabel {
+    flex: none;
+    min-width: 4.2rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ifm-color-primary-darker);
+}
+
+[data-theme='dark'] .explanationLabel {
+    color: var(--ifm-color-primary-light);
+}
+
+.explanationText > p:last-child {
+    margin-bottom: 0;
+}
+
+/* --- index --- */
+
+.index {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 0.8rem;
+    margin: 1.5rem 0 2rem;
+}
+
+.indexGroup {
+    padding: 0.85rem 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--ifm-color-emphasis-200);
+    background: var(--ifm-background-surface-color);
+}
+
+.indexName {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ifm-color-emphasis-700);
+}
+
+.indexGroup ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.indexGroup li {
+    margin: 0.25rem 0;
+    font-size: 0.92rem;
+    line-height: 1.35;
+}
+
+@media (max-width: 600px) {
+    .mistake {
+        padding: 1rem 0.9rem 0.2rem;
+    }
+
+    .symptom,
+    .explanation {
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+}

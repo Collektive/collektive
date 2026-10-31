@@ -1,100 +1,107 @@
 ---
 title: Basic Usage
 sidebar_position: 3
+description: "Small programs with the core operators, from one-hop interactions to network-wide computations."
 ---
 
+This tutorial builds a few small programs with the core aggregate operators,
+from one-hop interactions to network-wide computations.
+All results refer to a line of five devices with IDs `0 - 1 - 2 - 3 - 4`.
+The operators used here are described in detail in [Aggregate Operators](../explanation/dsl-descriptions.mdx).
+
+## Counting neighbors
+
 ```kotlin
-/**
- * Function to evaluate the number of neighbors of a node in an [Aggregate] context.
- */
-fun Aggregate<Int>.neighborCounter(): Int = neighboring(1).count()
+import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.neighborhood
+
+fun Aggregate<Int>.neighborCounter(): Int = neighborhood().neighbors.size
 ```
 
-The library function neighboring is a **aggregate operator** and is used to observe the value of an expression [local] across neighboring nodes.
+[`neighborhood()`](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/latest/collektive-dsl/it.unibo.collektive.aggregate.api/neighborhood.html)
+returns the [`Field`](../explanation/fields.mdx) of the neighbors aligned with the current device,
+exchanging only the minimal information needed to discover them.
+`neighbors` excludes the device itself, so its `size` is the number of neighbors.
 
-The returned field has as its local value the value passed as input (1 in this example). Using the count function, you count the values in the field, thus obtaining the number of neighbors of a node.
+Result: `{0=1, 1=2, 2=2, 3=2, 4=1}`.
 
-## Example
-
-### First part
-
-This first part code demonstrates how devices, through mutual communication, are able to identify the maximum ID among the neighboring nodes within their local network area (neighborhood):
+## The maximum ID around me
 
 ```kotlin
-/**
- * Identify the maximum ID values among the neighboring nodes.
-*/
+import it.unibo.collektive.aggregate.api.neighboring
+import it.unibo.collektive.aggregate.values
+import it.unibo.collektive.stdlib.collapse.max
 
-fun Aggregate<Int>.maxNeighborID(environment: EnvironmentVariables): Int =
-    neighboring(local = localId).max(base = localId)
+fun Aggregate<Int>.maxNeighborID(): Int = neighboring(localId).all.values.max()
 ```
 
-With the max function the maximum value of a field that includes the local value of the node is identified.
+[`neighboring`](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/latest/collektive-dsl/it.unibo.collektive.aggregate.api/neighboring.html)
+sends a value (here, the device ID) to all neighbors, and returns the `Field` of the values received.
+`all.values.max()` collapses the field into its maximum, *including* the local value.
 
-### Second part
+Result: `{0=1, 1=2, 2=3, 3=4, 4=4}`.
 
-This second part represents a variation of the previous one. Building upon the local maximum computation introduced in the first part,
-the code presented here extends the process through a second layer of communication among nodes, enabling convergence toward the global maximum of the network.
+## Going further: two hops
+
+Information obtained through `neighboring` travels exactly one hop.
+Composing two calls, the maximum spreads two hops away:
 
 ```kotlin
-/**
- * Identify the maximum ID values in the network.
-*/
-
-fun Aggregate<Int>.maxNetworkID(environment: EnvironmentVariables): Int {
-    val maxLocalValue = maxNeighborID()
-    return neighboring(local = maxLocalValue).max(base = maxLocalValue)
-}
-
-// Function of the previous part
-fun Aggregate<Int>.maxNeighborID(): Int {
-    val neighborValues = neighboring(local = localId)
-    val maxValue = neighborValues.max(base = localId)
-    return maxValue
+fun Aggregate<Int>.maxIDWithinTwoHops(): Int {
+    val maxAroundMe = maxNeighborID()
+    return neighboring(maxAroundMe).all.values.max()
 }
 ```
 
-This second part illustrates a variant of leader election implemented with Collektive.
+Result: `{0=2, 1=3, 2=4, 3=4, 4=4}`.
 
-Specifically, in this first two part, the use of aggregated operators and operations on the neighborhood field is analyzed.
+## The maximum ID in the network
 
-### Third part
-
-In this final part, we extend the previous exercise by considering dividing the network into multiple subnets.
-The goal is to determine the diameter in relation to the source, which corresponds to the maximum value of the subnetworks.
-
-In other words, we aim to find the maximum distance (measured in terms of hops) from a non-source node to the nearest source node.
-The source nodes are those with the highest ID values in the network, and each source node identifies a separate subnetwork.
+To reach any distance, the value computed at each round must be fed back and shared again.
+This is what [`share`](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/latest/collektive-dsl/it.unibo.collektive.aggregate.api/share.html) does:
 
 ```kotlin
-/**
- * Determine the diameter of the subnetworks corresponding to the nodes with the maximum ID values in the network of the last exercise.
-*/
+import it.unibo.collektive.aggregate.api.share
 
-// Preliminary step: define a data class to represent the association between a source node and its distance
-data class SourceDistance(val sourceID: Int, val distance: Int)
+fun Aggregate<Int>.maxNetworkID(): Int = share(localId) { ids -> ids.all.values.max() }
+```
 
-fun Aggregate<Int>.subnetdiameter(sourceID: Int, distanceToSource: Int): SourceDistance {
-    // Step 1: retrieve the distances from neighboring nodes, including the distance of the current node
-    val distances = neighboring(SourceDistance(sourceID, distanceToSource))
+At every round, each device shares the largest ID it knows, so the maximum advances by one hop per round.
+After a few rounds: `{0=4, 1=4, 2=4, 3=4, 4=4}`.
 
-    // Step 2: find the neighbor with the maximum distance for the given sourceID
-    return distances.maxBy(SourceDistance(sourceID, distanceToSource)){ 
+:::caution
+This program never forgets: if device `4` leaves the network, the others keep returning `4`.
+The standard library's [`gossipMax`](../explanation/standard-library/gossip-and-leader-election.mdx#gossip)
+solves the same problem in a *self-stabilizing* way, recovering from such changes.
+:::
 
-        // If the sourceID matches, return the actual distance; otherwise, Int.MIN_VALUE is used to exclude it
-        if(sourceID == it.sourceID) it.distance else Int.MIN_VALUE 
-    }
-}
+## The diameter of a subnetwork
 
-fun Aggregate<Int>.maxNetworkID(environment: EnvironmentVariables): Int {
-    // Preliminary step: the distance from the nearest source is calculated using the hopDistanceTo library function
-    distanceToSource = hopDistanceTo(localId == maxValue)
-    // Calculate subnets diameter 
-    val subnetDiameterValue = subnetdiameter(maxValue, distanceToSource).distance
+Finally, let's compute, for a given source, how far the farthest device is (in hops),
+and let every device know it.
+We compose three standard library blocks:
+a distance ([`hopDistanceTo`](../explanation/standard-library/spreading.mdx#distances)),
+a collection towards the source ([`convergeCast`](../explanation/standard-library/collection.mdx)),
+and a broadcast from the source ([`gradientCast`](../explanation/standard-library/spreading.mdx#broadcasts-gradient-casts)):
 
+```kotlin
+import it.unibo.collektive.stdlib.accumulation.convergeCast
+import it.unibo.collektive.stdlib.ints.FieldedInts.toDouble
+import it.unibo.collektive.stdlib.spreading.gradientCast
+import it.unibo.collektive.stdlib.spreading.hopDistanceTo
+import it.unibo.collektive.stdlib.util.hops
+
+fun Aggregate<Int>.subnetDiameter(isSource: Boolean): Int {
+    // G: how many hops away from the source am I?
+    val distance = hopDistanceTo(isSource)
+    // C: the source collects the largest distance
+    val farthest = convergeCast(local = distance, sink = isSource) { a, b -> maxOf(a, b) }
+    // G: the source shares it with everybody
+    return gradientCast(source = isSource, local = farthest, metric = hops().toDouble())
 }
 ```
 
-The maxBy function is a variant of the max function (used in previous parts) that calculates the maximum value in the field according to specifications. In particular, in this part, maxBy is used to specify towards which source the shared distance has been calculated. In such a way as to count in the identification of the maximum only the distances towards a specific source.
-
-The distance in terms of hops to the nearest source is calculated using the hopDistanceTo function.
+With source `0`: `{0=4, 1=4, 2=4, 3=4, 4=4}`.
+With several sources, each device computes the value for the subnetwork of its nearest source.
+Using the device with the maximum ID as source (`subnetDiameter(localId == maxNetworkID())`)
+combines this program with the previous one: this is the program executed in the [Alchemist tutorial](collektive-and-alchemist.mdx).

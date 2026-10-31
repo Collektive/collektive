@@ -1,0 +1,106 @@
+---
+title: Collection
+sidebar_position: 4
+description: "Converge-casts: summing, counting, and aggregating values towards a sink."
+---
+
+# Collection: Converge-casts
+
+*Collection* blocks move information **inwards**: values held by many devices are aggregated, hop by hop,
+towards one or more *sinks*.
+They are the **C** of the [G-C-S building blocks](overview.mdx#the-self-organizing-building-blocks),
+and the dual of [spreading](spreading.mdx): where a gradient-cast goes *down* from the sources,
+a converge-cast goes *up* towards the sinks.
+
+All functions live in `it.unibo.collektive.stdlib.accumulation`.
+
+## How a converge-cast works
+
+A converge-cast needs a **potential**: a field that decreases towards the sinks, typically a distance from them.
+
+1. Each device selects a **parent**: the neighbor with the lowest potential (`findParent`).
+   Parent links form a spanning tree (a forest, with multiple sinks) rooted in the local minima of the potential.
+2. Each device combines its local value with the values received from its *children*,
+   and sends the result **to its parent only**.
+   This is an anisotropic message, implemented with [`exchanging`](../dsl-descriptions.mdx#exchange-and-exchanging-neighbor-specific-messages).
+3. Eventually, each device holds the aggregate of its subtree; the sink holds the aggregate of the whole tree.
+
+```kotlin
+convergeCast(
+    local: Data,                       // my contribution
+    potential: Field<ID, Potential>,   // (or a local Potential, shared internally with neighboring)
+    selectParent: Comparator<FieldEntry<ID, Potential>> = compareBy { it.value },
+    accumulateData: Reducer<Data>,     // how to combine two contributions
+): Data
+```
+
+The simplest overload takes the sink directly, and builds the potential with `hopDistanceTo(sink)`:
+
+```kotlin
+val total: Int = convergeCast(local = myItems, sink = isBaseStation) { a, b -> a + b }
+```
+
+## Ready-made collections
+
+| Function | Result at the sink |
+|----------|--------------------|
+| `convergeSum(local, sink)` | sum of `Int` or `Double` values |
+| `convergeMean(local, sink)` | mean of `Double` values (sum / count) |
+| `countDevices(sink)` | number of devices in the tree |
+| `convergeCast(local, sink) { a, b -> … }` | any associative combination |
+
+Each function also has overloads taking a `potential` (a local value or a `Field`) and a `selectParent` comparator,
+to build the tree along any potential: a Euclidean distance, a signal strength, a priority.
+
+On a line of five devices `0 - 1 - 2 - 3 - 4` with sink `0`:
+
+| | device 0 (sink) | device 1 | device 2 | device 3 | device 4 |
+|---|:---:|:---:|:---:|:---:|:---:|
+| `countDevices(sink)` | **5** | 4 | 3 | 2 | 1 |
+| `convergeSum(localId, sink)` | **10** | 10 | 9 | 7 | 4 |
+
+Notice that *every* device returns the aggregate of its own subtree:
+device `2` counts itself, `3`, and `4`. Only the sink holds the network-wide result.
+
+:::note Properties of the reducer
+The reducer is applied in an order that depends on the tree, and on the timing of the rounds:
+use associative and commutative operations (sum, min, max, union, …).
+The collected value lags behind changes by (roughly) one round per hop of the tree depth.
+:::
+
+## Collect and share
+
+Since only the sink knows the result, collections are often followed by a broadcast (G → C → G):
+
+```kotlin
+fun Aggregate<Int>.networkSize(sink: Boolean): Int {
+    val count = countDevices(sink)
+    return gradientCast(sink, count, hops().toDouble())
+}
+```
+
+On the same line, all devices converge to `5`.
+Replacing the fixed `sink` with an [elected leader](gossip-and-leader-election.mdx#leader-election)
+makes the computation resilient to the failure of the sink and to network partitions.
+
+## Finding parents
+
+The tree-building primitives are available on their own:
+
+| Function | Returns |
+|----------|---------|
+| `findParent(potential, comparator)` | the ID of the neighbor with the minimum potential, or the local ID if the device itself is the minimum |
+| `findParents(potential, isParent)` | the set of neighbors satisfying `isParent` (by default, all neighbors with a lower potential) |
+
+`findParents` is the starting point for *multi-path* collections, which spread a device's contribution over several
+parents to reduce the impact of a single broken link.
+
+```kotlin
+val parent: Int = findParent(hopDistanceTo(isSink)) // on the line above: {0=0, 1=0, 2=1, 3=2, 4=3}
+```
+
+:::caution One minimum per tree
+Each local minimum of the potential becomes the root of a tree.
+For `countDevices` and friends to count *all* devices, the potential must have a single minimum in each connected component
+(e.g., a distance from a single sink).
+:::

@@ -1,0 +1,324 @@
+---
+title: Thinking in Fields
+sidebar_position: 3
+description: "The mental model of aggregate programming: computational fields, neighbors, rounds, and the Field type."
+---
+
+import Figure, {FigureGrid} from '@site/src/components/Figure';
+
+# Thinking in Fields
+
+Aggregate programming asks you to stop thinking about *one device sending messages* and start thinking about
+**values spread over a whole network**.
+This page introduces the two notions of "field" you will meet in Collektive,
+the round-based execution model that makes them work,
+and the `Field<ID, T>` type you manipulate in your programs.
+
+## Two readings of the same program
+
+Every aggregate program can be read in two ways.
+
+- **Global reading** (*what the collective computes*).
+  A **computational field** associates a value with every device of the system, at every moment in time.
+  The temperature perceived by a sensor network is a field;
+  so is the estimated distance of every device from the nearest exit,
+  or the identifier of the leader each device currently follows.
+  Even the constant `1 + 1` is a field: it holds `2` on every device, at every time.
+  Aggregate programs are compositions of functions that turn fields into other fields.
+- **Local reading** (*what a single device does*).
+  Each device runs the very same program, round after round,
+  using only its own sensors, its own previous state, and the messages received from its neighbors.
+
+Consider the distance-from-a-source program (a *gradient*, discussed [below](#example-a-gradient-in-a-few-lines)):
+
+| Reading | Description |
+|---------|-------------|
+| Local   | "If I am the source my distance is 0, otherwise it is the minimum, among my neighbors, of *their* distance plus the distance between us." |
+| Global  | "The network converges to the field of shortest-path distances from the source, and repairs it when the source moves or links break." |
+
+You *write* the local step, but you *design* by reasoning on the global field.
+This is what makes aggregate programs compositional:
+the output field of a building block (a distance field, a leader election, a sum)
+is the input field of the next one.
+
+## The execution model: sense, compute, interact
+
+Devices execute **asynchronous rounds**.
+There is no global clock: each device decides when to run its next round,
+devices can join, leave, and move, and messages can be lost or delayed.
+A round consists of three steps.
+
+<Figure src="/img/concepts/aggregate-round.svg" alt="A network of devices, and the three steps of a round of one device: sense, compute, interact" width={760} card>
+Each device of the collective (left) repeatedly executes rounds (right): it senses its environment and the messages of its neighbors, computes the program, and interacts by sending messages.
+</Figure>
+
+1. **Sense**: the device reads its sensors, and takes a snapshot of the most recent message received from each neighbor
+   (older messages from the same neighbor are discarded, and messages expire after a while).
+2. **Compute**: the device evaluates the aggregate program against its *computational context*:
+   the sensor readings, the neighbors' messages, and the state it stored at the end of its previous round.
+   The evaluation produces the program result, the new state, and the messages to be sent.
+3. **Interact**: the device sends the outgoing messages to its neighbors, then typically sleeps until the next round.
+
+In Collektive, a round is one call to `cycle()` on a [`Collektive`](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/latest/collektive-dsl/it.unibo.collektive/-collektive/index.html) instance:
+
+```kotlin
+val device = Collektive(localId = 42, network = mailbox) {
+    // this lambda is the aggregate program, executed with an Aggregate<Int> receiver
+    hopDistanceTo(source = localId == 0)
+}
+val result = device.cycle() // sense - compute - interact, once
+```
+
+The `Mailbox` is the only bridge between the program and the network:
+it decides how neighbors are discovered, how long messages are retained, and whether payloads are serialized.
+This is why the same program runs unchanged in unit tests, in the [Alchemist simulator](../tutorials/collektive-and-alchemist.mdx),
+and on real devices.
+See [Aggregate Operators](dsl-descriptions.mdx#running-an-aggregate-program) for the details.
+
+:::info Why values from neighbors are "one round old"
+Neighbors' values are read from the messages received *before* the current round started.
+As a consequence, any information needs (at least) one round per hop to travel across the network,
+and a freshly started device sees no neighbors at all during its first round.
+:::
+
+## Neighborhood fields: the `Field<ID, T>` type
+
+A computational field is a *global* object: no device ever holds it entirely.
+What a device can observe, in a round, is the portion of the field in its **neighborhood**.
+In Collektive this local view is a first-class value of type
+[`Field<ID, T>`](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/latest/collektive-dsl/it.unibo.collektive.aggregate/-field/index.html)
+(called *neighbor value*, or *nvalue*, in the eXchange Calculus literature).
+
+A `Field<ID, T>` maps:
+
+- the **local** device (the one executing the round) to its own value, and
+- each **aligned neighbor** to the value associated with that neighbor,
+
+where `ID` is the type of the device identifiers (`Int`, `String`, a `UUID`, …) and `T` the type of the values.
+
+:::note Terminology
+In this documentation, *computational field* (or just *field*, when unambiguous) refers to the global, network-wide structure,
+while `Field` (in code font) refers to the Kotlin type representing a device's local view of it.
+:::
+
+### Fields in action
+
+Consider four devices, where devices `0`, `1`, and `2` are connected to each other, and device `3` is connected only to `0`.
+Each device holds a local value equal to `(id + 1) * 5`:
+
+<Figure src="/img/concepts/four-devices.svg" alt="Four devices: 0, 1 and 2 are connected to each other, 3 is connected only to 0" width={460}>
+Devices `0`, `1`, and `2` are connected to each other; device `3` is connected only to `0`.
+</Figure>
+
+Every device runs the following program, where [`neighboring`](dsl-descriptions.mdx#neighboring-observing-the-neighborhood)
+shares a value with the neighbors and returns the `Field` of the values received:
+
+```kotlin
+fun Aggregate<Int>.observe(): Field<Int, Int> = neighboring((localId + 1) * 5)
+```
+
+Running a round on each device, in order of ID, produces the following fields:
+
+```text
+round 1
+  0: ϕ(pointwise: 0=5)                          // device 0 runs first and has heard from nobody yet
+  1: ϕ(local: 1=10, neighbors: {0=5})
+  2: ϕ(local: 2=15, neighbors: {0=5, 1=10})
+  3: ϕ(local: 3=20, neighbors: {0=5})
+round 2
+  0: ϕ(local: 0=5, neighbors: {1=10, 2=15, 3=20})
+  1: ϕ(local: 1=10, neighbors: {0=5, 2=15})
+  2: ϕ(local: 2=15, neighbors: {0=5, 1=10})
+  3: ϕ(local: 3=20, neighbors: {0=5})
+```
+
+Some things to notice:
+
+- each device sees a *different* `Field`: its own neighborhood, centered on itself;
+- in the first round, devices that have not yet received messages see fewer (or no) neighbors:
+  a `Field` with no neighbors is called *pointwise*;
+- from round 2 on, device `0` sees all other devices, while device `3` only sees device `0`.
+
+### Anatomy of a `Field`
+
+A `Field` exposes three **views** over its entries.
+Each entry is a [`FieldEntry<ID, T>`](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/latest/collektive-dsl/it.unibo.collektive.aggregate/-field-entry/index.html),
+a lightweight `(id, value)` pair that supports destructuring.
+
+| Member | Type | Content |
+|--------|------|---------|
+| `local` | `FieldEntry<ID, T>` | the entry of the device executing the round |
+| `neighbors` | `CollapseNeighbors<FieldEntry<ID, T>>` | the entries of the aligned neighbors, **excluding** the local one |
+| `all` | `CollapseAll<FieldEntry<ID, T>>` | the entries of the neighbors **and** the local one |
+| `get(id)` / `field[id]` | `T` | the value associated with `id` (throws if `id` is not in the field) |
+| `context` | `Aggregate<ID>` | the aggregate context the field belongs to |
+
+`neighbors` and `all` are *collapsible views* (`Collapse`): they can be read as a `list`, a `set`, or a lazy `sequence`,
+and can be projected on identifiers (`.ids`) or values (`.values`), preserving the view kind:
+
+```kotlin
+val field = neighboring((localId + 1) * 5)   // on device 0, after round 2:
+field.local                                  // 0=5
+field.local.value                            // 5
+field.neighbors.list                         // [1=10, 2=15, 3=20]
+field.neighbors.ids.set                      // [1, 2, 3]
+field.all.values.sum()                       // 50, i.e., 5 + 10 + 15 + 20 (from collektive-stdlib)
+field[2]                                     // 15
+```
+
+The distinction between `CollapseNeighbors` and `CollapseAll` is enforced by the type system,
+and it matters: `all` is never empty (it always contains the local entry),
+while `neighbors` can be empty.
+Reductions in the [standard library](standard-library/field-operations.mdx) exploit this difference:
+for instance, `field.all.values.min()` returns a `T`,
+while `field.neighbors.values.min()` returns a `T?` (`null` when there are no neighbors),
+or a neutral element for numeric types (e.g., `Double.POSITIVE_INFINITY` for `Double`s).
+
+:::tip Self or not self?
+Choosing between `all` and `neighbors` is a design decision, not a detail.
+"The maximum value around me, including mine" is `all.values.max()`;
+"the best value I can obtain *through* a neighbor" (as in a gradient) must exclude the local entry: `neighbors.values.min()`.
+:::
+
+## Working with fields
+
+Fields are immutable values: operations return new fields and never modify the original.
+
+### Transforming
+
+| Operation | Description |
+|-----------|-------------|
+| `mapValues { value -> … }` | transforms each value, ignoring the IDs |
+| `map { (id, value) -> … }` | transforms each entry, with access to the device ID |
+| `mapToConstant(value)` | builds a field with the same domain, holding the same value everywhere |
+
+```kotlin
+val field = neighboring((localId + 1) * 5)
+field.mapValues { it * 2 }               // ϕ(local: 0=10, neighbors: {1=20, 2=30, 3=40})
+field.map { (id, value) -> "$id:$value" } // ϕ(local: 0=0:5, neighbors: {1=1:10, 2=2:15, 3=3:20})
+field.mapToConstant(true)                // ϕ(constant: true, localId: 0, neighborsIDs: [1, 2, 3])
+```
+
+### Combining
+
+Two or more fields can be combined entry by entry with `alignedMap` (with access to the ID)
+and `alignedMapValues` (values only).
+Overloads accept up to six additional fields.
+
+```kotlin
+val samples: Field<Int, Double> = neighboring(temperature)
+val linkCost: Field<Int, Double> = euclideanDistance2D(position)
+// for each neighbor: its temperature, penalized by its distance
+val penalized = samples.alignedMapValues(linkCost) { temperature, cost -> temperature - cost }
+```
+
+Combined fields must be **aligned**, namely, they must have exactly the same set of neighbors.
+Fields built in the same aggregate context are aligned by construction:
+the Collektive compiler plugin takes care of restricting (*projecting*) fields when needed,
+see [Alignment](alignment.mdx#field-projection).
+If you ever get an alignment error at runtime, it is most likely a bug: please [report it](https://github.com/Collektive/collektive/issues).
+
+### Field arithmetic
+
+Writing `alignedMapValues` for every sum is tedious.
+The standard library provides *fielded* versions of the operators and functions of the Kotlin standard library,
+so that fields can be combined with fields and scalars as if they were plain values:
+
+```kotlin
+import it.unibo.collektive.stdlib.doubles.FieldedDoubles.plus
+import it.unibo.collektive.stdlib.doubles.FieldedDoubles.times
+
+val distances: Field<Int, Double> = neighboring(myDistance)
+val metric: Field<Int, Double> = euclideanDistance2D(position)
+val throughNeighbors = distances + metric  // Field + Field
+val scaled = metric * 2.0                  // Field + scalar
+```
+
+These operators are generated automatically from the Kotlin standard library,
+see [Fielded operators](standard-library/field-operations.mdx#fielded-operators).
+
+### Collapsing
+
+Sooner or later, a `Field` must be **collapsed** into a local value
+(a device can only act, store, or return local values).
+Collapsing operations live on the `neighbors` and `all` views and are provided by the standard library
+(`min`, `max`, `sum`, `fold`, `reduce`, `any`, `all`, `minBy`, `idOfMin`, …):
+
+```kotlin
+val field = neighboring(temperature)
+val hottest: Double = field.all.values.max()               // including myself
+val coldestNeighbor: Int? = field.neighbors.idOfMinBy { it.value } // the ID of the coldest neighbor
+val anyAlarm: Boolean = neighboring(alarm).neighbors.values.any    // is any neighbor in alarm?
+```
+
+The complete catalogue is in [Field operations](standard-library/field-operations.mdx).
+
+### Building fields without communicating
+
+Sometimes you need a field whose values can be computed locally, given the neighbor ID:
+[`mapNeighborhood`](dsl-descriptions.mdx#mapneighborhood-and-neighborhood) does that
+with the minimal communication needed to discover the aligned neighbors:
+
+```kotlin
+val isNeighborEven: Field<Int, Boolean> = mapNeighborhood { id -> id % 2 == 0 }
+val oneHop: Field<Int, Int> = hops() // 0 for the local device, 1 for every neighbor (from collektive-stdlib)
+```
+
+## Rules of the game
+
+Fields are powerful, but a few rules keep programs correct.
+Collektive enforces all of them, either at compile time or at runtime.
+
+1. **Fields cannot contain fields.**
+   A `Field<ID, Field<ID, T>>` is rejected at construction time: nested neighborhoods have no meaning.
+2. **Fields must not escape their aligned context.**
+   A field is meaningful only in the round and in the [alignment context](alignment.mdx) where it was created.
+   For this reason:
+   - `if`/`when` branches cannot return a `Field` (compile-time error): build the fields *before* the branch and combine them afterwards;
+   - `evolve`/`evolving` cannot store or return a `Field` (runtime error): store collapsed values instead;
+   - `alignedOn` blocks cannot return a `Field` (runtime error).
+3. **Shared values must be serializable.**
+   Values sent to neighbors (via `neighboring`, `share`, `exchange`, …) travel over the network,
+   unless the mailbox works in memory only (e.g., in some simulators).
+   Use types supported by [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization)
+   and annotate your own data classes with `@Serializable`.
+
+## Example: a gradient in a few lines
+
+Putting everything together,
+the following program computes the distance of each device from the nearest `source`,
+given a `metric` field with the distance to each neighbor:
+
+```kotlin
+import it.unibo.collektive.aggregate.Field
+import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.share
+import it.unibo.collektive.aggregate.values
+import it.unibo.collektive.stdlib.collapse.min
+import it.unibo.collektive.stdlib.doubles.FieldedDoubles.plus
+
+fun Aggregate<Int>.gradient(source: Boolean, metric: Field<Int, Double>): Double =
+    share(Double.POSITIVE_INFINITY) { distances: Field<Int, Double> ->
+        // the best distance obtainable through each neighbor, collapsed to the minimum
+        val throughNeighbors = (distances + metric).neighbors.values.min()
+        if (source) 0.0 else throughNeighbors
+    }
+```
+
+- `share` exposes the distances computed by the neighbors in their last round as a `Field`,
+  and shares the value returned by the lambda (see [Aggregate Operators](dsl-descriptions.mdx#share-and-sharing-propagating-state));
+- `distances + metric` combines two fields;
+- `.neighbors.values.min()` collapses the result excluding the local entry (`+∞` if there are no neighbors).
+
+On a line of five devices with source `0` and a hop-count metric, the network converges to `{0=0.0, 1=1.0, 2=2.0, 3=3.0, 4=4.0}`.
+
+:::warning Compute *before* branching
+Notice that `throughNeighbors` is computed *outside* the `if`.
+Writing `if (source) 0.0 else (distances + metric).neighbors.values.min()` looks equivalent, but it is not:
+`if` branches partition the network, and inside the `else` branch the source (which took the other branch) is not
+a neighbor anymore. The gradient would never leave infinity.
+The [Alignment](alignment.mdx#branches-partition-the-network) page explains why.
+:::
+
+You do not need to write gradients yourself: the standard library provides
+[self-healing, production-ready versions](standard-library/spreading.mdx).

@@ -1,0 +1,145 @@
+---
+title: Overview
+slug: /explanation/stdlib-descriptions
+sidebar_position: 1
+description: "The organization of the standard library, and the self-organizing building blocks it implements."
+---
+
+import Figure, {FigureGrid} from '@site/src/components/Figure';
+
+# The Collektive Standard Library
+
+The `collektive-stdlib` module packages the recurring building blocks of aggregate programming:
+operations on fields, distance estimation, information spreading and collection, gossip, leader election, and time.
+Every function in the library is an ordinary Kotlin extension function on `Aggregate<ID>` (or on `Field`/`Collapse`),
+written with the same [operators](../dsl-descriptions.mdx) you use in your programs:
+reading the [source code](https://github.com/Collektive/collektive/tree/master/collektive-stdlib/src/commonMain/kotlin/it/unibo/collektive/stdlib)
+is a great way to learn idiomatic Collektive.
+
+```kotlin
+dependencies {
+    implementation("it.unibo.collektive:collektive-stdlib:<latest version>")
+}
+```
+
+## Organization
+
+| Package (`it.unibo.collektive.stdlib.…`) | Content | Guide |
+|------------------------------------------|---------|-------|
+| `collapse` | reductions of `Field`s to local values: `min`, `max`, `sum`, `fold`, `idOfMin`, … | [Field operations](field-operations.mdx#collapsing-fields) |
+| `ints`, `doubles`, `booleans`, `strings`, … | *fielded* versions of the Kotlin standard library operators (`+`, `-`, `<`, `!`, …) | [Field operations](field-operations.mdx#fielded-operators) |
+| `util` | metrics (`hops`, `euclideanDistance2D/3D`), `Point2D`/`Point3D`, field utilities, functional type aliases | [Field operations](field-operations.mdx#utilities), [Spreading](spreading.mdx#metrics) |
+| `spreading` | distances (`distanceTo`, `hopDistanceTo`) and broadcasts (`gradientCast` and variants) | [Spreading](spreading.mdx) |
+| `accumulation` | collection along spanning trees (`convergeCast`, `convergeSum`, `countDevices`, `findParent`) | [Collection](collection.mdx) |
+| `spreading` (gossip) | network-wide agreement on a value (`gossipMax`, `gossipMin`, `isHappeningAnywhere`, …) | [Gossip and leader election](gossip-and-leader-election.mdx#gossip) |
+| `consensus` | leader election (`boundedElection`, `globalElection`) | [Gossip and leader election](gossip-and-leader-election.mdx#leader-election) |
+| `time`, `processes` | shared clocks, timers, replicated processes (`sharedClock`, `timeReplicated`) | [Time and processes](time-and-processes.mdx) |
+
+:::info Imports
+Most library functions are top-level extension functions: your IDE will suggest the right import.
+*Fielded* operators are members of generated objects, and must be imported explicitly,
+e.g., `import it.unibo.collektive.stdlib.doubles.FieldedDoubles.plus`.
+:::
+
+## The self-organizing building blocks
+
+Most collective behaviors can be built by composing three families of coordination operators[^1],
+each one self-stabilizing: given stable inputs, it converges to a correct result
+from any initial state, and repairs itself after changes.
+
+| Operator | Direction | Role | Collektive |
+|----------|-----------|------|------------|
+| **G** (gradient-cast) | outwards, from sources to the network | estimate distances, broadcast data along shortest paths | `distanceTo`, `gradientCast` |
+| **C** (converge-cast) | inwards, from the network to sinks | aggregate data along a spanning tree | `convergeCast`, `convergeSum`, `countDevices` |
+| **S** (sparse choice) | symmetry breaking | elect leaders, spaced according to a distance | `boundedElection` |
+
+To these, the library adds **gossip** (network-wide agreement without a designated source),
+and **time**-related blocks (shared clocks and periodically restarted processes).
+
+### Composition patterns
+
+Building blocks are designed to be chained: the output field of one is the input field of the next.
+
+**G → C → G: summarize and share.**
+Collect a value towards a sink, then broadcast the result back so that every device knows it.
+The following program makes *every* device know how many devices are in the network:
+
+```kotlin
+import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.stdlib.accumulation.countDevices
+import it.unibo.collektive.stdlib.ints.FieldedInts.toDouble
+import it.unibo.collektive.stdlib.spreading.gradientCast
+import it.unibo.collektive.stdlib.util.hops
+
+fun Aggregate<Int>.networkSize(sink: Boolean): Int {
+    val count = countDevices(sink)                  // C: only the sink holds the total
+    return gradientCast(sink, count, hops().toDouble()) // G: broadcast the sink's value
+}
+```
+
+**S → G → C → G: summarize per region.**
+Replace the fixed sink with elected leaders, and the same program computes one result per region,
+recovering automatically if the leader fails or the network splits
+(see the [First Collektive Program](../../tutorials/first-collektive-program.mdx) tutorial).
+
+```kotlin
+fun Aggregate<Int>.regionSize(radius: Int): Int {
+    val leader = boundedElection(bound = radius)  // S: one leader every ~radius hops
+    return networkSize(sink = leader == localId)  // G → C → G within each region
+}
+```
+
+**G + G + G: channel.**
+Combining two distances and a broadcast identifies a self-healing corridor between a source and a target:
+devices whose distance from the source plus the distance from the target does not exceed
+the source-target distance (plus some `width`).
+
+```kotlin
+import it.unibo.collektive.aggregate.Field
+import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.stdlib.spreading.distanceTo
+import it.unibo.collektive.stdlib.spreading.gradientCast
+
+fun Aggregate<Int>.channel(source: Boolean, target: Boolean, width: Double, metric: Field<Int, Double>): Boolean {
+    val toSource = distanceTo(source, metric = metric)
+    val toTarget = distanceTo(target, metric = metric)
+    val sourceToTarget = gradientCast(source, toTarget, metric) // the distance to the target, as seen by the source
+    val slack = toSource + toTarget - sourceToTarget
+    return slack.isFinite() && slack <= width
+}
+```
+
+<FigureGrid columns={3}>
+  <Figure src="/img/concepts/channel-1-distance.png" alt="Distance from the source" label="(a)">distance from the source</Figure>
+  <Figure src="/img/concepts/channel-2-sum.png" alt="Sum of the distances from source and target" label="(b)">sum of the distances from source and target</Figure>
+  <Figure src="/img/concepts/channel-3-result.png" alt="The resulting channel" label="(c)">the resulting channel</Figure>
+</FigureGrid>
+
+The [ChannelWithObstacles example](https://github.com/Collektive/collektive-examples/blob/master/simulation/src/main/kotlin/it/unibo/collektive/examples/channel/ChannelWithObstacles.kt)
+runs this program in the Alchemist simulator.
+
+## Common conventions
+
+A few conventions recur across the library; knowing them makes the signatures much easier to read.
+
+- **Metrics as fields.** Functions that reason about space take a `metric: Field<ID, Distance>`
+  holding the distance to each neighbor, e.g., `hops()` or `euclideanDistance2D(position)`.
+  This keeps the library independent of how distances are sensed.
+- **Generic distances.** The most general overloads work with any `Distance : Comparable<Distance>`
+  and require `bottom` (the distance at a source, usually zero), `top` (the maximum distance, usually infinity),
+  and an `accumulateDistance` reducer (usually `+`).
+  Accumulation must satisfy the triangle inequality: Collektive checks it at runtime.
+  Convenience overloads for `Double` (`0.0`, `+∞`, `+`) and `Int` (`0`, `Int.MAX_VALUE`, non-overflowing `+`) are provided.
+- **`maxDiameter`.** Algorithms that track paths accept an upper bound on the network diameter (in hops):
+  paths longer than that are discarded, reducing message size and computation. It defaults to `Int.MAX_VALUE`.
+- **`Reducer<T>`, `Accumulator<D, T>`, `Predicate<T>`.** Functional type aliases defined in `stdlib.util`:
+  `Reducer<T>` is `(T, T) -> T`, `Accumulator<D, T>` is `(D, T) -> D`.
+- **Inline and reified.** Most functions are `inline` with `reified` type parameters,
+  needed to derive the serializer of the shared values. Shared types must therefore be serializable.
+
+---
+
+[^1]: M. Viroli, G. Audrito, J. Beal, F. Damiani, and D. Pianini,
+"Engineering Resilient Collective Adaptive Systems by Self-Stabilisation",
+ACM Transactions on Modeling and Computer Simulation, 28(2), 2018.
+[doi:10.1145/3177774](https://doi.org/10.1145/3177774)

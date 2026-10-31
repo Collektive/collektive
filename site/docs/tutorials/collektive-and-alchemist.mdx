@@ -1,125 +1,148 @@
 ---
-title: Using Collektive with Alchemist Simulator
+title: Using Collektive with the Alchemist Simulator
 sidebar_position: 5
+description: "Simulate Collektive programs on large networks of devices with the Alchemist simulator."
 ---
 
-[Alchemist Simulator](https://alchemistsimulator.github.io/) is a distributed systems simulation platform,
+[Alchemist](https://alchemistsimulator.github.io/) is a simulator for distributed and pervasive systems,
 particularly suited for aggregate programming.
-It allows you to model and simulate interactions between agents in complex environments,
-supporting different abstractions and programming paradigms.
+Through the **Collektive incarnation**, Alchemist runs Collektive programs on simulated networks of devices,
+described in YAML files: deployments, connectivity, mobility, and time are handled by the simulator,
+while each simulated device executes your aggregate program.
 
-Together,
-Alchemist and Collektive allow you to write aggregate programs in Kotlin that can be executed and simulated within dynamic and configurable environments through YAML files.
-
-:::warning
-In order to use the simulator, you need the following _Alchemist_ dependencies:
-```gradle
-dependencies {
-    implementation("it.unibo.alchemist:alchemist:<latest-version>")
-    implementation("it.unibo.alchemist:alchemist-swingui:<latest-version>")
-    implementation("it.unibo.alchemist:alchemist-euclidean-geometry:<latest-version>")
-}
-```
-And the **Collektive incarnation** dependency:
-```gradle
-dependencies {
-    implementation("it.unibo.collektive:alchemist-incarnation-collektive:<latest-version>")
-}
-```
-Note that Alchemist is a **JVM only** simulator.
+:::tip Other simulators
+For high-fidelity 3D simulations, with physics and realistic scenes, the same programs can also run in the Unity game engine:
+see [Using Collektive with Unity](collektive-and-unity.mdx).
 :::
 
-## YAML configuration file for Collektive
+## Dependencies
 
-The YAML files define a Collektive simulation run through Alchemist. Below is how it is composed.
+```kotlin
+dependencies {
+    implementation("it.unibo.collektive:alchemist-incarnation-collektive:<latest version>")
+    implementation("it.unibo.alchemist:alchemist:<latest version>")
+    implementation("it.unibo.alchemist:alchemist-euclidean-geometry:<latest version>")
+    implementation("it.unibo.alchemist:alchemist-swingui:<latest version>") // graphical interface
+}
+```
 
-### Incarnation
+:::note
+Alchemist runs on the **JVM** only. Your aggregate programs can still live in a multiplatform module,
+and be simulated from its JVM target.
+The simplest way to start is the [experiments bootstrap template](https://github.com/Collektive/collektive-experiments-bootstrap).
+:::
+
+## The YAML configuration
+
+A minimal simulation looks like this:
 
 ```yaml
 incarnation: collektive
+
+network-model:
+  type: ConnectWithinDistance   # devices closer than 5 units are neighbors
+  parameters: [5]
+
+_pool: &program
+  - time-distribution: 1        # rounds per time unit
+    type: Event
+    actions:
+      - type: RunCollektiveProgram
+        parameters: [it.unibo.collektive.examples.tutorial.TutorialKt.maxIdTutorial]
+
+deployments:
+  - type: Rectangle             # 200 devices placed randomly in a 20x20 square
+    parameters: [200, 0, 0, 20, 20]
+    programs:
+      - *program
 ```
 
-`incarnation` specifies the programming "dialect" used for the simulation. In this case, we use `collektive`.
+- `incarnation: collektive` selects Collektive as the programming language of the devices.
+- `RunCollektiveProgram` executes, at every round, the aggregate function given by its fully qualified name:
+  for a top-level function `maxIdTutorial` in file `Tutorial.kt` of package `it.unibo.collektive.examples.tutorial`,
+  the name is `it.unibo.collektive.examples.tutorial.TutorialKt.maxIdTutorial`.
+- `time-distribution` is the frequency of the rounds; each device starts with a random phase,
+  so rounds are not synchronized, as in a real deployment.
 
----
+For everything else (network models, deployments, mobility, exporters),
+see the [Alchemist documentation](https://alchemistsimulator.github.io/).
 
-### Specific configuration
+### Inline programs
 
-For further details on the configuration options,
-such as network configuration, node properties and deployment,
-please refer to the [Alchemist documentation](https://alchemistsimulator.github.io/).
-
----
-
-### Program definition
-
-To run a Collektive program within Alchemist,
-you need to define the entrypoint of the program in the YAML file.
-The action type must be `RunCollektiveProgram`,
-and the parameters must be the fully qualified name of the program to be executed.
+Alternatively, the `program` key lets you define the entrypoint as a Kotlin expression,
+optionally with additional code compiled on the fly:
 
 ```yaml
 _pool: &program
   - time-distribution: 1
-    type: Event
-    actions:
-      - type: RunCollektiveProgram
-        parameters: [it.unibo.collektive.examples.tutorialExample.TutorialExampleKt.maxID]
+    program:
+      name: Gradient
+      code: |
+        import it.unibo.collektive.stdlib.spreading.distanceTo
+      entrypoint: with(device) { distanceTo(localId == 0, metric = distances()) }
 ```
-The program is executed as an `Event` with a time distribution, in this case, of 1 unit.
-The program executed is the function `maxID`, which is the entrypoint of the program.
 
----
+The entrypoint is compiled (with the Collektive compiler plugin) as the body of a function with an `Aggregate<Int>` receiver,
+where the simulated device is available as `device`.
+The `code` block can contain imports and helper functions, and the `source-sets` key can list folders of Kotlin sources to compile with it.
+
+## Writing programs for Alchemist
+
+An entrypoint is an aggregate function (with an `Aggregate<Int>` receiver: in Alchemist, device IDs are `Int`s),
+whose parameters are injected by the simulator according to their type:
+
+| Parameter type | Injected value |
+|----------------|----------------|
+| `CollektiveDevice<*>` | the simulated device: provides `distances()`, the `Field` of the Euclidean distances to the neighbors, and the current simulated time |
+| `EnvironmentVariables` | read and write access to the *molecules* of the node, to read inputs from the simulation and export outputs |
+| `Node<*>` | the Alchemist node itself |
+
+The value returned by the program is stored in a molecule named after the program (the `name` key of inline programs, or the entrypoint name).
+
+:::info
+`EnvironmentVariables` and `CollektiveDevice` exist only in the simulator.
+Keep your aggregate logic in functions that take plain parameters, and use them only in thin entrypoints:
+the same logic will then run unchanged on real devices.
+:::
+
+The following program combines the functions of the [Basic Usage](basic-usage.mdx) tutorial,
+and exports the intermediate results as molecules:
+
+```kotlin
+import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
+import it.unibo.collektive.stdlib.spreading.hopDistanceTo
+
+fun Aggregate<Int>.maxIdTutorial(env: EnvironmentVariables): Int {
+    val maxAroundMe = maxNeighborID()          // the maximum ID among my neighbors and me
+    val maxInNetwork = maxNetworkID()          // the maximum ID in my connected component
+    val isMax = localId == maxInNetwork
+    val distance = hopDistanceTo(isMax)        // hops from the device with the maximum ID
+    val diameter = subnetDiameter(isMax)       // hops from it to the farthest device
+    env["isMaxAroundMe"] = localId == maxAroundMe
+    env["isMaxID"] = isMax
+    env["distanceToMax"] = distance
+    env["isFarthest"] = distance == diameter
+    return maxInNetwork
+}
+```
 
 ## Graphical simulation
 
 ![](/img/collektive-and-alchemist-1.png)
 ![](/img/collektive-and-alchemist-2.png)
 
-On the left, the network of nodes is displayed with the connection edges hidden, while on the right, the network is shown with the edges between the nodes, from which the interconnection of the network can be observed.
+On the left, the network is displayed with the connection edges hidden; on the right, the edges are shown,
+revealing three disconnected subnetworks.
 
-The molecules with Boolean concentration have been used to assign different colors to the nodes based on their role:
-- **Green nodes** are those with the highest ID within a subnet.
-- **Red nodes** are those with the highest ID within their neighborhood, but where a node with a higher ID has been identified within the neighborhood of their neighbors.
-- **Purple nodes** are those located farther from the nearest green node.
-- **Blue nodes** are those that do not fall into any of the previous categories.
-- Finally, the **labels of the nodes** correspond to the maximum ID value identified by each node, allowing for the distinction of three subnets (identified by the ID of the green nodes) and the nodes belonging to each subnet.
+Molecules with Boolean values can be used to color the nodes according to their role:
+- **green** nodes have the highest ID of their subnetwork (`isMaxID`);
+- **red** nodes have the highest ID in their neighborhood, but not in their subnetwork (`isMaxAroundMe`);
+- **purple** nodes are the farthest from the green node of their subnetwork (`isFarthest`);
+- **blue** nodes are all the others.
+
+The labels show the value returned by the program, namely, the maximum ID of the subnetwork.
 
 ![](/img/collektive-and-alchemist-3.png)
 
-Clicking on a node opens a window displaying the molecule values for the selected node.
-
-Below is presented the example code.
-
-:::info
-The _EnvironmentVariables_ parameter is used to store and show the values of the molecules within the simulation,
-it is a node property only related to the Alchemist simulator.
-A generic **Collektive** program **can** and **should** be written without the need to use the EnvironmentVariables.
-:::
-
-```kotlin
-fun Aggregate<Int>.maxID(env: EnvironmentVariables): Int {
-    val maxLocalValue = maxNeighborID()
-    // Shares the maxNeighborID with neighbors and obtain a field of values
-    val neighborValues = neighboring(local = maxLocalValue)
-    // Find the maximum value among neighbors (including self)
-    val maxID = neighborValues.max(base = maxLocalValue)
-    // Evaluates the distance from the nearest source
-    val distToSource = distanceToSource(maxID == localId)
-    // Calculate subnets diameter 
-    val subnetDiameterValue = subnetDiameter(maxID, distToSource)
-    val subnetDiameterDistance = subnetDiameter.distance
-    // Assign the result to the molecules
-    env["localID"] = localId
-    env["isMaxLocalID"] = localId == maxLocalValue
-    env["maxNeighborID"] = maxLocalValue
-    env["isMaxID"] = localId == maxID
-    env["maxNetworkID"] = maxID
-    env["distanceToSource"] = distToSource
-    env["subnetDiameter"] = subnetDiameterValue
-    env["subnetDiameterValue"] = subnetDiameterDistance
-    env["isSubnetDiameterDistance"] = subnetDiameterDistance == env["distanceToSource"]
-    env["nothing"] =  !(env["isSubnetDiameterDistance"] || env["isMaxID"] || env["isMaxLocalID"])
-    return maxValue
-}
-```
+Clicking on a node opens a window displaying the values of its molecules.

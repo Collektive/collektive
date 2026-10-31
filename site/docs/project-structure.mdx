@@ -1,23 +1,42 @@
 ---
 title: Project Structure
 sidebar_position: 5
+description: "The architecture of Collektive and the modules of its repository."
 ---
 
-## Project submodules
+import Figure, {FigureGrid} from '@site/src/components/Figure';
 
-The Collektive project is organized into several submodules, each serving a distinct role:
+## Architecture
 
-- **collektive-dsl**: the core implementation of the Domain-Specific Language (DSL) for aggregate computing,
-    exposing the operators and logic for this programming paradigm.
-- **collektive-stdlib**: a standard library providing essential functions and utilities to support aggregate computing operations.
-- **collektive-compiler-plugin** is divided into two components:
-  - **frontend**: checks for dangerous or inappropriate code written using the Collektive DSL
-  - **backend**: a compiler plugin that modifies a data structure used to track the runtime stack.
-        Each time a function is called, its name is registered in this structure.
-- **collektive-compiler-embeddable**:
-  - **compiler-embedded**: an embeddable version of the compiler designed for integration into other projects.
-    This allows developers to leverage the compiler’s capabilities directly within their applications,
-    making it easier to extend and customize compilation features.
-- **collektive-gradle-plugin**: a necessary plugin that allows Gradle projects to include and apply the compiler plugin.
-- **alchemist-incarnation-collektive**: an incarnation of Collektive for the Alchemist simulator,
-  which is a simulation framework for distributed systems.
+Collektive separates the aggregate programming semantics, which is the same on every platform,
+from the platform-specific mechanisms used to communicate:
+
+<Figure src="/img/concepts/collektive-architecture.svg" alt="Collektive architecture: coordination libraries are built on the DSL and runtime, compiled with the compiler plugin; the Mailbox is the only communication dependency, implemented by platform-specific adapters such as a real network, Alchemist, Unity, or in-memory tests; the common code compiles for JVM, JavaScript, Android, iOS, and native targets" width={720} />
+
+- **Coordination libraries**, the standard library as well as your own, are ordinary Kotlin functions built on the DSL;
+- the **DSL and runtime** (`collektive-dsl`) provide the `Aggregate` scope, the operators, fields,
+  and the executor of rounds (`Collektive`), which keeps the state of a device from one round to the next;
+- the **compiler plugin** is applied to every compilation of aggregate code: it injects alignment and reports misuses of the DSL;
+- the **`Mailbox`** is the only communication dependency of the runtime.
+  Below it, an adapter connects the device to the world: a real network (MQTT, sockets, …),
+  a simulator ([Alchemist](tutorials/collektive-and-alchemist.mdx), [Unity](tutorials/collektive-and-unity.mdx)), or an in-memory network for tests.
+
+Everything above the `Mailbox` is common Kotlin code, compiled for every target supported by Kotlin Multiplatform:
+devices running on different platforms can cooperate in the same collective, as long as their adapters exchange compatible messages.
+
+## Modules
+
+The Collektive repository is organized into the following modules.
+
+| Module | Artifact | Role |
+|--------|----------|------|
+| `collektive-dsl` | `it.unibo.collektive:collektive-dsl` | the core of Collektive: the `Aggregate` scope, the [aggregate operators](explanation/dsl-descriptions.mdx), [fields](explanation/fields.mdx), and the round-based runtime (`Collektive`, `Mailbox`) |
+| `collektive-stdlib` | `it.unibo.collektive:collektive-stdlib` | the [standard library](explanation/standard-library/overview.mdx) of collective building blocks |
+| `collektive-compiler-plugin` | `it.unibo.collektive:collektive-compiler-plugin` | the Kotlin compiler plugin that injects [alignment](explanation/alignment.mdx) and field projections (backend), and reports misuses of the DSL (frontend) |
+| `collektive-gradle-plugin` | `it.unibo.collektive.collektive-plugin` (Gradle plugin) | applies the compiler plugin to the Kotlin compilations of a Gradle project |
+| `collektive-compiler-embeddable` | `it.unibo.collektive:collektive-compiler-embeddable` | a programmatic Kotlin/JVM compiler with the Collektive plugin applied, to compile aggregate programs at runtime (used, e.g., by the Alchemist incarnation for inline programs) |
+| `collektivize` | `it.unibo.collektive.collektivize` (Gradle plugin) | the code generator producing the [fielded operators](explanation/standard-library/field-operations.mdx#fielded-operators) of the standard library |
+| `collektive-test-tooling` | (internal) | in-memory networks (grids, meshes) and deterministic round scheduling, to unit test aggregate programs |
+| `alchemist-incarnation-collektive` | `it.unibo.collektive:alchemist-incarnation-collektive` | the incarnation running Collektive programs in the [Alchemist simulator](tutorials/collektive-and-alchemist.mdx) |
+
+The `site` folder contains the sources of this website.

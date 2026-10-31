@@ -1,81 +1,68 @@
 ---
 title: What is Collektive?
+description: "What Collektive is, the problems it addresses, and what makes it different."
 ---
+
+import {Card, CardGrid} from '@site/src/components/Cards';
 
 # What is Collektive?
 
-Collektive is an open-source framework designed to simplify the development of resilient and
-scalable distributed systems through the principles of Aggregate Programming.
+Collektive is an open-source framework for **aggregate programming** in Kotlin:
+it lets you program a whole collective of devices (sensors, robots, smartphones, vehicles, servers)
+as a single entity, and takes care of turning that collective program into the local behavior
+and the messages of each device.
 
 ---
 
-## What is the Purpose of Collektive?
+## What problems does Collektive address?
 
-The primary purpose of Collektive is to provide developers with a robust framework to design and implement self-organizing
-collective behaviors in dynamic and distributed environments.
-It abstracts away the complexities of low-level device interactions and communication,
-allowing users to focus on high-level coordination logic.
+Large-scale distributed systems, such as IoT deployments, robot swarms, or smart-city infrastructures,
+are made of many devices that operate autonomously but must collectively achieve global goals,
+often without reliable infrastructure, central servers, or stable connectivity.
+Programming them device by device forces developers to bridge the gap between local rules and global behavior by hand.
 
----
+Aggregate programming bridges this gap by construction:
+programs describe how *computational fields* (values spread over the network) are created, combined, and evolved,
+and the resulting behavior is
 
-## What Problems does Collektive solve?
+- **self-organizing**: global coordination emerges from local interactions, without central control;
+- **resilient**: programs keep working, and repair themselves, when devices fail, move, or change their inputs;
+- **scalable**: devices only interact with their neighbors, regardless of the size of the system.
 
-### Complex Coordination
-
-Collektive addresses the challenge of coordinating large-scale systems,
-such as sensor networks,
-drone swarms,
-or IoT devices,
-where nodes operate autonomously but must collectively achieve global objectives.
-
-### Scalability
-
-By leveraging Aggregate Programming,
-Collektive ensures that applications scale seamlessly as the number of devices increases.
-
-### Resilience
-
-Collektive provides mechanisms to maintain system stability and adapt to changes,
-such as node failures,
-communication delays,
-or environmental variability.
+See [Building Resilient Systems with Aggregate Programming](../explanation/aggregate-programming.mdx) for an introduction to the paradigm.
 
 ---
 
 ## Why Collektive?
 
-### High-Level Abstraction
-
-Collektive simplifies the implementation of distributed behaviors,
-allowing developers to express coordination logic concisely without managing individual device states.
-
-### Declarative Programming
-
-The library promotes a declarative approach,
-enabling developers to describe what the system should achieve,
-while Collektive handles how at runtime.
-
-### Dynamic Adaptation
-
-Applications built with Collektive can react dynamically to network changes or external inputs,
-ensuring robustness in unpredictable environments.
+<CardGrid columns={2}>
+  <Card icon="code" title="Plain, statically typed Kotlin">
+    An *internal* DSL: aggregate programs are ordinary Kotlin functions, with full IDE support, static type checking,
+    and the whole Kotlin ecosystem. No new language to learn.
+  </Card>
+  <Card to="/docs/explanation/alignment" icon="sitemap" title="Transparent alignment">
+    The compiler plugin matches each message to its operator at compile time, without annotations,
+    and warns about common misuses of the DSL while you build.
+  </Card>
+  <Card to="/docs/explanation/stdlib-descriptions" icon="shield" title="Complete semantic foundation">
+    The **eXchange Calculus**, with first-class neighborhood fields, and a standard library of self-stabilizing building blocks:
+    distances, broadcasts, collection, gossip, leader election, and time.
+  </Card>
+  <Card icon="multiplatform" title="Truly multiplatform">
+    The same program compiles for the **JVM**, **JavaScript**, and **native** targets, including **Android** and **iOS**:
+    devices on different platforms cooperate in the same collective.
+  </Card>
+</CardGrid>
 
 ---
 
-## Potential Applications of Collektive
+## Where has Collektive been used?
 
-The Collektive library is particularly well-suited for addressing challenges in the following domains:
+Collektive has been used to engineer self-organizing spatial structures
+(vascular morphogenesis[^1]), runtime replanning in robot swarms, safe swarm control,
+distributed particle filtering, and self-stabilizing consensus.
+See the [Showcase](/docs/category/showcase/) for the published works, with their experiments and artifacts.
 
-- **Internet of Things Systems Management**
-- **Swarm Robotics**
-- **Crowd Management**
-- **Self-Healing Distributed Systems**
-- **Simulation of Natural and Biological Processes**
+---
 
-### Proven Applications
-
-Collektive has already been applied successfully in domains vascular morphogenesis,
-demonstrating its utility in modeling self-organizing biological processes[^1].
-
-----
-[^1]: [A. Cortecchia, D. Pianini, G. Ciatto, and R. Casadei, “An Aggregate Vascular Morphogenesis Controller for Engineered Self-Organising Spatial Structures,” 2024](https://doi.org/10.1109/ACSOS61780.2024.00032).
+[^1]: [A. Cortecchia, D. Pianini, G. Ciatto, and R. Casadei, “An Aggregate Vascular Morphogenesis Controller for Engineered Self-Organising Spatial Structures,” ACSOS 2024](https://doi.org/10.1109/ACSOS61780.2024.00032).
