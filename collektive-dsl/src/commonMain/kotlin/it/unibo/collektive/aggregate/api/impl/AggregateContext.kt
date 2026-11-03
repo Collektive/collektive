@@ -56,7 +56,8 @@ internal class AggregateContext<ID : Any>(
         This Is a wrapper for the field construction, and must thus not be projected or aligned.
         """,
     )
-    private fun <T> newField(localValue: T, others: Map<ID, T>): Field<ID, T> = Field(this, localId, localValue, others)
+    private fun <T> newField(default: T, localValue: T = default, others: Map<ID, T>): Field<ID, T> =
+        Field(this, default, localId, localValue, others)
 
     @CollektiveIgnore(
         """
@@ -65,6 +66,7 @@ internal class AggregateContext<ID : Any>(
     )
     @DelicateCollektiveApi
     override fun <Shared, Returned> InternalAPI.`_ serialization aware exchanging`(
+        default: Shared,
         initial: Shared,
         dataSharingMethod: DataSharingMethod<Shared>,
         body: YieldingScope<Field<ID, Shared>, Returned>,
@@ -72,7 +74,7 @@ internal class AggregateContext<ID : Any>(
         val path: Path = stack.currentPath()
         val messages = inboundMessage.dataAt(path, dataSharingMethod)
         val previous = stateAt(path, initial)
-        val subject: Field<ID, Shared> = newField(previous, messages)
+        val subject: Field<ID, Shared> = newField(default, previous, messages)
         val context = YieldingContext<Field<ID, Shared>, Returned>()
         return context.body(subject)
             .also {
@@ -108,14 +110,15 @@ internal class AggregateContext<ID : Any>(
         """,
     )
     @DelicateCollektiveApi
-    override fun <Scalar> InternalAPI.`_ serialization aware neighboring`(
-        local: Scalar,
-        dataSharingMethod: DataSharingMethod<Scalar>,
-    ): Field<ID, Scalar> {
+    override fun <Shared> InternalAPI.`_ serialization aware neighboring`(
+        default: Shared,
+        local: Shared,
+        dataSharingMethod: DataSharingMethod<Shared>,
+    ): Field<ID, Shared> {
         val path = stack.currentPath()
-        val neighborValues: Map<ID, Scalar> = inboundMessage.dataAt(path, dataSharingMethod)
+        val neighborValues: Map<ID, Shared> = inboundMessage.dataAt(path, dataSharingMethod)
         toBeSent.addData(path, SharedData(local), dataSharingMethod)
-        return newField(local, neighborValues)
+        return newField(default, local, neighborValues)
     }
 
     override fun <Stored> evolve(initial: Stored, transform: (Stored) -> Stored): Stored = evolving(initial) {
