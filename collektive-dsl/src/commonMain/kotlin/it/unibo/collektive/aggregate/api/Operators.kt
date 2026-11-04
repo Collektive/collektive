@@ -29,7 +29,8 @@ import it.unibo.collektive.aggregate.Field
  * rather, from the previously computed local field value.
  */
 inline fun <ID : Any, reified Shared> Aggregate<ID>.exchange(
-    initial: Shared,
+    default: Shared,
+    initial: Shared = default,
     noinline body: (Field<ID, Shared>) -> Field<ID, Shared>,
 ): Field<ID, Shared> = exchanging(initial) { field -> body(field).yielding { this } }
 
