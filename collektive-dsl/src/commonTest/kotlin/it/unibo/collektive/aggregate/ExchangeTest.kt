@@ -9,7 +9,9 @@
 package it.unibo.collektive.aggregate
 
 import it.unibo.collektive.Collektive.Companion.aggregate
+import it.unibo.collektive.aggregate.Field.Companion.mapValuesKeepingDefault
 import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.alignment.PerformanceProfile
 import it.unibo.collektive.aggregate.api.exchange
 import it.unibo.collektive.aggregate.api.exchanging
 import it.unibo.collektive.aggregate.api.field.mapValues
@@ -62,16 +64,17 @@ class ExchangeTest {
         }
 
     @Test
-    fun `exchange on the first round should use the initial value and send the new value according to the function`() {
-        val result =
-            aggregate(0) {
-                val res = exchange(1, body = increaseOrDouble)
-                assertEquals(2, res.local.value)
-            }
-        val messages = result.toSend.prepareMessageFor(1).sharedData
-        assertEquals(1, messages.size)
-        assertContentEquals(listOf(2), messages.values)
-    }
+    fun `exchange on the first round should use the initial value and send the new value according to the function`() =
+        forEachPerformanceProfile { profile ->
+            val result =
+                aggregate(0, performanceProfile = profile) {
+                    val res = exchange(1, body = increaseOrDouble)
+                    assertEquals(2, res.local.value)
+                }
+            val messages = result.toSend.prepareMessageFor(1).sharedData
+            assertEquals(1, messages.size)
+            assertContentEquals(listOf(2), messages.values)
+        }
 
     @Test
     fun `exchange should share data with other aligned devices in the network`() =
@@ -151,7 +154,7 @@ class ExchangeTest {
     }
 
     @Test
-    fun `exchange should not carry a mapped default over to the next round`() {
+    fun `exchange should carry a mapped default over to the next round`() = forEachPerformanceProfile { profile ->
         /**
          * Returns the default of the field received by exchange (before mapping)
          * and the default of the field it sends (after mapping).
@@ -165,28 +168,43 @@ class ExchangeTest {
             return checkNotNull(defaultBefore) to mapped.default
         }
         val rounds = 6
-        val environment = mooreGrid<Pair<Int, Int>?>(1, 1, null) { _ -> defaults() }
-        val history = List(rounds) {
+        val environment = mooreGrid<Pair<Int, Int>?>(1, 1, null, profile) { _ -> defaults() }
+        val history = List(rounds) { round ->
             environment.cycleInOrder()
-            checkNotNull(environment.status().getValue(0))
+            checkNotNull(environment.status().getValue(0)).also { (before, after) ->
+                println("round $round: default before mapping = $before, after mapping = $after")
+            }
         }
-        /*
-         * As per the XC semantics (rule [A-XC]), the received field uses the initial value as default in every round:
-         * the mapped default is only sent to neighbors with no dedicated message, and never fed back to the sender.
-         * Hence, every round receives 0 and sends 1.
-         */
-        assertEquals(List(rounds) { 0 to 1 }, history)
+        // The default produced by the mapping in a round must be the default received in the next one:
+        // round r receives r and sends r + 1, i.e., (0, 1), (1, 2), (2, 3), ...
+        history.zipWithNext().forEachIndexed { round, (current, next) ->
+            assertEquals(
+                current.second,
+                next.first,
+                "The default sent in round $round must be the one received in round ${round + 1}",
+            )
+        }
+        assertEquals(List(rounds) { it to it + 1 }, history)
     }
 
     @Test
-    fun `exchange should be able to support ping-pong in two devices and reset to zero when re-connected`() {
+    fun `exchange should be able to support ping-pong in two devices and reset to zero when re-connected`() = forEachPerformanceProfile { profile ->
         val size = 2
+
+        /**
+         * Snapshot of the field sent by a device in a round: its default and its (local + neighbors) values.
+         * The snapshot is taken inside the round, since a [Field] is bound to the context of the round
+         * that produced it and must not be inspected after the round is over.
+         */
         fun Aggregate<Int>.pingPong(): Pair<Int, Map<Int, Int>> = exchange(0) { field ->
-            field.mapValues { value -> value + 1 }
+            println("before mapping $field")
+            field.mapValuesKeepingDefault { value -> value + 1 }.also { println("after $it") }
         }.let { it.default to it.all.toMap() }
-        val environment = mooreGrid<Pair<Int, Map<Int, Int>>?>(size, 1, null) { _ -> pingPong() }
+
+        val environment = mooreGrid<Pair<Int, Map<Int, Int>>?>(size, 1, null, profile) { _ -> pingPong() }
         // Two connected devices: every round each device increments the counter received from the other
         repeat(size) {
+            println("=== ROUND ===")
             environment.cycleInOrder()
         }
         assertEquals(
