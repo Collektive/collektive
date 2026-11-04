@@ -1,0 +1,153 @@
+---
+title: A Self-stabilizing Min-Max Consensus via Path-Loop Detection (2026)
+summary: "A self-stabilizing min-max consensus algorithm that removes obsolete contributions after transient faults and topology changes."
+sidebar_position: 3
+---
+
+:::info
+Experimental artefact and simulation setup available at
+[https://github.com/angelacorte/experiments-coordination-self-stabilizing-gossip](https://github.com/angelacorte/experiments-coordination-self-stabilizing-gossip)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18942476.svg)](https://doi.org/10.5281/zenodo.18942476)
+
+This work was published in **COORDINATION 2026**, pp. 93–114
+(DOI: [10.1007/978-3-032-28358-0_5](https://doi.org/10.1007/978-3-032-28358-0_5)).
+:::
+
+:::note
+The artefact associated with this article has been awarded the EAPLS **Artifacts Available** and **Artifacts Evaluated – Functional** badges.
+:::
+
+## Abstract
+
+Min-max consensus allows the nodes of a distributed system to converge on the best value produced by any participant.
+Traditional gossip implementations are monotonic: once a value has been incorporated into the aggregate,
+it cannot be retracted.
+Consequently, values made obsolete by a transient fault, a changed local input, or a network partition can continue to circulate indefinitely.
+
+This work introduces a **self-stabilizing min-max consensus algorithm** based on path-loop detection.
+Each gossip message carries both a candidate value and the path of nodes that acknowledged it.
+Nodes propagate information along shortest valid paths,
+use the path to prevent loops,
+and naturally prune contributions that are no longer supported by the current network state.
+
+The algorithm is presented through Aggregate Computing,
+formally shown to self-stabilize (it is an instance of the *minimizing-share* pattern),
+and implemented as a reusable operation for the Collektive DSL.
+It provides a resilient coordination building block for large-scale and pervasive distributed systems.
+
+## The algorithm
+
+Every device $\delta$ propagates a pair $(x_\delta, P_\delta)$, where $x_\delta$ is the best value known so far
+and $P_\delta$ is the path of devices leading to the closest device holding it.
+At each round, a device:
+
+1. discards every neighbor candidate whose path already contains itself (**loop detection**);
+2. selects the best value according to the comparator;
+3. breaks ties by preferring the **shortest path**, and then the lowest identifier;
+4. appends its own identifier to the selected path and forwards it.
+
+When the device holding the best value disappears, the stale candidates that still refer to it
+eventually loop back and get pruned, and the next best value spreads along the shortest valid paths:
+
+![Path-loop detection: the best value (node 0) fails and the network converges to the next best values](/img/coordination-2026-self-stabilizing-gossip/path-loop-detection.gif)
+
+*Nodes are labelled with their identifiers (the algorithm searches for the minimum), black lines are communication links,
+and colored arcs show the shortest valid path through which each node received its value.
+When node 0 fails, the network splits and each partition converges to its own best value.*
+
+The core of the implementation in Collektive is a single `share` with a fold over the neighbors' candidates:
+
+```kotlin
+data class GossipValue<ID : Comparable<ID>, Value>(
+    val best: Value,
+    val path: List<ID> = emptyList(),
+) {
+    fun addHop(id: ID) = GossipValue(best, path + id)
+}
+
+fun <ID : Comparable<ID>, Value> Aggregate<ID>.findMaxOf(local: Value, comparator: Comparator<in Value>): Value {
+    val localGossip = GossipValue<ID, Value>(best = local)
+    return share(localGossip) { gossip ->
+        gossip.neighbors.values.fold(localGossip) { current, neighbor ->
+            when {
+                localId in neighbor.path -> current // ignore paths that loop back
+                else -> when (comparator.compare(neighbor.best, current.best)) {
+                    0 -> when { // same value: prefer the shortest path, then the lowest sender
+                        neighbor.path.size == current.path.size -> listOf(neighbor, current).minBy { it.path.last() }
+                        else -> listOf(neighbor, current).minBy { it.path.size }
+                    }
+                    in 1..Int.MAX_VALUE -> neighbor
+                    else -> current
+                }
+            }
+        }.addHop(localId)
+    }.best
+}
+```
+
+A generalised version of this path-based, loop-free gossip is available in the Collektive standard library
+(`it.unibo.collektive.stdlib.spreading`), through `gossipMax`, `gossipMin`, and their `...By`/`...With` variants
+accepting a selector or a comparator:
+
+```kotlin
+val minimumId = gossipMin(localId)
+val hottest = gossipMaxBy(sensorReading) { it.temperature }
+```
+
+## Experiment description
+
+The evaluation uses Alchemist to simulate devices randomly deployed in a two-dimensional square arena.
+Communication is proximity-based: each device exchanges information only with neighbors within a fixed range,
+and every node executes rounds at 1 Hz, starting asynchronously.
+Every numeric experiment is repeated 32 times with different random seeds.
+
+The main split-and-merge scenario uses $N_0 = 100$ devices in a $20 \times 20$ m arena with a 4 m communication range,
+and lasts 200 simulated seconds:
+
+1. Nodes start with random values in $[-1, 1]$ and run min-consensus for 50 seconds.
+2. The network is partitioned by moving the devices on the right side of the arena into a separate area.
+3. After another 50 seconds, every node receives a new random value in $[-1/2, 1/2]$.
+4. The two groups are reconnected and allowed to converge again for a final 50 seconds.
+
+The evaluation compares three approaches under these perturbations:
+
+- **Non-stabilizing gossip**: the conventional monotonic min-max consensus baseline.
+- **Self-stabilizing gossip**: the proposed path-based algorithm.
+- **Time-replicated gossip**: non-stabilizing gossip wrapped in time replication to obtain self-stabilization
+  ($k = 4$ replicas, launch period $p = 9$ s).
+
+Correctness is measured as the Root Mean Squared Error (RMSE) with respect to an oracle,
+computed separately for each partition;
+communication cost is measured as the data rate needed to sustain the algorithm.
+
+## Results
+
+### The algorithm at work
+
+The animation below shows the algorithm in a scenario with 50 devices ($L = 50$ m, $R = 10$ m)
+configured to find the minimum identifier in the network (0).
+Node color represents the currently selected value, so equal colors indicate agreement.
+The stabilized network is partitioned in five segments, each segment converges to the best value it contains,
+and once the network is reconnected the whole system returns to the initial best value.
+
+![Self-stabilization of the algorithm under network partitioning and reconnection](/img/coordination-2026-self-stabilizing-gossip/split-merge.gif)
+
+### Performance analysis
+
+![RMSE over time for the three gossip algorithms](/img/coordination-2026-self-stabilizing-gossip/rmse.png)
+
+*RMSE over time. Vertical lines show the disruption events (cut, change of values, merge), shaded areas show mean $\pm\sigma$.*
+
+- The **non-stabilizing gossip** fails to converge after any of the perturbations.
+- The **self-stabilizing gossip** starts converging as soon as a perturbation occurs, with a smooth decrease of the error,
+  as stale candidates are progressively pruned through loop detection.
+- The **time-replicated gossip** reaches the correct values with a delayed, step-like pattern, once the first replica that captured the new values becomes valid:
+  a well-tuned instance may reach the final value sooner, while the proposed algorithm offers a lower error during the transient.
+
+![Overall data rate over time for the three gossip algorithms](/img/coordination-2026-self-stabilizing-gossip/data-rate.png)
+
+*Overall data rate used by all devices over time.*
+
+The proposed algorithm requires a slightly higher data rate than the non-stabilizing baseline (due to the path data),
+but its communication overhead is about **four times lower** than time-replicated gossip,
+whose periodic replicas are clearly visible in the chart.
