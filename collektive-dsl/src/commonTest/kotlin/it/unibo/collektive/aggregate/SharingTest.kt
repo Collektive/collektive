@@ -44,9 +44,9 @@ class SharingTest {
     }
 
     @Test
-    fun `first time sharing`() = forEachPerformanceProfile { profile ->
-        aggregate(0, performanceProfile = profile) {
-            val result = share(1, findMax)
+    fun `first time sharing`() {
+        aggregate(0) {
+            val result = share(1, body = findMax)
             assertEquals(1, result)
         }
     }
@@ -55,9 +55,9 @@ class SharingTest {
     fun `share should communicate with aligned devices`() = forEachPerformanceProfile { profile ->
         val size = 5
         val environment =
-            mooreGridWithProgram(size, profile) { _ ->
-                val maxValue = share(localId, findMax)
-                val minValue = share(localId, findMin)
+            mooreGridWithProgram(size) { _ ->
+                val maxValue = share(localId, body = findMax)
+                val minValue = share(localId, body = findMin)
                 maxValue to minValue
             }
         repeat(size) {
