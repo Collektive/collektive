@@ -207,7 +207,7 @@ sealed interface Field<ID : Any, out T> {
     }, transform)
 
     fun <B> mapValues(newDefault: (T) -> B, transform: (T) -> B): Field<ID, B> = map { (_, value) -> transform(value) }
-    fun <B> mapValues(newDefault: B, transform: (T) -> B): Field<ID, B> = mapValues({ transform(it) }, transform)
+    fun <B> mapValues(newDefault: B, transform: (T) -> B): Field<ID, B> = mapValues({ newDefault }, transform)
     fun <B> mapValues(transform: (T) -> B): Field<ID, B> = mapValues({ transform(default) }, transform)
 
     /**
@@ -275,7 +275,7 @@ sealed interface Field<ID : Any, out T> {
             }
             noFieldsInFields(localId, localValue)
             return when {
-                others.isEmpty() -> PointwiseField(context, localId, localValue)
+                others.isEmpty() -> PointwiseField(context, localId, default, localValue)
                 others.values.all { it == localValue } ->
                     ConstantField(context, localId, localValue, others.keys.asSequence())
                 else -> ArrayBasedField(context, default, localId, localValue, others.map { it.toFieldEntry() })
@@ -312,7 +312,7 @@ internal abstract class AbstractField<ID : Any, T>(
         val sortedString = sortedEntries.joinToString(separator = ", ", prefix = "{", postfix = "}") { (id, value) ->
             "$id=$value"
         }
-        "ϕ(local: $local, neighbors: $sortedString)"
+        "ϕ(default: $default, local: $local, neighbors: $sortedString)"
     }
 
     final override fun equals(other: Any?): Boolean {
@@ -423,7 +423,7 @@ internal class ConstantField<ID : Any, T>(
         SequenceBackedCollapse(neighborsAsSequence())
 
     override val stringRepresentation: String by lazy {
-        "ϕ(constant: $localValue, localId: $localId, neighborsIDs: ${sortedEntries.map { it.id }.toSet()})"
+        "ϕ(default: $default, constant: $localValue, localId: $localId, neighborsIDs: ${sortedEntries.map { it.id }.toSet()})"
     }
 
     override fun <R> mapNeighbors(transform: (FieldEntry<ID, T>) -> R): Sequence<FieldEntry<ID, R>> =
@@ -433,8 +433,8 @@ internal class ConstantField<ID : Any, T>(
         neighborsIDs.map { FieldEntry(checkNotLocal(it), local.value) }
 }
 
-internal class PointwiseField<ID : Any, T>(context: Aggregate<ID>, localId: ID, localValue: T) :
-    AbstractField<ID, T>(context, localValue, localId, localValue) {
+internal class PointwiseField<ID : Any, T>(context: Aggregate<ID>, localId: ID, default: T, localValue: T = default) :
+    AbstractField<ID, T>(context, default, localId, localValue) {
 
     override val all: CollapseAll<FieldEntry<ID, T>>
         get() = object : CollapseAll<FieldEntry<ID, T>> {
@@ -455,7 +455,7 @@ internal class PointwiseField<ID : Any, T>(context: Aggregate<ID>, localId: ID, 
         }
 
     override val stringRepresentation: String by lazy {
-        "ϕ(pointwise: $local)"
+        "ϕ(default: $default, pointwise: $local)"
     }
 
     override fun <R> mapNeighbors(transform: (FieldEntry<ID, T>) -> R): Sequence<FieldEntry<ID, R>> = emptySequence()
