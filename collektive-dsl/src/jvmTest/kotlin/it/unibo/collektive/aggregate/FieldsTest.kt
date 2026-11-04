@@ -18,8 +18,8 @@ import kotlin.test.assertTrue
 
 class FieldsTest {
     private val mockedContext = mockk<Aggregate<Int>>(relaxed = true)
-    private val emptyField = Field(mockedContext, 0, 10)
-    private val fullField = Field(mockedContext, 0, 1, mapOf(1 to 1, 2 to 2, 3 to 3))
+    private val emptyField = Field(mockedContext, 10, 0)
+    private val fullField = Field(mockedContext, 1, 0, others = mapOf(1 to 1, 2 to 2, 3 to 3))
 
     @Test
     fun `empty fields contain self`() {
