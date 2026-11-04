@@ -49,7 +49,7 @@ open class Environment<R>(
     ) {
         require(nodes.none { it.id == id }) { "A node with id $id is already part of the environment" }
         nextId = maxOf(nextId, id + 1)
-        positions[Node(this, id, initial, retainTime, program)] = position
+        positions[Node(this, id, initial, performanceProfile, retainTime, program)] = position
     }
 
     /**
