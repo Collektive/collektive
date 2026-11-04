@@ -35,14 +35,18 @@ open class Environment<R>(
 
     /**
      * Adds a node to the environment at the given [position] with the given [initial] value and [program].
+     * The node gets the given [id] (by default, the next free one), which must not be already in use.
      */
     fun addNode(
         position: Position,
         initial: R,
         retainTime: Int = defaultRetainTime,
+        id: Int = nextId,
         program: Aggregate<Int>.(environment: Environment<R>) -> R,
     ) {
-        positions[Node(this, nextId++, initial, retainTime, program)] = position
+        require(nodes.none { it.id == id }) { "A node with id $id is already part of the environment" }
+        nextId = maxOf(nextId, id + 1)
+        positions[Node(this, id, initial, retainTime, program)] = position
     }
 
     /**
