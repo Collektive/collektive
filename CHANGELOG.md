@@ -1,3 +1,26 @@
+## [28.3.6](https://github.com/Collektive/collektive/compare/28.3.5...28.3.6) (2026-11-04)
+
+### Dependency updates
+
+* **deps:** update arrow-kt monorepo to v2.3.0 ([e6af05e](https://github.com/Collektive/collektive/commit/e6af05eab1bd6e367a3741a4fe8d9e2b9a8b5ceb))
+* **deps:** update dependency react-router-dom to v7.18.5 ([594bd5b](https://github.com/Collektive/collektive/commit/594bd5b5f8b3d15a98e734c02a18ad6bec4907f5))
+* **deps:** update gradle to v9.8.2 ([3d01c4b](https://github.com/Collektive/collektive/commit/3d01c4b9dbb42b0463f88ab9652a043ab88aeddf))
+* **deps:** update node.js to v26 ([235ed6a](https://github.com/Collektive/collektive/commit/235ed6a3b9c01566637f79f3692a77ccf4f3f14c))
+* **deps:** update plugin com.gradle.develocity to v4.6.1 ([b49b5ff](https://github.com/Collektive/collektive/commit/b49b5fffa268bb8efcc68d3d424b0ab753ad5f07))
+* **deps:** update plugin gitsemver to v7.3.0 ([1621ae2](https://github.com/Collektive/collektive/commit/1621ae2a4e5f3da4fb939c6ad0c595986b0e9970))
+* **deps:** update plugin ksp to v2.3.13 ([032250e](https://github.com/Collektive/collektive/commit/032250e4314847d22bd8f106a6cd6992a3f77209))
+* **deps:** update plugin multijvmtesting to v4.5.11 ([6fdaaae](https://github.com/Collektive/collektive/commit/6fdaaae674f9dfb77f3de030ebbec7c64de76f63))
+
+### Documentation
+
+* **showcase:** add new papers and experiments to showcase ([#1689](https://github.com/Collektive/collektive/issues/1689)) ([32a5fd5](https://github.com/Collektive/collektive/commit/32a5fd5f81090af10898fcc33ec9f3eaa3c200e5))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.50 ([2fe177b](https://github.com/Collektive/collektive/commit/2fe177bbef61d7361b21ba50377d723adeeea173))
+* **deps:** update github/codeql-action action to v4.39.1 ([f5ea0ab](https://github.com/Collektive/collektive/commit/f5ea0ab84c3930f771a6af3ed74eef7c39ec026a))
+* **deps:** update github/codeql-action action to v4.39.2 ([ce1350d](https://github.com/Collektive/collektive/commit/ce1350d7333554bb5edb867108216c5f4463c328))
+
 ## [28.3.5](https://github.com/Collektive/collektive/compare/28.3.4...28.3.5) (2026-10-20)
 
 ### Dependency updates
