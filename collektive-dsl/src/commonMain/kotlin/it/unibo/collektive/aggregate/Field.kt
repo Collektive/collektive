@@ -423,7 +423,9 @@ internal class ConstantField<ID : Any, T>(
         SequenceBackedCollapse(neighborsAsSequence())
 
     override val stringRepresentation: String by lazy {
-        "ϕ(default: $default, constant: $localValue, localId: $localId, neighborsIDs: ${sortedEntries.map { it.id }.toSet()})"
+        "ϕ(default: $default, constant: $localValue, localId: $localId, neighborsIDs: ${sortedEntries.map {
+            it.id
+        }.toSet()})"
     }
 
     override fun <R> mapNeighbors(transform: (FieldEntry<ID, T>) -> R): Sequence<FieldEntry<ID, R>> =
