@@ -36,9 +36,9 @@ class FieldOpsTest {
     }
     private val emptyField = Field(mockedContext, "localVal", 0)
     private val emptyFieldOfNullables: Field<Int, String?> = emptyField
-    private val field = Field(mockedContext, 0, 0, others =  mapOf(1 to 10, 2 to 20))
+    private val field = Field(mockedContext, 0, 0, others = mapOf(1 to 10, 2 to 20))
     private val fulfilledField = Field(mockedContext, 0, 0, others = mapOf(1 to 10, 2 to 20, 3 to 15))
-    private val fulfilledCompatibleField = Field(mockedContext, 1, 0, others =  mapOf(1 to 1, 2 to 1, 3 to 1))
+    private val fulfilledCompatibleField = Field(mockedContext, 1, 0, others = mapOf(1 to 1, 2 to 1, 3 to 1))
 
     @Test
     fun `An empty field should return null or an empty Option when its peer values are reduced`() {
@@ -78,7 +78,12 @@ class FieldOpsTest {
 
     @Test
     fun `An empty field when mapped only the local value should be transformed`() {
-        assertEquals(Field(mockedContext, "localVal-mapped", 0, others = mapOf()), emptyField.mapValues { "$it-mapped" })
+        assertEquals(
+            Field(mockedContext, "localVal-mapped", 0, others = mapOf()),
+            emptyField.mapValues {
+                "$it-mapped"
+            },
+        )
     }
 
     @Test
@@ -133,13 +138,19 @@ class FieldOpsTest {
 
     @Test
     fun `The replaceMatching should return a field with the replaced values`() {
-        assertEquals(Field(mockedContext, 0, 0, others = mapOf(1 to 42, 2 to 20)), field.replaceMatchingValues(42) { it == 10 })
+        assertEquals(
+            Field(mockedContext, 0, 0, others = mapOf(1 to 42, 2 to 20)),
+            field.replaceMatchingValues(42) {
+                it ==
+                    10
+            },
+        )
     }
 
     @Test
     fun `An empty field should return an empty field when aligned mapped with another empty field`() {
         assertEquals(
-            Field(mockedContext,  "no-data", 0, others = emptyMap()),
+            Field(mockedContext, "no-data", 0, others = emptyMap()),
             emptyField.alignedMap(emptyField) { _, _, _ ->
                 "no-data"
             },

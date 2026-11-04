@@ -82,14 +82,16 @@ internal class AggregateContext<ID : Any>(
                     it.toSend.default,
                     it.toSend.neighbors.sequence
                         .filterNot { (_, v) -> v == it.toSend.default }
-                        .toMap()
+                        .toMap(),
                 )
                 toBeSent.addData(path, message, dataSharingMethod)
                 internalState += path to it.toSend.local.value
             }.toReturn
-        TODO("There's still a bug that involves not updating the default value when needed, " +
-            "e.g. currently mapping also on the default value won't change the value for the next round," +
-            "see relative test in ExchangeTest.kt")
+        TODO(
+            "There's still a bug that involves not updating the default value when needed, " +
+                "e.g. currently mapping also on the default value won't change the value for the next round," +
+                "see relative test in ExchangeTest.kt",
+        )
     }
 
     override fun <Stored, Return> evolving(initial: Stored, transform: YieldingScope<Stored, Return>): Return {
