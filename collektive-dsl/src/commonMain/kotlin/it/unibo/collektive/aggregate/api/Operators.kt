@@ -29,7 +29,8 @@ import it.unibo.collektive.aggregate.Field
  * rather, from the previously computed local field value.
  */
 inline fun <ID : Any, reified Shared> Aggregate<ID>.exchange(
-    initial: Shared,
+    default: Shared,
+    initial: Shared = default,
     noinline body: (Field<ID, Shared>) -> Field<ID, Shared>,
 ): Field<ID, Shared> = exchanging(initial) { field -> body(field).yielding { this } }
 
@@ -65,9 +66,10 @@ fun <ID : Any> Aggregate<ID>.neighborhood(): Field<ID, *> = neighboring(0.toByte
  * rather, from the previously computed result.
  */
 inline fun <ID : Any, reified Shared> Aggregate<ID>.share(
-    initial: Shared,
+    default: Shared,
+    initial: Shared = default,
     noinline body: (Field<ID, Shared>) -> Shared,
-): Shared = sharing(initial) { field -> body(field).yielding { this } }
+): Shared = sharing(default, initial) { field -> body(field).yielding { this } }
 
 /**
  * [sharing] implements efficient stateful data sharing.
@@ -81,9 +83,10 @@ inline fun <ID : Any, reified Shared> Aggregate<ID>.share(
  * rather, from the previously computed result.
  */
 inline fun <ID : Any, reified Shared, Returned> Aggregate<ID>.sharing(
-    initial: Shared,
+    default: Shared,
+    initial: Shared = default,
     noinline body: YieldingContext<Shared, Returned>.(Field<ID, Shared>) -> YieldingResult<Shared, Returned>,
-): Returned = exchanging(initial) { field: Field<ID, Shared> ->
+): Returned = exchanging(default, initial) { field: Field<ID, Shared> ->
     with(YieldingContext<Shared, Returned>()) {
         val result: YieldingResult<Shared, Returned> = body(field)
         field.mapToConstant(result.toSend).yielding { result.toReturn }
