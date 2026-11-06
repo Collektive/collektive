@@ -1,0 +1,476 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.1"
+   viewBox="0 0 626.40002 648.63898"
+   width="626.40002"
+   height="648.63898"
+   id="svg13"
+   sodipodi:docname="collektive-multiplatform.svg"
+   inkscape:version="1.4 (e7c3feb1, 2024-10-09)"
+   inkscape:export-filename="collektive-multiplatform.pdf"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview13"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.84222311"
+     inkscape:cx="275.46145"
+     inkscape:cy="208.37709"
+     inkscape:window-width="2560"
+     inkscape:window-height="1440"
+     inkscape:window-x="1470"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg13" />
+  <!-- svg-source:excalidraw -->
+  <metadata
+     id="metadata1" />
+  <path
+     style="opacity:1;fill:#c9fd85;fill-opacity:1;stroke:#000000;stroke-width:2.34262;stroke-dasharray:7.02788, 7.02788;stroke-dashoffset:0;stroke-opacity:1"
+     d="M 2.6130279,360.42856 626.13885,358.80976"
+     id="path38"
+     sodipodi:nodetypes="cc" />
+  <defs
+     id="defs1">
+    <marker
+       style="overflow:visible"
+       id="marker23"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path23" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Triangle"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135" />
+    </marker>
+    <style
+       class="style-fonts"
+       id="style1">
+      @font-face { font-family: &quot;Comic Shanns&quot;; src: url(data:font/woff2;base64,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); }</style>
+  </defs>
+  <g
+     stroke-linecap="round"
+     transform="matrix(2.8032287,0,0,2.1759171,55.62335,35.292025)"
+     id="g37"
+     style="opacity:1;fill:#d5e8ff;fill-opacity:1;stroke:#115a99;stroke-width:1.61961;stroke-dasharray:none;stroke-opacity:1">
+    <path
+       d="m 25.45,0 c 44.37,0 88.74,0 132.89,0 16.96,0 25.44,8.48 25.44,25.45 0,18.61 0,37.22 0,50.89 0,16.96 -8.48,25.45 -25.44,25.45 -33.37,0 -66.73,0 -132.89,0 C 8.48,101.79 0,93.3 0,76.34 0,65.23 0,54.12 0,25.45 0,8.48 8.48,0 25.45,0"
+       stroke="none"
+       stroke-width="0"
+       fill="#b2f2bb"
+       id="path36"
+       style="fill:#d5e8ff;fill-opacity:1;stroke:#115a99;stroke-width:1.61961;stroke-dasharray:none;stroke-opacity:1" />
+  </g>
+  <g
+     stroke-linecap="round"
+     id="g2"
+     transform="translate(-10,-97.252107)"
+     style="stroke:none">
+    <g
+       transform="translate(10,457.8354)"
+       id="g1"
+       style="stroke:none">
+      <path
+         d="M 0,0 C 119.73,-0.33 598.66,-1.63 718.4,-1.95"
+         stroke="#1e1e1e"
+         stroke-width="4.5"
+         fill="none"
+         stroke-dasharray="1.5, 10"
+         id="path1"
+         style="stroke:none" />
+    </g>
+  </g>
+  <mask
+     id="mask2" />
+  <g
+     stroke-linecap="round"
+     transform="translate(103.276,-15.591579)"
+     id="g3"
+     style="stroke:#000000;stroke-opacity:1" />
+  <g
+     stroke-linecap="round"
+     transform="translate(93.34669,95.14032)"
+     id="g38"
+     style="fill:#9accff;fill-opacity:1;stroke:#115a99;stroke-width:4;stroke-dasharray:none;stroke-opacity:1">
+    <path
+       d="m 25.45,0 h 132.89 c 18.0748,0 25.44,9.6770592 25.44,25.45 v 50.89 c 0,16.96 -8.48,25.45 -25.44,25.45 H 25.45 C 8.48,101.79 0,93.3 0,76.34 V 25.45 C 0,8.48 8.48,0 25.45,0"
+       stroke="none"
+       stroke-width="0"
+       fill="#b2f2bb"
+       id="path37"
+       style="fill:#9accff;fill-opacity:1;stroke:#115a99;stroke-width:4;stroke-dasharray:none;stroke-opacity:1"
+       sodipodi:nodetypes="csssssssc" />
+  </g>
+  <g
+     transform="translate(161.01668,131.18132)"
+     id="g6">
+    <text
+       x="23.099998"
+       y="24.5"
+       font-family="'Comic Shanns', monospace, 'Segoe UI Emoji'"
+       font-size="28px"
+       fill="#1e1e1e"
+       text-anchor="middle"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;direction:ltr;dominant-baseline:alphabetic;text-anchor:middle;white-space:pre;fill:#115a99;fill-opacity:1"
+       direction="ltr"
+       dominant-baseline="alphabetic"
+       id="text5"><tspan
+         sodipodi:role="line"
+         id="tspan14"
+         x="23.099998"
+         y="24.5"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">DSL</tspan><tspan
+         sodipodi:role="line"
+         id="tspan15"
+         x="23.099998"
+         y="59.5" /></text>
+  </g>
+  <g
+     stroke-linecap="round"
+     transform="translate(342.99144,95.14032)"
+     id="g7"
+     style="fill:#9accff;fill-opacity:1;stroke:#115a99;stroke-width:4;stroke-dasharray:none;stroke-opacity:1">
+    <path
+       d="m 25.45,0 h 132.89 c 18.0748,0 25.44,9.6770592 25.44,25.45 v 50.89 c 0,16.96 -8.48,25.45 -25.44,25.45 H 25.45 C 8.48,101.79 0,93.3 0,76.34 V 25.45 C 0,8.48 8.48,0 25.45,0"
+       stroke="none"
+       stroke-width="0"
+       fill="#b2f2bb"
+       id="path6"
+       style="fill:#9accff;fill-opacity:1;stroke:#115a99;stroke-width:4;stroke-dasharray:none;stroke-opacity:1"
+       sodipodi:nodetypes="csssssssc" />
+  </g>
+  <g
+     transform="translate(380.98273,129.47332)"
+     id="g8"
+     style="fill:#115a99;fill-opacity:1">
+    <text
+       x="53.900002"
+       y="24.5"
+       font-family="'Comic Shanns', monospace, 'Segoe UI Emoji'"
+       font-size="28px"
+       fill="#1e1e1e"
+       text-anchor="middle"
+       style="font-size:28px;font-family:'Comic Shanns', monospace, 'Segoe UI Emoji';direction:ltr;dominant-baseline:alphabetic;text-anchor:middle;white-space:pre;fill:#115a99;fill-opacity:1"
+       direction="ltr"
+       dominant-baseline="alphabetic"
+       id="text7"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#115a99;fill-opacity:1"
+         id="tspan16">Library</tspan></text>
+  </g>
+  <g
+     stroke-linecap="round"
+     transform="translate(74.06673,322.76011)"
+     id="g9"
+     style="fill:#d5e8d4;fill-opacity:1;stroke:#307702;stroke-width:4;stroke-dasharray:none;stroke-opacity:1">
+    <path
+       d="m 18.13,0 c 75.71,0 151.41,0 191.97,0 12.09,0 18.14,6.04 18.14,18.13 0,12.37 0,24.74 0,36.27 0,12.09 -6.05,18.13 -18.14,18.13 -73.41,0 -146.83,0 -191.97,0 C 6.04,72.53 0,66.49 0,54.4 0,44.27 0,34.15 0,18.13 0,6.04 6.04,0 18.13,0"
+       stroke="none"
+       stroke-width="0"
+       fill="#ffec99"
+       id="path8"
+       style="fill:#d5e8d4;fill-opacity:1;stroke:#307702;stroke-width:4;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       d="M 18.13,0 C 58.21,0 98.29,0 210.1,0 M 18.13,0 C 76.02,0 133.9,0 210.1,0 m 0,0 c 12.09,0 18.14,6.04 18.14,18.13 M 210.1,0 c 12.09,0 18.14,6.04 18.14,18.13 m 0,0 c 0,8.8 0,17.6 0,36.27 m 0,-36.27 c 0,11.62 0,23.24 0,36.27 m 0,0 c 0,12.09 -6.05,18.13 -18.14,18.13 M 228.24,54.4 c 0,12.09 -6.05,18.13 -18.14,18.13 m 0,0 c -55.62,0 -111.25,0 -191.97,0 m 191.97,0 c -68.25,0 -136.51,0 -191.97,0 m 0,0 C 6.04,72.53 0,66.49 0,54.4 M 18.13,72.53 C 6.04,72.53 0,66.49 0,54.4 m 0,0 C 0,42.33 0,30.25 0,18.13 M 0,54.4 C 0,44.33 0,34.26 0,18.13 m 0,0 C 0,6.04 6.04,0 18.13,0 M 0,18.13 C 0,6.04 6.04,0 18.13,0"
+       stroke="#1e1e1e"
+       stroke-width="1"
+       fill="none"
+       id="path9"
+       style="fill:#d5e8d4;fill-opacity:1;stroke:#307702;stroke-width:4;stroke-dasharray:none;stroke-opacity:1" />
+  </g>
+  <g
+     transform="translate(137.57675,342.58579)"
+     id="g10">
+    <text
+       x="0"
+       y="24.5"
+       font-family="Comic Shanns, monospace, Segoe UI Emoji"
+       font-size="28px"
+       fill="#1e1e1e"
+       text-anchor="start"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;direction:ltr;dominant-baseline:alphabetic;text-anchor:start;white-space:pre;fill:#307702;fill-opacity:1"
+       direction="ltr"
+       dominant-baseline="alphabetic"
+       id="text9">Mailbox</text>
+  </g>
+  <g
+     transform="translate(353.5501,316.28481)"
+     id="g11">
+    <text
+       x="38.957802"
+       y="20.651381"
+       font-family="'Comic Shanns', monospace, 'Segoe UI Emoji'"
+       font-size="21.7446px"
+       fill="#1e1e1e"
+       text-anchor="start"
+       style="font-size:21.7446px;font-family:'Comic Shanns', monospace, 'Segoe UI Emoji';direction:ltr;dominant-baseline:alphabetic;text-anchor:start;white-space:pre;fill:#000000;fill-opacity:1"
+       direction="ltr"
+       dominant-baseline="alphabetic"
+       id="text10"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1"
+         id="tspan17">Common (Multiplatform)</tspan></text>
+  </g>
+  <path
+     style="opacity:1;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Triangle)"
+     d="m 185.24169,198.84586 0.42338,114.85118"
+     id="path17"
+     sodipodi:nodetypes="cc" />
+  <path
+     style="opacity:1;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:2.5;stroke-dasharray:none;stroke-opacity:1"
+     d="m 186.44554,397.26799 -0.0589,78.43347"
+     id="path18"
+     sodipodi:nodetypes="cc" />
+  <path
+     style="opacity:1;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:2.5;stroke-dasharray:none;stroke-opacity:1"
+     d="m 65.31699,475.68698 487.51147,0.0583"
+     id="path19"
+     sodipodi:nodetypes="cc" />
+  <path
+     style="opacity:1;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:2.5;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker23)"
+     d="m 65.34565,474.63804 -0.0817,91.92976"
+     id="path20"
+     sodipodi:nodetypes="cc" />
+  <path
+     style="opacity:1;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:2.5;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker23)"
+     d="m 389.96896,474.68784 -0.0817,91.92976"
+     id="path21"
+     sodipodi:nodetypes="cc" />
+  <path
+     style="opacity:1;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:2.5;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker23)"
+     d="m 551.82996,475.73853 -0.0817,90.95256"
+     id="path22"
+     sodipodi:nodetypes="cc" />
+  <g
+     stroke-linecap="round"
+     transform="matrix(0.68259497,0,0,0.68259497,2.544281,577.15763)"
+     id="g25"
+     style="fill:#ffe6cc;fill-opacity:1;stroke:#d79b00;stroke-width:5.85999;stroke-dasharray:none;stroke-opacity:1">
+    <path
+       d="m 25.45,0 c 44.37,0 88.74,0 132.89,0 16.96,0 25.44,8.48 25.44,25.45 0,18.61 0,37.22 0,50.89 0,16.96 -8.48,25.45 -25.44,25.45 -33.37,0 -66.73,0 -132.89,0 C 8.48,101.79 0,93.3 0,76.34 0,65.23 0,54.12 0,25.45 0,8.48 8.48,0 25.45,0"
+       stroke="none"
+       stroke-width="0"
+       fill="#b2f2bb"
+       id="path24"
+       style="fill:#ffe6cc;fill-opacity:1;stroke:#d79b00;stroke-width:5.85999;stroke-dasharray:none;stroke-opacity:1" />
+  </g>
+  <g
+     transform="matrix(0.83818509,0,0,0.83818509,34.104789,604.07553)"
+     id="g26"
+     style="fill:#d79b00;fill-opacity:1">
+    <text
+       x="36.675312"
+       y="20.084982"
+       font-family="'Comic Shanns', monospace, 'Segoe UI Emoji'"
+       font-size="28px"
+       fill="#1e1e1e"
+       text-anchor="middle"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;direction:ltr;dominant-baseline:alphabetic;text-anchor:middle;white-space:pre;fill:#d79b00;fill-opacity:1"
+       direction="ltr"
+       dominant-baseline="alphabetic"
+       id="text26"><tspan
+         sodipodi:role="line"
+         id="tspan25"
+         x="36.675312"
+         y="20.084982"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">iOS</tspan><tspan
+         sodipodi:role="line"
+         id="tspan26"
+         x="36.675312"
+         y="55.08498"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal" /></text>
+  </g>
+  <g
+     stroke-linecap="round"
+     transform="matrix(0.68259497,0,0,0.68259497,165.95213,577.15763)"
+     id="g29"
+     style="fill:#ffe6cc;fill-opacity:1;stroke:#d79b00;stroke-width:5.85999;stroke-dasharray:none;stroke-opacity:1">
+    <path
+       d="m 25.45,0 c 44.37,0 88.74,0 132.89,0 16.96,0 25.44,8.48 25.44,25.45 0,18.61 0,37.22 0,50.89 0,16.96 -8.48,25.45 -25.44,25.45 -33.37,0 -66.73,0 -132.89,0 C 8.48,101.79 0,93.3 0,76.34 0,65.23 0,54.12 0,25.45 0,8.48 8.48,0 25.45,0"
+       stroke="none"
+       stroke-width="0"
+       fill="#b2f2bb"
+       id="path28"
+       style="fill:#ffe6cc;fill-opacity:1;stroke:#d79b00;stroke-width:5.85999;stroke-dasharray:none;stroke-opacity:1" />
+  </g>
+  <g
+     transform="matrix(0.83818509,0,0,0.83818509,197.51264,604.07553)"
+     id="g30"
+     style="fill:#d79b00;fill-opacity:1">
+    <text
+       x="36.675312"
+       y="20.084982"
+       font-family="'Comic Shanns', monospace, 'Segoe UI Emoji'"
+       font-size="28px"
+       fill="#1e1e1e"
+       text-anchor="middle"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;direction:ltr;dominant-baseline:alphabetic;text-anchor:middle;white-space:pre;fill:#d79b00;fill-opacity:1"
+       direction="ltr"
+       dominant-baseline="alphabetic"
+       id="text30"><tspan
+         sodipodi:role="line"
+         id="tspan29"
+         x="36.675312"
+         y="20.084982"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">Android</tspan><tspan
+         sodipodi:role="line"
+         id="tspan30"
+         x="36.675312"
+         y="55.08498"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal" /></text>
+  </g>
+  <g
+     stroke-linecap="round"
+     transform="matrix(0.68259497,0,0,0.68259497,327.96927,577.15763)"
+     id="g31"
+     style="fill:#ffe6cc;fill-opacity:1;stroke:#d79b00;stroke-width:5.85999;stroke-dasharray:none;stroke-opacity:1">
+    <path
+       d="m 25.45,0 c 44.37,0 88.74,0 132.89,0 16.96,0 25.44,8.48 25.44,25.45 0,18.61 0,37.22 0,50.89 0,16.96 -8.48,25.45 -25.44,25.45 -33.37,0 -66.73,0 -132.89,0 C 8.48,101.79 0,93.3 0,76.34 0,65.23 0,54.12 0,25.45 0,8.48 8.48,0 25.45,0"
+       stroke="none"
+       stroke-width="0"
+       fill="#b2f2bb"
+       id="path30"
+       style="fill:#ffe6cc;fill-opacity:1;stroke:#d79b00;stroke-width:5.85999;stroke-dasharray:none;stroke-opacity:1" />
+  </g>
+  <g
+     transform="matrix(0.83818509,0,0,0.83818509,359.52978,604.07553)"
+     id="g32"
+     style="fill:#d79b00;fill-opacity:1">
+    <text
+       x="36.675312"
+       y="20.084982"
+       font-family="'Comic Shanns', monospace, 'Segoe UI Emoji'"
+       font-size="28px"
+       fill="#1e1e1e"
+       text-anchor="middle"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;direction:ltr;dominant-baseline:alphabetic;text-anchor:middle;white-space:pre;fill:#d79b00;fill-opacity:1"
+       direction="ltr"
+       dominant-baseline="alphabetic"
+       id="text32"><tspan
+         sodipodi:role="line"
+         id="tspan31"
+         x="36.675312"
+         y="20.084982"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">Linux</tspan><tspan
+         sodipodi:role="line"
+         id="tspan32"
+         x="36.675312"
+         y="55.08498" /></text>
+  </g>
+  <g
+     stroke-linecap="round"
+     transform="matrix(0.68259497,0,0,0.68259497,489.22468,577.15763)"
+     id="g34"
+     style="fill:#ffe6cc;fill-opacity:1;stroke:#d79b00;stroke-width:5.85999;stroke-dasharray:none;stroke-opacity:1">
+    <path
+       d="m 25.45,0 c 44.37,0 88.74,0 132.89,0 16.96,0 25.44,8.48 25.44,25.45 0,18.61 0,37.22 0,50.89 0,16.96 -8.48,25.45 -25.44,25.45 -33.37,0 -66.73,0 -132.89,0 C 8.48,101.79 0,93.3 0,76.34 0,65.23 0,54.12 0,25.45 0,8.48 8.48,0 25.45,0"
+       stroke="none"
+       stroke-width="0"
+       fill="#b2f2bb"
+       id="path33"
+       style="fill:#ffe6cc;fill-opacity:1;stroke:#d79b00;stroke-width:5.85999;stroke-dasharray:none;stroke-opacity:1" />
+  </g>
+  <g
+     transform="matrix(0.83818509,0,0,0.83818509,520.78519,596.41285)"
+     id="g35"
+     style="fill:#d79b00;fill-opacity:1">
+    <text
+       x="36.675312"
+       y="20.084982"
+       font-family="'Comic Shanns', monospace, 'Segoe UI Emoji'"
+       font-size="28px"
+       fill="#1e1e1e"
+       text-anchor="middle"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;direction:ltr;dominant-baseline:alphabetic;text-anchor:middle;white-space:pre;fill:#d79b00;fill-opacity:1"
+       direction="ltr"
+       dominant-baseline="alphabetic"
+       id="text35"><tspan
+         sodipodi:role="line"
+         id="tspan35"
+         x="36.675312"
+         y="20.084982"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">...</tspan></text>
+  </g>
+  <g
+     transform="translate(438.52951,370.31504)"
+     id="g5">
+    <text
+       x="25.158348"
+       y="19.547424"
+       font-family="'Comic Shanns', monospace, 'Segoe UI Emoji'"
+       font-size="21.7446px"
+       fill="#1e1e1e"
+       text-anchor="start"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;direction:ltr;dominant-baseline:alphabetic;text-anchor:start;white-space:pre;fill:#000000;fill-opacity:1"
+       direction="ltr"
+       dominant-baseline="alphabetic"
+       id="text1"><tspan
+         sodipodi:role="line"
+         id="tspan5"
+         x="25.158348"
+         y="19.547424"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">Platform specific</tspan><tspan
+         sodipodi:role="line"
+         id="tspan6"
+         x="25.158348"
+         y="44.547424"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal" /></text>
+  </g>
+  <path
+     style="opacity:1;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:2.5;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker23)"
+     d="m 230.0469,475.85019 -0.0817,90.75712"
+     id="path7"
+     sodipodi:nodetypes="cc" />
+  <g
+     transform="translate(336.84066,313.3792)"
+     id="g12">
+    <text
+       x="-82.895309"
+       y="-286.65921"
+       font-family="'Comic Shanns', monospace, 'Segoe UI Emoji'"
+       font-size="21.7446px"
+       fill="#1e1e1e"
+       text-anchor="start"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:26.6667px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;direction:ltr;dominant-baseline:alphabetic;text-anchor:start;white-space:pre;fill:#000000;fill-opacity:1"
+       direction="ltr"
+       dominant-baseline="alphabetic"
+       id="text8"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:26.6667px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1"
+         id="tspan7">Collektive</tspan></text>
+  </g>
+</svg>

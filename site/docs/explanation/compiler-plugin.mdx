@@ -1,0 +1,359 @@
+---
+title: The Compiler Plugin
+sidebar_position: 5.5
+description: "Alignment at compile time, and the warnings and errors that catch misuses of the DSL."
+---
+
+import {Mistake, DoDont, Do, Dont, Explanation, Diagnostic, MistakeIndex} from '@site/src/components/Mistakes';
+
+# The Compiler Plugin
+
+Collektive is an *internal* DSL: aggregate programs are plain Kotlin, compiled by the plain Kotlin compiler.
+This is what gives you type checking, IDE support, and every Kotlin target for free,
+but it has a price: the Kotlin compiler knows nothing about aggregate programming.
+It cannot know that two calls to `neighboring` must not share a path,
+that a branch is a partition of the network, or that a loop around `share` makes messages collide.
+
+The Collektive **compiler plugin** teaches these rules to the compiler.
+It is applied automatically by the Collektive Gradle plugin (see [Getting Started](../tutorials/getting-started.mdx#compiler-plugin-setup)),
+and works in two phases of the compilation:
+
+- in the **backend**, it rewrites the code to inject **alignment**: every aggregate call, branch, and lambda gets its own path,
+  and fields captured from outer scopes are projected.
+  This is what makes Collektive programs correct, and it is described in [Alignment and Domain Partitioning](alignment.mdx);
+- in the **frontend**, it performs **static analysis**: it inspects the code while it is being type-checked,
+  and reports the uses of the DSL that are wrong, or that work but are probably not what you meant.
+
+This page is about the second part.
+
+## Diagnostics like any other
+
+The checks of the plugin run inside the Kotlin compiler, as checkers of its K2 frontend,
+so their results are ordinary compiler diagnostics: they appear in the output of the Gradle build, point to the exact call,
+and can be shown by the IDE next to the code.
+Each one explains what is wrong and suggests a fix.
+
+```text
+w: file:///…/Example.kt:12:71 Aggregate function 'neighboring' is called inside a loop without explicit alignment.
+This may cause the same execution path to trigger multiple interactions, resulting in ambiguous alignment.
+Wrap the function call using 'alignedOn' with a unique key to ensure consistent alignment.
+```
+
+There is one **error**, for code that cannot be aligned correctly, and several **warnings**,
+for code that is legal but suspicious or inefficient.
+Warnings can be silenced, and turned into errors, like any other Kotlin warning (see [below](#silencing-a-diagnostic)).
+
+Checks only apply to aggregate code: functions with an `Aggregate` receiver or parameter, and the lambdas they run.
+
+<MistakeIndex groups={[
+  {name: 'Alignment', entries: [
+    {to: '#branch-returns-field', title: 'A branch returns a Field'},
+    {to: '#aggregate-in-loop', title: 'Aggregate calls in loops'},
+    {to: '#explicit-align', title: 'Explicit align / dealign'},
+  ]},
+  {name: 'Useless communication', entries: [
+    {to: '#neighboring-constant', title: 'neighboring with a constant'},
+    {to: '#evolve-share', title: 'evolve that should be a share'},
+  ]},
+  {name: 'Useless constructs', entries: [
+    {to: '#unused-parameter', title: 'Unused lambda parameter'},
+    {to: '#unnecessary-yielding', title: 'Unnecessary yielding'},
+  ]},
+]} />
+
+## The checks
+
+<Mistake>
+
+### A branch returns a `Field` {#branch-returns-field}
+
+<Diagnostic id="BRANCH_RETURNS_FIELD" severity="error">
+This branch returns a 'it.unibo.collektive.aggregate.Field&lt;Int, Int&gt;', which is an instance of it.unibo.collektive.aggregate.Field.
+Returning fields from branches is disallowed, as it may break alignment: fields are projected within branches
+and may be restricted to partial domains.
+</Diagnostic>
+
+<DoDont>
+<Dont label="each branch builds a field on a different set of neighbors">
+
+```kotlin
+val f = if (condition) neighboring(a) else neighboring(b)
+```
+
+</Dont>
+<Do label="build both fields before the branch, then choose entry by entry">
+
+```kotlin
+val fa = neighboring(a)
+val fb = neighboring(b)
+val f = fa.alignedMapValues(fb) { x, y -> if (condition) x else y }
+```
+
+</Do>
+</DoDont>
+
+<Explanation>
+
+Inside a branch, only the devices that took the same branch are aligned,
+so a field built there is defined on a part of the neighborhood only.
+See [Branches cannot return fields](alignment.mdx#branches-cannot-return-fields).
+
+</Explanation>
+
+</Mistake>
+
+<Mistake>
+
+### Aggregate calls in loops {#aggregate-in-loop}
+
+<Diagnostic id="AGGREGATE_FUNCTION_INSIDE_ITERATION" severity="warning">
+Aggregate function 'neighboring' is called inside a loop without explicit alignment.
+</Diagnostic>
+
+<DoDont>
+<Dont label="every iteration produces the same path">
+
+```kotlin
+for (target in targets) {
+    distances[target] = distanceTo(localId == target)
+}
+```
+
+</Dont>
+<Do label="align each iteration on a value that identifies it on every device">
+
+```kotlin
+for (target in targets) {
+    distances[target] = alignedOn(target) { distanceTo(localId == target) }
+}
+```
+
+</Do>
+</DoDont>
+
+<Explanation title="Detects">
+
+Calls to any aggregate function (the operators, the standard library like `distanceTo`, or your own functions)
+in `for`, `while`, and `do`/`while` loops, also when `alignedOn` wraps the whole loop instead of each iteration.
+
+</Explanation>
+
+<Explanation title="Misses">
+
+Calls inside the lambdas of collection operations, such as `targets.map { distanceTo(…) }`:
+they compile silently, and fail at runtime with an `AlignmentClashException`.
+Use `alignedOn` there too.
+
+</Explanation>
+
+</Mistake>
+
+<Mistake>
+
+### Explicit `align` / `dealign` {#explicit-align}
+
+<Diagnostic id="FORBIDDEN_FUNCTION_CALL" severity="warning">
+The function 'it.unibo.collektive.aggregate.api.Aggregate.align' must not be called explicitly
+</Diagnostic>
+
+<DoDont>
+<Dont label="low-level primitives, already managed by the plugin">
+
+```kotlin
+align(target)
+val d = distanceTo(localId == target)
+dealign()
+```
+
+</Dont>
+<Do label="the same, scoped and safe">
+
+```kotlin
+val d = alignedOn(target) { distanceTo(localId == target) }
+```
+
+</Do>
+</DoDont>
+
+<Explanation>
+
+`align` and `dealign` are the primitives the plugin uses to build paths.
+Calling them by hand interferes with the paths the plugin generates, and forgetting a `dealign` shifts the paths of all the code that follows.
+
+</Explanation>
+
+</Mistake>
+
+<Mistake>
+
+### `neighboring` with a constant {#neighboring-constant}
+
+<Diagnostic id="NEIGHBORING_WITH_CONSTANT" severity="warning">
+This 'neighboring' call uses a compile-time constant, which is shared with neighbors unnecessarily.
+Consider using 'mapNeighborhood {'{'} constant {'}'}' instead, which provides minimal communication by only sharing the alignment token.
+</Diagnostic>
+
+<DoDont>
+<Dont label="sends a value that every device already knows">
+
+```kotlin
+val ones = neighboring(1)
+```
+
+</Dont>
+<Do label="the same field, without sending the value">
+
+```kotlin
+val ones = mapNeighborhood { 1 }
+```
+
+</Do>
+</DoDont>
+
+<Explanation title="Note">
+
+The check is skipped inside functions annotated with `@Test`, where sharing a literal can be intentional.
+
+</Explanation>
+
+</Mistake>
+
+<Mistake>
+
+### `evolve` that should be a `share` {#evolve-share}
+
+<Diagnostic id="IMPROPER_EVOLVE_CONSTRUCT" severity="warning">
+This 'evolve' can be replaced with 'share' for better performance.
+</Diagnostic>
+
+<DoDont>
+<Dont label="neighbors receive the value before the update: information travels slower">
+
+```kotlin
+evolve(localId) { max -> neighboring(max).all.values.max() }
+```
+
+</Dont>
+<Do label="neighbors receive the updated value">
+
+```kotlin
+share(localId) { ids -> ids.all.values.max() }
+```
+
+</Do>
+</DoDont>
+
+<Explanation>
+
+`evolve` + `neighboring` of the state is a slower `share`:
+the value sent to the neighbors is the one of the previous round, so every hop costs an extra round.
+The check applies to `evolve` and `evolving`, when the state (or a variable computed from it) is sent with `neighboring`.
+See [share and sharing](dsl-descriptions.mdx#share-and-sharing-propagating-state).
+
+</Explanation>
+
+</Mistake>
+
+<Mistake>
+
+### Unused lambda parameter {#unused-parameter}
+
+<Diagnostic id="UNNECESSARY_CONSTRUCT_CALL" severity="warning">
+This 'share' appears unnecessary in this case, as the anonymous function's parameter is unused.
+Consider using a different construct or eliminating the call altogether.
+</Diagnostic>
+
+<DoDont>
+<Dont label="the state of the previous round is ignored: share does nothing useful">
+
+```kotlin
+share(0) { _ -> sensorReading() }
+```
+
+</Dont>
+<Do label="just use the value">
+
+```kotlin
+sensorReading()
+```
+
+</Do>
+</DoDont>
+
+<Explanation>
+
+`evolve`, `share`, and `exchange` (and their `-ing` variants) exist to work on the value their lambda receives.
+If the lambda ignores it, the construct keeps state, or talks to the neighbors, for nothing:
+it is usually a sign that a different construct was meant.
+
+</Explanation>
+
+</Mistake>
+
+<Mistake>
+
+### Unnecessary `yielding` {#unnecessary-yielding}
+
+<Diagnostic id="UNNECESSARY_YIELDING_CONTEXT" severity="warning">
+The 'yielding' block inside 'sharing' may be redundant, as the yielded expression is identical to the one being exchanged.
+Consider using the non-ing (non-yielding) version of the same construct (e.g., 'share' instead of 'sharing').
+</Diagnostic>
+
+<DoDont>
+<Dont label="yields exactly what is shared">
+
+```kotlin
+sharing(0) { ids ->
+    val max = ids.all.values.max()
+    max.yielding { max }
+}
+```
+
+</Dont>
+<Do label="the plain construct already returns it">
+
+```kotlin
+share(0) { ids -> ids.all.values.max() }
+```
+
+</Do>
+</DoDont>
+
+<Explanation>
+
+The `-ing` variants (`evolving`, `sharing`, `exchanging`) exist to return something *different* from what is stored or sent.
+See [the yielding variants](dsl-descriptions.mdx#share-and-sharing-propagating-state).
+
+</Explanation>
+
+</Mistake>
+
+## Silencing a diagnostic
+
+The warnings of the plugin are heuristics, and sometimes the code is right as it is.
+They can be handled like any other Kotlin warning:
+
+- `@Suppress("AGGREGATE_FUNCTION_INSIDE_ITERATION")` (or any other identifier above) on a declaration silences that warning there;
+- `allWarningsAsErrors` in the Kotlin compiler options makes the build fail on any of them, which is a good idea in CI;
+- `@CollektiveIgnore("reason")` on a function, a class, or a file disables the plugin altogether, alignment included:
+  use it only for low-level code that manages alignment by hand (see [Opting out](alignment.mdx#opting-out-collektiveignore)).
+
+```kotlin
+@Suppress("NEIGHBORING_WITH_CONSTANT") // we want to measure the cost of sending the value
+fun Aggregate<Int>.benchmark(): Field<Int, Int> = neighboring(1)
+```
+
+## Limits
+
+Static analysis on a general-purpose language can never be complete.
+The checks recognize the most common shapes of each mistake, and stay silent when they are not sure,
+so that warnings are rarely false alarms.
+The price is that some mistakes slip through: for instance, aggregate calls in collection lambdas (see [above](#aggregate-in-loop)),
+or an `evolve` whose state reaches `neighboring` through an expression rather than a variable.
+Alignment itself, on the other hand, never depends on these checks: it is always injected by the backend.
+
+:::info Background
+The static analysis of the plugin was designed and developed in the master's thesis
+*Static Analysis of Aggregate Programs through Compiler Plugins* (F. Magnani, University of Bologna, A.Y. 2023/2024),
+which discusses the patterns, how they are detected on the compiler's intermediate representation, and how they are tested.
+:::
