@@ -1,3 +1,17 @@
+## [28.3.7](https://github.com/Collektive/collektive/compare/28.3.6...28.3.7) (2026-11-09)
+
+### Dependency updates
+
+* **deps:** update alchemist to v48 ([89fd58b](https://github.com/Collektive/collektive/commit/89fd58bfc0e9e4999ae08f803e80e967f387c468))
+
+### Bug Fixes
+
+* **deps:** rollback to alchemist v43 waiting for incarnation updates ([f2b83ce](https://github.com/Collektive/collektive/commit/f2b83ceef0ababece74969545657327d0d4bd45a))
+
+### Build and continuous integration
+
+* **deps:** update dependency macos github actions runner to v15 ([6270321](https://github.com/Collektive/collektive/commit/62703217da6fc9ddd05cbc129d9302847572f7ea))
+
 ## [28.3.6](https://github.com/Collektive/collektive/compare/28.3.5...28.3.6) (2026-11-04)
 
 ### Dependency updates
