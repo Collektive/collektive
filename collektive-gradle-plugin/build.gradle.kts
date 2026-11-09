@@ -58,7 +58,7 @@ gradlePlugin {
             displayName = "Collektive Plugin"
             description = pluginDescription
             implementationClass = "it.unibo.collektive.GradlePlugin"
-            tags = listOf("kotlin compiler plugin", "aggregate computing", "collektive", "kotlin", "alignment")
+            tags = listOf("kotlin-compiler-plugin", "aggregate-computing", "collektive", "kotlin", "alignment")
         }
     }
 }
