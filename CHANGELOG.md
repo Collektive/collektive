@@ -1,3 +1,26 @@
+## [28.3.8](https://github.com/Collektive/collektive/compare/28.3.7...28.3.8) (2026-11-10)
+
+### Dependency updates
+
+* **deps:** update dependency io.mockk:mockk to v1.14.12 ([8bc0bfe](https://github.com/Collektive/collektive/commit/8bc0bfe10d187cc283c7dfedaa439f9fdd774782))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.158 ([#1704](https://github.com/Collektive/collektive/issues/1704)) ([def5c38](https://github.com/Collektive/collektive/commit/def5c38c09784f54e140dc7388d9c2dc4a2b66d5))
+* **deps:** update plugin publishoncentral to v9.3.1 ([9508744](https://github.com/Collektive/collektive/commit/95087444ce52a38569ade5b0b627c137cb49fad4))
+
+### Bug Fixes
+
+* **gradle-plugin:** use kebab case for release tags ([#1720](https://github.com/Collektive/collektive/issues/1720)) ([52ec97a](https://github.com/Collektive/collektive/commit/52ec97a643c63cfb3af57671ec6cad523b4c64a5))
+
+### Documentation
+
+* **deps:** update dependency org.jetbrains.dokka to v2.3.0 ([bdaff70](https://github.com/Collektive/collektive/commit/bdaff7074b23f26a8639e24111feb93cffb6abec))
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.51 ([#1703](https://github.com/Collektive/collektive/issues/1703)) ([44e64a9](https://github.com/Collektive/collektive/commit/44e64a950ddf8e684e89bd4ea677f7b981005660))
+* **deps:** update dependency macos github actions runner to v26 ([e6ee7ca](https://github.com/Collektive/collektive/commit/e6ee7ca0634864f86662b81405aab665630c0884))
+* **deps:** update dependency windows github actions runner to v2025 ([9d85a42](https://github.com/Collektive/collektive/commit/9d85a42353510e5ee47794b778ccc518bea4a677))
+* **deps:** update github/codeql-action action to v4.39.3 ([a7d9c84](https://github.com/Collektive/collektive/commit/a7d9c84244ab2aea59fad9024054a9c6dd812405))
+
 ## [28.3.7](https://github.com/Collektive/collektive/compare/28.3.6...28.3.7) (2026-11-09)
 
 ### Dependency updates
