@@ -1,3 +1,15 @@
+## [28.3.9](https://github.com/Collektive/collektive/compare/28.3.8...28.3.9) (2026-11-12)
+
+### Dependency updates
+
+* **core-deps:** update serialization to v1.13.0 ([0d7dfdd](https://github.com/Collektive/collektive/commit/0d7dfdd06cc359804796b0a331551b272761a942))
+* **deps:** update kotest to v6.2.7 ([505e75e](https://github.com/Collektive/collektive/commit/505e75e5b870a73ddf549a05c9150f049976345d))
+* **deps:** update plugin publishoncentral to v9.3.2 ([2689edb](https://github.com/Collektive/collektive/commit/2689edbc815a8bfcbf75ca70d6aed55e6d2f61d3))
+
+### Build and continuous integration
+
+* **deps:** update dependency ubuntu github actions runner to v26 ([#1718](https://github.com/Collektive/collektive/issues/1718)) ([bf0343d](https://github.com/Collektive/collektive/commit/bf0343dcfb37524b5f5d99c784d0c525e4ecddf2))
+
 ## [28.3.8](https://github.com/Collektive/collektive/compare/28.3.7...28.3.8) (2026-11-10)
 
 ### Dependency updates
