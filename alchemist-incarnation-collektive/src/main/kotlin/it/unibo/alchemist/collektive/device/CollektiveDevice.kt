@@ -17,6 +17,7 @@ import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.DataSharingMethod
+import it.unibo.collektive.aggregate.api.field.mapValues
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
 import it.unibo.collektive.networking.Mailbox
