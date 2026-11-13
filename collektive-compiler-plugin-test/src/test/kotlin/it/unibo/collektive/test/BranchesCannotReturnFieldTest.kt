@@ -11,11 +11,26 @@ package it.unibo.collektive.test
 import it.unibo.collektive.test.util.CompileUtils.compileResource
 import kotlin.test.Test
 import kotlin.test.assertTrue
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 
 class BranchesCannotReturnFieldTest {
 
     private val String.doesNotCompileBecauseBranchesReturnField get(): Unit {
-        assertTrue(compileResource(this).second.hasErrors())
+        val errors = compileResource(this).second[CompilerMessageSeverity.ERROR].map { it.message }
+        assertTrue(
+            errors.any { BRANCH_RETURNS_FIELD in it },
+            "Expected an error containing '$BRANCH_RETURNS_FIELD' when compiling $this, but got: $errors",
+        )
+        val unresolved = errors.filter { UNRESOLVED_REFERENCE in it }
+        assertTrue(
+            unresolved.isEmpty(),
+            "$this must be otherwise valid code, but it has unresolved references: $unresolved",
+        )
+    }
+
+    private companion object {
+        const val BRANCH_RETURNS_FIELD = "Returning fields from branches is disallowed"
+        const val UNRESOLVED_REFERENCE = "Unresolved reference"
     }
 
     @Test

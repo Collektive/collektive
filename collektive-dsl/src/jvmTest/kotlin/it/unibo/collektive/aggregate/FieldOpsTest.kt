@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -17,6 +17,8 @@ import io.mockk.just
 import io.mockk.mockk
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.CollektiveIgnore
+import it.unibo.collektive.aggregate.api.field.alignedMap
+import it.unibo.collektive.aggregate.api.field.mapValues
 import it.unibo.collektive.stdlib.collapse.fold
 import it.unibo.collektive.stdlib.collapse.reduce
 import it.unibo.collektive.stdlib.collapse.sum
@@ -80,9 +82,7 @@ class FieldOpsTest {
     fun `An empty field when mapped only the local value should be transformed`() {
         assertEquals(
             Field(mockedContext, "localVal-mapped", 0, others = mapOf()),
-            emptyField.mapValues {
-                "$it-mapped"
-            },
+            emptyField.mapValues { "$it-mapped" },
         )
     }
 

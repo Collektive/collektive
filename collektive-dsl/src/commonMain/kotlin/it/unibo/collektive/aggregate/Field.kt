@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -59,156 +59,10 @@ sealed interface Field<ID : Any, out T> {
     val local: FieldEntry<ID, T>
 
     /**
-     * Combines this field with another (aligned) one considering the [ID] when combining the values.
+     * Map the field using the [transform] function.
+     * A `null` [ID] is used to represent the [default] value of the field.
      */
-    fun <B, R> alignedMap(other: Field<ID, B>, transform: (ID, T, B) -> R): Field<ID, R> {
-        checkAligned(this, other)
-        return map { transform(it.id, it.value, other[it.id]) }
-    }
-
-    /**
-     * Combines this field with other two (aligned) fields based on the [ID]s.
-     */
-    fun <B, C, R> alignedMap(f1: Field<ID, B>, f2: Field<ID, C>, transform: (ID, T, B, C) -> R): Field<ID, R> {
-        checkAligned(this, f1, f2)
-        return map { (id, value) -> transform(id, value, f1[id], f2[id]) }
-    }
-
-    /**
-     * Combines this field with other three (aligned) fields based on the [ID]s.
-     */
-    fun <B, C, D, R> alignedMap(
-        f1: Field<ID, B>,
-        f2: Field<ID, C>,
-        f3: Field<ID, D>,
-        transform: (ID, T, B, C, D) -> R,
-    ): Field<ID, R> {
-        checkAligned(this, f1, f2, f3)
-        return map { (id, value) -> transform(id, value, f1[id], f2[id], f3[id]) }
-    }
-
-    /**
-     * Combines this field with other four (aligned) fields based on the [ID]s.
-     */
-    fun <B, C, D, E, R> alignedMap(
-        f1: Field<ID, B>,
-        f2: Field<ID, C>,
-        f3: Field<ID, D>,
-        f4: Field<ID, E>,
-        transform: (ID, T, B, C, D, E) -> R,
-    ): Field<ID, R> {
-        checkAligned(this, f1, f2, f3, f4)
-        return map { (id, value) -> transform(id, value, f1[id], f2[id], f3[id], f4[id]) }
-    }
-
-    /**
-     * Combines this field with other five (aligned) fields based on the [ID]s.
-     */
-    fun <B, C, D, E, F, R> alignedMap(
-        f1: Field<ID, B>,
-        f2: Field<ID, C>,
-        f3: Field<ID, D>,
-        f4: Field<ID, E>,
-        f5: Field<ID, F>,
-        transform: (ID, T, B, C, D, E, F) -> R,
-    ): Field<ID, R> {
-        checkAligned(this, f1, f2, f3, f4, f5)
-        return map { (id, value) -> transform(id, value, f1[id], f2[id], f3[id], f4[id], f5[id]) }
-    }
-
-    /**
-     * Combines this field with other six (aligned) fields based on the [ID]s.
-     */
-    fun <B, C, D, E, F, G, R> alignedMap(
-        f1: Field<ID, B>,
-        f2: Field<ID, C>,
-        f3: Field<ID, D>,
-        f4: Field<ID, E>,
-        f5: Field<ID, F>,
-        f6: Field<ID, G>,
-        transform: (ID, T, B, C, D, E, F, G) -> R,
-    ): Field<ID, R> {
-        checkAligned(this, f1, f2, f3, f4, f5, f6)
-        return map { (id, value) -> transform(id, value, f1[id], f2[id], f3[id], f4[id], f5[id], f6[id]) }
-    }
-
-    /**
-     * Combines this field with another (aligned) one.
-     */
-    fun <B, R> alignedMapValues(other: Field<ID, B>, transform: (T, B) -> R): Field<ID, R> =
-        alignedMap(other) { _, value, otherValue -> transform(value, otherValue) }
-
-    /**
-     * Combines this field with other two (aligned) fields based on the [ID]s.
-     */
-    fun <B, C, R> alignedMapValues(f1: Field<ID, B>, f2: Field<ID, C>, transform: (T, B, C) -> R): Field<ID, R> =
-        alignedMap(f1, f2) { _, value, f1Value, f2Value -> transform(value, f1Value, f2Value) }
-
-    /**
-     * Combines this field with other three (aligned) fields based on the [ID]s.
-     */
-    fun <B, C, D, R> alignedMapValues(
-        f1: Field<ID, B>,
-        f2: Field<ID, C>,
-        f3: Field<ID, D>,
-        transform: (T, B, C, D) -> R,
-    ): Field<ID, R> =
-        alignedMap(f1, f2, f3) { _, value, f1Value, f2Value, f3Value -> transform(value, f1Value, f2Value, f3Value) }
-
-    /**
-     * Combines this field with other four (aligned) fields based on the [ID]s.
-     */
-    fun <B, C, D, E, R> alignedMapValues(
-        f1: Field<ID, B>,
-        f2: Field<ID, C>,
-        f3: Field<ID, D>,
-        f4: Field<ID, E>,
-        transform: (T, B, C, D, E) -> R,
-    ): Field<ID, R> = alignedMap(f1, f2, f3, f4) { _, value, f1Value, f2Value, f3Value, f4Value ->
-        transform(value, f1Value, f2Value, f3Value, f4Value)
-    }
-
-    /**
-     * Combines this field with other five (aligned) fields based on the [ID]s.
-     */
-    fun <B, C, D, E, F, R> alignedMapValues(
-        f1: Field<ID, B>,
-        f2: Field<ID, C>,
-        f3: Field<ID, D>,
-        f4: Field<ID, E>,
-        f5: Field<ID, F>,
-        transform: (T, B, C, D, E, F) -> R,
-    ): Field<ID, R> = alignedMap(f1, f2, f3, f4, f5) { _, value, f1Value, f2Value, f3Value, f4Value, f5Value ->
-        transform(value, f1Value, f2Value, f3Value, f4Value, f5Value)
-    }
-
-    /**
-     * Combines this field with other six (aligned) fields based on the [ID]s.
-     */
-    fun <B, C, D, E, F, G, R> alignedMapValues(
-        f1: Field<ID, B>,
-        f2: Field<ID, C>,
-        f3: Field<ID, D>,
-        f4: Field<ID, E>,
-        f5: Field<ID, F>,
-        f6: Field<ID, G>,
-        transform: (T, B, C, D, E, F, G) -> R,
-    ): Field<ID, R> =
-        alignedMap(f1, f2, f3, f4, f5, f6) { _, value, f1Value, f2Value, f3Value, f4Value, f5Value, f6Value ->
-            transform(value, f1Value, f2Value, f3Value, f4Value, f5Value, f6Value)
-        }
-
-    fun <B> map(newDefault: (T) -> B, transform: (FieldEntry<ID, T>) -> B): Field<ID, B>
-
-    fun <B> map(newDefault: B, transform: (FieldEntry<ID, T>) -> B): Field<ID, B> = map({ newDefault }, transform)
-
-    fun <B> map(transform: (FieldEntry<ID, T>) -> B): Field<ID, B> = map({
-        transform(FieldEntry(local.id, default))
-    }, transform)
-
-    fun <B> mapValues(newDefault: (T) -> B, transform: (T) -> B): Field<ID, B> = map { (_, value) -> transform(value) }
-    fun <B> mapValues(newDefault: B, transform: (T) -> B): Field<ID, B> = mapValues({ newDefault }, transform)
-    fun <B> mapValues(transform: (T) -> B): Field<ID, B> = mapValues({ transform(default) }, transform)
+    fun <B> map(transform: (FieldEntry<ID?, T>) -> B): Field<ID, B>
 
     /**
      * Map the field resulting in a new one where the value for the local and the neighbors is [singleton].
@@ -220,17 +74,12 @@ sealed interface Field<ID : Any, out T> {
      * Get the value associated with the [id].
      * Raise an error if the [id] is not present in the field.
      */
-    operator fun get(id: ID): T
+    operator fun get(id: ID?): T
 
     /**
      * Base operations on [Field]s.
      */
-    companion object {
-
-        fun <ID : Any, T> Field<ID, T>.mapKeepingDefault(transform: (FieldEntry<ID, T>) -> T): Field<ID, T> =
-            map(default, transform)
-        fun <ID : Any, T> Field<ID, T>.mapValuesKeepingDefault(transform: (T) -> T): Field<ID, T> =
-            mapValues(default, transform)
+    companion object Fields {
 
         /**
          * Check if two or more fields are aligned, throwing an IllegalStateException otherwise.
@@ -326,17 +175,15 @@ internal abstract class AbstractField<ID : Any, T>(
 
     final override fun hashCode(): Int = asMap.hashCode()
 
-    override operator fun get(id: ID): T = asMap.getValue(id)
+    override operator fun get(id: ID?): T = if (id == null) default else asMap.getValue(id)
 
-    final override fun <B> map(newDefault: (T) -> B, transform: (FieldEntry<ID, T>) -> B): Field<ID, B> =
-        SequenceBasedField(
-            context,
-            // CRTICAL! MUST BE DOCUMENTED
-            context.alignedOn(FieldDefaultKey) { newDefault(default) },
-            local.id,
-            context.alignedOn(local.id) { transform(local) },
-            mapNeighbors(transform),
-        )
+    final override fun <B> map(transform: (FieldEntry<ID?, T>) -> B): Field<ID, B> = SequenceBasedField(
+        context,
+        context.alignedOn(FieldDefaultKey) { transform(FieldEntry(null, default)) },
+        local.id,
+        context.alignedOn(local.id) { transform(local) },
+        mapNeighbors(transform),
+    )
 
     override fun <B> mapToConstant(singleton: B): Field<ID, B> =
         ConstantField(context, local.id, singleton, neighbors.ids.sequence)

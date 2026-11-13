@@ -8,7 +8,6 @@
 
 package it.unibo.collektive.aggregate.api.impl
 
-import it.unibo.collektive.aggregate.ConstantField
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.Aggregate.InternalAPI
@@ -87,11 +86,6 @@ internal class AggregateContext<ID : Any>(
                 toBeSent.addData(path, message, dataSharingMethod)
                 internalState += path to it.toSend.local.value
             }.toReturn
-        TODO(
-            "There's still a bug that involves not updating the default value when needed, " +
-                "e.g. currently mapping also on the default value won't change the value for the next round," +
-                "see relative test in ExchangeTest.kt",
-        )
     }
 
     override fun <Stored, Return> evolving(initial: Stored, transform: YieldingScope<Stored, Return>): Return {
