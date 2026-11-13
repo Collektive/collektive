@@ -8,9 +8,9 @@
 
 package it.unibo.alchemist.collektive.device
 
+import it.unibo.alchemist.model.Capability
 import it.unibo.alchemist.model.Environment
 import it.unibo.alchemist.model.Node
-import it.unibo.alchemist.model.NodeProperty
 import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Time
 import it.unibo.alchemist.model.molecules.SimpleMolecule
@@ -38,9 +38,10 @@ class CollektiveDevice<P>(
     val environment: Environment<Any?, P>,
     override val node: Node<Any?>,
     private val retainMessagesFor: Time? = null,
-) : NodeProperty<Any?>,
+) : Capability<Any?>,
     Mailbox<Int>,
-    EnvironmentVariables where P : Position<P> {
+    EnvironmentVariables
+    where P : Position<P> {
 
     private data class TimedMessage(val receivedAt: Time, val payload: Message<Int, *>)
 
@@ -50,7 +51,7 @@ class CollektiveDevice<P>(
      * The current time.
      */
     val currentTime: Time
-        get() = environment.simulationOrNull?.time ?: Time.ZERO
+        get() = environment.simulationOrNull?.time?.current ?: Time.ZERO
 
     /**
      * The ID of the node (alias of [localId]).
@@ -71,24 +72,24 @@ class CollektiveDevice<P>(
     /**
      * Returns the distances to the neighboring nodes.
      */
-    fun <ID : Any> Aggregate<ID>.distances(): Field<ID, Double> = environment.getPosition(node).let { nodePosition ->
-        neighboring(nodePosition.coordinates).mapValues { position ->
-            nodePosition.distanceTo(environment.makePosition(position))
+    fun <ID : Any> Aggregate<ID>.distances(): Field<ID, Double> =
+        environment.positionOf(node).current.let { nodePosition ->
+            neighboring(nodePosition.coordinates).mapValues { position ->
+                nodePosition.distanceTo(environment.makePosition(position))
+            }
         }
-    }
 
-    override fun cloneOnNewNode(node: Node<Any?>): NodeProperty<Any?> =
+    override fun cloneOnNewNode(node: Node<Any?>): Capability<Any?> =
         CollektiveDevice(randomGenerator, environment, node, retainMessagesFor)
 
     override fun deliverableFor(outboundMessage: OutboundEnvelope<Int>) {
         if (outboundMessage.isNotEmpty()) {
-            val neighborsNodes = environment.getNeighborhood(node)
-            if (!neighborsNodes.isEmpty) {
-                val neighborhood =
-                    neighborsNodes.mapNotNull { node ->
-                        @Suppress("UNCHECKED_CAST")
-                        node.properties.firstOrNull { it is CollektiveDevice<*> } as? CollektiveDevice<P>
-                    }
+            val neighborsNodes = environment.neighborhoodOf(node).current.neighbors
+            if (!neighborsNodes.isEmpty()) {
+                val neighborhood = neighborsNodes.mapNotNull { node ->
+                    @Suppress("UNCHECKED_CAST")
+                    node.properties.firstOrNull { it is CollektiveDevice<*> } as? CollektiveDevice<P>
+                }
                 neighborhood.forEach { neighbor ->
                     neighbor.deliverableReceived(outboundMessage.prepareMessageFor(neighbor.id))
                 }
@@ -124,7 +125,7 @@ class CollektiveDevice<P>(
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T> get(name: String): T = node.getConcentration(SimpleMolecule(name)) as T
+    override fun <T> get(name: String): T = node[SimpleMolecule(name)] as T
 
     override fun <T> getOrNull(name: String): T? = when {
         isDefined(name) -> get(name)
@@ -135,5 +136,5 @@ class CollektiveDevice<P>(
 
     override fun isDefined(name: String): Boolean = node.contains(SimpleMolecule(name))
 
-    override fun <T> set(name: String, value: T): T = value.also { node.setConcentration(SimpleMolecule(name), it) }
+    override fun <T> set(name: String, value: T): T = value.also { node[SimpleMolecule(name)] = it }
 }
