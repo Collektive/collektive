@@ -9,21 +9,18 @@
 package it.unibo.collektive.collektivize.extensions.kotlinpoet
 
 import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.MemberName.Companion.member
 import com.squareup.kotlinpoet.ParameterSpec
-import it.unibo.collektive.collektivize.FIELD_INTERFACE
+import it.unibo.collektive.collektivize.ALIGNED_MAP_VALUES
+import it.unibo.collektive.collektivize.FIELD_MAP
 import it.unibo.collektive.collektivize.extensions.kotlin.isProperty
 import kotlin.reflect.KCallable
 import org.gradle.internal.extensions.stdlib.capitalized
-
-private val ALIGNED_MAP_VALUES = FIELD_INTERFACE.member("alignedMapValues")
-private val FIELD_MAP = FIELD_INTERFACE.member("mapValues")
 
 /**
  * Generate the body for function where the extension receiver is a `Field` and the function has no arguments.
  */
 internal fun FunSpec.Builder.addSingleStatementBodyFunction(callable: KCallable<*>) {
-    val baseCall = "return·%N·{·it.${callable.name}"
+    val baseCall = "return·%M·{·it.${callable.name}"
     when {
         callable.isProperty() -> addStatement("$baseCall·}", FIELD_MAP)
         callable.typeParameters.isEmpty() -> addStatement("$baseCall()·}", FIELD_MAP)
@@ -47,7 +44,7 @@ internal fun FunSpec.Builder.addBodyFunction(
                 "Bug in Collektivize expanding ${callable.name}"
             }
             addStatement(
-                "return ${parameters.first().name}.%N·{·receiver·->·receiver.%N }",
+                "return ${parameters.first().name}.%M·{·receiver·->·receiver.%N }",
                 FIELD_MAP,
                 callable.name,
             )
@@ -82,7 +79,7 @@ internal fun FunSpec.Builder.addBodyFunction(
                 }
             }
             addStatement(
-                "return $receiverField.%N$fieldArguments·{·$lambdaNames$receiver.%N($arguments)·}",
+                "return $receiverField.%M$fieldArguments·{·$lambdaNames$receiver.%N($arguments)·}",
                 if (fieldArguments.isEmpty()) FIELD_MAP else ALIGNED_MAP_VALUES,
                 callable.name,
             )

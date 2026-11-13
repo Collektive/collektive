@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -11,6 +11,8 @@ package it.unibo.collektive.stdlib.util
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
+import it.unibo.collektive.aggregate.api.field.alignedMap
+import it.unibo.collektive.aggregate.api.field.alignedMapValues
 import it.unibo.collektive.aggregate.ids
 import it.unibo.collektive.aggregate.toMap
 import it.unibo.collektive.aggregate.values
@@ -83,17 +85,19 @@ internal inline fun <reified Distance, reified ID, reified Value> Aggregate<ID>.
 ): Sequence<PathValue<ID, Value, Distance>>
 where Distance : Comparable<Distance>, ID : Any {
     val neighbors = neighborData.neighbors.ids.set
-    val accDistances =
-        neighborData.alignedMapValues(coercedMetric) { path, distance ->
-            path?.distance?.let { accumulateDistance(it, distance) }
-        }
+    val accDistances = neighborData.alignedMapValues(coercedMetric) { path, distance ->
+        path?.distance?.let { accumulateDistance(it, distance) }
+    }
     val neighborAccumulatedDistances = accDistances.neighbors.toMap()
     return neighborData.alignedMap(accDistances, coercedMetric) { id, path, accDist, distance ->
-        path?.takeUnless { id == localId }
+        path?.takeUnless { id == null || id == localId }
             ?.takeUnless { path.length > maxDiameter }
             ?.takeUnless { localId in path.hops }
             ?.takeUnless { path.isInvalidViaShortcut(accDist, neighbors, neighborAccumulatedDistances) }
-            ?.run { accDist to lazy { update(id, distance, bottom, top, accumulateDistance, accumulateData) } }
+            ?.run {
+                accDist to
+                    lazy { update(checkNotNull(id), distance, bottom, top, accumulateDistance, accumulateData) }
+            }
     }.neighbors.values.sequence.filterNotNull().sortedBy { it.first }.map { it.second.value }
 }
 
@@ -153,7 +157,6 @@ data class PathValue<ID : Any, Value, Distance : Comparable<Distance>>(
      * @param accumulateData Function to update the carried data when crossing the edge.
      * @return A new [PathValue] including the neighbor hop, updated distance, and data.
      */
-    @OptIn(DelicateCollektiveApi::class)
     inline fun update(
         neighbor: ID,
         distanceToNeighbor: Distance,

@@ -13,6 +13,7 @@ import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.alignment.PerformanceProfile
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.exchange
+import it.unibo.collektive.aggregate.api.field.alignedMapValues
 import it.unibo.collektive.aggregate.api.mapNeighborhood
 import it.unibo.collektive.aggregate.api.neighborhood
 import it.unibo.collektive.aggregate.api.neighboring
@@ -114,19 +115,16 @@ class BranchAlignmentTest {
             }
         }
 
-    private fun manuallyAlignedExchangeWithThreeDevices(profile: PerformanceProfile, pivot: (Int) -> Any?) =
-        exchangeWithThreeDevices(profile) { field ->
-            val neighborsBeforeRestriction = field.neighbors.size
-            assertTrue(localId == 0 || neighborsBeforeRestriction > 0)
-            // Map the pivots to the number of neighbors that are pivoting on the same value
-            val expectations = mapNeighborhood(pivot).neighbors.values.list.groupBy { it }.mapValues { it.value.size }
-            alignedOn(pivot(localId)) {
-                val neighborsAfterRestriction = neighborhood().neighbors.size
-                val restrictedField = field.neighbors.size
-                assertEquals(neighborsAfterRestriction, restrictedField)
-                assertEquals(expectations[pivot(localId)] ?: 0, restrictedField)
-            }
-            field
+    private fun manuallyAlignedExchangeWithThreeDevices(pivot: (Int) -> Any?) = exchangeWithThreeDevices { field ->
+        val neighborsBeforeRestriction = field.neighbors.size
+        assertTrue(localId == 0 || neighborsBeforeRestriction > 0)
+        // Map the pivots to the number of neighbors that are pivoting on the same value
+        val expectations = mapNeighborhood(0, pivot).neighbors.values.list.groupBy { it }.mapValues { it.value.size }
+        alignedOn(pivot(localId)) {
+            val neighborsAfterRestriction = neighborhood().neighbors.size
+            val restrictedField = field.neighbors.size
+            assertEquals(neighborsAfterRestriction, restrictedField)
+            assertEquals(expectations[pivot(localId)] ?: 0, restrictedField)
         }
 
     @Test

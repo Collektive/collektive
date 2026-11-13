@@ -13,7 +13,7 @@ import it.unibo.collektive.aggregate.api.Aggregate.Companion.dataSharingMethod
 import it.unibo.collektive.aggregate.api.Aggregate.InternalAPI
 
 /**
- * [exchange] implements *anisotropic* data sharing
+ * [exchanging] implements *anisotropic* data sharing
  * (the field information looks different depending on the direction from which you are observing it).
  *
  * Starting from an [initial] value, it computes a [Field] of [Shared] values

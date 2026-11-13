@@ -147,6 +147,7 @@ val importDsl = tasks.register<Copy>("importDsl") {
     listOf(
         "Aggregate",
         "Collapse",
+        "CoreOperators",
         "DataSharingMethod",
         "DelicateCollektiveApi",
         "Field",

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -44,9 +44,35 @@ inline fun <ID : Any, reified Shared> Aggregate<ID>.exchange(
  * ```
  *
  * as it does not actually share the constant with neighbors.
+ *
+ * [local] is invoked with the [ID] of each neighbor to compute the corresponding field entry,
+ * and with `null` to compute the entry of the local device.
  */
-inline fun <ID : Any, T> Aggregate<ID>.mapNeighborhood(crossinline local: (ID) -> T): Field<ID, T> =
-    neighborhood().map { (id, _) -> local(id) }
+inline fun <ID : Any, T> Aggregate<ID>.mapNeighborhood(crossinline local: (ID?) -> T): Field<ID, T> =
+    mapNeighborhood({ local(null) }, local)
+
+/**
+ * Observes the value of an expression [local] across neighbors,
+ * using [default] as the value of the local device.
+ * Builds a [Field] with minimal communication, using only the minimal machinery required to verify the alignment state.
+ *
+ * [local] is invoked with the [ID] of each neighbor to compute the corresponding field entry.
+ */
+inline fun <ID : Any, T> Aggregate<ID>.mapNeighborhood(default: T, crossinline local: (ID) -> T): Field<ID, T> =
+    mapNeighborhood({ default }, local)
+
+/**
+ * Observes the value of an expression [local] across neighbors,
+ * lazily computing the value of the local device via [default].
+ * Builds a [Field] with minimal communication, using only the minimal machinery required to verify the alignment state.
+ *
+ * [local] is invoked with the [ID] of each neighbor to compute the corresponding field entry,
+ * while [default] is invoked to compute the entry of the local device.
+ */
+inline fun <ID : Any, T> Aggregate<ID>.mapNeighborhood(
+    crossinline default: () -> T,
+    crossinline local: (ID) -> T,
+): Field<ID, T> = neighborhood().map { (id, _) -> if (id == null) default() else local(id) }
 
 /**
  * builds a [Field] of aligned [ID]s with minimal communication.
