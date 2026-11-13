@@ -1,0 +1,168 @@
+---
+title: Glossary
+sidebar_position: 4.5
+hide_table_of_contents: true
+description: "The terms of aggregate programming and Collektive, in one place."
+---
+
+import Glossary, {Term} from '@site/src/components/Glossary';
+
+# Glossary
+
+The terms used throughout this documentation, in alphabetical order. Each entry links to the page where the concept is explained in detail.
+
+<Glossary>
+
+<Term name="Aggregate program">
+
+A program describing the behavior of a whole collective of devices.
+Every device executes the same program, in rounds; in Collektive, an extension function of `Aggregate<ID>`.
+See [Thinking in Fields](explanation/fields.mdx).
+
+</Term>
+
+<Term name="Aggregate scope" aka="Aggregate<ID>">
+
+The receiver of aggregate functions. It provides `localId` and the aggregate operators;
+only code running in this scope can keep state across rounds or communicate.
+
+</Term>
+
+<Term name="Alignment">
+
+The mechanism matching each value received from a neighbor with the operator that must consume it,
+based on the operator's *path* in the program.
+Two devices are *aligned* on an operator if both evaluated it in their last round.
+See [Alignment](explanation/alignment.mdx).
+
+</Term>
+
+<Term name="Anisotropic / isotropic communication">
+
+Isotropic: every neighbor receives the same value (`neighboring`, `share`).
+Anisotropic: each neighbor can receive a different value (`exchange`).
+
+</Term>
+
+<Term name="Branch" aka="domain partitioning">
+
+An `if`/`when` in an aggregate program: devices taking different branches form separate sub-collectives and do not
+communicate inside the branches.
+
+</Term>
+
+<Term name="Building block">
+
+A reusable, typically self-stabilizing, collective function: gradient-cast (G), converge-cast (C), sparse choice / leader election (S), …
+See the [standard library](explanation/standard-library/overview.mdx).
+
+</Term>
+
+<Term name="Collapse">
+
+Reducing a `Field` to a local value (`min`, `max`, `sum`, `fold`, …), on the `neighbors` view (excluding the local device)
+or on the `all` view (including it).
+
+</Term>
+
+<Term name="Compiler plugin">
+
+The Kotlin compiler plugin applied by the Collektive Gradle plugin: it injects alignment into aggregate code,
+and reports misuses of the DSL as compiler warnings and errors.
+See [The Compiler Plugin](explanation/compiler-plugin.mdx).
+
+</Term>
+
+<Term name="Computational field">
+
+A global, distributed data structure mapping every device of the system to a value, at every moment in time.
+
+</Term>
+
+<Term name="Converge-cast">
+
+Aggregation of values *towards* a sink, along a spanning tree. See [Collection](explanation/standard-library/collection.mdx).
+
+</Term>
+
+<Term name="eXchange Calculus" aka="XC">
+
+The core calculus implemented by Collektive. It unifies state, neighbor interaction, and domain partitioning in the
+`exchange` primitive.
+
+</Term>
+
+<Term name="Field" aka="Field<ID, T>, neighbor value, nvalue">
+
+The local view of a computational field: the value of the local device and of each aligned neighbor.
+A first-class (*reified*) value in Collektive.
+
+</Term>
+
+<Term name="Gossip">
+
+Network-wide agreement on an aggregate (minimum, maximum, …) of the local values, without designated sources.
+In Collektive it is self-stabilizing: candidates carry the path they traveled, and the ones that loop back are discarded.
+See [Gossip](explanation/standard-library/gossip-and-leader-election.mdx#path-loop-detection).
+
+</Term>
+
+<Term name="Gradient">
+
+A gradient is the field of the distances from the nearest source; a gradient-cast propagates a value from the nearest source along it.
+See [Spreading](explanation/standard-library/spreading.mdx).
+
+</Term>
+
+<Term name="Mailbox">
+
+The interface connecting Collektive to a network: it delivers outgoing messages and provides the incoming ones.
+See [Running an aggregate program](explanation/dsl-descriptions.mdx#running-an-aggregate-program).
+
+</Term>
+
+<Term name="Metric">
+
+A `Field` holding the distance to each neighbor (hops, meters, latency, …), used by spatial building blocks.
+
+</Term>
+
+<Term name="Neighbor">
+
+A device whose messages are received by the local device. Neighborhoods are decided by the network (or the simulator), not by the program.
+
+</Term>
+
+<Term name="Path">
+
+The identifier of the position of an operator in the program (calls, branches, explicit alignment points), used for alignment and state.
+
+</Term>
+
+<Term name="Projection">
+
+The restriction of a field captured from an outer scope to the neighbors aligned in the current branch or `alignedOn` block,
+performed automatically by the compiler plugin.
+
+</Term>
+
+<Term name="Round">
+
+One execution of the aggregate program on a device: *sense* (read sensors and messages), *compute*, *interact* (send messages).
+Rounds of different devices are not synchronized.
+
+</Term>
+
+<Term name="Self-stabilization">
+
+The property of converging to the correct result from any initial state, once inputs and network stop changing.
+
+</Term>
+
+<Term name="Source and sink">
+
+Devices playing a special role in a building block: sources emit information (gradients, broadcasts), sinks collect it (converge-casts).
+
+</Term>
+
+</Glossary>
