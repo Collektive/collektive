@@ -204,7 +204,6 @@ class ExchangeTest {
         val environment = mooreGrid<Pair<Int, Map<Int, Int>>?>(size, 1, null, profile) { _ -> pingPong() }
         // Two connected devices: every round each device increments the counter received from the other
         repeat(size) {
-            println("=== ROUND ===")
             environment.cycleInOrder()
         }
         assertEquals(
