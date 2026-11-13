@@ -175,7 +175,7 @@ internal abstract class AbstractField<ID : Any, T>(
 
     final override fun hashCode(): Int = asMap.hashCode()
 
-    override operator fun get(id: ID?): T = if (id == null) default else asMap.getValue(id)
+    override operator fun get(id: ID?): T = if (id == null) default else asMap.getOrElse(id) { default }
 
     final override fun <B> map(transform: (FieldEntry<ID?, T>) -> B): Field<ID, B> = SequenceBasedField(
         context,
