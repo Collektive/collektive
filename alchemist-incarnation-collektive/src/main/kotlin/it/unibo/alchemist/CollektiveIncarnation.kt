@@ -13,20 +13,18 @@ import com.github.benmanes.caffeine.cache.LoadingCache
 import it.unibo.alchemist.actions.RunCollektiveProgram
 import it.unibo.alchemist.collektive.device.CollektiveDevice
 import it.unibo.alchemist.model.Action
-import it.unibo.alchemist.model.Actionable
 import it.unibo.alchemist.model.Condition
-import it.unibo.alchemist.model.Context
 import it.unibo.alchemist.model.Environment
 import it.unibo.alchemist.model.Incarnation
 import it.unibo.alchemist.model.Molecule
 import it.unibo.alchemist.model.Node
+import it.unibo.alchemist.model.NodeReaction
 import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Reaction
 import it.unibo.alchemist.model.TimeDistribution
-import it.unibo.alchemist.model.conditions.AbstractCondition
 import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.alchemist.model.nodes.GenericNode
-import it.unibo.alchemist.model.reactions.Event
+import it.unibo.alchemist.model.reactions.GenericReaction
 import it.unibo.alchemist.model.timedistributions.DiracComb
 import it.unibo.alchemist.model.times.DoubleTime
 import it.unibo.alchemist.util.RandomGenerators.nextDouble
@@ -62,22 +60,23 @@ import org.slf4j.LoggerFactory
  */
 class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
 
-    override fun createMolecule(molecule: String) = SimpleMolecule(molecule)
+    override fun createMolecule(s: String) = SimpleMolecule(s)
 
-    override fun createConcentration(concentration: Any?): Any? = concentration
-
-    override fun createConcentration() = Unit
+    override fun createConcentration(descriptor: Any?): Any? = descriptor
 
     override fun createAction(
         randomGenerator: RandomGenerator,
         environment: Environment<Any?, P>,
         node: Node<Any?>?,
-        actionable: Actionable<Any?>,
+        reaction: Reaction<Any?>,
         additionalParameters: Any?,
     ): Action<Any?> {
         requireNotNull(node) { "Collektive requires a device and cannot execute in a Global Reaction" }
+        require(reaction is NodeReaction<Any?>) {
+            "Collektive cannot execute on the environment, it requires a node"
+        }
         if (additionalParameters is CharSequence) {
-            return RunCollektiveProgram(node, additionalParameters.toString())
+            return RunCollektiveProgram(reaction, additionalParameters.toString())
         }
         val parameters = additionalParameters as? Map<*, *>
         requireNotNull(parameters) {
@@ -116,30 +115,30 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
                 loadMethod()
             }
             .getOrThrow()
-        return RunCollektiveProgram(node, methodToCall, name)
+        return RunCollektiveProgram(reaction, methodToCall, name)
     }
 
     override fun createCondition(
         randomGenerator: RandomGenerator,
-        environment: Environment<Any?, P>?,
+        environment: Environment<Any?, P>,
         node: Node<Any?>?,
-        actionable: Actionable<Any?>,
+        reaction: Reaction<Any?>,
         additionalParameters: Any?,
-    ): Condition<Any?> = object : AbstractCondition<Any>(requireNotNull(node)) {
-        override fun getContext() = Context.LOCAL
-
-        override fun getPropensityContribution(): Double = 1.0
-
-        override fun isValid(): Boolean = true
-    }
+    ): Condition<Any?> = error("Collektive does not support conditions.")
 
     override fun createReaction(
+        randomGenerator: RandomGenerator,
+        environment: Environment<Any?, P>,
+        parameter: Any?,
+    ): Reaction<Any?> = error("Collektive reactions must run on nodes.")
+
+    override fun createNodeReaction(
         randomGenerator: RandomGenerator,
         environment: Environment<Any?, P>,
         node: Node<Any?>,
         timeDistribution: TimeDistribution<Any?>,
         parameter: Any?,
-    ): Reaction<Any?> = Event(node, timeDistribution).also {
+    ): NodeReaction<Any?> = GenericReaction(node, timeDistribution).also {
         it.actions = listOf(
             createAction(randomGenerator, environment, node, it, parameter),
         )
@@ -181,11 +180,11 @@ class CollektiveIncarnation<P> : Incarnation<Any?, P> where P : Position<P> {
         )
     }
 
-    override fun getProperty(node: Node<Any?>, molecule: Molecule, property: String?): Double {
+    override fun readConcentration(node: Node<Any?>, molecule: Molecule, property: String): Double {
         val interpreted = when {
-            property.isNullOrBlank() -> node.getConcentration(molecule)
+            property.isBlank() -> node[molecule]
             else -> {
-                val concentration = node.getConcentration(molecule)
+                val concentration = node[molecule]
                 val toInvoke = propertyCache.get(CodeElements(concentration, property))
                 node.asPropertyOrNull(CollektiveDevice::class).toInvoke(concentration)
             }

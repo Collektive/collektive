@@ -13,7 +13,7 @@ import it.unibo.collektive.aggregate.api.Aggregate.Companion.dataSharingMethod
 import it.unibo.collektive.aggregate.api.Aggregate.InternalAPI
 
 /**
- * [exchange] implements *anisotropic* data sharing
+ * [exchanging] implements *anisotropic* data sharing
  * (the field information looks different depending on the direction from which you are observing it).
  *
  * Starting from an [initial] value, it computes a [Field] of [Shared] values
@@ -33,11 +33,12 @@ import it.unibo.collektive.aggregate.api.Aggregate.InternalAPI
  * rather, from the previously computed local field value.
  */
 inline fun <ID : Any, reified Shared, Returned> Aggregate<ID>.exchanging(
-    initial: Shared,
+    default: Shared,
+    initial: Shared = default,
     noinline body: YieldingScope<Field<ID, Shared>, Returned>,
 ): Returned =
     @OptIn(DelicateCollektiveApi::class)
-    InternalAPI.`_ serialization aware exchanging`(initial, dataSharingMethod(), body)
+    InternalAPI.`_ serialization aware exchanging`(default, initial, dataSharingMethod(), body)
 
 /**
  * Observes the value of an expression [local] across neighbors.
@@ -57,6 +58,9 @@ inline fun <ID : Any, reified Shared, Returned> Aggregate<ID>.exchanging(
  * In this case, the field returned has the computation as a result,
  * in form of a field of functions with type `() -> Int`.
  */
-inline fun <ID : Any, reified Shared> Aggregate<ID>.neighboring(local: Shared): Field<ID, Shared> =
+inline fun <ID : Any, reified Shared> Aggregate<ID>.neighboring(
+    default: Shared,
+    local: Shared = default,
+): Field<ID, Shared> =
     @OptIn(DelicateCollektiveApi::class)
-    InternalAPI.`_ serialization aware neighboring`(local, dataSharingMethod())
+    InternalAPI.`_ serialization aware neighboring`(default, local, dataSharingMethod())

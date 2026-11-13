@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -43,10 +43,10 @@ class LoadingWithAlchemistTest {
         val incarnation = CollektiveIncarnation<Euclidean2DPosition>()
         val environment = Continuous2DEnvironment(incarnation)
         val reference = SimpleMolecule("ref")
-        val node = GenericNode(environment).apply { setConcentration(reference, listOf(1, 2, 3)) }
+        val node = GenericNode(environment).apply { set(reference, listOf(1, 2, 3)) }
         assertEquals(
             3.0,
-            incarnation.getProperty(node, reference, "it[2]"),
+            incarnation.readConcentration(node, reference, "it[2]"),
         )
     }
 
@@ -59,7 +59,7 @@ class LoadingWithAlchemistTest {
         val node = GenericNode(environment).apply { addProperty(CollektiveDevice(randomGenerator, environment, this)) }
         assertEquals(
             0.0,
-            incarnation.getProperty(node, reference, "localId"),
+            incarnation.readConcentration(node, reference, "localId"),
         )
     }
 }

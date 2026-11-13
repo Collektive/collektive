@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -29,7 +29,8 @@ import it.unibo.collektive.aggregate.Field
  * rather, from the previously computed local field value.
  */
 inline fun <ID : Any, reified Shared> Aggregate<ID>.exchange(
-    initial: Shared,
+    default: Shared,
+    initial: Shared = default,
     noinline body: (Field<ID, Shared>) -> Field<ID, Shared>,
 ): Field<ID, Shared> = exchanging(initial) { field -> body(field).yielding { this } }
 
@@ -43,9 +44,35 @@ inline fun <ID : Any, reified Shared> Aggregate<ID>.exchange(
  * ```
  *
  * as it does not actually share the constant with neighbors.
+ *
+ * [local] is invoked with the [ID] of each neighbor to compute the corresponding field entry,
+ * and with `null` to compute the entry of the local device.
  */
-inline fun <ID : Any, T> Aggregate<ID>.mapNeighborhood(crossinline local: (ID) -> T): Field<ID, T> =
-    neighborhood().map { (id, _) -> local(id) }
+inline fun <ID : Any, T> Aggregate<ID>.mapNeighborhood(crossinline local: (ID?) -> T): Field<ID, T> =
+    mapNeighborhood({ local(null) }, local)
+
+/**
+ * Observes the value of an expression [local] across neighbors,
+ * using [default] as the value of the local device.
+ * Builds a [Field] with minimal communication, using only the minimal machinery required to verify the alignment state.
+ *
+ * [local] is invoked with the [ID] of each neighbor to compute the corresponding field entry.
+ */
+inline fun <ID : Any, T> Aggregate<ID>.mapNeighborhood(default: T, crossinline local: (ID) -> T): Field<ID, T> =
+    mapNeighborhood({ default }, local)
+
+/**
+ * Observes the value of an expression [local] across neighbors,
+ * lazily computing the value of the local device via [default].
+ * Builds a [Field] with minimal communication, using only the minimal machinery required to verify the alignment state.
+ *
+ * [local] is invoked with the [ID] of each neighbor to compute the corresponding field entry,
+ * while [default] is invoked to compute the entry of the local device.
+ */
+inline fun <ID : Any, T> Aggregate<ID>.mapNeighborhood(
+    crossinline default: () -> T,
+    crossinline local: (ID) -> T,
+): Field<ID, T> = neighborhood().map { (id, _) -> if (id == null) default() else local(id) }
 
 /**
  * builds a [Field] of aligned [ID]s with minimal communication.
@@ -65,9 +92,10 @@ fun <ID : Any> Aggregate<ID>.neighborhood(): Field<ID, *> = neighboring(0.toByte
  * rather, from the previously computed result.
  */
 inline fun <ID : Any, reified Shared> Aggregate<ID>.share(
-    initial: Shared,
+    default: Shared,
+    initial: Shared = default,
     noinline body: (Field<ID, Shared>) -> Shared,
-): Shared = sharing(initial) { field -> body(field).yielding { this } }
+): Shared = sharing(default, initial) { field -> body(field).yielding { this } }
 
 /**
  * [sharing] implements efficient stateful data sharing.
@@ -81,9 +109,10 @@ inline fun <ID : Any, reified Shared> Aggregate<ID>.share(
  * rather, from the previously computed result.
  */
 inline fun <ID : Any, reified Shared, Returned> Aggregate<ID>.sharing(
-    initial: Shared,
+    default: Shared,
+    initial: Shared = default,
     noinline body: YieldingContext<Shared, Returned>.(Field<ID, Shared>) -> YieldingResult<Shared, Returned>,
-): Returned = exchanging(initial) { field: Field<ID, Shared> ->
+): Returned = exchanging(default, initial) { field: Field<ID, Shared> ->
     with(YieldingContext<Shared, Returned>()) {
         val result: YieldingResult<Shared, Returned> = body(field)
         field.mapToConstant(result.toSend).yielding { result.toReturn }

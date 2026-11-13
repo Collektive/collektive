@@ -1,15 +1,22 @@
+/*
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
+ *
+ * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
+ * as described in the LICENSE file in this project's repository's top directory.
+ */
+
 package it.unibo.alchemist.actions
 
 import it.unibo.alchemist.collektive.device.CollektiveDevice
 import it.unibo.alchemist.model.Action
-import it.unibo.alchemist.model.Context
+import it.unibo.alchemist.model.Capability
 import it.unibo.alchemist.model.Node
 import it.unibo.alchemist.model.Node.Companion.asProperty
-import it.unibo.alchemist.model.NodeProperty
+import it.unibo.alchemist.model.NodeReaction
 import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Reaction
 import it.unibo.alchemist.model.actions.AbstractAction
-import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.collektive.Collektive
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.path.FullPathFactory
@@ -19,61 +26,57 @@ import kotlin.reflect.jvm.kotlinFunction
 
 /**
  * An Alchemist [Action] that runs a [Collektive] program.
- * Requires a [node], a program [name], and the actual [program] to execute.
+ * Requires a [reaction], a program [name], and the actual [program] to execute.
  */
 class RunCollektiveProgram<P : Position<P>>(
-    node: Node<Any?>,
+    reaction: NodeReaction<Any?>,
     val name: String,
     val program: Aggregate<Int>.(CollektiveDevice<P>) -> Any?,
-) : AbstractAction<Any?>(node) {
-    private val programIdentifier = SimpleMolecule(name)
+) : AbstractAction<Any?>(reaction) {
 
     /**
-     * The [CollektiveDevice] associated with the [node].
+     * The [CollektiveDevice] associated with the [reaction] host node.
      */
-    val localDevice: CollektiveDevice<P> = node.asProperty()
+    val localDevice: CollektiveDevice<P> = reaction.host.asProperty()
 
     /**
      * The [Collektive] program on which cycles will be executed.
      */
-    val collektiveProgram: Collektive<Int, Any?>
-
-    init {
-        declareDependencyTo(programIdentifier)
-        collektiveProgram =
-            Collektive(localDevice.id, network = localDevice, pathFactory = FullPathFactory) {
-                program(localDevice)
-            }
-    }
+    val collektiveProgram: Collektive<Int, Any?> =
+        Collektive(localDevice.id, network = localDevice, pathFactory = FullPathFactory) {
+            program(localDevice)
+        }
 
     /**
-     * Create a [RunCollektiveProgram] with a specific [entrypoint] and a [node].
+     * Create a [RunCollektiveProgram] with a specific [entrypoint] and a [reaction].
      */
     constructor(
-        node: Node<Any?>,
+        reaction: NodeReaction<Any?>,
         entrypoint: String,
-    ) : this(node, entrypoint, findEntrypoint(entrypoint))
+    ) : this(reaction, entrypoint, findEntrypoint(entrypoint))
 
     /**
-     * Create a [RunCollektiveProgram] with a specific [entrypoint] and a [node].
+     * Create a [RunCollektiveProgram] with a specific [entrypoint] and a [reaction].
      */
     @JvmOverloads
     constructor(
-        node: Node<Any?>,
+        reaction: NodeReaction<Any?>,
         entrypoint: Method,
         name: String = entrypoint.name,
-    ) : this(node, name, buildEntryPoint(entrypoint))
+    ) : this(reaction, name, buildEntryPoint(entrypoint))
 
-    override fun cloneAction(node: Node<Any?>, reaction: Reaction<Any?>): Action<Any?> =
-        RunCollektiveProgram(node, name)
+    override fun cloneAction(newReaction: Reaction<Any?>): Action<Any?> {
+        require(newReaction is NodeReaction<Any?>) {
+            "RunCollektiveProgram can only be cloned on a NodeReaction."
+        }
+        return RunCollektiveProgram(newReaction, name)
+    }
 
     override fun execute() {
         collektiveProgram.cycle().also {
-            node.setConcentration(programIdentifier, it)
+            localDevice[name] = it
         }
     }
-
-    override fun getContext(): Context = Context.NEIGHBORHOOD
 
     private companion object {
         private fun <P : Position<P>> findEntrypoint(
@@ -114,7 +117,7 @@ class RunCollektiveProgram<P : Position<P>>(
         private fun Node<*>.hasPropertyCompatibleWith(parameter: Parameter): Boolean =
             properties.any { parameter.type.isAssignableFrom(it::class.java) }
 
-        private fun Node<*>.getPropertyCompatibleWith(property: Parameter): NodeProperty<*> =
+        private fun Node<*>.getPropertyCompatibleWith(property: Parameter): Capability<*> =
             properties.first { property.type.isAssignableFrom(it::class.java) }
     }
 }
