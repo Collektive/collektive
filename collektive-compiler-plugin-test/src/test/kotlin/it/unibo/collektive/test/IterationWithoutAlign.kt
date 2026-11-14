@@ -8,19 +8,16 @@
 
 package it.unibo.collektive.test
 
-import io.github.subjekt.Subjekt.subjekt
-import io.github.subjekt.generators.FilesGenerator.toTempFiles
 import it.unibo.collektive.test.util.CompileUtils.formsOfIteration
 import it.unibo.collektive.test.util.CompileUtils.`iteration with warning`
 import it.unibo.collektive.test.util.CompileUtils.`iteration without warning`
+import it.unibo.collektive.test.util.CompileUtils.subjects
 import it.unibo.collektive.test.util.CompileUtils.testedAggregateFunctions
 import kotlin.test.Test
 
 class IterationWithoutAlign {
     private val testSubjects =
-        subjekt {
-            addSource("src/test/resources/subjekt/IterationWithAggregate.yaml")
-        }.toTempFiles()
+        subjects("src/test/resources/subjekt/IterationWithAggregate.yaml")
 
     @Test
     fun `test iterations without align`() {

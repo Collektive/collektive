@@ -41,7 +41,7 @@ internal fun ConeKotlinType.directSuperTypes(session: FirSession): Set<ConeKotli
     (toSymbol(session) as? FirClassSymbol)?.resolvedSuperTypes?.toSet().orEmpty()
 
 /**
- * Checks whether this type is an aggregate-aware type (either [Aggregate] or [Field]).
+ * Checks whether this type is an aggregate-aware type (either `Aggregate` or `Field`).
  *
  * This includes both direct and inherited aggregate types.
  *

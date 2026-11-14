@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -8,6 +8,7 @@
 
 package it.unibo.collektive.test.util
 
+import io.github.subjekt.Subjekt
 import it.unibo.collektive.compiler.CollektiveK2JVMCompiler
 import it.unibo.collektive.compiler.logging.CollectingMessageCollector
 import java.io.File
@@ -19,19 +20,17 @@ import kotlin.test.assertTrue
 import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 
-object CompileUtils {
+internal object CompileUtils {
     data class KotlinTestingProgram(val fileName: String, val program: String) {
 
-        fun compile(): Pair<ExitCode, CollectingMessageCollector> {
+        private fun compile(): Pair<ExitCode, CollectingMessageCollector> {
             val collector = CollectingMessageCollector()
-            val tempDir =
-                createTempDirectory("collektive-test").toFile().also {
-                    require(it.exists() && it.isDirectory)
-                }
-            val programFile =
-                tempDir.resolve(fileName).apply {
-                    writeText(program)
-                }
+            val tempDir = createTempDirectory("collektive-test").toFile().also {
+                require(it.exists() && it.isDirectory)
+            }
+            val programFile = tempDir.resolve(fileName).apply {
+                writeText(program)
+            }
             return CollektiveK2JVMCompiler.compile(listOf(programFile), collector) to collector
         }
 
@@ -62,19 +61,43 @@ object CompileUtils {
 
     fun String.asTestingProgram(fileName: String): KotlinTestingProgram = KotlinTestingProgram(fileName, this)
 
-    fun pascalCase(vararg words: String): String = words.joinToString("") { it.replaceFirstChar(Char::titlecase) }
+    private fun pascalCase(vararg words: String): String =
+        words.joinToString("") { it.replaceFirstChar(Char::titlecase) }
 
     /**
-     * Retrieves a Kotlin testing program from a map of files given its [name].
+     * Resolves the Subjekt suite at [path], returning the code of each subject, indexed by subject name.
+     * The code preamble of the suite configuration is prepended to the code of every subject.
      */
-    fun Map<String, File>.getTestingProgram(name: String): KotlinTestingProgram =
-        this[name]?.readText()?.asTestingProgram("$name.kt")
+    fun subjects(path: String): Map<String, String> {
+        val suite = checkNotNull(Subjekt.fromYaml(File(path).readText()).resolvedSuite) {
+            "Unable to resolve the Subjekt suite at $path"
+        }
+        val preamble = suite.originalSuite.configuration.codePreamble
+            .takeIf { it.isNotBlank() }
+            ?.let { "$it\n" }
+            .orEmpty()
+        return suite.resolvedSubjects.associate { subject ->
+            val name = checkNotNull(subject.name?.value?.castToString()?.value) {
+                "Unnamed subject in $path"
+            }
+            val code = checkNotNull(subject.instances["code"]?.value?.castToString()?.value) {
+                "Subject $name in $path has no code"
+            }
+            name to preamble + code
+        }
+    }
+
+    /**
+     * Retrieves a Kotlin testing program from a map of subject codes given its [name].
+     */
+    fun Map<String, String>.getTestingProgram(name: String): KotlinTestingProgram =
+        this[name]?.asTestingProgram("$name.kt")
             ?: throw FileNotFoundException("Program not found: $name")
 
-    internal fun Map<String, File>.subject(case: String, functionName: String, iteration: String) =
+    private fun Map<String, String>.subject(case: String, functionName: String, iteration: String) =
         getTestingProgram(pascalCase(case, functionName, iteration))
 
-    internal fun Map<String, File>.`iteration with warning`(
+    fun Map<String, String>.`iteration with warning`(
         case: String,
         functionName: String,
         iteration: String,
@@ -83,22 +106,18 @@ object CompileUtils {
         subject(case, functionName, iteration) shouldCompileWith warningMessage(warning)
     }
 
-    internal fun Map<String, File>.`iteration without warning`(case: String, functionName: String, iteration: String) {
+    fun Map<String, String>.`iteration without warning`(case: String, functionName: String, iteration: String) {
         subject(case, functionName, iteration) shouldCompileWith noWarning
     }
 
-    val testedAggregateFunctions =
-        listOf(
-            "neighboring(1 - 1)",
-        )
+    val testedAggregateFunctions = listOf("neighboring(1 - 1)")
 
-    val formsOfIteration =
-        listOf(
-            "For" to "a for loop",
-            "ForEach" to "a 'forEach' call",
-        )
+    val formsOfIteration = listOf(
+        "For" to "a for loop",
+        "ForEach" to "a 'forEach' call",
+    )
 
-    internal fun compileResource(name: String): Pair<ExitCode, CollectingMessageCollector> {
+    fun compileResource(name: String): Pair<ExitCode, CollectingMessageCollector> {
         val collector = CollectingMessageCollector()
         val file = createTempFile(suffix = ".kt")
         file.writeText(ClassLoader.getSystemResource("it/unibo/collektive/test/$name.kt").readText())

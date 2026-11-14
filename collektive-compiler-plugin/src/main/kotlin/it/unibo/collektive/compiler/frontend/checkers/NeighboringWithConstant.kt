@@ -40,7 +40,7 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
  * mapNeighborhood { 42 }
  * ```
  *
- * This checker does not fire inside functions annotated with [kotlin.test.Test], as test code
+ * This checker does not fire inside functions annotated with `kotlin.test.Test`, as test code
  * may intentionally use `neighboring(constant)` to verify value-sharing semantics at runtime,
  * which differ from `mapNeighborhood`.
  */

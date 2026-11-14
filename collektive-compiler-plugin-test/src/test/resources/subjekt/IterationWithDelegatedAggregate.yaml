@@ -7,15 +7,43 @@ config:
     import it.unibo.collektive.aggregate.api.Aggregate
     import it.unibo.collektive.aggregate.api.neighboring
 
-import:
-  "src/test/resources/subjekt/Macros.yaml"
+# Subjekt 2 does not support imports yet: the shared macros are inlined
+macros:
+  - def: loop(code)
+    values:
+      - |-
+        for(i in 1..3) {
+          ${{ code }}
+        }
+      - |-
+        (1..3).forEach {
+          ${{ code }}
+        }
+  - def: alignedOn(code)
+    values:
+      - |-
+        alignedOn(0) {
+          ${{ code }}
+        }
+  - def: nestedFun(code)
+    values:
+      - |-
+        fun Aggregate<Int>.nested() {
+          ${{ code }}
+        }
+  - def: aggregate(code)
+    values:
+      - |-
+        aggregate(0) {
+          ${{ code }}
+        }
 
 parameters:
   name: "AGGREGATE"
   value: neighboring(1 - 1)
 
 subjects:
-  - name: IterationAlignDelegate${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
+  - name: "IterationAlignDelegate${{ prettify(AGGREGATE, loop(AGGREGATE)) }}"
     code: |-
       fun delegate(aggregate: Aggregate<Int>) {
           aggregate.${{ AGGREGATE }}
@@ -33,7 +61,7 @@ subjects:
         Consider wrapping the function into the 'alignedOn' method with a unique element, either at the call site
         or inside the '${{ AGGREGATE }}' function declaration, wrapping the involved aggregate calls.
 
-  - name: IterationDelegateAlign${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
+  - name: "IterationDelegateAlign${{ prettify(AGGREGATE, loop(AGGREGATE)) }}"
     code: |-
       fun delegate(aggregate: Aggregate<Int>) {
           aggregate.${{ alignedOn("aggregate." + AGGREGATE) }}
@@ -50,7 +78,7 @@ subjects:
 
         Consider wrapping the function into the 'alignedOn' method with a unique element at the call site.
 
-  - name: IterationDelegate${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
+  - name: "IterationDelegate${{ prettify(AGGREGATE, loop(AGGREGATE)) }}"
     code: |-
       fun delegate(aggregate: Aggregate<Int>) {
           aggregate.${{ AGGREGATE }}
@@ -68,7 +96,7 @@ subjects:
         Consider wrapping the function into the 'alignedOn' method with a unique element, either at the call site
         or inside the '${{ AGGREGATE }}' function declaration, wrapping the involved aggregate calls.
 
-  - name: IterationDelegateWithNestedFun${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
+  - name: "IterationDelegateWithNestedFun${{ prettify(AGGREGATE, loop(AGGREGATE)) }}"
     code: |-
       fun delegate(aggregate: Aggregate<Int>) {
           fun nested() {
@@ -86,7 +114,7 @@ subjects:
 
         Consider wrapping the function into the 'alignedOn' method with a unique element.
 
-  - name: IterationRecursiveDelegate${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
+  - name: "IterationRecursiveDelegate${{ prettify(AGGREGATE, loop(AGGREGATE)) }}"
     code: |-
       fun delegate(aggregate: Aggregate<Int>) {
         delegate2(aggregate)
@@ -108,7 +136,7 @@ subjects:
         Consider wrapping the function into the 'alignedOn' method with a unique element, either at the call site
         or inside the '${{ AGGREGATE }}' function declaration, wrapping the involved aggregate calls.
 
-  - name: IterationRecursiveDelegateAlign${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
+  - name: "IterationRecursiveDelegateAlign${{ prettify(AGGREGATE, loop(AGGREGATE)) }}"
     code: |-
       fun delegate(aggregate: Aggregate<Int>) {
         delegate2(aggregate)
@@ -130,7 +158,7 @@ subjects:
 
         Consider wrapping the function into the 'alignedOn' method with a unique element.
 
-  - name: IterationAlignRecursiveDelegate${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
+  - name: "IterationAlignRecursiveDelegate${{ prettify(AGGREGATE, loop(AGGREGATE)) }}"
     code: |-
       fun delegate(aggregate: Aggregate<Int>) {
         aggregate.alignedOn(0) {
@@ -152,7 +180,7 @@ subjects:
 
         Consider wrapping the function into the 'alignedOn' method with a unique element.
 
-  - name: IterationDelegatedNestedFun${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
+  - name: "IterationDelegatedNestedFun${{ prettify(AGGREGATE, loop(AGGREGATE)) }}"
     code: |-
       fun delegate(aggregate: Aggregate<Int>) {
         fun delegate2() {
@@ -173,7 +201,7 @@ subjects:
         Consider wrapping the function into the 'alignedOn' method with a unique element, either at the call site
         or inside the '${{ AGGREGATE }}' function declaration, wrapping the involved aggregate calls.
 
-  - name: IterationDelegatedNestedFunAlign${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
+  - name: "IterationDelegatedNestedFunAlign${{ prettify(AGGREGATE, loop(AGGREGATE)) }}"
     code: |-
       fun delegate(aggregate: Aggregate<Int>) {
         fun delegate2() {
@@ -188,7 +216,7 @@ subjects:
           ${{ loop("delegate(this)") }}
       }
 
-  - name: IterationAlignDelegatedNestedFun${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
+  - name: "IterationAlignDelegatedNestedFun${{ prettify(AGGREGATE, loop(AGGREGATE)) }}"
     code: |-
       fun delegate(aggregate: Aggregate<Int>) {
         fun delegate2() {

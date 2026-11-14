@@ -27,8 +27,8 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
  * and applies alignment transformations to their bodies.
  *
  * ## Purpose
- * - Detects functions that operate on [it.unibo.collektive.aggregate.api.Aggregate]s
- *   or [it.unibo.collektive.aggregate.Field]s.
+ * - Detects functions that operate on `it.unibo.collektive.aggregate.api.Aggregate`s
+ *   or `it.unibo.collektive.aggregate.Field`s.
  * - Projects field values inside user-defined branches and `alignOn` blocks.
  * - Wraps aggregate computations with `alignRaw` and `dealign` calls using the [AlignmentTransformer].
  *

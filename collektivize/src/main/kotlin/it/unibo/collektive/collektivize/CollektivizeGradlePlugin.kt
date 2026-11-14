@@ -34,6 +34,8 @@ open class CollektivizeGradlePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         val extension = target.extensions.create<CollektivizeExtension>("collektivize")
         target.tasks.register<CollektivizeTask>("collektivizeKotlinStdlib") {
+            group = "build"
+            description = "Generates the \"fielded\" version of the configured Kotlin types and extensions."
             typesToField.set(extension.typesToField.get() + extension.extensionsToField.get())
             outputDirectory.set(extension.outputDirectory.get())
         }

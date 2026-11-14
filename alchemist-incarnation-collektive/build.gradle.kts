@@ -16,7 +16,7 @@ plugins {
 
 apply(plugin = rootProject.libs.plugins.kotlin.jvm.id)
 
-val targetJvm = JvmTarget.JVM_17
+val targetJvm = JvmTarget.JVM_21
 
 java {
     toolchain {

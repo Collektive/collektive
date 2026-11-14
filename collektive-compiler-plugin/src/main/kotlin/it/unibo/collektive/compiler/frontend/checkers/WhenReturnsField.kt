@@ -26,7 +26,7 @@ import org.jetbrains.kotlin.fir.types.type
 
 /**
  * Checker that verifies whether `when` expressions inside aggregate functions
- * return values of type [it.unibo.collektive.aggregate.Field].
+ * return values of type `it.unibo.collektive.aggregate.Field`.
  *
  * ### Purpose
  * Ensures **semantic alignment safety** by preventing `Field` values
