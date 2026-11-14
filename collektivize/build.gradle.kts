@@ -107,6 +107,13 @@ gradlePlugin {
     }
 }
 
+dokka {
+    dokkaSourceSets.named("main") {
+        // The DSL files are copied from collektive-dsl only to compile the generator: they are documented there.
+        sourceRoots.setFrom(layout.projectDirectory.dir("src/main/kotlin"))
+    }
+}
+
 publishOnCentral {
     projectLongName = info.longName
     projectDescription = info.description
