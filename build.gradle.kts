@@ -30,7 +30,7 @@ plugins {
     alias(libs.plugins.taskTree)
     id("it.unibo.collektive.collektive-plugin")
 }
-val reportMerge by tasks.registering(ReportMergeTask::class) {
+val reportMerge = tasks.register<ReportMergeTask>("reportMerge") {
     output = project.layout.buildDirectory.file("reports/merge.sarif")
 }
 
@@ -84,8 +84,8 @@ allprojects {
 
     signing {
         if (System.getenv("CI") == "true") {
-            val signingKey: String? by project
-            val signingPassword: String? by project
+            val signingKey = findProperty("signingKey")?.toString()
+            val signingPassword = findProperty("signingPassword")?.toString()
             useInMemoryPgpKeys(signingKey, signingPassword)
         }
     }
@@ -134,11 +134,12 @@ allprojects {
                 task.name.let { it.endsWith("Main") || it.endsWith("Test") } &&
                     !task.name.contains("Baseline")
             }
-        val check by tasks.getting
-        val detektAll by tasks.registering {
+        val detektAll = tasks.register("detektAll") {
             group = "verification"
-            check.dependsOn(this)
             dependsOn(detektTasks)
+        }
+        tasks.check.configure {
+            dependsOn(detektAll)
         }
     }
 

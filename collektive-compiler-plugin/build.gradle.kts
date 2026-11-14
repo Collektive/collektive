@@ -66,8 +66,8 @@ ktlint {
 
 signing {
     if (System.getenv("CI") == "true") {
-        val signingKey: String? by project
-        val signingPassword: String? by project
+        val signingKey = findProperty("signingKey")?.toString()
+        val signingPassword = findProperty("signingPassword")?.toString()
         useInMemoryPgpKeys(signingKey, signingPassword)
     }
 }
@@ -110,7 +110,7 @@ publishOnCentral {
 
 val dslSource = rootProject.layout.buildDirectory.dir("resources/main/it/unibo/collektive/compiler/sources")
 
-val importDsl by tasks.registering(Copy::class) {
+val importDsl = tasks.register<Copy>("importDsl") {
     listOf(
         "Aggregate",
         "Field",
