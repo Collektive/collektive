@@ -99,7 +99,7 @@ parameters:
         }
 
 subjects:
-  - name: ImproperUse${{ prettify(IMPROPER_CONSTRUCT_IMPLICIT) }}Implicit
+  - name: "ImproperUse${{ prettify(IMPROPER_CONSTRUCT_IMPLICIT) }}Implicit"
     code: |-
       fun Aggregate<Int>.entry() {
           ${{ IMPROPER_CONSTRUCT_IMPLICIT }}
@@ -108,7 +108,7 @@ subjects:
       warning: |-
         The 'evolve' construct is not necessary for the given use case.
 
-  - name: ImproperUse${{ prettify(IMPROPER_CONSTRUCT_EXPLICIT) }}Explicit
+  - name: "ImproperUse${{ prettify(IMPROPER_CONSTRUCT_EXPLICIT) }}Explicit"
     code: |-
       fun Aggregate<Int>.entry() {
           ${{ IMPROPER_CONSTRUCT_EXPLICIT }}
@@ -117,7 +117,7 @@ subjects:
       warning: |-
         The 'evolve' construct is not necessary for the given use case.
 
-  - name: ImproperUse${{ prettify(IMPROPER_CONSTRUCT_DELEGATED_FIELD_IMPLICIT) }}DelegatedFieldImplicit
+  - name: "ImproperUse${{ prettify(IMPROPER_CONSTRUCT_DELEGATED_FIELD_IMPLICIT) }}DelegatedFieldImplicit"
     code: |-
       fun Aggregate<Int>.entry() {
           ${{ IMPROPER_CONSTRUCT_DELEGATED_FIELD_IMPLICIT }}
@@ -126,7 +126,7 @@ subjects:
       warning: |-
         The 'evolve' construct is not necessary for the given use case.
 
-  - name: ImproperUse${{ prettify(IMPROPER_CONSTRUCT_DELEGATED_FIELD_EXPLICIT) }}DelegatedFieldExplicit
+  - name: "ImproperUse${{ prettify(IMPROPER_CONSTRUCT_DELEGATED_FIELD_EXPLICIT) }}DelegatedFieldExplicit"
     code: |-
       fun Aggregate<Int>.entry() {
           ${{ IMPROPER_CONSTRUCT_DELEGATED_FIELD_EXPLICIT }}
@@ -135,21 +135,21 @@ subjects:
       warning: |-
         The 'evolve' construct is not necessary for the given use case.
 
-  - name: ProperUse${{ prettify(PROPER_CONSTRUCT_EXPLICIT) }}Explicit
+  - name: "ProperUse${{ prettify(PROPER_CONSTRUCT_EXPLICIT) }}Explicit"
     code: |-
       fun Aggregate<Int>.entry() {
           val otherValue = 5
           ${{ PROPER_CONSTRUCT_EXPLICIT }}
       }
 
-  - name: ProperUse${{ prettify(PROPER_CONSTRUCT_IMPLICIT) }}Implicit
+  - name: "ProperUse${{ prettify(PROPER_CONSTRUCT_IMPLICIT) }}Implicit"
     code: |-
       fun Aggregate<Int>.entry() {
           val otherValue = 5
           ${{ PROPER_CONSTRUCT_IMPLICIT }}
       }
 
-  - name: ProperUse${{ prettify(PROPER_USE_SAME_RETURN) }}SameReturn
+  - name: "ProperUse${{ prettify(PROPER_USE_SAME_RETURN) }}SameReturn"
     code: |-
       fun Aggregate<Int>.entry() {
           ${{ PROPER_USE_SAME_RETURN }}

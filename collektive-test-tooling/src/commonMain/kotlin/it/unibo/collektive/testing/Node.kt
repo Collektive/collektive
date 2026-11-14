@@ -26,7 +26,7 @@ class Node<R>(
     val id: Int,
     var value: R,
     private val cyclesToResetMessages: Int = 1,
-    private val program: Aggregate<Int>.(Environment<R>) -> R,
+    program: Aggregate<Int>.(Environment<R>) -> R,
 ) {
     private val network = DeviceMailbox()
     private var lastcycle = 0

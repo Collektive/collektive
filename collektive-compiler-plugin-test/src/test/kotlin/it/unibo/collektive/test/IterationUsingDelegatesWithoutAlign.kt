@@ -8,20 +8,16 @@
 
 package it.unibo.collektive.test
 
-import io.github.subjekt.Subjekt.subjekt
-import io.github.subjekt.generators.FilesGenerator.toTempFiles
 import it.unibo.collektive.test.util.CompileUtils.formsOfIteration
 import it.unibo.collektive.test.util.CompileUtils.`iteration with warning`
 import it.unibo.collektive.test.util.CompileUtils.`iteration without warning`
+import it.unibo.collektive.test.util.CompileUtils.subjects
 import it.unibo.collektive.test.util.CompileUtils.testedAggregateFunctions
-import java.io.File
 import kotlin.test.Test
 
 class IterationUsingDelegatesWithoutAlign {
-    private val testSubjects: Map<String, File> =
-        subjekt {
-            addSource("src/test/resources/subjekt/IterationWithDelegatedAggregate.yaml")
-        }.toTempFiles()
+    private val testSubjects: Map<String, String> =
+        subjects("src/test/resources/subjekt/IterationWithDelegatedAggregate.yaml")
 
     @Test
     fun `test iterations using delegates`() {

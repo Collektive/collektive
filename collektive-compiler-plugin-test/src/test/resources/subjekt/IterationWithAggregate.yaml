@@ -1,4 +1,3 @@
----
 name: "Invalid iteration of aggregate calls"
 config:
   codePreamble: |-
@@ -8,8 +7,36 @@ config:
     import it.unibo.collektive.aggregate.api.Aggregate
     import it.unibo.collektive.aggregate.api.neighboring
 
-import:
-  "src/test/resources/subjekt/Macros.yaml"
+# Subjekt 2 does not support imports yet: the shared macros are inlined
+macros:
+  - def: loop(code)
+    values:
+      - |-
+        for(i in 1..3) {
+          ${{ code }}
+        }
+      - |-
+        (1..3).forEach {
+          ${{ code }}
+        }
+  - def: alignedOn(code)
+    values:
+      - |-
+        alignedOn(0) {
+          ${{ code }}
+        }
+  - def: nestedFun(code)
+    values:
+      - |-
+        fun Aggregate<Int>.nested() {
+          ${{ code }}
+        }
+  - def: aggregate(code)
+    values:
+      - |-
+        aggregate(0) {
+          ${{ code }}
+        }
 
 parameters:
   name: AGGREGATE
@@ -19,7 +46,7 @@ parameters:
 subjects:
 
   # SIMPLE ITERATIONS
-  - name: Iteration${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
+  - name: "Iteration${{ prettify(AGGREGATE, loop(AGGREGATE)) }}"
     code: |-
       fun Aggregate<Int>.entry() {
         ${{ loop(AGGREGATE) }}
@@ -30,7 +57,7 @@ subjects:
         This may cause the same execution path to trigger multiple interactions, resulting in ambiguous alignment.
         Wrap the function call using ''alignedOn'' with a unique key to ensure consistent alignment.
 
-  - name: IterationExtAlign${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
+  - name: "IterationExtAlign${{ prettify(AGGREGATE, loop(AGGREGATE)) }}"
     code: |-
       fun Aggregate<Int>.entry() {
         ${{ alignedOn(loop(AGGREGATE)) }}
@@ -41,13 +68,13 @@ subjects:
         This may cause the same execution path to trigger multiple interactions, resulting in ambiguous alignment.
         Wrap the function call using ''alignedOn'' with a unique key to ensure consistent alignment.
 
-  - name: IterationAlign${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
+  - name: "IterationAlign${{ prettify(AGGREGATE, loop(AGGREGATE)) }}"
     code: |-
       fun Aggregate<Int>.entry() {
         ${{ loop(alignedOn(AGGREGATE)) }}
       }
 
-  - name: IterationWithNestedFun${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
+  - name: "IterationWithNestedFun${{ prettify(AGGREGATE, loop(AGGREGATE)) }}"
     code: |-
       fun Aggregate<Int>.entry() {
         ${{ loop(nestedFun(AGGREGATE)) }}
@@ -55,7 +82,7 @@ subjects:
 
   # OUTSIDE
 
-  - name: OutsideAggregate${{ prettify(AGGREGATE, loop(AGGREGATE)) }}
+  - name: "OutsideAggregate${{ prettify(AGGREGATE, loop(AGGREGATE)) }}"
     code: |-
       import it.unibo.collektive.Collektive.Companion.aggregate
       

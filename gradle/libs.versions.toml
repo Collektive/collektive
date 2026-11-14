@@ -4,7 +4,7 @@ arrow = "2.3.0"
 build-config = "6.1.2"
 dokka = "2.3.0"
 kotest = "6.2.7"
-kotlin = "2.4.10"
+kotlin = "2.4.21"
 serialization = "1.13.0"
 
 [libraries]
@@ -33,7 +33,7 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 kotlinx-serialization-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-serialization-protobuf", version.ref = "serialization" }
 mockk = "io.mockk:mockk:1.14.12"
 slf4j = "org.slf4j:slf4j-api:2.0.20"
-subjekt = "io.github.freshmag:subjekt-api:1.1.5"
+subjekt = "io.github.mini-roostico:subjekt:2.2.0"
 
 [bundles]
 kotlin-compiler = [

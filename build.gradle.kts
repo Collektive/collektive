@@ -146,15 +146,6 @@ allprojects {
         }
     }
 
-    // Enforce the use of the Kotlin version in all subprojects
-    configurations.matching { it.name != "detekt" }.all {
-        resolutionStrategy.eachDependency {
-            if (requested.group == "org.jetbrains.kotlin") {
-                useVersion(rootProject.libs.versions.kotlin.get())
-            }
-        }
-    }
-
     tasks.withType<SourceTask>().matching { it is VerificationTask }.configureEach {
         finalizedBy(reportMerge)
         excludeGenerated()

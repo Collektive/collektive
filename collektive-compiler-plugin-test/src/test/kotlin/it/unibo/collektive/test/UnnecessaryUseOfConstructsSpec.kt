@@ -8,8 +8,6 @@
 
 package it.unibo.collektive.test
 
-import io.github.subjekt.Subjekt.subjekt
-import io.github.subjekt.generators.FilesGenerator.toTempFiles
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.data.forAll
 import io.kotest.data.headers
@@ -17,6 +15,7 @@ import io.kotest.data.row
 import io.kotest.data.table
 import it.unibo.collektive.test.util.CompileUtils.getTestingProgram
 import it.unibo.collektive.test.util.CompileUtils.noWarning
+import it.unibo.collektive.test.util.CompileUtils.subjects
 import it.unibo.collektive.test.util.CompileUtils.warningMessage
 
 class UnnecessaryUseOfConstructsSpec : FreeSpec({
@@ -29,9 +28,7 @@ class UnnecessaryUseOfConstructsSpec : FreeSpec({
 
     "When using an Aggregate construct" - {
         val testSubjects =
-            subjekt {
-                addSource("src/test/resources/subjekt/UnnecessaryUseOfConstructs.yaml")
-            }.toTempFiles()
+            subjects("src/test/resources/subjekt/UnnecessaryUseOfConstructs.yaml")
 
         val constructs =
             table(

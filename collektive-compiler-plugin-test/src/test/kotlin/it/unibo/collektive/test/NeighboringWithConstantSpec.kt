@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -8,11 +8,10 @@
 
 package it.unibo.collektive.test
 
-import io.github.subjekt.Subjekt.subjekt
-import io.github.subjekt.generators.FilesGenerator.toTempFiles
 import io.kotest.core.spec.style.FreeSpec
 import it.unibo.collektive.test.util.CompileUtils.getTestingProgram
 import it.unibo.collektive.test.util.CompileUtils.noWarning
+import it.unibo.collektive.test.util.CompileUtils.subjects
 import it.unibo.collektive.test.util.CompileUtils.warningMessage
 
 class NeighboringWithConstantSpec : FreeSpec({
@@ -40,36 +39,27 @@ class NeighboringWithConstantSpec : FreeSpec({
         """.trimIndent()
 
     "When using neighboring with a constant" - {
-        val testSubjects =
-            subjekt {
-                addSource("src/test/resources/subjekt/NeighboringWithConstant.yaml")
-            }.toTempFiles()
-
+        val testSubjects = subjects("src/test/resources/subjekt/NeighboringWithConstant.yaml")
         "passing an integer literal should produce a warning" - {
             val code = testSubjects.getTestingProgram("NeighboringWithIntConstant")
             code shouldCompileWith warningMessage(expectedWarning())
         }
-
         "passing a string literal should produce a warning" - {
             val code = testSubjects.getTestingProgram("NeighboringWithStringConstant")
             code shouldCompileWith warningMessage(expectedWarning())
         }
-
         "passing a boolean literal should produce a warning" - {
             val code = testSubjects.getTestingProgram("NeighboringWithBooleanConstant")
             code shouldCompileWith warningMessage(expectedWarning())
         }
-
         "passing a variable (non-constant) should not produce a warning" - {
             val code = testSubjects.getTestingProgram("NeighboringWithVariable")
             code shouldCompileWith noWarning
         }
-
         "passing a function call result (non-constant) should not produce a warning" - {
             val code = testSubjects.getTestingProgram("NeighboringWithFunctionCall")
             code shouldCompileWith noWarning
         }
-
         "using mapNeighborhood instead should not produce a warning" - {
             val code = testSubjects.getTestingProgram("NeighboringWithMapNeighborhood")
             code shouldCompileWith noWarning
