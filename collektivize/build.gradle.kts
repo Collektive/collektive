@@ -76,8 +76,8 @@ dependencies {
 
 signing {
     if (System.getenv("CI") == "true") {
-        val signingKey: String? by project
-        val signingPassword: String? by project
+        val signingKey = findProperty("signingKey")?.toString()
+        val signingPassword = findProperty("signingPassword")?.toString()
         useInMemoryPgpKeys(signingKey, signingPassword)
     }
 }
@@ -104,6 +104,13 @@ gradlePlugin {
             implementationClass = info.pluginImplementationClass
             tags = info.tags
         }
+    }
+}
+
+dokka {
+    dokkaSourceSets.named("main") {
+        // The DSL files are copied from collektive-dsl only to compile the generator: they are documented there.
+        sourceRoots.setFrom(layout.projectDirectory.dir("src/main/kotlin"))
     }
 }
 
@@ -135,6 +142,7 @@ publishOnCentral {
 }
 
 val importDsl = tasks.register<Copy>("importDsl") {
+    group = "build"
     description = "Imports the DSL source files from the collektive-dsl module into this module's build directory."
     listOf(
         "Aggregate",

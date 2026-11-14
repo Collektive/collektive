@@ -26,7 +26,7 @@ internal fun KParameter.isFunctionType(): Boolean = (type.classifier as? KClass<
     ?.startsWith("kotlin.Function") == true
 
 /**
- * Given a [KParameter], returns a [ParameterSpec] where the type is a [Field] of the same type as the parameter.
+ * Given a [KParameter], returns a [ParameterSpec] where the type is a `Field` of the same type as the parameter.
  * Returns `null` if the "fielded" parameter would be shadowed.
  */
 internal fun KParameter.toFieldParameterSpec(): ParameterSpec? {

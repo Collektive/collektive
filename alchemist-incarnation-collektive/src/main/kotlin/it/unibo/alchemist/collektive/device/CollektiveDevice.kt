@@ -17,7 +17,6 @@ import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.DataSharingMethod
-import it.unibo.collektive.aggregate.api.field.mapValues
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
 import it.unibo.collektive.networking.Mailbox
@@ -50,8 +49,7 @@ class CollektiveDevice<P>(
     /**
      * The current time.
      */
-    val currentTime: Time
-        get() = environment.simulationOrNull?.time?.current ?: Time.ZERO
+    val currentTime: Time get() = environment.simulationOrNull?.time?.current ?: Time.ZERO
 
     /**
      * The ID of the node (alias of [localId]).
@@ -125,7 +123,7 @@ class CollektiveDevice<P>(
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T> get(name: String): T = node[SimpleMolecule(name)] as T
+    override fun <T> get(name: String): T = node[SimpleMolecule(name)].getOrNull() as T
 
     override fun <T> getOrNull(name: String): T? = when {
         isDefined(name) -> get(name)

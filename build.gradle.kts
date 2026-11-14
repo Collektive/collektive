@@ -31,6 +31,8 @@ plugins {
     id("it.unibo.collektive.collektive-plugin")
 }
 val reportMerge = tasks.register<ReportMergeTask>("reportMerge") {
+    group = "verification"
+    description = "Merges the SARIF reports of all static analysis tools into a single file."
     output = project.layout.buildDirectory.file("reports/merge.sarif")
 }
 
@@ -84,8 +86,8 @@ allprojects {
 
     signing {
         if (System.getenv("CI") == "true") {
-            val signingKey: String? by project
-            val signingPassword: String? by project
+            val signingKey = findProperty("signingKey")?.toString()
+            val signingPassword = findProperty("signingPassword")?.toString()
             useInMemoryPgpKeys(signingKey, signingPassword)
         }
     }
@@ -134,20 +136,13 @@ allprojects {
                 task.name.let { it.endsWith("Main") || it.endsWith("Test") } &&
                     !task.name.contains("Baseline")
             }
-        val check by tasks.getting
-        val detektAll by tasks.registering {
+        val detektAll = tasks.register("detektAll") {
             group = "verification"
-            check.dependsOn(this)
+            description = "Runs detekt on all the main and test source sets of this project."
             dependsOn(detektTasks)
         }
-    }
-
-    // Enforce the use of the Kotlin version in all subprojects
-    configurations.matching { it.name != "detekt" }.all {
-        resolutionStrategy.eachDependency {
-            if (requested.group == "org.jetbrains.kotlin") {
-                useVersion(rootProject.libs.versions.kotlin.get())
-            }
+        tasks.check.configure {
+            dependsOn(detektAll)
         }
     }
 
