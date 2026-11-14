@@ -32,9 +32,9 @@ jobs:
         run: |
           ruby << 'RUBY' >> $GITHUB_OUTPUT
             branch = ENV['GITHUB_REF'].sub(/^refs\/heads\//, '')
-            keywords = %w[gradle publishoncentral]
+            keywords = %w[] # %w[gradle publishoncentral]
             dry = keywords.any? { |kw| branch.include?(kw) } ? '' : '--dry-run'
-            puts "dry_run=#{dry}"
+            # puts "dry_run=#{dry}"
           RUBY
       - uses: DanySK/build-check-deploy-gradle-action@4.0.52
         with:
