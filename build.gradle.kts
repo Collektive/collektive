@@ -31,6 +31,8 @@ plugins {
     id("it.unibo.collektive.collektive-plugin")
 }
 val reportMerge = tasks.register<ReportMergeTask>("reportMerge") {
+    group = "verification"
+    description = "Merges the SARIF reports of all static analysis tools into a single file."
     output = project.layout.buildDirectory.file("reports/merge.sarif")
 }
 
@@ -136,6 +138,7 @@ allprojects {
             }
         val detektAll = tasks.register("detektAll") {
             group = "verification"
+            description = "Runs detekt on all the main and test source sets of this project."
             dependsOn(detektTasks)
         }
         tasks.check.configure {

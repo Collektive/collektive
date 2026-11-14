@@ -111,6 +111,8 @@ publishOnCentral {
 val dslSource = rootProject.layout.buildDirectory.dir("resources/main/it/unibo/collektive/compiler/sources")
 
 val importDsl = tasks.register<Copy>("importDsl") {
+    group = "build"
+    description = "Imports the DSL source files from the collektive-dsl module as resources of the compiler plugin."
     listOf(
         "Aggregate",
         "Field",

@@ -142,6 +142,7 @@ publishOnCentral {
 }
 
 val importDsl = tasks.register<Copy>("importDsl") {
+    group = "build"
     description = "Imports the DSL source files from the collektive-dsl module into this module's build directory."
     listOf(
         "Aggregate",
