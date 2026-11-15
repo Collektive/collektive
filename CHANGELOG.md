@@ -1,3 +1,27 @@
+## [29.0.0](https://github.com/Collektive/collektive/compare/28.3.9...29.0.0) (2026-11-15)
+
+### ⚠ BREAKING CHANGES
+
+* CollektiveJVMCompiler has been removed, use CollektiveK2JVMCompiler instead.
+* RunCollektiveProgram now takes a NodeReaction instead of a Node, and
+  CollektiveDevice is a Capability instead of a NodeProperty, following the Alchemist 50 API.
+
+### Dependency updates
+
+* **deps:** update alchemist to v50 ([60f7773](https://github.com/Collektive/collektive/commit/60f77730d628da5247b058b869803867c574ae2f))
+* **deps:** update alchemist to v50.0.3 ([0449f30](https://github.com/Collektive/collektive/commit/0449f30b176ea5cd4a663dc2404804afb8ff7af0))
+* **deps:** update gradle to v9.9.1 ([0416b18](https://github.com/Collektive/collektive/commit/0416b18e0840fe015445a666ec17792d3d8c706a))
+* **deps:** update plugin kotlin-qa to v1.9.3 ([9085a1f](https://github.com/Collektive/collektive/commit/9085a1f26c29e053b377f64686077c797197e062))
+* **deps:** update plugin ksp to v2.3.14 ([3234ea1](https://github.com/Collektive/collektive/commit/3234ea13c1c861e9f742a65eb6c68783a3e97483))
+
+### Bug Fixes
+
+* **build:** prevent buildSrc from shadowing kotlinx-coroutines ([0317def](https://github.com/Collektive/collektive/commit/0317def6a93c5be28e8f1ed03e786ae3a0c06eed))
+
+### Refactoring
+
+* adapt to Alchemist 50 and Kotlin 2.4.21, drop the legacy JVM compiler facade ([#1726](https://github.com/Collektive/collektive/issues/1726)) ([62f86fd](https://github.com/Collektive/collektive/commit/62f86fd427f4344722038c2e6e7f7aeb4c9ef1ba))
+
 ## [28.3.9](https://github.com/Collektive/collektive/compare/28.3.8...28.3.9) (2026-11-12)
 
 ### Dependency updates
