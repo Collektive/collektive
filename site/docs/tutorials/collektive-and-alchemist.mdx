@@ -19,12 +19,18 @@ see [Using Collektive with Unity](collektive-and-unity.mdx).
 
 ```kotlin
 dependencies {
-    implementation("it.unibo.collektive:alchemist-incarnation-collektive:<latest version>")
-    implementation("it.unibo.alchemist:alchemist:<latest version>")
-    implementation("it.unibo.alchemist:alchemist-euclidean-geometry:<latest version>")
-    implementation("it.unibo.alchemist:alchemist-swingui:<latest version>") // graphical interface
+    implementation("it.unibo.collektive:alchemist-incarnation-collektive:<collektive version>")
+    implementation("it.unibo.alchemist:alchemist:<alchemist version>")
+    implementation("it.unibo.alchemist:alchemist-euclidean-geometry:<alchemist version>")
+    implementation("it.unibo.alchemist:alchemist-swingui:<alchemist version>") // graphical interface
 }
 ```
+
+:::caution Versions
+The incarnation is built against a specific major version of Alchemist, and the two must match.
+Since Collektive **29.0.0**, the incarnation requires **Alchemist 50** and a **JVM 21** toolchain;
+earlier Collektive versions use Alchemist 43 and are not compatible with Alchemist 50.
+:::
 
 :::note
 Alchemist runs on the **JVM** only. Your aggregate programs can still live in a multiplatform module,
@@ -45,10 +51,7 @@ network-model:
 
 _pool: &program
   - time-distribution: 1        # rounds per time unit
-    type: Event
-    actions:
-      - type: RunCollektiveProgram
-        parameters: [it.unibo.collektive.examples.tutorial.TutorialKt.maxIdTutorial]
+    program: it.unibo.collektive.examples.tutorial.TutorialKt.maxIdTutorial
 
 deployments:
   - type: Rectangle             # 200 devices placed randomly in a 20x20 square
@@ -58,7 +61,7 @@ deployments:
 ```
 
 - `incarnation: collektive` selects Collektive as the programming language of the devices.
-- `RunCollektiveProgram` executes, at every round, the aggregate function given by its fully qualified name:
+- `program` is the aggregate function executed at every round, given by its fully qualified name:
   for a top-level function `maxIdTutorial` in file `Tutorial.kt` of package `it.unibo.collektive.examples.tutorial`,
   the name is `it.unibo.collektive.examples.tutorial.TutorialKt.maxIdTutorial`.
 - `time-distribution` is the frequency of the rounds; each device starts with a random phase,
@@ -83,8 +86,21 @@ _pool: &program
 ```
 
 The entrypoint is compiled (with the Collektive compiler plugin) as the body of a function with an `Aggregate<Int>` receiver,
-where the simulated device is available as `device`.
-The `code` block can contain imports and helper functions, and the `source-sets` key can list folders of Kotlin sources to compile with it.
+where the simulated device is available as `device` (a `CollektiveDevice`, see [below](#writing-programs-for-alchemist)).
+The `code` block can contain a `package` declaration, imports, and helper functions,
+and the `source-sets` key can list folders of Kotlin sources to compile with it:
+
+```yaml
+    program:
+      name: Gradient
+      source-sets:
+        - src/main/kotlin                       # compiled together with the entrypoint
+      code: |
+        import my.library.*
+      entrypoint: gradient(device, device.get("source"))   # reads the "source" molecule of the node
+```
+
+Compiled programs are cached, so devices sharing the same program compile it only once.
 
 ## Writing programs for Alchemist
 
@@ -93,11 +109,17 @@ whose parameters are injected by the simulator according to their type:
 
 | Parameter type | Injected value |
 |----------------|----------------|
-| `CollektiveDevice<*>` | the simulated device: provides `distances()`, the `Field` of the Euclidean distances to the neighbors, and the current simulated time |
+| `CollektiveDevice<*>` | the simulated device: provides `distances()`, the `Field` of the Euclidean distances to the neighbors, and `currentTime`, the current simulated time |
 | `EnvironmentVariables` | read and write access to the *molecules* of the node, to read inputs from the simulation and export outputs |
 | `Node<*>` | the Alchemist node itself |
+| any other type | a *capability* of the node with a compatible type, if any (otherwise, the program fails at its first round) |
 
-The value returned by the program is stored in a molecule named after the program (the `name` key of inline programs, or the entrypoint name).
+`distances()` is an extension of `Aggregate`, so it must be called within the device scope:
+`with(device) { distances() }`.
+
+The value returned by the program is stored in a molecule named after the program:
+the `name` key of inline programs, or the fully qualified entrypoint as written in the YAML
+(e.g., `it.unibo.collektive.examples.tutorial.TutorialKt.maxIdTutorial`).
 
 :::info
 `EnvironmentVariables` and `CollektiveDevice` exist only in the simulator.

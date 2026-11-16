@@ -13,7 +13,8 @@ import TabItem from '@theme/TabItem';
 
 - the **DSL** (`collektive-dsl`), defining the aggregate operators and the runtime that executes them;
 - the **compiler plugin**, which instruments your Kotlin code with the *alignment* information needed to match
-  the messages exchanged by devices with the operators that produced them (see [Alignment](../explanation/alignment.mdx));
+  the messages exchanged by devices with the operators that produced them (see [Alignment](../explanation/alignment.mdx)),
+  and statically checks it for misuses of the DSL (see [The Compiler Plugin](../explanation/compiler-plugin.mdx));
 - the **standard library** (`collektive-stdlib`), providing ready-to-use collective building blocks
   (distances, broadcasts, collection, gossip, leader election, …).
 
@@ -55,7 +56,18 @@ Without it, programs compile but fail at runtime with an `AlignmentClashExceptio
 as soon as they contain more than one aggregate operator.
 :::
 
-The plugin is enabled by default. If needed, it can be disabled for a specific project:
+:::caution Kotlin version
+Kotlin compiler plugins are tied to the version of the Kotlin compiler.
+Use the same Kotlin version Collektive was built with (Collektive 29.0.0 uses Kotlin **2.4.21**):
+the version used by each release is declared in its [version catalog](https://github.com/Collektive/collektive/blob/master/gradle/libs.versions.toml).
+:::
+
+The diagnostics of the plugin are reported in the Gradle build output.
+To see them in IntelliJ IDEA while you type, a registry setting must be changed:
+see [Seeing the diagnostics](../explanation/compiler-plugin.mdx#seeing-the-diagnostics).
+
+The plugin is enabled by default. If needed, it can be disabled for a specific project
+(this disables both the alignment and the checks):
 
 ```kotlin
 collektive {
