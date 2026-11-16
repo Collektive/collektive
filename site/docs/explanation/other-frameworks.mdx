@@ -30,11 +30,15 @@ If you already know one of them, this page helps you map what you know onto Coll
 | Native | × | ∼ | ✓ | ✓ |
 | Android / iOS | ∼ / × | ∼ / × | ∼ / × | ✓ / ✓ |
 | Static typing | × | ✓ | ✓ | ✓ |
-| Alignment | runtime, transparent | runtime, needs explicit scopes in some cases | runtime, explicit (`CALL`) | compile-time, transparent |
+| Alignment: when | runtime | runtime | runtime | compile-time |
+| Alignment: semantics | strong | weak in some cases | strong | strong |
+| Alignment: interface | transparent (within the DSL) | explicit `aggregate` scopes in some cases | explicit (`CALL`) | transparent |
 | Reified neighbor fields | ✓ | × | ✓ | ✓ |
 | eXchange Calculus | ∼ | ∼ | ✓ | ✓ |
 
 ✓ supported, ∼ partially supported, × not supported.
+*Strong* alignment encodes the semantic context of each call (so `min(nbr(x))` and `max(nbr(x))` never mix their messages),
+*transparent* alignment needs no annotations from the developer: see [Alignment](alignment.mdx#how-collektive-computes-paths).
 
 ## Concept mapping
 
