@@ -60,10 +60,13 @@ The gossip of Collektive solves the problem with a self-stabilizing min-max cons
 Every candidate value travels with the **path** of the devices that forwarded it, starting from the device that produced it.
 At every round, each device:
 
-1. discards the candidates whose path already contains its own identifier: they are **loops**, echoes of something the device itself sent;
-2. among the remaining ones and its own local value, picks the **best value**;
-3. breaks ties by preferring the **shortest path**, then the neighbor with the lowest identifier;
-4. appends its own identifier to the path of the winner, and sends it to the neighbors.
+1. extends each candidate received from a neighbor with the identifier of that neighbor;
+2. discards the candidates whose path already contains its own identifier: they are **loops**, echoes of something the device itself sent;
+   it also discards the paths longer than `maxDiameter`, and the paths that are inconsistent with what its neighbors report
+   (the same filters used by [`gradientCast`](spreading.mdx#fast-repair-vs-bellman-ford));
+3. among the remaining candidates and its own local value, picks the **best value**,
+   preferring the **shortest path** among candidates carrying the same value;
+4. shares the winner, with its path, with the neighbors.
 
 A value whose source disappears is no longer regenerated: its copies keep circulating only until they reach,
 along some cycle, a device they already traversed, and then they are discarded.
@@ -106,45 +109,49 @@ The algorithm is an instance of the *minimizing share* pattern
 (extending the path makes a candidate strictly worse, and loops are rejected),
 which is enough to prove that it self-stabilizes in any network that eventually stops changing.
 
-### The algorithm in a few lines
+### The implementation
 
 The core of the algorithm is a `share` with a fold over the neighbors' candidates.
-The standard library implements a generalized version of it, based on the same path utilities as
-[`gradientCast`](spreading.mdx#fast-repair-vs-bellman-ford);
-the version below, from the paper, is self-contained and behaves in the same way (it produces the table above):
+This is the implementation of `gossip` in the standard library, on which `gossipMax`, `gossipMin`,
+and the other gossip functions are built (by choosing the `reducer`).
+It relies on the same path utilities as [`gradientCast`](spreading.mdx#fast-repair-vs-bellman-ford):
+`PathValue` (a value with its path and length), `nonLoopingPaths` (steps 1 and 2 above, plus the shortcut check), and `pathCoherence`.
 
 ```kotlin
-@Serializable
-data class GossipValue<ID : Comparable<ID>, Value>(
-    val best: Value,
-    val path: List<ID> = emptyList(),
-) {
-    fun addHop(id: ID) = GossipValue(best, path + id)
-}
-
-inline fun <reified ID : Comparable<ID>, reified Value> Aggregate<ID>.findMaxOf(
+inline fun <reified ID : Comparable<ID>, reified Value> Aggregate<ID>.gossip(
     local: Value,
-    comparator: Comparator<in Value>,
+    maxDiameter: Int = Int.MAX_VALUE,
+    noinline reducer: Reducer<Value> = { first, _ -> first },
 ): Value {
-    val localGossip = GossipValue<ID, Value>(best = local)
-    return share(localGossip) { gossip ->
-        gossip.neighbors.values.fold(localGossip) { current, neighbor ->
+    val localCandidate = PathValue<ID, Value, Int>(0, local, emptyList())
+    return share(localCandidate) { candidate ->
+        // the neighbors' candidates, extended with the sender, without loops and paths longer than maxDiameter,
+        // each combined with the local value, and sorted by path length
+        val nonLoopingPaths = nonLoopingPaths(
+            candidate,
+            hops(),
+            maxDiameter,
+            0,
+            Int.MAX_VALUE,
+            { _, _, data -> reducer(local, data) },
+            Int::plus,
+        )
+        // discard the paths inconsistent with each other, then pick the best value
+        pathCoherence(nonLoopingPaths).fold(localCandidate) { current, next ->
+            val candidateValue = reducer(current.data, next.data)
             when {
-                localId in neighbor.path -> current // a loop: discard it
-                else -> when (comparator.compare(neighbor.best, current.best)) {
-                    0 -> when { // same value: shortest path first, then lowest sender
-                        neighbor.path.size == current.path.size ->
-                            listOf(neighbor, current).minBy { it.path.last() }
-                        else -> listOf(neighbor, current).minBy { it.path.size }
-                    }
-                    in 1..Int.MAX_VALUE -> neighbor // a better value
-                    else -> current
-                }
+                current.data == next.data -> listOf(current, next).minBy { it.hops.size } // same value: shortest path
+                candidateValue == current.data -> current
+                else -> next
             }
-        }.addHop(localId) // acknowledge the winner, and forward it
-    }.best
+        }
+    }.data ?: local
 }
 ```
+
+The [source code](https://github.com/Collektive/collektive/blob/master/collektive-stdlib/src/commonMain/kotlin/it/unibo/collektive/stdlib/spreading/Gossip.kt)
+contains all the variants: `gossipMax`, for instance, is `gossip` with a reducer that keeps the larger of the two values.
+The table above is the behavior of this implementation.
 
 ### Costs and alternatives
 
@@ -185,7 +192,7 @@ Use `isHappeningAnywhere` when the condition may stop holding, `everHappened` wh
 ## Leader election
 
 Leader election breaks the symmetry of the network by selecting a few devices as coordinators.
-It is the **S** (*sparse choice*) of the [G-C-S building blocks](overview.mdx#the-self-organizing-building-blocks),
+It is one of the [self-organizing building blocks](overview.mdx#the-self-organizing-building-blocks),
 and it is the key to making sinks and sources resilient:
 elect them instead of hard-coding them, and the system will replace them when they fail.
 The functions live in `it.unibo.collektive.stdlib.consensus`.
@@ -243,8 +250,8 @@ fun Aggregate<Int>.areaAverage(temperature: Double, radius: Int): Double {
     val leader = boundedElection(bound = radius)
     val isLeader = leader == localId
     val potential = hopDistanceTo(isLeader)
-    val average = convergeMean(temperature, potential)              // C: towards the leader
-    return gradientCast(isLeader, average, hops().toDouble())       // G: back to the area
+    val average = convergeMean(temperature, potential)              // collection: towards the leader
+    return gradientCast(isLeader, average, hops().toDouble())       // spreading: back to the area
 }
 ```
 

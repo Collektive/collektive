@@ -8,7 +8,7 @@ description: "Converge-casts: summing, counting, and aggregating values towards 
 
 *Collection* blocks move information **inwards**: values held by many devices are aggregated, hop by hop,
 towards one or more *sinks*.
-They are the **C** of the [G-C-S building blocks](overview.mdx#the-self-organizing-building-blocks),
+They are one of the [self-organizing building blocks](overview.mdx#the-self-organizing-building-blocks),
 and the dual of [spreading](spreading.mdx): where a gradient-cast goes *down* from the sources,
 a converge-cast goes *up* towards the sinks.
 
@@ -70,7 +70,7 @@ The collected value lags behind changes by (roughly) one round per hop of the tr
 
 ## Collect and share
 
-Since only the sink knows the result, collections are often followed by a broadcast (G → C → G):
+Since only the sink knows the result, collections are often followed by a broadcast (spreading → collection → spreading):
 
 ```kotlin
 fun Aggregate<Int>.networkSize(sink: Boolean): Int {
