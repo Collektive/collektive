@@ -32,7 +32,7 @@ inline fun <ID : Any, reified Shared> Aggregate<ID>.exchange(
     default: Shared,
     initial: Shared = default,
     noinline body: (Field<ID, Shared>) -> Field<ID, Shared>,
-): Field<ID, Shared> = exchanging(initial) { field -> body(field).yielding { this } }
+): Field<ID, Shared> = exchanging(default, initial) { field -> body(field).yielding { this } }
 
 /**
  * Observes the value of an expression [local] across neighbors.
