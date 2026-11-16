@@ -34,7 +34,7 @@ jobs:
             branch = ENV['GITHUB_REF'].sub(/^refs\/heads\//, '')
             keywords = %w[] # %w[gradle publishoncentral]
             dry = keywords.any? { |kw| branch.include?(kw) } ? '' : '--dry-run'
-            # puts "dry_run=#{dry}"
+            puts "dry_run=#{dry}"
           RUBY
       - uses: DanySK/build-check-deploy-gradle-action@4.0.52
         with:
