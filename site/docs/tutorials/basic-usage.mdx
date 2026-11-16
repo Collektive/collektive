@@ -92,11 +92,11 @@ import it.unibo.collektive.stdlib.spreading.hopDistanceTo
 import it.unibo.collektive.stdlib.util.hops
 
 fun Aggregate<Int>.subnetDiameter(isSource: Boolean): Int {
-    // G: how many hops away from the source am I?
+    // spreading: how many hops away from the source am I?
     val distance = hopDistanceTo(isSource)
-    // C: the source collects the largest distance
+    // collection: the source collects the largest distance
     val farthest = convergeCast(local = distance, sink = isSource) { a, b -> maxOf(a, b) }
-    // G: the source shares it with everybody
+    // spreading: the source shares it with everybody
     return gradientCast(source = isSource, local = farthest, metric = hops().toDouble())
 }
 ```
