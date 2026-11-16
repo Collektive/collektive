@@ -15,9 +15,6 @@ please feel free to open an issue or fix them through a [PR](https://github.com/
 
 import {Card, CardGrid} from '@site/src/components/Cards';
 
-Collektive is a Kotlin Multiplatform framework for **aggregate programming**:
-you write one program for a whole network of devices, and Collektive turns it into what each device computes and sends.
-
 ## Start here
 
 <CardGrid columns={3}>
