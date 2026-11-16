@@ -10,6 +10,8 @@ Rounds are asynchronous, and device clocks are not synchronized.
 The blocks on this page let a collective reason about time anyway:
 measuring elapsed time, agreeing on a shared notion of time, and periodically refreshing computations
 that would otherwise never forget.
+Timers and replicated processes are the time-related blocks among the
+[self-organizing building blocks](overview.mdx#the-self-organizing-building-blocks).
 
 Time is passed to these functions as a parameter (a `kotlin.time.Instant`),
 so the same program works with wall-clock time on real devices and with simulated time in simulators.

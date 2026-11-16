@@ -8,7 +8,7 @@ description: "Distances and broadcasts: gradients, gradient-casts, and their sel
 
 *Spreading* blocks propagate information **outwards**, from one or more *sources* to the rest of the network,
 along shortest paths.
-They are the **G** of the [G-C-S building blocks](overview.mdx#the-self-organizing-building-blocks)
+They are one of the [self-organizing building blocks](overview.mdx#the-self-organizing-building-blocks)
 and the foundation of most aggregate programs: distances, broadcasts, regions, channels, and spanning trees all build on them.
 
 All functions live in `it.unibo.collektive.stdlib.spreading`.
@@ -147,9 +147,9 @@ The cost grows linearly with the number of sources: use it for a handful of well
 
 Spreading blocks are the starting point of most higher-level patterns:
 
-- **broadcast of a collected value** (G → C → G): see [Collection](collection.mdx#collect-and-share);
-- **regions** around elected leaders (S → G): broadcast the leader ID with `gradientCast(isLeader, localId, metric)`;
-- **channels** (G + G + G): see the [overview](overview.mdx#composition-patterns).
+- **broadcast of a collected value** (spreading → collection → spreading): see [Collection](collection.mdx#collect-and-share);
+- **regions** around elected leaders (leader election → spreading): broadcast the leader ID with `gradientCast(isLeader, localId, metric)`;
+- **channels** (three spreadings): see the [overview](overview.mdx#composition-patterns).
 
 ---
 

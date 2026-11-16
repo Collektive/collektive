@@ -43,24 +43,32 @@ e.g., `import it.unibo.collektive.stdlib.doubles.FieldedDoubles.plus`.
 
 ## The self-organizing building blocks
 
-Most collective behaviors can be built by composing three families of coordination operators[^1],
+Most collective behaviors can be built by composing a small set of coordination operators[^1][^2],
 each one self-stabilizing: given stable inputs, it converges to a correct result
 from any initial state, and repairs itself after changes.
+Three of them, together with branching, form the basis of the approach;
+higher-level blocks such as sparse choice are built on top of them.
 
-| Operator | Direction | Role | Collektive |
-|----------|-----------|------|------------|
-| **G** (gradient-cast) | outwards, from sources to the network | estimate distances, broadcast data along shortest paths | `distanceTo`, `gradientCast` |
-| **C** (converge-cast) | inwards, from the network to sinks | aggregate data along a spanning tree | `convergeCast`, `convergeSum`, `countDevices` |
-| **S** (sparse choice) | symmetry breaking | elect leaders, spaced according to a distance | `boundedElection` |
+| Block | Direction | Role | Collektive |
+|-------|-----------|------|------------|
+| [**Spreading**](spreading.mdx) | outwards, from sources to the network | estimate distances, broadcast data along shortest paths | `distanceTo`, `gradientCast` |
+| [**Collection**](collection.mdx) | inwards, from the network to sinks | aggregate data along a spanning tree | `convergeCast`, `convergeSum`, `countDevices` |
+| [**Time**](time-and-processes.mdx) | in time, locally | count down and expire timers, forget old information | `sharedTimeLeftTo`, `timeReplicated` |
+| [**Leader election**](gossip-and-leader-election.mdx#leader-election), built on spreading | symmetry breaking | elect leaders, spaced according to a distance | `boundedElection` |
+
+:::note Names in the literature
+In the aggregate programming literature, these blocks are often called by single letters:
+**G** (gradient-cast, i.e., spreading), **C** (converge-cast, i.e., collection), **T** (time decay), and **S** (sparse choice, i.e., leader election).
+:::
 
 To these, the library adds **gossip** (network-wide agreement without a designated source),
-and **time**-related blocks (shared clocks and periodically restarted processes).
+and further **time**-related blocks (shared clocks and replicated processes).
 
 ### Composition patterns
 
 Building blocks are designed to be chained: the output field of one is the input field of the next.
 
-**G → C → G: summarize and share.**
+**Spreading → collection → spreading: summarize and share.**
 Collect a value towards a sink, then broadcast the result back so that every device knows it.
 The following program makes *every* device know how many devices are in the network:
 
@@ -72,24 +80,24 @@ import it.unibo.collektive.stdlib.spreading.gradientCast
 import it.unibo.collektive.stdlib.util.hops
 
 fun Aggregate<Int>.networkSize(sink: Boolean): Int {
-    val count = countDevices(sink)                  // C: only the sink holds the total
-    return gradientCast(sink, count, hops().toDouble()) // G: broadcast the sink's value
+    val count = countDevices(sink)                  // collection: only the sink holds the total
+    return gradientCast(sink, count, hops().toDouble()) // spreading: broadcast the sink's value
 }
 ```
 
-**S → G → C → G: summarize per region.**
+**Leader election → summarize and share: summarize per region.**
 Replace the fixed sink with elected leaders, and the same program computes one result per region,
 recovering automatically if the leader fails or the network splits
 (see the [First Collektive Program](../../tutorials/first-collektive-program.mdx) tutorial).
 
 ```kotlin
 fun Aggregate<Int>.regionSize(radius: Int): Int {
-    val leader = boundedElection(bound = radius)  // S: one leader every ~radius hops
-    return networkSize(sink = leader == localId)  // G → C → G within each region
+    val leader = boundedElection(bound = radius)  // leader election: one leader every ~radius hops
+    return networkSize(sink = leader == localId)  // summarize and share within each region
 }
 ```
 
-**G + G + G: channel.**
+**Three spreadings: channel.**
 Combining two distances and a broadcast identifies a self-healing corridor between a source and a target:
 devices whose distance from the source plus the distance from the target does not exceed
 the source-target distance (plus some `width`).
@@ -143,3 +151,8 @@ A few conventions recur across the library; knowing them makes the signatures mu
 "Engineering Resilient Collective Adaptive Systems by Self-Stabilisation",
 ACM Transactions on Modeling and Computer Simulation, 28(2), 2018.
 [doi:10.1145/3177774](https://doi.org/10.1145/3177774)
+
+[^2]: J. Beal and M. Viroli,
+"Building blocks for aggregate programming of self-organising applications",
+IEEE International Conference on Self-Adaptive and Self-Organizing Systems Workshops (SASOW), 2014.
+[doi:10.1109/SASOW.2014.6](https://doi.org/10.1109/SASOW.2014.6)
