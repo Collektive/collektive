@@ -32,7 +32,7 @@ only code running in this scope can keep state across rounds or communicate.
 
 The mechanism matching each value received from a neighbor with the operator that must consume it,
 based on the operator's *path* in the program.
-Two devices are *aligned* on an operator if both evaluated it in their last round.
+A neighbor is *aligned* with the local device on an operator if it evaluated the same operator (same path) in its last round.
 See [Alignment](explanation/alignment.mdx).
 
 </Term>
@@ -53,7 +53,7 @@ communicate inside the branches.
 
 <Term name="Building block">
 
-A reusable, typically self-stabilizing, collective function: gradient-cast (G), converge-cast (C), sparse choice / leader election (S), …
+A reusable, typically self-stabilizing, collective function: spreading (gradient-cast), collection (converge-cast), leader election, time, …
 See the [standard library](explanation/standard-library/overview.mdx).
 
 </Term>
@@ -67,8 +67,9 @@ or on the `all` view (including it).
 
 <Term name="Compiler plugin">
 
-The Kotlin compiler plugin applied by the Collektive Gradle plugin: it injects alignment into aggregate code,
-and reports misuses of the DSL as compiler warnings and errors.
+The Kotlin compiler plugin applied by the Collektive Gradle plugin. It has two parts:
+in the compiler backend, it injects alignment into aggregate code;
+in the compiler frontend, it reports misuses of the DSL as compiler warnings and errors.
 See [The Compiler Plugin](explanation/compiler-plugin.mdx).
 
 </Term>
@@ -87,8 +88,8 @@ Aggregation of values *towards* a sink, along a spanning tree. See [Collection](
 
 <Term name="eXchange Calculus" aka="XC">
 
-The core calculus implemented by Collektive. It unifies state, neighbor interaction, and domain partitioning in the
-`exchange` primitive.
+The core calculus implemented by Collektive. It unifies state and neighbor interaction in the `exchange` primitive;
+together with branching (domain partitioning), it expresses all aggregate programs.
 
 </Term>
 

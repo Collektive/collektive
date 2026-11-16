@@ -7,10 +7,8 @@ import {Card, CardGrid} from '@site/src/components/Cards';
 
 # What is Collektive?
 
-Collektive is an open-source framework for **aggregate programming** in Kotlin:
-it lets you program a whole collective of devices (sensors, robots, smartphones, vehicles, servers)
-as a single entity, and takes care of turning that collective program into the local behavior
-and the messages of each device.
+Collektive is an open-source framework designed to simplify the development of resilient and
+scalable distributed systems through the principles of Aggregate Programming.
 
 ---
 
@@ -18,16 +16,17 @@ and the messages of each device.
 
 Large-scale distributed systems, such as IoT deployments, robot swarms, or smart-city infrastructures,
 are made of many devices that operate autonomously but must collectively achieve global goals,
-often without reliable infrastructure, central servers, or stable connectivity.
+often while the system keeps evolving and devices dynamically fail, join or leave the network.
 Programming them device by device forces developers to bridge the gap between local rules and global behavior by hand.
 
-Aggregate programming bridges this gap by construction:
-programs describe how *computational fields* (values spread over the network) are created, combined, and evolved,
-and the resulting behavior is
+Aggregate programming addresses this gap by letting developers program the collective as a whole:
+programs describe how *computational fields* (maps from devices to values) are created, combined, and evolved over time,
+and every device runs the same program, interacting only with its neighbors.
+Programs built from self-stabilizing building blocks are
 
-- **self-organizing**: global coordination emerges from local interactions, without central control;
-- **resilient**: programs keep working, and repair themselves, when devices fail, move, or change their inputs;
-- **scalable**: devices only interact with their neighbors, regardless of the size of the system.
+- **self-organizing**: the specified global behavior is achieved through local interactions alone, without central control;
+- **resilient**: when devices fail, move, or change their inputs, the system automatically re-converges to the correct result once changes settle;
+- **scalable**: each device only communicates with its neighbors, so its cost depends on the neighborhood, not on the size of the whole system.
 
 See [Building Resilient Systems with Aggregate Programming](../explanation/aggregate-programming.mdx) for an introduction to the paradigm.
 
