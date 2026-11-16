@@ -27,17 +27,17 @@ and let each device run its part.
 **Aggregate programming**[^1] is a macroprogramming approach that does exactly that.
 The programmer describes the collective behavior as a composition of reusable *collective* functions,
 and the framework turns it into the local behavior and the messages of each device.
-The resulting systems are:
+Programs built from self-stabilizing building blocks (see below) are:
 
 <CardGrid columns={3}>
   <Card icon="sitemap" title="Self-organizing">
-    Global coordination emerges from local interactions, without central control.
+    The specified global behavior is achieved through local interactions alone, without central control.
   </Card>
   <Card icon="shield" title="Resilient">
-    Failures and topology changes are repaired automatically: programs are self-stabilizing.
+    After failures and topology changes, the system re-converges to the correct result: programs are self-stabilizing.
   </Card>
   <Card icon="layers" title="Scalable">
-    Devices only talk to their neighbors: the same program runs on ten devices or ten thousand.
+    Devices only talk to their neighbors: per-device cost depends on the neighborhood, not on the size of the system.
   </Card>
 </CardGrid>
 
@@ -49,8 +49,9 @@ whatever state it starts from: the effects of a disruption eventually vanish, wi
 Aggregate programming has its formal roots in the *field calculus*[^3],
 a minimal functional language in which programs manipulate *computational fields*:
 values spread over the devices of the network, and evolving over time.
-Its latest evolution, the *eXchange Calculus*[^6] (XC), unifies state, communication with the neighbors, and domain partitioning
-in a single primitive, `exchange`. XC is the calculus implemented by Collektive (see [Aggregate Operators](dsl-descriptions.mdx)).
+Its latest evolution, the *eXchange Calculus*[^6] (XC), unifies state and communication with the neighbors
+(the `rep`, `nbr`, and `share` constructs of the field calculus) in a single primitive, `exchange`,
+while domain partitioning is obtained through branching. XC is the calculus implemented by Collektive (see [Aggregate Operators](dsl-descriptions.mdx)).
 
 On top of these primitives, aggregate programming provides *building blocks*[^7]:
 self-stabilizing collective functions that recur in most applications.

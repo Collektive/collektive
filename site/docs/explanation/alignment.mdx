@@ -74,13 +74,14 @@ Collektive provides **strong**, **transparent**, **compile-time** alignment:
   surrounding it), not just the position of the aggregate operators.
   Two structurally identical computations like `min(neighboring(x))` and `max(neighboring(x))` do not mix up their messages.
 
-The compiler plugin visits each function that operates on an `Aggregate` and:
+Alignment is injected by the backend part of the [compiler plugin](compiler-plugin.mdx#alignment-backend),
+which visits each function that operates on an `Aggregate` in two steps:
 
-1. wraps every call to an aggregate function (any function with an `Aggregate` receiver or parameter) in an alignment scope,
-   identified by the function signature plus a progressive counter for repeated calls in the same scope;
-2. wraps every `if`/`when` branch whose body involves aggregate computations in a scope identified by the branch outcome;
-3. descends into lambdas passed to aggregate functions, so that higher-order code is aligned according to the context in which the lambda is invoked;
-4. **projects** the fields captured from outer scopes (see [below](#field-projection)).
+1. it **projects** the fields captured from outer scopes (see [below](#field-projection));
+2. it wraps in an alignment scope every call to an aggregate function (any function with an `Aggregate` receiver or parameter),
+   identified by the function name and type arguments plus a progressive counter for repeated calls in the same scope,
+   and every `if`/`when` branch whose body involves aggregate computations, identified by the branch outcome;
+   it also descends into lambdas passed to aggregate functions, so that higher-order code is aligned according to the context in which the lambda is invoked.
 
 For example, this function:
 
@@ -194,7 +195,7 @@ When you just need to *select* a value (what field calculus calls `mux`), comput
 ### Branches cannot return fields
 
 Since fields are projected inside branches, a branch returning a `Field` would produce a field defined on a partial domain.
-The plugin rejects it at compile time:
+The [static analysis](compiler-plugin.mdx#branch-returns-field) of the compiler plugin rejects it at compile time:
 
 <DoDont>
 <Dont label="compile-time error: this branch returns a Field">
@@ -243,7 +244,7 @@ With the default path representation, pivots must be hashable values:
 `Boolean`, numbers, `Char`, `String`, `Uuid`, `null`, or pairs, triples, collections, and maps of them.
 To align on your own data classes, align on one of their identifying properties.
 
-The plugin [warns](compiler-plugin.mdx#aggregate-in-loop) when it detects an aggregate call inside a `for`/`while` loop without `alignedOn`.
+The [static analysis](compiler-plugin.mdx#aggregate-in-loop) of the compiler plugin warns when it detects an aggregate call inside a `for`/`while` loop without `alignedOn`.
 Calls inside lambdas of collection operations (`map`, `forEach`, …) are not detected:
 if you forget `alignedOn` there, Collektive fails at runtime with an `AlignmentClashException`.
 
@@ -254,10 +255,11 @@ Never call `align`/`dealign` directly: they are low-level primitives used by the
 
 ## Compiler diagnostics
 
-Besides injecting alignment, the plugin checks the code for common misuses of the DSL,
+Alignment is not the only job of the compiler plugin: a separate part of it, running in the compiler frontend,
+checks the code for common misuses of the DSL,
 such as aggregate calls in loops without `alignedOn` or branches returning fields,
 and reports them as compiler warnings and errors.
-See [The Compiler Plugin](compiler-plugin.mdx) for the list.
+See [The Compiler Plugin](compiler-plugin.mdx#static-analysis-frontend) for the list, and for how to see them in IntelliJ IDEA.
 
 ## Opting out: `@CollektiveIgnore`
 

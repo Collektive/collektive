@@ -50,7 +50,7 @@ Most standard library functions are written this way.
 | [`if` / `when`](alignment.mdx#branches-partition-the-network) | branch | – | – | partition the network into sub-collectives |
 | [`alignedOn`](alignment.mdx#loops-and-alignedon) | `align` | – | – | align computations explicitly (e.g., in loops) |
 
-`exchange` is the most general construct: all the others (except branching) can be expressed through it.
+`exchange` is the most general construct: `evolve`, `neighboring`, and `share` can all be expressed through it.
 Prefer the most specific one that fits your needs: it communicates the intent, and it is often cheaper.
 
 ### The `-ing` variants and `yielding`

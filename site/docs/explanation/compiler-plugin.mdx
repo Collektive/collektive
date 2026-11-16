@@ -1,7 +1,7 @@
 ---
 title: The Compiler Plugin
 sidebar_position: 5.5
-description: "Alignment at compile time, and the warnings and errors that catch misuses of the DSL."
+description: "The two parts of the compiler plugin: alignment injection (backend) and static analysis of the DSL (frontend), and how to see its diagnostics in IntelliJ IDEA."
 ---
 
 import {Mistake, DoDont, Do, Dont, Explanation, Diagnostic, MistakeIndex} from '@site/src/components/Mistakes';
@@ -15,23 +15,49 @@ It cannot know that two calls to `neighboring` must not share a path,
 that a branch is a partition of the network, or that a loop around `share` makes messages collide.
 
 The Collektive **compiler plugin** teaches these rules to the compiler.
-It is applied automatically by the Collektive Gradle plugin (see [Getting Started](../tutorials/getting-started.mdx#compiler-plugin-setup)),
-and works in two phases of the compilation:
+It is applied automatically by the Collektive Gradle plugin (see [Getting Started](../tutorials/getting-started.mdx#compiler-plugin-setup))
+to every Kotlin compilation, and it is made of two independent parts, hooked into two different phases of the Kotlin compiler:
 
-- in the **backend**, it rewrites the code to inject **alignment**: every aggregate call, branch, and lambda gets its own path,
-  and fields captured from outer scopes are projected.
-  This is what makes Collektive programs correct, and it is described in [Alignment and Domain Partitioning](alignment.mdx);
-- in the **frontend**, it performs **static analysis**: it inspects the code while it is being type-checked,
-  and reports the uses of the DSL that are wrong, or that work but are probably not what you meant.
+| | Alignment | Static analysis |
+|---|---|---|
+| **Compiler phase** | backend (IR) | frontend (FIR, K2) |
+| **What it does** | rewrites the code, injecting the alignment of aggregate calls and branches | inspects the code, and reports misuses of the DSL as warnings and errors |
+| **Required?** | yes: without it, programs fail at runtime | no: it helps you write correct code, but programs work without it |
+| **Where you see it** | nowhere: it only changes the compiled code | in the build output and, once enabled, in the IDE |
 
-This page is about the second part.
+## Alignment (backend)
 
-## Diagnostics like any other
+The backend part of the plugin implements **strong, transparent, compile-time** alignment:
+alignment tokens are derived from the code while compiling it, they encode the semantic context of each call,
+and you never have to annotate anything (see [How Collektive computes paths](alignment.mdx#how-collektive-computes-paths)).
 
-The checks of the plugin run inside the Kotlin compiler, as checkers of its K2 frontend,
-so their results are ordinary compiler diagnostics: they appear in the output of the Gradle build, point to the exact call,
-and can be shown by the IDE next to the code.
-Each one explains what is wrong and suggests a fix.
+It works on the intermediate representation (IR) produced by the compiler frontend, and visits every aggregate function
+(any function with an `Aggregate` receiver or parameter) in two strictly ordered steps:
+
+1. **Field projection.** Every operation on a `Field` captured from an outer scope is wrapped in a call to `project`,
+   which restricts the field to the neighbors aligned in the current context
+   (a branch, an `alignedOn` block): see [Field projection](alignment.mdx#field-projection).
+2. **Code alignment.** Every call to an aggregate function, every access to a declaration that captures the aggregate context,
+   and every branch involving aggregate computations is wrapped in an `align`/`dealign` pair.
+   Calls are identified by the function name and type arguments, plus a progressive counter for repeated calls in the same scope;
+   branches by the outcome of the condition (`true` or `false`).
+   Lambdas passed to aggregate functions are visited too, so that higher-order code is aligned according to the context
+   in which the lambda is invoked.
+
+Projection comes first so that the alignment scopes injected by the second step do not cause unnecessary projections.
+At runtime, devices only enter and leave these pre-computed scopes.
+The result is described, with examples of the transformed code, in [Alignment and Domain Partitioning](alignment.mdx).
+
+There is nothing to configure: the alignment is always injected when the plugin is applied,
+and it does not depend on the static analysis.
+
+## Static analysis (frontend)
+
+The frontend part of the plugin consists of a set of checkers of the K2 frontend (FIR):
+while the code is being type-checked, they report the uses of the DSL that are wrong,
+or that work but are probably not what you meant.
+Their results are ordinary compiler diagnostics: they point to the exact call,
+and each one explains what is wrong and suggests a fix.
 
 ```text
 w: file:///…/Example.kt:12:71 Aggregate function 'neighboring' is called inside a loop without explicit alignment.
@@ -42,6 +68,28 @@ Wrap the function call using 'alignedOn' with a unique key to ensure consistent 
 There is one **error**, for code that cannot be aligned correctly, and several **warnings**,
 for code that is legal but suspicious or inefficient.
 Warnings can be silenced, and turned into errors, like any other Kotlin warning (see [below](#silencing-a-diagnostic)).
+
+### Seeing the diagnostics
+
+**In the build.** The checks run in every compilation of a project where the plugin is applied:
+the diagnostics appear in the output of the Gradle build (`./gradlew build`), and fail it in case of errors.
+No configuration is needed.
+
+**In IntelliJ IDEA.** In K2 mode, the IDE only loads the compiler plugins bundled with Kotlin,
+so the Collektive diagnostics are not shown in the editor by default.
+To enable them:
+
+1. make sure the IDE runs in K2 mode (*Settings → Languages & Frameworks → Kotlin → Enable K2 mode*);
+2. open the registry (*Help → Find Action…*, then type `Registry…`);
+3. disable `kotlin.k2.only.bundled.compiler.plugins.enabled`;
+4. restart the IDE and reload the Gradle project.
+
+The diagnostics are then highlighted while you type, as any other Kotlin warning or error.
+The IDE runs the plugin with its own Kotlin compiler:
+if the IDE Kotlin version is far from the one Collektive is built with, the plugin may fail to load in the editor.
+The Gradle build is not affected, and remains the reference.
+
+### What is checked
 
 Checks only apply to aggregate code: functions with an `Aggregate` receiver or parameter, and the lambdas they run.
 
@@ -61,7 +109,7 @@ Checks only apply to aggregate code: functions with an `Aggregate` receiver or p
   ]},
 ]} />
 
-## The checks
+## The checks of the static analysis
 
 <Mistake>
 
@@ -343,14 +391,14 @@ They can be handled like any other Kotlin warning:
 fun Aggregate<Int>.benchmark(): Field<Int, Int> = neighboring(1)
 ```
 
-## Limits
+## Limits of the static analysis
 
 Static analysis on a general-purpose language can never be complete.
 The checks recognize the most common shapes of each mistake, and stay silent when they are not sure,
 so that warnings are rarely false alarms.
 The price is that some mistakes slip through: for instance, aggregate calls in collection lambdas (see [above](#aggregate-in-loop)),
 or an `evolve` whose state reaches `neighboring` through an expression rather than a variable.
-Alignment itself, on the other hand, never depends on these checks: it is always injected by the backend.
+Alignment, on the other hand, never depends on these checks: it is always injected by the backend part of the plugin.
 
 :::info Background
 The static analysis of the plugin was designed and developed in the master's thesis
