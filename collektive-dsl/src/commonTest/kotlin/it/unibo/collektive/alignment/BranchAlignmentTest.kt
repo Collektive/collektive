@@ -12,6 +12,7 @@ import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.exchange
+import it.unibo.collektive.aggregate.api.field.alignedMapValues
 import it.unibo.collektive.aggregate.api.mapNeighborhood
 import it.unibo.collektive.aggregate.api.neighborhood
 import it.unibo.collektive.aggregate.api.neighboring
@@ -121,7 +122,7 @@ class BranchAlignmentTest {
         val neighborsBeforeRestriction = field.neighbors.size
         assertTrue(localId == 0 || neighborsBeforeRestriction > 0)
         // Map the pivots to the number of neighbors that are pivoting on the same value
-        val expectations = mapNeighborhood(pivot).neighbors.values.list.groupBy { it }.mapValues { it.value.size }
+        val expectations = mapNeighborhood(0, pivot).neighbors.values.list.groupBy { it }.mapValues { it.value.size }
         alignedOn(pivot(localId)) {
             val neighborsAfterRestriction = neighborhood().neighbors.size
             val restrictedField = field.neighbors.size

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -39,5 +39,5 @@ inline fun <ID : Any, T> Field<ID, T>.replaceMatchingValues(
  */
 inline fun <ID : Any, T> Field<ID, T>.replaceMatching(
     replacement: T,
-    crossinline predicate: Predicate<FieldEntry<ID, T>>,
+    crossinline predicate: Predicate<FieldEntry<ID?, T>>,
 ): Field<ID, T> = map { (id, value) -> if (predicate(FieldEntry(id, value))) replacement else value }

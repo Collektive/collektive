@@ -13,6 +13,7 @@ config:
     import it.unibo.collektive.aggregate.api.share
     import it.unibo.collektive.aggregate.api.sharing
     import it.unibo.collektive.aggregate.*
+    import it.unibo.collektive.aggregate.api.field.*
     import it.unibo.collektive.stdlib.collapse.*
 
 parameters:

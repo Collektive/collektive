@@ -8,6 +8,7 @@
 package it.unibo.collektive.test
 
 import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.api.field.alignedMapValues
 import it.unibo.collektive.aggregate.api.neighboring
 import kotlin.random.Random
 
