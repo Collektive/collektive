@@ -1,3 +1,23 @@
+## [30.0.0](https://github.com/Collektive/collektive/compare/29.0.0...30.0.0) (2026-11-18)
+
+### ⚠ BREAKING CHANGES
+
+* **dsl:** rework alignment paths and require an explicit PerformanceProfile (#1730)
+
+### Dependency updates
+
+* **deps:** update dependency it.unibo.alchemist:alchemist to v50.0.4 ([d379a3e](https://github.com/Collektive/collektive/commit/d379a3e7b09e3c282328ddfa2fd2cfecc4b006b2))
+* **deps:** update plugin kotlin-qa to v1.10.2 ([44c19bc](https://github.com/Collektive/collektive/commit/44c19bcf5d68c3bc40a6fe00b5889357cc067a1d))
+
+### Build and continuous integration
+
+* always perform a dry-run in CI to relieve some weight from Central ([#1728](https://github.com/Collektive/collektive/issues/1728)) ([58e236d](https://github.com/Collektive/collektive/commit/58e236db53805652d684dbf67fc24d4ba859882b))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v4.0.52 ([e1e1ee3](https://github.com/Collektive/collektive/commit/e1e1ee326243160560c2344ebe30975baf00abbe))
+
+### Refactoring
+
+* **dsl:** rework alignment paths and require an explicit PerformanceProfile ([#1730](https://github.com/Collektive/collektive/issues/1730)) ([942b76d](https://github.com/Collektive/collektive/commit/942b76d939ab049d940847ea0515bf65fdc4c9ee))
+
 ## [29.0.0](https://github.com/Collektive/collektive/compare/28.3.9...29.0.0) (2026-11-15)
 
 ### ⚠ BREAKING CHANGES
