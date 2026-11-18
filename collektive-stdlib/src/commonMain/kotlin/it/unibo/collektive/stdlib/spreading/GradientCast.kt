@@ -189,10 +189,8 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
                 else -> pathCoherence<Distance, ID, Value>(nonLoopingPaths)
             }
         val bestLazyList = best.map { lazy { it } }.toList()
-        // neighbor == null is the field default, sent to neighbors we have not heard from yet.
-        // It must not be filtered by the last hop: a source has no hops, and would otherwise send null.
         mapNeighborhood { neighbor ->
-            bestLazyList.firstOrNull { neighbor == null || it.value.hops.lastOrNull() != neighbor }?.value
+            bestLazyList.firstOrNull { it.value.hops.lastOrNull() != neighbor }?.value
         }
     }.local.value?.data ?: local
 }
