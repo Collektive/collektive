@@ -8,10 +8,12 @@
 
 package it.unibo.collektive.stdlib.test
 
+import it.unibo.collektive.aggregate.alignment.PerformanceProfile
 import it.unibo.collektive.stdlib.spreading.gossipMax
 import it.unibo.collektive.stdlib.spreading.gossipMin
 import it.unibo.collektive.stdlib.spreading.nonStabilizingGossip
 import it.unibo.collektive.testing.Environment
+import it.unibo.collektive.testing.forEachPerformanceProfile
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -24,8 +26,8 @@ class GossipTest {
 
     private fun <Value> Environment<Value>.gossipResult(): Value = status().values.distinct().first()
 
-    private fun squareMooreGridWithGossip(size: Int, max: Boolean = true) =
-        mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }) { _ ->
+    private fun squareMooreGridWithGossip(size: Int, performanceProfile: PerformanceProfile, max: Boolean = true) =
+        mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }, performanceProfile) { _ ->
             if (max) {
                 gossipMax(localId) // gossip the max localID in the network
             } else {
@@ -40,8 +42,8 @@ class GossipTest {
             }
         }
 
-    private fun linearMooreGridWithGossip(size: Int, max: Boolean = true) =
-        mooreGrid<Int>(size, 1, { _, _ -> Int.MAX_VALUE }) { _ ->
+    private fun linearMooreGridWithGossip(size: Int, performanceProfile: PerformanceProfile, max: Boolean = true) =
+        mooreGrid<Int>(size, 1, { _, _ -> Int.MAX_VALUE }, performanceProfile) { _ ->
             if (max) {
                 gossipMax(localId) // gossip the max localID in the network
             } else {
@@ -56,8 +58,8 @@ class GossipTest {
             }
         }
 
-    private fun squareMooreGridWithNonSelfStabilizingGossip(size: Int) =
-        mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }) { _ ->
+    private fun squareMooreGridWithNonSelfStabilizingGossip(size: Int, performanceProfile: PerformanceProfile) =
+        mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }, performanceProfile) { _ ->
             nonStabilizingGossip(localId) { first, second -> if (first >= second) first else second }
         }.apply {
             assertEquals(size * size, nodes.size)
@@ -69,9 +71,9 @@ class GossipTest {
         }
 
     @Test
-    fun `gossipMax in a square moore grid stabilizes after 2 reverse cycles`() {
+    fun `gossipMax in a square moore grid stabilizes after 2 reverse cycles`() = forEachPerformanceProfile { profile ->
         val size = 5
-        val environment: Environment<Int> = squareMooreGridWithGossip(size)
+        val environment: Environment<Int> = squareMooreGridWithGossip(size, profile)
         environment.cycleInOrder()
         val firstRound = environment.status()
         assertEquals(size * size, firstRound.values.distinct().size)
@@ -83,53 +85,55 @@ class GossipTest {
     }
 
     @Test
-    fun `gossipMax in the best case stabilizes in one cycle`() {
+    fun `gossipMax in the best case stabilizes in one cycle`() = forEachPerformanceProfile { profile ->
         val size = 5
-        val environment: Environment<Int> = squareMooreGridWithGossip(size)
+        val environment: Environment<Int> = squareMooreGridWithGossip(size, profile)
         environment.cycleInReverseOrder()
         assertTrue(environment.gossipIsStable())
         assertEquals(24, environment.gossipResult())
     }
 
     @Test
-    fun `gossipMax in the worst case stabilizes in the network diameter cycles`() {
-        val size = 10
-        val environment: Environment<Int> = linearMooreGridWithGossip(size)
-        repeat(size - 1) {
+    fun `gossipMax in the worst case stabilizes in the network diameter cycles`() =
+        forEachPerformanceProfile { profile ->
+            val size = 10
+            val environment: Environment<Int> = linearMooreGridWithGossip(size, profile)
+            repeat(size - 1) {
+                environment.cycleInOrder()
+                assertFalse(environment.gossipIsStable())
+            }
             environment.cycleInOrder()
-            assertFalse(environment.gossipIsStable())
+            assertTrue(environment.gossipIsStable())
+            assertEquals(9, environment.gossipResult())
         }
-        environment.cycleInOrder()
-        assertTrue(environment.gossipIsStable())
-        assertEquals(9, environment.gossipResult())
-    }
 
     @Test
-    fun `gossipMin in the best case stabilizes in one cycle`() {
+    fun `gossipMin in the best case stabilizes in one cycle`() = forEachPerformanceProfile { profile ->
         val size = 5
-        val environment: Environment<Int> = squareMooreGridWithGossip(size, max = false)
+        val environment: Environment<Int> = squareMooreGridWithGossip(size, profile, max = false)
         environment.cycleInOrder()
         assertTrue(environment.gossipIsStable())
         assertEquals(0, environment.gossipResult())
     }
 
     @Test
-    fun `gossipMin in the worst case stabilizes in the network diameter cycles`() {
-        val size = 10
-        val environment: Environment<Int> = linearMooreGridWithGossip(size, max = false)
-        repeat(size - 1) {
-            environment.cycleInReverseOrder()
-            assertFalse(environment.gossipIsStable())
+    fun `gossipMin in the worst case stabilizes in the network diameter cycles`() =
+        forEachPerformanceProfile { profile ->
+            val size = 10
+            val environment: Environment<Int> = linearMooreGridWithGossip(size, profile, max = false)
+            repeat(size - 1) {
+                environment.cycleInReverseOrder()
+                assertFalse(environment.gossipIsStable())
+            }
+            environment.cycleInOrder()
+            assertTrue(environment.gossipIsStable())
+            assertEquals(0, environment.gossipResult())
         }
-        environment.cycleInOrder()
-        assertTrue(environment.gossipIsStable())
-        assertEquals(0, environment.gossipResult())
-    }
 
     @Test
-    fun `gossipMin in a square moore grid stabilizes after 2 reverse cycles`() {
+    fun `gossipMin in a square moore grid stabilizes after 2 reverse cycles`() = forEachPerformanceProfile { profile ->
         val size = 5
-        val environment: Environment<Int> = squareMooreGridWithGossip(size, max = false)
+        val environment: Environment<Int> = squareMooreGridWithGossip(size, profile, max = false)
         environment.cycleInReverseOrder()
         val firstRound = environment.status()
         assertEquals(size * size, firstRound.values.distinct().size)
@@ -141,17 +145,18 @@ class GossipTest {
     }
 
     @Test
-    fun `non-self-stabilizing gossip should not update the best value when it drops from the network`() {
-        val size = 5
-        val environment: Environment<Int> = squareMooreGridWithNonSelfStabilizingGossip(size)
-        repeat(size) {
-            environment.cycleInReverseOrder()
+    fun `non-self-stabilizing gossip should not update the best value when it drops from the network`() =
+        forEachPerformanceProfile { profile ->
+            val size = 5
+            val environment: Environment<Int> = squareMooreGridWithNonSelfStabilizingGossip(size, profile)
+            repeat(size) {
+                environment.cycleInReverseOrder()
+            }
+            val maxId = environment.nodes.maxBy { it.id }.id
+            environment.status().forEach { (_, value) -> assertEquals(maxId, value) }
+            repeat(size) {
+                environment.nodes.drop(maxId).forEach { n -> n.cycle() }
+            }
+            environment.status().forEach { (_, value) -> assertEquals(maxId, value) }
         }
-        val maxId = environment.nodes.maxBy { it.id }.id
-        environment.status().forEach { (_, value) -> assertEquals(maxId, value) }
-        repeat(size) {
-            environment.nodes.drop(maxId).forEach { n -> n.cycle() }
-        }
-        environment.status().forEach { (_, value) -> assertEquals(maxId, value) }
-    }
 }

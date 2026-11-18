@@ -8,14 +8,17 @@
 
 package it.unibo.collektive.testing
 
+import it.unibo.collektive.aggregate.alignment.PerformanceProfile
 import it.unibo.collektive.aggregate.api.Aggregate
 import kotlin.random.Random
 
 /**
  * An environment with a set of [nodes] with a [defaultRetainTime] mapped into positions,
  * which are considered connected if the [areConnected] function returns true for them.
+ * Nodes build their alignment stacks according to the [performanceProfile].
  */
 open class Environment<R>(
+    val performanceProfile: PerformanceProfile,
     val defaultRetainTime: Int = 1,
     val areConnected: (Environment<R>, Node<R>, Node<R>) -> Boolean = { _, _, _ -> true },
 ) {
@@ -42,7 +45,7 @@ open class Environment<R>(
         retainTime: Int = defaultRetainTime,
         program: Aggregate<Int>.(environment: Environment<R>) -> R,
     ) {
-        positions[Node(this, nextId++, initial, retainTime, program)] = position
+        positions[Node(this, nextId++, initial, performanceProfile, retainTime, program)] = position
     }
 
     /**

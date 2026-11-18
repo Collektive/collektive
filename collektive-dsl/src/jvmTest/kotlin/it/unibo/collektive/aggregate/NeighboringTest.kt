@@ -9,9 +9,11 @@
 package it.unibo.collektive.aggregate
 
 import it.unibo.collektive.Collektive.Companion.aggregate
+import it.unibo.collektive.aggregate.alignment.PerformanceProfile
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.testing.Environment
+import it.unibo.collektive.testing.forEachPerformanceProfile
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.test.Test
 import kotlin.test.assertContains
@@ -20,73 +22,81 @@ import kotlin.test.assertTrue
 
 class NeighboringTest {
 
-    private fun mooreGrid(size: Int, program: Aggregate<Int>.(Environment<Map<Int, Int>>) -> Map<Int, Int>) =
-        mooreGrid(size, size, emptyMap(), program).also {
-            assertEquals(size * size, it.nodes.size)
-        }
-
-    @Test
-    fun `neighboring must produce a field with the local value when no neighbours are present`() {
-        aggregate(0) {
-            val field = neighboring(1)
-            assertContains(field.all.toMap().values, 1)
-            assertEquals(1, field.local.value)
-        }
+    private fun mooreGrid(
+        size: Int,
+        profile: PerformanceProfile,
+        program: Aggregate<Int>.(Environment<Map<Int, Int>>) -> Map<Int, Int>,
+    ) = mooreGrid(size, size, emptyMap(), performanceProfile = profile, program = program).also {
+        assertEquals(size * size, it.nodes.size)
     }
 
     @Test
-    fun `optimized neighboring must produce a field with the local value when no neighbours are present`() {
-        aggregate(0) {
-            val field = neighboring(1)
-            assertContains(field.all.toMap().values, 1)
-            assertEquals(1, field.local.value)
+    fun `neighboring must produce a field with the local value when no neighbours are present`() =
+        forEachPerformanceProfile { profile ->
+            aggregate(0, performanceProfile = profile) {
+                val field = neighboring(1)
+                assertContains(field.all.toMap().values, 1)
+                assertEquals(1, field.local.value)
+            }
         }
-    }
 
-    private fun envWithNeihboring1(size: Int) = mooreGrid(size) { _ ->
+    @Test
+    fun `optimized neighboring must produce a field with the local value when no neighbours are present`() =
+        forEachPerformanceProfile { profile ->
+            aggregate(0, performanceProfile = profile) {
+                val field = neighboring(1)
+                assertContains(field.all.toMap().values, 1)
+                assertEquals(1, field.local.value)
+            }
+        }
+
+    private fun envWithNeihboring1(size: Int, profile: PerformanceProfile) = mooreGrid(size, profile) { _ ->
         val n = 1
         neighboring(n).all.toMap()
     }
 
     @Test
-    fun `neighboring should build a field containing the values of the aligned neighbors`() {
-        val size = 5
-        val environment = envWithNeihboring1(size)
-        repeat(size - 1) {
-            environment.cycleInOrder()
+    fun `neighboring should build a field containing the values of the aligned neighbors`() =
+        forEachPerformanceProfile { profile ->
+            val size = 5
+            val environment = envWithNeihboring1(size, profile)
+            repeat(size - 1) {
+                environment.cycleInOrder()
+            }
+            environment.status().forEach { (id, field) ->
+                assertEquals(1, field[id])
+                assertTrue(field.all { it.value == 1 })
+            }
         }
-        environment.status().forEach { (id, field) ->
-            assertEquals(1, field[id])
-            assertTrue(field.all { it.value == 1 })
-        }
-    }
 
     @Test
-    fun `optimized neighboring should build a field containing the values of the aligned neighbors`() {
-        val size = 10
-        val environment = envWithNeihboring1(size)
-        repeat(size - 1) {
-            environment.cycleInOrder()
+    fun `optimized neighboring should build a field containing the values of the aligned neighbors`() =
+        forEachPerformanceProfile { profile ->
+            val size = 10
+            val environment = envWithNeihboring1(size, profile)
+            repeat(size - 1) {
+                environment.cycleInOrder()
+            }
+            environment.status().forEach { (id, field) ->
+                assertEquals(1, field[id])
+                assertTrue(field.all { it.value == 1 })
+            }
         }
-        environment.status().forEach { (id, field) ->
-            assertEquals(1, field[id])
-            assertTrue(field.all { it.value == 1 })
-        }
-    }
 
-    private fun envWithTwoNeighboringOpsInBranch(size: Int, condition: (Int) -> Boolean) = mooreGrid(size) { _ ->
-        val kingValue = 1
-        val queenValue = 2
-        fun kingBehavior() = neighboring(kingValue)
-        fun queenBehavior() = neighboring(queenValue)
-        if (condition(localId)) kingBehavior().all.toMap() else queenBehavior().all.toMap()
-    }
+    private fun envWithTwoNeighboringOpsInBranch(size: Int, profile: PerformanceProfile, condition: (Int) -> Boolean) =
+        mooreGrid(size, profile) { _ ->
+            val kingValue = 1
+            val queenValue = 2
+            fun kingBehavior() = neighboring(kingValue)
+            fun queenBehavior() = neighboring(queenValue)
+            if (condition(localId)) kingBehavior().all.toMap() else queenBehavior().all.toMap()
+        }
 
     @Test
-    fun `only aligned devices should communicate each other`() {
+    fun `only aligned devices should communicate each other`() = forEachPerformanceProfile { profile ->
         val size = 2
         val condition: (Int) -> Boolean = { it % 2 == 0 }
-        val environment = envWithTwoNeighboringOpsInBranch(size, condition)
+        val environment = envWithTwoNeighboringOpsInBranch(size, profile, condition)
         repeat(size - 1) {
             environment.cycleInOrder()
         }
@@ -102,17 +112,18 @@ class NeighboringTest {
     }
 
     @Test
-    fun `only aligned devices should communicate each other with optimized neighboring`() {
-        val size = 4
-        val condition: (Int) -> Boolean = { it % 2 == 0 }
-        val environment = envWithTwoNeighboringOpsInBranch(size, condition)
-        repeat(size - 1) {
-            environment.cycleInOrder()
+    fun `only aligned devices should communicate each other with optimized neighboring`() =
+        forEachPerformanceProfile { profile ->
+            val size = 4
+            val condition: (Int) -> Boolean = { it % 2 == 0 }
+            val environment = envWithTwoNeighboringOpsInBranch(size, profile, condition)
+            repeat(size - 1) {
+                environment.cycleInOrder()
+            }
+            environment.status().forEach { (id, field) ->
+                val expectedValue = if (condition(id)) 1 else 2
+                assertEquals(expectedValue, field[id])
+                assertTrue(field.all { it.value == expectedValue })
+            }
         }
-        environment.status().forEach { (id, field) ->
-            val expectedValue = if (condition(id)) 1 else 2
-            assertEquals(expectedValue, field[id])
-            assertTrue(field.all { it.value == expectedValue })
-        }
-    }
 }

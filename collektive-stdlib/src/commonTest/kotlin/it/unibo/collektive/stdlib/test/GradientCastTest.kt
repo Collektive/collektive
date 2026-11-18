@@ -8,6 +8,7 @@
 package it.unibo.collektive.stdlib.test
 
 import it.unibo.collektive.Collektive.Companion.aggregate
+import it.unibo.collektive.aggregate.alignment.PerformanceProfile
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.stdlib.spreading.bellmanFordGradientCast
@@ -19,6 +20,8 @@ import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.EnvironmentWithMeshNetwork
 import it.unibo.collektive.testing.Position
 import it.unibo.collektive.testing.SerializingMailbox
+import it.unibo.collektive.testing.forEachPerformanceProfile
+import it.unibo.collektive.testing.serializablePerformanceProfiles
 import it.unibo.collektive.testing.vonNeumannGrid
 import kotlin.math.abs
 import kotlin.math.min
@@ -32,9 +35,9 @@ import kotlin.test.assertTrue
 class GradientCastTest {
 
     @Test
-    fun `GradientPath is serializable`() {
+    fun `GradientPath is serializable`() = forEachPerformanceProfile(serializablePerformanceProfiles) { profile ->
         val network = SerializingMailbox()
-        aggregate(0, network) {
+        aggregate(0, network, performanceProfile = profile) {
             neighboring(PathValue(0, 0, emptyList<String>()))
             neighboring(PathValue(0, 0, listOf(1, 2, 3)))
         }
@@ -42,21 +45,25 @@ class GradientCastTest {
     }
 
     /**
+     * @param performanceProfile the performance profile shared by all the nodes
      * @param program an aggregate program that can access the environment and the y coordinate of the node
      */
-    private fun threeNodeEnvironment(program: Aggregate<Int>.(env: Environment<Double>, y: Double) -> Double) =
-        EnvironmentWithMeshNetwork<Double>(
-            connectDistance = 1.1,
-            defaultRetainTime = 2,
-        ).apply {
-            val left = 0.0.nextDown()
-            val right = 0.0.nextUp()
-            for ((x, y) in listOf(0.0 to 0.0, 1.0 to left, 1.0 to right)) {
-                addNode(Position(x, y, 0.0), Double.NaN) {
-                    program(this@apply, y)
-                }
+    private fun threeNodeEnvironment(
+        performanceProfile: PerformanceProfile,
+        program: Aggregate<Int>.(env: Environment<Double>, y: Double) -> Double,
+    ) = EnvironmentWithMeshNetwork<Double>(
+        connectDistance = 1.1,
+        defaultRetainTime = 2,
+        performanceProfile = performanceProfile,
+    ).apply {
+        val left = 0.0.nextDown()
+        val right = 0.0.nextUp()
+        for ((x, y) in listOf(0.0 to 0.0, 1.0 to left, 1.0 to right)) {
+            addNode(Position(x, y, 0.0), Double.NaN) {
+                program(this@apply, y)
             }
         }
+    }
 
     private fun Environment<Double>.stabilizeAndDropSource() {
         assertTrue(nodes.all { it.value.isNaN() })
@@ -66,8 +73,8 @@ class GradientCastTest {
     }
 
     @Test
-    fun `gradientCast does not suffer from the raising value problem`() {
-        threeNodeEnvironment { env, y ->
+    fun `gradientCast does not suffer from the raising value problem`() = forEachPerformanceProfile { profile ->
+        threeNodeEnvironment(profile) { env, y ->
             gradientCast(
                 source = localId == 0,
                 local = y,
@@ -84,8 +91,8 @@ class GradientCastTest {
     }
 
     @Test
-    fun `Bellman-Ford does suffer from the raising value problem`() {
-        threeNodeEnvironment { env, y ->
+    fun `Bellman-Ford does suffer from the raising value problem`() = forEachPerformanceProfile { profile ->
+        threeNodeEnvironment(profile) { env, y ->
             bellmanFordGradientCast(
                 source = localId == 0,
                 local = y,
@@ -98,8 +105,11 @@ class GradientCastTest {
         }
     }
 
-    fun testManhattanDistance(program: Aggregate<Int>.(Environment<Int>) -> Int) {
-        vonNeumannGrid(10, 10, Int.MIN_VALUE, program).apply {
+    fun testManhattanDistance(
+        performanceProfile: PerformanceProfile,
+        program: Aggregate<Int>.(Environment<Int>) -> Int,
+    ) {
+        vonNeumannGrid(10, 10, Int.MIN_VALUE, performanceProfile, program).apply {
             cycleInOrder()
             nodes.forEach { node ->
                 val (x, y) = positionOf(node.id)
@@ -110,15 +120,15 @@ class GradientCastTest {
     }
 
     @Test
-    fun `the hop count in a Von Neumann grid is the Manhattan distance`() {
-        testManhattanDistance {
+    fun `the hop count in a Von Neumann grid is the Manhattan distance`() = forEachPerformanceProfile { profile ->
+        testManhattanDistance(profile) {
             hopDistanceTo(localId == 0)
         }
     }
 
     @Test
-    fun `gradientCast supports multiple sources`() {
-        vonNeumannGrid(10, 10, Int.MAX_VALUE) {
+    fun `gradientCast supports multiple sources`() = forEachPerformanceProfile { profile ->
+        vonNeumannGrid(10, 10, Int.MAX_VALUE, performanceProfile = profile) {
             hopDistanceTo(localId == 0 || localId == 99)
         }.apply {
             repeat(10) {

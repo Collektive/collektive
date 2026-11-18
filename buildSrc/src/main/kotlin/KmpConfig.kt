@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import kotlin.time.Duration.Companion.minutes
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 val Provider<PluginDependency>.id: String get() = get().pluginId
 
@@ -86,10 +87,15 @@ fun Project.configureKotlinMultiplatform() {
             }
             binaries.library()
         }
+        @OptIn(ExperimentalWasmDsl::class)
+        wasmWasi {
+            nodejs()
+            binaries.library()
+        }
         val nativeSetup: KotlinNativeTarget.() -> Unit = {
             binaries {
-                sharedLib()
-                staticLib()
+//                sharedLib()
+//                staticLib()
             }
         }
 
@@ -106,7 +112,6 @@ fun Project.configureKotlinMultiplatform() {
 
         macosArm64(nativeSetup)
         iosArm64(nativeSetup)
-        iosX64(nativeSetup)
         iosSimulatorArm64(nativeSetup)
         tvosArm64(nativeSetup)
         tvosSimulatorArm64(nativeSetup)

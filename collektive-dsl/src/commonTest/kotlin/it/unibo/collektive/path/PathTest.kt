@@ -9,7 +9,9 @@
 package it.unibo.collektive.path
 
 import it.unibo.collektive.Collektive
-import it.unibo.collektive.aggregate.AlignmentClashException
+import it.unibo.collektive.aggregate.alignment.AlignmentClashException
+import it.unibo.collektive.aggregate.alignment.PerformanceProfile
+import it.unibo.collektive.aggregate.alignment.path.FullPath
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.neighboring
 import kotlin.test.Test
@@ -37,7 +39,7 @@ class PathTest {
         fun Aggregate<Int>.bar() = baz()
         fun Aggregate<Int>.foo() = bar()
         val error = assertFailsWith<AlignmentClashException> {
-            Collektive.aggregate(0, pathFactory = FullPathFactory) {
+            Collektive.aggregate(0, PerformanceProfile.ForSimulation) {
                 foo()
             }
         }

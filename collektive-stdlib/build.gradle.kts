@@ -42,10 +42,10 @@ kotlinMultiplatform {
         commonMain {
 //            languageSettings.enableLanguageFeature("ContextParameters")
             dependencies {
-                implementation(collektive("dsl"))
-                implementation(rootProject.libs.kotlinx.serialization.core)
-                implementation(rootProject.libs.kotlinx.datetime)
-                implementation(rootProject.libs.arrow.core.serialization)
+                api(collektive("dsl"))
+                api(libs.arrow.core)
+                api(libs.kotlinx.serialization.core)
+                implementation(libs.arrow.core.serialization)
             }
             kotlin.srcDirs(collektivizeKotlinStdlibTask)
         }
@@ -53,8 +53,8 @@ kotlinMultiplatform {
             dependencies {
                 implementation(kotlin("test"))
                 implementation(collektive("test-tooling"))
-                implementation(rootProject.libs.bundles.kotest)
-                implementation(rootProject.libs.kotlinx.serialization.json)
+                implementation(libs.bundles.kotest)
+                implementation(libs.kotlinx.serialization.json)
             }
         }
     }

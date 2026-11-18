@@ -15,6 +15,7 @@ import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.matchers.assertNotAligned
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
+import it.unibo.collektive.testing.forEachPerformanceProfile
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -22,9 +23,9 @@ import kotlin.test.assertFailsWith
 
 class AlignmentTest {
     @Test
-    fun `the alignment should be performed also for the same aggregate operation called multiple times issue 51`() {
-        val result =
-            aggregate(0) {
+    fun `the alignment should be performed also for the same aggregate operation called multiple times issue 51`() =
+        forEachPerformanceProfile { profile ->
+            val result = aggregate(0, performanceProfile = profile) {
                 neighboring(10) // path -> [neighboring.1] = 10
                 share(5) {
                     requireNotNull(neighboring(20).local.value) // path -> [share.1, neighboring.2] = 20
@@ -33,39 +34,39 @@ class AlignmentTest {
                 neighboring(30) // path -> [neighboring.3] = 30
                 5
             }
-        assertEquals(5, result.result)
-        val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
-        assertEquals(4, messageFor0.size) // 4 paths of alignment
-        assertEquals(listOf(10, 20, 5, 30), messageFor0.values.toList())
-    }
+            assertEquals(5, result.result)
+            val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
+            assertEquals(4, messageFor0.size) // 4 paths of alignment
+            assertEquals(listOf(10, 20, 5, 30), messageFor0.values.toList())
+        }
 
     @Test
-    fun `alignment must fail clearly when entries try to override each other`() {
-        val exception =
-            assertFailsWith<IllegalStateException> {
-                aggregate(0) {
-                    repeat(2) {
-                        neighboring(0)
-                    }
+    fun `alignment must fail clearly when entries try to override each other`() = forEachPerformanceProfile { profile ->
+        val exception = assertFailsWith<IllegalStateException> {
+            aggregate(0, performanceProfile = profile) {
+                repeat(2) {
+                    neighboring(0)
                 }
             }
+        }
         assertContains(exception.message.toString(), "Aggregate alignment clash originated at the same path:")
     }
 
     @Test
-    fun `different alignment should be performed when a function has an aggregate parameter`() {
-        val x = 0
+    fun `different alignment should be performed when a function has an aggregate parameter`() =
+        forEachPerformanceProfile { profile ->
+            val x = 0
 
-        fun foo(agg: Aggregate<Int>) = agg.neighboring(x)
-
-        assertNotAligned(
-            { foo(this) },
-            { neighboring(x) },
-        )
-    }
+            fun foo(agg: Aggregate<Int>) = agg.neighboring(x)
+            assertNotAligned(
+                profile,
+                { foo(this) },
+                { neighboring(x) },
+            )
+        }
 
     @Test
-    fun `overload function with different arity should not align`() {
+    fun `overload function with different arity should not align`() = forEachPerformanceProfile { profile ->
         val x = 0
 
         fun foo(aggregate: Aggregate<Int>) = aggregate.neighboring(x)
@@ -73,13 +74,14 @@ class AlignmentTest {
         fun foo(value: Int, aggregate: Aggregate<Int>) = aggregate.neighboring(value)
 
         assertNotAligned(
+            profile,
             { foo(this) },
             { foo(x, this) },
         )
     }
 
     @Test
-    fun `overload function with different arguments order should not align`() {
+    fun `overload function with different arguments order should not align`() = forEachPerformanceProfile { profile ->
         val x = 0
 
         fun foo(aggregate: Aggregate<Int>, value: Int) = aggregate.neighboring(value)
@@ -87,36 +89,41 @@ class AlignmentTest {
         fun foo(value: Int, aggregate: Aggregate<Int>) = aggregate.neighboring(value)
 
         assertNotAligned(
+            profile,
             { foo(this, x) },
             { foo(x, this) },
         )
     }
 
     @Test
-    fun `non-collektive function taking collective function as argument should align the non-collective function`() {
-        val x = 0
+    fun `non-collektive function taking collective function as argument should align the non-collective function`() =
+        forEachPerformanceProfile { profile ->
+            val x = 0
 
-        fun foo(aggregate: Aggregate<Int>) = aggregate.neighboring(x)
+            fun foo(aggregate: Aggregate<Int>) = aggregate.neighboring(x)
 
-        fun bar(f1: Field<Int, Int>, f2: Field<Int, Int>) = f1 + f2
+            fun bar(f1: Field<Int, Int>, f2: Field<Int, Int>) = f1 + f2
 
-        assertNotAligned(
-            { foo(this) to foo(this) },
-            { bar(foo(this), foo(this)) },
-        )
-    }
+            assertNotAligned(
+                profile,
+                { foo(this) to foo(this) },
+                { bar(foo(this), foo(this)) },
+            )
+        }
 
     @Test
-    fun `different outer non-collektive functions with the same aggregate body should not align`() {
-        val x = 0
+    fun `different outer non-collektive functions with the same aggregate body should not align`() =
+        forEachPerformanceProfile { profile ->
+            val x = 0
 
-        fun foo(aggregate: Aggregate<Int>) = aggregate.neighboring(x)
+            fun foo(aggregate: Aggregate<Int>) = aggregate.neighboring(x)
 
-        fun bar(aggregate: Aggregate<Int>) = aggregate.neighboring(x)
+            fun bar(aggregate: Aggregate<Int>) = aggregate.neighboring(x)
 
-        assertNotAligned(
-            { foo(this) },
-            { bar(this) },
-        )
-    }
+            assertNotAligned(
+                profile,
+                { foo(this) },
+                { bar(this) },
+            )
+        }
 }

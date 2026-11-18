@@ -8,12 +8,12 @@
 
 package it.unibo.collektive.networking
 
-import it.unibo.collektive.path.Path
+import it.unibo.collektive.aggregate.alignment.Path
 
 /**
  * Factory for creating [Message] instances.
  */
-interface MessageFactory<ID : Any, out Payload> {
+fun interface MessageFactory<ID : Any, out Payload> {
     /**
      * Creates a [Message] instance with the given [senderId] and [sharedData].
      */

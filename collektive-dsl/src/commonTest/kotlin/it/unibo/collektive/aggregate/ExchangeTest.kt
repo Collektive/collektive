@@ -9,11 +9,13 @@
 package it.unibo.collektive.aggregate
 
 import it.unibo.collektive.Collektive.Companion.aggregate
+import it.unibo.collektive.aggregate.alignment.PerformanceProfile
 import it.unibo.collektive.aggregate.api.exchange
 import it.unibo.collektive.aggregate.api.exchanging
 import it.unibo.collektive.stdlib.collapse.fold
 import it.unibo.collektive.stdlib.collapse.sum
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
+import it.unibo.collektive.testing.forEachPerformanceProfile
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -25,24 +27,26 @@ class ExchangeTest {
         f.map { (_, v) -> if (v % 2 == 0) v + 1 else v * 2 }
     }
 
-    private fun mooreGridWithIncreaseOrDouble(size: Int) = mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }) { _ ->
-        exchange(1) { field ->
-            field.mapValues { field.neighbors.values.fold(localId) { acc, value -> acc + value } }
-        }.local.value
-    }.also {
-        assertEquals(size * size, it.nodes.size)
-    }
-
-    private fun mooreGridWithConstantFieldResult(size: Int) = mooreGrid<Field<Int, Int>?>(size, size, null) { _ ->
-        exchange(1) { field ->
-            field.mapToConstant(10)
+    private fun mooreGridWithIncreaseOrDouble(size: Int, profile: PerformanceProfile) =
+        mooreGrid<Int>(size, size, { _, _ -> Int.MAX_VALUE }, profile) { _ ->
+            exchange(1) { field ->
+                field.mapValues { field.neighbors.values.fold(localId) { acc, value -> acc + value } }
+            }.local.value
+        }.also {
+            assertEquals(size * size, it.nodes.size)
         }
-    }.also {
-        assertEquals(size * size, it.nodes.size)
-    }
 
-    private fun mooreGridWithDedicatedNeighborValues(size: Int) =
-        mooreGrid<Int>(size, size, { _, _ -> Int.MIN_VALUE }) { _ ->
+    private fun mooreGridWithConstantFieldResult(size: Int, profile: PerformanceProfile) =
+        mooreGrid<Field<Int, Int>?>(size, size, null, profile) { _ ->
+            exchange(1) { field ->
+                field.mapToConstant(10)
+            }
+        }.also {
+            assertEquals(size * size, it.nodes.size)
+        }
+
+    private fun mooreGridWithDedicatedNeighborValues(size: Int, profile: PerformanceProfile) =
+        mooreGrid<Int>(size, size, { _, _ -> Int.MIN_VALUE }, profile) { _ ->
             val res: Field<Int, Int> = exchange(0) { field ->
                 field.map { (id, _) ->
                     when (id) {
@@ -57,39 +61,41 @@ class ExchangeTest {
         }
 
     @Test
-    fun `exchange on the first round should use the initial value and send the new value according to the function`() {
-        val result =
-            aggregate(0) {
-                val res = exchange(1, increaseOrDouble)
-                assertEquals(2, res.local.value)
-            }
-        val messages = result.toSend.prepareMessageFor(1).sharedData
-        assertEquals(1, messages.size)
-        assertContentEquals(listOf(2), messages.values)
-    }
+    fun `exchange on the first round should use the initial value and send the new value according to the function`() =
+        forEachPerformanceProfile { profile ->
+            val result =
+                aggregate(0, performanceProfile = profile) {
+                    val res = exchange(1, increaseOrDouble)
+                    assertEquals(2, res.local.value)
+                }
+            val messages = result.toSend.prepareMessageFor(1).sharedData
+            assertEquals(1, messages.size)
+            assertContentEquals(listOf(2), messages.values)
+        }
 
     @Test
-    fun `exchange should share data with other aligned devices in the network`() {
-        val environment = mooreGridWithIncreaseOrDouble(2)
-        environment.cycleInOrder()
-        val result = environment.status()
+    fun `exchange should share data with other aligned devices in the network`() =
+        forEachPerformanceProfile { profile ->
+            val environment = mooreGridWithIncreaseOrDouble(2, profile)
+            environment.cycleInOrder()
+            val result = environment.status()
 
-        /**
-         * The network is fully connected.
-         * Devices execute the round in order:
-         * 0=ϕ(localId=0, localValue=0, neighbors={})
-         * 1=ϕ(localId=1, localValue=1, neighbors={0=1})
-         * 2=ϕ(localId=2, localValue=3, neighbors={0=3, 1=3})
-         * 3=ϕ(localId=3, localValue=7, neighbors={0=7, 1=7, 2=7})
-         */
-        val expectedResult = mapOf(0 to 0, 1 to 1, 2 to 3, 3 to 7)
-        assertEquals(expectedResult, result)
-    }
+            /**
+             * The network is fully connected.
+             * Devices execute the round in order:
+             * 0=ϕ(localId=0, localValue=0, neighbors={})
+             * 1=ϕ(localId=1, localValue=1, neighbors={0=1})
+             * 2=ϕ(localId=2, localValue=3, neighbors={0=3, 1=3})
+             * 3=ϕ(localId=3, localValue=7, neighbors={0=7, 1=7, 2=7})
+             */
+            val expectedResult = mapOf(0 to 0, 1 to 1, 2 to 3, 3 to 7)
+            assertEquals(expectedResult, result)
+        }
 
     @Test
-    fun `exchange can yield a result but return a different value`() {
+    fun `exchange can yield a result but return a different value`() = forEachPerformanceProfile { profile ->
         val result =
-            aggregate(0) {
+            aggregate(0, performanceProfile = profile) {
                 val xcRes =
                     exchanging(1) {
                         val fieldResult = it + 1
@@ -103,9 +109,9 @@ class ExchangeTest {
     }
 
     @Test
-    fun `exchange can yield a result of nullable values`() {
+    fun `exchange can yield a result of nullable values`() = forEachPerformanceProfile { profile ->
         val result =
-            aggregate(0) {
+            aggregate(0, performanceProfile = profile) {
                 val xcRes =
                     exchanging(1) {
                         val fieldResult = it + 1
@@ -119,22 +125,23 @@ class ExchangeTest {
     }
 
     @Test
-    fun `exchange should produce a message with no overrides when producing a constant field`() {
-        val size = 2
-        val environment = mooreGridWithConstantFieldResult(size)
-        // Executes two rounds per device
-        environment.cycleInOrder()
-        environment.cycleInOrder()
-        val result = environment.status()
-        assertEquals(1, result.values.distinct().size)
-        assertTrue(result.values.all { it is ConstantField })
-        assertEquals(listOf(10, 10, 10, 10), result.values.mapNotNull { it?.local?.value })
-    }
+    fun `exchange should produce a message with no overrides when producing a constant field`() =
+        forEachPerformanceProfile { profile ->
+            val size = 2
+            val environment = mooreGridWithConstantFieldResult(size, profile)
+            // Executes two rounds per device
+            environment.cycleInOrder()
+            environment.cycleInOrder()
+            val result = environment.status()
+            assertEquals(1, result.values.distinct().size)
+            assertTrue(result.values.all { it is ConstantField })
+            assertEquals(listOf(10, 10, 10, 10), result.values.mapNotNull { it?.local?.value })
+        }
 
     @Test
-    fun `exchange should send dedicated values to neighbors`() {
+    fun `exchange should send dedicated values to neighbors`() = forEachPerformanceProfile { profile ->
         val size = 3
-        val environment = mooreGridWithDedicatedNeighborValues(size)
+        val environment = mooreGridWithDedicatedNeighborValues(size, profile)
         // Executes two rounds per device
         repeat(size * size) { environment.cycleInOrder() }
         val result = environment.status()

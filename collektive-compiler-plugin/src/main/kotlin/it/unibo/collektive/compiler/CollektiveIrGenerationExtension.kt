@@ -56,14 +56,12 @@ class CollektiveIrGenerationExtension(private val logger: MessageCollector) : Ir
         }
         val projectFunction = finder.findFunctions(
             CallableId(
-                FqName("it.unibo.collektive.aggregate.api.impl"),
+                FqName("it.unibo.collektive.aggregate.api"),
                 Name.identifier(PROJECTION_FUNCTION_NAME),
             ),
         ).firstOrNull() ?: return logger.error("Unable to find the 'project' function")
         val alignRawFunction = aggregateClass.getFunctionReferenceWithName(ALIGN_FUNCTION_NAME)
-            ?: return logger.error("Unable to find the '$ALIGN_FUNCTION_NAME' function")
         val dealignFunction = aggregateClass.getFunctionReferenceWithName(DEALIGN_FUNCTION_NAME)
-            ?: return logger.error("Unable to find the '$DEALIGN_FUNCTION_NAME' function")
         moduleFragment.transform(
             AggregateFunctionTransformer(
                 pluginContext,
@@ -79,6 +77,6 @@ class CollektiveIrGenerationExtension(private val logger: MessageCollector) : Ir
         )
     }
 
-    private fun IrClassSymbol.getFunctionReferenceWithName(functionName: String): IrFunctionSymbol? =
+    private fun IrClassSymbol.getFunctionReferenceWithName(functionName: String): IrFunctionSymbol =
         functions.single { it.owner.name == Name.identifier(functionName) }
 }

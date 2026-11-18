@@ -6,25 +6,17 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
-package it.unibo.collektive.aggregate.api.impl
+package it.unibo.collektive.aggregate.api
 
 import it.unibo.collektive.aggregate.ConstantField
 import it.unibo.collektive.aggregate.Field
-import it.unibo.collektive.aggregate.api.Aggregate
+import it.unibo.collektive.aggregate.alignment.Path
+import it.unibo.collektive.aggregate.alignment.Stack
 import it.unibo.collektive.aggregate.api.Aggregate.InternalAPI
-import it.unibo.collektive.aggregate.api.CollektiveIgnore
-import it.unibo.collektive.aggregate.api.DataSharingMethod
-import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
-import it.unibo.collektive.aggregate.api.YieldingContext
-import it.unibo.collektive.aggregate.api.YieldingResult
-import it.unibo.collektive.aggregate.api.YieldingScope
-import it.unibo.collektive.aggregate.api.impl.stack.Stack
 import it.unibo.collektive.aggregate.toMap
 import it.unibo.collektive.networking.NeighborsData
 import it.unibo.collektive.networking.OutboundEnvelope
 import it.unibo.collektive.networking.OutboundEnvelope.SharedData
-import it.unibo.collektive.path.Path
-import it.unibo.collektive.path.PathFactory
 import it.unibo.collektive.state.State
 import it.unibo.collektive.state.impl.getTyped
 
@@ -38,9 +30,8 @@ internal class AggregateContext<ID : Any>(
     private val inboundMessage: NeighborsData<ID>,
     private val previousState: State,
     override val inMemoryOnly: Boolean = false,
-    pathFactory: PathFactory,
+    private val stack: Stack,
 ) : Aggregate<ID> {
-    private val stack = Stack(pathFactory)
     private val internalState: MutableMap<Path, Any?> = mutableMapOf()
     private val toBeSent: OutboundEnvelope<ID> = OutboundEnvelope(localId, inboundMessage.neighbors.size)
 

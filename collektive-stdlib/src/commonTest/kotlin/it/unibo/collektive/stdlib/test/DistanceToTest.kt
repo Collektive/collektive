@@ -7,9 +7,11 @@
  */
 package it.unibo.collektive.stdlib.test
 
+import it.unibo.collektive.aggregate.alignment.PerformanceProfile
 import it.unibo.collektive.stdlib.spreading.distanceTo
 import it.unibo.collektive.stdlib.util.euclideanDistance3D
 import it.unibo.collektive.testing.Environment
+import it.unibo.collektive.testing.forEachPerformanceProfile
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.math.abs
 import kotlin.math.sqrt
@@ -38,8 +40,8 @@ class DistanceToTest {
             abs(value - expected.toFloat()) < 1e-6
         }
 
-    private fun mooreGridWithGradient(size: Int) =
-        mooreGrid<Double>(size, size, { _, _ -> Double.NaN }) { environment ->
+    private fun mooreGridWithGradient(size: Int, performanceProfile: PerformanceProfile) =
+        mooreGrid<Double>(size, size, { _, _ -> Double.NaN }, performanceProfile) { environment ->
             val localPosition = environment.positionOf(localId)
             distanceTo(localId == 0, metric = euclideanDistance3D(localPosition.toTriple()))
         }.apply {
@@ -52,29 +54,30 @@ class DistanceToTest {
         }
 
     @Test
-    fun `distanceTo in the luckiest case stabilizes in one cycle`() {
-        val environment: Environment<Double> = mooreGridWithGradient(10)
+    fun `distanceTo in the luckiest case stabilizes in one cycle`() = forEachPerformanceProfile { profile ->
+        val environment: Environment<Double> = mooreGridWithGradient(10, profile)
         environment.cycleInOrder()
         assertTrue(environment.gradientIsStable(isMoore = true, 10))
     }
 
     @Test
-    fun `distanceTo requires at most the longest path length cycles to stabilize`() {
-        val size = 5
-        val environment: Environment<Double> = mooreGridWithGradient(size)
-        environment.cycleInReverseOrder()
-        val firstRound = environment.status()
-        assertEquals(0.0, firstRound[0])
-        firstRound.forEach { (id, value) ->
-            when (id) {
-                0 -> assertEquals(0.0, value)
-                else -> assertEquals(Double.POSITIVE_INFINITY, value)
-            }
-        }
-        repeat(size - 1) {
-            assertFalse(environment.gradientIsStable(isMoore = true, size))
+    fun `distanceTo requires at most the longest path length cycles to stabilize`() =
+        forEachPerformanceProfile { profile ->
+            val size = 5
+            val environment: Environment<Double> = mooreGridWithGradient(size, profile)
             environment.cycleInReverseOrder()
+            val firstRound = environment.status()
+            assertEquals(0.0, firstRound[0])
+            firstRound.forEach { (id, value) ->
+                when (id) {
+                    0 -> assertEquals(0.0, value)
+                    else -> assertEquals(Double.POSITIVE_INFINITY, value)
+                }
+            }
+            repeat(size - 1) {
+                assertFalse(environment.gradientIsStable(isMoore = true, size))
+                environment.cycleInReverseOrder()
+            }
+            assertTrue(environment.gradientIsStable(isMoore = true, size))
         }
-        assertTrue(environment.gradientIsStable(isMoore = true, size))
-    }
 }

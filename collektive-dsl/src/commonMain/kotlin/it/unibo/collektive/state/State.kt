@@ -1,6 +1,6 @@
 package it.unibo.collektive.state
 
-import it.unibo.collektive.path.Path
+import it.unibo.collektive.aggregate.alignment.Path
 
 /**
  * State is an association between a path and a value.

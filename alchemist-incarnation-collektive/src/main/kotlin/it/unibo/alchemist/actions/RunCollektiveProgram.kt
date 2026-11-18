@@ -18,8 +18,8 @@ import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Reaction
 import it.unibo.alchemist.model.actions.AbstractAction
 import it.unibo.collektive.Collektive
+import it.unibo.collektive.aggregate.alignment.PerformanceProfile
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.path.FullPathFactory
 import java.lang.reflect.Method
 import java.lang.reflect.Parameter
 import kotlin.reflect.jvm.kotlinFunction
@@ -43,7 +43,7 @@ class RunCollektiveProgram<P : Position<P>>(
      * The [Collektive] program on which cycles will be executed.
      */
     val collektiveProgram: Collektive<Int, Any?> =
-        Collektive(localDevice.id, network = localDevice, pathFactory = FullPathFactory) {
+        Collektive(localDevice.id, localDevice, PerformanceProfile.ForSimulation) {
             program(localDevice)
         }
 

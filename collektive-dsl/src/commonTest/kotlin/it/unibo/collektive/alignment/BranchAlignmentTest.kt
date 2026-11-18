@@ -10,6 +10,7 @@ package it.unibo.collektive.alignment
 
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.Field
+import it.unibo.collektive.aggregate.alignment.PerformanceProfile
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.exchange
 import it.unibo.collektive.aggregate.api.mapNeighborhood
@@ -21,36 +22,36 @@ import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.stdlib.collapse.min
 import it.unibo.collektive.stdlib.ints.FieldedInts.minus
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
+import it.unibo.collektive.testing.forEachPerformanceProfile
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class BranchAlignmentTest {
     @Test
-    fun `Branch alignment should work in nested functions`() {
-        val result =
-            aggregate(0) {
-                val condition = true
+    fun `Branch alignment should work in nested functions`() = forEachPerformanceProfile { profile ->
+        val result = aggregate(0, performanceProfile = profile) {
+            val condition = true
 
-                fun test() {
-                    neighboring("test")
-                }
-
-                fun test2() {
-                    test()
-                }
-                if (condition) {
-                    test2()
-                }
+            fun test() {
+                neighboring("test")
             }
+
+            fun test2() {
+                test()
+            }
+            if (condition) {
+                test2()
+            }
+        }
         val messageFor1 = result.toSend.prepareMessageFor(0).sharedData
         assertEquals(1, messageFor1.size) // 1 path of alignment
         assertEquals(listOf("test"), messageFor1.values.toList())
     }
 
     @Test
-    fun `Branch alignment should not occur in non aggregate context`() {
-        val result = aggregate(0) {
+    fun `Branch alignment should not occur in non aggregate context`() = forEachPerformanceProfile { profile ->
+        val result = aggregate(0, performanceProfile = profile) {
             val condition = true
 
             fun test(): String = "hello".uppercase()
@@ -62,21 +63,15 @@ class BranchAlignmentTest {
                 test2()
             }
         }
-        assertEquals(
-            0,
-            result.toSend
-                .prepareMessageFor(0)
-                .sharedData.size,
-        ) // 0 paths of alignment
+        assertEquals(0, result.toSend.prepareMessageFor(0).sharedData.size) // 0 paths of alignment
     }
 
     @Test
-    fun `A field should be projected when used in a body of a branch condition issue 171`() {
-        val nm = NetworkManager()
-        (0..2)
-            .map { NetworkImplTest(nm, it) to it }
-            .map { (net, id) ->
-                aggregate(id, net) {
+    fun `A field should be projected when used in a body of a branch condition issue 171`() =
+        forEachPerformanceProfile { profile ->
+            val nm = NetworkManager()
+            (0..2).map { NetworkImplTest(nm, it) to it }.map { (net, id) ->
+                aggregate(id, net, performanceProfile = profile) {
                     val outerField = neighboring(0)
                     assertEquals(id, outerField.neighbors.size)
                     if (id % 2 == 0) {
@@ -92,70 +87,76 @@ class BranchAlignmentTest {
                     }
                 }
             }
-    }
+        }
 
-    private fun exchangeWithThreeDevices(body: Aggregate<Int>.(Field<Int, Int>) -> Field<Int, Int>) {
+    private fun exchangeWithThreeDevices(
+        profile: PerformanceProfile,
+        body: Aggregate<Int>.(Field<Int, Int>) -> Field<Int, Int>,
+    ) {
         val nm = NetworkManager()
-        (0..2)
-            .map { NetworkImplTest(nm, it) to it }
-            .map { (net, id) ->
-                aggregate(id, net) {
-                    exchange(0) { body(it) }
+        (0..2).map { NetworkImplTest(nm, it) to it }.map { (net, id) ->
+            aggregate(id, net, performanceProfile = profile) {
+                exchange(0) { body(it) }
+            }
+        }
+    }
+
+    @Test
+    fun `A field should be projected also when the field is referenced as lambda parameter issue 171`() =
+        forEachPerformanceProfile { profile ->
+            exchangeWithThreeDevices(profile) {
+                if (localId % 2 == 0) {
+                    assertEquals(neighborhood().neighbors.size, it.neighbors.size)
+                } else {
+                    assertEquals(neighborhood().neighbors.size, it.neighbors.size)
                 }
+                mapNeighborhood { 1 }
             }
-    }
+        }
 
-    @Test
-    fun `A field should be projected also when the field is referenced as lambda parameter issue 171`() {
-        exchangeWithThreeDevices {
-            if (localId % 2 == 0) {
-                assertEquals(neighborhood().neighbors.size, it.neighbors.size)
-            } else {
-                assertEquals(neighborhood().neighbors.size, it.neighbors.size)
+    private fun manuallyAlignedExchangeWithThreeDevices(profile: PerformanceProfile, pivot: (Int) -> Any?) =
+        exchangeWithThreeDevices(profile) { field ->
+            val neighborsBeforeRestriction = field.neighbors.size
+            assertTrue(localId == 0 || neighborsBeforeRestriction > 0)
+            // Map the pivots to the number of neighbors that are pivoting on the same value
+            val expectations = mapNeighborhood(pivot).neighbors.values.list.groupBy { it }.mapValues { it.value.size }
+            alignedOn(pivot(localId)) {
+                val neighborsAfterRestriction = neighborhood().neighbors.size
+                val restrictedField = field.neighbors.size
+                assertEquals(neighborsAfterRestriction, restrictedField)
+                assertEquals(expectations[pivot(localId)] ?: 0, restrictedField)
             }
-            mapNeighborhood { 1 }
+            field
         }
-    }
 
-    private fun manuallyAlignedExchangeWithThreeDevices(pivot: (Int) -> Any?) = exchangeWithThreeDevices { field ->
-        val neighborsBeforeRestriction = field.neighbors.size
-        assertTrue(localId == 0 || neighborsBeforeRestriction > 0)
-        // Map the pivots to the number of neighbors that are pivoting on the same value
-        val expectations = mapNeighborhood(pivot).neighbors.values.list.groupBy { it }.mapValues { it.value.size }
-        alignedOn(pivot(localId)) {
-            val neighborsAfterRestriction = neighborhood().neighbors.size
-            val restrictedField = field.neighbors.size
-            assertEquals(neighborsAfterRestriction, restrictedField)
-            assertEquals(expectations[pivot(localId)] ?: 0, restrictedField)
+    @Test
+    fun `A field should be projected whenever there is an alignment operation not just on branches issue 171`() =
+        forEachPerformanceProfile { profile ->
+            manuallyAlignedExchangeWithThreeDevices(profile) { it % 2 == 0 }
         }
-        field
-    }
 
     @Test
-    fun `A field should be projected whenever there is an alignment operation not just on branches issue 171`() {
-        manuallyAlignedExchangeWithThreeDevices { it % 2 == 0 }
-    }
+    fun `A field should be projected whenever there is an alignment regardless of the type not just bools issue 171`() =
+        forEachPerformanceProfile { profile ->
+            manuallyAlignedExchangeWithThreeDevices(profile) { it % 2 }
+        }
 
     @Test
-    fun `A field should be projected whenever there is an alignment regardless of the type not just bools issue 171`() {
-        manuallyAlignedExchangeWithThreeDevices { it % 2 }
-    }
-
-    @Test
-    fun `A field should be projected when it is a non-direct receiver issue 171`() {
-        exchangeWithThreeDevices {
-            with(it) {
-                with(local.id % 2 == 0) {
-                    if (this) {
-                        assertEquals(neighborhood().neighbors.size, neighbors.size)
-                        alignedMapValues(neighboring(1)) { a, b -> a + b }.local
-                    } else {
-                        assertEquals(neighborhood().neighbors.size, it.neighbors.size)
-                        alignedMapValues(neighboring(1)) { a, b -> a - b }.local
+    fun `A field should be projected when it is a non-direct receiver issue 171`() =
+        forEachPerformanceProfile { profile ->
+            exchangeWithThreeDevices(profile) {
+                with(it) {
+                    with(local.id % 2 == 0) {
+                        if (this) {
+                            assertEquals(neighborhood().neighbors.size, neighbors.size)
+                            alignedMapValues(neighboring(1)) { a, b -> a + b }.local
+                        } else {
+                            assertEquals(neighborhood().neighbors.size, it.neighbors.size)
+                            alignedMapValues(neighboring(1)) { a, b -> a - b }.local
+                        }
                     }
                 }
+                mapNeighborhood { 1 }
             }
-            mapNeighborhood { 1 }
         }
-    }
 }

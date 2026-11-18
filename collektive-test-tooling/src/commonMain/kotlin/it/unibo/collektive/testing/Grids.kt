@@ -8,6 +8,7 @@
 
 package it.unibo.collektive.testing
 
+import it.unibo.collektive.aggregate.alignment.PerformanceProfile
 import it.unibo.collektive.aggregate.api.Aggregate
 
 /**
@@ -31,39 +32,48 @@ fun <R, E : Environment<R>> E.grid(
 private const val SAFE_MOORE_DISTANCE = 1.5
 
 /**
- * Creates a grid environment with Moore connections between nodes.
+ * Creates a grid environment with Moore connections between nodes, using the given [performanceProfile].
  */
 fun <R> mooreGrid(
     sizeX: Int,
     sizeY: Int,
     initial: (Environment<R>, Position) -> R,
+    performanceProfile: PerformanceProfile,
     program: Aggregate<Int>.(Environment<R>) -> R,
 ): EnvironmentWithMeshNetwork<R> = EnvironmentWithMeshNetwork<R>(
     SAFE_MOORE_DISTANCE,
+    performanceProfile = performanceProfile,
 ).grid(sizeX, sizeY, initial, program)
 
 /**
- * Creates a grid environment with Moore connections between nodes.
+ * Creates a grid environment with Moore connections between nodes, using the given [performanceProfile].
  */
 fun <R> mooreGrid(
     sizeX: Int,
     sizeY: Int,
     initial: R,
+    performanceProfile: PerformanceProfile,
     program: Aggregate<Int>.(Environment<R>) -> R,
-): EnvironmentWithMeshNetwork<R> = mooreGrid<R>(sizeX, sizeY, { _, _ -> initial }, program)
+): EnvironmentWithMeshNetwork<R> = mooreGrid(sizeX, sizeY, { _, _ -> initial }, performanceProfile, program)
 
 /**
- * Creates a grid environment with Von Neumann connections between nodes.
+ * Creates a grid environment with Von Neumann connections between nodes, using the given [performanceProfile].
  */
 fun <R> vonNeumannGrid(
     sizeX: Int,
     sizeY: Int,
     initial: (Environment<R>, Position) -> R,
+    performanceProfile: PerformanceProfile,
     program: Aggregate<Int>.(Environment<R>) -> R,
-) = EnvironmentWithMeshNetwork<R>(1.0).grid(sizeX, sizeY, initial, program)
+) = EnvironmentWithMeshNetwork<R>(1.0, performanceProfile = performanceProfile).grid(sizeX, sizeY, initial, program)
 
 /**
- * Creates a grid environment with Von Neumann connections between nodes.
+ * Creates a grid environment with Von Neumann connections between nodes, using the given [performanceProfile].
  */
-fun <R> vonNeumannGrid(sizeX: Int, sizeY: Int, initial: R, program: Aggregate<Int>.(Environment<R>) -> R) =
-    vonNeumannGrid<R>(sizeX, sizeY, { _, _ -> initial }, program)
+fun <R> vonNeumannGrid(
+    sizeX: Int,
+    sizeY: Int,
+    initial: R,
+    performanceProfile: PerformanceProfile,
+    program: Aggregate<Int>.(Environment<R>) -> R,
+) = vonNeumannGrid(sizeX, sizeY, { _, _ -> initial }, performanceProfile, program)

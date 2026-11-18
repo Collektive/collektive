@@ -6,27 +6,9 @@
  * as described in the LICENSE file in this project's repository's top directory.
  */
 
-package it.unibo.collektive.path
+package it.unibo.collektive.aggregate.alignment.path
 
-import kotlin.jvm.JvmInline
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
-
-/**
- * A path represents a specific point in the AST of an aggregate program.
- * The point in the AS is identified as a sequence of tokens.
- */
-@Serializable(with = PathSerializer::class)
-sealed interface Path {
-
-    /**
-     * Returns a multiline string representation of the path.
-     */
-    fun toMultilineString(separator: String = "\n"): String = toString()
-}
+import it.unibo.collektive.aggregate.alignment.Path
 
 /**
  * Non-serializable, list-based, high performance path intended for use in simulated environments.
@@ -73,30 +55,4 @@ data class FullPath(private val path: List<Any?>) : Path {
             }
         }
     }
-}
-
-/**
- * Serializable [Path] implementation that wraps a [backend] object.
- */
-@JvmInline
-@Serializable
-value class SerializablePath(val backend: String) : Path
-
-/**
- * Custom serializer for [Path] that delegates to [SerializablePath] for serialization and deserialization.
- * This allows us to serialize any [Path] that can be represented as a [SerializablePath], while throwing
- * an exception for unsupported types.
- */
-object PathSerializer : KSerializer<Path> {
-    override val descriptor: SerialDescriptor
-        get() = SerializablePath.serializer().descriptor
-
-    override fun serialize(encoder: Encoder, value: Path) {
-        when (value) {
-            is SerializablePath -> SerializablePath.serializer().serialize(encoder, value)
-            else -> throw IllegalArgumentException("Cannot serialize $value")
-        }
-    }
-
-    override fun deserialize(decoder: Decoder): Path = SerializablePath.serializer().deserialize(decoder)
 }

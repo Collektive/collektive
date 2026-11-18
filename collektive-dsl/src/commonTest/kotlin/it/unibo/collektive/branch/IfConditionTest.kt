@@ -10,14 +10,15 @@ package it.unibo.collektive.branch
 
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.neighboring
+import it.unibo.collektive.testing.forEachPerformanceProfile
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class IfConditionTest {
     @Test
-    fun `Branches with constant conditions should get aligned`() {
-        val result = aggregate(0) {
+    fun `Branches with constant conditions should get aligned`() = forEachPerformanceProfile { profile ->
+        val result = aggregate(0, performanceProfile = profile) {
             if (true) neighboring("test").local
         }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
@@ -26,9 +27,9 @@ class IfConditionTest {
     }
 
     @Test
-    fun `Branches with conditions read from variables should get aligned`() {
+    fun `Branches with conditions read from variables should get aligned`() = forEachPerformanceProfile { profile ->
         val customCondition = true
-        val result = aggregate(0) {
+        val result = aggregate(0, performanceProfile = profile) {
             if (customCondition) neighboring("test").local
         }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
@@ -37,9 +38,9 @@ class IfConditionTest {
     }
 
     @Test
-    fun `Function condition if`() {
+    fun `Function condition if`() = forEachPerformanceProfile { profile ->
         fun customFunction() = Random.nextDouble() > -1
-        val result = aggregate(0) {
+        val result = aggregate(0, performanceProfile = profile) {
             if (customFunction()) neighboring("test").local
         }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
@@ -48,10 +49,10 @@ class IfConditionTest {
     }
 
     @Test
-    fun `Function and condition if`() {
+    fun `Function and condition if`() = forEachPerformanceProfile { profile ->
         val customCondition1 = true
         val customCondition2 = true
-        val result = aggregate(0) {
+        val result = aggregate(0, performanceProfile = profile) {
             if (customCondition1 && customCondition2) neighboring("test").local
         }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
@@ -60,10 +61,10 @@ class IfConditionTest {
     }
 
     @Test
-    fun `Function or condition if`() {
+    fun `Function or condition if`() = forEachPerformanceProfile { profile ->
         val customCondition1 = true
         val customCondition2 = true
-        val result = aggregate(0) {
+        val result = aggregate(0, performanceProfile = profile) {
             if (customCondition1 || customCondition2) neighboring("test").local
         }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
@@ -72,10 +73,10 @@ class IfConditionTest {
     }
 
     @Test
-    fun `Function not condition if`() {
+    fun `Function not condition if`() = forEachPerformanceProfile { profile ->
         val customCondition1 = true
         val customCondition2 = false
-        val result = aggregate(0) {
+        val result = aggregate(0, performanceProfile = profile) {
             if (customCondition1 && !customCondition2) neighboring("test").local
         }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData

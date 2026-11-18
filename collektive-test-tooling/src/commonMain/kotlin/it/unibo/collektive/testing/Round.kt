@@ -10,6 +10,7 @@ package it.unibo.collektive.testing
 
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.AggregateResult
+import it.unibo.collektive.aggregate.alignment.PerformanceProfile
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.networking.NoNeighborsData
 
@@ -19,17 +20,25 @@ import it.unibo.collektive.networking.NoNeighborsData
 object Round {
     /**
      * Simulates a round-based computation for [steps] rounds for the given [deviceId]
-     * executing the [computation] function.
+     * executing the [computation] function, aligning according to the [performanceProfile].
      */
     fun <ID : Any, Result> roundFor(
         steps: Int = 10,
         deviceId: ID,
+        performanceProfile: PerformanceProfile,
         computation: Aggregate<ID>.() -> Result,
     ): AggregateResult<ID, Result> {
         require(steps > 0) { "Unable to perform '$steps' rounds. At least 1 round is required" }
-        val firstRoundResult = aggregate(deviceId, inMemory = false, compute = computation)
+        val firstRoundResult = aggregate(deviceId, performanceProfile, inMemory = false, compute = computation)
         return (1 until steps).fold(firstRoundResult) { previousResult, _ ->
-            aggregate(deviceId, previousResult.newState, NoNeighborsData(), inMemory = false, compute = computation)
+            aggregate(
+                deviceId,
+                performanceProfile,
+                previousResult.newState,
+                NoNeighborsData(),
+                inMemory = false,
+                compute = computation,
+            )
         }
     }
 }
