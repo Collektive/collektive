@@ -10,15 +10,16 @@ package it.unibo.collektive.branch
 
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.neighboring
+import it.unibo.collektive.testing.forEachPerformanceProfile
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class IfElseBlockTest {
     @Test
-    fun `true condition in if else should not evaluate else block`() {
+    fun `true condition in if else should not evaluate else block`() = forEachPerformanceProfile { profile ->
         val customCondition = true
         val result =
-            aggregate(0) {
+            aggregate(0, performanceProfile = profile) {
                 if (customCondition) {
                     neighboring("test1").local
                 } else {
@@ -31,10 +32,10 @@ class IfElseBlockTest {
     }
 
     @Test
-    fun `false condition in if else should not evaluate if block`() {
+    fun `false condition in if else should not evaluate if block`() = forEachPerformanceProfile { profile ->
         val customCondition = false
         val result =
-            aggregate(0) {
+            aggregate(0, performanceProfile = profile) {
                 if (customCondition) {
                     neighboring("test1").local
                 } else {
@@ -47,11 +48,11 @@ class IfElseBlockTest {
     }
 
     @Test
-    fun `if else block should only evaluate when the condition is true`() {
+    fun `if else block should only evaluate when the condition is true`() = forEachPerformanceProfile { profile ->
         val customCondition1 = false
         val customCondition2 = true
         val result =
-            aggregate(0) {
+            aggregate(0, performanceProfile = profile) {
                 if (customCondition1) {
                     neighboring("test1").local
                 } else if (customCondition2) {

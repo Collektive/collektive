@@ -16,6 +16,7 @@ import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.stdlib.collapse.min
 import it.unibo.collektive.stdlib.doubles.FieldedDoubles.plus
+import it.unibo.collektive.testing.forEachPerformanceProfile
 import kotlin.Double.Companion.POSITIVE_INFINITY
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -31,15 +32,13 @@ class NestedCallsTest {
     }
 
     @Test
-    fun `regression test for the issue 207`() {
+    fun `regression test for issue 207`() = forEachPerformanceProfile { profile ->
         val networkManager = NetworkManager()
         val network0 = NetworkImplTest(networkManager, 0)
         val network1 = NetworkImplTest(networkManager, 1)
-
-        val collektiveDevice0 = Collektive(0, network0) { bar() }
-        assertEquals(collektiveDevice0.cycle(), 0.0)
-
-        val collektiveDevice1 = Collektive(1, network1) { bar() }
-        assertEquals(Double.POSITIVE_INFINITY, collektiveDevice1.cycle())
+        val collektiveDevice0 = Collektive(0, network0, profile) { bar() }
+        assertEquals(0.0, collektiveDevice0.cycle())
+        val collektiveDevice1 = Collektive(1, network1, profile) { bar() }
+        assertEquals(POSITIVE_INFINITY, collektiveDevice1.cycle())
     }
 }

@@ -15,15 +15,6 @@ typealias YieldingScope<Shared, Returned> =
     YieldingContext<Shared, Returned>.(Shared) -> YieldingResult<Shared, Returned>
 
 /**
- * Represents methods intended to be used internally only.
- * The usage of these methods is discouraged and should be avoided.
- */
-@RequiresOptIn(level = RequiresOptIn.Level.ERROR)
-@Retention(AnnotationRetention.BINARY)
-@Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY, AnnotationTarget.CLASS)
-annotation class DelicateCollektiveApi
-
-/**
  * Models the minimal set of aggregate operations.
  * Holds the [localId] of the device executing the aggregate program.
  */

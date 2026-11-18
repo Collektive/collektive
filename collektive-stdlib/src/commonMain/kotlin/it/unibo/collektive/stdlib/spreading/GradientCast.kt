@@ -14,9 +14,6 @@ import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
 import it.unibo.collektive.aggregate.api.exchange
 import it.unibo.collektive.aggregate.api.mapNeighborhood
 import it.unibo.collektive.aggregate.api.share
-import it.unibo.collektive.aggregate.ids
-import it.unibo.collektive.aggregate.toMap
-import it.unibo.collektive.aggregate.values
 import it.unibo.collektive.stdlib.collapse.valueOfMinBy
 import it.unibo.collektive.stdlib.util.PathValue
 import it.unibo.collektive.stdlib.util.Reducer

@@ -9,6 +9,7 @@
 package it.unibo.collektive.networking
 
 import it.unibo.collektive.Collektive.Companion.aggregate
+import it.unibo.collektive.aggregate.alignment.PerformanceProfile
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.testing.SerializingMailbox
@@ -22,6 +23,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.protobuf.ProtoBuf
 
 class SerializationTest {
+    private val profile = PerformanceProfile.ForDeployment.LowMemory.Fast
+
     @Serializable
     data class Custom(val x: Int, val y: Int)
 
@@ -31,7 +34,7 @@ class SerializationTest {
     @Test
     fun `an aggregate output can be serialized when the network supports it`() {
         val mailbox1 = SerializingMailbox()
-        aggregate(1, mailbox1, emptyMap()) {
+        aggregate(1, mailbox1, profile) {
             neighboring(10)
         }
         val serializedMessage = mailbox1.serializeToString(2)
@@ -45,7 +48,7 @@ class SerializationTest {
     @Test
     fun `an aggregate output can be serialized when using custom types without exception`() {
         val network = SerializingMailbox()
-        aggregate(1, network, emptyMap()) {
+        aggregate(1, network, profile) {
             neighboring(Custom(10, 20))
         }
         network.serializeToString(1)
@@ -55,7 +58,7 @@ class SerializationTest {
     fun `an exception should be raised when a non-serializable type is used`() {
         assertFails {
             val network = SerializingMailbox()
-            aggregate(1, network, emptyMap()) {
+            aggregate(1, network, profile) {
                 neighboring(Any())
             }
             network.serializeToString(1)
@@ -65,7 +68,7 @@ class SerializationTest {
     @Test
     fun `a generic data class should be serialized properly`() {
         val network = SerializingMailbox()
-        aggregate(1, network, emptyMap()) {
+        aggregate(1, network, profile) {
             neighboring(CustomGeneric(localId))
         }
         val serializedMessage = network.serializeToString(1)
@@ -77,7 +80,7 @@ class SerializationTest {
     fun `protobuf can be used as a serializer for binary encoded payload`() {
         @OptIn(ExperimentalSerializationApi::class)
         val network = SerializingMailbox(ProtoBuf)
-        aggregate(1, network, emptyMap()) {
+        aggregate(1, network, profile) {
             neighboring(10)
         }
         val serializedMessage = network.serializeToString(1)
@@ -88,11 +91,12 @@ class SerializationTest {
     @Serializable
     data class MaySerialize<T, K>(val t: T, val k: K)
 
-    private fun <T, K> cantSerializeBecauseOfMissingInlining(t: T, k: K) = aggregate(0, SerializingMailbox(Json)) {
-        share(MaySerialize(t, k)) {
-            it.local.value
+    private fun <T, K> cantSerializeBecauseOfMissingInlining(t: T, k: K) =
+        aggregate(0, SerializingMailbox(Json), profile) {
+            share(MaySerialize(t, k)) {
+                it.local.value
+            }
         }
-    }
 
     @Test
     fun `functions without inlining cannot magically serialize`() {

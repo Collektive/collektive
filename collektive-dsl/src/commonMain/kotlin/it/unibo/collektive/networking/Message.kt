@@ -8,10 +8,9 @@
 
 package it.unibo.collektive.networking
 
+import it.unibo.collektive.aggregate.alignment.Path
 import it.unibo.collektive.aggregate.api.Serialize
-import it.unibo.collektive.path.Path
 import kotlinx.serialization.BinaryFormat
-import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialFormat
 import kotlinx.serialization.Serializable
@@ -26,7 +25,7 @@ sealed interface Message<ID : Any, out Payload> {
 }
 
 /**
- * A message specifically designed to be delivered in a in-memory fashion, containing a [senderId] and [sharedData].
+ * A message specifically designed to be delivered in an in-memory fashion, containing a [senderId] and [sharedData].
  */
 data class InMemoryMessage<ID : Any>(override val senderId: ID, override val sharedData: Map<Path, Any?>) :
     Message<ID, Any?>
@@ -51,7 +50,6 @@ data class SerializedMessage<ID : Any>(override val senderId: ID, override val s
  */
 class SerializedMessageFactory<ID : Any, Payload>(private val serializerFormat: SerialFormat) :
     MessageFactory<ID, ByteArray> {
-    @OptIn(InternalSerializationApi::class)
     override fun invoke(senderId: ID, sharedData: Map<Path, PayloadRepresentation<Any?>>): Message<ID, ByteArray> {
         val serializedSharedData =
             sharedData.mapValues { (_, representation) ->

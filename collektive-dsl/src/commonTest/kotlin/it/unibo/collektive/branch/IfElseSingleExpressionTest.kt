@@ -10,15 +10,16 @@ package it.unibo.collektive.branch
 
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.api.neighboring
+import it.unibo.collektive.testing.forEachPerformanceProfile
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class IfElseSingleExpressionTest {
     @Test
-    fun `true condition in if else block`() {
+    fun `true condition in if else block`() = forEachPerformanceProfile { profile ->
         val customCondition = true
         val result =
-            aggregate(0) {
+            aggregate(0, performanceProfile = profile) {
                 if (customCondition) neighboring("test-true").local else neighboring("test-false").local
             }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
@@ -27,10 +28,10 @@ class IfElseSingleExpressionTest {
     }
 
     @Test
-    fun `false condition in if else block`() {
+    fun `false condition in if else block`() = forEachPerformanceProfile { profile ->
         val customCondition = false
         val result =
-            aggregate(0) {
+            aggregate(0, performanceProfile = profile) {
                 if (customCondition) neighboring("test-true").local else neighboring("test-false").local
             }
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData

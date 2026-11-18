@@ -9,12 +9,14 @@
 package it.unibo.collektive.branch
 
 import it.unibo.collektive.Collektive.Companion.aggregate
+import it.unibo.collektive.aggregate.alignment.PerformanceProfile
 import it.unibo.collektive.aggregate.api.neighboring
+import it.unibo.collektive.testing.forEachPerformanceProfile
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class WhenTest {
-    private fun programUnderTest(input: Any) = aggregate(0) {
+    private fun programUnderTest(input: Any, profile: PerformanceProfile) = aggregate(0, performanceProfile = profile) {
         val stringVal = "string"
         val testVal = "test"
         when (input) {
@@ -24,31 +26,31 @@ class WhenTest {
     }
 
     @Test
-    fun `When in single expression`() {
+    fun `When in single expression`() = forEachPerformanceProfile { profile ->
         val condition = true
         val x = if (condition) "hello" else 123
-        val result = programUnderTest(x)
+        val result = programUnderTest(x, profile)
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
         assertEquals(1, messageFor0.size)
         assertEquals(listOf("string"), messageFor0.values.toList())
     }
 
     @Test
-    fun `When in single expression in else case`() {
+    fun `When in single expression in else case`() = forEachPerformanceProfile { profile ->
         val condition = false
         val x = if (condition) "hello" else 123
-        val result = programUnderTest(x)
+        val result = programUnderTest(x, profile)
         val messageFor0 = result.toSend.prepareMessageFor(0).sharedData
         assertEquals(1, messageFor0.size)
         assertEquals(listOf("test"), messageFor0.values.toList())
     }
 
     @Test
-    fun `When with nested function`() {
+    fun `When with nested function`() = forEachPerformanceProfile { profile ->
         val condition = true
         val x = if (condition) "hello" else 123
         val result =
-            aggregate(0) {
+            aggregate(0, performanceProfile = profile) {
                 fun test() {
                     neighboring("test")
                 }
@@ -67,11 +69,11 @@ class WhenTest {
     }
 
     @Test
-    fun `Nested when condition must be aligned`() {
+    fun `Nested when condition must be aligned`() = forEachPerformanceProfile { profile ->
         val condition1 = false
         val condition2 = true
         val result =
-            aggregate(0) {
+            aggregate(0, performanceProfile = profile) {
                 when {
                     condition1 -> neighboring("test").local
                     else ->

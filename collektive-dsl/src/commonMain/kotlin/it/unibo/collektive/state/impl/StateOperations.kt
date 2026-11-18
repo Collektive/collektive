@@ -1,6 +1,6 @@
 package it.unibo.collektive.state.impl
 
-import it.unibo.collektive.path.Path
+import it.unibo.collektive.aggregate.alignment.Path
 import it.unibo.collektive.state.State
 
 @Suppress("UNCHECKED_CAST")

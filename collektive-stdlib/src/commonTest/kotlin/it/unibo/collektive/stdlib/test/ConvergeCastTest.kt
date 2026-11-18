@@ -14,6 +14,7 @@ import it.unibo.collektive.stdlib.util.Point3D
 import it.unibo.collektive.stdlib.util.euclideanDistance3D
 import it.unibo.collektive.testing.Environment
 import it.unibo.collektive.testing.Position
+import it.unibo.collektive.testing.forEachPerformanceProfile
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.Int.Companion.MIN_VALUE
 import kotlin.random.Random
@@ -25,9 +26,9 @@ import kotlin.test.assertTrue
 
 class ConvergeCastTest {
     @Test
-    fun `convergeCast can count devices`() {
+    fun `convergeCast can count devices`() = forEachPerformanceProfile { profile ->
         val size = 10
-        val environment = mooreGrid<Int>(size, size, { _, _ -> MIN_VALUE }) {
+        val environment = mooreGrid<Int>(size, size, { _, _ -> MIN_VALUE }, performanceProfile = profile) {
             countDevices(localId == 0)
         }
         environment.cycleInOrder()
@@ -47,8 +48,11 @@ class ConvergeCastTest {
     }
 
     @Test
-    fun `convergeCast with a custom metric can accumulate on lists`() {
-        Environment<List<Int>> { env, n1, n2 -> env.positionOf(n1).distanceTo(env.positionOf(n2)) <= 2.5 }.apply {
+    fun `convergeCast with a custom metric can accumulate on lists`() = forEachPerformanceProfile { profile ->
+        Environment<List<Int>>(
+            areConnected = { env, n1, n2 -> env.positionOf(n1).distanceTo(env.positionOf(n2)) <= 2.5 },
+            performanceProfile = profile,
+        ).apply {
             val nodeCount = 100
             val bounds = 0.0..8.0
             val random = Random(0)

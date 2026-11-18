@@ -8,9 +8,9 @@
 
 package it.unibo.collektive.networking
 
-import it.unibo.collektive.aggregate.AlignmentClashException
+import it.unibo.collektive.aggregate.alignment.AlignmentClashException
+import it.unibo.collektive.aggregate.alignment.Path
 import it.unibo.collektive.aggregate.api.DataSharingMethod
-import it.unibo.collektive.path.Path
 
 /**
  * Defined the output of the aggregate program.

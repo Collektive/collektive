@@ -43,6 +43,7 @@ includeBuild("collektive-compiler-plugin")
 includeBuild("collektivize")
 include(
     "alchemist-incarnation-collektive",
+    "collektive-benchmarks",
     "collektive-compiler-embeddable",
     "collektive-compiler-plugin-test",
     "collektive-dsl",

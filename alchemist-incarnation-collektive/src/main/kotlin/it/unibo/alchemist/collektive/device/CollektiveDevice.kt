@@ -15,6 +15,7 @@ import it.unibo.alchemist.model.Position
 import it.unibo.alchemist.model.Time
 import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.collektive.aggregate.Field
+import it.unibo.collektive.aggregate.alignment.Path
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.DataSharingMethod
 import it.unibo.collektive.aggregate.api.neighboring
@@ -24,7 +25,6 @@ import it.unibo.collektive.networking.Message
 import it.unibo.collektive.networking.NeighborsData
 import it.unibo.collektive.networking.NoNeighborsData
 import it.unibo.collektive.networking.OutboundEnvelope
-import it.unibo.collektive.path.Path
 import org.apache.commons.math3.random.RandomGenerator
 
 /**

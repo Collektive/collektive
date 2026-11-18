@@ -14,6 +14,7 @@ import it.unibo.collektive.network.NetworkImplTest
 import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.stdlib.collapse.max
 import it.unibo.collektive.stdlib.collapse.min
+import it.unibo.collektive.testing.forEachPerformanceProfile
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -25,64 +26,64 @@ class FieldManipulationTest {
     private val id1 = 1
 
     @Test
-    fun `get the min value including self`() {
-        aggregate(id0) {
+    fun `get the min value including self`() = forEachPerformanceProfile { profile ->
+        aggregate(id0, performanceProfile = profile) {
             val sharedField = neighboring(doubleOf(3))
             assertEquals(6, sharedField.all.values.min())
         }
 
-        aggregate(id1) {
+        aggregate(id1, performanceProfile = profile) {
             val sharedField = neighboring(doubleOf(2))
             assertEquals(4, sharedField.all.values.min())
         }
     }
 
     @Test
-    fun `get the max value including self issue 767`() {
+    fun `get the max value including self issue 767`() = forEachPerformanceProfile { profile ->
         val nm = NetworkManager()
         val network0 = NetworkImplTest(nm, id0)
         val network1 = NetworkImplTest(nm, id1)
 
-        aggregate(id0, network0) {
+        aggregate(id0, network0, performanceProfile = profile) {
             val sharedField = neighboring(doubleOf(3))
             assertEquals(6, sharedField.all.values.max())
         }
 
-        aggregate(id1, network1) {
+        aggregate(id1, network1, performanceProfile = profile) {
             val sharedField = neighboring(doubleOf(4))
             assertEquals(8, sharedField.all.values.max())
         }
     }
 
     @Test
-    fun `get min value non including self`() {
+    fun `get min value non including self`() = forEachPerformanceProfile { profile ->
         val nm = NetworkManager()
         val network0 = NetworkImplTest(nm, id0)
         val network1 = NetworkImplTest(nm, id1)
 
-        aggregate(id0, network0) {
+        aggregate(id0, network0, performanceProfile = profile) {
             val minValue: Int = neighboring(doubleOf(3)).neighbors.values.min()
             assertEquals(Int.MAX_VALUE, minValue)
         }
 
-        aggregate(id1, network1) {
+        aggregate(id1, network1, performanceProfile = profile) {
             val minValue: Int = neighboring(doubleOf(2)).neighbors.values.min()
             assertEquals(6, minValue)
         }
     }
 
     @Test
-    fun `get max value non including self`() {
+    fun `get max value non including self`() = forEachPerformanceProfile { profile ->
         val nm = NetworkManager()
         val network0 = NetworkImplTest(nm, id0)
         val network1 = NetworkImplTest(nm, id1)
 
-        aggregate(id0, network0) {
+        aggregate(id0, network0, performanceProfile = profile) {
             val maxValue = neighboring(doubleOf(3)).neighbors.values.max()
             assertEquals(Int.MIN_VALUE, maxValue)
         }
 
-        aggregate(id1, network1) {
+        aggregate(id1, network1, performanceProfile = profile) {
             val maxValue = neighboring(doubleOf(2)).neighbors.values.max()
             assertEquals(6, maxValue)
         }

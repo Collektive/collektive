@@ -9,9 +9,9 @@
 package it.unibo.collektive.path
 
 import it.unibo.collektive.Collektive
-import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.stdlib.spreading.multiGradientCast
+import it.unibo.collektive.testing.forEachPerformanceProfile
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.uuid.ExperimentalUuidApi
@@ -20,13 +20,13 @@ import kotlin.uuid.Uuid
 class DigestHashingFactoryTest {
     @OptIn(ExperimentalUuidApi::class)
     @Test
-    fun `Uuids must be valid device identifiers`() {
+    fun `Uuids must be valid device identifiers`() = forEachPerformanceProfile { profile ->
         val sources: Set<Uuid> = setOf(
             Uuid.parse("00000000-0000-0000-0000-000000000001"),
             Uuid.parse("00000000-0000-0000-0000-000000000002"),
             Uuid.parse("00000000-0000-0000-0000-000000000003"),
         )
-        val result = Collektive.aggregate(sources.first()) {
+        val result = Collektive.aggregate(sources.first(), performanceProfile = profile) {
             multiGradientCast(
                 sources = sources,
                 local = "data",

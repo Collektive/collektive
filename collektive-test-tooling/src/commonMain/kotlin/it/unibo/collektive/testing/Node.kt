@@ -9,22 +9,25 @@
 package it.unibo.collektive.testing
 
 import it.unibo.collektive.Collektive
+import it.unibo.collektive.aggregate.alignment.Path
+import it.unibo.collektive.aggregate.alignment.PerformanceProfile
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.DataSharingMethod
 import it.unibo.collektive.networking.Mailbox
 import it.unibo.collektive.networking.Message
 import it.unibo.collektive.networking.NeighborsData
 import it.unibo.collektive.networking.OutboundEnvelope
-import it.unibo.collektive.path.Path
 import kotlin.jvm.JvmInline
 
 /**
- * A network node with an associated [environment], [id], [value], and [program].
+ * A network node with an associated [environment], [id], [value], and [program],
+ * whose alignment is managed according to the given performance profile.
  */
 class Node<R>(
     val environment: Environment<R>,
     val id: Int,
     var value: R,
+    performanceProfile: PerformanceProfile,
     private val cyclesToResetMessages: Int = 1,
     program: Aggregate<Int>.(Environment<R>) -> R,
 ) {
@@ -34,7 +37,7 @@ class Node<R>(
     /**
      * The Collektive instance associated with this node.
      */
-    val collektive = Collektive(id, network) { program(environment) }
+    val collektive = Collektive(id, network, performanceProfile) { program(environment) }
 
     init {
         require(cyclesToResetMessages >= 1)

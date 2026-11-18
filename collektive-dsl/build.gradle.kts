@@ -16,14 +16,15 @@ configureKotlinMultiplatform()
 kotlinMultiplatform {
     sourceSets {
         commonMain.dependencies {
-            implementation(libs.arrow.core)
-            implementation(libs.hash.sha3)
+            api(libs.hash.sha3)
+            api(libs.noncryptohash)
             implementation(libs.kotlinx.serialization.core)
         }
         commonTest.dependencies {
             implementation(collektive("stdlib"))
             implementation(collektive("test-tooling"))
             implementation(kotlin("test"))
+            implementation(libs.arrow.core)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.serialization.protobuf)
         }

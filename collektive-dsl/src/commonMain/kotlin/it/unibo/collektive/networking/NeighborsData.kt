@@ -8,8 +8,8 @@
 
 package it.unibo.collektive.networking
 
+import it.unibo.collektive.aggregate.alignment.Path
 import it.unibo.collektive.aggregate.api.DataSharingMethod
-import it.unibo.collektive.path.Path
 
 /**
  * Data received from neighbors.

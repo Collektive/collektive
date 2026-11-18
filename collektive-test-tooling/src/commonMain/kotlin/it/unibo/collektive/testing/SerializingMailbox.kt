@@ -8,6 +8,7 @@
 
 package it.unibo.collektive.testing
 
+import it.unibo.collektive.aggregate.alignment.Path
 import it.unibo.collektive.aggregate.api.DataSharingMethod
 import it.unibo.collektive.aggregate.api.Serialize
 import it.unibo.collektive.networking.Mailbox
@@ -16,7 +17,6 @@ import it.unibo.collektive.networking.NeighborsData
 import it.unibo.collektive.networking.OutboundEnvelope
 import it.unibo.collektive.networking.SerializedMessage
 import it.unibo.collektive.networking.SerializedMessageFactory
-import it.unibo.collektive.path.Path
 import kotlinx.serialization.BinaryFormat
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerialFormat
@@ -94,7 +94,6 @@ class SerializingMailbox(private val serializer: SerialFormat = Json) : Mailbox<
         receivedMessages[message.senderId] = message
     }
 
-    @OptIn(InternalSerializationApi::class)
     override fun currentInbound(): NeighborsData<Int> = object : NeighborsData<Int> {
         override val neighbors: Set<Int> get() = receivedMessages.keys
 

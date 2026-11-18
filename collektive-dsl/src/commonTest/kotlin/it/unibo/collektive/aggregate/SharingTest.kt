@@ -9,6 +9,7 @@
 package it.unibo.collektive.aggregate
 
 import it.unibo.collektive.Collektive.Companion.aggregate
+import it.unibo.collektive.aggregate.alignment.PerformanceProfile
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.aggregate.api.sharing
@@ -17,6 +18,7 @@ import it.unibo.collektive.network.NetworkManager
 import it.unibo.collektive.stdlib.collapse.max
 import it.unibo.collektive.stdlib.collapse.min
 import it.unibo.collektive.testing.Environment
+import it.unibo.collektive.testing.forEachPerformanceProfile
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -29,24 +31,31 @@ class SharingTest {
 
     private fun mooreGridWithProgram(
         size: Int,
+        profile: PerformanceProfile,
         program: Aggregate<Int>.(Environment<Pair<Int, Int>>) -> Pair<Int, Int>,
-    ) = mooreGrid(size, size, { _, _ -> Int.MIN_VALUE to Int.MAX_VALUE }, program).also {
+    ) = mooreGrid(
+        size,
+        size,
+        { _, _ -> Int.MIN_VALUE to Int.MAX_VALUE },
+        performanceProfile = profile,
+        program = program,
+    ).also {
         assertEquals(size * size, it.nodes.size)
     }
 
     @Test
-    fun `first time sharing`() {
-        aggregate(0) {
+    fun `first time sharing`() = forEachPerformanceProfile { profile ->
+        aggregate(0, performanceProfile = profile) {
             val result = share(1, findMax)
             assertEquals(1, result)
         }
     }
 
     @Test
-    fun `share should communicate with aligned devices`() {
+    fun `share should communicate with aligned devices`() = forEachPerformanceProfile { profile ->
         val size = 5
         val environment =
-            mooreGridWithProgram(size) { _ ->
+            mooreGridWithProgram(size, profile) { _ ->
                 val maxValue = share(localId, findMax)
                 val minValue = share(localId, findMin)
                 maxValue to minValue
@@ -58,10 +67,10 @@ class SharingTest {
     }
 
     @Test
-    fun `share with lambda body should work fine`() {
+    fun `share with lambda body should work fine`() = forEachPerformanceProfile { profile ->
         val testNetwork = NetworkImplTest(NetworkManager(), 1)
 
-        aggregate(1, testNetwork) {
+        aggregate(1, testNetwork, performanceProfile = profile) {
             val result =
                 share(1) {
                     it.all.values.max()
@@ -71,10 +80,10 @@ class SharingTest {
     }
 
     @Test
-    fun `sharing should return the value passed in the yielding function`() {
+    fun `sharing should return the value passed in the yielding function`() = forEachPerformanceProfile { profile ->
         val testNetwork = NetworkImplTest(NetworkManager(), 1)
 
-        aggregate(1, testNetwork) {
+        aggregate(1, testNetwork, performanceProfile = profile) {
             val res =
                 sharing(1) {
                     val min = it.all.values.min()
@@ -85,10 +94,10 @@ class SharingTest {
     }
 
     @Test
-    fun `sharing should work fine even with null as value`() {
+    fun `sharing should work fine even with null as value`() = forEachPerformanceProfile { profile ->
         val testNetwork = NetworkImplTest(NetworkManager(), 1)
 
-        aggregate(1, testNetwork) {
+        aggregate(1, testNetwork, performanceProfile = profile) {
             val res =
                 sharing(1) {
                     val min = it.all.values.min()

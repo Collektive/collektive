@@ -34,7 +34,7 @@ macros:
   - def: aggregate(code)
     values:
       - |-
-        aggregate(0) {
+        aggregate(0, PerformanceProfile.ForSimulation) {
           ${{ code }}
         }
 

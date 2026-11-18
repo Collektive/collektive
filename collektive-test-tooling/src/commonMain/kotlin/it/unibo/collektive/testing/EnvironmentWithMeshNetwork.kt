@@ -8,13 +8,20 @@
 
 package it.unibo.collektive.testing
 
+import it.unibo.collektive.aggregate.alignment.PerformanceProfile
+
 /**
- * An environment where nodes are connected if they are within [connectDistance] from each other.
+ * An environment where nodes are connected if they are within [connectDistance] from each other,
+ * aligning according to the given performance profile.
  */
-class EnvironmentWithMeshNetwork<R>(val connectDistance: Double, defaultRetainTime: Int = 1) :
-    Environment<R>(
-        defaultRetainTime = defaultRetainTime,
-        { thisEnv, a, b -> thisEnv.positionOf(a).distanceTo(thisEnv.positionOf(b)) <= connectDistance },
-    ) {
+class EnvironmentWithMeshNetwork<R>(
+    val connectDistance: Double,
+    performanceProfile: PerformanceProfile,
+    defaultRetainTime: Int = 1,
+) : Environment<R>(
+    performanceProfile,
+    defaultRetainTime,
+    { thisEnv, a, b -> thisEnv.positionOf(a).distanceTo(thisEnv.positionOf(b)) <= connectDistance },
+) {
     override fun toString() = "Environment(connection=$connectDistance, nodes=$nodes)"
 }

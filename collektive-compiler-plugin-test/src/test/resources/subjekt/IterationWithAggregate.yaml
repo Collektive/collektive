@@ -34,7 +34,7 @@ macros:
   - def: aggregate(code)
     values:
       - |-
-        aggregate(0) {
+        aggregate(0, PerformanceProfile.ForSimulation) {
           ${{ code }}
         }
 
@@ -85,6 +85,7 @@ subjects:
   - name: "OutsideAggregate${{ prettify(AGGREGATE, loop(AGGREGATE)) }}"
     code: |-
       import it.unibo.collektive.Collektive.Companion.aggregate
+      import it.unibo.collektive.aggregate.alignment.PerformanceProfile
       
       fun entry() {
         ${{ loop(aggregate(AGGREGATE)) }}
