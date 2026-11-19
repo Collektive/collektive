@@ -1,65 +1,76 @@
 ---
 title: First Collektive Program
 sidebar_position: 2
+description: "A self-healing collective program, written and run step by step."
 ---
 
-### Device Counter
-Let's create a program where *each device* learns the total number of devices in the network.
+## Device counter
 
-We can use the [countDevices](https://javadoc.io/doc/it.unibo.collektive/collektive-stdlib/latest/collektive-stdlib/it.unibo.collektive.stdlib.accumulation/count-devices.html)
-function from the standard library,
-which relies on a [hopDistance](https://javadoc.io/doc/it.unibo.collektive/collektive-stdlib/latest/collektive-stdlib/it.unibo.collektive.stdlib.spreading/hop-distance-to.html) metric.
-This function is based on the [convergeCast](https://javadoc.io/doc/it.unibo.collektive/collektive-stdlib/latest/collektive-stdlib/it.unibo.collektive.stdlib.accumulation/converge-cast.html) operation,
-which aggregates values towards the root device in the network.
+Let's write a program where *each device* learns the total number of devices in the network.
+There is no central server: devices can only talk to their neighbors.
 
-```kotlin file=<rootDir>/static/code/FirstCollektiveProgram.kt#L1-L7
+### Step 1: counting
+
+We can use the [`countDevices`](https://javadoc.io/doc/it.unibo.collektive/collektive-stdlib/latest/collektive-stdlib/it.unibo.collektive.stdlib.accumulation/count-devices.html)
+function from the standard library.
+It builds a spanning tree rooted in a *sink* device, using the hop-count distance from the sink
+([`hopDistanceTo`](https://javadoc.io/doc/it.unibo.collektive/collektive-stdlib/latest/collektive-stdlib/it.unibo.collektive.stdlib.spreading/hop-distance-to.html)),
+and then sums `1` for every device along the tree, towards the sink
+(a [converge-cast](../explanation/standard-library/collection.mdx)).
+
+```kotlin file=<rootDir>/static/code/FirstCollektiveProgram.kt#L9-L15
 ```
 
 :::note
-With our goal in mind,
-this implementation has a limitation: only the root device will know the number of devices in the network.
+This implementation has a limitation: only the sink knows the number of devices in the network.
+Every other device knows the size of its own subtree.
 :::
 
-We now need to propagate the information accumulated by the root device to all other devices in the network.
-How?
-By broadcasting the value with the [gradientCast](https://javadoc.io/doc/it.unibo.collektive/collektive-stdlib/latest/collektive-stdlib/it.unibo.collektive.stdlib.spreading/gradient-cast.html) function,
-which propagates it across multiple spanning trees,
-starting from the root.
+### Step 2: sharing the result
 
-```kotlin file=<rootDir>/static/code/FirstCollektiveProgram.kt#L9-L18
+We now need to propagate the value accumulated by the sink to all the other devices.
+We can broadcast it with the [`gradientCast`](https://javadoc.io/doc/it.unibo.collektive/collektive-stdlib/latest/collektive-stdlib/it.unibo.collektive.stdlib.spreading/gradient-cast.html)
+function, which propagates a value from a source along the shortest paths
+(a [gradient-cast](../explanation/standard-library/spreading.mdx)):
+
+```kotlin file=<rootDir>/static/code/FirstCollektiveProgram.kt#L17-L25
 ```
 
-The following is the program that each device will execute:
+The following entrypoint uses device `0` as source and sink,
+and the physical distances among devices (provided by the simulator) as metric:
 
-```kotlin file=<rootDir>/static/code/FirstCollektiveProgram.kt#L20-L30
+```kotlin file=<rootDir>/static/code/FirstCollektiveProgram.kt#L27-L36
 ```
 
-Now all the devices in the network will know how many devices are currently connected.
+Now all the devices in the network know how many devices are currently connected.
+This collect-then-broadcast composition is a recurring pattern in aggregate programming,
+see [Composition patterns](../explanation/standard-library/overview.mdx#composition-patterns).
+
+### Step 3: surviving failures
 
 :::caution
-What happens if a group of devices or the root gets disconnected from the network,
-or the network becomes segmented?
+What happens if the root fails, or the network gets split in two?
 :::
 
-In such a case,
-the subnetwork that still contains the root device will continue to compute the updated number of devices.
-However,
-any subnetworks that no longer include the root will not be able to do so.
+The part of the network that still contains device `0` keeps counting correctly,
+but the other parts have no sink anymore, and cannot compute anything meaningful.
 
-How can we address this issue?
-We can use a **leader election algorithm**,
-which allows us to dynamically elect a new root device within each connected component of the network.
-In this tutorial,
-we use the [boundedElection](https://javadoc.io/doc/it.unibo.collektive/collektive-stdlib/latest/collektive-stdlib/it.unibo.collektive.stdlib.consensus/bounded-election.html) function from the standard library.
+We can fix this by *electing* the root instead of choosing it in advance.
+A **leader election** algorithm, such as
+[`boundedElection`](https://javadoc.io/doc/it.unibo.collektive/collektive-stdlib/latest/collektive-stdlib/it.unibo.collektive.stdlib.consensus/bounded-election.html),
+selects a leader in every area of the network (here, areas of at most 25 hops), so every connected component gets its own root:
 
-```kotlin file=<rootDir>/static/code/FirstCollektiveProgram.kt#L32-L44
+```kotlin file=<rootDir>/static/code/FirstCollektiveProgram.kt#L38-L57
 ```
 
 :::tip[Success]
 Now we're all set!
-The final program will recompute the number of devices in the network, even if the network becomes segmented.
+The final program counts the devices of each part of the network, and keeps doing so when the network is split or merged.
+See [Gossip and Leader Election](../explanation/standard-library/gossip-and-leader-election.mdx#leader-election)
+for how the election reacts when a leader fails.
 :::
 
 :::info
 The code above can be found and executed in the [collektive examples repository](https://github.com/Collektive/collektive-examples/blob/master/simulation/src/main/kotlin/it/unibo/collektive/examples/counter/Counter.kt).
+The parameters of type `CollektiveDevice` and `EnvironmentVariables` are provided by the [Alchemist simulator](collektive-and-alchemist.mdx).
 :::
