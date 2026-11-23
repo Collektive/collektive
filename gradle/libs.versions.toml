@@ -1,6 +1,6 @@
 [versions]
 alchemist = "50.0.4"
-arrow = "2.3.0"
+arrow = "2.3.0.1"
 build-config = "6.1.2"
 dokka = "2.3.0"
 kotest = "6.2.7"
