@@ -17,7 +17,7 @@ import it.unibo.collektive.stdlib.util.PathValue
 import it.unibo.collektive.stdlib.util.Reducer
 import it.unibo.collektive.stdlib.util.filterPathsTraversingOppositeDirections
 import it.unibo.collektive.stdlib.util.hops
-import it.unibo.collektive.stdlib.util.nonLoopingPaths
+import it.unibo.collektive.stdlib.util.sortedNonLoopingPaths
 import kotlin.jvm.JvmOverloads
 
 /**
@@ -39,7 +39,7 @@ inline fun <reified ID : Comparable<ID>, reified Value> Aggregate<ID>.gossip(
 ): Value {
     val localCandidate = PathValue<ID, Value, Int>(0, local, emptyList())
     return share(null, localCandidate) { candidate ->
-        val nonLoopingPaths: Sequence<PathValue<ID, Value, Int>> = nonLoopingPaths(
+        val nonLoopingPaths: Sequence<PathValue<ID, Value, Int>> = sortedNonLoopingPaths(
             candidate,
             hops(),
             maxDiameter,

@@ -77,7 +77,7 @@ where Distance : Comparable<Distance>, ID : Any {
  */
 @OptIn(DelicateCollektiveApi::class)
 @PublishedApi
-internal inline fun <reified Distance, reified ID, reified Value> Aggregate<ID>.nonLoopingPaths(
+internal inline fun <reified Distance, reified ID, reified Value> Aggregate<ID>.sortedNonLoopingPaths(
     neighborData: Field<ID, PathValue<ID, Value, Distance>?>,
     coercedMetric: Field<ID, Distance>,
     maxDiameter: Int,
