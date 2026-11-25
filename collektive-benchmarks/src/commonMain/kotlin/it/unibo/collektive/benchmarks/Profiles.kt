@@ -86,11 +86,11 @@ class PersistentListStack : Stack {
     override fun currentPath(): Path = FullPath(tokens)
 
     override fun alignRaw(token: Any?) {
-        tokens = tokens.add(token)
+        tokens = tokens.adding(token)
     }
 
     override fun dealign() {
-        tokens = tokens.removeAt(tokens.lastIndex)
+        tokens = tokens.removingAt(tokens.lastIndex)
     }
 }
 
