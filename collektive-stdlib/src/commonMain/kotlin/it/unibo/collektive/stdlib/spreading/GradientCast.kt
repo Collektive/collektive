@@ -22,8 +22,8 @@ import it.unibo.collektive.stdlib.util.accumulate
 import it.unibo.collektive.stdlib.util.coerceIn
 import it.unibo.collektive.stdlib.util.filterPathsTraversingOppositeDirections
 import it.unibo.collektive.stdlib.util.hops
-import it.unibo.collektive.stdlib.util.nonLoopingPaths
 import it.unibo.collektive.stdlib.util.nonOverflowingPlus
+import it.unibo.collektive.stdlib.util.sortedNonLoopingPaths
 import kotlin.jvm.JvmOverloads
 
 /**
@@ -173,7 +173,7 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
     val localCandidate = if (source) PathValue<ID, Value, Distance>(bottom, local, emptyList()) else null
     return exchange(null, localCandidate) { neighborData: Field<ID, PathValue<ID, Value, Distance>?> ->
         // Accumulated distances with neighbors, to be used to exclude invalid paths
-        val nonLoopingPaths: Sequence<PathValue<ID, Value, Distance>> = nonLoopingPaths<Distance, ID, Value>(
+        val nonLoopingPaths: Sequence<PathValue<ID, Value, Distance>> = sortedNonLoopingPaths<Distance, ID, Value>(
             neighborData,
             coercedMetric,
             maxDiameter,
@@ -187,11 +187,9 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
             else -> nonLoopingPaths.filterPathsTraversingOppositeDirections()
         }
         val bestLazyList = best.map { lazy { it } }.toList()
-        mapNeighborhood { neighbor ->
-            when {
-                neighbor.isDefault -> localCandidate
-                else -> bestLazyList.firstOrNull { it.value.hops.lastOrNull() != neighbor }?.value
-            }
+        // Send the best known candidate to unknown neighbors, or the local candidate if none is available.
+        mapNeighborhood(bestLazyList.firstOrNull()?.value ?: localCandidate) { neighbor ->
+            bestLazyList.firstOrNull { it.value.hops.lastOrNull() != neighbor }?.value
         }
     }.local.value?.data ?: local
 }
