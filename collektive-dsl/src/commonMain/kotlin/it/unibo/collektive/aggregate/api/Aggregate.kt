@@ -89,6 +89,11 @@ interface Aggregate<ID : Any> {
     fun dealign()
 
     /**
+     * Check whether it is a default value of the field.
+     */
+    val ID?.isDefault: Boolean get() = this == null
+
+    /**
      * Contains the inlined version of the [Aggregate],
      * [Aggregate.exchanging], [Aggregate.neighboring] functions.
      */
