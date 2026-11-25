@@ -20,10 +20,10 @@ import it.unibo.collektive.stdlib.util.PathValue
 import it.unibo.collektive.stdlib.util.Reducer
 import it.unibo.collektive.stdlib.util.accumulate
 import it.unibo.collektive.stdlib.util.coerceIn
+import it.unibo.collektive.stdlib.util.filterPathsTraversingOppositeDirections
 import it.unibo.collektive.stdlib.util.hops
 import it.unibo.collektive.stdlib.util.nonLoopingPaths
 import it.unibo.collektive.stdlib.util.nonOverflowingPlus
-import it.unibo.collektive.stdlib.util.pathCoherence
 import kotlin.jvm.JvmOverloads
 
 /**
@@ -171,26 +171,27 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
 ): Value {
     val coercedMetric = metric.coerceIn(bottom, top)
     val localCandidate = if (source) PathValue<ID, Value, Distance>(bottom, local, emptyList()) else null
-    return exchange(localCandidate) { neighborData: Field<ID, PathValue<ID, Value, Distance>?> ->
+    return exchange(null, localCandidate) { neighborData: Field<ID, PathValue<ID, Value, Distance>?> ->
         // Accumulated distances with neighbors, to be used to exclude invalid paths
-        val nonLoopingPaths: Sequence<PathValue<ID, Value, Distance>> =
-            nonLoopingPaths<Distance, ID, Value>(
-                neighborData,
-                coercedMetric,
-                maxDiameter,
-                bottom,
-                top,
-                accumulateData,
-                accumulateDistance,
-            )
-        val best =
-            when {
-                localCandidate != null -> sequenceOf(localCandidate)
-                else -> pathCoherence<Distance, ID, Value>(nonLoopingPaths)
-            }
+        val nonLoopingPaths: Sequence<PathValue<ID, Value, Distance>> = nonLoopingPaths<Distance, ID, Value>(
+            neighborData,
+            coercedMetric,
+            maxDiameter,
+            bottom,
+            top,
+            accumulateData,
+            accumulateDistance,
+        )
+        val best = when {
+            localCandidate != null -> sequenceOf(localCandidate)
+            else -> nonLoopingPaths.filterPathsTraversingOppositeDirections()
+        }
         val bestLazyList = best.map { lazy { it } }.toList()
         mapNeighborhood { neighbor ->
-            bestLazyList.firstOrNull { it.value.hops.lastOrNull() != neighbor }?.value
+            when {
+                neighbor.isDefault -> localCandidate
+                else -> bestLazyList.firstOrNull { it.value.hops.lastOrNull() != neighbor }?.value
+            }
         }
     }.local.value?.data ?: local
 }
