@@ -17,6 +17,7 @@ import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.aggregate.api.sharing
 import it.unibo.collektive.stdlib.collapse.max
+import it.unibo.collektive.testing.forEachPerformanceProfile
 import it.unibo.collektive.testing.mooreGrid
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -29,8 +30,8 @@ class DefaultAndLocalTest {
     private fun Field<Int, Int>.toMapWithDefault(): Map<Int?, Int> = all.toMap() + (null to default)
 
     @Test
-    fun `exchange starts from initial but exposes and sends the default`() {
-        val result = aggregate(0) {
+    fun `exchange starts from initial but exposes and sends the default`() = forEachPerformanceProfile { profile ->
+        val result = aggregate(0, profile) {
             val res = exchange(default = 0, initial = 10) { field ->
                 assertEquals(mapOf(null to 0, 0 to 10), field.toMapWithDefault())
                 field.mapValues { it + 1 }
@@ -42,25 +43,26 @@ class DefaultAndLocalTest {
     }
 
     @Test
-    fun `exchange evolves the local value while the default stays fixed across rounds`() {
-        val env = mooreGrid<Map<Int?, Int>?>(1, 1, null) { _ ->
-            var received: Map<Int?, Int>? = null
-            exchange(default = 0, initial = 10) { field ->
-                received = field.toMapWithDefault()
-                field.mapValues { it + 1 }
+    fun `exchange evolves the local value while the default stays fixed across rounds`() =
+        forEachPerformanceProfile { profile ->
+            val env = mooreGrid<Map<Int?, Int>?>(1, 1, null, profile) { _ ->
+                var received: Map<Int?, Int>? = null
+                exchange(default = 0, initial = 10) { field ->
+                    received = field.toMapWithDefault()
+                    field.mapValues { it + 1 }
+                }
+                received
             }
-            received
+            val history = List(3) {
+                env.cycleInOrder()
+                env.status().getValue(0)
+            }
+            assertEquals((10..12).map { mapOf(null to 0, 0 to it) }, history)
         }
-        val history = List(3) {
-            env.cycleInOrder()
-            env.status().getValue(0)
-        }
-        assertEquals((10..12).map { mapOf(null to 0, 0 to it) }, history)
-    }
 
     @Test
-    fun `exchanging neighbors read the sender default not its local value`() {
-        val env = mooreGrid<Map<Int?, Int>?>(2, 1, null) { _ ->
+    fun `exchanging neighbors read the sender default not its local value`() = forEachPerformanceProfile { profile ->
+        val env = mooreGrid<Map<Int?, Int>?>(2, 1, null, profile) { _ ->
             exchanging(default = 0, initial = 100) { field ->
                 field.mapValues { it + 1 }.yielding { field.toMapWithDefault() }
             }
@@ -77,8 +79,8 @@ class DefaultAndLocalTest {
     }
 
     @Test
-    fun `share starts from initial and exposes the default`() {
-        aggregate(0) {
+    fun `share starts from initial and exposes the default`() = forEachPerformanceProfile { profile ->
+        aggregate(0, profile) {
             val res = share(default = 0, initial = 5) { field ->
                 assertEquals(mapOf(null to 0, 0 to 5), field.toMapWithDefault())
                 field.all.values.max()
@@ -88,8 +90,8 @@ class DefaultAndLocalTest {
     }
 
     @Test
-    fun `sharing starts from initial and exposes the default`() {
-        aggregate(0) {
+    fun `sharing starts from initial and exposes the default`() = forEachPerformanceProfile { profile ->
+        aggregate(0, profile) {
             val res = sharing(default = 0, initial = 5) { field ->
                 assertEquals(mapOf(null to 0, 0 to 5), field.toMapWithDefault())
                 (field.local.value + 1).yielding { "sent $this" }
@@ -99,8 +101,8 @@ class DefaultAndLocalTest {
     }
 
     @Test
-    fun `neighboring shares local but exposes the default`() {
-        val env = mooreGrid<Map<Int?, Int>?>(2, 1, null) { _ ->
+    fun `neighboring shares local but exposes the default`() = forEachPerformanceProfile { profile ->
+        val env = mooreGrid<Map<Int?, Int>?>(2, 1, null, profile) { _ ->
             neighboring(default = -1, local = localId + 10).toMapWithDefault()
         }
         env.cycleInOrder()
@@ -114,20 +116,22 @@ class DefaultAndLocalTest {
     }
 
     @Test
-    fun `mapNeighborhood with a single lambda computes the default with a null id`() {
-        val env = mooreGrid<Map<Int?, Int>?>(2, 1, null) { _ ->
-            mapNeighborhood { id: Int? -> id?.times(10) ?: -1 }.toMapWithDefault()
+    fun `mapNeighborhood with a single lambda computes the default with a null id`() =
+        forEachPerformanceProfile { profile ->
+            val env = mooreGrid<Map<Int?, Int>?>(2, 1, null, profile) { _ ->
+                mapNeighborhood { id: Int? -> id?.times(10) ?: -1 }.toMapWithDefault()
+            }
+            env.cycleInOrder()
+            assertEquals(mapOf(null to -1, 1 to 10, 0 to 0), env.status().getValue(1))
         }
-        env.cycleInOrder()
-        assertEquals(mapOf(null to -1, 1 to 10, 0 to 0), env.status().getValue(1))
-    }
 
     @Test
-    fun `mapNeighborhood with an explicit default uses it for the default entry`() {
-        val env = mooreGrid<Map<Int?, Int>?>(2, 1, null) { _ ->
-            mapNeighborhood(default = -1) { id: Int -> id * 10 }.toMapWithDefault()
+    fun `mapNeighborhood with an explicit default uses it for the default entry`() =
+        forEachPerformanceProfile { profile ->
+            val env = mooreGrid<Map<Int?, Int>?>(2, 1, null, profile) { _ ->
+                mapNeighborhood(default = -1) { id: Int -> id * 10 }.toMapWithDefault()
+            }
+            env.cycleInOrder()
+            assertEquals(mapOf(null to -1, 1 to 10, 0 to 0), env.status().getValue(1))
         }
-        env.cycleInOrder()
-        assertEquals(mapOf(null to -1, 1 to 10, 0 to 0), env.status().getValue(1))
-    }
 }
