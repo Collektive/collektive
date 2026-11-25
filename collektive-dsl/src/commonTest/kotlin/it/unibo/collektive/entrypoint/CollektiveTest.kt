@@ -64,9 +64,9 @@ class CollektiveTest {
                     exchange(initV1, body = increaseOrDouble).local.value
                 }
 
-        val result = collectiveDevice.cycleWhile { it.result < 10 }
-        assertEquals(14, result)
-    }
+            val result = collectiveDevice.cycleWhile { it.result < 10 }
+            assertEquals(14, result)
+        }
 
     @Test
     fun `Collektive compute function can be a val`() = forEachPerformanceProfile { profile ->
