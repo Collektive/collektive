@@ -37,9 +37,7 @@ class GossipTest {
             assertEquals(size * size, nodes.size)
             val initial = status().values.distinct()
             assertEquals(1, initial.size)
-            check(initial.first() == Int.MAX_VALUE) {
-                "Initial status is not `Int.MAX_VALUE`, but it is $initial (${initial::class.simpleName})"
-            }
+            assertEquals(Int.MAX_VALUE, initial.first())
         }
 
     private fun linearMooreGridWithGossip(size: Int, performanceProfile: PerformanceProfile, max: Boolean = true) =
@@ -53,9 +51,7 @@ class GossipTest {
             assertEquals(size, nodes.size)
             val initial = status().values.distinct()
             assertEquals(1, initial.size)
-            check(initial.first() == Int.MAX_VALUE) {
-                "Initial status is not `Int.MAX_VALUE`, but it is $initial (${initial::class.simpleName})"
-            }
+            assertEquals(Int.MAX_VALUE, initial.first())
         }
 
     private fun squareMooreGridWithNonSelfStabilizingGossip(size: Int, performanceProfile: PerformanceProfile) =
@@ -65,9 +61,7 @@ class GossipTest {
             assertEquals(size * size, nodes.size)
             val initial = status().values.distinct()
             assertEquals(1, initial.size)
-            check(initial.first() == Int.MAX_VALUE) {
-                "Initial status is not `Int.MAX_VALUE`, but it is $initial (${initial::class.simpleName})"
-            }
+            assertEquals(Int.MAX_VALUE, initial.first())
         }
 
     @Test
