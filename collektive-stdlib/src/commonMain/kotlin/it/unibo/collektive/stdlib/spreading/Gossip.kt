@@ -15,9 +15,9 @@ import it.unibo.collektive.aggregate.values
 import it.unibo.collektive.stdlib.collapse.reduce
 import it.unibo.collektive.stdlib.util.PathValue
 import it.unibo.collektive.stdlib.util.Reducer
+import it.unibo.collektive.stdlib.util.filterPathsTraversingOppositeDirections
 import it.unibo.collektive.stdlib.util.hops
-import it.unibo.collektive.stdlib.util.nonLoopingPaths
-import it.unibo.collektive.stdlib.util.pathCoherence
+import it.unibo.collektive.stdlib.util.sortedNonLoopingPaths
 import kotlin.jvm.JvmOverloads
 
 /**
@@ -38,8 +38,8 @@ inline fun <reified ID : Comparable<ID>, reified Value> Aggregate<ID>.gossip(
     noinline reducer: Reducer<Value> = { first, _ -> first }, // identity function
 ): Value {
     val localCandidate = PathValue<ID, Value, Int>(0, local, emptyList())
-    return share(localCandidate) { candidate ->
-        val nonLoopingPaths = nonLoopingPaths(
+    return share(null, localCandidate) { candidate ->
+        val nonLoopingPaths: Sequence<PathValue<ID, Value, Int>> = sortedNonLoopingPaths(
             candidate,
             hops(),
             maxDiameter,
@@ -48,7 +48,7 @@ inline fun <reified ID : Comparable<ID>, reified Value> Aggregate<ID>.gossip(
             { _, _, data -> reducer(local, data) },
             Int::plus,
         )
-        pathCoherence(nonLoopingPaths).fold(localCandidate) { current, next ->
+        nonLoopingPaths.filterPathsTraversingOppositeDirections().fold(localCandidate) { current, next ->
             val candidateValue = reducer(current.data, next.data)
             when {
                 current.data == next.data -> listOf(current, next).minBy { it.hops.size }
@@ -56,7 +56,7 @@ inline fun <reified ID : Comparable<ID>, reified Value> Aggregate<ID>.gossip(
                 else -> next
             }
         }
-    }.data ?: local
+    }?.data ?: local
 }
 
 /**

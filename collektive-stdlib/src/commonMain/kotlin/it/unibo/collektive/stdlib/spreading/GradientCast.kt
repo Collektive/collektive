@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -12,6 +12,7 @@ import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
 import it.unibo.collektive.aggregate.api.exchange
+import it.unibo.collektive.aggregate.api.field.alignedMapValues
 import it.unibo.collektive.aggregate.api.mapNeighborhood
 import it.unibo.collektive.aggregate.api.share
 import it.unibo.collektive.stdlib.collapse.valueOfMinBy
@@ -19,10 +20,10 @@ import it.unibo.collektive.stdlib.util.PathValue
 import it.unibo.collektive.stdlib.util.Reducer
 import it.unibo.collektive.stdlib.util.accumulate
 import it.unibo.collektive.stdlib.util.coerceIn
+import it.unibo.collektive.stdlib.util.filterPathsTraversingOppositeDirections
 import it.unibo.collektive.stdlib.util.hops
-import it.unibo.collektive.stdlib.util.nonLoopingPaths
 import it.unibo.collektive.stdlib.util.nonOverflowingPlus
-import it.unibo.collektive.stdlib.util.pathCoherence
+import it.unibo.collektive.stdlib.util.sortedNonLoopingPaths
 import kotlin.jvm.JvmOverloads
 
 /**
@@ -170,25 +171,26 @@ inline fun <reified ID : Any, reified Value, reified Distance : Comparable<Dista
 ): Value {
     val coercedMetric = metric.coerceIn(bottom, top)
     val localCandidate = if (source) PathValue<ID, Value, Distance>(bottom, local, emptyList()) else null
-    return exchange(localCandidate) { neighborData: Field<ID, PathValue<ID, Value, Distance>?> ->
+    return exchange(null, localCandidate) { neighborData: Field<ID, PathValue<ID, Value, Distance>?> ->
         // Accumulated distances with neighbors, to be used to exclude invalid paths
-        val nonLoopingPaths: Sequence<PathValue<ID, Value, Distance>> =
-            nonLoopingPaths<Distance, ID, Value>(
-                neighborData,
-                coercedMetric,
-                maxDiameter,
-                bottom,
-                top,
-                accumulateData,
-                accumulateDistance,
-            )
-        val best =
-            when {
-                localCandidate != null -> sequenceOf(localCandidate)
-                else -> pathCoherence<Distance, ID, Value>(nonLoopingPaths)
-            }
+        val nonLoopingPaths: Sequence<PathValue<ID, Value, Distance>> = sortedNonLoopingPaths<Distance, ID, Value>(
+            neighborData,
+            coercedMetric,
+            maxDiameter,
+            bottom,
+            top,
+            accumulateData,
+            accumulateDistance,
+        )
+        val best = when {
+            localCandidate != null -> sequenceOf(localCandidate)
+            else -> nonLoopingPaths.filterPathsTraversingOppositeDirections()
+        }
         val bestLazyList = best.map { lazy { it } }.toList()
-        mapNeighborhood { neighbor -> bestLazyList.firstOrNull { it.value.hops.lastOrNull() != neighbor }?.value }
+        // Send the best known candidate to unknown neighbors, or the local candidate if none is available.
+        mapNeighborhood(bestLazyList.firstOrNull()?.value ?: localCandidate) { neighbor ->
+            bestLazyList.firstOrNull { it.value.hops.lastOrNull() != neighbor }?.value
+        }
     }.local.value?.data ?: local
 }
 

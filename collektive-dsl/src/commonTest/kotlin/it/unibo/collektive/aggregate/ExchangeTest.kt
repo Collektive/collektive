@@ -10,8 +10,10 @@ package it.unibo.collektive.aggregate
 
 import it.unibo.collektive.Collektive.Companion.aggregate
 import it.unibo.collektive.aggregate.alignment.PerformanceProfile
+import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.exchange
 import it.unibo.collektive.aggregate.api.exchanging
+import it.unibo.collektive.aggregate.api.field.mapValues
 import it.unibo.collektive.stdlib.collapse.fold
 import it.unibo.collektive.stdlib.collapse.sum
 import it.unibo.collektive.stdlib.ints.FieldedInts.plus
@@ -65,7 +67,7 @@ class ExchangeTest {
         forEachPerformanceProfile { profile ->
             val result =
                 aggregate(0, performanceProfile = profile) {
-                    val res = exchange(1, increaseOrDouble)
+                    val res = exchange(1, body = increaseOrDouble)
                     assertEquals(2, res.local.value)
                 }
             val messages = result.toSend.prepareMessageFor(1).sharedData
@@ -149,4 +151,66 @@ class ExchangeTest {
         val expectedLocalValues = mapOf(0 to 3, 1 to 5, 2 to 4, 3 to 5, 4 to 8, 5 to 6, 6 to 4, 7 to 6, 8 to 4)
         assertEquals(expectedLocalValues, result)
     }
+
+    @Test
+    fun `exchange should be able to support ping-pong in two devices and reset to zero when re-connected`() =
+        forEachPerformanceProfile { profile ->
+            val size = 2
+
+            /**
+             * Snapshot of the field sent by a device in a round: its default and its (local + neighbors) values.
+             * The snapshot is taken inside the round, since a [Field] is bound to the context of the round
+             * that produced it and must not be inspected after the round is over.
+             */
+            fun Aggregate<Int>.pingPong(): Pair<Int, Map<Int, Int>> = exchange(0) { field ->
+                println("before mapping $field")
+                field.mapValues { it + 1 }.also { println("after $it") }
+            }.let { it.default to it.all.toMap() }
+
+            val environment = mooreGrid<Pair<Int, Map<Int, Int>>?>(size, 1, null, profile) { _ -> pingPong() }
+            // Two connected devices: every round each device increments the counter received from the other
+            repeat(size) {
+                environment.cycleInOrder()
+            }
+            assertEquals(
+                mapOf(
+                    0 to (1 to mapOf(0 to 2, 1 to 3)),
+                    1 to (1 to mapOf(1 to 2, 0 to 4)),
+                ),
+                environment.status(),
+            )
+            // Device 1 leaves the network
+            val positionNode1 = environment.positionOf(environment[1].id)
+            environment.removeNode(1)
+            println("=== DEVICE 1 DIED ===")
+            assertEquals(1, environment.nodes.size)
+            assertEquals(mapOf(0 to (1 to mapOf(0 to 2, 1 to 3))), environment.status())
+            // Device 0 still sees the last (retained) message of 1, then it expires and 0 is alone
+            repeat(size) {
+                println("=== ROUND ===")
+                environment.cycleInOrder()
+            }
+            assertEquals(mapOf(0 to (1 to mapOf(0 to 4))), environment.status())
+            // Device 1 re-joins (rebooted, with empty state): having no dedicated message from 0,
+            // it must read 0's default (1), not 0's self value, so the counter between 0 and 1 restarts from scratch
+            environment.addNode(positionNode1, null, id = 1) { _ -> pingPong() }
+            println("=== DEVICE 1 RE-JOINED ===")
+            environment.cycleInOrder()
+            assertEquals(
+                mapOf(
+                    0 to (1 to mapOf(0 to 5)),
+                    1 to (1 to mapOf(1 to 1, 0 to 2)),
+                ),
+                environment.status(),
+            )
+            println("=== ROUND ===")
+            environment.cycleInOrder()
+            assertEquals(
+                mapOf(
+                    0 to (1 to mapOf(0 to 6, 1 to 3)),
+                    1 to (1 to mapOf(1 to 2, 0 to 4)),
+                ),
+                environment.status(),
+            )
+        }
 }

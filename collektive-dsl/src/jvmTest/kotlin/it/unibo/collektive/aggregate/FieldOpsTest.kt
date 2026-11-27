@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -17,6 +17,8 @@ import io.mockk.just
 import io.mockk.mockk
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.CollektiveIgnore
+import it.unibo.collektive.aggregate.api.field.alignedMap
+import it.unibo.collektive.aggregate.api.field.mapValues
 import it.unibo.collektive.stdlib.collapse.fold
 import it.unibo.collektive.stdlib.collapse.reduce
 import it.unibo.collektive.stdlib.collapse.sum
@@ -34,11 +36,11 @@ class FieldOpsTest {
             lambda<() -> Any?>().captured.invoke()
         }
     }
-    private val emptyField = Field(mockedContext, 0, "localVal")
+    private val emptyField = Field(mockedContext, "localVal", 0)
     private val emptyFieldOfNullables: Field<Int, String?> = emptyField
-    private val field = Field(mockedContext, 0, 0, mapOf(1 to 10, 2 to 20))
-    private val fulfilledField = Field(mockedContext, 0, 0, mapOf(1 to 10, 2 to 20, 3 to 15))
-    private val fulfilledCompatibleField = Field(mockedContext, 0, 1, mapOf(1 to 1, 2 to 1, 3 to 1))
+    private val field = Field(mockedContext, 0, 0, others = mapOf(1 to 10, 2 to 20))
+    private val fulfilledField = Field(mockedContext, 0, 0, others = mapOf(1 to 10, 2 to 20, 3 to 15))
+    private val fulfilledCompatibleField = Field(mockedContext, 1, 0, others = mapOf(1 to 1, 2 to 1, 3 to 1))
 
     @Test
     fun `An empty field should return null or an empty Option when its peer values are reduced`() {
@@ -78,18 +80,21 @@ class FieldOpsTest {
 
     @Test
     fun `An empty field when mapped only the local value should be transformed`() {
-        assertEquals(Field(mockedContext, 0, "localVal-mapped", mapOf()), emptyField.mapValues { "$it-mapped" })
+        assertEquals(
+            Field(mockedContext, "localVal-mapped", 0, others = mapOf()),
+            emptyField.mapValues { "$it-mapped" },
+        )
     }
 
     @Test
     fun `A field can be mapped on its values with a given function`() {
-        assertEquals(Field(mockedContext, 0, 3, mapOf(1 to 13, 2 to 23)), field.mapValues { it + 3 })
+        assertEquals(Field(mockedContext, 3, 0, others = mapOf(1 to 13, 2 to 23)), field.mapValues { it + 3 })
     }
 
     @Test
     fun `A field can be mapped on its values with a given function and the id`() {
         assertEquals(
-            Field(mockedContext, 0, "0-0", mapOf(1 to "1-10", 2 to "2-20")),
+            Field(mockedContext, "0-0", 0, others = mapOf(1 to "1-10", 2 to "2-20")),
             field.map { (id, value) ->
                 "$id-$value"
             },
@@ -103,17 +108,17 @@ class FieldOpsTest {
 
     @Test
     fun `Two field are equals if they contains the same values`() {
-        assertEquals(Field(mockedContext, 0, 0, mapOf(1 to 10, 2 to 20)), field)
+        assertEquals(Field(mockedContext, 0, 0, others = mapOf(1 to 10, 2 to 20)), field)
     }
 
     @Test
     fun `Two fields are not equals if they contains different values`() {
-        assertNotEquals(field, Field(mockedContext, 0, 0, mapOf(1 to -1, 2 to -1)))
+        assertNotEquals(field, Field(mockedContext, 0, 0, others = mapOf(1 to -1, 2 to -1)))
     }
 
     @Test
     fun `Two field are not equals if the contains the same neighboring values but the local id is different`() {
-        assertNotEquals(field, Field(mockedContext, 10, 0, mapOf(1 to 10, 2 to 20)))
+        assertNotEquals(field, Field(mockedContext, 0, 10, others = mapOf(1 to 10, 2 to 20)))
     }
 
     @Test
@@ -133,13 +138,19 @@ class FieldOpsTest {
 
     @Test
     fun `The replaceMatching should return a field with the replaced values`() {
-        assertEquals(Field(mockedContext, 0, 0, mapOf(1 to 42, 2 to 20)), field.replaceMatchingValues(42) { it == 10 })
+        assertEquals(
+            Field(mockedContext, 0, 0, others = mapOf(1 to 42, 2 to 20)),
+            field.replaceMatchingValues(42) {
+                it ==
+                    10
+            },
+        )
     }
 
     @Test
     fun `An empty field should return an empty field when aligned mapped with another empty field`() {
         assertEquals(
-            Field(mockedContext, 0, "no-data", emptyMap()),
+            Field(mockedContext, "no-data", 0, others = emptyMap()),
             emptyField.alignedMap(emptyField) { _, _, _ ->
                 "no-data"
             },
@@ -149,15 +160,15 @@ class FieldOpsTest {
     @Test
     fun `A field should return a field with the mapped values when aligned mapped with another field`() {
         assertEquals(
-            Field(mockedContext, 0, 1, mapOf(1 to 11, 2 to 21, 3 to 16)),
+            Field(mockedContext, 1, 0, others = mapOf(1 to 11, 2 to 21, 3 to 16)),
             fulfilledField.alignedMap(fulfilledCompatibleField) { _, value, other -> value + other },
         )
     }
 
     @Test
     fun `The string representation of a field should contain the local id and the local value and the neighbors`() {
-        assertEquals("ϕ(pointwise: 0=localVal)", emptyField.toString())
-        assertEquals("ϕ(local: 0=0, neighbors: {1=10, 2=20})", field.toString())
-        assertEquals("ϕ(local: 0=0, neighbors: {1=10, 2=20, 3=15})", fulfilledField.toString())
+        assertEquals("ϕ(default: localVal, pointwise: 0=localVal)", emptyField.toString())
+        assertEquals("ϕ(default: 0, local: 0=0, neighbors: {1=10, 2=20})", field.toString())
+        assertEquals("ϕ(default: 0, local: 0=0, neighbors: {1=10, 2=20, 3=15})", fulfilledField.toString())
     }
 }

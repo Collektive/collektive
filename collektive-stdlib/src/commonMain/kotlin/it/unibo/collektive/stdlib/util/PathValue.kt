@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
+ * Copyright (c) 2023-2026, Danilo Pianini, Nicolas Farabegoli, Elisa Tronetti,
  * and all authors listed in the `build.gradle.kts` and the generated `pom.xml` file.
  *
  * This file is part of Collektive, and is distributed under the terms of the Apache License 2.0,
@@ -11,6 +11,8 @@ package it.unibo.collektive.stdlib.util
 import it.unibo.collektive.aggregate.Field
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.DelicateCollektiveApi
+import it.unibo.collektive.aggregate.api.field.alignedMap
+import it.unibo.collektive.aggregate.api.field.alignedMapValues
 import it.unibo.collektive.aggregate.ids
 import it.unibo.collektive.aggregate.toMap
 import it.unibo.collektive.aggregate.values
@@ -21,7 +23,6 @@ import kotlinx.serialization.Serializable
 
 /**
  * Filters the input sequence of paths to retain only those that satisfy the coherence criterion.
- * Path coherence ensures that paths containing inconsistent information are removed.
  * Specifically, if a path passes through two nodes in a certain order and another path
  * passes through the same nodes in the reverse order, only the shortest path is retained unless
  * their lengths are identical (indicating a symmetric network).
@@ -32,11 +33,16 @@ import kotlinx.serialization.Serializable
  */
 @OptIn(DelicateCollektiveApi::class)
 @PublishedApi
-internal inline fun <reified Distance : Comparable<Distance>, reified ID : Any, reified Value> pathCoherence(
-    nonLoopingPaths: Sequence<PathValue<ID, Value, Distance>>,
-): Sequence<PathValue<ID, Value, Distance>> {
-    val pathsHopSets = nonLoopingPaths.associate { it.nextHop to it.hops.toSet() }
-    return nonLoopingPaths.filter { reference ->
+internal inline fun <
+    reified Distance,
+    reified ID,
+    reified Value,
+    > Sequence<PathValue<ID, Value, Distance>>.filterPathsTraversingOppositeDirections(): Sequence<
+    PathValue<ID, Value, Distance>,
+    >
+where Distance : Comparable<Distance>, ID : Any {
+    val pathsHopSets = associate { it.nextHop to it.hops.toSet() }
+    return filter { reference ->
         /*
          * Path-coherence: paths that contain inconsistent information must be removed.
          * In particular, if some path passes through A and then B, and another reaches the source
@@ -44,15 +50,14 @@ internal inline fun <reified Distance : Comparable<Distance>, reified ID : Any, 
          * (unless they have the same path-length, namely the network is symmetric).
          */
         val refSize = reference.length
-        refSize <= 1 ||
-            nonLoopingPaths.all { other ->
-                // the current reference is shorter
-                other.length > refSize ||
-                    // same hop count, same distance (symmetric network or same path)
-                    (other.length == refSize && other.distance == reference.distance) ||
-                    // all common hops appear in the same order
-                    reference.allCommonHopsAppearInTheSameOrderOf(other, pathsHopSets)
-            }
+        refSize <= 1 || all { other ->
+            // the current reference is shorter
+            other.length > refSize ||
+                // same hop count, same distance (symmetric network or same path)
+                (other.length == refSize && other.distance == reference.distance) ||
+                // all common hops appear in the same order
+                reference.allCommonHopsAppearInTheSameOrderOf(other, pathsHopSets)
+        }
     }
 }
 
@@ -72,7 +77,7 @@ internal inline fun <reified Distance : Comparable<Distance>, reified ID : Any, 
  */
 @OptIn(DelicateCollektiveApi::class)
 @PublishedApi
-internal inline fun <reified Distance, reified ID, reified Value> Aggregate<ID>.nonLoopingPaths(
+internal inline fun <reified Distance, reified ID, reified Value> Aggregate<ID>.sortedNonLoopingPaths(
     neighborData: Field<ID, PathValue<ID, Value, Distance>?>,
     coercedMetric: Field<ID, Distance>,
     maxDiameter: Int,
@@ -82,18 +87,24 @@ internal inline fun <reified Distance, reified ID, reified Value> Aggregate<ID>.
     crossinline accumulateDistance: Reducer<Distance>,
 ): Sequence<PathValue<ID, Value, Distance>>
 where Distance : Comparable<Distance>, ID : Any {
+    check(neighborData.default == null) {
+        "Invalid neighbor data in nonLoopingPaths, the field default must be null, got: $neighborData"
+    }
     val neighbors = neighborData.neighbors.ids.set
-    val accDistances =
-        neighborData.alignedMapValues(coercedMetric) { path, distance ->
-            path?.distance?.let { accumulateDistance(it, distance) }
-        }
+    val accDistances = neighborData.alignedMapValues(coercedMetric) { path, distance ->
+        path?.distance?.let { accumulateDistance(it, distance) }
+    }
     val neighborAccumulatedDistances = accDistances.neighbors.toMap()
     return neighborData.alignedMap(accDistances, coercedMetric) { id, path, accDist, distance ->
         path?.takeUnless { id == localId }
             ?.takeUnless { path.length > maxDiameter }
             ?.takeUnless { localId in path.hops }
             ?.takeUnless { path.isInvalidViaShortcut(accDist, neighbors, neighborAccumulatedDistances) }
-            ?.run { accDist to lazy { update(id, distance, bottom, top, accumulateDistance, accumulateData) } }
+            ?.run {
+                accDist to lazy {
+                    update(checkNotNull(id), distance, bottom, top, accumulateDistance, accumulateData)
+                }
+            }
     }.neighbors.values.sequence.filterNotNull().sortedBy { it.first }.map { it.second.value }
 }
 
@@ -153,7 +164,6 @@ data class PathValue<ID : Any, Value, Distance : Comparable<Distance>>(
      * @param accumulateData Function to update the carried data when crossing the edge.
      * @return A new [PathValue] including the neighbor hop, updated distance, and data.
      */
-    @OptIn(DelicateCollektiveApi::class)
     inline fun update(
         neighbor: ID,
         distanceToNeighbor: Distance,
@@ -173,15 +183,13 @@ data class PathValue<ID : Any, Value, Distance : Comparable<Distance>>(
     // Check if the path is invalid because there is a shortcut through an intermediate neighboring hop
     @PublishedApi
     internal fun isInvalidViaShortcut(
-        accDist: Distance?,
+        accumulatedDistance: Distance?,
         neighbors: Set<ID>,
         neighborAccumulatedDistances: Map<ID, Distance?>,
-    ): Boolean = accDist != null &&
-        hops
-            .asSequence()
-            .filter { it in neighbors }
-            .map { neighborAccumulatedDistances[it] }
-            .any { it == null || it < accDist }
+    ): Boolean = accumulatedDistance != null && hops.asSequence()
+        .filter { it in neighbors }
+        .map { neighborAccumulatedDistances[it] }
+        .any { it == null || it < accumulatedDistance }
 
     // Check if all hops that appear in both paths have the same order
     @PublishedApi

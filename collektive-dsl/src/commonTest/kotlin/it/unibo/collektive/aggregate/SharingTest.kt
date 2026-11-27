@@ -46,7 +46,7 @@ class SharingTest {
     @Test
     fun `first time sharing`() = forEachPerformanceProfile { profile ->
         aggregate(0, performanceProfile = profile) {
-            val result = share(1, findMax)
+            val result = share(1, body = findMax)
             assertEquals(1, result)
         }
     }
@@ -56,8 +56,8 @@ class SharingTest {
         val size = 5
         val environment =
             mooreGridWithProgram(size, profile) { _ ->
-                val maxValue = share(localId, findMax)
-                val minValue = share(localId, findMin)
+                val maxValue = share(localId, body = findMax)
+                val minValue = share(localId, body = findMin)
                 maxValue to minValue
             }
         repeat(size) {
