@@ -1,3 +1,17 @@
+## [31.0.0](https://github.com/Collektive/collektive/compare/30.0.1...31.0.0) (2026-11-27)
+
+### ⚠ BREAKING CHANGES
+
+* **dsl:** add default in fields and core operators (#1700)
+
+### Features
+
+* **dsl:** add default in fields and core operators ([#1700](https://github.com/Collektive/collektive/issues/1700)) ([279e4ef](https://github.com/Collektive/collektive/commit/279e4ef53b831d15dc6ea4a9e236af95d517194a))
+
+### Dependency updates
+
+* **deps:** update gradle to v9.9.3 ([d67ed85](https://github.com/Collektive/collektive/commit/d67ed859f5fa0befd659d6e935f95b39b1dfd659))
+
 ## [30.0.1](https://github.com/Collektive/collektive/compare/30.0.0...30.0.1) (2026-11-27)
 
 ### Dependency updates
