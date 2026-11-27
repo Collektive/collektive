@@ -1,3 +1,32 @@
+## [30.0.1](https://github.com/Collektive/collektive/compare/30.0.0...30.0.1) (2026-11-27)
+
+### Dependency updates
+
+* **core-deps:** update dependency org.jetbrains.kotlinx:kotlinx-collections-immutable to v0.5.2 ([28213b8](https://github.com/Collektive/collektive/commit/28213b8a5f4e87c3d532a677478db788e8da41be))
+* **deps:** update alchemist to v50.0.6 ([bef0717](https://github.com/Collektive/collektive/commit/bef0717df70a8b4f147f40610ac76f3600e001e3))
+* **deps:** update alchemist to v50.0.7 ([abf845a](https://github.com/Collektive/collektive/commit/abf845ac82d0e75eab929ff16184148e3e7ccd38))
+* **deps:** update alchemist to v50.0.8 ([318827c](https://github.com/Collektive/collektive/commit/318827cdb7db736dc2dcbabba5ad3a00ebec4a1f))
+* **deps:** update dependency io.arrow-kt:arrow-core to v2.3.0.1 ([fd7d2c2](https://github.com/Collektive/collektive/commit/fd7d2c218ef37060d6355607e53ccd610eca137e))
+* **deps:** update dependency org.danilopianini:noncrypto-hash-kt to v1.2.1 ([72cae1b](https://github.com/Collektive/collektive/commit/72cae1b3ee1aab112bdc951342707b9df8d75183))
+* **deps:** update dependency react-router-dom to v7.18.6 ([5e74edc](https://github.com/Collektive/collektive/commit/5e74edca2857b66ddb56c4d92eac32896de18b62))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.159 ([8633a03](https://github.com/Collektive/collektive/commit/8633a03dc7daa9da544dda7953c03d3b37a7fcf9))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.160 ([3e6588d](https://github.com/Collektive/collektive/commit/3e6588d2d16c8ba65658528a39eaf1587872eb7e))
+* **deps:** update gradle to v9.9.2 ([a3b03e6](https://github.com/Collektive/collektive/commit/a3b03e6a044de70c05ba1fae1dc66bedac3a5dfc))
+* **deps:** update plugin publishoncentral to v9.3.3 ([5c402fb](https://github.com/Collektive/collektive/commit/5c402fb1557c5a98e8420d06f48b29438102ddd4))
+
+### Bug Fixes
+
+* remove deprecated calls ([67c7b19](https://github.com/Collektive/collektive/commit/67c7b196f113e055b7a95dc49f1be09a4408343a))
+
+### Tests
+
+* use assert instead of check in tests ([838e903](https://github.com/Collektive/collektive/commit/838e903a0655f155a22b6118f2d2f5eb9d3f2a65))
+
+### Build and continuous integration
+
+* **deps:** update github/codeql-action action to v4.39.4 ([46a9691](https://github.com/Collektive/collektive/commit/46a9691f228f37ebf0960d2f9c3badabcf598e35))
+* **deps:** update github/codeql-action action to v4.39.5 ([3d33453](https://github.com/Collektive/collektive/commit/3d33453878b63a90a49f28b7d281964840667552))
+
 ## [30.0.0](https://github.com/Collektive/collektive/compare/29.0.0...30.0.0) (2026-11-18)
 
 ### ⚠ BREAKING CHANGES
